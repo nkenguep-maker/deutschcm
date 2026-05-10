@@ -13,6 +13,7 @@
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "latest",
     "@remotion/player": "^4.0.459",
+    "remotion": "^4.0.459",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "latest",
     "@types/pg": "^8.20.0",
