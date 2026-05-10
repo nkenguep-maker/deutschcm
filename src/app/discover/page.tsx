@@ -1,0 +1,1020 @@
+"use client";
+
+import { useState, useEffect, useRef, useMemo } from "react";
+import Link from "next/link";
+import Layout from "@/components/Layout";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface ClassItem {
+  id: string; teacherName: string; teacherAvatar: string; verified: boolean;
+  level: string; city: string; center: string; students: number; max: number;
+  schedule: string; nextSession: string; description: string; tags: string[];
+  rating: number; reviews: number; code: string; isOnline?: boolean; lastActive: string;
+}
+interface CenterItem {
+  id: string; name: string; city: string; region: string; avatar: string;
+  verified: boolean; plan: string; teachers: number; students: number;
+  classes: number; languages: string[]; code: string; successRate: number; yearsActive: number;
+}
+interface GroupItem {
+  id: string; name: string; creatorName: string; creatorAvatar: string;
+  level: string; city: string; members: number; max: number;
+  goal: string; schedule: string; description: string; tags: string[];
+  lastActive: string; memberAvatars: string[];
+}
+interface SoloItem {
+  id: string; name: string; avatar: string; level: string; targetLevel: string;
+  city: string; goal: string; availability: string; desc: string;
+}
+interface Filters {
+  levels: string[]; cities: string[]; availability: string[];
+  spotsOnly: boolean; verifiedOnly: boolean;
+}
+
+// ─── Mock data ────────────────────────────────────────────────────────────────
+
+const CLASSES: ClassItem[] = [
+  { id: "cls1", teacherName: "Prof. Marie Tchamba", teacherAvatar: "MT", verified: true, level: "A1", city: "Yaoundé", center: "Institut Lingua Plus", students: 12, max: 20, schedule: "Lun/Mer 18h–20h", nextSession: "Lundi 19 mai 18h", description: "Cours pour grands débutants — accent sur l'oral et la phonétique. Méthode Netzwerk A1.", tags: ["Débutant", "Oral", "Goethe"], rating: 4.9, reviews: 28, code: "DEUTSCH-A1-2024", lastActive: "il y a 2h" },
+  { id: "cls2", teacherName: "Prof. Jean Mbarga", teacherAvatar: "JB", verified: true, level: "A2", city: "Douala", center: "Goethe Center CM", students: 8, max: 15, schedule: "Mar/Jeu 14h–16h", nextSession: "Mardi 20 mai 14h", description: "Préparation Goethe A2 avec focus sur la compréhension orale et écrite.", tags: ["A2", "TELC", "Prépa"], rating: 4.7, reviews: 19, code: "LINGUA-A2-0512", lastActive: "il y a 5h" },
+  { id: "cls3", teacherName: "Prof. Alice Ngo", teacherAvatar: "AN", verified: true, level: "B1", city: "Bafoussam", center: "LangSchool Bafoussam", students: 14, max: 15, schedule: "Ven 10h–12h", nextSession: "Vendredi 16 mai 10h", description: "Classe B1 intensive — grammaire avancée, expression écrite, simulation d'examens Goethe.", tags: ["B1", "Avancé", "Intensif"], rating: 4.8, reviews: 34, code: "LANG-B1-NGO1", lastActive: "il y a 1h" },
+  { id: "cls4", teacherName: "Prof. Samuel Foto", teacherAvatar: "SF", verified: true, level: "B2", city: "Yaoundé", center: "Institut Lingua Plus", students: 5, max: 10, schedule: "Mer/Sam 9h–11h", nextSession: "Mercredi 21 mai 9h", description: "B2 avancé — préparation TestDaF et études en Allemagne. Vocabulaire académique.", tags: ["B2", "TestDaF", "Académique"], rating: 5.0, reviews: 12, code: "GOETHE-B2-SAM1", lastActive: "il y a 30min" },
+  { id: "cls5", teacherName: "Prof. Christine Bello", teacherAvatar: "CB", verified: false, level: "A1", city: "Douala", center: "DeutschAkademie Garoua", students: 10, max: 12, schedule: "Lun/Mer/Ven 16h–17h", nextSession: "Lundi 19 mai 16h", description: "Allemand pour enfants (8–12 ans) — jeux, chansons, histoire. Pédagogie ludique.", tags: ["Enfants", "Ludique", "A1"], rating: 4.6, reviews: 22, code: "BELL-A1-KID5", lastActive: "il y a 3h" },
+  { id: "cls6", teacherName: "Prof. David Kamga", teacherAvatar: "DK", verified: true, level: "C1", city: "En ligne", center: "Cours particuliers", students: 6, max: 8, schedule: "Sam/Dim 10h–12h", nextSession: "Samedi 17 mai 10h", description: "Conversation niveau C1 — débats, actualités, culture allemande. 100% en ligne.", tags: ["C1", "Conversation", "En ligne"], rating: 4.9, reviews: 41, code: "KAMG-C1-CONV", isOnline: true, lastActive: "il y a 15min" },
+  { id: "cls7", teacherName: "Prof. Fatima Oumar", teacherAvatar: "FO", verified: false, level: "A2", city: "Garoua", center: "DeutschAkademie Garoua", students: 3, max: 15, schedule: "Mar/Jeu 8h–10h", nextSession: "Mardi 20 mai 8h", description: "A2 adultes — vocabulaire professionnel, voyage, administration. Rythme progressif.", tags: ["A2", "Adultes", "Professionnel"], rating: 4.5, reviews: 7, code: "OUMA-A2-GAR7", lastActive: "il y a 1j" },
+  { id: "cls8", teacherName: "Prof. Robert Essama", teacherAvatar: "RE", verified: true, level: "B1", city: "Yaoundé", center: "Institut Lingua Plus", students: 7, max: 10, schedule: "Lun/Jeu 17h–19h", nextSession: "Jeudi 22 mai 17h", description: "Prépa TestDaF B1 — lecture, écriture, écoute. Taux de réussite 89%.", tags: ["B1", "TestDaF", "Goethe"], rating: 4.8, reviews: 16, code: "ESSA-B1-TDF8", lastActive: "il y a 4h" },
+];
+
+const CENTERS: CenterItem[] = [
+  { id: "ctr1", name: "Institut Lingua Plus", city: "Yaoundé", region: "Centre", avatar: "LP", verified: true, plan: "pro", teachers: 8, students: 245, classes: 12, languages: ["🇩🇪", "🇬🇧", "🇪🇸"], code: "CENTRE-LINGUA", successRate: 87, yearsActive: 6 },
+  { id: "ctr2", name: "Goethe Center CM", city: "Douala", region: "Littoral", avatar: "GC", verified: true, plan: "enterprise", teachers: 12, students: 380, classes: 18, languages: ["🇩🇪", "🇬🇧"], code: "CENTRE-GOETHE", successRate: 92, yearsActive: 9 },
+  { id: "ctr3", name: "LangSchool Bafoussam", city: "Bafoussam", region: "Ouest", avatar: "LS", verified: false, plan: "starter", teachers: 4, students: 89, classes: 6, languages: ["🇩🇪", "🇫🇷"], code: "CENTRE-LANG01", successRate: 74, yearsActive: 3 },
+  { id: "ctr4", name: "DeutschAkademie Garoua", city: "Garoua", region: "Nord", avatar: "DA", verified: false, plan: "starter", teachers: 3, students: 45, classes: 4, languages: ["🇩🇪"], code: "CENTRE-DEUT04", successRate: 68, yearsActive: 2 },
+];
+
+const GROUPS: GroupItem[] = [
+  { id: "grp1", name: "Prépa Goethe A1 — Juin 2026", creatorName: "Fatima Oumarou", creatorAvatar: "FO", level: "A1", city: "Yaoundé", members: 6, max: 10, goal: "Passer le Goethe A1 en juin 2026", schedule: "Sam 10h–12h", description: "Groupe de révision sérieux — exercices mutuels, quiz hebdo, corrections collectives.", tags: ["A1", "Goethe", "Weekend"], lastActive: "il y a 1h", memberAvatars: ["FO", "AM", "CB", "PK", "RN", "SK"] },
+  { id: "grp2", name: "Révision B1 Douala", creatorName: "Alice Fotso", creatorAvatar: "AF", level: "B1", city: "Douala", members: 4, max: 10, goal: "B1 pour visa étudiant — sept 2026", schedule: "Mar/Jeu soir 20h", description: "Groupe orienté examens — simulations d'épreuves, corrections et feedback entre membres.", tags: ["B1", "Visa", "Intensif"], lastActive: "il y a 3h", memberAvatars: ["AF", "JM", "CB", "PL"] },
+  { id: "grp3", name: "Visa Allemagne 2026", creatorName: "Samuel Biya", creatorAvatar: "SB", level: "A2", city: "Yaoundé", members: 8, max: 10, goal: "Dossier visa Allemagne — automne 2026", schedule: "Lun/Ven 19h–20h", description: "Focus sur le vocabulaire administratif, les lettres de motivation et l'entretien consulaire.", tags: ["A2", "Visa", "Ambassade"], lastActive: "il y a 30min", memberAvatars: ["SB", "AM", "FK", "PO", "RN", "CB", "JM", "LT"] },
+  { id: "grp4", name: "Conversation A2 Weekend", creatorName: "Paul Ondoa", creatorAvatar: "PO", level: "A2", city: "Douala", members: 3, max: 10, goal: "Fluidité orale — objectif B1 en 6 mois", schedule: "Dim 15h–16h30", description: "Sessions de conversation libres — thèmes du quotidien, actualités légères, échanges culturels.", tags: ["A2", "Conversation", "Weekend"], lastActive: "il y a 2j", memberAvatars: ["PO", "KN", "AF"] },
+];
+
+const SOLOS: SoloItem[] = [
+  { id: "sol1", name: "Amina K.", avatar: "AK", level: "A1", targetLevel: "A2", city: "Yaoundé", goal: "Goethe A1 — juin 2026", availability: "Soirs et weekends", desc: "Infirmière, motive et sérieuse. Cherche groupe A1 structuré avec prof ou tuteur." },
+  { id: "sol2", name: "Boris T.", avatar: "BT", level: "A2", targetLevel: "B1", city: "Douala", goal: "Voyage/stage en Allemagne", availability: "Weekends uniquement", desc: "A2 acquis seul en 4 mois. Cherche groupe pour pratiquer l'oral avant un stage à Hamburg." },
+  { id: "sol3", name: "Claire N.", avatar: "CN", level: "A1", targetLevel: "A1", city: "Bafoussam", goal: "Découverte culturelle", availability: "Flexible", desc: "Débutante complète passionnée de culture germanique. Cherche groupe bienveillant et patient." },
+  { id: "sol4", name: "Didier F.", avatar: "DF", level: "B1", targetLevel: "B2", city: "Yaoundé", goal: "Visa étudiant — master en Allemagne", availability: "Matin 8h–12h et soirs", desc: "Dossier en cours pour TU Berlin. Cherche partenaire de révision TestDaF niveau B2." },
+];
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const LEVEL_COLORS: Record<string, string> = { A1: "#10b981", A2: "#34d399", B1: "#3b82f6", B2: "#8b5cf6", C1: "#f59e0b", C2: "#ef4444" };
+const PLAN_LABEL: Record<string, { label: string; color: string }> = {
+  starter: { label: "Starter", color: "#64748b" },
+  pro: { label: "Pro", color: "#6366f1" },
+  enterprise: { label: "Enterprise", color: "#f59e0b" },
+};
+
+function Av({ initials, size = 38, color = "#10b981" }: { initials: string; size?: number; color?: string }) {
+  return (
+    <div style={{ width: size, height: size, borderRadius: "50%", flexShrink: 0, background: `linear-gradient(135deg, ${color}, ${color}88)`, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: size * 0.36 }}>
+      {initials}
+    </div>
+  );
+}
+
+function LvlBadge({ level }: { level: string }) {
+  const c = LEVEL_COLORS[level] ?? "#64748b";
+  return <span style={{ background: `${c}20`, color: c, border: `1px solid ${c}40`, borderRadius: 7, padding: "2px 8px", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{level}</span>;
+}
+
+function Stars({ rating }: { rating: number }) {
+  return (
+    <span style={{ color: "#fbbf24", fontSize: 11 }}>
+      {"★".repeat(Math.floor(rating))}
+      {rating % 1 >= 0.5 ? "½" : ""}
+      <span style={{ color: "rgba(255,255,255,0.2)" }}>{"★".repeat(5 - Math.ceil(rating))}</span>
+    </span>
+  );
+}
+
+function SpotsBar({ current, max }: { current: number; max: number }) {
+  const pct = (current / max) * 100;
+  const color = pct >= 90 ? "#ef4444" : pct >= 70 ? "#f59e0b" : "#10b981";
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 10, color: "rgba(255,255,255,0.4)" }}>
+        <span>{current}/{max} élèves</span>
+        <span style={{ color: pct >= 90 ? "#ef4444" : "#10b981", fontWeight: 600 }}>{max - current > 0 ? `${max - current} places` : "Complet"}</span>
+      </div>
+      <div style={{ height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 2 }}>
+        <div style={{ width: `${pct}%`, height: "100%", background: color, borderRadius: 2, transition: "width 0.4s" }} />
+      </div>
+    </div>
+  );
+}
+
+// ─── Cameroon Map ─────────────────────────────────────────────────────────────
+
+const MAP_CITIES = [
+  { name: "Yaoundé", x: 82, y: 220, classes: 4 },
+  { name: "Douala", x: 35, y: 215, classes: 3 },
+  { name: "Bafoussam", x: 52, y: 185, classes: 1 },
+  { name: "Garoua", x: 128, y: 95, classes: 1 },
+  { name: "Bamenda", x: 44, y: 172, classes: 0 },
+  { name: "Maroua", x: 148, y: 55, classes: 0 },
+  { name: "En ligne", x: 110, y: 240, classes: 1 },
+];
+
+function CameroonMap({ onCityClick }: { onCityClick: (city: string) => void }) {
+  const [hovered, setHovered] = useState<string | null>(null);
+  return (
+    <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 16, display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, marginBottom: 12 }}>🗺️ Carte du Cameroun — cliquez une ville</div>
+      <svg viewBox="0 0 200 300" width={200} height={300} style={{ overflow: "visible" }}>
+        {/* Cameroon outline — simplified */}
+        <path d="M 30,275 C 40,280 65,285 85,282 L 130,278 C 155,265 175,240 185,210 L 190,175 L 185,145 C 182,120 175,100 165,78 L 152,50 C 140,28 122,10 100,3 L 72,0 C 48,5 25,22 14,50 L 3,82 C 0,108 8,132 12,158 L 16,192 L 22,228 Z"
+          fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.25)" strokeWidth="1.5" />
+
+        {/* City pins */}
+        {MAP_CITIES.map(city => (
+          <g key={city.name} onClick={() => onCityClick(city.name)} style={{ cursor: "pointer" }}
+            onMouseEnter={() => setHovered(city.name)} onMouseLeave={() => setHovered(null)}>
+            <circle cx={city.x} cy={city.y} r={city.classes > 0 ? 7 : 4}
+              fill={city.classes > 0 ? "#10b981" : "rgba(255,255,255,0.2)"}
+              stroke={hovered === city.name ? "white" : city.classes > 0 ? "rgba(16,185,129,0.4)" : "rgba(255,255,255,0.1)"}
+              strokeWidth={hovered === city.name ? 2 : 1} opacity={hovered === city.name ? 1 : 0.85} />
+            {city.classes > 0 && (
+              <text x={city.x} y={city.y + 0.5} textAnchor="middle" dominantBaseline="middle" fill="white" fontSize={7} fontWeight="bold">{city.classes}</text>
+            )}
+            <text x={city.x + 10} y={city.y} dominantBaseline="middle" fill={hovered === city.name ? "white" : "rgba(255,255,255,0.6)"} fontSize={9}>{city.name}</text>
+          </g>
+        ))}
+      </svg>
+      <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 10, color: "rgba(255,255,255,0.35)" }}>
+        <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", display: "inline-block" }} /> Classes disponibles</span>
+        <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "inline-block" }} /> Ville</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Code Section ─────────────────────────────────────────────────────────────
+
+interface LookupResult { found: boolean; type?: "teacher" | "classroom"; teacher?: { user: { fullName: string; city: string | null }; classrooms: { id: string; name: string; level: string; maxStudents: number; _count: { enrollments: number } }[] }; classroom?: { id: string; name: string; level: string; maxStudents: number; _count: { enrollments: number }; teacher: { user: { fullName: string } } } }
+
+function CodeSection({ onJoin }: { onJoin: (id: string, name: string, teacherName?: string) => void }) {
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<LookupResult | null>(null);
+  const [joined, setJoined] = useState<Set<string>>(new Set());
+  const [history, setHistory] = useState<string[]>([]);
+  const [scanning, setScanning] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("codeHistory");
+    if (saved) setHistory(JSON.parse(saved));
+  }, []);
+
+  const lookup = async (c?: string) => {
+    const trimmed = (c ?? code).trim().toUpperCase();
+    if (!trimmed) return;
+    setLoading(true); setResult(null); setScanning(true);
+    setTimeout(() => setScanning(false), 800);
+    try {
+      const r = await fetch(`/api/social?action=lookup-code&code=${encodeURIComponent(trimmed)}`);
+      const d = await r.json();
+      setResult(d);
+      if (d.found) {
+        const newHistory = [trimmed, ...history.filter(h => h !== trimmed)].slice(0, 3);
+        setHistory(newHistory);
+        localStorage.setItem("codeHistory", JSON.stringify(newHistory));
+      }
+    } finally { setLoading(false); }
+  };
+
+  const accentColor = "#10b981";
+  const isValid = code.trim().length >= 4;
+  const hasResult = result !== null;
+
+  return (
+    <div style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.08), rgba(5,150,105,0.03))", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 20, padding: "20px 22px", marginBottom: 28 }}>
+      <div style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 14 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>🔑</div>
+        <div>
+          <div style={{ color: "white", fontWeight: 700, fontSize: 14, marginBottom: 2 }}>Rejoindre par code</div>
+          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>Code enseignant <code style={{ color: accentColor }}>TCH-XXXXXX</code> ou code de classe</div>
+        </div>
+      </div>
+
+      {/* Input */}
+      <div style={{ display: "flex", gap: 10, marginBottom: hasResult || history.length > 0 ? 12 : 0 }}>
+        <div style={{ flex: 1, position: "relative" }}>
+          <input
+            value={code}
+            onChange={e => { setCode(e.target.value.toUpperCase()); setResult(null); }}
+            onKeyDown={e => e.key === "Enter" && isValid && lookup()}
+            placeholder="TCH-AB3KP2 ou DEUTSCH-A1-2024"
+            style={{
+              width: "100%", padding: "11px 14px", borderRadius: 12, boxSizing: "border-box",
+              background: "rgba(255,255,255,0.06)", fontSize: 13, outline: "none", fontFamily: "monospace", letterSpacing: "0.05em",
+              border: `1px solid ${hasResult ? (result?.found ? "rgba(16,185,129,0.5)" : "rgba(239,68,68,0.5)") : scanning ? "rgba(16,185,129,0.6)" : "rgba(255,255,255,0.12)"}`,
+              color: "white", transition: "border-color 0.2s",
+              boxShadow: scanning ? `0 0 12px rgba(16,185,129,0.3)` : "none",
+            }}
+          />
+          {scanning && <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", width: 8, height: 8, borderRadius: "50%", background: accentColor, animation: "pulse 0.8s infinite" }} />}
+        </div>
+        <button onClick={() => lookup()} disabled={!isValid || loading} style={{
+          padding: "11px 20px", borderRadius: 12, fontSize: 13, fontWeight: 700, cursor: isValid ? "pointer" : "not-allowed",
+          background: isValid ? `linear-gradient(135deg, ${accentColor}, #059669)` : "rgba(255,255,255,0.05)",
+          color: isValid ? "white" : "rgba(255,255,255,0.3)", border: "none", opacity: loading ? 0.7 : 1,
+          boxShadow: isValid ? `0 4px 14px ${accentColor}40` : "none",
+        }}>
+          {loading ? "..." : "Rechercher →"}
+        </button>
+      </div>
+
+      {/* History */}
+      {!hasResult && history.length > 0 && (
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11 }}>Récents :</span>
+          {history.map(h => (
+            <button key={h} onClick={() => { setCode(h); lookup(h); }} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, padding: "2px 10px", fontSize: 11, color: "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "monospace" }}>
+              {h}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Results */}
+      {hasResult && !result?.found && (
+        <div style={{ color: "#ef4444", fontSize: 12, display: "flex", gap: 6, alignItems: "center" }}>
+          <span>❌</span> Code introuvable. Vérifiez l&apos;orthographe et réessayez.
+        </div>
+      )}
+
+      {result?.found && result.type === "teacher" && result.teacher && (
+        <div style={{ marginTop: 4 }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 10 }}>
+            <Av initials={result.teacher.user.fullName.split(" ").map(w => w[0]).join("").slice(0, 2)} size={36} color="#6366f1" />
+            <div>
+              <div style={{ color: "white", fontWeight: 700, fontSize: 13 }}>{result.teacher.user.fullName} ✅</div>
+              <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>📍 {result.teacher.user.city ?? "Cameroun"} · {result.teacher.classrooms.length} classe(s)</div>
+            </div>
+          </div>
+          {result.teacher.classrooms.map(cls => {
+            const spots = cls.maxStudents - cls._count.enrollments;
+            const done = joined.has(cls.id);
+            return (
+              <div key={cls.id} style={{ display: "flex", gap: 10, alignItems: "center", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "9px 12px", marginBottom: 6 }}>
+                <LvlBadge level={cls.level} />
+                <span style={{ flex: 1, color: "rgba(255,255,255,0.75)", fontSize: 12 }}>{cls.name}</span>
+                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>{spots > 0 ? `${spots} pl.` : "Complet"}</span>
+                <button onClick={() => { setJoined(s => new Set([...s, cls.id])); onJoin(cls.id, cls.name, result.teacher!.user.fullName); }} disabled={done || spots <= 0} style={{ padding: "5px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: (!done && spots > 0) ? "pointer" : "default", background: done ? `${accentColor}15` : `${accentColor}20`, border: `1px solid ${accentColor}40`, color: done ? accentColor : accentColor }}>
+                  {done ? "✓ Envoyé" : spots <= 0 ? "Complet" : "Rejoindre"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {result?.found && result.type === "classroom" && result.classroom && (() => {
+        const cls = result.classroom!;
+        const spots = cls.maxStudents - cls._count.enrollments;
+        const done = joined.has(cls.id);
+        return (
+          <div style={{ display: "flex", gap: 10, alignItems: "center", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 14px", marginTop: 4 }}>
+            <LvlBadge level={cls.level} />
+            <div style={{ flex: 1 }}>
+              <div style={{ color: "white", fontWeight: 700, fontSize: 13 }}>{cls.name}</div>
+              <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>Prof. {cls.teacher.user.fullName} · {spots > 0 ? `${spots} places` : "Complet"}</div>
+            </div>
+            <button onClick={() => { setJoined(s => new Set([...s, cls.id])); onJoin(cls.id, cls.name, cls.teacher.user.fullName); }} disabled={done || spots <= 0} style={{ padding: "8px 16px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: (!done && spots > 0) ? "pointer" : "default", background: done ? `${accentColor}15` : `linear-gradient(135deg, ${accentColor}, #059669)`, border: done ? `1px solid ${accentColor}40` : "none", color: done ? accentColor : "white" }}>
+              {done ? "✓ Envoyé" : spots <= 0 ? "Complet" : "Rejoindre cette classe"}
+            </button>
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+// ─── Onboarding tooltip ───────────────────────────────────────────────────────
+
+function OnboardingOverlay({ onClose }: { onClose: () => void }) {
+  const [step, setStep] = useState(0);
+  const steps = [
+    { icon: "🔑", title: "Vous avez un code ?", desc: "Entrez votre code enseignant (TCH-XXXXXX) ou code de classe en haut pour rejoindre directement." },
+    { icon: "🔍", title: "Ou recherchez", desc: "Utilisez la barre de recherche et les filtres pour trouver une classe par niveau, ville ou institut." },
+    { icon: "📩", title: "Rejoignez en 1 clic", desc: "Cliquez sur Rejoindre sur n'importe quelle carte. Votre profil sera envoyé automatiquement." },
+  ];
+  const current = steps[step];
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 1500, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div style={{ background: "#0d1117", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 24, padding: "32px 28px", maxWidth: 400, width: "100%", textAlign: "center" }}>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>{current.icon}</div>
+        <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 20 }}>
+          {steps.map((_, i) => <div key={i} style={{ width: i === step ? 20 : 6, height: 6, borderRadius: 3, background: i === step ? "#10b981" : "rgba(255,255,255,0.15)", transition: "width 0.3s" }} />)}
+        </div>
+        <h3 style={{ color: "white", fontSize: 18, fontWeight: 800, margin: "0 0 10px" }}>{current.title}</h3>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>{current.desc}</p>
+        <div style={{ display: "flex", gap: 10 }}>
+          {step < steps.length - 1 ? (
+            <>
+              <button onClick={onClose} style={{ flex: 1, padding: "11px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)", fontSize: 13, cursor: "pointer" }}>Passer</button>
+              <button onClick={() => setStep(s => s + 1)} style={{ flex: 2, padding: "11px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", color: "white", border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Suivant →</button>
+            </>
+          ) : (
+            <button onClick={onClose} style={{ width: "100%", padding: "12px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", color: "white", border: "none", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>J&apos;ai compris ! 🚀</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Filter sidebar ───────────────────────────────────────────────────────────
+
+const CITIES_LIST = ["Yaoundé", "Douala", "Bafoussam", "Garoua", "Bamenda", "Maroua", "Ngaoundéré", "En ligne"];
+const LEVELS_LIST = ["A1", "A2", "B1", "B2", "C1"];
+const AVAIL_LIST = ["Matin", "Après-midi", "Soir", "Weekend"];
+
+function FilterSidebar({ filters, onChange, onReset, count }: { filters: Filters; onChange: (f: Filters) => void; onReset: () => void; count: number }) {
+  const toggle = (key: keyof Pick<Filters, "levels" | "cities" | "availability">, val: string) => {
+    const arr = filters[key];
+    onChange({ ...filters, [key]: arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val] });
+  };
+
+  const Chip = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
+    <button onClick={onClick} style={{ padding: "5px 10px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", background: active ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)", border: active ? "1px solid rgba(16,185,129,0.4)" : "1px solid rgba(255,255,255,0.07)", color: active ? "#10b981" : "rgba(255,255,255,0.45)", transition: "all 0.15s" }}>
+      {label}
+    </button>
+  );
+
+  return (
+    <div style={{ width: 220, flexShrink: 0, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 16, height: "fit-content", position: "sticky", top: 140 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>🎚️ Filtres</span>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <span style={{ background: "rgba(16,185,129,0.15)", color: "#10b981", borderRadius: 8, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{count} résultats</span>
+          <button onClick={onReset} style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, background: "none", border: "none", cursor: "pointer" }}>Reset</button>
+        </div>
+      </div>
+
+      {[
+        { label: "Niveau", key: "levels" as const, items: LEVELS_LIST },
+        { label: "Ville", key: "cities" as const, items: CITIES_LIST },
+        { label: "Disponibilité", key: "availability" as const, items: AVAIL_LIST },
+      ].map(section => (
+        <div key={section.key} style={{ marginBottom: 16 }}>
+          <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{section.label}</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+            {section.items.map(item => (
+              <Chip key={item} label={item} active={filters[section.key].includes(item)} onClick={() => toggle(section.key, item)} />
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+        {[
+          { key: "spotsOnly", label: "Places disponibles uniquement" },
+          { key: "verifiedOnly", label: "Centres vérifiés uniquement" },
+        ].map(opt => (
+          <label key={opt.key} style={{ display: "flex", gap: 8, alignItems: "center", cursor: "pointer" }}>
+            <div onClick={() => onChange({ ...filters, [opt.key]: !filters[opt.key as keyof Filters] })} style={{ width: 16, height: 16, borderRadius: 4, border: "1px solid rgba(255,255,255,0.2)", background: filters[opt.key as keyof Filters] ? "#10b981" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+              {filters[opt.key as keyof Filters] && <span style={{ color: "white", fontSize: 10 }}>✓</span>}
+            </div>
+            <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 11 }}>{opt.label}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Class Card ───────────────────────────────────────────────────────────────
+
+function ClassCard({ cls, recommended, onJoin, faved, onFav, sent }: { cls: ClassItem; recommended?: boolean; onJoin: (id: string, name: string, teacher: string) => void; faved: boolean; onFav: (id: string) => void; sent?: boolean }) {
+  const [hovered, setHovered] = useState(false);
+  const [waitlisted, setWaitlisted] = useState(false);
+  const isFull = cls.students >= cls.max;
+  const lc = LEVEL_COLORS[cls.level] ?? "#10b981";
+
+  const share = () => {
+    const url = `${window.location.origin}/discover/class/${cls.id}`;
+    navigator.clipboard.writeText(url).catch(() => {});
+    const wa = `https://wa.me/?text=${encodeURIComponent(`Rejoins cette classe d'allemand : ${cls.teacherName} (${cls.level}) — ${url}`)}`;
+    window.open(wa, "_blank");
+  };
+
+  return (
+    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{
+      background: "rgba(255,255,255,0.03)", border: `1px solid ${hovered ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.08)"}`,
+      borderRadius: 18, padding: 18, display: "flex", flexDirection: "column", gap: 12,
+      transform: hovered ? "translateY(-3px)" : "translateY(0)",
+      boxShadow: hovered ? "0 12px 40px rgba(0,0,0,0.3)" : "none",
+      transition: "all 0.25s ease", position: "relative",
+    }}>
+      {recommended && <div style={{ position: "absolute", top: -8, left: 16, background: "#f59e0b", color: "#000", fontSize: 10, fontWeight: 800, padding: "2px 10px", borderRadius: 99, letterSpacing: "0.05em" }}>⭐ RECOMMANDÉ</div>}
+
+      <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+        <Av initials={cls.teacherAvatar} size={44} color="#6366f1" />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", marginBottom: 2 }}>
+            <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{cls.teacherName}</span>
+            {cls.verified && <span title="Vérifié" style={{ fontSize: 12 }}>✅</span>}
+            {cls.isOnline && <span style={{ background: "rgba(99,102,241,0.15)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 10 }}>🌐 En ligne</span>}
+          </div>
+          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>🏛️ {cls.center} · 📍 {cls.city}</div>
+        </div>
+        <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
+          <LvlBadge level={cls.level} />
+          <button onClick={() => onFav(cls.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, lineHeight: 1, opacity: faved ? 1 : 0.3, transition: "opacity 0.2s" }} title="Ajouter aux favoris">
+            {faved ? "❤️" : "🤍"}
+          </button>
+        </div>
+      </div>
+
+      <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: 12, lineHeight: 1.6 }}>{cls.description}</p>
+
+      <SpotsBar current={cls.students} max={cls.max} />
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+        <div>📅 {cls.schedule}</div>
+        <div style={{ color: "#10b981" }}>⏭ {cls.nextSession}</div>
+        <div style={{ display: "flex", gap: 4, alignItems: "center" }}><Stars rating={cls.rating} /> <span>{cls.rating} ({cls.reviews})</span></div>
+        <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 10 }}>🕐 Actif {cls.lastActive}</div>
+      </div>
+
+      <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+        {cls.tags.map(t => <span key={t} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 5, padding: "1px 7px", fontSize: 10, color: "rgba(255,255,255,0.4)" }}>#{t}</span>)}
+      </div>
+
+      <div style={{ display: "flex", gap: 8 }}>
+        <Link href={`/discover/class/${cls.id}`} style={{ flex: 1, textAlign: "center", padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 600, textDecoration: "none", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.7)" }}>
+          👁 Programme
+        </Link>
+        {isFull ? (
+          <button onClick={() => setWaitlisted(true)} style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 11, fontWeight: 700, cursor: waitlisted ? "default" : "pointer", background: waitlisted ? "rgba(239,68,68,0.08)" : "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", color: waitlisted ? "rgba(255,255,255,0.4)" : "#f87171" }}>
+            {waitlisted ? "✓ Liste d'attente" : "🔴 Liste d'attente"}
+          </button>
+        ) : sent ? (
+          <button disabled style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 11, fontWeight: 700, cursor: "not-allowed", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.3)" }}>
+            ⏳ Demande envoyée
+          </button>
+        ) : (
+          <button onClick={() => onJoin(cls.id, cls.teacherName + " — " + cls.level, cls.teacherName)} style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", background: `linear-gradient(135deg, #10b981, #059669)`, color: "white", border: "none", boxShadow: hovered ? "0 4px 14px rgba(16,185,129,0.5)" : "0 4px 14px rgba(16,185,129,0.3)" }}>
+            📩 Rejoindre
+          </button>
+        )}
+        <button onClick={share} style={{ padding: "9px 10px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)", fontSize: 14, cursor: "pointer" }} title="Partager">
+          ↗
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Center Card ──────────────────────────────────────────────────────────────
+
+function CenterCard({ center, onJoin, faved, onFav, sent }: { center: CenterItem; onJoin: (id: string, name: string) => void; faved: boolean; onFav: (id: string) => void; sent?: boolean }) {
+  const [hovered, setHovered] = useState(false);
+  const plan = PLAN_LABEL[center.plan];
+
+  return (
+    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{
+      background: "rgba(255,255,255,0.03)", border: `1px solid ${hovered ? "rgba(234,179,8,0.3)" : "rgba(255,255,255,0.08)"}`,
+      borderRadius: 18, padding: 18, display: "flex", flexDirection: "column", gap: 12,
+      transform: hovered ? "translateY(-3px)" : "translateY(0)",
+      boxShadow: hovered ? "0 12px 40px rgba(0,0,0,0.3)" : "none",
+      transition: "all 0.25s ease",
+    }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+        <div style={{ width: 48, height: 48, borderRadius: 14, background: "linear-gradient(135deg, rgba(234,179,8,0.2), rgba(234,179,8,0.05))", border: "1px solid rgba(234,179,8,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fbbf24", fontWeight: 800, fontSize: 16, flexShrink: 0 }}>
+          {center.avatar}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", marginBottom: 2 }}>
+            <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{center.name}</span>
+            {center.verified && <span title="Vérifié par DeutschCM" style={{ fontSize: 12 }}>✅</span>}
+          </div>
+          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>📍 {center.city}, {center.region} · {center.yearsActive} ans</div>
+        </div>
+        <div style={{ display: "flex", gap: 5, alignItems: "center", flexShrink: 0 }}>
+          <span style={{ background: `${plan.color}20`, color: plan.color, borderRadius: 6, padding: "2px 7px", fontSize: 10, fontWeight: 700 }}>{plan.label}</span>
+          <button onClick={() => onFav(center.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, opacity: faved ? 1 : 0.3 }}>
+            {faved ? "❤️" : "🤍"}
+          </button>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+        {[{ v: center.teachers, l: "Enseignants" }, { v: center.students, l: "Élèves" }, { v: center.classes, l: "Classes" }].map(s => (
+          <div key={s.l} style={{ textAlign: "center", background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: "8px 4px" }}>
+            <div style={{ color: "#fbbf24", fontWeight: 800, fontSize: 16 }}>{s.v}</div>
+            <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 10 }}>{s.l}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 4 }}>{center.languages.map(l => <span key={l} style={{ fontSize: 18 }}>{l}</span>)}</div>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>Réussite Goethe</div>
+          <div style={{ background: "rgba(16,185,129,0.15)", color: "#10b981", borderRadius: 6, padding: "2px 8px", fontSize: 12, fontWeight: 700 }}>{center.successRate}%</div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 8 }}>
+        <Link href={`/discover/center/${center.id}`} style={{ flex: 1, textAlign: "center", padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 600, textDecoration: "none", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.7)" }}>
+          📋 Voir les classes
+        </Link>
+        {sent ? (
+          <button disabled style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 11, fontWeight: 700, cursor: "not-allowed", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.3)" }}>
+            ⏳ Demande envoyée
+          </button>
+        ) : (
+          <button onClick={() => onJoin(center.id, center.name)} style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg, #eab308, #ca8a04)", color: "white", border: "none", boxShadow: hovered ? "0 4px 14px rgba(234,179,8,0.4)" : "none" }}>
+            🏫 Rejoindre
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Group Card ───────────────────────────────────────────────────────────────
+
+function GroupCard({ group, onJoin, faved, onFav, sent }: { group: GroupItem; onJoin: (id: string, name: string) => void; faved: boolean; onFav: (id: string) => void; sent?: boolean }) {
+  const [hovered, setHovered] = useState(false);
+  const isFull = group.members >= group.max;
+  const lc = LEVEL_COLORS[group.level] ?? "#10b981";
+  const isActive = group.lastActive.includes("min") || group.lastActive.includes("1h") || group.lastActive.includes("2h") || group.lastActive.includes("3h");
+
+  return (
+    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{
+      background: "rgba(255,255,255,0.03)", border: `1px solid ${hovered ? "rgba(99,102,241,0.3)" : "rgba(255,255,255,0.08)"}`,
+      borderRadius: 18, padding: 18, display: "flex", flexDirection: "column", gap: 12,
+      transform: hovered ? "translateY(-3px)" : "translateY(0)", transition: "all 0.25s ease",
+    }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <Av initials={group.creatorAvatar} size={40} color="#6366f1" />
+        <div style={{ flex: 1 }}>
+          <div style={{ color: "white", fontWeight: 700, fontSize: 14, marginBottom: 2 }}>{group.name}</div>
+          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>par {group.creatorName} · 📍 {group.city}</div>
+        </div>
+        <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+          <LvlBadge level={group.level} />
+          <button onClick={() => onFav(group.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, opacity: faved ? 1 : 0.3 }}>{faved ? "❤️" : "🤍"}</button>
+        </div>
+      </div>
+
+      {/* Stacked member avatars */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex" }}>
+          {group.memberAvatars.slice(0, 5).map((av, i) => (
+            <div key={i} style={{ width: 26, height: 26, borderRadius: "50%", background: `hsl(${i * 60}, 60%, 50%)`, border: "2px solid #0d1117", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 9, fontWeight: 700, marginLeft: i > 0 ? -8 : 0, zIndex: 5 - i, position: "relative" }}>
+              {av}
+            </div>
+          ))}
+          {group.members > 5 && <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "2px solid #0d1117", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.5)", fontSize: 9, marginLeft: -8, zIndex: 0 }}>+{group.members - 5}</div>}
+        </div>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{group.members}/{group.max} membres</div>
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4, fontSize: 11 }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: isActive ? "#10b981" : "rgba(255,255,255,0.2)", display: "inline-block", flexShrink: 0 }} />
+          <span style={{ color: "rgba(255,255,255,0.35)" }}>{group.lastActive}</span>
+        </div>
+      </div>
+
+      <SpotsBar current={group.members} max={group.max} />
+
+      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+        <div style={{ marginBottom: 4 }}>🎯 <strong style={{ color: "rgba(255,255,255,0.6)" }}>{group.goal}</strong></div>
+        <div>📅 {group.schedule}</div>
+      </div>
+
+      <div style={{ display: "flex", gap: 8 }}>
+        <Link href={`/discover/group/${group.id}`} style={{ flex: 1, textAlign: "center", padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 600, textDecoration: "none", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.7)" }}>
+          💬 Activité
+        </Link>
+        {sent ? (
+          <button disabled style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 11, fontWeight: 700, cursor: "not-allowed", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.3)" }}>
+            ⏳ Demande envoyée
+          </button>
+        ) : (
+          <button onClick={() => !isFull && onJoin(group.id, group.name)} disabled={isFull} style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: isFull ? "default" : "pointer", background: isFull ? "rgba(255,255,255,0.04)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: isFull ? "1px solid rgba(255,255,255,0.07)" : "none", color: isFull ? "rgba(255,255,255,0.25)" : "white", boxShadow: (!isFull && hovered) ? "0 4px 14px rgba(99,102,241,0.4)" : "none" }}>
+            {isFull ? "⛔ Complet" : "👥 Rejoindre"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Solo Card ────────────────────────────────────────────────────────────────
+
+function SoloCard({ student, onInvite, invited }: { student: SoloItem; onInvite: (id: string, name: string) => void; invited: boolean }) {
+  const [hovered, setHovered] = useState(false);
+  const lc = LEVEL_COLORS[student.level] ?? "#10b981";
+  const tlc = LEVEL_COLORS[student.targetLevel] ?? "#f59e0b";
+
+  return (
+    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{
+      background: "rgba(255,255,255,0.03)", border: `1px solid ${hovered ? "rgba(245,158,11,0.3)" : "rgba(255,255,255,0.08)"}`,
+      borderRadius: 18, padding: 18, display: "flex", flexDirection: "column", gap: 12,
+      transform: hovered ? "translateY(-3px)" : "translateY(0)", transition: "all 0.25s ease",
+    }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <Av initials={student.avatar} size={44} color="#f59e0b" />
+        <div style={{ flex: 1 }}>
+          <div style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{student.name}</div>
+          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>📍 {student.city}</div>
+        </div>
+        <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+          <LvlBadge level={student.level} />
+          <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>→</span>
+          <LvlBadge level={student.targetLevel} />
+        </div>
+      </div>
+
+      <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: 12, lineHeight: 1.6, fontStyle: "italic" }}>&ldquo;{student.desc}&rdquo;</p>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+        <div>🎯 {student.goal}</div>
+        <div>⏰ {student.availability}</div>
+      </div>
+
+      <div style={{ display: "flex", gap: 8 }}>
+        <button onClick={() => !invited && onInvite(student.id, student.name)} disabled={invited} style={{
+          flex: 1, padding: "10px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: invited ? "default" : "pointer",
+          background: invited ? "rgba(245,158,11,0.08)" : "rgba(245,158,11,0.15)",
+          border: invited ? "1px solid rgba(245,158,11,0.15)" : "1px solid rgba(245,158,11,0.35)",
+          color: "#f59e0b", boxShadow: (!invited && hovered) ? "0 4px 14px rgba(245,158,11,0.2)" : "none",
+        }}>
+          {invited ? "✓ Invitation envoyée" : "✉️ Inviter dans mon groupe"}
+        </button>
+        <button onClick={() => { const wa = `https://wa.me/?text=${encodeURIComponent(`Salut ${student.name} ! Je t'invite à rejoindre mon groupe d'étude d'allemand sur DeutschCM.`)}`; window.open(wa, "_blank"); }} style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(37,211,102,0.1)", border: "1px solid rgba(37,211,102,0.2)", color: "#25d166", fontSize: 14, cursor: "pointer" }} title="Inviter sur WhatsApp">
+          💬
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main page ────────────────────────────────────────────────────────────────
+
+type TabKey = "all" | "classes" | "centers" | "groups" | "solo";
+type SortKey = "relevance" | "active" | "new" | "rating";
+
+const DEFAULT_FILTERS: Filters = { levels: [], cities: [], availability: [], spotsOnly: false, verifiedOnly: false };
+
+export default function DiscoverPage() {
+  const [search, setSearch] = useState("");
+  const [tab, setTab] = useState<TabKey>("all");
+  const [sort, setSort] = useState<SortKey>("relevance");
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [joined, setJoined] = useState<Set<string>>(new Set());
+  const [invited, setInvited] = useState<Set<string>>(new Set());
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<{ id: string; name: string; type: "class" | "group" | "center"; teacherName?: string } | null>(null);
+  const [messageText, setMessageText] = useState("");
+  const [sending, setSending] = useState(false);
+  const [userLevel, setUserLevel] = useState<string | null>(null);
+  const [userCity, setUserCity] = useState<string | null>(null);
+
+  useEffect(() => {
+    const seen = localStorage.getItem("discoverSeen");
+    if (!seen) { setShowOnboarding(true); localStorage.setItem("discoverSeen", "1"); }
+    const favs = localStorage.getItem("discoverFavs");
+    if (favs) setFavorites(new Set(JSON.parse(favs)));
+
+    fetch("/api/me").then(r => r.ok ? r.json() : null).then(d => {
+      if (d?.germanLevel) setUserLevel(d.germanLevel);
+      if (d?.city) setUserCity(d.city);
+    }).catch(() => {});
+  }, []);
+
+  const toggleFav = (id: string) => {
+    setFavorites(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      localStorage.setItem("discoverFavs", JSON.stringify([...next]));
+      return next;
+    });
+  };
+
+  const applyFilter = (items: (ClassItem | CenterItem | GroupItem)[], key: "level" | "city" | "verified") => {
+    return items.filter(item => {
+      const it = item as unknown as Record<string, unknown>;
+      if (key === "level" && filters.levels.length > 0 && !filters.levels.includes(it.level as string)) return false;
+      if (key === "city" && filters.cities.length > 0 && !filters.cities.includes(it.city as string)) return false;
+      if (key === "verified" && filters.verifiedOnly && !it.verified) return false;
+      return true;
+    });
+  };
+
+  const matchSearch = (text: string) => !search || text.toLowerCase().includes(search.toLowerCase());
+
+  const filteredClasses = useMemo(() => {
+    let r = CLASSES.filter(c =>
+      matchSearch(`${c.teacherName} ${c.center} ${c.level} ${c.city} ${c.tags.join(" ")}`) &&
+      (filters.levels.length === 0 || filters.levels.includes(c.level)) &&
+      (filters.cities.length === 0 || filters.cities.includes(c.city)) &&
+      (!filters.spotsOnly || c.students < c.max)
+    );
+    if (sort === "rating") r = [...r].sort((a, b) => b.rating - a.rating);
+    if (sort === "new") r = [...r].sort((a, b) => a.students - b.students);
+    if (sort === "active") r = [...r].sort((a, b) => a.lastActive.localeCompare(b.lastActive));
+    return r;
+  }, [search, filters, sort]);
+
+  const filteredCenters = useMemo(() => CENTERS.filter(c =>
+    matchSearch(`${c.name} ${c.city} ${c.region}`) &&
+    (filters.cities.length === 0 || filters.cities.includes(c.city)) &&
+    (!filters.verifiedOnly || c.verified)
+  ), [search, filters]);
+
+  const filteredGroups = useMemo(() => GROUPS.filter(g =>
+    matchSearch(`${g.name} ${g.level} ${g.city} ${g.goal}`) &&
+    (filters.levels.length === 0 || filters.levels.includes(g.level)) &&
+    (filters.cities.length === 0 || filters.cities.includes(g.city)) &&
+    (!filters.spotsOnly || g.members < g.max)
+  ), [search, filters]);
+
+  const filteredSolos = useMemo(() => SOLOS.filter(s =>
+    matchSearch(`${s.name} ${s.city} ${s.level} ${s.goal}`)
+  ), [search]);
+
+  const recommendedIds = useMemo(() => {
+    if (!userLevel) return new Set<string>();
+    return new Set(CLASSES.filter(c => c.level === userLevel || (userCity && c.city === userCity)).map(c => c.id));
+  }, [userLevel, userCity]);
+
+  const totalCount = filteredClasses.length + filteredCenters.length + filteredGroups.length + filteredSolos.length;
+
+  const openJoin = (id: string, name: string, type: "class" | "group" | "center", teacher?: string) => {
+    if (joined.has(id)) return;
+    setSelectedItem({ id, name, type, teacherName: teacher });
+    setModalOpen(true);
+  };
+
+  const accentColor = "#10b981";
+  const showClasses = tab === "all" || tab === "classes";
+  const showCenters = tab === "all" || tab === "centers";
+  const showGroups = tab === "all" || tab === "groups";
+  const showSolo = tab === "all" || tab === "solo";
+
+  return (
+    <Layout title="Découvrir">
+      <style>{`
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
+      `}</style>
+
+      {showOnboarding && <OnboardingOverlay onClose={() => setShowOnboarding(false)} />}
+
+      {/* Sticky header */}
+      <div style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(8,12,16,0.95)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)", margin: "-24px -24px 24px", padding: "16px 24px" }}>
+        {/* Title + actions */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <div>
+            <h1 style={{ margin: 0, color: "white", fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 20 }}>🔍 Découvrir</h1>
+            <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.35)", fontSize: 12 }}>{totalCount} résultats · {userLevel ? `Niveau ${userLevel}` : "Tous niveaux"}{userCity ? ` · ${userCity}` : ""}</p>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={() => setShowFilters(f => !f)} style={{ padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: "pointer", background: showFilters ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.05)", border: showFilters ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.08)", color: showFilters ? accentColor : "rgba(255,255,255,0.5)" }}>
+              🎚️ Filtres
+            </button>
+            <button onClick={() => setViewMode(v => v === "list" ? "map" : "list")} style={{ padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: "pointer", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
+              {viewMode === "list" ? "🗺️ Carte" : "☰ Liste"}
+            </button>
+          </div>
+        </div>
+
+        {/* Universal search */}
+        <div style={{ position: "relative", marginBottom: 12 }}>
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Rechercher une classe, un centre, un enseignant, un groupe..."
+            style={{ width: "100%", padding: "11px 14px 11px 38px", borderRadius: 12, boxSizing: "border-box", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 13, outline: "none", transition: "border-color 0.2s" }}
+            onFocus={e => e.target.style.borderColor = "rgba(16,185,129,0.5)"}
+            onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
+          />
+          <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 15, opacity: 0.4 }}>🔍</span>
+          {search && <button onClick={() => setSearch("")} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 16, cursor: "pointer" }}>×</button>}
+        </div>
+
+        {/* Tab filters + sort */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {([
+              { key: "all", label: "🎯 Tous", count: totalCount },
+              { key: "classes", label: "👨‍🏫 Classes", count: filteredClasses.length },
+              { key: "centers", label: "🏫 Centres", count: filteredCenters.length },
+              { key: "groups", label: "👥 Groupes", count: filteredGroups.length },
+              { key: "solo", label: "🎓 Élèves solo", count: filteredSolos.length },
+            ] as { key: TabKey; label: string; count: number }[]).map(t => (
+              <button key={t.key} onClick={() => setTab(t.key)} style={{ padding: "6px 12px", borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: "pointer", background: tab === t.key ? `${accentColor}18` : "rgba(255,255,255,0.04)", border: tab === t.key ? `1px solid ${accentColor}40` : "1px solid rgba(255,255,255,0.07)", color: tab === t.key ? accentColor : "rgba(255,255,255,0.5)" }}>
+                {t.label} <span style={{ opacity: 0.6, fontSize: 11 }}>({t.count})</span>
+              </button>
+            ))}
+          </div>
+          <select value={sort} onChange={e => setSort(e.target.value as SortKey)} style={{ padding: "6px 10px", borderRadius: 8, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", fontSize: 12, outline: "none", cursor: "pointer" }}>
+            <option value="relevance">📊 Pertinence</option>
+            <option value="active">⚡ Les plus actifs</option>
+            <option value="rating">⭐ Mieux notés</option>
+            <option value="new">🆕 Places dispo.</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Code section */}
+      <CodeSection onJoin={(id, name, teacher) => openJoin(id, name, "class", teacher)} />
+
+      {viewMode === "map" ? (
+        <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 20 }}>
+          <CameroonMap onCityClick={(city) => { setFilters(f => ({ ...f, cities: [city] })); setViewMode("list"); }} />
+          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
+            Cliquez sur une ville pour filtrer les classes
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
+          {showFilters && (
+            <FilterSidebar
+              filters={filters}
+              onChange={setFilters}
+              onReset={() => setFilters(DEFAULT_FILTERS)}
+              count={totalCount}
+            />
+          )}
+
+          <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 32 }}>
+
+            {/* Recommended */}
+            {recommendedIds.size > 0 && (tab === "all" || tab === "classes") && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <span style={{ color: "#f59e0b", fontSize: 16 }}>⭐</span>
+                  <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 16 }}>Recommandé pour vous</h2>
+                  <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 12 }}>Basé sur votre niveau {userLevel}</span>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
+                  {filteredClasses.filter(c => recommendedIds.has(c.id)).map(cls => (
+                    <ClassCard key={cls.id} cls={cls} recommended onJoin={(id, name, teacher) => openJoin(id, name, "class", teacher)} faved={favorites.has(cls.id)} onFav={toggleFav} sent={joined.has(cls.id)} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Classes */}
+            {showClasses && filteredClasses.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <span style={{ fontSize: 16 }}>👨‍🏫</span>
+                  <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 16 }}>Classes enseignants</h2>
+                  <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", borderRadius: 8, padding: "2px 8px", fontSize: 12 }}>{filteredClasses.length}</span>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
+                  {filteredClasses.map(cls => (
+                    <ClassCard key={cls.id} cls={cls} recommended={recommendedIds.has(cls.id)} onJoin={(id, name, teacher) => openJoin(id, name, "class", teacher)} faved={favorites.has(cls.id)} onFav={toggleFav} sent={joined.has(cls.id)} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Centers */}
+            {showCenters && filteredCenters.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <span style={{ fontSize: 16 }}>🏫</span>
+                  <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 16 }}>Centres de langue</h2>
+                  <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", borderRadius: 8, padding: "2px 8px", fontSize: 12 }}>{filteredCenters.length}</span>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
+                  {filteredCenters.map(center => (
+                    <CenterCard key={center.id} center={center} onJoin={(id, name) => openJoin(id, name, "center")} faved={favorites.has(center.id)} onFav={toggleFav} sent={joined.has(center.id)} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Groups */}
+            {showGroups && filteredGroups.length > 0 && (
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <span style={{ fontSize: 16 }}>👥</span>
+                    <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 16 }}>Groupes d&apos;élèves</h2>
+                    <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", borderRadius: 8, padding: "2px 8px", fontSize: 12 }}>{filteredGroups.length}</span>
+                  </div>
+                  <Link href="/group/create" style={{ padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 700, textDecoration: "none", background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.25)", color: "#818cf8" }}>
+                    + Créer un groupe
+                  </Link>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
+                  {filteredGroups.map(group => (
+                    <GroupCard key={group.id} group={group} onJoin={(id, name) => openJoin(id, name, "group")} faved={favorites.has(group.id)} onFav={toggleFav} sent={joined.has(group.id)} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Solo */}
+            {showSolo && filteredSolos.length > 0 && (
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <span style={{ fontSize: 16 }}>🎓</span>
+                  <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 16 }}>Élèves en recherche</h2>
+                  <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", borderRadius: 8, padding: "2px 8px", fontSize: 12 }}>{filteredSolos.length}</span>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+                  {filteredSolos.map(s => (
+                    <SoloCard key={s.id} student={s} onInvite={(id, name) => { setInvited(prev => new Set([...prev, id])); fetch("/api/social", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "invite-to-group", toUserId: id, groupName: "Mon groupe" }) }); }} invited={invited.has(s.id)} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Empty state */}
+            {totalCount === 0 && (
+              <div style={{ textAlign: "center", padding: "60px 16px", color: "rgba(255,255,255,0.3)" }}>
+                <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
+                <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Aucun résultat</div>
+                <div style={{ fontSize: 13 }}>Modifiez vos filtres ou votre recherche</div>
+                <button onClick={() => { setSearch(""); setFilters(DEFAULT_FILTERS); }} style={{ marginTop: 16, padding: "10px 20px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)", fontSize: 13, cursor: "pointer" }}>
+                  Réinitialiser
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      {/* Join modal */}
+      {modalOpen && selectedItem && (
+        <div
+          onClick={() => setModalOpen(false)}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ width: "100%", maxWidth: 480, background: "linear-gradient(160deg,#0f1a14,#080c10)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 24, padding: 32 }}>
+            <div style={{ width: 36, height: 4, borderRadius: 99, background: "rgba(255,255,255,0.15)", margin: "0 auto 24px" }} />
+            <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 800, margin: "0 0 6px" }}>
+              Rejoindre {selectedItem.type === "group" ? "ce groupe" : selectedItem.type === "center" ? "ce centre" : "cette classe"}
+            </h2>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: "0 0 20px" }}>
+              {selectedItem.name}
+            </p>
+            <label style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", display: "block", marginBottom: 8 }}>
+              Message (optionnel)
+            </label>
+            <textarea
+              value={messageText}
+              onChange={e => setMessageText(e.target.value)}
+              placeholder="Bonjour, je m'appelle... je souhaite rejoindre pour..."
+              rows={4}
+              style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: 12, color: "white", fontSize: 13, resize: "none", outline: "none", marginBottom: 20, boxSizing: "border-box" }}
+            />
+            <div style={{ display: "flex", gap: 12 }}>
+              <button
+                onClick={async () => {
+                  const item = selectedItem;
+                  setSending(true);
+                  const action = item.type === "group" ? "request-join-group" : "request-join-class";
+                  const bodyKey = item.type === "group" ? "groupId" : "classroomId";
+                  try {
+                    await fetch("/api/social", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ action, [bodyKey]: item.id, message: messageText }),
+                    });
+                  } catch { /* optimistic */ }
+                  setJoined(prev => new Set([...prev, item.id]));
+                  setModalOpen(false);
+                  setMessageText("");
+                  setSending(false);
+                }}
+                disabled={sending}
+                style={{ flex: 1, padding: "14px", borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", opacity: sending ? 0.7 : 1 }}>
+                {sending ? "Envoi..." : "📩 Envoyer la demande"}
+              </button>
+              <button
+                onClick={() => setModalOpen(false)}
+                style={{ padding: "14px 20px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: 13 }}>
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </Layout>
+  );
+}
