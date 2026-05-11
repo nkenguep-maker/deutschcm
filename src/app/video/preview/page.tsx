@@ -1,10 +1,12 @@
 "use client"
-import { Player } from "@remotion/player"
+import dynamic from "next/dynamic"
+import { useState } from "react"
 import { LessonSlide } from "@/remotion/compositions/LessonSlide"
 import { VocabularySlide } from "@/remotion/compositions/VocabularySlide"
 import { GrammarSlide } from "@/remotion/compositions/GrammarSlide"
 import { QuizSlide } from "@/remotion/compositions/QuizSlide"
-import { useState } from "react"
+
+const Player = dynamic(() => import("@remotion/player").then(m => m.Player), { ssr: false })
 
 const DEMO_WORDS = [
   { de: "Hallo", fr: "Bonjour", article: null, example: "Hallo, ich bin Paul!" },
