@@ -65,7 +65,7 @@ export default function CenterDetailPage() {
 
   if (!center) {
     return (
-      <Layout>
+      <Layout title="Détail Centre">
         <div style={{ padding: 40, textAlign: "center" }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🏫</div>
           <div style={{ color: "white", fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Centre introuvable</div>
@@ -81,7 +81,7 @@ export default function CenterDetailPage() {
   const plan = PLAN_LABEL[center.plan];
 
   return (
-    <Layout>
+    <Layout title="Détail Centre">
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap')`}</style>
       <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 0 60px" }}>
 
