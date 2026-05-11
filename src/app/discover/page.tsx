@@ -21,7 +21,7 @@ interface GroupItem {
   id: string; name: string; creatorName: string; creatorAvatar: string;
   level: string; city: string; members: number; max: number;
   goal: string; schedule: string; description: string; tags: string[];
-  lastActive: string; memberAvatars: string[];
+  lastActive: string; memberAvatars: string[]; code: string;
 }
 interface SoloItem {
   id: string; name: string; avatar: string; level: string; targetLevel: string;
@@ -53,10 +53,10 @@ const CENTERS: CenterItem[] = [
 ];
 
 const GROUPS: GroupItem[] = [
-  { id: "grp1", name: "Prépa Goethe A1 — Juin 2026", creatorName: "Fatima Oumarou", creatorAvatar: "FO", level: "A1", city: "Yaoundé", members: 6, max: 10, goal: "Passer le Goethe A1 en juin 2026", schedule: "Sam 10h–12h", description: "Groupe de révision sérieux — exercices mutuels, quiz hebdo, corrections collectives.", tags: ["A1", "Goethe", "Weekend"], lastActive: "il y a 1h", memberAvatars: ["FO", "AM", "CB", "PK", "RN", "SK"] },
-  { id: "grp2", name: "Révision B1 Douala", creatorName: "Alice Fotso", creatorAvatar: "AF", level: "B1", city: "Douala", members: 4, max: 10, goal: "B1 pour visa étudiant — sept 2026", schedule: "Mar/Jeu soir 20h", description: "Groupe orienté examens — simulations d'épreuves, corrections et feedback entre membres.", tags: ["B1", "Visa", "Intensif"], lastActive: "il y a 3h", memberAvatars: ["AF", "JM", "CB", "PL"] },
-  { id: "grp3", name: "Visa Allemagne 2026", creatorName: "Samuel Biya", creatorAvatar: "SB", level: "A2", city: "Yaoundé", members: 8, max: 10, goal: "Dossier visa Allemagne — automne 2026", schedule: "Lun/Ven 19h–20h", description: "Focus sur le vocabulaire administratif, les lettres de motivation et l'entretien consulaire.", tags: ["A2", "Visa", "Ambassade"], lastActive: "il y a 30min", memberAvatars: ["SB", "AM", "FK", "PO", "RN", "CB", "JM", "LT"] },
-  { id: "grp4", name: "Conversation A2 Weekend", creatorName: "Paul Ondoa", creatorAvatar: "PO", level: "A2", city: "Douala", members: 3, max: 10, goal: "Fluidité orale — objectif B1 en 6 mois", schedule: "Dim 15h–16h30", description: "Sessions de conversation libres — thèmes du quotidien, actualités légères, échanges culturels.", tags: ["A2", "Conversation", "Weekend"], lastActive: "il y a 2j", memberAvatars: ["PO", "KN", "AF"] },
+  { id: "grp1", name: "Prépa Goethe A1 — Juin 2026", creatorName: "Fatima Oumarou", creatorAvatar: "FO", level: "A1", city: "Yaoundé", members: 6, max: 10, goal: "Passer le Goethe A1 en juin 2026", schedule: "Sam 10h–12h", description: "Groupe de révision sérieux — exercices mutuels, quiz hebdo, corrections collectives.", tags: ["A1", "Goethe", "Weekend"], lastActive: "il y a 1h", memberAvatars: ["FO", "AM", "CB", "PK", "RN", "SK"], code: "GROUPE-PREP01" },
+  { id: "grp2", name: "Révision B1 Douala", creatorName: "Alice Fotso", creatorAvatar: "AF", level: "B1", city: "Douala", members: 4, max: 10, goal: "B1 pour visa étudiant — sept 2026", schedule: "Mar/Jeu soir 20h", description: "Groupe orienté examens — simulations d'épreuves, corrections et feedback entre membres.", tags: ["B1", "Visa", "Intensif"], lastActive: "il y a 3h", memberAvatars: ["AF", "JM", "CB", "PL"], code: "GROUPE-REV-B1" },
+  { id: "grp3", name: "Visa Allemagne 2026", creatorName: "Samuel Biya", creatorAvatar: "SB", level: "A2", city: "Yaoundé", members: 8, max: 10, goal: "Dossier visa Allemagne — automne 2026", schedule: "Lun/Ven 19h–20h", description: "Focus sur le vocabulaire administratif, les lettres de motivation et l'entretien consulaire.", tags: ["A2", "Visa", "Ambassade"], lastActive: "il y a 30min", memberAvatars: ["SB", "AM", "FK", "PO", "RN", "CB", "JM", "LT"], code: "GROUPE-VISA26" },
+  { id: "grp4", name: "Conversation A2 Weekend", creatorName: "Paul Ondoa", creatorAvatar: "PO", level: "A2", city: "Douala", members: 3, max: 10, goal: "Fluidité orale — objectif B1 en 6 mois", schedule: "Dim 15h–16h30", description: "Sessions de conversation libres — thèmes du quotidien, actualités légères, échanges culturels.", tags: ["A2", "Conversation", "Weekend"], lastActive: "il y a 2j", memberAvatars: ["PO", "KN", "AF"], code: "GROUPE-CONV-A2" },
 ];
 
 const SOLOS: SoloItem[] = [
@@ -65,6 +65,25 @@ const SOLOS: SoloItem[] = [
   { id: "sol3", name: "Claire N.", avatar: "CN", level: "A1", targetLevel: "A1", city: "Bafoussam", goal: "Découverte culturelle", availability: "Flexible", desc: "Débutante complète passionnée de culture germanique. Cherche groupe bienveillant et patient." },
   { id: "sol4", name: "Didier F.", avatar: "DF", level: "B1", targetLevel: "B2", city: "Yaoundé", goal: "Visa étudiant — master en Allemagne", availability: "Matin 8h–12h et soirs", desc: "Dossier en cours pour TU Berlin. Cherche partenaire de révision TestDaF niveau B2." },
 ];
+
+// ─── Code lookup (demo hardcodé) ─────────────────────────────────────────────
+
+type CodeResultType =
+  | { type: "class";  data: ClassItem  }
+  | { type: "center"; data: CenterItem }
+  | { type: "group";  data: GroupItem  };
+
+const CODE_LOOKUP: Record<string, CodeResultType> = {
+  "DEUTSCH-A1-2024": { type: "class",  data: CLASSES[0] },
+  "LINGUA-A2-0512":  { type: "class",  data: CLASSES[1] },
+  "GOETHE-B1-PRO1":  { type: "class",  data: CLASSES[2] },
+  "GOETHE-B2-SAM1":  { type: "class",  data: CLASSES[3] },
+  "CENTRE-LINGUA":   { type: "center", data: CENTERS[0] },
+  "CENTRE-GOETHE":   { type: "center", data: CENTERS[1] },
+  "CENTRE-LANG01":   { type: "center", data: CENTERS[2] },
+  "GROUPE-PREP01":   { type: "group",  data: GROUPS[0] },
+  "GROUPE-REV-B1":   { type: "group",  data: GROUPS[1] },
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -159,144 +178,243 @@ function CameroonMap({ onCityClick }: { onCityClick: (city: string) => void }) {
   );
 }
 
-// ─── Code Section ─────────────────────────────────────────────────────────────
+// ─── Dual Search ─────────────────────────────────────────────────────────────
 
-interface LookupResult { found: boolean; type?: "teacher" | "classroom"; teacher?: { user: { fullName: string; city: string | null }; classrooms: { id: string; name: string; level: string; maxStudents: number; _count: { enrollments: number } }[] }; classroom?: { id: string; name: string; level: string; maxStudents: number; _count: { enrollments: number }; teacher: { user: { fullName: string } } } }
-
-function CodeSection({ onJoin }: { onJoin: (id: string, name: string, teacherName?: string) => void }) {
+function DualSearch({ onJoin }: { onJoin: (id: string, name: string, type: "class" | "group" | "center", teacher?: string) => void }) {
   const [code, setCode] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<LookupResult | null>(null);
-  const [joined, setJoined] = useState<Set<string>>(new Set());
-  const [history, setHistory] = useState<string[]>([]);
-  const [scanning, setScanning] = useState(false);
+  const [codeResult, setCodeResult] = useState<CodeResultType | null | "notfound">(null);
+  const [codeSent, setCodeSent] = useState<Set<string>>(new Set());
+  const [nameQuery, setNameQuery] = useState("");
+  const [nameFilter, setNameFilter] = useState<"all" | "teachers" | "centers" | "groups" | "students">("all");
 
-  useEffect(() => {
-    const saved = localStorage.getItem("codeHistory");
-    if (saved) setHistory(JSON.parse(saved));
-  }, []);
-
-  const lookup = async (c?: string) => {
-    const trimmed = (c ?? code).trim().toUpperCase();
+  const handleCodeSearch = () => {
+    const trimmed = code.trim().toUpperCase();
     if (!trimmed) return;
-    setLoading(true); setResult(null); setScanning(true);
-    setTimeout(() => setScanning(false), 800);
-    try {
-      const r = await fetch(`/api/social?action=lookup-code&code=${encodeURIComponent(trimmed)}`);
-      const d = await r.json();
-      setResult(d);
-      if (d.found) {
-        const newHistory = [trimmed, ...history.filter(h => h !== trimmed)].slice(0, 3);
-        setHistory(newHistory);
-        localStorage.setItem("codeHistory", JSON.stringify(newHistory));
-      }
-    } finally { setLoading(false); }
+    setCodeResult(CODE_LOOKUP[trimmed] ?? "notfound");
   };
 
-  const accentColor = "#10b981";
-  const isValid = code.trim().length >= 4;
-  const hasResult = result !== null;
+  const nameResults = useMemo(() => {
+    if (nameQuery.length < 3) return [];
+    const q = nameQuery.toLowerCase();
+    type NR = { type: "class" | "center" | "group" | "student"; data: ClassItem | CenterItem | GroupItem | SoloItem };
+    const r: NR[] = [];
+    if (nameFilter === "all" || nameFilter === "teachers")
+      CLASSES.filter(c => `${c.teacherName} ${c.city} ${c.level} ${c.center}`.toLowerCase().includes(q)).forEach(c => r.push({ type: "class", data: c }));
+    if (nameFilter === "all" || nameFilter === "centers")
+      CENTERS.filter(c => `${c.name} ${c.city}`.toLowerCase().includes(q)).forEach(c => r.push({ type: "center", data: c }));
+    if (nameFilter === "all" || nameFilter === "groups")
+      GROUPS.filter(g => `${g.name} ${g.city} ${g.level}`.toLowerCase().includes(q)).forEach(g => r.push({ type: "group", data: g }));
+    if (nameFilter === "all" || nameFilter === "students")
+      SOLOS.filter(s => `${s.name} ${s.city}`.toLowerCase().includes(q)).forEach(s => r.push({ type: "student", data: s }));
+    return r;
+  }, [nameQuery, nameFilter]);
+
+  const ac = "#10b981";
 
   return (
-    <div style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.08), rgba(5,150,105,0.03))", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 20, padding: "20px 22px", marginBottom: 28 }}>
-      <div style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 14 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>🔑</div>
-        <div>
-          <div style={{ color: "white", fontWeight: 700, fontSize: 14, marginBottom: 2 }}>Rejoindre par code</div>
-          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>Code enseignant <code style={{ color: accentColor }}>TCH-XXXXXX</code> ou code de classe</div>
-        </div>
-      </div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 28 }}>
 
-      {/* Input */}
-      <div style={{ display: "flex", gap: 10, marginBottom: hasResult || history.length > 0 ? 12 : 0 }}>
-        <div style={{ flex: 1, position: "relative" }}>
+      {/* ── BARRE 1 : CODE ── */}
+      <div style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.08), rgba(5,150,105,0.03))", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 18, padding: "16px 20px" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
+          <span style={{ fontSize: 14 }}>🔑</span>
+          <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>Rejoindre par code</span>
+          <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>· Classes · Centres · Groupes</span>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
           <input
             value={code}
-            onChange={e => { setCode(e.target.value.toUpperCase()); setResult(null); }}
-            onKeyDown={e => e.key === "Enter" && isValid && lookup()}
-            placeholder="TCH-AB3KP2 ou DEUTSCH-A1-2024"
-            style={{
-              width: "100%", padding: "11px 14px", borderRadius: 12, boxSizing: "border-box",
-              background: "rgba(255,255,255,0.06)", fontSize: 13, outline: "none", fontFamily: "monospace", letterSpacing: "0.05em",
-              border: `1px solid ${hasResult ? (result?.found ? "rgba(16,185,129,0.5)" : "rgba(239,68,68,0.5)") : scanning ? "rgba(16,185,129,0.6)" : "rgba(255,255,255,0.12)"}`,
-              color: "white", transition: "border-color 0.2s",
-              boxShadow: scanning ? `0 0 12px rgba(16,185,129,0.3)` : "none",
-            }}
+            onChange={e => { setCode(e.target.value.toUpperCase()); setCodeResult(null); }}
+            onKeyDown={e => e.key === "Enter" && code.trim().length >= 4 && handleCodeSearch()}
+            placeholder="Entrez un code : DEUTSCH-A1-XXXX / CENTRE-XXXX / GROUPE-XXXX"
+            style={{ flex: 1, padding: "10px 12px", borderRadius: 11, background: "rgba(255,255,255,0.06)", border: `1px solid ${codeResult === "notfound" ? "rgba(239,68,68,0.5)" : codeResult ? "rgba(16,185,129,0.5)" : "rgba(255,255,255,0.12)"}`, color: "white", fontSize: 12, outline: "none", fontFamily: "monospace", letterSpacing: "0.04em", boxSizing: "border-box" as const }}
           />
-          {scanning && <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", width: 8, height: 8, borderRadius: "50%", background: accentColor, animation: "pulse 0.8s infinite" }} />}
+          <button onClick={handleCodeSearch} disabled={code.trim().length < 4} style={{ padding: "10px 18px", borderRadius: 11, fontSize: 13, fontWeight: 700, cursor: code.trim().length >= 4 ? "pointer" : "not-allowed", background: code.trim().length >= 4 ? `linear-gradient(135deg,${ac},#059669)` : "rgba(255,255,255,0.05)", color: code.trim().length >= 4 ? "white" : "rgba(255,255,255,0.3)", border: "none", whiteSpace: "nowrap" as const }}>
+            Rechercher →
+          </button>
         </div>
-        <button onClick={() => lookup()} disabled={!isValid || loading} style={{
-          padding: "11px 20px", borderRadius: 12, fontSize: 13, fontWeight: 700, cursor: isValid ? "pointer" : "not-allowed",
-          background: isValid ? `linear-gradient(135deg, ${accentColor}, #059669)` : "rgba(255,255,255,0.05)",
-          color: isValid ? "white" : "rgba(255,255,255,0.3)", border: "none", opacity: loading ? 0.7 : 1,
-          boxShadow: isValid ? `0 4px 14px ${accentColor}40` : "none",
-        }}>
-          {loading ? "..." : "Rechercher →"}
-        </button>
-      </div>
 
-      {/* History */}
-      {!hasResult && history.length > 0 && (
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11 }}>Récents :</span>
-          {history.map(h => (
-            <button key={h} onClick={() => { setCode(h); lookup(h); }} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, padding: "2px 10px", fontSize: 11, color: "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "monospace" }}>
-              {h}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Results */}
-      {hasResult && !result?.found && (
-        <div style={{ color: "#ef4444", fontSize: 12, display: "flex", gap: 6, alignItems: "center" }}>
-          <span>❌</span> Code introuvable. Vérifiez l&apos;orthographe et réessayez.
-        </div>
-      )}
-
-      {result?.found && result.type === "teacher" && result.teacher && (
-        <div style={{ marginTop: 4 }}>
-          <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 10 }}>
-            <Av initials={result.teacher.user.fullName.split(" ").map(w => w[0]).join("").slice(0, 2)} size={36} color="#6366f1" />
-            <div>
-              <div style={{ color: "white", fontWeight: 700, fontSize: 13 }}>{result.teacher.user.fullName} ✅</div>
-              <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>📍 {result.teacher.user.city ?? "Cameroun"} · {result.teacher.classrooms.length} classe(s)</div>
-            </div>
+        {codeResult === "notfound" && (
+          <div style={{ marginTop: 10, color: "#ef4444", fontSize: 12, display: "flex", gap: 6, alignItems: "center" }}>
+            ❌ Code introuvable. Vérifiez l&apos;orthographe et réessayez.
           </div>
-          {result.teacher.classrooms.map(cls => {
-            const spots = cls.maxStudents - cls._count.enrollments;
-            const done = joined.has(cls.id);
+        )}
+
+        {codeResult && codeResult !== "notfound" && (() => {
+          if (codeResult.type === "class") {
+            const cls = codeResult.data;
+            const spots = cls.max - cls.students;
+            const sent = codeSent.has(cls.id);
+            const lc = LEVEL_COLORS[cls.level] ?? ac;
             return (
-              <div key={cls.id} style={{ display: "flex", gap: 10, alignItems: "center", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "9px 12px", marginBottom: 6 }}>
-                <LvlBadge level={cls.level} />
-                <span style={{ flex: 1, color: "rgba(255,255,255,0.75)", fontSize: 12 }}>{cls.name}</span>
-                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>{spots > 0 ? `${spots} pl.` : "Complet"}</span>
-                <button onClick={() => { setJoined(s => new Set([...s, cls.id])); onJoin(cls.id, cls.name, result.teacher!.user.fullName); }} disabled={done || spots <= 0} style={{ padding: "5px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: (!done && spots > 0) ? "pointer" : "default", background: done ? `${accentColor}15` : `${accentColor}20`, border: `1px solid ${accentColor}40`, color: done ? accentColor : accentColor }}>
-                  {done ? "✓ Envoyé" : spots <= 0 ? "Complet" : "Rejoindre"}
+              <div style={{ marginTop: 12, padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: `1px solid ${lc}30`, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" as const }}>
+                <Av initials={cls.teacherAvatar} size={42} color={lc} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" as const, marginBottom: 3 }}>
+                    <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{cls.teacherName}</span>
+                    <LvlBadge level={cls.level} />
+                    <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 10, fontWeight: 700 }}>Enseignant</span>
+                  </div>
+                  <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>📍 {cls.city} · 📅 {cls.schedule} · {spots > 0 ? `${spots} places dispo` : "Complet"}</div>
+                </div>
+                <button onClick={() => { if (!sent && spots > 0) { setCodeSent(s => new Set([...s, cls.id])); onJoin(cls.id, `${cls.teacherName} — ${cls.level}`, "class", cls.teacherName); } }} disabled={sent || spots <= 0} style={{ padding: "9px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: (!sent && spots > 0) ? "pointer" : "not-allowed", background: sent ? `${ac}15` : `linear-gradient(135deg,${ac},#059669)`, border: sent ? `1px solid ${ac}40` : "none", color: sent ? ac : "white", whiteSpace: "nowrap" as const }}>
+                  {sent ? "✓ Envoyé" : spots <= 0 ? "Complet" : "📩 Rejoindre"}
                 </button>
               </div>
             );
-          })}
-        </div>
-      )}
-
-      {result?.found && result.type === "classroom" && result.classroom && (() => {
-        const cls = result.classroom!;
-        const spots = cls.maxStudents - cls._count.enrollments;
-        const done = joined.has(cls.id);
-        return (
-          <div style={{ display: "flex", gap: 10, alignItems: "center", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 14px", marginTop: 4 }}>
-            <LvlBadge level={cls.level} />
-            <div style={{ flex: 1 }}>
-              <div style={{ color: "white", fontWeight: 700, fontSize: 13 }}>{cls.name}</div>
-              <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>Prof. {cls.teacher.user.fullName} · {spots > 0 ? `${spots} places` : "Complet"}</div>
+          }
+          if (codeResult.type === "center") {
+            const ctr = codeResult.data;
+            const sent = codeSent.has(ctr.id);
+            return (
+              <div style={{ marginTop: 12, padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(234,179,8,0.3)", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" as const }}>
+                <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(234,179,8,0.15)", border: "1px solid rgba(234,179,8,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fbbf24", fontWeight: 800, fontSize: 15, flexShrink: 0 }}>{ctr.avatar}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" as const, marginBottom: 3 }}>
+                    <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{ctr.name}</span>
+                    {ctr.verified && <span>✅</span>}
+                    <span style={{ background: "rgba(234,179,8,0.12)", color: "#fbbf24", borderRadius: 5, padding: "1px 6px", fontSize: 10, fontWeight: 700 }}>Centre</span>
+                  </div>
+                  <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>📍 {ctr.city} · {ctr.classes} classes · {ctr.successRate}% réussite Goethe</div>
+                </div>
+                <button onClick={() => { if (!sent) { setCodeSent(s => new Set([...s, ctr.id])); onJoin(ctr.id, ctr.name, "center"); } }} disabled={sent} style={{ padding: "9px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: sent ? "not-allowed" : "pointer", background: sent ? "rgba(234,179,8,0.1)" : "linear-gradient(135deg,#eab308,#ca8a04)", border: sent ? "1px solid rgba(234,179,8,0.3)" : "none", color: sent ? "#fbbf24" : "white", whiteSpace: "nowrap" as const }}>
+                  {sent ? "✓ Envoyé" : "📩 Rejoindre"}
+                </button>
+              </div>
+            );
+          }
+          const grp = codeResult.data;
+          const isFull = grp.members >= grp.max;
+          const sent = codeSent.has(grp.id);
+          return (
+            <div style={{ marginTop: 12, padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(99,102,241,0.25)", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" as const }}>
+              <Av initials={grp.creatorAvatar} size={42} color="#6366f1" />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" as const, marginBottom: 3 }}>
+                  <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{grp.name}</span>
+                  <LvlBadge level={grp.level} />
+                  <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 10, fontWeight: 700 }}>Groupe</span>
+                </div>
+                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>📍 {grp.city} · {grp.members}/{grp.max} membres · {grp.schedule}</div>
+              </div>
+              <button onClick={() => { if (!isFull && !sent) { setCodeSent(s => new Set([...s, grp.id])); onJoin(grp.id, grp.name, "group"); } }} disabled={sent || isFull} style={{ padding: "9px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: (sent || isFull) ? "not-allowed" : "pointer", background: sent ? "rgba(99,102,241,0.1)" : isFull ? "rgba(255,255,255,0.04)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: sent ? "1px solid rgba(99,102,241,0.3)" : isFull ? "1px solid rgba(255,255,255,0.07)" : "none", color: sent ? "#818cf8" : isFull ? "rgba(255,255,255,0.3)" : "white", whiteSpace: "nowrap" as const }}>
+                {sent ? "✓ Envoyé" : isFull ? "⛔ Complet" : "📩 Rejoindre"}
+              </button>
             </div>
-            <button onClick={() => { setJoined(s => new Set([...s, cls.id])); onJoin(cls.id, cls.name, cls.teacher.user.fullName); }} disabled={done || spots <= 0} style={{ padding: "8px 16px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: (!done && spots > 0) ? "pointer" : "default", background: done ? `${accentColor}15` : `linear-gradient(135deg, ${accentColor}, #059669)`, border: done ? `1px solid ${accentColor}40` : "none", color: done ? accentColor : "white" }}>
-              {done ? "✓ Envoyé" : spots <= 0 ? "Complet" : "Rejoindre cette classe"}
+          );
+        })()}
+      </div>
+
+      {/* ── BARRE 2 : NOM ── */}
+      <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: "16px 20px" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
+          <span style={{ fontSize: 14 }}>🔍</span>
+          <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>Rechercher par nom</span>
+        </div>
+        <div style={{ position: "relative" as const, marginBottom: 10 }}>
+          <input
+            value={nameQuery}
+            onChange={e => setNameQuery(e.target.value)}
+            placeholder="Rechercher un enseignant, centre ou élève..."
+            style={{ width: "100%", padding: "10px 36px 10px 36px", borderRadius: 11, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 13, outline: "none", boxSizing: "border-box" as const }}
+            onFocus={e => (e.target.style.borderColor = "rgba(255,255,255,0.3)")}
+            onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
+          />
+          <span style={{ position: "absolute" as const, left: 11, top: "50%", transform: "translateY(-50%)", fontSize: 14, opacity: 0.4 }}>🔍</span>
+          {nameQuery && <button onClick={() => setNameQuery("")} style={{ position: "absolute" as const, right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 16, cursor: "pointer" }}>×</button>}
+        </div>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" as const }}>
+          {(["all", "teachers", "centers", "groups", "students"] as const).map(f => (
+            <button key={f} onClick={() => setNameFilter(f)} style={{ padding: "4px 11px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", background: nameFilter === f ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.04)", border: nameFilter === f ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.07)", color: nameFilter === f ? "white" : "rgba(255,255,255,0.4)" }}>
+              {f === "all" ? "Tous" : f === "teachers" ? "Enseignants" : f === "centers" ? "Centres" : f === "groups" ? "Groupes" : "Élèves"}
             </button>
+          ))}
+        </div>
+
+        {nameQuery.length >= 3 && (
+          <div style={{ marginTop: 12 }}>
+            <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginBottom: 8 }}>
+              {nameResults.length} résultat{nameResults.length !== 1 ? "s" : ""} pour « {nameQuery} »
+            </div>
+            {nameResults.length === 0 ? (
+              <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, textAlign: "center" as const, padding: "10px 0" }}>
+                Aucun résultat pour « {nameQuery} »
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 6, maxHeight: 320, overflowY: "auto" as const }}>
+                {nameResults.slice(0, 8).map((r, i) => {
+                  if (r.type === "class") {
+                    const cls = r.data as ClassItem;
+                    const lc = LEVEL_COLORS[cls.level] ?? ac;
+                    return (
+                      <div key={`c${i}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <Av initials={cls.teacherAvatar} size={32} color={lc} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: "flex", gap: 5, alignItems: "center", flexWrap: "wrap" as const }}>
+                            <span style={{ color: "white", fontSize: 12, fontWeight: 700 }}>{cls.teacherName}</span>
+                            <LvlBadge level={cls.level} />
+                            <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 5px", fontSize: 9, fontWeight: 700 }}>Enseignant</span>
+                          </div>
+                          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 10 }}>📍 {cls.city} · {cls.max - cls.students > 0 ? `${cls.max - cls.students} places` : "Complet"}</div>
+                        </div>
+                        <button onClick={() => onJoin(cls.id, `${cls.teacherName} — ${cls.level}`, "class", cls.teacherName)} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: "pointer", background: `linear-gradient(135deg,${ac},#059669)`, color: "white", border: "none", whiteSpace: "nowrap" as const }}>Voir →</button>
+                      </div>
+                    );
+                  }
+                  if (r.type === "center") {
+                    const ctr = r.data as CenterItem;
+                    return (
+                      <div key={`t${i}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(234,179,8,0.15)", border: "1px solid rgba(234,179,8,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fbbf24", fontWeight: 800, fontSize: 12, flexShrink: 0 }}>{ctr.avatar}</div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                            <span style={{ color: "white", fontSize: 12, fontWeight: 700 }}>{ctr.name}</span>
+                            <span style={{ background: "rgba(234,179,8,0.12)", color: "#fbbf24", borderRadius: 5, padding: "1px 5px", fontSize: 9, fontWeight: 700 }}>Centre</span>
+                          </div>
+                          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 10 }}>📍 {ctr.city} · {ctr.classes} classes</div>
+                        </div>
+                        <button onClick={() => onJoin(ctr.id, ctr.name, "center")} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg,#eab308,#ca8a04)", color: "white", border: "none", whiteSpace: "nowrap" as const }}>Voir →</button>
+                      </div>
+                    );
+                  }
+                  if (r.type === "group") {
+                    const grp = r.data as GroupItem;
+                    const lc = LEVEL_COLORS[grp.level] ?? ac;
+                    return (
+                      <div key={`g${i}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <Av initials={grp.creatorAvatar} size={32} color="#6366f1" />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: "flex", gap: 5, alignItems: "center", flexWrap: "wrap" as const }}>
+                            <span style={{ color: "white", fontSize: 12, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, maxWidth: 120 }}>{grp.name}</span>
+                            <LvlBadge level={grp.level} />
+                            <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 5px", fontSize: 9, fontWeight: 700 }}>Groupe</span>
+                          </div>
+                          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 10 }}>📍 {grp.city} · {grp.members}/{grp.max} membres</div>
+                        </div>
+                        <button onClick={() => onJoin(grp.id, grp.name, "group")} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", border: "none", whiteSpace: "nowrap" as const }}>Voir →</button>
+                      </div>
+                    );
+                  }
+                  const s = r.data as SoloItem;
+                  return (
+                    <div key={`s${i}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                      <Av initials={s.avatar} size={32} color="#f59e0b" />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                          <span style={{ color: "white", fontSize: 12, fontWeight: 700 }}>{s.name}</span>
+                          <LvlBadge level={s.level} />
+                          <span style={{ background: "rgba(245,158,11,0.12)", color: "#fbbf24", borderRadius: 5, padding: "1px 5px", fontSize: 9, fontWeight: 700 }}>Élève</span>
+                        </div>
+                        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 10 }}>📍 {s.city} · {s.availability}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        );
-      })()}
+        )}
+      </div>
     </div>
   );
 }
@@ -429,6 +547,10 @@ function ClassCard({ cls, recommended, onJoin, faved, onFav, sent }: { cls: Clas
             {cls.isOnline && <span style={{ background: "rgba(99,102,241,0.15)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 10 }}>🌐 En ligne</span>}
           </div>
           <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>🏛️ {cls.center} · 📍 {cls.city}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
+            <code style={{ fontSize: 9, color: "rgba(255,255,255,0.28)", letterSpacing: "0.03em" }}>{cls.code}</code>
+            <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(cls.code).catch(() => {}); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 9, opacity: 0.4, lineHeight: 1 }} title="Copier le code">📋</button>
+          </div>
         </div>
         <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
           <LvlBadge level={cls.level} />
@@ -502,6 +624,10 @@ function CenterCard({ center, onJoin, faved, onFav, sent }: { center: CenterItem
             {center.verified && <span title="Vérifié par DeutschCM" style={{ fontSize: 12 }}>✅</span>}
           </div>
           <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>📍 {center.city}, {center.region} · {center.yearsActive} ans</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
+            <code style={{ fontSize: 9, color: "rgba(255,255,255,0.28)", letterSpacing: "0.03em" }}>{center.code}</code>
+            <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(center.code).catch(() => {}); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 9, opacity: 0.4, lineHeight: 1 }} title="Copier le code">📋</button>
+          </div>
         </div>
         <div style={{ display: "flex", gap: 5, alignItems: "center", flexShrink: 0 }}>
           <span style={{ background: `${plan.color}20`, color: plan.color, borderRadius: 6, padding: "2px 7px", fontSize: 10, fontWeight: 700 }}>{plan.label}</span>
@@ -565,6 +691,10 @@ function GroupCard({ group, onJoin, faved, onFav, sent }: { group: GroupItem; on
         <div style={{ flex: 1 }}>
           <div style={{ color: "white", fontWeight: 700, fontSize: 14, marginBottom: 2 }}>{group.name}</div>
           <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>par {group.creatorName} · 📍 {group.city}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
+            <code style={{ fontSize: 9, color: "rgba(255,255,255,0.28)", letterSpacing: "0.03em" }}>{group.code}</code>
+            <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(group.code).catch(() => {}); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 9, opacity: 0.4, lineHeight: 1 }} title="Copier le code">📋</button>
+          </div>
         </div>
         <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
           <LvlBadge level={group.level} />
@@ -836,8 +966,8 @@ export default function DiscoverPage() {
         </div>
       </div>
 
-      {/* Code section */}
-      <CodeSection onJoin={(id, name, teacher) => openJoin(id, name, "class", teacher)} />
+      {/* Dual search */}
+      <DualSearch onJoin={openJoin} />
 
       {viewMode === "map" ? (
         <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 20 }}>
