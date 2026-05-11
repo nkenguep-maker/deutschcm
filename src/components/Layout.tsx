@@ -14,7 +14,7 @@ const STUDENT_NAV = [
   { icon: "🏫", label: "Mes Classes",     href: "/classroom"  },
   { icon: "🔍", label: "Découvrir",       href: "/discover"   },
   { icon: "🎙️", label: "Simulateur IA",  href: "/simulateur" },
-  { icon: "📈", label: "Progression",     href: "/progress"   },
+  { icon: "📊", label: "Progression",     href: "/progress"   },
   { icon: "⚙️", label: "Paramètres",     href: "/settings"   },
 ];
 
