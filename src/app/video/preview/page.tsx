@@ -1,19 +1,42 @@
 "use client"
-import dynamic from "next/dynamic"
 import { useState } from "react"
-import { LessonSlide } from "@/remotion/compositions/LessonSlide"
-import { VocabularySlide } from "@/remotion/compositions/VocabularySlide"
-import { GrammarSlide } from "@/remotion/compositions/GrammarSlide"
-import { QuizSlide } from "@/remotion/compositions/QuizSlide"
+import dynamic from "next/dynamic"
 
-const Player = dynamic(() => import("@remotion/player").then(m => m.Player), { ssr: false })
+const Player = dynamic(
+  () => import("@remotion/player").then(m => m.Player),
+  { ssr: false, loading: () => (
+    <div style={{ aspectRatio:"16/9", background:"rgba(255,255,255,0.03)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center" }}>
+      <p style={{ color:"rgba(255,255,255,0.4)", fontSize:12 }}>⏳ Chargement du player...</p>
+    </div>
+  )}
+)
+
+const LessonSlide = dynamic(
+  () => import("@/remotion/compositions/LessonSlide").then(m => m.LessonSlide),
+  { ssr: false }
+)
+
+const VocabularySlide = dynamic(
+  () => import("@/remotion/compositions/VocabularySlide").then(m => m.VocabularySlide),
+  { ssr: false }
+)
+
+const GrammarSlide = dynamic(
+  () => import("@/remotion/compositions/GrammarSlide").then(m => m.GrammarSlide),
+  { ssr: false }
+)
+
+const QuizSlide = dynamic(
+  () => import("@/remotion/compositions/QuizSlide").then(m => m.QuizSlide),
+  { ssr: false }
+)
 
 const DEMO_WORDS = [
   { de: "Hallo", fr: "Bonjour", article: null, example: "Hallo, ich bin Paul!" },
   { de: "Guten Tag", fr: "Bonjour (formel)", article: null, example: "Guten Tag, Frau Müller." },
   { de: "Danke", fr: "Merci", article: null, example: "Danke schön!" },
   { de: "Bitte", fr: "S'il vous plaît", article: null, example: "Bitte kommen Sie herein." },
-  { de: "Tschüss", fr: "Au revoir (familier)", article: null, example: "Tschüss, bis morgen!" }
+  { de: "Tschüss", fr: "Au revoir", article: null, example: "Tschüss, bis morgen!" }
 ]
 
 const DEMO_TABLE = {
@@ -32,10 +55,10 @@ export default function VideoPreview() {
   const [activeSlide, setActiveSlide] = useState("intro")
 
   const slides = [
-    { key: "intro", label: "🎬 Intro", icon: "🎬" },
-    { key: "vocab", label: "📖 Vocabulaire", icon: "📖" },
-    { key: "grammar", label: "📝 Grammaire", icon: "📝" },
-    { key: "quiz", label: "❓ Quiz", icon: "❓" },
+    { key: "intro", label: "🎬 Intro" },
+    { key: "vocab", label: "📖 Vocabulaire" },
+    { key: "grammar", label: "📝 Grammaire" },
+    { key: "quiz", label: "❓ Quiz" },
   ]
 
   return (
@@ -46,50 +69,43 @@ export default function VideoPreview() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono&display=swap')`}</style>
 
       <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-        <h1 style={{
-          fontFamily: "'Syne',sans-serif",
-          color: "white", fontSize: 24, fontWeight: 800, marginBottom: 4
-        }}>
+        <h1 style={{ fontFamily:"'Syne',sans-serif", color:"white", fontSize:24, fontWeight:800, marginBottom:4 }}>
           🎬 Vidéos Cours — DeutschCM
         </h1>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginBottom: 24 }}>
-          Slides animées générées avec Remotion · Lektion 1 — Guten Tag! · A1
+        <p style={{ color:"rgba(255,255,255,0.4)", fontSize:13, marginBottom:24 }}>
+          Slides animées · Lektion 1 — Guten Tag! · A1
         </p>
 
-        {/* Sélecteur slide */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
+        <div style={{ display:"flex", gap:8, marginBottom:24, flexWrap:"wrap" }}>
           {slides.map(s => (
             <button key={s.key} onClick={() => setActiveSlide(s.key)}
               style={{
-                padding: "8px 20px", borderRadius: 99, fontSize: 12, fontWeight: 700,
+                padding:"8px 20px", borderRadius:99, fontSize:12, fontWeight:700,
                 background: activeSlide === s.key
                   ? "linear-gradient(135deg,#10b981,#059669)"
                   : "rgba(255,255,255,0.05)",
-                border: activeSlide === s.key
-                  ? "none" : "1px solid rgba(255,255,255,0.1)",
+                border: activeSlide === s.key ? "none" : "1px solid rgba(255,255,255,0.1)",
                 color: activeSlide === s.key ? "white" : "rgba(255,255,255,0.5)",
-                cursor: "pointer"
-              }}
-            >
+                cursor:"pointer"
+              }}>
               {s.label}
             </button>
           ))}
         </div>
 
-        {/* Player Remotion */}
-        <div style={{ borderRadius: 20, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ borderRadius:20, overflow:"hidden", border:"1px solid rgba(255,255,255,0.08)" }}>
           {activeSlide === "intro" && (
             <Player
-              component={LessonSlide}
+              component={LessonSlide as any}
               durationInFrames={300}
               fps={30}
               compositionWidth={1280}
               compositionHeight={720}
-              style={{ width: "100%", aspectRatio: "16/9" }}
+              style={{ width:"100%", aspectRatio:"16/9" }}
               controls
               inputProps={{
                 title: "Guten Tag!",
-                subtitle: "Salutations et présentations en allemand",
+                subtitle: "Salutations et présentations",
                 level: "A1",
                 manuel: "Netzwerk neu A1",
                 lektion: 1
@@ -98,24 +114,24 @@ export default function VideoPreview() {
           )}
           {activeSlide === "vocab" && (
             <Player
-              component={VocabularySlide}
+              component={VocabularySlide as any}
               durationInFrames={450}
               fps={30}
               compositionWidth={1280}
               compositionHeight={720}
-              style={{ width: "100%", aspectRatio: "16/9" }}
+              style={{ width:"100%", aspectRatio:"16/9" }}
               controls
               inputProps={{ words: DEMO_WORDS, level: "A1", title: "Vocabulaire — Lektion 1" }}
             />
           )}
           {activeSlide === "grammar" && (
             <Player
-              component={GrammarSlide}
+              component={GrammarSlide as any}
               durationInFrames={360}
               fps={30}
               compositionWidth={1280}
               compositionHeight={720}
-              style={{ width: "100%", aspectRatio: "16/9" }}
+              style={{ width:"100%", aspectRatio:"16/9" }}
               controls
               inputProps={{
                 rule: "Conjugaison du verbe 'sein'",
@@ -127,33 +143,22 @@ export default function VideoPreview() {
           )}
           {activeSlide === "quiz" && (
             <Player
-              component={QuizSlide}
+              component={QuizSlide as any}
               durationInFrames={180}
               fps={30}
               compositionWidth={1280}
               compositionHeight={720}
-              style={{ width: "100%", aspectRatio: "16/9" }}
+              style={{ width:"100%", aspectRatio:"16/9" }}
               controls
               inputProps={{
-                question: "Comment dit-on 'bonjour' formellement en allemand ?",
+                question: "Comment dit-on 'bonjour' formellement ?",
                 options: ["Hallo", "Guten Tag", "Tschüss", "Danke"],
                 correct: 1,
-                explanation: "Guten Tag est la salutation formelle. Hallo est familier.",
+                explanation: "Guten Tag est la salutation formelle.",
                 level: "A1"
               }}
             />
           )}
-        </div>
-
-        <div style={{
-          marginTop: 20, padding: 16, borderRadius: 12,
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.07)"
-        }}>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0 }}>
-            💡 Ces slides sont générées dynamiquement depuis le contenu des leçons.
-            L&apos;admin peut générer et exporter en MP4 via l&apos;interface admin.
-          </p>
         </div>
       </div>
     </div>
