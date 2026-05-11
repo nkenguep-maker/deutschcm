@@ -10,7 +10,7 @@ export const RemotionRoot = () => {
     <>
       <Composition
         id="LessonVideo"
-        component={LessonSlide}
+        component={LessonSlide as any}
         durationInFrames={300}
         fps={30}
         width={1280}
@@ -27,7 +27,7 @@ export const RemotionRoot = () => {
       />
       <Composition
         id="VocabularyVideo"
-        component={VocabularySlide}
+        component={VocabularySlide as any}
         durationInFrames={450}
         fps={30}
         width={1280}
@@ -46,7 +46,7 @@ export const RemotionRoot = () => {
       />
       <Composition
         id="GrammarVideo"
-        component={GrammarSlide}
+        component={GrammarSlide as any}
         durationInFrames={360}
         fps={30}
         width={1280}
