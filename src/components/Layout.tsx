@@ -81,6 +81,15 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
   const [userLevel, setUserLevel] = useState<string | null>(null);
   const [studentType, setStudentType] = useState<string | null>(null);
   const [isValidated, setIsValidated] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     const supabase = createClient();
@@ -146,6 +155,10 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
           from { opacity: 0; transform: translateY(14px); }
           to   { opacity: 1; transform: translateY(0); }
         }
+        @keyframes slideIn {
+          from { transform: translateX(-100%); }
+          to   { transform: translateX(0); }
+        }
         .fade-up { animation: fadeUp 0.45s ease forwards; }
         .card-delay-1 { animation-delay: 0.05s; opacity: 0; }
         .card-delay-2 { animation-delay: 0.10s; opacity: 0; }
@@ -153,18 +166,34 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
         .card-delay-4 { animation-delay: 0.20s; opacity: 0; }
         .card-delay-5 { animation-delay: 0.25s; opacity: 0; }
         .nav-link:hover { background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.8) !important; }
+        .sidebar-drawer { animation: slideIn 0.25s ease forwards; }
       `}</style>
+
+      {/* Mobile overlay backdrop */}
+      {isMobile && sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 39,
+            background: "rgba(0,0,0,0.6)", backdropFilter: "blur(2px)",
+          }}
+        />
+      )}
 
       <div style={{ display: "flex", minHeight: "100vh", background: "#080c10", fontFamily: "'DM Mono', monospace" }}>
 
         {/* ════════════════ SIDEBAR ════════════════ */}
-        <aside style={{
-          position: "fixed", top: 0, left: 0, bottom: 0, width: 260, zIndex: 40,
-          display: "flex", flexDirection: "column",
-          background: "rgba(8,12,16,0.95)",
-          borderRight: "1px solid rgba(255,255,255,0.07)",
-          backdropFilter: "blur(24px)",
-        }}>
+        <aside
+          className={isMobile ? "sidebar-drawer" : ""}
+          style={{
+            position: "fixed", top: 0, left: 0, bottom: 0, width: 260, zIndex: 40,
+            display: isMobile && !sidebarOpen ? "none" : "flex",
+            flexDirection: "column",
+            background: "rgba(8,12,16,0.98)",
+            borderRight: "1px solid rgba(255,255,255,0.07)",
+            backdropFilter: "blur(24px)",
+          }}
+        >
           {/* Ambient glow */}
           <div style={{
             position: "absolute", top: -40, left: -40, width: 200, height: 200,
@@ -174,7 +203,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
           }} />
 
           {/* ── Logo ── */}
-          <div style={{ padding: "26px 20px 20px" }}>
+          <div style={{ padding: "26px 20px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <Link href="/dashboard" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 11 }}>
               <div style={{
                 width: 42, height: 42, borderRadius: 13, flexShrink: 0,
@@ -192,6 +221,12 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
                 </p>
               </div>
             </Link>
+            {isMobile && (
+              <button
+                onClick={() => setSidebarOpen(false)}
+                style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: "1.2rem", cursor: "pointer", padding: 4, lineHeight: 1 }}
+              >✕</button>
+            )}
           </div>
 
           {/* ── Divider ── */}
@@ -215,6 +250,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
                   key={item.href}
                   href={item.href}
                   className="nav-link"
+                  onClick={() => isMobile && setSidebarOpen(false)}
                   style={{
                     display: "flex", alignItems: "center", gap: 11,
                     padding: "10px 13px", borderRadius: 11, textDecoration: "none",
@@ -279,62 +315,79 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
         </aside>
 
         {/* ════════════════ RIGHT SIDE ════════════════ */}
-        <div style={{ marginLeft: 260, flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+        <div style={{ marginLeft: isMobile ? 0 : 260, flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
 
           {/* ── Header ── */}
           <header style={{
-            position: "sticky", top: 0, zIndex: 30, height: 64,
-            display: "flex", alignItems: "center", gap: 20, padding: "0 28px",
+            position: "sticky", top: 0, zIndex: 30, height: 56,
+            display: "flex", alignItems: "center", gap: isMobile ? 10 : 20,
+            padding: isMobile ? "0 14px" : "0 28px",
             background: "rgba(8,12,16,0.92)",
             borderBottom: "1px solid rgba(255,255,255,0.06)",
             backdropFilter: "blur(20px)",
           }}>
+            {/* Hamburger (mobile only) */}
+            {isMobile && (
+              <button
+                onClick={() => setSidebarOpen(true)}
+                style={{
+                  flexShrink: 0, background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
+                  color: "white", fontSize: "1rem", cursor: "pointer",
+                  width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center",
+                }}
+              >☰</button>
+            )}
+
             {/* Page title */}
             <h1 style={{
               margin: 0, color: "white", fontFamily: "'Syne', sans-serif",
-              fontWeight: 700, fontSize: "1.05rem", flexShrink: 0, minWidth: 120,
+              fontWeight: 700, fontSize: isMobile ? "0.9rem" : "1.05rem",
+              flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+              maxWidth: isMobile ? 140 : "none",
             }}>
               {title}
             </h1>
 
-            {/* Search */}
-            <div style={{
-              flex: 1, maxWidth: 500,
-              display: "flex", alignItems: "center", gap: 8,
-              padding: "8px 14px", borderRadius: 10,
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}>
-              <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.82rem", flexShrink: 0 }}>🔍</span>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => onSearchChange?.(e.target.value)}
-                placeholder="Rechercher un cours, un scénario..."
-                style={{
-                  flex: 1, background: "transparent", border: "none", outline: "none",
-                  color: "white", fontSize: "0.8rem", fontFamily: "'DM Mono', monospace",
-                }}
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => onSearchChange?.("")}
-                  style={{ color: "rgba(255,255,255,0.35)", background: "none", border: "none", cursor: "pointer", fontSize: "0.72rem" }}
-                >
-                  ✕
-                </button>
-              )}
-            </div>
+            {/* Search — hidden on mobile when no handler provided */}
+            {(!isMobile || onSearchChange) && (
+              <div style={{
+                flex: 1, maxWidth: isMobile ? "none" : 500,
+                display: "flex", alignItems: "center", gap: 8,
+                padding: isMobile ? "6px 10px" : "8px 14px", borderRadius: 10,
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.08)",
+              }}>
+                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.82rem", flexShrink: 0 }}>🔍</span>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => onSearchChange?.(e.target.value)}
+                  placeholder={isMobile ? "Rechercher…" : "Rechercher un cours, un scénario..."}
+                  style={{
+                    flex: 1, background: "transparent", border: "none", outline: "none",
+                    color: "white", fontSize: "0.8rem", fontFamily: "'DM Mono', monospace",
+                    minWidth: 0,
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => onSearchChange?.("")}
+                    style={{ color: "rgba(255,255,255,0.35)", background: "none", border: "none", cursor: "pointer", fontSize: "0.72rem", flexShrink: 0 }}
+                  >✕</button>
+                )}
+              </div>
+            )}
 
             {/* Right actions */}
-            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
               <NotificationBell accentColor={accentColor} />
 
               {/* Avatar */}
               <div style={{
-                width: 36, height: 36, borderRadius: 10,
+                width: 34, height: 34, borderRadius: 10, flexShrink: 0,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem",
+                fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem",
                 color: "white", cursor: "pointer",
                 background: "linear-gradient(135deg, rgba(16,185,129,0.22), rgba(5,150,105,0.1))",
                 border: "1px solid rgba(16,185,129,0.3)",
@@ -345,7 +398,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
           </header>
 
           {/* ── Main content ── */}
-          <main style={{ flex: 1, padding: "32px 28px 48px" }}>
+          <main style={{ flex: 1, padding: isMobile ? "16px 14px 32px" : "32px 28px 48px" }}>
             <div style={{ maxWidth: 1400, margin: "0 auto" }}>
               {children}
             </div>
