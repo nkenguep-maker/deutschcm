@@ -808,6 +808,14 @@ export default function DiscoverPage() {
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [joined, setJoined] = useState<Set<string>>(new Set());
@@ -970,7 +978,7 @@ export default function DiscoverPage() {
       <DualSearch onJoin={openJoin} />
 
       {viewMode === "map" ? (
-        <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "220px 1fr", gap: 20 }}>
           <CameroonMap onCityClick={(city) => { setFilters(f => ({ ...f, cities: [city] })); setViewMode("list"); }} />
           <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
             Cliquez sur une ville pour filtrer les classes

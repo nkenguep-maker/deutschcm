@@ -181,6 +181,14 @@ export default function StudentDashboard() {
     city?: string | null; studentType?: string; isValidated?: boolean;
   } | null>(null);
   const [classJoinCode, setClassJoinCode] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     fetch("/api/me").then(r => r.ok ? r.json() : null).then(d => {
@@ -208,15 +216,17 @@ export default function StudentDashboard() {
       {/* ── Welcome row ── */}
       <div className="fade-up" style={{ marginBottom: 28 }}>
         <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "20px 24px", borderRadius: 18,
+          display: "flex", flexDirection: isMobile ? "column" : "row",
+          alignItems: isMobile ? "flex-start" : "center",
+          justifyContent: "space-between", gap: isMobile ? 16 : 0,
+          padding: isMobile ? "16px 18px" : "20px 24px", borderRadius: 18,
           background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
         }}>
           <div>
             <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.68rem", letterSpacing: "0.1em", textTransform: "uppercase" }}>
               {greet} 👋
             </p>
-            <h2 style={{ margin: "6px 0 10px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.8rem" }}>
+            <h2 style={{ margin: "6px 0 10px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: isMobile ? "1.4rem" : "1.8rem" }}>
               {firstName}
             </h2>
             <div style={{
@@ -232,11 +242,12 @@ export default function StudentDashboard() {
             onClick={() => router.push("/simulateur")}
             style={{
               display: "flex", alignItems: "center", gap: 10,
-              padding: "14px 22px", borderRadius: 14, cursor: "pointer",
+              padding: isMobile ? "12px 18px" : "14px 22px", borderRadius: 14, cursor: "pointer",
               background: "linear-gradient(135deg, #10b981, #059669)",
               border: "none", color: "white",
               fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem",
               boxShadow: "0 4px 24px rgba(16,185,129,0.35)",
+              width: isMobile ? "100%" : "auto", justifyContent: isMobile ? "center" : "flex-start",
             }}
           >
             <span style={{ fontSize: "1.2rem" }}>🎙️</span>
@@ -247,13 +258,13 @@ export default function StudentDashboard() {
 
       {/* ── Stats grid (6 cols) ── */}
       <div className="fade-up card-delay-1" style={{
-        display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 14, marginBottom: 28,
+        display: "grid", gridTemplateColumns: isMobile ? "repeat(3, 1fr)" : "repeat(6, 1fr)", gap: isMobile ? 10 : 14, marginBottom: 28,
       }}>
         {dynamicStats.map(s => <StatCard key={s.label} {...s} />)}
       </div>
 
       {/* ── Main grid (2 cols) ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 24, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 380px", gap: 24, alignItems: "start" }}>
 
         {/* ── Left col ── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>

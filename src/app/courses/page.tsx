@@ -162,7 +162,7 @@ function CourseCard({ course }: { course: Course }) {
 
 // ─── Level section ────────────────────────────────────────────────────────────
 
-function LevelSection({ level, courses }: { level: Level; courses: Course[] }) {
+function LevelSection({ level, courses, isMobile }: { level: Level; courses: Course[]; isMobile: boolean }) {
   const cfg = LEVEL_CONFIG[level];
   const isLocked = courses.every(c => c.locked);
   const done = courses.filter(c => c.progress === 100).length;
@@ -190,18 +190,20 @@ function LevelSection({ level, courses }: { level: Level; courses: Course[] }) {
             {isLocked ? "Verrouillé" : `${done}/${courses.length} cours · ${cfg.certif}`}
           </p>
         </div>
-        <div style={{
-          padding: "4px 12px", borderRadius: 8, fontSize: "0.65rem",
-          background: isLocked ? "rgba(255,255,255,0.03)" : cfg.bg,
-          color: isLocked ? "rgba(255,255,255,0.2)" : cfg.color,
-          border: `1px solid ${isLocked ? "rgba(255,255,255,0.06)" : cfg.border}`,
-        }}>
-          🎓 {cfg.certif}
-        </div>
+        {!isMobile && (
+          <div style={{
+            padding: "4px 12px", borderRadius: 8, fontSize: "0.65rem",
+            background: isLocked ? "rgba(255,255,255,0.03)" : cfg.bg,
+            color: isLocked ? "rgba(255,255,255,0.2)" : cfg.color,
+            border: `1px solid ${isLocked ? "rgba(255,255,255,0.06)" : cfg.border}`,
+          }}>
+            🎓 {cfg.certif}
+          </div>
+        )}
       </div>
 
-      {/* Cards — 3-column grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+      {/* Cards grid */}
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(3, 1fr)", gap: isMobile ? 10 : 14 }}>
         {courses.map(course =>
           course.locked ? (
             <CourseCard key={course.id} course={course} />
@@ -222,6 +224,14 @@ export default function CoursesPage() {
   const [filter, setFilter] = useState<Filter>("Tous");
   const [search, setSearch] = useState("");
   const [dbCourses, setDbCourses] = useState<Course[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     fetch("/api/courses")
@@ -296,24 +306,26 @@ export default function CoursesPage() {
             </p>
           </div>
 
-          {/* Level stat pills */}
-          <div style={{ display: "flex", gap: 10 }}>
-            {LEVELS.map(l => {
-              const cfg = LEVEL_CONFIG[l];
-              const lvlDone = allCourses.filter(c => c.level === l && c.progress === 100).length;
-              const lvlTotal = allCourses.filter(c => c.level === l && !c.locked).length;
-              return (
-                <div key={l} style={{
-                  padding: "8px 14px", borderRadius: 12, textAlign: "center",
-                  background: cfg.bg, border: `1px solid ${cfg.border}`,
-                  opacity: lvlTotal === 0 ? 0.4 : 1,
-                }}>
-                  <p style={{ margin: 0, color: cfg.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1rem" }}>{l}</p>
-                  <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.3)", fontSize: "0.58rem" }}>{lvlDone}/{lvlTotal || allCourses.filter(c => c.level === l).length}</p>
-                </div>
-              );
-            })}
-          </div>
+          {/* Level stat pills — hidden on mobile */}
+          {!isMobile && (
+            <div style={{ display: "flex", gap: 10 }}>
+              {LEVELS.map(l => {
+                const cfg = LEVEL_CONFIG[l];
+                const lvlDone = allCourses.filter(c => c.level === l && c.progress === 100).length;
+                const lvlTotal = allCourses.filter(c => c.level === l && !c.locked).length;
+                return (
+                  <div key={l} style={{
+                    padding: "8px 14px", borderRadius: 12, textAlign: "center",
+                    background: cfg.bg, border: `1px solid ${cfg.border}`,
+                    opacity: lvlTotal === 0 ? 0.4 : 1,
+                  }}>
+                    <p style={{ margin: 0, color: cfg.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1rem" }}>{l}</p>
+                    <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.3)", fontSize: "0.58rem" }}>{lvlDone}/{lvlTotal || allCourses.filter(c => c.level === l).length}</p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
@@ -351,7 +363,7 @@ export default function CoursesPage() {
         </div>
       ) : (
         visibleLevels.map(level => (
-          <LevelSection key={level} level={level} courses={filtered.filter(c => c.level === level)} />
+          <LevelSection key={level} level={level} courses={filtered.filter(c => c.level === level)} isMobile={isMobile} />
         ))
       )}
     </Layout>

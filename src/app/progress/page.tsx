@@ -85,6 +85,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export default function ProgressPage() {
   const [data, setData] = useState(DEMO_DATA)
   const [activeTab, setActiveTab] = useState<"overview" | "skills" | "history" | "badges">("overview")
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener("resize", check)
+    return () => window.removeEventListener("resize", check)
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -134,7 +142,7 @@ export default function ProgressPage() {
         </div>
 
         {/* Stats globales */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 28 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(3, 1fr)" : "repeat(5, 1fr)", gap: 12, marginBottom: 28 }}>
           {[
             { label: "XP Total", value: overview.xpTotal.toLocaleString(), icon: "⚡", color: "#10b981" },
             { label: "Streak", value: `${overview.streakDays}j`, icon: "🔥", color: "#f59e0b" },
@@ -193,10 +201,10 @@ export default function ProgressPage() {
           borderRadius: 14, marginBottom: 24
         }}>
           {[
-            { key: "overview", label: "📈 Vue d'ensemble" },
-            { key: "skills", label: "🎯 Compétences" },
-            { key: "history", label: "📋 Historique" },
-            { key: "badges", label: "🏆 Badges" },
+            { key: "overview", label: isMobile ? "📈" : "📈 Vue d'ensemble" },
+            { key: "skills", label: isMobile ? "🎯" : "🎯 Compétences" },
+            { key: "history", label: isMobile ? "📋" : "📋 Historique" },
+            { key: "badges", label: isMobile ? "🏆" : "🏆 Badges" },
           ].map(tab => (
             <button key={tab.key} onClick={() => setActiveTab(tab.key as any)}
               style={{
@@ -217,7 +225,7 @@ export default function ProgressPage() {
 
         {/* Onglet Vue d'ensemble */}
         {activeTab === "overview" && (
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "2fr 1fr", gap: 16 }}>
             <div style={{
               padding: "20px 24px", borderRadius: 16,
               background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)"
@@ -299,7 +307,7 @@ export default function ProgressPage() {
 
         {/* Onglet Compétences */}
         {activeTab === "skills" && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
             <div style={{
               padding: "20px 24px", borderRadius: 16,
               background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)"
@@ -360,7 +368,7 @@ export default function ProgressPage() {
 
         {/* Onglet Historique */}
         {activeTab === "history" && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
             <div style={{
               padding: "20px 24px", borderRadius: 16,
               background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)"
@@ -448,7 +456,7 @@ export default function ProgressPage() {
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, marginBottom: 20 }}>
               {overview.totalBadges} badge{overview.totalBadges > 1 ? "s" : ""} obtenus sur {BADGES.length}
             </p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: 12 }}>
               {BADGES.map((badge, i) => (
                 <div key={i} style={{
                   padding: "20px 16px", borderRadius: 16, textAlign: "center",
