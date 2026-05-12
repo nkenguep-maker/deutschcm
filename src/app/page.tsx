@@ -6,11 +6,19 @@ export default function LandingPage() {
   const router = useRouter()
   const [scrolled, setScrolled] = useState(false)
   const [faqOpen, setFaqOpen] = useState<number | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50)
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener("resize", check)
+    return () => window.removeEventListener("resize", check)
   }, [])
 
   const stats = [
@@ -70,7 +78,7 @@ export default function LandingPage() {
       {/* ── NAVBAR ── */}
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-        padding: "16px 40px",
+        padding: isMobile ? "12px 16px" : "16px 40px",
         background: scrolled ? "rgba(8,12,16,0.95)" : "transparent",
         backdropFilter: scrolled ? "blur(20px)" : "none",
         borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
@@ -83,31 +91,33 @@ export default function LandingPage() {
             Deutsch<span style={{ color: "#10b981" }}>CM</span>
           </span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-          {["Fonctionnalités", "Niveaux", "Tarifs", "Centres"].map(item => (
-            <a key={item} href={`#${item.toLowerCase()}`}
-              style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", transition: "color 0.2s" }}
-              onMouseOver={e => (e.target as HTMLElement).style.color = "white"}
-              onMouseOut={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.6)"}
-            >
-              {item}
-            </a>
-          ))}
-        </div>
-        <div style={{ display: "flex", gap: 10 }}>
+        {!isMobile && (
+          <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+            {["Fonctionnalités", "Niveaux", "Tarifs", "Centres"].map(item => (
+              <a key={item} href={`#${item.toLowerCase()}`}
+                style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", transition: "color 0.2s" }}
+                onMouseOver={e => (e.target as HTMLElement).style.color = "white"}
+                onMouseOut={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.6)"}
+              >
+                {item}
+              </a>
+            ))}
+          </div>
+        )}
+        <div style={{ display: "flex", gap: 8 }}>
           <button onClick={() => router.push("/login")}
-            style={{ padding: "9px 20px", borderRadius: 10, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)", fontSize: 13, cursor: "pointer" }}>
-            Se connecter
+            style={{ padding: isMobile ? "8px 14px" : "9px 20px", borderRadius: 10, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)", fontSize: 12, cursor: "pointer" }}>
+            Connexion
           </button>
           <button onClick={() => router.push("/register")}
-            style={{ padding: "9px 20px", borderRadius: 10, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
-            Commencer gratuitement
+            style={{ padding: isMobile ? "8px 14px" : "9px 20px", borderRadius: 10, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
+            {isMobile ? "Démarrer" : "Commencer gratuitement"}
           </button>
         </div>
       </nav>
 
       {/* ── HERO ── */}
-      <section style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "120px 40px 80px", position: "relative", textAlign: "center" }}>
+      <section style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: isMobile ? "100px 20px 60px" : "120px 40px 80px", position: "relative", textAlign: "center" }}>
         {/* Glows */}
         <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)", width: 800, height: 800, borderRadius: "50%", background: "radial-gradient(circle,rgba(16,185,129,0.08),transparent 70%)", pointerEvents: "none", animation: "pulse 4s ease-in-out infinite" }} />
 
@@ -119,13 +129,13 @@ export default function LandingPage() {
           </div>
 
           {/* Titre */}
-          <h1 className="fade-up" style={{ fontFamily: "'Syne',sans-serif", fontSize: 64, fontWeight: 900, lineHeight: 1.05, marginBottom: 20, letterSpacing: "-0.02em" }}>
+          <h1 className="fade-up" style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 36 : 64, fontWeight: 900, lineHeight: 1.1, marginBottom: 20, letterSpacing: "-0.02em" }}>
             Apprenez l'allemand<br />
             <span style={{ color: "#10b981" }}>comme à Berlin</span>
           </h1>
 
           {/* Sous-titre */}
-          <p className="fade-up" style={{ fontSize: 18, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 36, maxWidth: 600, margin: "0 auto 36px" }}>
+          <p className="fade-up" style={{ fontSize: isMobile ? 14 : 18, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 36, maxWidth: 600, margin: "0 auto 36px" }}>
             Le seul LMS d'allemand avec IA conversationnelle, correction vocale en temps réel et préparation Goethe-Zertifikat A1→C1.
           </p>
 
@@ -154,7 +164,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="fonctionnalités" style={{ padding: "80px 40px", maxWidth: 1200, margin: "0 auto" }}>
+      <section id="fonctionnalités" style={{ padding: isMobile ? "60px 16px" : "80px 40px", maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12 }}>
             Tout ce dont vous avez besoin
@@ -163,7 +173,7 @@ export default function LandingPage() {
             12 outils IA intégrés pour un apprentissage complet
           </p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 10 : 16 }}>
           {features.map((f, i) => (
             <div key={i} style={{ padding: "20px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", transition: "border-color 0.2s" }}
               onMouseOver={e => (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.25)"}
@@ -181,7 +191,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── NIVEAUX ── */}
-      <section id="niveaux" style={{ padding: "80px 40px", background: "rgba(255,255,255,0.01)" }}>
+      <section id="niveaux" style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12 }}>
@@ -216,8 +226,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── SIMULATEUR DEMO ── */}
-      <section style={{ padding: "80px 40px" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center" }}>
+      <section style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
+        <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "center" }}>
           <div>
             <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Fonctionnalité phare</span>
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2 }}>
@@ -277,12 +287,12 @@ export default function LandingPage() {
       </section>
 
       {/* ── TÉMOIGNAGES ── */}
-      <section style={{ padding: "80px 40px", background: "rgba(255,255,255,0.01)" }}>
+      <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, textAlign: "center", marginBottom: 48 }}>
+          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 26 : 36, fontWeight: 800, textAlign: "center", marginBottom: 48 }}>
             Ils nous font confiance
           </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: isMobile ? 12 : 20 }}>
             {testimonials.map((t, i) => (
               <div key={i} style={{ padding: "24px", borderRadius: 18, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <div style={{ display: "flex", gap: 3, marginBottom: 14 }}>
@@ -303,8 +313,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── CENTRES ── */}
-      <section id="centres" style={{ padding: "80px 40px" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center" }}>
+      <section id="centres" style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
+        <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "center" }}>
           <div>
             <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Solution B2B</span>
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2 }}>
@@ -357,9 +367,9 @@ export default function LandingPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section style={{ padding: "80px 40px", background: "rgba(255,255,255,0.01)" }}>
+      <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
-          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, textAlign: "center", marginBottom: 40 }}>
+          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 24 : 36, fontWeight: 800, textAlign: "center", marginBottom: 40 }}>
             Questions fréquentes
           </h2>
           {faqs.map((faq, i) => (
@@ -380,12 +390,12 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA FINAL ── */}
-      <section style={{ padding: "80px 40px", textAlign: "center" }}>
+      <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", textAlign: "center" }}>
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
           <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, margin: "0 auto 24px", animation: "float 3s ease-in-out infinite" }}>
             🇩🇪
           </div>
-          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 40, fontWeight: 900, marginBottom: 16, lineHeight: 1.1 }}>
+          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 28 : 40, fontWeight: 900, marginBottom: 16, lineHeight: 1.1 }}>
             Commencez aujourd'hui.<br />
             <span style={{ color: "#10b981" }}>C'est gratuit.</span>
           </h2>
@@ -403,7 +413,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer style={{ padding: "40px", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
+      <footer style={{ padding: isMobile ? "32px 16px" : "40px", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", flexWrap: "wrap", gap: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 20 }}>🇩🇪</span>
           <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800 }}>
