@@ -8,7 +8,7 @@ import {
   type UserRole
 } from "@/lib/permissions"
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Routes publiques
