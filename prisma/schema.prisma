@@ -3,7 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -97,6 +99,13 @@ model User {
   testScore         Float?
   levelAssignedAt   DateTime?
   centerId          String?
+  bio               String?
+  qualifications    String?
+  teachingLevels    String?
+  centerName        String?
+  centerAddress     String?
+  centerCity        String?
+  centerWebsite     String?
 
   enrollments           Enrollment[]
   moduleProgress        ModuleProgress[]

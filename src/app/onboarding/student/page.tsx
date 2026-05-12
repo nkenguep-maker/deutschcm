@@ -144,10 +144,26 @@ export default function StudentOnboardingPage() {
             body: JSON.stringify({ code: form.centerCode }),
           });
         }
-        await fetch("/api/onboarding/complete", { method: "POST" });
+        const completeRes = await fetch("/api/onboarding/complete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            role: "STUDENT",
+            profileData: {
+              fullName: `${form.firstName.trim()} ${form.lastName.trim()}`,
+              phone: form.phone,
+              city: form.city,
+              country: "Cameroun",
+              dateOfBirth: form.dateOfBirth,
+              learningGoal: form.learningGoal,
+              availability: form.availability,
+            }
+          })
+        });
+        const completeData = await completeRes.json();
         document.cookie = "onboarding_done=true;path=/;max-age=2592000";
         if (form.learningType === "group_creator") router.push("/group/create");
-        else router.push("/test-niveau");
+        else router.push(completeData.redirectTo || "/test-niveau");
       }
     } finally {
       setSaving(false);

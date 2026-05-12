@@ -112,7 +112,24 @@ export default function TeacherOnboardingPage() {
       if (step < STEPS.length - 1) {
         setStep(s => s + 1);
       } else {
-        await fetch("/api/onboarding/complete", { method: "POST" });
+        await fetch("/api/onboarding/complete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            role: "TEACHER",
+            profileData: {
+              fullName: `${form.firstName} ${form.lastName}`.trim(),
+              phone: form.phone,
+              city: form.city,
+              country: "Cameroun",
+              bio: form.bio,
+              qualifications: form.diploma,
+              teachingLevels: form.levels.join(","),
+              availability: JSON.stringify(form.availability),
+              centerName: form.centerName,
+            }
+          })
+        });
         document.cookie = "onboarding_done=true;path=/;max-age=2592000";
         router.push("/teacher");
       }

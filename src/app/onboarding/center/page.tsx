@@ -115,7 +115,23 @@ export default function CenterOnboardingPage() {
           await new Promise(r => setTimeout(r, 1200));
           set("payStep", "done");
           setSaving(false);
-          await fetch("/api/onboarding/complete", { method: "POST" });
+          await fetch("/api/onboarding/complete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              role: "CENTER_MANAGER",
+              profileData: {
+                fullName: form.name,
+                phone: form.phone,
+                city: form.city,
+                country: "Cameroun",
+                centerName: form.name,
+                centerAddress: form.address,
+                centerCity: form.city,
+                centerWebsite: form.website,
+              }
+            })
+          });
           document.cookie = "onboarding_done=true;path=/;max-age=2592000";
           setTimeout(() => router.push("/center"), 1500);
           return;
@@ -424,7 +440,23 @@ export default function CenterOnboardingPage() {
                   </div>
 
                   <button onClick={async () => {
-                    await fetch("/api/onboarding/complete", { method: "POST" });
+                    await fetch("/api/onboarding/complete", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        role: "CENTER_MANAGER",
+                        profileData: {
+                          fullName: form.name,
+                          phone: form.phone,
+                          city: form.city,
+                          country: "Cameroun",
+                          centerName: form.name,
+                          centerAddress: form.address,
+                          centerCity: form.city,
+                          centerWebsite: form.website,
+                        }
+                      })
+                    });
                     document.cookie = "onboarding_done=true;path=/;max-age=2592000";
                     router.push("/center");
                   }} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.3)", cursor: "pointer", fontSize: 12, textDecoration: "underline", textAlign: "center" }}>
