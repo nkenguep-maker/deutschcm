@@ -4,17 +4,7 @@ import { Link } from "@/navigation";
 import { usePathname } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
-
-const CENTER_NAV = [
-  { icon: "🏛️", label: "Vue d'ensemble",  href: "/center"                   },
-  { icon: "👨‍🏫", label: "Enseignants",     href: "/center/teachers"          },
-  { icon: "🏫", label: "Classes",           href: "/center/classes"           },
-  { icon: "👥", label: "Élèves",            href: "/center/students"          },
-  { icon: "✨", label: "Générer cours",     href: "/admin/courses/generate"   },
-  { icon: "💳", label: "Facturation",       href: "/center/billing"           },
-  { icon: "📊", label: "Statistiques",      href: "/center/stats"             },
-  { icon: "⚙️", label: "Paramètres",       href: "/center/settings"          },
-];
+import { useTranslations } from "next-intl";
 
 interface CenterLayoutProps {
   children: React.ReactNode;
@@ -25,7 +15,20 @@ interface CenterLayoutProps {
 
 export default function CenterLayout({ children, title, centerName = "Institut Goethe Yaoundé", centerCity = "Yaoundé" }: CenterLayoutProps) {
   const pathname = usePathname();
+  const tNav = useTranslations("nav");
+  const tC = useTranslations("center");
   const [userName, setUserName] = useState("Directeur");
+
+  const CENTER_NAV = [
+    { icon: "🏛️", label: tNav("overview"),       href: "/center"                   },
+    { icon: "👨‍🏫", label: tNav("teachers"),      href: "/center/teachers"          },
+    { icon: "🏫", label: "Classes",               href: "/center/classes"           },
+    { icon: "👥", label: tNav("students"),        href: "/center/students"          },
+    { icon: "✨", label: tNav("generateCourse"),  href: "/admin/courses/generate"   },
+    { icon: "💳", label: tNav("billing"),         href: "/center/billing"           },
+    { icon: "📊", label: tNav("stats"),           href: "/center/stats"             },
+    { icon: "⚙️", label: tNav("settings"),       href: "/center/settings"          },
+  ];
 
   useEffect(() => {
     const supabase = createClient();
@@ -33,7 +36,6 @@ export default function CenterLayout({ children, title, centerName = "Institut G
       if (!data.user) return;
       const name = data.user.user_metadata?.full_name ?? data.user.email?.split("@")[0] ?? "Directeur";
       setUserName(name);
-      // Backfill role for accounts created before the role selector was added
       if (!data.user.user_metadata?.role || data.user.user_metadata.role === "STUDENT") {
         await fetch("/api/fix-role", {
           method: "POST",
@@ -89,7 +91,7 @@ export default function CenterLayout({ children, title, centerName = "Institut G
                   Yema
                 </p>
                 <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.58rem", letterSpacing: "0.08em" }}>
-                  Portail Centre
+                  {tC("portal")}
                 </p>
               </div>
             </Link>
@@ -110,7 +112,7 @@ export default function CenterLayout({ children, title, centerName = "Institut G
                 border: "1px solid rgba(234,179,8,0.35)", borderRadius: 20,
                 padding: "3px 10px", fontSize: 10, color: "#eab308", fontWeight: 700,
               }}>
-                ⭐ Centre Partenaire
+                {tC("partnerBadge")}
               </div>
             </div>
           </div>
@@ -169,7 +171,7 @@ export default function CenterLayout({ children, title, centerName = "Institut G
                 <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {userName}
                 </p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.6rem" }}>Directeur · CENTER_MANAGER</p>
+                <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.6rem" }}>{tC("directorRole")}</p>
               </div>
             </Link>
           </div>
@@ -196,7 +198,7 @@ export default function CenterLayout({ children, title, centerName = "Institut G
                 color: "rgba(255,255,255,0.5)", borderRadius: 8, padding: "6px 14px",
                 fontSize: 12, textDecoration: "none",
               }}>
-                ← Portail élève
+                {tC("studentPortal")}
               </Link>
               <div style={{
                 width: 36, height: 36, borderRadius: 10,

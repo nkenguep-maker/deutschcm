@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "@/navigation";
 import CenterLayout from "@/components/CenterLayout";
+import { useTranslations } from "next-intl";
 
 interface CenterStats {
   teacherCount: number;
@@ -23,6 +24,8 @@ interface CenterTeacher {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function CenterDashboard() {
+  const tC = useTranslations("center");
+  const tCommon = useTranslations("common");
   const [centerCode, setCenterCode] = useState<string | null>(null);
   const [codeCopied, setCodeCopied] = useState(false);
   const [stats, setStats] = useState<CenterStats | null>(null);
@@ -69,14 +72,16 @@ export default function CenterDashboard() {
   const displayName = centerName || "Mon Centre";
   const displayCity = centerCity || "";
   const statCards = [
-    { label: "Enseignants actifs", value: stats ? stats.teacherCount : "—", icon: "👨‍🏫", color: "#eab308", sub: loading ? "Chargement..." : "" },
-    { label: "Élèves inscrits",    value: stats ? stats.studentCount : "—",  icon: "👥",   color: "#10b981", sub: loading ? "Chargement..." : "" },
-    { label: "Classes actives",   value: stats ? stats.classCount : "—",    icon: "🏫",   color: "#6366f1", sub: "" },
-    { label: "Revenus du mois",   value: "—",                                icon: "💰",   color: "#f59e0b", sub: "Monétisation à venir" },
+    { label: tC("statTeachers"), value: stats ? stats.teacherCount : "—", icon: "👨‍🏫", color: "#eab308", sub: loading ? tC("loading") : "" },
+    { label: tC("statStudents"), value: stats ? stats.studentCount : "—",  icon: "👥",   color: "#10b981", sub: loading ? tC("loading") : "" },
+    { label: tC("statClasses"),  value: stats ? stats.classCount : "—",    icon: "🏫",   color: "#6366f1", sub: "" },
+    { label: tC("statRevenue"),  value: "—",                               icon: "💰",   color: "#f59e0b", sub: tC("statRevenueSub") },
   ];
 
+  const tableHeaders = [tC("tableTeacher"), tC("tableSpecialty"), tC("tableClasses"), tC("tableStudents"), tC("tableAvgScore"), tC("tableStatus")];
+
   return (
-    <CenterLayout title="Vue d'ensemble" centerName={displayName} centerCity={displayCity}>
+    <CenterLayout title={tC("overview")} centerName={displayName} centerCity={displayCity}>
 
       {/* ── Header ── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20 }}>
@@ -89,10 +94,10 @@ export default function CenterDashboard() {
               background: "rgba(16,185,129,0.15)", color: "#10b981",
               border: "1px solid rgba(16,185,129,0.3)", borderRadius: 20,
               padding: "3px 12px", fontSize: 11, fontWeight: 700,
-            }}>✓ Vérifié</span>
+            }}>{tC("verified")}</span>
           </div>
           <p style={{ margin: 0, color: "rgba(255,255,255,0.45)", fontSize: 13 }}>
-            {displayCity ? `📍 ${displayCity} · ` : ""}Tableau de bord · {new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+            {displayCity ? `📍 ${displayCity} · ` : ""}{tC("dashboard")} · {new Date().toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })}
           </p>
         </div>
         <Link href="/center/billing" style={{
@@ -101,11 +106,11 @@ export default function CenterDashboard() {
           fontSize: 13, fontWeight: 700, textDecoration: "none",
           fontFamily: "'Syne', sans-serif",
         }}>
-          ⭐ Plan Pro
+          {tC("proPlan")}
         </Link>
       </div>
 
-      {/* ── Code d'inscription ── */}
+      {/* ── Registration code ── */}
       <div style={{
         background: "linear-gradient(135deg, rgba(234,179,8,0.08), rgba(161,120,0,0.04))",
         border: "1px solid rgba(234,179,8,0.25)", borderRadius: 16,
@@ -115,14 +120,14 @@ export default function CenterDashboard() {
         <div style={{ fontSize: 32 }}>🔑</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ color: "#eab308", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>
-            Code d&apos;inscription de votre centre
+            {tC("registrationCode")}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{
               fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 700,
               color: "#f1f5f9", letterSpacing: "0.15em",
             }}>
-              {centerCode ?? "Chargement..."}
+              {centerCode ?? tCommon("loading")}
             </span>
             {centerCode && (
               <button
@@ -135,12 +140,12 @@ export default function CenterDashboard() {
                   transition: "all 0.2s",
                 }}
               >
-                {codeCopied ? "✓ Copié !" : "Copier"}
+                {codeCopied ? tC("copied") : tC("copy")}
               </button>
             )}
           </div>
           <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, marginTop: 4 }}>
-            Partagez ce code à vos élèves — ils le saisissent lors de leur inscription sur Yema.
+            {tC("shareCodeStudents")}
           </div>
         </div>
         <Link href="/center/students" style={{
@@ -148,7 +153,7 @@ export default function CenterDashboard() {
           color: "#eab308", borderRadius: 10, padding: "10px 18px",
           fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap",
         }}>
-          Voir les élèves →
+          {tC("viewStudents")}
         </Link>
       </div>
 
@@ -181,51 +186,51 @@ export default function CenterDashboard() {
       {/* ── Main grid ── */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20, marginBottom: 20 }}>
 
-        {/* ── Inscriptions chart ── */}
+        {/* ── Registrations chart ── */}
         <div style={{
           background: "rgba(13,17,23,0.8)", border: "1px solid rgba(255,255,255,0.07)",
           borderRadius: 14, padding: 24, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 260,
         }}>
           <div style={{ color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 15, marginBottom: 8 }}>
-            Évolution des inscriptions
+            {tC("registrationsChart")}
           </div>
           <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, textAlign: "center", margin: 0 }}>
-            Les statistiques d&apos;inscription apparaîtront ici au fur et à mesure.
+            {tC("registrationsEmpty")}
           </p>
         </div>
 
         {/* ── Alerts ── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div style={{ color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 14, marginBottom: 4 }}>
-            Alertes & Notifications
+            {tC("alerts")}
           </div>
           <div style={{ padding: "20px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, margin: 0 }}>Aucune alerte pour le moment</p>
+            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, margin: 0 }}>{tC("noAlerts")}</p>
           </div>
         </div>
       </div>
 
-      {/* ── Enseignants list ── */}
+      {/* ── Teachers list ── */}
       <div style={{
         background: "rgba(13,17,23,0.8)", border: "1px solid rgba(255,255,255,0.07)",
         borderRadius: 14, padding: 24,
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
           <div style={{ color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 15 }}>
-            Enseignants du centre
+            {tC("teachersList")}
           </div>
           <Link href="/center/teachers" style={{
             background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)",
             border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8,
             padding: "6px 14px", fontSize: 12, textDecoration: "none",
           }}>
-            Voir tout →
+            {tC("viewAll")}
           </Link>
         </div>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-              {["Enseignant", "Spécialité", "Classes", "Élèves", "Score moy.", "Statut"].map(h => (
+              {tableHeaders.map(h => (
                 <th key={h} style={{
                   padding: "8px 14px", textAlign: "left", color: "rgba(255,255,255,0.3)",
                   fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em",
@@ -237,7 +242,7 @@ export default function CenterDashboard() {
             {teachers.length === 0 && (
               <tr>
                 <td colSpan={6} style={{ padding: "32px", textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 13 }}>
-                  Aucun enseignant associé au centre pour l&apos;instant.
+                  {tC("noTeachers")}
                 </td>
               </tr>
             )}
@@ -275,7 +280,7 @@ export default function CenterDashboard() {
                     border: `1px solid ${t.status === "active" ? "rgba(16,185,129,0.3)" : "rgba(100,116,139,0.3)"}`,
                     borderRadius: 6, padding: "2px 10px", fontSize: 11, fontWeight: 700,
                   }}>
-                    {t.status === "active" ? "Actif" : "Inactif"}
+                    {t.status === "active" ? tCommon("active") : tCommon("inactive")}
                   </span>
                 </td>
               </tr>

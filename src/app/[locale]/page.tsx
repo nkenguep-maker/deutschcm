@@ -26,44 +26,51 @@ export default function LandingPage() {
   }, [])
 
   const stats = [
-    { value: "10.000+", label: "Apprenants" },
-    { value: "A1→C1", label: "Niveaux CEFR" },
-    { value: "95%", label: "Taux de réussite" },
-    { value: "50+", label: "Centres partenaires" },
+    { value: "10.000+", label: t("statsUsers") },
+    { value: "A1→C1", label: t("statsLevels") },
+    { value: "95%", label: t("statsSuccess") },
+    { value: "50+", label: t("statsCenters") },
   ]
 
   const features = [
-    { icon: "🏛️", title: "Simulateur Ambassade IA", desc: "Entraînez-vous avec Herr Bauer, consul allemand virtuel. Scoring en temps réel sur grammaire, vocabulaire et pertinence.", badge: "Exclusif" },
-    { icon: "🎧", title: "Dialogues Audio Natifs", desc: "Voix allemandes authentiques générées par voix natives. Dialogues adaptés à chaque niveau A1→C1." },
-    { icon: "🎙️", title: "Reconnaissance Vocale", desc: "Parlez en allemand, l'IA analyse votre prononciation et corrige vos erreurs en français instantanément.", badge: "IA" },
-    { icon: "✍️", title: "Correction Schreiben IA", desc: "Rédigez en allemand, Gemini corrige grammaire, vocabulaire et style avec explications détaillées.", badge: "Gemini" },
-    { icon: "🎯", title: "Quiz Adaptatif", desc: "La difficulté s'ajuste automatiquement selon vos performances. Plus vous progressez, plus c'est challengeant.", badge: "Adaptatif" },
-    { icon: "👨‍🏫", title: "Classes Virtuelles", desc: "Rejoignez la classe d'un enseignant ou créez votre groupe de révision. Suivi en temps réel.", badge: "Social" },
-    { icon: "🏫", title: "Solution Centres", desc: "Dashboard complet pour les centres de langues. Gérez enseignants, élèves et classes depuis un seul endroit.", badge: "B2B" },
-    { icon: "📊", title: "Analytics Progression", desc: "Suivez votre progression sur 5 compétences : Lesen, Hören, Sprechen, Schreiben, Grammatik.", badge: "Insights" },
+    { icon: "🏛️", title: t("feature1Title"), desc: t("feature1Desc"), badge: t("feature1Badge") },
+    { icon: "🎧", title: t("feature2Title"), desc: t("feature2Desc") },
+    { icon: "🎙️", title: t("feature3Title"), desc: t("feature3Desc"), badge: t("feature3Badge") },
+    { icon: "✍️", title: t("feature4Title"), desc: t("feature4Desc"), badge: t("feature4Badge") },
+    { icon: "🎯", title: t("feature5Title"), desc: t("feature5Desc"), badge: t("feature5Badge") },
+    { icon: "👨‍🏫", title: t("feature6Title"), desc: t("feature6Desc"), badge: t("feature6Badge") },
+    { icon: "🏫", title: t("feature7Title"), desc: t("feature7Desc"), badge: t("feature7Badge") },
+    { icon: "📊", title: t("feature8Title"), desc: t("feature8Desc"), badge: t("feature8Badge") },
   ]
 
   const levels = [
-    { level: "A1", name: "Débutant", desc: "Salutations, famille, chiffres, routine quotidienne", modules: 48, color: "#10b981", locked: false },
-    { level: "A2", name: "Élémentaire", desc: "Vie urbaine, médias, santé, voyages", modules: 48, color: "#34d399", locked: false },
-    { level: "B1", name: "Intermédiaire", desc: "Travail, société, culture, environnement", modules: 60, color: "#60a5fa", locked: true },
-    { level: "B2", name: "Avancé", desc: "Sciences, économie, médias, histoire", modules: 40, color: "#a78bfa", locked: true },
-    { level: "C1", name: "Maîtrise", desc: "Philosophie, littérature, carrière internationale", modules: 40, color: "#f59e0b", locked: true },
+    { level: "A1", name: t("level1Name"), desc: t("level1Desc"), modules: 48, color: "#10b981", locked: false },
+    { level: "A2", name: t("level2Name"), desc: t("level2Desc"), modules: 48, color: "#34d399", locked: false },
+    { level: "B1", name: t("level3Name"), desc: t("level3Desc"), modules: 60, color: "#60a5fa", locked: true },
+    { level: "B2", name: t("level4Name"), desc: t("level4Desc"), modules: 40, color: "#a78bfa", locked: true },
+    { level: "C1", name: t("level5Name"), desc: t("level5Desc"), modules: 40, color: "#f59e0b", locked: true },
   ]
 
   const testimonials = [
-    { name: "Paul Nkengue", city: "Yaoundé", level: "B1 obtenu", text: "En 6 mois, j'ai atteint le B1 grâce au simulateur ambassade. Mon entretien de visa s'est parfaitement passé !", avatar: "🇨🇲", stars: 5 },
-    { name: "Prof. Marie Tchamba", city: "Douala", role: "Enseignante", text: "Mes élèves progressent 2x plus vite avec les outils IA. La correction automatique me fait gagner un temps précieux.", avatar: "👩‍🏫", stars: 5 },
-    { name: "Institut Lingua Plus", city: "Bafoussam", role: "Centre partenaire", text: "150 élèves gérés depuis un seul tableau de bord. Les analyses de progression sont excellentes.", avatar: "🏫", stars: 5 },
+    { name: "Paul Nkengue", city: "Yaoundé", level: t("testimonial1Role"), text: t("testimonial1Text"), avatar: "🇨🇲", stars: 5 },
+    { name: "Prof. Marie Tchamba", city: "Douala", role: t("testimonial2Role"), text: t("testimonial2Text"), avatar: "👩‍🏫", stars: 5 },
+    { name: "Institut Lingua Plus", city: "Bafoussam", role: t("testimonial3Role"), text: t("testimonial3Text"), avatar: "🏫", stars: 5 },
   ]
 
   const faqs = [
-    { q: "Comment fonctionne le simulateur ambassade ?", a: "Vous conversez en temps réel avec Herr Bauer, un agent consulaire IA alimenté par notre IA. Il analyse votre allemand et vous donne un score détaillé après chaque échange." },
-    { q: "Le plan gratuit est-il vraiment gratuit ?", a: "Oui, totalement gratuit. Pas de carte bancaire requise. Accès complet au niveau A1 avec 3 leçons par jour et 3 sessions simulateur par mois." },
-    { q: "Les certifications Goethe sont-elles reconnues ?", a: "Les examens Goethe-Zertifikat sont reconnus mondialement pour les visas allemands. Yema vous prépare spécifiquement à ces examens du A1 au C1." },
-    { q: "Puis-je rejoindre la classe d'un enseignant ?", a: "Oui ! Entrez le code de classe de votre enseignant lors de l'inscription ou depuis votre tableau de bord. Votre enseignant validera votre accès." },
-    { q: "Y a-t-il une app mobile ?", a: "La plateforme est optimisée pour mobile (iOS et Android) via le navigateur. Une app native est en développement." },
-    { q: "Comment devenir centre partenaire ?", a: "Contactez-nous sur WhatsApp. Nous offrons 30 jours gratuits pour tester la solution centre avec votre équipe." },
+    { q: t("faq1Q"), a: t("faq1A") },
+    { q: t("faq2Q"), a: t("faq2A") },
+    { q: t("faq3Q"), a: t("faq3A") },
+    { q: t("faq4Q"), a: t("faq4A") },
+    { q: t("faq5Q"), a: t("faq5A") },
+    { q: t("faq6Q"), a: t("faq6A") },
+  ]
+
+  const navItems = [
+    { label: t("navFeatures"), href: "#features" },
+    { label: t("navLevels"), href: "#levels" },
+    { label: t("navPricing"), href: "#pricing" },
+    { label: t("navCenters"), href: "#centres" },
   ]
 
   return (
@@ -97,13 +104,13 @@ export default function LandingPage() {
         </div>
         {!isMobile && (
           <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-            {["Fonctionnalités", "Niveaux", "Tarifs", "Centres"].map(item => (
-              <a key={item} href={`#${item.toLowerCase()}`}
+            {navItems.map(item => (
+              <a key={item.href} href={item.href}
                 style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", transition: "color 0.2s" }}
                 onMouseOver={e => (e.target as HTMLElement).style.color = "white"}
                 onMouseOut={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.6)"}
               >
-                {item}
+                {item.label}
               </a>
             ))}
           </div>
@@ -169,13 +176,13 @@ export default function LandingPage() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="fonctionnalités" style={{ padding: isMobile ? "60px 16px" : "80px 40px", maxWidth: 1200, margin: "0 auto" }}>
+      <section id="features" style={{ padding: isMobile ? "60px 16px" : "80px 40px", maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12 }}>
-            Tout ce dont vous avez besoin
+            {t("featuresTitle")}
           </h2>
           <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15 }}>
-            12 outils IA intégrés pour un apprentissage complet
+            {t("featuresSubtitle")}
           </p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 10 : 16 }}>
@@ -187,7 +194,7 @@ export default function LandingPage() {
               <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
                 <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, fontWeight: 700, margin: 0 }}>{f.title}</h3>
-                <span style={{ fontSize: 8, padding: "2px 6px", borderRadius: 99, background: "rgba(16,185,129,0.12)", color: "#10b981", fontWeight: 700, whiteSpace: "nowrap" }}>{f.badge}</span>
+                {f.badge && <span style={{ fontSize: 8, padding: "2px 6px", borderRadius: 99, background: "rgba(16,185,129,0.12)", color: "#10b981", fontWeight: 700, whiteSpace: "nowrap" }}>{f.badge}</span>}
               </div>
               <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
             </div>
@@ -195,15 +202,15 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── NIVEAUX ── */}
-      <section id="niveaux" style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
+      {/* ── LEVELS ── */}
+      <section id="levels" style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12 }}>
-              Programme officiel Goethe-Institut
+              {t("levelsTitle")}
             </h2>
             <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15 }}>
-              Basé sur Netzwerk neu (A1-B1) et Aspekte neu (B2-C1)
+              {t("levelsSubtitle")}
             </p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -215,14 +222,14 @@ export default function LandingPage() {
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
                     <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 700, margin: 0 }}>{lvl.name}</h3>
-                    {!lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: `${lvl.color}15`, color: lvl.color, fontWeight: 700 }}>Disponible</span>}
-                    {lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>🔒 Premium</span>}
+                    {!lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: `${lvl.color}15`, color: lvl.color, fontWeight: 700 }}>{t("available")}</span>}
+                    {lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>{t("locked")}</span>}
                   </div>
                   <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 12, margin: 0 }}>{lvl.desc}</p>
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800, color: lvl.color }}>{lvl.modules}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>modules</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{t("modules")}</div>
                 </div>
               </div>
             ))}
@@ -230,19 +237,19 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── SIMULATEUR DEMO ── */}
+      {/* ── SIMULATOR DEMO ── */}
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "center" }}>
           <div>
-            <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Fonctionnalité phare</span>
+            <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t("simTitle")}</span>
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2 }}>
-              Simulez un vrai entretien consulaire
+              {t("simHeadline")}
             </h2>
             <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.8, marginBottom: 24 }}>
-              Herr Bauer, notre consul IA, vous pose les vraies questions d'un entretien de visa allemand. Chaque réponse est analysée et notée sur la grammaire, le vocabulaire et la pertinence.
+              {t("simDesc")}
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-              {["Visa étudiant (§16b AufenthG)", "Visa travail / EU Blue Card", "Visa touriste Schengen", "Regroupement familial", "Renouvellement de titre"].map((s, i) => (
+              {[t("simVisa1"), t("simVisa2"), t("simVisa3"), t("simVisa4"), t("simVisa5")].map((s, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ color: "#10b981", fontSize: 12 }}>✓</span>
                   <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>{s}</span>
@@ -251,7 +258,7 @@ export default function LandingPage() {
             </div>
             <button onClick={() => router.push("/simulateur")}
               style={{ padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
-              Essayer gratuitement →
+              {t("simCta")}
             </button>
           </div>
 
@@ -261,13 +268,13 @@ export default function LandingPage() {
               <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🏛️</div>
               <div>
                 <p style={{ color: "white", fontSize: 12, fontWeight: 700, margin: 0 }}>Herr Klaus Bauer</p>
-                <p style={{ color: "#10b981", fontSize: 9, margin: 0 }}>Agent consulaire · En ligne</p>
+                <p style={{ color: "#10b981", fontSize: 9, margin: 0 }}>{t("simConsulOnline")}</p>
               </div>
             </div>
             {[
-              { role: "consul", text: "Guten Tag. Bitte zeigen Sie mir Ihren Reisepass.", translation: "Bonjour. Montrez-moi votre passeport." },
-              { role: "user", text: "Guten Tag, Herr Bauer. Hier ist mein Reisepass.", translation: "Voici mon passeport." },
-              { role: "consul", text: "Warum möchten Sie in Deutschland studieren?", translation: "Pourquoi souhaitez-vous étudier en Allemagne ?" },
+              { role: "consul", text: "Guten Tag. Bitte zeigen Sie mir Ihren Reisepass.", translation: t("simMsg1") },
+              { role: "user", text: "Guten Tag, Herr Bauer. Hier ist mein Reisepass.", translation: t("simMsg2") },
+              { role: "consul", text: "Warum möchten Sie in Deutschland studieren?", translation: t("simMsg3") },
             ].map((msg, i) => (
               <div key={i} style={{ marginBottom: 12, display: "flex", justifyContent: msg.role === "user" ? "flex-end" : "flex-start" }}>
                 <div style={{ maxWidth: "80%", padding: "10px 14px", borderRadius: msg.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px", background: msg.role === "user" ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.05)", border: msg.role === "user" ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.08)" }}>
@@ -277,9 +284,9 @@ export default function LandingPage() {
               </div>
             ))}
             <div style={{ padding: "8px 12px", borderRadius: 10, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)", marginTop: 8 }}>
-              <p style={{ color: "#10b981", fontSize: 10, fontWeight: 700, margin: "0 0 3px" }}>📊 Score en temps réel</p>
+              <p style={{ color: "#10b981", fontSize: 10, fontWeight: 700, margin: "0 0 3px" }}>{t("simScoreLabel")}</p>
               <div style={{ display: "flex", gap: 12 }}>
-                {[["Grammaire","8/10"],["Vocab","7/10"],["Pertinence","9/10"]].map(([label,val]) => (
+                {[[t("simGrammar"),"8/10"],[t("simVocab"),"7/10"],[t("simRelevance"),"9/10"]].map(([label,val]) => (
                   <div key={label}>
                     <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 9 }}>{label} </span>
                     <span style={{ color: "#10b981", fontSize: 10, fontWeight: 700 }}>{val}</span>
@@ -291,24 +298,24 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── TÉMOIGNAGES ── */}
+      {/* ── TESTIMONIALS ── */}
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 26 : 36, fontWeight: 800, textAlign: "center", marginBottom: 48 }}>
-            Ils nous font confiance
+            {t("testimonialsTitle")}
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: isMobile ? 12 : 20 }}>
-            {testimonials.map((t, i) => (
+            {testimonials.map((item, i) => (
               <div key={i} style={{ padding: "24px", borderRadius: 18, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <div style={{ display: "flex", gap: 3, marginBottom: 14 }}>
-                  {Array.from({ length: t.stars }).map((_, j) => <span key={j} style={{ color: "#f59e0b", fontSize: 14 }}>★</span>)}
+                  {Array.from({ length: item.stars }).map((_, j) => <span key={j} style={{ color: "#f59e0b", fontSize: 14 }}>★</span>)}
                 </div>
-                <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, lineHeight: 1.7, marginBottom: 16, fontStyle: "italic" }}>"{t.text}"</p>
+                <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, lineHeight: 1.7, marginBottom: 16, fontStyle: "italic" }}>&ldquo;{item.text}&rdquo;</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 28 }}>{t.avatar}</span>
+                  <span style={{ fontSize: 28 }}>{item.avatar}</span>
                   <div>
-                    <p style={{ color: "white", fontSize: 13, fontWeight: 700, margin: "0 0 2px", fontFamily: "'Syne',sans-serif" }}>{t.name}</p>
-                    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, margin: 0 }}>{t.city} · {t.level || t.role}</p>
+                    <p style={{ color: "white", fontSize: 13, fontWeight: 700, margin: "0 0 2px", fontFamily: "'Syne',sans-serif" }}>{item.name}</p>
+                    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, margin: 0 }}>{item.city} · {item.level || item.role}</p>
                   </div>
                 </div>
               </div>
@@ -317,23 +324,23 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── CENTRES ── */}
+      {/* ── CENTERS ── */}
       <section id="centres" style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "center" }}>
           <div>
-            <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Solution B2B</span>
+            <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t("b2bLabel")}</span>
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2 }}>
-              Vous gérez un centre de langues ?
+              {t("centerTitle")}
             </h2>
             <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.8, marginBottom: 24 }}>
-              Dashboard centralisé pour gérer tous vos enseignants, élèves et classes. Suivi en temps réel, analytics avancés et facturation simplifiée.
+              {t("centerDesc")}
             </p>
             {[
-              { icon: "👨‍🏫", text: "Dashboard enseignant avec suivi élèves" },
-              { icon: "📊", text: "Analytics progression en temps réel" },
-              { icon: "🏛️", text: "Simulateur ambassade intégré" },
-              { icon: "📱", text: "Accès mobile pour tous les élèves" },
-              { icon: "💳", text: "Facturation Mobile Money simplifiée" },
+              { icon: "👨‍🏫", text: t("centerFeature1") },
+              { icon: "📊", text: t("centerFeature2") },
+              { icon: "🏛️", text: t("centerFeature3") },
+              { icon: "📱", text: t("centerFeature4") },
+              { icon: "💳", text: t("centerFeature5") },
             ].map((item, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                 <span style={{ fontSize: 18 }}>{item.icon}</span>
@@ -343,16 +350,16 @@ export default function LandingPage() {
             <div style={{ display: "flex", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
               <button onClick={() => router.push("/register")}
                 style={{ padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
-                Demander une démo →
+                {t("centerCta")}
               </button>
             </div>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {[
-              { plan: "Starter", price: "25.000", users: "5 enseignants · 100 élèves", color: "#10b981" },
-              { plan: "Pro", price: "75.000", users: "20 enseignants · 500 élèves", color: "#f59e0b" },
-              { plan: "Enterprise", price: "Sur devis", users: "Illimité · Support dédié", color: "#a78bfa" },
+              { plan: "Starter", price: "25.000", users: `5 teachers · 100 students`, color: "#10b981" },
+              { plan: "Pro", price: "75.000", users: `20 teachers · 500 students`, color: "#f59e0b" },
+              { plan: "Enterprise", price: t("centerOnDemand"), users: `Unlimited · Dedicated support`, color: "#a78bfa" },
             ].map((p, i) => (
               <div key={i} style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: `1px solid ${p.color}25`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
@@ -361,9 +368,9 @@ export default function LandingPage() {
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <p style={{ fontFamily: "'Syne',sans-serif", color: p.color, fontSize: 16, fontWeight: 800, margin: "0 0 1px" }}>
-                    {p.price === "Sur devis" ? p.price : `${p.price} XAF`}
+                    {p.price === t("centerOnDemand") ? p.price : `${p.price} XAF`}
                   </p>
-                  {p.price !== "Sur devis" && <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 9, margin: 0 }}>/mois</p>}
+                  {p.price !== t("centerOnDemand") && <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 9, margin: 0 }}>{t("centerPerMonth")}</p>}
                 </div>
               </div>
             ))}
@@ -375,7 +382,7 @@ export default function LandingPage() {
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 24 : 36, fontWeight: 800, textAlign: "center", marginBottom: 40 }}>
-            Questions fréquentes
+            {t("faqTitle")}
           </h2>
           {faqs.map((faq, i) => (
             <div key={i} style={{ marginBottom: 8, borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
@@ -394,25 +401,25 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── CTA FINAL ── */}
+      {/* ── FINAL CTA ── */}
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", textAlign: "center" }}>
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
           <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, margin: "0 auto 24px", animation: "float 3s ease-in-out infinite" }}>
-           
+
           </div>
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 28 : 40, fontWeight: 900, marginBottom: 16, lineHeight: 1.1 }}>
-            Commencez aujourd'hui.<br />
-            <span style={{ color: "#10b981" }}>C'est gratuit.</span>
+            {t("ctaFinalTitle")}<br />
+            <span style={{ color: "#10b981" }}>{t("ctaFinalSub")}</span>
           </h2>
           <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, marginBottom: 32 }}>
-            Pas de carte bancaire. Pas d'engagement. Accès immédiat au niveau A1 complet.
+            {t("ctaFinalDesc")}
           </p>
           <button onClick={() => router.push("/register")}
             style={{ padding: "18px 48px", borderRadius: 16, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 12px 40px rgba(16,185,129,0.35)" }}>
-            🚀 Créer mon compte gratuitement
+            {t("ctaFinalBtn")}
           </button>
           <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, marginTop: 16 }}>
-            Déjà +10.000 apprenants au Cameroun et en Afrique
+            {t("ctaFinalSocial")}
           </p>
         </div>
       </section>
@@ -425,11 +432,11 @@ export default function LandingPage() {
             Yema
           </span>
           <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, marginLeft: 8 }}>
-            Fait avec ❤️ au Cameroun 🇨🇲
+            {t("footerMade")}
           </span>
         </div>
         <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-          {["Mentions légales", "CGU", "Confidentialité", "Contact"].map(link => (
+          {[t("footerLegal"), t("footerTerms"), t("footerPrivacy"), t("footerContact")].map(link => (
             <a key={link} href="#" style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{link}</a>
           ))}
         </div>

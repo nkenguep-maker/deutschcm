@@ -2,126 +2,104 @@
 
 import { useState } from "react";
 import { Link } from "@/navigation";
-
-const FEATURES = [
-  {
-    icon: "👥",
-    title: "Suivi élèves en temps réel",
-    desc: "Tableau de bord complet par élève : XP, progression, scores aux quiz, historique du simulateur d'ambassade. Identifiez instantanément les élèves en difficulté.",
-  },
-  {
-    icon: "🎙️",
-    title: "Simulateur IA intégré",
-    desc: "Herr Klaus Bauer, notre consul IA, entraîne vos élèves à l'entretien ambassade en situation réelle. Scores grammaire, vocabulaire et fluidité à chaque session.",
-  },
-  {
-    icon: "📱",
-    title: "Paiements Mobile Money",
-    desc: "Abonnements et frais de cours encaissés via MTN Mobile Money et Orange Money. Aucun compte bancaire nécessaire. Historique complet des transactions.",
-  },
-  {
-    icon: "📊",
-    title: "Analytics avancées",
-    desc: "Taux de rétention J-30/60/90, classement des enseignants, progression A1→C1, export CSV. Prenez des décisions basées sur les données.",
-  },
-  {
-    icon: "🏫",
-    title: "Gestion multi-classes",
-    desc: "Créez autant de classes que nécessaire. Codes d'accès uniques, gestion des devoirs, corrections en ligne, chat avec les élèves.",
-  },
-  {
-    icon: "🌍",
-    title: "Conçu pour le Cameroun",
-    desc: "Interface en français, contenu centré sur la culture camerounaise, prix en FCFA, connexion optimisée pour les réseaux locaux.",
-  },
-];
-
-const PLANS = [
-  {
-    name: "Starter",
-    price: "25 000",
-    icon: "🌱",
-    color: "#64748b",
-    accentBg: "rgba(100,116,139,0.08)",
-    accentBorder: "rgba(100,116,139,0.2)",
-    teachers: 5,
-    students: 100,
-    features: ["5 enseignants", "100 élèves", "Dashboard centre", "Rapports mensuels", "Support email"],
-    cta: "Commencer gratuitement",
-    popular: false,
-  },
-  {
-    name: "Pro",
-    price: "75 000",
-    icon: "⭐",
-    color: "#eab308",
-    accentBg: "rgba(234,179,8,0.08)",
-    accentBorder: "rgba(234,179,8,0.3)",
-    teachers: 20,
-    students: 500,
-    features: ["20 enseignants", "500 élèves", "Analytics avancées", "Export CSV/PDF", "Simulateur IA illimité", "Support prioritaire", "Mobile Money intégré"],
-    cta: "Choisir Pro",
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    price: "150 000",
-    icon: "🏆",
-    color: "#6366f1",
-    accentBg: "rgba(99,102,241,0.08)",
-    accentBorder: "rgba(99,102,241,0.2)",
-    teachers: -1,
-    students: -1,
-    features: ["Enseignants illimités", "Élèves illimités", "API dédiée", "Formations sur site", "Manager dédié", "SLA 99,9%", "Personnalisation complète"],
-    cta: "Contacter l'équipe",
-    popular: false,
-  },
-];
-
-const TESTIMONIALS = [
-  {
-    name: "Pr. Henriette Ngo Biyong",
-    role: "Directrice",
-    center: "Institut Goethe Yaoundé",
-    city: "Yaoundé",
-    flag: "🏛️",
-    quote: "Depuis Yema, nous avons réduit notre temps d'administration de 60%. Nos élèves progressent deux fois plus vite grâce au simulateur d'ambassade. Le résultat visa de nos apprenants est passé de 45% à 78%.",
-    avatar: "HN",
-    stars: 5,
-  },
-  {
-    name: "M. Emmanuel Tchouala",
-    role: "Fondateur",
-    center: "Deutsch-Kamerun Center",
-    city: "Douala",
-    flag: "🏫",
-    quote: "La facturation Mobile Money a été un game-changer. Nos élèves paient maintenant depuis leur téléphone en 2 minutes. Nous avons augmenté notre taux de renouvellement de 40%.",
-    avatar: "ET",
-    stars: 5,
-  },
-  {
-    name: "Mme Rosine Abena",
-    role: "Responsable pédagogique",
-    center: "Sprache & Kultur Bafoussam",
-    city: "Bafoussam",
-    flag: "📚",
-    quote: "Les analytics sont impressionnants. Je vois en temps réel quels élèves décrochent et j'interviens avant qu'ils abandonnent. Notre rétention à 90 jours est passée de 38% à 64%.",
-    avatar: "RA",
-    stars: 5,
-  },
-];
-
-const FAQS = [
-  { q: "Comment migrer mes données existantes ?", a: "Notre équipe vous accompagne dans la migration gratuite de vos données élèves depuis Excel, Google Sheets ou tout autre système en moins de 48h." },
-  { q: "Les paiements Mobile Money sont-ils sécurisés ?", a: "Oui, nous utilisons les APIs officielles MTN MoMo et Orange Money avec chiffrement bout-en-bout. Toutes les transactions sont journalisées et auditables." },
-  { q: "Puis-je tester avant de payer ?", a: "Absolument. Le plan Starter est gratuit le premier mois avec toutes les fonctionnalités Pro incluses. Aucune carte bancaire requise." },
-  { q: "Y a-t-il une formation pour les enseignants ?", a: "Oui, chaque compte inclut 2h de formation en ligne et un accès à notre base de connaissances. Le plan Enterprise inclut des formations sur site." },
-];
+import { useTranslations } from "next-intl";
 
 export default function LandingPage() {
+  const t = useTranslations("centerLanding");
   const [contactForm, setContactForm] = useState({ nom: "", email: "", centre: "", ville: "", message: "" });
   const [contactSent, setContactSent] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const FEATURES = [
+    { icon: "👥", title: t("feat1Title"), desc: t("feat1Desc") },
+    { icon: "🎙️", title: t("feat2Title"), desc: t("feat2Desc") },
+    { icon: "📱", title: t("feat3Title"), desc: t("feat3Desc") },
+    { icon: "📊", title: t("feat4Title"), desc: t("feat4Desc") },
+    { icon: "🏫", title: t("feat5Title"), desc: t("feat5Desc") },
+    { icon: "🌍", title: t("feat6Title"), desc: t("feat6Desc") },
+  ];
+
+  const PLANS = [
+    {
+      name: "Starter",
+      price: "25 000",
+      icon: "🌱",
+      color: "#64748b",
+      accentBg: "rgba(100,116,139,0.08)",
+      accentBorder: "rgba(100,116,139,0.2)",
+      teachersLabel: t("planStarterTeachers"),
+      studentsLabel: t("planStarterStudents"),
+      features: [t("planStarterF1"), t("planStarterF2"), t("planStarterF3"), t("planStarterF4"), t("planStarterF5")],
+      cta: t("planStarterCta"),
+      popular: false,
+    },
+    {
+      name: "Pro",
+      price: "75 000",
+      icon: "⭐",
+      color: "#eab308",
+      accentBg: "rgba(234,179,8,0.08)",
+      accentBorder: "rgba(234,179,8,0.3)",
+      teachersLabel: t("planProTeachers"),
+      studentsLabel: t("planProStudents"),
+      features: [t("planProF1"), t("planProF2"), t("planProF3"), t("planProF4"), t("planProF5"), t("planProF6"), t("planProF7")],
+      cta: t("planProCta"),
+      popular: true,
+    },
+    {
+      name: "Enterprise",
+      price: "150 000",
+      icon: "🏆",
+      color: "#6366f1",
+      accentBg: "rgba(99,102,241,0.08)",
+      accentBorder: "rgba(99,102,241,0.2)",
+      teachersLabel: t("planEnterpriseTeachers"),
+      studentsLabel: t("planEnterpriseStudents"),
+      features: [t("planEnterpriseF1"), t("planEnterpriseF2"), t("planEnterpriseF3"), t("planEnterpriseF4"), t("planEnterpriseF5"), t("planEnterpriseF6"), t("planEnterpriseF7")],
+      cta: t("planEnterpriseCta"),
+      popular: false,
+    },
+  ];
+
+  const TESTIMONIALS = [
+    {
+      name: "Pr. Henriette Ngo Biyong",
+      role: t("testimonial1Role"),
+      center: "Institut Goethe Yaoundé",
+      city: "Yaoundé",
+      flag: "🏛️",
+      quote: t("testimonial1Quote"),
+      avatar: "HN",
+      stars: 5,
+    },
+    {
+      name: "M. Emmanuel Tchouala",
+      role: t("testimonial2Role"),
+      center: "Deutsch-Kamerun Center",
+      city: "Douala",
+      flag: "🏫",
+      quote: t("testimonial2Quote"),
+      avatar: "ET",
+      stars: 5,
+    },
+    {
+      name: "Mme Rosine Abena",
+      role: t("testimonial3Role"),
+      center: "Sprache & Kultur Bafoussam",
+      city: "Bafoussam",
+      flag: "📚",
+      quote: t("testimonial3Quote"),
+      avatar: "RA",
+      stars: 5,
+    },
+  ];
+
+  const FAQS = [
+    { q: t("faq1Q"), a: t("faq1A") },
+    { q: t("faq2Q"), a: t("faq2A") },
+    { q: t("faq3Q"), a: t("faq3A") },
+    { q: t("faq4Q"), a: t("faq4A") },
+  ];
 
   const handleContact = (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,19 +142,19 @@ export default function LandingPage() {
           }}></div>
           <span className="syne" style={{ color: "white", fontWeight: 800, fontSize: "1.1rem" }}>
             Yema
-            <span style={{ color: "rgba(255,255,255,0.3)", fontWeight: 400, fontSize: "0.75rem", marginLeft: 8 }}>pour Centres</span>
+            <span style={{ color: "rgba(255,255,255,0.3)", fontWeight: 400, fontSize: "0.75rem", marginLeft: 8 }}>{t("navForCenters")}</span>
           </span>
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <a href="#features" style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, textDecoration: "none" }}>Fonctionnalités</a>
-          <a href="#pricing" style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, textDecoration: "none" }}>Tarifs</a>
-          <a href="#testimonials" style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, textDecoration: "none" }}>Témoignages</a>
-          <Link href="/login" style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, textDecoration: "none" }}>Connexion</Link>
+          <a href="#features" style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, textDecoration: "none" }}>{t("navFeatures")}</a>
+          <a href="#pricing" style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, textDecoration: "none" }}>{t("navPricing")}</a>
+          <a href="#testimonials" style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, textDecoration: "none" }}>{t("navTestimonials")}</a>
+          <Link href="/login" style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, textDecoration: "none" }}>{t("navLogin")}</Link>
           <a href="#contact" className="btn-gold" style={{
             background: "linear-gradient(135deg, #eab308, #ca8a04)",
             color: "#080c10", borderRadius: 9, padding: "8px 20px",
             fontSize: 13, fontWeight: 700, textDecoration: "none",
-          }}>Demander une démo</a>
+          }}>{t("navDemo")}</a>
         </div>
       </nav>
 
@@ -186,7 +164,6 @@ export default function LandingPage() {
         padding: "90px 40px 80px", textAlign: "center",
         background: "linear-gradient(180deg, rgba(234,179,8,0.04) 0%, transparent 100%)",
       }}>
-        {/* BG decorations */}
         <div style={{ position: "absolute", top: -100, left: "50%", transform: "translateX(-50%)", width: 600, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(234,179,8,0.08), transparent)", filter: "blur(60px)", pointerEvents: "none" }} />
 
         <div style={{ position: "relative", maxWidth: 820, margin: "0 auto" }}>
@@ -196,22 +173,21 @@ export default function LandingPage() {
             background: "rgba(234,179,8,0.1)", border: "1px solid rgba(234,179,8,0.25)",
             borderRadius: 20, padding: "6px 16px",
           }}>
-            <span style={{ color: "#eab308", fontSize: 12, fontWeight: 700 }}>✦ Conçu pour le Cameroun</span>
+            <span style={{ color: "#eab308", fontSize: 12, fontWeight: 700 }}>{t("heroBadge")}</span>
           </div>
           <h1 className="syne" style={{
             fontSize: "clamp(32px, 5vw, 58px)", fontWeight: 800, lineHeight: 1.1,
             color: "#f8fafc", margin: "0 0 20px",
           }}>
-            Digitalisez votre<br />
-            <span style={{ color: "#eab308" }}>centre de langues</span><br />
-            au Cameroun
+            {t("heroTitle1")}<br />
+            <span style={{ color: "#eab308" }}>{t("heroTitleAccent")}</span><br />
+            {t("heroTitle2")}
           </h1>
           <p style={{
             fontSize: 18, color: "rgba(255,255,255,0.5)", maxWidth: 580, margin: "0 auto 36px",
             lineHeight: 1.7,
           }}>
-            Gérez enseignants, élèves, devoirs et paiements depuis une seule plateforme.
-            Avec le simulateur d&apos;ambassade IA et les analytics avancées.
+            {t("heroSubtitle")}
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <a href="#contact" className="btn-gold" style={{
@@ -219,22 +195,22 @@ export default function LandingPage() {
               color: "#080c10", borderRadius: 12, padding: "14px 28px",
               fontSize: 15, fontWeight: 700, textDecoration: "none",
             }}>
-              Demander une démo gratuite →
+              {t("heroCtaDemo")}
             </a>
             <Link href="/register" style={{
               background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)",
               border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "14px 28px",
               fontSize: 15, textDecoration: "none",
             }}>
-              Créer un compte
+              {t("heroCtaRegister")}
             </Link>
           </div>
           {/* Social proof */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 24, marginTop: 40 }}>
             {[
-              { value: "30+", label: "Centres partenaires" },
-              { value: "2 800+", label: "Élèves actifs" },
-              { value: "98%", label: "Satisfaction centres" },
+              { value: "30+", label: t("stat1Label") },
+              { value: "2 800+", label: t("stat2Label") },
+              { value: "98%", label: t("stat3Label") },
             ].map(s => (
               <div key={s.label} style={{ textAlign: "center" }}>
                 <div className="syne" style={{ color: "#eab308", fontWeight: 800, fontSize: 22 }}>{s.value}</div>
@@ -249,10 +225,10 @@ export default function LandingPage() {
       <section id="features" style={{ padding: "80px 40px", maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h2 className="syne" style={{ fontSize: 36, fontWeight: 800, color: "#f1f5f9", margin: "0 0 12px" }}>
-            Tout ce dont votre centre a besoin
+            {t("featuresTitle")}
           </h2>
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 16 }}>
-            Une suite complète pensée pour les instituts de langues camerounais
+            {t("featuresSubtitle")}
           </p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
@@ -274,9 +250,9 @@ export default function LandingPage() {
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <h2 className="syne" style={{ fontSize: 36, fontWeight: 800, color: "#f1f5f9", margin: "0 0 12px" }}>
-              Tarifs transparents en XAF
+              {t("pricingTitle")}
             </h2>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 16 }}>Sans frais cachés. Paiement mensuel par Mobile Money.</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 16 }}>{t("pricingSubtitle")}</p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
             {PLANS.map(plan => (
@@ -292,17 +268,16 @@ export default function LandingPage() {
                     background: "linear-gradient(135deg, #eab308, #ca8a04)",
                     color: "#080c10", borderRadius: 20, padding: "4px 16px",
                     fontSize: 11, fontWeight: 800, whiteSpace: "nowrap",
-                  }}>⭐ Le plus populaire</div>
+                  }}>{t("planPopular")}</div>
                 )}
                 <div style={{ fontSize: 32, marginBottom: 12 }}>{plan.icon}</div>
                 <div className="syne" style={{ color: plan.color, fontWeight: 800, fontSize: 20, marginBottom: 4 }}>{plan.name}</div>
                 <div style={{ marginBottom: 8 }}>
                   <span className="syne" style={{ color: plan.color, fontWeight: 800, fontSize: 30 }}>{plan.price}</span>
-                  <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}> XAF/mois</span>
+                  <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}> {t("planPerMonth")}</span>
                 </div>
                 <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, marginBottom: 20 }}>
-                  {plan.teachers === -1 ? "Enseignants illimités" : `${plan.teachers} enseignants`} ·{" "}
-                  {plan.students === -1 ? "Élèves illimités" : `${plan.students} élèves`}
+                  {plan.teachersLabel} · {plan.studentsLabel}
                 </div>
                 <ul style={{ margin: "0 0 24px", padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
                   {plan.features.map(f => (
@@ -330,23 +305,23 @@ export default function LandingPage() {
       <section id="testimonials" style={{ padding: "80px 40px", maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h2 className="syne" style={{ fontSize: 36, fontWeight: 800, color: "#f1f5f9", margin: "0 0 12px" }}>
-            Ils font confiance à Yema
+            {t("testimonialsTitle")}
           </h2>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 16 }}>Centres partenaires au Cameroun</p>
+          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 16 }}>{t("testimonialsSubtitle")}</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
-          {TESTIMONIALS.map((t, i) => (
+          {TESTIMONIALS.map((item, i) => (
             <div key={i} style={{
               background: "rgba(13,17,23,0.8)", border: "1px solid rgba(255,255,255,0.07)",
               borderRadius: 16, padding: 28,
             }}>
               <div style={{ display: "flex", gap: 2, marginBottom: 16 }}>
-                {Array.from({ length: t.stars }).map((_, j) => (
+                {Array.from({ length: item.stars }).map((_, j) => (
                   <span key={j} style={{ color: "#eab308", fontSize: 16 }}>★</span>
                 ))}
               </div>
               <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, lineHeight: 1.7, margin: "0 0 20px", fontStyle: "italic" }}>
-                &ldquo;{t.quote}&rdquo;
+                &ldquo;{item.quote}&rdquo;
               </p>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{
@@ -356,12 +331,12 @@ export default function LandingPage() {
                   display: "flex", alignItems: "center", justifyContent: "center",
                   color: "#eab308", fontWeight: 700, fontSize: 14,
                 }}>
-                  {t.avatar}
+                  {item.avatar}
                 </div>
                 <div>
-                  <div style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 13 }}>{t.name}</div>
-                  <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{t.role} · {t.center}</div>
-                  <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 10 }}>{t.flag} {t.city}</div>
+                  <div style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 13 }}>{item.name}</div>
+                  <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{item.role} · {item.center}</div>
+                  <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 10 }}>{item.flag} {item.city}</div>
                 </div>
               </div>
             </div>
@@ -373,7 +348,7 @@ export default function LandingPage() {
       <section style={{ padding: "60px 40px", background: "rgba(13,17,23,0.5)", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <h2 className="syne" style={{ fontSize: 30, fontWeight: 800, color: "#f1f5f9", margin: "0 0 32px", textAlign: "center" }}>
-            Questions fréquentes
+            {t("faqTitle")}
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {FAQS.map((faq, i) => (
@@ -404,10 +379,10 @@ export default function LandingPage() {
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <h2 className="syne" style={{ fontSize: 34, fontWeight: 800, color: "#f1f5f9", margin: "0 0 12px" }}>
-              Demandez votre démo gratuite
+              {t("contactTitle")}
             </h2>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 15 }}>
-              Notre équipe vous rappelle sous 24h pour une démonstration personnalisée.
+              {t("contactSubtitle")}
             </p>
           </div>
 
@@ -418,10 +393,10 @@ export default function LandingPage() {
             }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
               <div className="syne" style={{ color: "#10b981", fontWeight: 800, fontSize: 22, marginBottom: 8 }}>
-                Demande reçue !
+                {t("contactSuccessTitle")}
               </div>
               <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 14 }}>
-                Notre équipe vous contacte dans les 24h ouvrées. En attendant, vous pouvez créer votre compte gratuitement.
+                {t("contactSuccessDesc")}
               </div>
               <Link href="/register" style={{
                 display: "inline-block", marginTop: 20,
@@ -429,7 +404,7 @@ export default function LandingPage() {
                 color: "#080c10", borderRadius: 10, padding: "10px 24px",
                 fontSize: 14, fontWeight: 700, textDecoration: "none",
               }}>
-                Créer mon compte →
+                {t("contactSuccessBtn")}
               </Link>
             </div>
           ) : (
@@ -439,8 +414,8 @@ export default function LandingPage() {
             }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 {[
-                  { label: "Nom complet", key: "nom", placeholder: "Dr. Henriette Ngo Biyong" },
-                  { label: "Email professionnel", key: "email", placeholder: "direction@votre-centre.cm" },
+                  { label: t("contactFullName"), key: "nom", placeholder: "Dr. Henriette Ngo Biyong" },
+                  { label: t("contactEmail"), key: "email", placeholder: "direction@votre-centre.cm" },
                 ].map(f => (
                   <div key={f.key}>
                     <label style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>{f.label}</label>
@@ -454,8 +429,8 @@ export default function LandingPage() {
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 {[
-                  { label: "Nom du centre", key: "centre", placeholder: "Institut Goethe Yaoundé" },
-                  { label: "Ville", key: "ville", placeholder: "Yaoundé, Douala..." },
+                  { label: t("contactCenter"), key: "centre", placeholder: "Institut Goethe Yaoundé" },
+                  { label: t("contactCity"), key: "ville", placeholder: "Yaoundé, Douala..." },
                 ].map(f => (
                   <div key={f.key}>
                     <label style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>{f.label}</label>
@@ -468,9 +443,9 @@ export default function LandingPage() {
                 ))}
               </div>
               <div>
-                <label style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Message (optionnel)</label>
+                <label style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>{t("contactMessage")}</label>
                 <textarea value={contactForm.message} onChange={e => setContactForm(c => ({ ...c, message: e.target.value }))}
-                  placeholder="Nous avons 8 enseignants et 150 élèves. Intéressé par le plan Pro..."
+                  placeholder="We have 8 teachers and 150 students. Interested in the Pro plan..."
                   rows={3}
                   style={{ width: "100%", background: "#161b22", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, padding: "10px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", resize: "vertical", boxSizing: "border-box" }} />
               </div>
@@ -479,10 +454,10 @@ export default function LandingPage() {
                 color: "#080c10", border: "none", borderRadius: 10, padding: "13px 0",
                 fontSize: 15, fontWeight: 700, cursor: "pointer", width: "100%",
               }}>
-                Envoyer ma demande de démo →
+                {t("contactSubmit")}
               </button>
               <p style={{ margin: 0, textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: 12 }}>
-                Premier mois gratuit · Aucune carte bancaire requise
+                {t("contactFree")}
               </p>
             </form>
           )}
@@ -495,11 +470,11 @@ export default function LandingPage() {
         display: "flex", justifyContent: "space-between", alignItems: "center",
         color: "rgba(255,255,255,0.25)", fontSize: 12,
       }}>
-        <div>© 2025 Yema · Conçu au Cameroun 🇨🇲</div>
+        <div>{t("footerCopyright")}</div>
         <div style={{ display: "flex", gap: 24 }}>
-          <Link href="/login" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>Connexion</Link>
-          <Link href="/register" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>Inscription</Link>
-          <Link href="/center" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>Espace Centre</Link>
+          <Link href="/login" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{t("footerLogin")}</Link>
+          <Link href="/register" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{t("footerRegister")}</Link>
+          <Link href="/center" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{t("footerCenter")}</Link>
         </div>
       </footer>
     </div>

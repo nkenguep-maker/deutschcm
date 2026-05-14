@@ -4,16 +4,7 @@ import { Link } from "@/navigation";
 import { usePathname, useRouter } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
-
-const TEACHER_NAV = [
-  { icon: "📊", label: "Vue d'ensemble", href: "/teacher"                },
-  { icon: "🏫", label: "Mes Classes",    href: "/teacher/classrooms"     },
-  { icon: "👥", label: "Élèves",         href: "/teacher/students"       },
-  { icon: "📋", label: "Devoirs",        href: "/teacher/assignments"    },
-  { icon: "✨", label: "Générer cours",  href: "/admin/courses/generate" },
-  { icon: "📈", label: "Statistiques",   href: "/teacher/stats"          },
-  { icon: "⚙️", label: "Paramètres",    href: "/teacher/settings"       },
-];
+import { useTranslations } from "next-intl";
 
 interface TeacherLayoutProps {
   children: React.ReactNode;
@@ -23,7 +14,19 @@ interface TeacherLayoutProps {
 export default function TeacherLayout({ children, title }: TeacherLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const tNav = useTranslations("nav");
+  const tT = useTranslations("teacher");
   const [teacherName, setTeacherName] = useState("Prof. Tchamba");
+
+  const TEACHER_NAV = [
+    { icon: "📊", label: tNav("overview"),      href: "/teacher"                },
+    { icon: "🏫", label: tNav("myClasses"),     href: "/teacher/classrooms"     },
+    { icon: "👥", label: tNav("students"),      href: "/teacher/students"       },
+    { icon: "📋", label: tNav("assignments"),   href: "/teacher/assignments"    },
+    { icon: "✨", label: tNav("generateCourse"),href: "/admin/courses/generate" },
+    { icon: "📈", label: tNav("stats"),         href: "/teacher/stats"          },
+    { icon: "⚙️", label: tNav("settings"),     href: "/teacher/settings"       },
+  ];
 
   useEffect(() => {
     const supabase = createClient();
@@ -84,8 +87,8 @@ export default function TeacherLayout({ children, title }: TeacherLayoutProps) {
           <div style={{ margin: "0 14px 12px", padding: "8px 12px", borderRadius: 10, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: "0.9rem" }}>👨‍🏫</span>
             <div>
-              <p style={{ margin: 0, color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.7rem" }}>Espace Enseignant</p>
-              <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.58rem" }}>Accès Professeur · Vérifié</p>
+              <p style={{ margin: 0, color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.7rem" }}>{tT("space")}</p>
+              <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.58rem" }}>{tT("access")}</p>
             </div>
             <span style={{ marginLeft: "auto", padding: "2px 6px", borderRadius: 6, background: "rgba(16,185,129,0.15)", color: "#10b981", fontSize: "0.58rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>✓</span>
           </div>
@@ -126,11 +129,11 @@ export default function TeacherLayout({ children, title }: TeacherLayoutProps) {
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{teacherName}</p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem" }}>Enseignant · Institut Lingua Plus</p>
+                <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem" }}>{tT("role")}</p>
               </div>
             </div>
             <button onClick={handleLogout} style={{ width: "100%", padding: "7px", borderRadius: 9, border: "1px solid rgba(239,68,68,0.15)", background: "transparent", color: "rgba(239,68,68,0.5)", fontFamily: "'DM Mono', monospace", fontSize: "0.68rem", cursor: "pointer" }}>
-              Déconnexion
+              {tNav("logout")}
             </button>
           </div>
         </aside>
