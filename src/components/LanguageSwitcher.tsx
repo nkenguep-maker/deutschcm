@@ -1,12 +1,19 @@
 "use client"
-import { useLanguage } from "@/hooks/useLanguage"
+import { useLocale } from "next-intl"
+import { useRouter } from "next/navigation"
 
 interface Props {
   style?: React.CSSProperties
 }
 
 export default function LanguageSwitcher({ style }: Props) {
-  const { lang, changeLang } = useLanguage()
+  const locale = useLocale()
+  const router = useRouter()
+
+  const changeLang = (newLocale: string) => {
+    document.cookie = `app_language=${newLocale};path=/;max-age=31536000;SameSite=Lax`
+    router.refresh()
+  }
 
   return (
     <div style={{
@@ -17,13 +24,13 @@ export default function LanguageSwitcher({ style }: Props) {
       ...style
     }}>
       {[
-        { code: "fr" as const, flag: "🇫🇷", label: "FR" },
-        { code: "en" as const, flag: "🇬🇧", label: "EN" },
+        { code: "fr", flag: "🇫🇷", label: "FR", title: "Français" },
+        { code: "en", flag: "🇬🇧", label: "EN", title: "English" },
       ].map(l => (
         <button
           key={l.code}
           onClick={() => changeLang(l.code)}
-          title={l.code === "fr" ? "Français" : "English"}
+          title={l.title}
           style={{
             padding: "5px 10px",
             borderRadius: 99,
@@ -34,10 +41,10 @@ export default function LanguageSwitcher({ style }: Props) {
             display: "flex",
             alignItems: "center",
             gap: 4,
-            background: lang === l.code
+            background: locale === l.code
               ? "linear-gradient(135deg,#10b981,#059669)"
               : "transparent",
-            color: lang === l.code ? "white" : "rgba(255,255,255,0.5)",
+            color: locale === l.code ? "white" : "rgba(255,255,255,0.5)",
             transition: "all 0.2s",
             fontFamily: "'DM Mono',monospace"
           }}

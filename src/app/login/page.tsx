@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { useLang } from "@/components/LanguageProvider";
+import { useTranslations } from "next-intl";
 
 type Role = "STUDENT" | "TEACHER" | "CENTER_MANAGER";
 
@@ -16,7 +16,8 @@ const ROLES: { key: Role; emoji: string; label: string }[] = [
 
 export default function LoginPage() {
   const router = useRouter();
-  const { tr } = useLang();
+  const t = useTranslations("auth");
+  const tc = useTranslations("common");
   const [selectedRole, setSelectedRole] = useState<Role>("STUDENT");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -135,10 +136,10 @@ export default function LoginPage() {
               className="text-lg font-bold mb-1"
               style={{ color: "white", fontFamily: "'Syne', sans-serif" }}
             >
-              {tr("auth", "login_title")}
+              {t("loginTitle")}
             </h2>
             <p className="text-xs mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>
-              {tr("auth", "login_subtitle")} 👋
+              {t("loginSubtitle")} 👋
             </p>
 
             {/* Role selector */}
@@ -183,7 +184,7 @@ export default function LoginPage() {
               {/* Email */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                  {tr("auth", "email")}
+                  {t("email")}
                 </label>
                 <input
                   type="email"
@@ -206,7 +207,7 @@ export default function LoginPage() {
               {/* Password */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                  {tr("auth", "password")}
+                  {t("password")}
                 </label>
                 <input
                   type="password"
@@ -241,14 +242,14 @@ export default function LoginPage() {
                   cursor: loading ? "not-allowed" : "pointer",
                 }}
               >
-                {loading ? tr("common", "loading") : `${tr("auth", "login_btn")} →`}
+                {loading ? tc("loading") : `${t("loginBtn")} →`}
               </button>
             </form>
           </div>
 
           {/* Footer */}
           <p className="text-center text-xs mt-6" style={{ color: "rgba(255,255,255,0.3)" }}>
-            {tr("auth", "no_account")}{" "}
+            {t("noAccount")}{" "}
             <Link
               href="/register"
               style={{ color: "#10b981", textDecoration: "none" }}

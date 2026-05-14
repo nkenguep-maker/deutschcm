@@ -1,17 +1,11 @@
 import type { Metadata } from "next"
-import { LanguageProvider } from "@/components/LanguageProvider"
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import { Geist, Geist_Mono } from "next/font/google"
+import { NextIntlClientProvider } from "next-intl"
+import { getLocale, getMessages } from "next-intl/server"
+import "./globals.css"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://deutschcm.vercel.app"),
@@ -31,7 +25,6 @@ export const metadata: Metadata = {
   creator: "DeutschCM",
   publisher: "DeutschCM",
   category: "education",
-  classification: "Language Learning",
   openGraph: {
     type: "website",
     locale: "fr_CM",
@@ -40,12 +33,7 @@ export const metadata: Metadata = {
     siteName: "DeutschCM",
     title: "DeutschCM — Apprenez l'allemand avec l'IA au Cameroun",
     description: "Le seul LMS d'allemand conçu pour le marché camerounais. Simulateur ambassade IA, voix natives Azure, quiz adaptatif Gemini. Préparation Goethe A1→C1.",
-    images: [{
-      url: "/opengraph-image",
-      width: 1200,
-      height: 630,
-      alt: "DeutschCM — Apprenez l'allemand au Cameroun"
-    }]
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "DeutschCM — Apprenez l'allemand au Cameroun" }]
   },
   twitter: {
     card: "summary_large_image",
@@ -54,40 +42,24 @@ export const metadata: Metadata = {
     images: ["/opengraph-image"],
     creator: "@deutschcm"
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    }
-  },
-  verification: {
-    google: "your-google-verification-code",
-  },
+  robots: { index: true, follow: true },
   alternates: {
     canonical: "https://deutschcm.vercel.app",
-    languages: {
-      "fr-CM": "https://deutschcm.vercel.app",
-      "fr-FR": "https://deutschcm.vercel.app",
-    }
+    languages: { "fr-CM": "https://deutschcm.vercel.app", "fr-FR": "https://deutschcm.vercel.app" }
   }
-};
+}
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale()
+  const messages = await getMessages()
+
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col"><LanguageProvider>{children}</LanguageProvider></body>
+    <html lang={locale} className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col">
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+        </NextIntlClientProvider>
+      </body>
     </html>
-  );
+  )
 }
