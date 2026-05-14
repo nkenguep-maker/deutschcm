@@ -66,7 +66,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Run intl middleware first — handles locale detection & redirects (e.g., / → /fr/)
-  const intlResponse = intlMiddleware(request)
+  const intlResponse = await intlMiddleware(request)
 
   // If it's a redirect (locale prefix addition), return it immediately
   if (intlResponse.status !== 200) {
