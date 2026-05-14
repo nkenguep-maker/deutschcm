@@ -394,5 +394,5 @@ export type TranslationKey = typeof TRANSLATIONS.fr
 
 export function t(lang: AppLanguage, section: keyof TranslationKey, key: string): string {
   const translations = TRANSLATIONS[lang] as Record<string, Record<string, string | Record<string, string>>>
-  return (translations?.[section]?.[key] as string) || (TRANSLATIONS.fr[section as keyof TranslationKey] as Record<string, string>)?.[key] || key
+  return (translations?.[section]?.[key] as string) || (TRANSLATIONS.fr[section as keyof TranslationKey] as Record<string, string | Record<string, string>>)?.[key] as string || key
 }
