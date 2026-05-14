@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
+import { useParams } from "next/navigation"
 import dynamic from "next/dynamic"
 import AudioPlayer from "@/components/AudioPlayer"
 import VoiceRecorder from "@/components/VoiceRecorder"
@@ -165,7 +166,8 @@ const DEMO_MODULES: Record<string, Module> = {
 }
 
 // ─── Composant principal ─────────────────────────────────
-export default function ModulePage({ params }: { params: { courseId: string; moduleId: string } }) {
+export default function ModulePage() {
+  const params = useParams<{ courseId: string; moduleId: string }>()
   const [module, setModule] = useState<Module | null>(null)
   const [completed, setCompleted] = useState(false)
   const [score, setScore] = useState<number | null>(null)
