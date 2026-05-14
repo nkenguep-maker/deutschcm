@@ -1,9 +1,12 @@
+import createMiddleware from "next-intl/middleware"
+import { routing } from "./src/i18n/routing"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 
 type UserRole = "STUDENT" | "TEACHER" | "CENTER_MANAGER" | "ADMIN"
 
+// Routes that don't require auth (without locale prefix)
 const PUBLIC_ROUTES = [
   "/", "/login", "/register", "/pricing",
   "/discover", "/test-niveau", "/auth",
@@ -32,35 +35,59 @@ function canAccessRoute(role: UserRole, pathname: string): boolean {
   return !allowed || allowed.includes(role)
 }
 
-function getDefaultRedirect(role: UserRole): string {
-  if (role === "ADMIN") return "/admin"
-  if (role === "TEACHER") return "/teacher"
-  if (role === "CENTER_MANAGER") return "/center"
-  return "/dashboard"
+function getDefaultRedirect(role: UserRole, locale: string): string {
+  if (role === "ADMIN") return `/${locale}/admin`
+  if (role === "TEACHER") return `/${locale}/teacher`
+  if (role === "CENTER_MANAGER") return `/${locale}/center`
+  return `/${locale}/dashboard`
 }
 
-function getOnboardingRoute(role: UserRole): string {
-  if (role === "TEACHER") return "/onboarding/teacher"
-  if (role === "CENTER_MANAGER") return "/onboarding/center"
-  return "/onboarding/student"
+function getOnboardingRoute(role: UserRole, locale: string): string {
+  if (role === "TEACHER") return `/${locale}/onboarding/teacher`
+  if (role === "CENTER_MANAGER") return `/${locale}/onboarding/center`
+  return `/${locale}/onboarding/student`
 }
+
+// Create the intl middleware
+const intlMiddleware = createMiddleware(routing)
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  if (PUBLIC_ROUTES.some(r => pathname === r || pathname.startsWith(r + "/"))) {
-    return NextResponse.next()
-  }
-
+  // Skip static assets and API routes
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/auth") ||
     (pathname.includes(".") && !pathname.startsWith("/api"))
   ) {
     return NextResponse.next()
   }
 
-  let response = NextResponse.next()
+  // Run intl middleware first — handles locale detection & redirects (e.g., / → /fr/)
+  const intlResponse = intlMiddleware(request)
+
+  // If it's a redirect (locale prefix addition), return it immediately
+  if (intlResponse.status !== 200) {
+    return intlResponse
+  }
+
+  // Strip the locale prefix to get the canonical path for auth checking
+  // e.g., /fr/dashboard → /dashboard, /en/login → /login
+  const localePrefix = routing.locales.find(l => pathname === `/${l}` || pathname.startsWith(`/${l}/`))
+  const canonicalPath = localePrefix
+    ? pathname === `/${localePrefix}` ? "/" : pathname.slice(`/${localePrefix}`.length)
+    : pathname
+  const locale = localePrefix ?? routing.defaultLocale
+
+  // Check if this is a public route
+  if (PUBLIC_ROUTES.some(r => canonicalPath === r || canonicalPath.startsWith(r + "/"))) {
+    return intlResponse
+  }
+
+  // Auth check for protected routes
+  let response = intlResponse
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -80,19 +107,19 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.redirect(new URL("/login", request.url))
+    return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
   }
 
   const userRole = (request.cookies.get("user_role")?.value ||
     user.user_metadata?.role || "STUDENT") as UserRole
   const onboardingDone = request.cookies.get("onboarding_done")?.value === "true"
 
-  if (!onboardingDone && !pathname.startsWith("/onboarding") && !pathname.startsWith("/api")) {
-    return NextResponse.redirect(new URL(getOnboardingRoute(userRole), request.url))
+  if (!onboardingDone && !canonicalPath.startsWith("/onboarding") && !canonicalPath.startsWith("/api")) {
+    return NextResponse.redirect(new URL(getOnboardingRoute(userRole, locale), request.url))
   }
 
-  if (!canAccessRoute(userRole, pathname)) {
-    return NextResponse.redirect(new URL(getDefaultRedirect(userRole), request.url))
+  if (!canAccessRoute(userRole, canonicalPath)) {
+    return NextResponse.redirect(new URL(getDefaultRedirect(userRole, locale), request.url))
   }
 
   return response

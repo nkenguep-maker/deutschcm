@@ -1,6 +1,6 @@
 "use client"
 import { usePermissions } from "@/hooks/usePermissions"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/navigation"
 import { useEffect } from "react"
 import type { UserRole } from "@/lib/permissions"
 import { getDefaultRedirect } from "@/lib/permissions"

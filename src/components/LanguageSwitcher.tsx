@@ -1,6 +1,6 @@
 "use client"
 import { useLocale } from "next-intl"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "@/navigation"
 
 interface Props {
   style?: React.CSSProperties
@@ -9,10 +9,10 @@ interface Props {
 export default function LanguageSwitcher({ style }: Props) {
   const locale = useLocale()
   const router = useRouter()
+  const pathname = usePathname()
 
-  const changeLang = (newLocale: string) => {
-    document.cookie = `app_language=${newLocale};path=/;max-age=31536000;SameSite=Lax`
-    router.refresh()
+  const switchLocale = (newLocale: string) => {
+    router.replace(pathname, { locale: newLocale })
   }
 
   return (
@@ -29,7 +29,7 @@ export default function LanguageSwitcher({ style }: Props) {
       ].map(l => (
         <button
           key={l.code}
-          onClick={() => changeLang(l.code)}
+          onClick={() => switchLocale(l.code)}
           title={l.title}
           style={{
             padding: "5px 10px",
