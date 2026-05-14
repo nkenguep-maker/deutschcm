@@ -23,8 +23,8 @@ export function useLanguage() {
   }, [])
 
   const tr = useCallback((section: keyof typeof TRANSLATIONS.fr, key: string): string => {
-    const translations = TRANSLATIONS[lang] as Record<string, Record<string, string>>
-    return translations?.[section]?.[key]
+    const translations = TRANSLATIONS[lang] as Record<string, Record<string, string | Record<string, string>>>
+    return translations?.[section]?.[key] as string
       || (TRANSLATIONS.fr[section as keyof typeof TRANSLATIONS.fr] as Record<string, string>)?.[key]
       || key
   }, [lang])
