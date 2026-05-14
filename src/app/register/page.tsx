@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { useLang } from "@/components/LanguageProvider";
 
 type Role = "STUDENT" | "TEACHER" | "CENTER_MANAGER";
 
@@ -21,6 +22,7 @@ const ONBOARDING_DEST: Record<Role, string> = {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { tr } = useLang();
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -191,7 +193,7 @@ export default function RegisterPage() {
                   Créer un compte
                 </h2>
                 <p className="text-xs mb-6" style={{ color: "rgba(255,255,255,0.35)" }}>
-                  Qui êtes-vous ? Choisissez votre profil 👇
+                  {tr("auth", "choose_role")} 👇
                 </p>
 
                 <div className="flex flex-col gap-3">
@@ -220,10 +222,10 @@ export default function RegisterPage() {
                           className="text-sm font-bold mb-0.5"
                           style={{ color: "rgba(255,255,255,0.9)", fontFamily: "'Syne', sans-serif" }}
                         >
-                          {label}
+                          {tr("auth", key === "STUDENT" ? "role_student" : key === "TEACHER" ? "role_teacher" : "role_center")}
                         </div>
                         <div className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
-                          {sub}
+                          {tr("auth", key === "STUDENT" ? "role_student_desc" : key === "TEACHER" ? "role_teacher_desc" : "role_center_desc")}
                         </div>
                       </div>
                       <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 18 }}>›</span>
@@ -348,7 +350,7 @@ export default function RegisterPage() {
                       cursor: loading ? "not-allowed" : "pointer",
                     }}
                   >
-                    {loading ? "Création du compte..." : "Créer mon compte →"}
+                    {loading ? tr("common", "loading") : `${tr("auth", "register_btn")} →`}
                   </button>
                 </form>
               </div>

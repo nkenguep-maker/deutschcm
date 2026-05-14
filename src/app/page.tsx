@@ -1,9 +1,12 @@
 "use client"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useLang } from "@/components/LanguageProvider"
+import LanguageSwitcher from "@/components/LanguageSwitcher"
 
 export default function LandingPage() {
   const router = useRouter()
+  const { tr } = useLang()
   const [scrolled, setScrolled] = useState(false)
   const [faqOpen, setFaqOpen] = useState<number | null>(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -104,14 +107,15 @@ export default function LandingPage() {
             ))}
           </div>
         )}
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <LanguageSwitcher style={{ marginRight: 4 }} />
           <button onClick={() => router.push("/login")}
             style={{ padding: isMobile ? "8px 14px" : "9px 20px", borderRadius: 10, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)", fontSize: 12, cursor: "pointer" }}>
-            Connexion
+            {tr("nav", "login")}
           </button>
           <button onClick={() => router.push("/register")}
             style={{ padding: isMobile ? "8px 14px" : "9px 20px", borderRadius: 10, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
-            {isMobile ? "Démarrer" : "Commencer gratuitement"}
+            {isMobile ? tr("common", "free") : tr("nav", "register")}
           </button>
         </div>
       </nav>
@@ -125,29 +129,29 @@ export default function LandingPage() {
           {/* Badge */}
           <div className="fade-up" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 18px", borderRadius: 99, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", marginBottom: 28 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block", animation: "pulse 2s infinite" }} />
-            <span style={{ color: "#10b981", fontSize: 12, fontWeight: 600 }}>🇨🇲 Conçu pour le marché camerounais</span>
+            <span style={{ color: "#10b981", fontSize: 12, fontWeight: 600 }}>{tr("landing", "badge")}</span>
           </div>
 
           {/* Titre */}
           <h1 className="fade-up" style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 36 : 64, fontWeight: 900, lineHeight: 1.1, marginBottom: 20, letterSpacing: "-0.02em" }}>
-            Apprenez l'allemand<br />
-            <span style={{ color: "#10b981" }}>comme à Berlin</span>
+            {tr("landing", "title")}<br />
+            <span style={{ color: "#10b981" }}>{tr("landing", "titleAccent")}</span>
           </h1>
 
           {/* Sous-titre */}
           <p className="fade-up" style={{ fontSize: isMobile ? 14 : 18, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 36, maxWidth: 600, margin: "0 auto 36px" }}>
-            Le seul LMS d'allemand avec IA conversationnelle, correction vocale en temps réel et préparation Goethe-Zertifikat A1→C1.
+            {tr("landing", "subtitle")}
           </p>
 
           {/* CTAs */}
           <div className="fade-up" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 48, flexWrap: "wrap" }}>
             <button onClick={() => router.push("/register")}
               style={{ padding: "16px 32px", borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 8px 32px rgba(16,185,129,0.3)", display: "flex", alignItems: "center", gap: 8 }}>
-              🚀 Commencer gratuitement
+              {tr("landing", "cta_primary")}
             </button>
             <button onClick={() => router.push("/simulateur")}
               style={{ padding: "16px 32px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "white", fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
-              🏛️ Voir le simulateur
+              {tr("landing", "cta_secondary")}
             </button>
           </div>
 

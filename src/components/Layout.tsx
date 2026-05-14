@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // ─── Nav definitions ──────────────────────────────────────────────────────────
 
@@ -381,6 +382,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
 
             {/* Right actions */}
             <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <LanguageSwitcher />
               <NotificationBell accentColor={accentColor} />
 
               {/* Avatar */}

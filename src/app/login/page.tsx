@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { useLang } from "@/components/LanguageProvider";
 
 type Role = "STUDENT" | "TEACHER" | "CENTER_MANAGER";
 
@@ -15,6 +16,7 @@ const ROLES: { key: Role; emoji: string; label: string }[] = [
 
 export default function LoginPage() {
   const router = useRouter();
+  const { tr } = useLang();
   const [selectedRole, setSelectedRole] = useState<Role>("STUDENT");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -133,10 +135,10 @@ export default function LoginPage() {
               className="text-lg font-bold mb-1"
               style={{ color: "white", fontFamily: "'Syne', sans-serif" }}
             >
-              Connexion
+              {tr("auth", "login_title")}
             </h2>
             <p className="text-xs mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>
-              Content de te revoir 👋
+              {tr("auth", "login_subtitle")} 👋
             </p>
 
             {/* Role selector */}
@@ -181,7 +183,7 @@ export default function LoginPage() {
               {/* Email */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                  Adresse email
+                  {tr("auth", "email")}
                 </label>
                 <input
                   type="email"
@@ -204,7 +206,7 @@ export default function LoginPage() {
               {/* Password */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                  Mot de passe
+                  {tr("auth", "password")}
                 </label>
                 <input
                   type="password"
@@ -239,14 +241,14 @@ export default function LoginPage() {
                   cursor: loading ? "not-allowed" : "pointer",
                 }}
               >
-                {loading ? "Connexion..." : "Se connecter →"}
+                {loading ? tr("common", "loading") : `${tr("auth", "login_btn")} →`}
               </button>
             </form>
           </div>
 
           {/* Footer */}
           <p className="text-center text-xs mt-6" style={{ color: "rgba(255,255,255,0.3)" }}>
-            Pas encore de compte ?{" "}
+            {tr("auth", "no_account")}{" "}
             <Link
               href="/register"
               style={{ color: "#10b981", textDecoration: "none" }}

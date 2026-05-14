@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "@/components/Layout";
+import { useLang } from "@/components/LanguageProvider";
 import { SCENARIOS as SIM_SCENARIOS } from "@/types/ambassade";
 import type { AmbassadeScenario } from "@/types/ambassade";
 
@@ -169,6 +170,7 @@ interface Analytics {
 
 export default function StudentDashboard() {
   const router = useRouter();
+  const { tr } = useLang();
   const [userData, setUserData] = useState<{
     fullName?: string; germanLevel?: string | null; xpTotal?: number; streakDays?: number;
     city?: string | null; studentType?: string; isValidated?: boolean;
