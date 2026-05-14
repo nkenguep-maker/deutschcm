@@ -15,29 +15,13 @@ interface Badge {
   earned: boolean;
 }
 
-const BADGES: Badge[] = [
-  { id: "1", icon: "🔥", label: "7 jours",   earned: true  },
-  { id: "2", icon: "⭐", label: "Premier A",  earned: true  },
-  { id: "3", icon: "🎯", label: "Précision",  earned: true  },
+const BADGE_DEFS: Badge[] = [
+  { id: "1", icon: "🔥", label: "7 jours",   earned: false },
+  { id: "2", icon: "⭐", label: "Premier A",  earned: false },
+  { id: "3", icon: "🎯", label: "Précision",  earned: false },
   { id: "4", icon: "🏆", label: "Champion",   earned: false },
   { id: "5", icon: "💎", label: "Diamant",    earned: false },
   { id: "6", icon: "🚀", label: "Rocket",     earned: false },
-];
-
-const SKILLS = [
-  { label: "Grammaire",      icon: "📝", score: 72 },
-  { label: "Vocabulaire",    icon: "📖", score: 58 },
-  { label: "Prononciation",  icon: "🗣️", score: 45 },
-  { label: "Compréhension",  icon: "👂", score: 81 },
-];
-
-const STATS = [
-  { icon: "⚡", value: "650",  label: "Points XP"  },
-  { icon: "✅", value: "12",   label: "Leçons"      },
-  { icon: "🎯", value: "8.2",  label: "Score moy."  },
-  { icon: "⏱",  value: "4h",   label: "Temps total" },
-  { icon: "🔥", value: "7",    label: "Jours streak"},
-  { icon: "🏆", value: "3",    label: "Badges"      },
 ];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -174,12 +158,22 @@ function SimulateurCard({ scenario, onTap }: { scenario: AmbassadeScenario; onTa
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
+interface Analytics {
+  xpTotal: number;
+  streakDays: number;
+  completedModules: number;
+  avgQuizScore: number;
+  totalBadges: number;
+  skillScores?: { lesen?: number; hoeren?: number; sprechen?: number; schreiben?: number; grammatik?: number };
+}
+
 export default function StudentDashboard() {
   const router = useRouter();
   const [userData, setUserData] = useState<{
     fullName?: string; germanLevel?: string | null; xpTotal?: number; streakDays?: number;
     city?: string | null; studentType?: string; isValidated?: boolean;
   } | null>(null);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [classJoinCode, setClassJoinCode] = useState("");
   const [isMobile, setIsMobile] = useState(false);
 
@@ -194,21 +188,39 @@ export default function StudentDashboard() {
     fetch("/api/me").then(r => r.ok ? r.json() : null).then(d => {
       if (d) setUserData(d);
     }).catch(() => {});
+
+    fetch("/api/analytics?type=student")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.success && d.data?.overview) setAnalytics(d.data.overview); })
+      .catch(() => {});
   }, []);
 
   const firstName = userData?.fullName?.split(" ")[0] ?? "Apprenant";
   const level = userData?.germanLevel ?? "A1";
-  const xp = userData?.xpTotal ?? 650;
-  const streak = userData?.streakDays ?? 0;
+  const xp = analytics?.xpTotal ?? userData?.xpTotal ?? 0;
+  const streak = analytics?.streakDays ?? userData?.streakDays ?? 0;
   const greet = new Date().getHours() < 12 ? "Guten Morgen" : new Date().getHours() < 18 ? "Guten Tag" : "Guten Abend";
+
   const dynamicStats = [
     { icon: "⚡", value: xp > 1000 ? `${(xp/1000).toFixed(1)}K` : String(xp), label: "Points XP" },
-    { icon: "✅", value: "12",  label: "Leçons" },
-    { icon: "🎯", value: "8.2", label: "Score moy." },
-    { icon: "⏱",  value: "4h",  label: "Temps total" },
-    { icon: "🔥", value: String(streak || 7), label: "Jours streak" },
-    { icon: "🏆", value: "3",   label: "Badges" },
+    { icon: "✅", value: analytics ? String(analytics.completedModules) : "—", label: "Leçons" },
+    { icon: "🎯", value: analytics ? `${analytics.avgQuizScore}%` : "—", label: "Score moy." },
+    { icon: "🔥", value: String(streak), label: "Jours streak" },
+    { icon: "🏆", value: analytics ? String(analytics.totalBadges) : "—", label: "Badges" },
+    { icon: "📖", value: level, label: "Niveau actuel" },
   ];
+
+  const skills = analytics?.skillScores
+    ? [
+        { label: "Grammaire",    icon: "📝", score: analytics.skillScores.grammatik ?? 0 },
+        { label: "Vocabulaire",  icon: "📖", score: analytics.skillScores.lesen ?? 0 },
+        { label: "Prononciation",icon: "🗣️", score: analytics.skillScores.sprechen ?? 0 },
+        { label: "Compréhension",icon: "👂", score: analytics.skillScores.hoeren ?? 0 },
+      ]
+    : null;
+
+  const earnedCount = analytics?.totalBadges ?? 0;
+  const badges = BADGE_DEFS.map((b, i) => ({ ...b, earned: i < earnedCount }));
 
   return (
     <Layout title="Dashboard">
@@ -235,7 +247,7 @@ export default function StudentDashboard() {
               background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.18)",
             }}>
               <span>🔥</span>
-              <span style={{ color: "#34d399", fontSize: "0.78rem" }}>{streak > 0 ? `${streak} jours consécutifs — continuez !` : "Commencez votre streak aujourd'hui !"}</span>
+              <span style={{ color: "#34d399", fontSize: "0.78rem" }}>{streak > 0 ? `${streak} jours consécutifs — continuez !` : "Connectez-vous chaque jour pour démarrer votre série"}</span>
             </div>
           </div>
           <button
@@ -319,7 +331,7 @@ export default function StudentDashboard() {
               </p>
             </div>
             <div style={{ padding: "14px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
-              {SKILLS.map(skill => (
+              {skills ? skills.map(skill => (
                 <div key={skill.label}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
                     <span style={{ color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.82rem" }}>
@@ -338,7 +350,11 @@ export default function StudentDashboard() {
                     }} />
                   </div>
                 </div>
-              ))}
+              )) : (
+                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", textAlign: "center", padding: "16px 0" }}>
+                  Commencez votre première leçon pour voir vos compétences !
+                </p>
+              )}
             </div>
           </div>
 
@@ -410,28 +426,36 @@ export default function StudentDashboard() {
                 Badges obtenus
               </p>
             </div>
-            <div style={{
-              padding: "16px", display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)", gap: 10,
-            }}>
-              {BADGES.map(badge => (
-                <div
-                  key={badge.id}
-                  style={{
-                    display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-                    padding: "14px 8px", borderRadius: 14,
-                    background: badge.earned ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.03)",
-                    border: badge.earned ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.06)",
-                    opacity: badge.earned ? 1 : 0.4,
-                  }}
-                >
-                  <span style={{ fontSize: "1.6rem" }}>{badge.icon}</span>
-                  <span style={{ color: badge.earned ? "#34d399" : "rgba(255,255,255,0.3)", fontSize: "0.62rem", textAlign: "center" }}>
-                    {badge.label}
-                  </span>
-                </div>
-              ))}
-            </div>
+            {earnedCount === 0 ? (
+              <div style={{ padding: "24px 16px", textAlign: "center" }}>
+                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", margin: 0 }}>
+                  Complétez votre première leçon pour gagner un badge
+                </p>
+              </div>
+            ) : (
+              <div style={{
+                padding: "16px", display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)", gap: 10,
+              }}>
+                {badges.map(badge => (
+                  <div
+                    key={badge.id}
+                    style={{
+                      display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                      padding: "14px 8px", borderRadius: 14,
+                      background: badge.earned ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.03)",
+                      border: badge.earned ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.06)",
+                      opacity: badge.earned ? 1 : 0.4,
+                    }}
+                  >
+                    <span style={{ fontSize: "1.6rem" }}>{badge.icon}</span>
+                    <span style={{ color: badge.earned ? "#34d399" : "rgba(255,255,255,0.3)", fontSize: "0.62rem", textAlign: "center" }}>
+                      {badge.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Social — Découvrir */}

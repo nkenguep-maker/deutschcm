@@ -44,6 +44,98 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ classrooms: dbUser.teacher?.classrooms ?? [] });
   }
 
+  if (action === "dashboard") {
+    const teacherWithDetails = await prisma.user.findUnique({
+      where: { supabaseId: authUser.id },
+      include: {
+        teacher: {
+          include: {
+            classrooms: {
+              include: {
+                enrollments: {
+                  include: {
+                    user: {
+                      select: {
+                        id: true, fullName: true, email: true,
+                        germanLevel: true, xpTotal: true, streakDays: true,
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!teacherWithDetails?.teacher) {
+      return NextResponse.json({ success: true, classes: [], students: [], pendingRequests: [], assignments: [] });
+    }
+
+    const classroomIds = teacherWithDetails.teacher.classrooms.map(c => c.id);
+
+    const pendingRequests = classroomIds.length > 0
+      ? await prisma.classJoinRequest.findMany({
+          where: { status: "pending", toClassroomId: { in: classroomIds } },
+          include: {
+            fromUser: { select: { id: true, fullName: true, email: true, germanLevel: true } }
+          }
+        })
+      : [];
+
+    const classes = teacherWithDetails.teacher.classrooms.map(cls => ({
+      id: cls.id,
+      name: cls.name,
+      level: cls.level,
+      code: cls.code,
+      maxStudents: cls.maxStudents,
+      isActive: cls.isActive,
+      students: cls.enrollments.length,
+      avgScore: 0,
+    }));
+
+    const students = teacherWithDetails.teacher.classrooms.flatMap(cls =>
+      cls.enrollments.map(e => ({
+        id: e.user.id,
+        name: e.user.fullName,
+        email: e.user.email,
+        classId: cls.id,
+        className: cls.name,
+        level: e.user.germanLevel,
+        xp: e.user.xpTotal,
+        streak: e.user.streakDays,
+        avgScore: 0,
+        lastActive: "—",
+        progress: 0,
+      }))
+    );
+
+    const formattedRequests = pendingRequests.map(r => ({
+      id: r.id,
+      studentName: r.fromUser.fullName,
+      studentEmail: r.fromUser.email,
+      studentLevel: r.fromUser.germanLevel,
+      message: r.message,
+      classroomId: r.toClassroomId,
+      className: teacherWithDetails.teacher!.classrooms.find(c => c.id === r.toClassroomId)?.name ?? "",
+      date: r.createdAt,
+    }));
+
+    return NextResponse.json({
+      success: true,
+      teacher: {
+        name: teacherWithDetails.fullName,
+        city: teacherWithDetails.city,
+        bio: teacherWithDetails.bio,
+      },
+      classes,
+      students,
+      pendingRequests: formattedRequests,
+      assignments: [],
+    });
+  }
+
   if (action === "code") {
     if (!dbUser.teacher) return NextResponse.json({ error: "No teacher profile" }, { status: 400 });
     let code = dbUser.teacher.code;

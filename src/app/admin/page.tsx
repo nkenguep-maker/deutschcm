@@ -1,74 +1,19 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 
-// ─── Données démo ─────────────────────────────────────────
-const STATS = {
-  users: { total: 1247, students: 1089, teachers: 124, centers: 34, admins: 0, growth: "+12%" },
-  courses: { total: 46, published: 28, draft: 18, modules: 312 },
-  sessions: { today: 89, week: 542, month: 2341, avgDuration: 24 },
-  revenue: { month: 0, total: 0, note: "Monétisation à venir" },
-  subscriptions: { free: 1198, basic: 34, premium: 15, annual: 0 },
+interface AdminStats {
+  users: { total: number; students: number; teachers: number; centers: number; growth: string };
+  courses: { total: number; published: number; draft: number; modules: number };
+  sessions: { today: number; avgDuration: number };
 }
 
-const WEEKLY_USERS = [
-  { day: "Lun", students: 45, teachers: 8, centers: 2 },
-  { day: "Mar", students: 62, teachers: 12, centers: 3 },
-  { day: "Mer", students: 38, teachers: 6, centers: 1 },
-  { day: "Jeu", students: 71, teachers: 15, centers: 4 },
-  { day: "Ven", students: 89, teachers: 18, centers: 5 },
-  { day: "Sam", students: 103, teachers: 9, centers: 2 },
-  { day: "Dim", students: 67, teachers: 4, centers: 1 },
-]
-
-const MONTHLY_SIGNUPS = [
-  { month: "Nov", users: 124 },
-  { month: "Déc", users: 189 },
-  { month: "Jan", users: 267 },
-  { month: "Fév", users: 334 },
-  { month: "Mar", users: 412 },
-  { month: "Avr", users: 589 },
-  { month: "Mai", users: 1247 },
-]
-
 const LEVEL_DISTRIBUTION = [
-  { name: "A1", value: 634, color: "#10b981" },
-  { name: "A2", value: 298, color: "#34d399" },
-  { name: "B1", value: 187, color: "#60a5fa" },
-  { name: "B2", value: 89, color: "#a78bfa" },
-  { name: "C1", value: 39, color: "#f59e0b" },
-]
-
-const CITIES = [
-  { city: "Yaoundé", users: 487, percent: 39 },
-  { city: "Douala", users: 356, percent: 29 },
-  { city: "Bafoussam", users: 124, percent: 10 },
-  { city: "Bamenda", users: 89, percent: 7 },
-  { city: "Garoua", users: 67, percent: 5 },
-  { city: "Autres", users: 124, percent: 10 },
-]
-
-const RECENT_USERS = [
-  { name: "Marie Kamdem", email: "marie@gmail.com", role: "STUDENT", level: "A1", city: "Yaoundé", date: "Il y a 5 min", status: "active" },
-  { name: "Prof. Jean Mbarga", email: "jean@gmail.com", role: "TEACHER", level: "B2", city: "Douala", date: "Il y a 12 min", status: "active" },
-  { name: "Institut Lingua", email: "lingua@gmail.com", role: "CENTER_MANAGER", level: "-", city: "Yaoundé", date: "Il y a 1h", status: "pending" },
-  { name: "Boris Tchouaga", email: "boris@gmail.com", role: "STUDENT", level: "A2", city: "Bafoussam", date: "Il y a 2h", status: "active" },
-  { name: "Alice Ngo", email: "alice@gmail.com", role: "TEACHER", level: "C1", city: "Douala", date: "Il y a 3h", status: "active" },
-]
-
-const RECENT_ACTIVITIES = [
-  { type: "signup", text: "Marie Kamdem vient de s'inscrire", time: "5 min", icon: "👤" },
-  { type: "course", text: "Lektion 3 A1 complétée par 12 élèves", time: "15 min", icon: "📚" },
-  { type: "simulateur", text: "89 sessions simulateur aujourd'hui", time: "1h", icon: "🏛️" },
-  { type: "center", text: "Institut Lingua Plus en attente de validation", time: "2h", icon: "🏫" },
-  { type: "teacher", text: "Prof. Samuel Foto a créé 2 nouvelles classes", time: "3h", icon: "👨‍🏫" },
-  { type: "quiz", text: "Quiz A2 : score moyen 74% cette semaine", time: "5h", icon: "🎯" },
-]
-
-const PENDING_VALIDATIONS = [
-  { type: "center", name: "Institut Lingua Plus", city: "Yaoundé", email: "lingua@gmail.com", date: "Aujourd'hui" },
-  { type: "teacher", name: "Prof. Robert Essama", city: "Yaoundé", email: "robert@gmail.com", date: "Hier" },
-  { type: "center", name: "LangSchool Bafoussam", city: "Bafoussam", email: "lang@gmail.com", date: "Il y a 2j" },
+  { name: "A1", value: 0, color: "#10b981" },
+  { name: "A2", value: 0, color: "#34d399" },
+  { name: "B1", value: 0, color: "#60a5fa" },
+  { name: "B2", value: 0, color: "#a78bfa" },
+  { name: "C1", value: 0, color: "#f59e0b" },
 ]
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -89,6 +34,28 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<"overview"|"users"|"courses"|"validations"|"system">("overview")
   const [searchUser, setSearchUser] = useState("")
   const [filterRole, setFilterRole] = useState("ALL")
+  const [stats, setStats] = useState<AdminStats>({
+    users: { total: 0, students: 0, teachers: 0, centers: 0, growth: "" },
+    courses: { total: 0, published: 0, draft: 0, modules: 0 },
+    sessions: { today: 0, avgDuration: 0 },
+  })
+  const [recentUsers, setRecentUsers] = useState<any[]>([])
+  const [pendingValidations, setPendingValidations] = useState<any[]>([])
+  const [loadingStats, setLoadingStats] = useState(true)
+
+  useEffect(() => {
+    fetch("/api/analytics?type=admin")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d?.success && d.data) {
+          if (d.data.stats) setStats(d.data.stats)
+          if (d.data.recentUsers) setRecentUsers(d.data.recentUsers)
+          if (d.data.pendingValidations) setPendingValidations(d.data.pendingValidations)
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingStats(false))
+  }, [])
 
   const roleColor: Record<string, string> = {
     STUDENT: "#10b981", TEACHER: "#60a5fa",
@@ -131,7 +98,7 @@ export default function AdminDashboard() {
             { key: "overview", icon: "📊", label: "Vue d'ensemble" },
             { key: "users", icon: "👥", label: "Utilisateurs" },
             { key: "courses", icon: "📚", label: "Cours & Contenu" },
-            { key: "validations", icon: "✅", label: "Validations", badge: PENDING_VALIDATIONS.length },
+            { key: "validations", icon: "✅", label: "Validations", badge: pendingValidations.length },
             { key: "system", icon: "⚙️", label: "Système" },
           ].map(item => (
             <button key={item.key} onClick={() => setActiveTab(item.key as any)}
@@ -180,11 +147,11 @@ export default function AdminDashboard() {
               {/* KPIs */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 24 }}>
                 {[
-                  { label: "Total utilisateurs", value: STATS.users.total.toLocaleString(), icon: "👥", color: "#10b981", sub: STATS.users.growth + " ce mois" },
-                  { label: "Élèves actifs", value: STATS.users.students.toLocaleString(), icon: "🎓", color: "#34d399", sub: "inscrits" },
-                  { label: "Enseignants", value: STATS.users.teachers.toLocaleString(), icon: "👨‍🏫", color: "#60a5fa", sub: "vérifiés" },
-                  { label: "Centres", value: STATS.users.centers.toLocaleString(), icon: "🏫", color: "#f59e0b", sub: "partenaires" },
-                  { label: "Sessions aujourd'hui", value: STATS.sessions.today.toLocaleString(), icon: "⚡", color: "#a78bfa", sub: `moy. ${STATS.sessions.avgDuration}min` },
+                  { label: "Total utilisateurs", value: stats.users.total.toLocaleString(), icon: "👥", color: "#10b981", sub: stats.users.growth + " ce mois" },
+                  { label: "Élèves actifs", value: stats.users.students.toLocaleString(), icon: "🎓", color: "#34d399", sub: "inscrits" },
+                  { label: "Enseignants", value: stats.users.teachers.toLocaleString(), icon: "👨‍🏫", color: "#60a5fa", sub: "vérifiés" },
+                  { label: "Centres", value: stats.users.centers.toLocaleString(), icon: "🏫", color: "#f59e0b", sub: "partenaires" },
+                  { label: "Sessions aujourd'hui", value: stats.sessions.today.toLocaleString(), icon: "⚡", color: "#a78bfa", sub: `moy. ${stats.sessions.avgDuration}min` },
                 ].map((kpi, i) => (
                   <div key={i} style={{ padding: "16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
                     <div style={{ fontSize: 22, marginBottom: 8 }}>{kpi.icon}</div>
@@ -202,7 +169,7 @@ export default function AdminDashboard() {
                 <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 20px" }}>📈 Inscriptions mensuelles</h3>
                   <ResponsiveContainer width="100%" height={180}>
-                    <AreaChart data={MONTHLY_SIGNUPS}>
+                    <AreaChart data={[]}>
                       <defs>
                         <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
@@ -246,7 +213,7 @@ export default function AdminDashboard() {
               <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
                 <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 20px" }}>📅 Activité cette semaine</h3>
                 <ResponsiveContainer width="100%" height={180}>
-                  <BarChart data={WEEKLY_USERS}>
+                  <BarChart data={[]}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                     <XAxis dataKey="day" stroke="rgba(255,255,255,0.3)" fontSize={10} />
                     <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} />
@@ -264,31 +231,19 @@ export default function AdminDashboard() {
                 {/* Activité récente */}
                 <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>🔔 Activité récente</h3>
-                  {RECENT_ACTIVITIES.map((act, i) => (
-                    <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 10, paddingBottom: 10, borderBottom: i < RECENT_ACTIVITIES.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                      <span style={{ fontSize: 16, flexShrink: 0 }}>{act.icon}</span>
-                      <div style={{ flex: 1 }}>
-                        <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, margin: "0 0 2px", lineHeight: 1.4 }}>{act.text}</p>
-                        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 9, margin: 0 }}>Il y a {act.time}</p>
-                      </div>
-                    </div>
-                  ))}
+                  <div style={{ textAlign: "center", padding: "20px 0" }}>
+                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: 0 }}>
+                      L&apos;activité récente apparaîtra ici
+                    </p>
+                  </div>
                 </div>
 
                 {/* Top villes */}
                 <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>🌍 Top villes</h3>
-                  {CITIES.map((city, i) => (
-                    <div key={i} style={{ marginBottom: 12 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>{city.city}</span>
-                        <span style={{ fontSize: 11, color: "#10b981", fontWeight: 700 }}>{city.users} · {city.percent}%</span>
-                      </div>
-                      <div style={{ height: 5, background: "rgba(255,255,255,0.06)", borderRadius: 99, overflow: "hidden" }}>
-                        <div style={{ height: "100%", width: `${city.percent}%`, background: "linear-gradient(90deg,#059669,#10b981)", borderRadius: 99 }} />
-                      </div>
-                    </div>
-                  ))}
+                  <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: 0, textAlign: "center", padding: "20px 0" }}>
+                    Données géographiques — bientôt disponibles
+                  </p>
                 </div>
               </div>
             </div>
@@ -319,9 +274,9 @@ export default function AdminDashboard() {
               {/* Stats rapides */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 20 }}>
                 {[
-                  { label: "Élèves", value: STATS.users.students, color: "#10b981" },
-                  { label: "Enseignants", value: STATS.users.teachers, color: "#60a5fa" },
-                  { label: "Centres", value: STATS.users.centers, color: "#f59e0b" },
+                  { label: "Élèves", value: stats.users.students, color: "#10b981" },
+                  { label: "Enseignants", value: stats.users.teachers, color: "#60a5fa" },
+                  { label: "Centres", value: stats.users.centers, color: "#f59e0b" },
                   { label: "Nouveaux aujourd'hui", value: 12, color: "#a78bfa" },
                 ].map((s, i) => (
                   <div key={i} style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", textAlign: "center" }}>
@@ -344,7 +299,7 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {RECENT_USERS
+                    {recentUsers
                       .filter(u => filterRole === "ALL" || u.role === filterRole)
                       .filter(u => !searchUser || u.name.toLowerCase().includes(searchUser.toLowerCase()) || u.email.toLowerCase().includes(searchUser.toLowerCase()))
                       .map((u, i) => (
@@ -403,10 +358,10 @@ export default function AdminDashboard() {
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 24 }}>
                 {[
-                  { label: "Cours total", value: STATS.courses.total, color: "#10b981", icon: "📚" },
-                  { label: "Publiés", value: STATS.courses.published, color: "#34d399", icon: "✅" },
-                  { label: "Brouillons", value: STATS.courses.draft, color: "#f59e0b", icon: "📝" },
-                  { label: "Modules total", value: STATS.courses.modules, color: "#60a5fa", icon: "🧩" },
+                  { label: "Cours total", value: stats.courses.total, color: "#10b981", icon: "📚" },
+                  { label: "Publiés", value: stats.courses.published, color: "#34d399", icon: "✅" },
+                  { label: "Brouillons", value: stats.courses.draft, color: "#f59e0b", icon: "📝" },
+                  { label: "Modules total", value: stats.courses.modules, color: "#60a5fa", icon: "🧩" },
                 ].map((s, i) => (
                   <div key={i} style={{ padding: "16px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", textAlign: "center" }}>
                     <div style={{ fontSize: 20, marginBottom: 6 }}>{s.icon}</div>
@@ -454,13 +409,13 @@ export default function AdminDashboard() {
                 ✅ Validations en attente
               </h1>
 
-              {PENDING_VALIDATIONS.length === 0 ? (
+              {pendingValidations.length === 0 ? (
                 <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,0.4)", fontSize: 13 }}>
                   ✅ Aucune validation en attente
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  {PENDING_VALIDATIONS.map((item, i) => (
+                  {pendingValidations.map((item, i) => (
                     <div key={i} style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", alignItems: "center", gap: 16 }}>
                       <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
                         {item.type === "center" ? "🏫" : "👨‍🏫"}

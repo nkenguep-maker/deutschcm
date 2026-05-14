@@ -28,6 +28,7 @@ export default function SchreibenEditor({
   const [showModel, setShowModel] = useState(false)
   const [showErrors, setShowErrors] = useState(true)
   const [activeTab, setActiveTab] = useState<"correction"|"conseils"|"modele">("correction")
+  const [apiUnavailable, setApiUnavailable] = useState(false)
 
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length
   const charCount = text.length
@@ -37,6 +38,7 @@ export default function SchreibenEditor({
     if (!text.trim()) return
     setAnalyzing(true)
     setCorrection(null)
+    setApiUnavailable(false)
     try {
       const res = await fetch("/api/schreiben/analyze", {
         method: "POST",
@@ -47,9 +49,12 @@ export default function SchreibenEditor({
       if (data.success) {
         setCorrection(data.correction)
         onComplete?.(data.correction.score_global, text)
+      } else {
+        setApiUnavailable(true)
       }
     } catch (e) {
       console.error(e)
+      setApiUnavailable(true)
     } finally {
       setAnalyzing(false)
     }
@@ -177,6 +182,21 @@ export default function SchreibenEditor({
           </button>
         )}
       </div>
+
+      {/* API unavailable notice */}
+      {apiUnavailable && (
+        <div style={{
+          padding: "12px 16px", borderRadius: 12, marginBottom: 16,
+          background: "rgba(245,158,11,0.06)",
+          border: "1px solid rgba(245,158,11,0.25)",
+          display: "flex", alignItems: "center", gap: 8
+        }}>
+          <span>⚠️</span>
+          <p style={{ color: "#f59e0b", fontSize: 13, margin: 0 }}>
+            Correction IA temporairement indisponible — réessayez dans quelques instants.
+          </p>
+        </div>
+      )}
 
       {/* Exemple */}
       {showModel && example && (

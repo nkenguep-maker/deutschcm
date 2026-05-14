@@ -32,58 +32,20 @@ interface Filters {
   spotsOnly: boolean; verifiedOnly: boolean;
 }
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
+// ─── Empty static arrays (data is fetched from API in DiscoverPage) ─────────
+const CLASSES: ClassItem[] = [];
+const CENTERS: CenterItem[] = [];
+const GROUPS: GroupItem[] = [];
+const SOLOS: SoloItem[] = [];
 
-const CLASSES: ClassItem[] = [
-  { id: "cls1", teacherName: "Prof. Marie Tchamba", teacherAvatar: "MT", verified: true, level: "A1", city: "Yaoundé", center: "Institut Lingua Plus", students: 12, max: 20, schedule: "Lun/Mer 18h–20h", nextSession: "Lundi 19 mai 18h", description: "Cours pour grands débutants — accent sur l'oral et la phonétique. Méthode Netzwerk A1.", tags: ["Débutant", "Oral", "Goethe"], rating: 4.9, reviews: 28, code: "DEUTSCH-A1-2024", lastActive: "il y a 2h" },
-  { id: "cls2", teacherName: "Prof. Jean Mbarga", teacherAvatar: "JB", verified: true, level: "A2", city: "Douala", center: "Goethe Center CM", students: 8, max: 15, schedule: "Mar/Jeu 14h–16h", nextSession: "Mardi 20 mai 14h", description: "Préparation Goethe A2 avec focus sur la compréhension orale et écrite.", tags: ["A2", "TELC", "Prépa"], rating: 4.7, reviews: 19, code: "LINGUA-A2-0512", lastActive: "il y a 5h" },
-  { id: "cls3", teacherName: "Prof. Alice Ngo", teacherAvatar: "AN", verified: true, level: "B1", city: "Bafoussam", center: "LangSchool Bafoussam", students: 14, max: 15, schedule: "Ven 10h–12h", nextSession: "Vendredi 16 mai 10h", description: "Classe B1 intensive — grammaire avancée, expression écrite, simulation d'examens Goethe.", tags: ["B1", "Avancé", "Intensif"], rating: 4.8, reviews: 34, code: "LANG-B1-NGO1", lastActive: "il y a 1h" },
-  { id: "cls4", teacherName: "Prof. Samuel Foto", teacherAvatar: "SF", verified: true, level: "B2", city: "Yaoundé", center: "Institut Lingua Plus", students: 5, max: 10, schedule: "Mer/Sam 9h–11h", nextSession: "Mercredi 21 mai 9h", description: "B2 avancé — préparation TestDaF et études en Allemagne. Vocabulaire académique.", tags: ["B2", "TestDaF", "Académique"], rating: 5.0, reviews: 12, code: "GOETHE-B2-SAM1", lastActive: "il y a 30min" },
-  { id: "cls5", teacherName: "Prof. Christine Bello", teacherAvatar: "CB", verified: false, level: "A1", city: "Douala", center: "DeutschAkademie Garoua", students: 10, max: 12, schedule: "Lun/Mer/Ven 16h–17h", nextSession: "Lundi 19 mai 16h", description: "Allemand pour enfants (8–12 ans) — jeux, chansons, histoire. Pédagogie ludique.", tags: ["Enfants", "Ludique", "A1"], rating: 4.6, reviews: 22, code: "BELL-A1-KID5", lastActive: "il y a 3h" },
-  { id: "cls6", teacherName: "Prof. David Kamga", teacherAvatar: "DK", verified: true, level: "C1", city: "En ligne", center: "Cours particuliers", students: 6, max: 8, schedule: "Sam/Dim 10h–12h", nextSession: "Samedi 17 mai 10h", description: "Conversation niveau C1 — débats, actualités, culture allemande. 100% en ligne.", tags: ["C1", "Conversation", "En ligne"], rating: 4.9, reviews: 41, code: "KAMG-C1-CONV", isOnline: true, lastActive: "il y a 15min" },
-  { id: "cls7", teacherName: "Prof. Fatima Oumar", teacherAvatar: "FO", verified: false, level: "A2", city: "Garoua", center: "DeutschAkademie Garoua", students: 3, max: 15, schedule: "Mar/Jeu 8h–10h", nextSession: "Mardi 20 mai 8h", description: "A2 adultes — vocabulaire professionnel, voyage, administration. Rythme progressif.", tags: ["A2", "Adultes", "Professionnel"], rating: 4.5, reviews: 7, code: "OUMA-A2-GAR7", lastActive: "il y a 1j" },
-  { id: "cls8", teacherName: "Prof. Robert Essama", teacherAvatar: "RE", verified: true, level: "B1", city: "Yaoundé", center: "Institut Lingua Plus", students: 7, max: 10, schedule: "Lun/Jeu 17h–19h", nextSession: "Jeudi 22 mai 17h", description: "Prépa TestDaF B1 — lecture, écriture, écoute. Taux de réussite 89%.", tags: ["B1", "TestDaF", "Goethe"], rating: 4.8, reviews: 16, code: "ESSA-B1-TDF8", lastActive: "il y a 4h" },
-];
-
-const CENTERS: CenterItem[] = [
-  { id: "ctr1", name: "Institut Lingua Plus", city: "Yaoundé", region: "Centre", avatar: "LP", verified: true, plan: "pro", teachers: 8, students: 245, classes: 12, languages: ["🇩🇪", "🇬🇧", "🇪🇸"], code: "CENTRE-LINGUA", successRate: 87, yearsActive: 6 },
-  { id: "ctr2", name: "Goethe Center CM", city: "Douala", region: "Littoral", avatar: "GC", verified: true, plan: "enterprise", teachers: 12, students: 380, classes: 18, languages: ["🇩🇪", "🇬🇧"], code: "CENTRE-GOETHE", successRate: 92, yearsActive: 9 },
-  { id: "ctr3", name: "LangSchool Bafoussam", city: "Bafoussam", region: "Ouest", avatar: "LS", verified: false, plan: "starter", teachers: 4, students: 89, classes: 6, languages: ["🇩🇪", "🇫🇷"], code: "CENTRE-LANG01", successRate: 74, yearsActive: 3 },
-  { id: "ctr4", name: "DeutschAkademie Garoua", city: "Garoua", region: "Nord", avatar: "DA", verified: false, plan: "starter", teachers: 3, students: 45, classes: 4, languages: ["🇩🇪"], code: "CENTRE-DEUT04", successRate: 68, yearsActive: 2 },
-];
-
-const GROUPS: GroupItem[] = [
-  { id: "grp1", name: "Prépa Goethe A1 — Juin 2026", creatorName: "Fatima Oumarou", creatorAvatar: "FO", level: "A1", city: "Yaoundé", members: 6, max: 10, goal: "Passer le Goethe A1 en juin 2026", schedule: "Sam 10h–12h", description: "Groupe de révision sérieux — exercices mutuels, quiz hebdo, corrections collectives.", tags: ["A1", "Goethe", "Weekend"], lastActive: "il y a 1h", memberAvatars: ["FO", "AM", "CB", "PK", "RN", "SK"], code: "GROUPE-PREP01" },
-  { id: "grp2", name: "Révision B1 Douala", creatorName: "Alice Fotso", creatorAvatar: "AF", level: "B1", city: "Douala", members: 4, max: 10, goal: "B1 pour visa étudiant — sept 2026", schedule: "Mar/Jeu soir 20h", description: "Groupe orienté examens — simulations d'épreuves, corrections et feedback entre membres.", tags: ["B1", "Visa", "Intensif"], lastActive: "il y a 3h", memberAvatars: ["AF", "JM", "CB", "PL"], code: "GROUPE-REV-B1" },
-  { id: "grp3", name: "Visa Allemagne 2026", creatorName: "Samuel Biya", creatorAvatar: "SB", level: "A2", city: "Yaoundé", members: 8, max: 10, goal: "Dossier visa Allemagne — automne 2026", schedule: "Lun/Ven 19h–20h", description: "Focus sur le vocabulaire administratif, les lettres de motivation et l'entretien consulaire.", tags: ["A2", "Visa", "Ambassade"], lastActive: "il y a 30min", memberAvatars: ["SB", "AM", "FK", "PO", "RN", "CB", "JM", "LT"], code: "GROUPE-VISA26" },
-  { id: "grp4", name: "Conversation A2 Weekend", creatorName: "Paul Ondoa", creatorAvatar: "PO", level: "A2", city: "Douala", members: 3, max: 10, goal: "Fluidité orale — objectif B1 en 6 mois", schedule: "Dim 15h–16h30", description: "Sessions de conversation libres — thèmes du quotidien, actualités légères, échanges culturels.", tags: ["A2", "Conversation", "Weekend"], lastActive: "il y a 2j", memberAvatars: ["PO", "KN", "AF"], code: "GROUPE-CONV-A2" },
-];
-
-const SOLOS: SoloItem[] = [
-  { id: "sol1", name: "Amina K.", avatar: "AK", level: "A1", targetLevel: "A2", city: "Yaoundé", goal: "Goethe A1 — juin 2026", availability: "Soirs et weekends", desc: "Infirmière, motive et sérieuse. Cherche groupe A1 structuré avec prof ou tuteur." },
-  { id: "sol2", name: "Boris T.", avatar: "BT", level: "A2", targetLevel: "B1", city: "Douala", goal: "Voyage/stage en Allemagne", availability: "Weekends uniquement", desc: "A2 acquis seul en 4 mois. Cherche groupe pour pratiquer l'oral avant un stage à Hamburg." },
-  { id: "sol3", name: "Claire N.", avatar: "CN", level: "A1", targetLevel: "A1", city: "Bafoussam", goal: "Découverte culturelle", availability: "Flexible", desc: "Débutante complète passionnée de culture germanique. Cherche groupe bienveillant et patient." },
-  { id: "sol4", name: "Didier F.", avatar: "DF", level: "B1", targetLevel: "B2", city: "Yaoundé", goal: "Visa étudiant — master en Allemagne", availability: "Matin 8h–12h et soirs", desc: "Dossier en cours pour TU Berlin. Cherche partenaire de révision TestDaF niveau B2." },
-];
-
-// ─── Code lookup (demo hardcodé) ─────────────────────────────────────────────
+// ─── Code lookup (vide — les vrais codes sont en DB) ────────────────────────
 
 type CodeResultType =
   | { type: "class";  data: ClassItem  }
   | { type: "center"; data: CenterItem }
   | { type: "group";  data: GroupItem  };
 
-const CODE_LOOKUP: Record<string, CodeResultType> = {
-  "DEUTSCH-A1-2024": { type: "class",  data: CLASSES[0] },
-  "LINGUA-A2-0512":  { type: "class",  data: CLASSES[1] },
-  "GOETHE-B1-PRO1":  { type: "class",  data: CLASSES[2] },
-  "GOETHE-B2-SAM1":  { type: "class",  data: CLASSES[3] },
-  "CENTRE-LINGUA":   { type: "center", data: CENTERS[0] },
-  "CENTRE-GOETHE":   { type: "center", data: CENTERS[1] },
-  "CENTRE-LANG01":   { type: "center", data: CENTERS[2] },
-  "GROUPE-PREP01":   { type: "group",  data: GROUPS[0] },
-  "GROUPE-REV-B1":   { type: "group",  data: GROUPS[1] },
-};
+const CODE_LOOKUP: Record<string, CodeResultType> = {};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -826,6 +788,11 @@ export default function DiscoverPage() {
   const [sending, setSending] = useState(false);
   const [userLevel, setUserLevel] = useState<string | null>(null);
   const [userCity, setUserCity] = useState<string | null>(null);
+  const [classes, setClasses] = useState<ClassItem[]>([]);
+  const [centers, setCenters] = useState<CenterItem[]>([]);
+  const [groups, setGroups] = useState<GroupItem[]>([]);
+  const [solos] = useState<SoloItem[]>([]);
+  const [discoverLoading, setDiscoverLoading] = useState(true);
 
   useEffect(() => {
     const seen = localStorage.getItem("discoverSeen");
@@ -837,6 +804,55 @@ export default function DiscoverPage() {
       if (d?.germanLevel) setUserLevel(d.germanLevel);
       if (d?.city) setUserCity(d.city);
     }).catch(() => {});
+
+    fetch("/api/discover")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d?.success) {
+          const apiClasses: ClassItem[] = (d.teachers ?? []).flatMap((t: any) =>
+            (t.classrooms ?? []).map((c: any) => ({
+              id: c.id,
+              teacherName: t.fullName,
+              teacherAvatar: (t.fullName || "?").split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase(),
+              verified: false,
+              level: c.level,
+              city: t.city ?? "—",
+              center: "",
+              students: c.enrollments ?? 0,
+              max: c.maxStudents ?? 30,
+              schedule: "",
+              nextSession: "",
+              description: t.bio ?? "",
+              tags: [],
+              rating: 0,
+              reviews: 0,
+              code: c.code,
+              lastActive: "—",
+            }))
+          );
+          const apiCenters: CenterItem[] = (d.centers ?? []).map((c: any) => ({
+            id: c.id,
+            name: c.centerName ?? c.fullName,
+            city: c.centerCity ?? "—",
+            region: "",
+            avatar: (c.centerName ?? c.fullName ?? "?").slice(0, 2).toUpperCase(),
+            verified: false,
+            plan: "starter",
+            teachers: 0,
+            students: 0,
+            classes: 0,
+            languages: ["🇩🇪"],
+            code: "",
+            successRate: 0,
+            yearsActive: 0,
+          }));
+          setClasses(apiClasses);
+          setCenters(apiCenters);
+          setGroups(d.groups ?? []);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setDiscoverLoading(false));
   }, []);
 
   const toggleFav = (id: string) => {
@@ -861,7 +877,7 @@ export default function DiscoverPage() {
   const matchSearch = (text: string) => !search || text.toLowerCase().includes(search.toLowerCase());
 
   const filteredClasses = useMemo(() => {
-    let r = CLASSES.filter(c =>
+    let r = classes.filter(c =>
       matchSearch(`${c.teacherName} ${c.center} ${c.level} ${c.city} ${c.tags.join(" ")}`) &&
       (filters.levels.length === 0 || filters.levels.includes(c.level)) &&
       (filters.cities.length === 0 || filters.cities.includes(c.city)) &&
@@ -871,31 +887,36 @@ export default function DiscoverPage() {
     if (sort === "new") r = [...r].sort((a, b) => a.students - b.students);
     if (sort === "active") r = [...r].sort((a, b) => a.lastActive.localeCompare(b.lastActive));
     return r;
-  }, [search, filters, sort]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [classes, search, filters, sort]);
 
-  const filteredCenters = useMemo(() => CENTERS.filter(c =>
+  const filteredCenters = useMemo(() => centers.filter(c =>
     matchSearch(`${c.name} ${c.city} ${c.region}`) &&
     (filters.cities.length === 0 || filters.cities.includes(c.city)) &&
     (!filters.verifiedOnly || c.verified)
-  ), [search, filters]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ), [centers, search, filters]);
 
-  const filteredGroups = useMemo(() => GROUPS.filter(g =>
+  const filteredGroups = useMemo(() => groups.filter(g =>
     matchSearch(`${g.name} ${g.level} ${g.city} ${g.goal}`) &&
     (filters.levels.length === 0 || filters.levels.includes(g.level)) &&
     (filters.cities.length === 0 || filters.cities.includes(g.city)) &&
     (!filters.spotsOnly || g.members < g.max)
-  ), [search, filters]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ), [groups, search, filters]);
 
-  const filteredSolos = useMemo(() => SOLOS.filter(s =>
+  const filteredSolos = useMemo(() => solos.filter(s =>
     matchSearch(`${s.name} ${s.city} ${s.level} ${s.goal}`)
-  ), [search]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ), [solos, search]);
 
   const recommendedIds = useMemo(() => {
     if (!userLevel) return new Set<string>();
-    return new Set(CLASSES.filter(c => c.level === userLevel || (userCity && c.city === userCity)).map(c => c.id));
-  }, [userLevel, userCity]);
+    return new Set(classes.filter(c => c.level === userLevel || (userCity && c.city === userCity)).map(c => c.id));
+  }, [classes, userLevel, userCity]);
 
   const totalCount = filteredClasses.length + filteredCenters.length + filteredGroups.length + filteredSolos.length;
+  const isEmpty = !discoverLoading && totalCount === 0 && !search;
 
   const openJoin = (id: string, name: string, type: "class" | "group" | "center", teacher?: string) => {
     if (joined.has(id)) return;

@@ -85,6 +85,15 @@ export default function VoiceRecorder({
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Coming soon banner */}
+      <div style={{padding:16, borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", textAlign:"center"}}>
+        <p style={{color:"#f59e0b", fontSize:13, margin:0}}>
+          🎙️ Correction vocale IA — Bientôt disponible
+        </p>
+        <p style={{color:"rgba(255,255,255,0.4)", fontSize:11, margin:"6px 0 0"}}>
+          L&apos;enregistrement vocal sera actif dans la prochaine mise à jour.
+        </p>
+      </div>
       {/* Mic button + waveform */}
       <div className="flex flex-col items-center gap-3">
         <button
