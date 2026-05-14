@@ -68,9 +68,17 @@ export async function middleware(request: NextRequest) {
   // Run intl middleware first — handles locale detection & redirects (e.g., / → /fr/)
   const intlResponse = await intlMiddleware(request)
 
+  // DEBUG: expose what intlMiddleware returned
+  const dbgStatus = String(intlResponse.status)
+  const dbgLoc = intlResponse.headers.get("location") ?? "none"
+
   // If it's a redirect (locale prefix addition), return it immediately
   if (intlResponse.status !== 200) {
-    return intlResponse
+    const r2 = new NextResponse(intlResponse.body, intlResponse)
+    r2.headers.set("x-dbg-stage", "intl-redirect")
+    r2.headers.set("x-dbg-intl-status", dbgStatus)
+    r2.headers.set("x-dbg-intl-loc", dbgLoc)
+    return r2
   }
 
   // Strip the locale prefix to get the canonical path for auth checking
@@ -83,7 +91,11 @@ export async function middleware(request: NextRequest) {
 
   // Check if this is a public route
   if (PUBLIC_ROUTES.some(r => canonicalPath === r || canonicalPath.startsWith(r + "/"))) {
-    return intlResponse
+    const r2 = new NextResponse(intlResponse.body, intlResponse)
+    r2.headers.set("x-dbg-stage", "public-route")
+    r2.headers.set("x-dbg-canonical", canonicalPath)
+    r2.headers.set("x-dbg-locale", locale)
+    return r2
   }
 
   // Auth check for protected routes
@@ -107,7 +119,13 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
+    const redirectUrl = new URL(`/${locale}/login`, request.url)
+    const r2 = NextResponse.redirect(redirectUrl)
+    r2.headers.set("x-dbg-stage", "no-user")
+    r2.headers.set("x-dbg-canonical", canonicalPath)
+    r2.headers.set("x-dbg-locale", locale)
+    r2.headers.set("x-dbg-intl-status", dbgStatus)
+    return r2
   }
 
   const userRole = (request.cookies.get("user_role")?.value ||
