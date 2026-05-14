@@ -83,10 +83,10 @@ export default function CenterLayout({ children, title, centerName = "Institut G
                 background: "linear-gradient(135deg, rgba(234,179,8,0.2), rgba(161,120,0,0.08))",
                 border: "1px solid rgba(234,179,8,0.3)",
                 boxShadow: "0 0 20px rgba(234,179,8,0.1)",
-              }}>🇩🇪</div>
+              }}></div>
               <div>
                 <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1rem", lineHeight: 1.2 }}>
-                  Deutsch<span style={{ color: "#eab308" }}>CM</span>
+                  Yema
                 </p>
                 <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.58rem", letterSpacing: "0.08em" }}>
                   Portail Centre

@@ -197,9 +197,9 @@ export default function StudentOnboardingPage() {
       <div style={{ width: "100%", maxWidth: 560 }} className="fadeUp">
         {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div style={{ fontSize: 36, marginBottom: 8 }}>🇩🇪</div>
+          <div style={{ fontSize: 36, marginBottom: 8 }}></div>
           <h1 style={{ margin: 0, color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 22 }}>
-            Bienvenue sur DeutschCM
+            Bienvenue sur Yema
           </h1>
           <p style={{ margin: "6px 0 0", color: "rgba(255,255,255,0.35)", fontSize: 13 }}>
             Configurons votre profil pour personnaliser votre apprentissage

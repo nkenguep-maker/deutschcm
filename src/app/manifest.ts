@@ -2,8 +2,8 @@ import { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "DeutschCM — Apprenez l'allemand",
-    short_name: "DeutschCM",
+    name: "Yema — Apprenez l'allemand",
+    short_name: "Yema",
     description: "Plateforme d'apprentissage de l'allemand avec IA pour le Cameroun",
     start_url: "/",
     display: "standalone",

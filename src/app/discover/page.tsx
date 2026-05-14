@@ -583,7 +583,7 @@ function CenterCard({ center, onJoin, faved, onFav, sent }: { center: CenterItem
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", marginBottom: 2 }}>
             <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{center.name}</span>
-            {center.verified && <span title="Vérifié par DeutschCM" style={{ fontSize: 12 }}>✅</span>}
+            {center.verified && <span title="Vérifié par Yema" style={{ fontSize: 12 }}>✅</span>}
           </div>
           <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>📍 {center.city}, {center.region} · {center.yearsActive} ans</div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
@@ -748,7 +748,7 @@ function SoloCard({ student, onInvite, invited }: { student: SoloItem; onInvite:
         }}>
           {invited ? "✓ Invitation envoyée" : "✉️ Inviter dans mon groupe"}
         </button>
-        <button onClick={() => { const wa = `https://wa.me/?text=${encodeURIComponent(`Salut ${student.name} ! Je t'invite à rejoindre mon groupe d'étude d'allemand sur DeutschCM.`)}`; window.open(wa, "_blank"); }} style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(37,211,102,0.1)", border: "1px solid rgba(37,211,102,0.2)", color: "#25d166", fontSize: 14, cursor: "pointer" }} title="Inviter sur WhatsApp">
+        <button onClick={() => { const wa = `https://wa.me/?text=${encodeURIComponent(`Salut ${student.name} ! Je t'invite à rejoindre mon groupe d'étude d'allemand sur Yema.`)}`; window.open(wa, "_blank"); }} style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(37,211,102,0.1)", border: "1px solid rgba(37,211,102,0.2)", color: "#25d166", fontSize: 14, cursor: "pointer" }} title="Inviter sur WhatsApp">
           💬
         </button>
       </div>
@@ -841,7 +841,7 @@ export default function DiscoverPage() {
             teachers: 0,
             students: 0,
             classes: 0,
-            languages: ["🇩🇪"],
+            languages: [""],
             code: "",
             successRate: 0,
             yearsActive: 0,

@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
     if (message.includes("AZURE_TTS_KEY")) {
       return NextResponse.json(
-        { error: "Azure TTS non configuré", details: message },
+        { error: "Synthèse vocale non configurée", details: message },
         { status: 503 }
       )
     }

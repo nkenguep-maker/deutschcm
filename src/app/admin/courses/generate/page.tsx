@@ -365,10 +365,10 @@ export default function AdminGenerateCourse() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold flex items-center gap-3 mb-1" style={{ fontFamily: "'Syne',sans-serif" }}>
-            <Sparkles className="text-emerald-400" /> DeutschCM — Générateur de Cours IA
+            <Sparkles className="text-emerald-400" /> Yema — Générateur de Cours IA
           </h1>
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>
-            Propulsé par Gemini 1.5 Pro · Programme officiel Goethe-Institut
+            Programme officiel Goethe-Institut
           </p>
         </div>
 
@@ -506,7 +506,7 @@ export default function AdminGenerateCourse() {
             }}
           >
             {loading ? <RefreshCw size={16} className="animate-spin" /> : <Sparkles size={16} />}
-            {loading ? "Génération en cours..." : "Générer avec Gemini 1.5 Pro"}
+            {loading ? "Génération en cours..." : "Générer avec notre IA"}
           </button>
         </div>
 

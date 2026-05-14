@@ -87,9 +87,9 @@ export default function AdminDashboard() {
           padding: "24px 16px", overflowY: "auto"
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28 }}>
-            <span style={{ fontSize: 20 }}>🇩🇪</span>
+            <span style={{ fontSize: 20 }}></span>
             <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800 }}>
-              Deutsch<span style={{ color: "#10b981" }}>CM</span>
+              Yema
             </span>
             <span style={{ fontSize: 8, padding: "2px 6px", borderRadius: 99, background: "rgba(239,68,68,0.15)", color: "#ef4444", fontWeight: 700, marginLeft: 4 }}>ADMIN</span>
           </div>
@@ -140,7 +140,7 @@ export default function AdminDashboard() {
                   👋 Bonjour, Admin
                 </h1>
                 <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: 0 }}>
-                  DeutschCM · {new Date().toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+                  Yema · {new Date().toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
                 </p>
               </div>
 
@@ -351,7 +351,7 @@ export default function AdminDashboard() {
                 <div style={{ display: "flex", gap: 8 }}>
                   <a href="/admin/courses/generate"
                     style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#10b981,#059669)", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
-                    ✨ Générer avec Gemini
+                    ✨ Générer
                   </a>
                 </div>
               </div>
@@ -455,8 +455,8 @@ export default function AdminDashboard() {
                 <div style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>🔌 APIs configurées</h3>
                   {[
-                    { name: "Gemini 1.5 Pro", status: "active", usage: "Quiz + Correction + Simulateur" },
-                    { name: "Azure Neural TTS", status: "active", usage: "Dialogues Hören" },
+                    { name: "IA générative", status: "active", usage: "Quiz + Correction + Simulateur" },
+                    { name: "native voices", status: "active", usage: "Dialogues Hören" },
                     { name: "Web Speech API", status: "active", usage: "Reconnaissance vocale" },
                     { name: "Supabase Auth", status: "active", usage: "Authentification" },
                     { name: "Prisma + PostgreSQL", status: "active", usage: "Base de données" },

@@ -133,7 +133,7 @@ export default function TestNiveauPage() {
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 44, marginBottom: 16 }}>⏳</div>
         <div style={{ color: "#10b981", fontWeight: 700, fontSize: 16 }}>Génération des questions CEFR...</div>
-        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, marginTop: 6 }}>Gemini IA prépare votre test de 30 questions A1→C1</div>
+        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, marginTop: 6 }}>notre IA prépare votre test de 30 questions A1→C1</div>
       </div>
     </div>
   );
@@ -176,7 +176,7 @@ export default function TestNiveauPage() {
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 20 }}>🇩🇪</span>
+              <span style={{ fontSize: 20 }}></span>
               <div>
                 <span style={{ color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 15 }}>Test de niveau CEFR</span>
                 <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, marginLeft: 8 }}>30 questions A1→C1</span>

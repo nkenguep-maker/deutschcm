@@ -34,9 +34,9 @@ export default function LandingPage() {
 
   const features = [
     { icon: "🏛️", title: "Simulateur Ambassade IA", desc: "Entraînez-vous avec Herr Bauer, consul allemand virtuel. Scoring en temps réel sur grammaire, vocabulaire et pertinence.", badge: "Exclusif" },
-    { icon: "🎧", title: "Dialogues Audio Natifs", desc: "Voix allemandes authentiques générées par Azure Neural TTS. Dialogues adaptés à chaque niveau A1→C1.", badge: "Azure TTS" },
+    { icon: "🎧", title: "Dialogues Audio Natifs", desc: "Voix allemandes authentiques générées par native voices. Dialogues adaptés à chaque niveau A1→C1." },
     { icon: "🎙️", title: "Reconnaissance Vocale", desc: "Parlez en allemand, l'IA analyse votre prononciation et corrige vos erreurs en français instantanément.", badge: "IA" },
-    { icon: "✍️", title: "Correction Schreiben IA", desc: "Rédigez en allemand, Gemini corrige grammaire, vocabulaire et style avec explications détaillées.", badge: "Gemini" },
+    { icon: "✍️", title: "Correction Schreiben IA", desc: "Rédigez en allemand, Gemini corrige grammaire, vocabulaire et style avec explications détaillées." },
     { icon: "🎯", title: "Quiz Adaptatif", desc: "La difficulté s'ajuste automatiquement selon vos performances. Plus vous progressez, plus c'est challengeant.", badge: "Adaptatif" },
     { icon: "👨‍🏫", title: "Classes Virtuelles", desc: "Rejoignez la classe d'un enseignant ou créez votre groupe de révision. Suivi en temps réel.", badge: "Social" },
     { icon: "🏫", title: "Solution Centres", desc: "Dashboard complet pour les centres de langues. Gérez enseignants, élèves et classes depuis un seul endroit.", badge: "B2B" },
@@ -58,9 +58,9 @@ export default function LandingPage() {
   ]
 
   const faqs = [
-    { q: "Comment fonctionne le simulateur ambassade ?", a: "Vous conversez en temps réel avec Herr Bauer, un agent consulaire IA alimenté par Gemini 1.5 Pro. Il analyse votre allemand et vous donne un score détaillé après chaque échange." },
+    { q: "Comment fonctionne le simulateur ambassade ?", a: "Vous conversez en temps réel avec Herr Bauer, un agent consulaire IA alimenté par notre IA. Il analyse votre allemand et vous donne un score détaillé après chaque échange." },
     { q: "Le plan gratuit est-il vraiment gratuit ?", a: "Oui, totalement gratuit. Pas de carte bancaire requise. Accès complet au niveau A1 avec 3 leçons par jour et 3 sessions simulateur par mois." },
-    { q: "Les certifications Goethe sont-elles reconnues ?", a: "Les examens Goethe-Zertifikat sont reconnus mondialement pour les visas allemands. DeutschCM vous prépare spécifiquement à ces examens du A1 au C1." },
+    { q: "Les certifications Goethe sont-elles reconnues ?", a: "Les examens Goethe-Zertifikat sont reconnus mondialement pour les visas allemands. Yema vous prépare spécifiquement à ces examens du A1 au C1." },
     { q: "Puis-je rejoindre la classe d'un enseignant ?", a: "Oui ! Entrez le code de classe de votre enseignant lors de l'inscription ou depuis votre tableau de bord. Votre enseignant validera votre accès." },
     { q: "Y a-t-il une app mobile ?", a: "La plateforme est optimisée pour mobile (iOS et Android) via le navigateur. Une app native est en développement." },
     { q: "Comment devenir centre partenaire ?", a: "Contactez-nous sur WhatsApp. Nous offrons 30 jours gratuits pour tester la solution centre avec votre équipe." },
@@ -90,9 +90,9 @@ export default function LandingPage() {
         transition: "all 0.3s"
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 24 }}>🇩🇪</span>
+          <span style={{ fontSize: 24 }}></span>
           <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800 }}>
-            Deutsch<span style={{ color: "#10b981" }}>CM</span>
+            Yema
           </span>
         </div>
         {!isMobile && (
@@ -398,7 +398,7 @@ export default function LandingPage() {
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", textAlign: "center" }}>
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
           <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, margin: "0 auto 24px", animation: "float 3s ease-in-out infinite" }}>
-            🇩🇪
+           
           </div>
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 28 : 40, fontWeight: 900, marginBottom: 16, lineHeight: 1.1 }}>
             Commencez aujourd'hui.<br />
@@ -420,9 +420,9 @@ export default function LandingPage() {
       {/* ── FOOTER ── */}
       <footer style={{ padding: isMobile ? "32px 16px" : "40px", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", flexWrap: "wrap", gap: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 20 }}>🇩🇪</span>
+          <span style={{ fontSize: 20 }}></span>
           <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800 }}>
-            Deutsch<span style={{ color: "#10b981" }}>CM</span>
+            Yema
           </span>
           <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, marginLeft: 8 }}>
             Fait avec ❤️ au Cameroun 🇨🇲

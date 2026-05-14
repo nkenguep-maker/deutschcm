@@ -89,7 +89,7 @@ const DEMO_MODULES: Record<string, Module> = {
           title: "Am Empfang — À l'accueil",
           context_fr: "Paul arrive pour la première fois dans une entreprise allemande.",
           lines: [
-            { sprecher: "Empfangsdame", text: "Guten Tag! Willkommen bei DeutschCM.", translation: "Bonjour ! Bienvenue chez DeutschCM.", gender: "female", pause_after_ms: 800 },
+            { sprecher: "Empfangsdame", text: "Guten Tag! Willkommen bei Yema.", translation: "Bonjour ! Bienvenue chez Yema.", gender: "female", pause_after_ms: 800 },
             { sprecher: "Paul", text: "Guten Tag. Ich heiße Paul Nkengue. Ich habe einen Termin.", translation: "Bonjour. Je m'appelle Paul Nkengue. J'ai un rendez-vous.", gender: "male", pause_after_ms: 700 },
             { sprecher: "Empfangsdame", text: "Einen Moment bitte, Herr Nkengue.", translation: "Un instant s'il vous plaît, M. Nkengue.", gender: "female", pause_after_ms: 600 },
           ]
@@ -278,7 +278,7 @@ export default function ModulePage() {
               <div style={{ padding:"16px 20px", borderRadius:14, background:"rgba(16,185,129,0.06)", border:"1px solid rgba(16,185,129,0.15)" }}>
                 <p style={{ fontSize:10, color:"#10b981", textTransform:"uppercase", letterSpacing:"0.1em", margin:"0 0 8px" }}>Introduction</p>
                 <p style={{ color:"rgba(255,255,255,0.8)", fontSize:14, margin:"0 0 8px", lineHeight:1.7 }}>{module.content.introduction}</p>
-                <p style={{ color:"rgba(255,255,255,0.45)", fontSize:12, margin:0, fontStyle:"italic" }}>🇩🇪 {module.content.kulturhinweis}</p>
+                <p style={{ color:"rgba(255,255,255,0.45)", fontSize:12, margin:0, fontStyle:"italic" }}>{module.content.kulturhinweis}</p>
               </div>
 
               {/* Vocabulaire avec audio */}

@@ -173,7 +173,7 @@ export default function CenterOnboardingPage() {
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{ fontSize: 34, marginBottom: 8 }}>🏫</div>
           <h1 style={{ margin: 0, color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 22 }}>Créer votre Centre</h1>
-          <p style={{ margin: "6px 0 0", color: "rgba(255,255,255,0.35)", fontSize: 13 }}>Enregistrez votre centre de langues sur la plateforme DeutschCM</p>
+          <p style={{ margin: "6px 0 0", color: "rgba(255,255,255,0.35)", fontSize: 13 }}>Enregistrez votre centre de langues sur la plateforme Yema</p>
         </div>
 
         <OnboardingProgress steps={STEPS} current={step} />
@@ -374,7 +374,7 @@ export default function CenterOnboardingPage() {
                   <div style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 12, padding: "16px 20px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                       <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Plan</span>
-                      <span style={{ color: "#f1f5f9", fontWeight: 700 }}>DeutschCM {selectedPlan.name}</span>
+                      <span style={{ color: "#f1f5f9", fontWeight: 700 }}>Yema {selectedPlan.name}</span>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                       <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Montant</span>

@@ -52,9 +52,9 @@ export default function SetupRolePage() {
         <div style={{ width: "100%", maxWidth: 440 }}>
           {/* Logo */}
           <div style={{ textAlign: "center", marginBottom: 32 }}>
-            <div style={{ fontSize: "2rem", marginBottom: 10 }}>🇩🇪</div>
+            <div style={{ fontSize: "2rem", marginBottom: 10 }}></div>
             <h1 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.3rem" }}>
-              Deutsch<span style={{ color: "#10b981" }}>CM</span>
+              Yema
             </h1>
             <p style={{ margin: "6px 0 0", color: "rgba(255,255,255,0.35)", fontSize: "0.78rem" }}>
               Ton profil n&apos;a pas encore de rôle assigné

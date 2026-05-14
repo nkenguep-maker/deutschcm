@@ -47,7 +47,7 @@ function inp(style?: React.CSSProperties): React.CSSProperties {
 
 const MOCK_CENTERS = [
   { id: "c1", name: "Institut Goethe Yaoundé", city: "Yaoundé" },
-  { id: "c2", name: "Centre DeutschCM Douala", city: "Douala" },
+  { id: "c2", name: "Centre Yema Douala", city: "Douala" },
   { id: "c3", name: "Alliance Francophone Bafoussam", city: "Bafoussam" },
 ];
 

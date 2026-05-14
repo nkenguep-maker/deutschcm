@@ -87,7 +87,7 @@ export const IntroSlide = ({
           fontSize: 22, fontWeight: 700,
           color: accentColor
         }}>
-          🇩🇪 DeutschCM
+          Yema
         </div>
       </div>
     </AbsoluteFill>

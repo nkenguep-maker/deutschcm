@@ -122,13 +122,13 @@ export default function RegisterPage() {
                 boxShadow: "0 0 40px rgba(16,185,129,0.1)",
               }}
             >
-              🇩🇪
+             
             </div>
             <h1
               className="text-2xl font-bold"
               style={{ color: "white", fontFamily: "'Syne', sans-serif" }}
             >
-              Deutsch<span style={{ color: "#10b981" }}>CM</span>
+              Yema
             </h1>
             <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
               Commence ton voyage linguistique

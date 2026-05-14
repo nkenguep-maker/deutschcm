@@ -47,7 +47,7 @@ export async function generateSpeech(options: TTSOptions): Promise<TTSResult> {
         "Ocp-Apim-Subscription-Key": apiKey,
         "Content-Type": "application/ssml+xml; charset=utf-8",
         "X-Microsoft-OutputFormat": "audio-16khz-128kbitrate-mono-mp3",
-        "User-Agent": "DeutschCM-LMS",
+        "User-Agent": "Yema-LMS",
       },
       body: ssml,
     }

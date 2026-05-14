@@ -1,4 +1,4 @@
-// ─── Rôles et permissions DeutschCM ───────────────────────
+// ─── Rôles et permissions Yema ───────────────────────
 
 export type UserRole = "STUDENT" | "TEACHER" | "CENTER_MANAGER" | "ADMIN"
 

@@ -150,7 +150,7 @@ export default function AdaptiveQuiz({
         {adaptive ? "Adaptation du niveau en cours..." : "Génération du quiz..."}
       </p>
       <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 4 }}>
-        Propulsé par Gemini IA
+        IA adaptative
       </p>
     </div>
   )

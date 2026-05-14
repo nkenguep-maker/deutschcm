@@ -140,7 +140,7 @@ export default function CenterDashboard() {
             )}
           </div>
           <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, marginTop: 4 }}>
-            Partagez ce code à vos élèves — ils le saisissent lors de leur inscription sur DeutschCM.
+            Partagez ce code à vos élèves — ils le saisissent lors de leur inscription sur Yema.
           </div>
         </div>
         <Link href="/center/students" style={{

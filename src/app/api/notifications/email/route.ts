@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       case "welcome":
         result = await sendEmail({
           to,
-          subject: `Bienvenue sur DeutschCM, ${data.name}! 🇩🇪`,
+          subject: `Bienvenue sur Yema, ${data.name}!`,
           html: emailWelcome(data.name, data.role)
         })
         break

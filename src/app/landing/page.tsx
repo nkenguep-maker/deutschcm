@@ -85,7 +85,7 @@ const TESTIMONIALS = [
     center: "Institut Goethe Yaoundé",
     city: "Yaoundé",
     flag: "🏛️",
-    quote: "Depuis DeutschCM, nous avons réduit notre temps d'administration de 60%. Nos élèves progressent deux fois plus vite grâce au simulateur d'ambassade. Le résultat visa de nos apprenants est passé de 45% à 78%.",
+    quote: "Depuis Yema, nous avons réduit notre temps d'administration de 60%. Nos élèves progressent deux fois plus vite grâce au simulateur d'ambassade. Le résultat visa de nos apprenants est passé de 45% à 78%.",
     avatar: "HN",
     stars: 5,
   },
@@ -161,9 +161,9 @@ export default function LandingPage() {
             background: "linear-gradient(135deg, rgba(234,179,8,0.2), rgba(161,120,0,0.08))",
             border: "1px solid rgba(234,179,8,0.3)",
             display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem",
-          }}>🇩🇪</div>
+          }}></div>
           <span className="syne" style={{ color: "white", fontWeight: 800, fontSize: "1.1rem" }}>
-            Deutsch<span style={{ color: "#eab308" }}>CM</span>
+            Yema
             <span style={{ color: "rgba(255,255,255,0.3)", fontWeight: 400, fontSize: "0.75rem", marginLeft: 8 }}>pour Centres</span>
           </span>
         </Link>
@@ -330,7 +330,7 @@ export default function LandingPage() {
       <section id="testimonials" style={{ padding: "80px 40px", maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h2 className="syne" style={{ fontSize: 36, fontWeight: 800, color: "#f1f5f9", margin: "0 0 12px" }}>
-            Ils font confiance à DeutschCM
+            Ils font confiance à Yema
           </h2>
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 16 }}>Centres partenaires au Cameroun</p>
         </div>
@@ -495,7 +495,7 @@ export default function LandingPage() {
         display: "flex", justifyContent: "space-between", alignItems: "center",
         color: "rgba(255,255,255,0.25)", fontSize: 12,
       }}>
-        <div>© 2025 DeutschCM · Conçu au Cameroun 🇨🇲</div>
+        <div>© 2025 Yema · Conçu au Cameroun 🇨🇲</div>
         <div style={{ display: "flex", gap: 24 }}>
           <Link href="/login" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>Connexion</Link>
           <Link href="/register" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>Inscription</Link>

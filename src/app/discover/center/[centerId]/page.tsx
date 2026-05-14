@@ -17,10 +17,10 @@ interface ClassData {
 }
 
 const CENTERS: Record<string, CenterData> = {
-  ctr1: { id: "ctr1", name: "Institut Lingua Plus", city: "Yaoundé", region: "Centre", avatar: "LP", verified: true, plan: "pro", teachers: 8, students: 245, classes: 12, languages: ["🇩🇪", "🇬🇧", "🇪🇸"], code: "CENTRE-LINGUA", successRate: 87, yearsActive: 6 },
-  ctr2: { id: "ctr2", name: "Goethe Center CM", city: "Douala", region: "Littoral", avatar: "GC", verified: true, plan: "enterprise", teachers: 12, students: 380, classes: 18, languages: ["🇩🇪", "🇬🇧"], code: "CENTRE-GOETHE", successRate: 92, yearsActive: 9 },
-  ctr3: { id: "ctr3", name: "LangSchool Bafoussam", city: "Bafoussam", region: "Ouest", avatar: "LS", verified: false, plan: "starter", teachers: 4, students: 89, classes: 6, languages: ["🇩🇪", "🇫🇷"], code: "CENTRE-LANG01", successRate: 74, yearsActive: 3 },
-  ctr4: { id: "ctr4", name: "DeutschAkademie Garoua", city: "Garoua", region: "Nord", avatar: "DA", verified: false, plan: "starter", teachers: 3, students: 45, classes: 4, languages: ["🇩🇪"], code: "CENTRE-DEUT04", successRate: 68, yearsActive: 2 },
+  ctr1: { id: "ctr1", name: "Institut Lingua Plus", city: "Yaoundé", region: "Centre", avatar: "LP", verified: true, plan: "pro", teachers: 8, students: 245, classes: 12, languages: ["", "🇬🇧", "🇪🇸"], code: "CENTRE-LINGUA", successRate: 87, yearsActive: 6 },
+  ctr2: { id: "ctr2", name: "Goethe Center CM", city: "Douala", region: "Littoral", avatar: "GC", verified: true, plan: "enterprise", teachers: 12, students: 380, classes: 18, languages: ["", "🇬🇧"], code: "CENTRE-GOETHE", successRate: 92, yearsActive: 9 },
+  ctr3: { id: "ctr3", name: "LangSchool Bafoussam", city: "Bafoussam", region: "Ouest", avatar: "LS", verified: false, plan: "starter", teachers: 4, students: 89, classes: 6, languages: ["", "🇫🇷"], code: "CENTRE-LANG01", successRate: 74, yearsActive: 3 },
+  ctr4: { id: "ctr4", name: "DeutschAkademie Garoua", city: "Garoua", region: "Nord", avatar: "DA", verified: false, plan: "starter", teachers: 3, students: 45, classes: 4, languages: [""], code: "CENTRE-DEUT04", successRate: 68, yearsActive: 2 },
 };
 
 const CENTER_CLASSES: Record<string, ClassData[]> = {
@@ -98,7 +98,7 @@ export default function CenterDetailPage() {
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
                 <span style={{ color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 20 }}>{center.name}</span>
-                {center.verified && <span title="Vérifié par DeutschCM" style={{ fontSize: 14 }}>✅</span>}
+                {center.verified && <span title="Vérifié par Yema" style={{ fontSize: 14 }}>✅</span>}
                 <span style={{ background: `${plan.color}20`, color: plan.color, border: `1px solid ${plan.color}40`, borderRadius: 7, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{plan.label}</span>
               </div>
               <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>

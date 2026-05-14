@@ -11,7 +11,7 @@ export async function sendEmail(params: EmailParams) {
   const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     const { data, error } = await resend.emails.send({
-      from: params.from || "DeutschCM <noreply@deutschcm.vercel.app>",
+      from: params.from || "Yema <noreply@deutschcm.vercel.app>",
       to: params.to,
       subject: params.subject,
       html: params.html,
@@ -39,9 +39,9 @@ export function emailWelcome(name: string, role: string): string {
 
     <!-- Header -->
     <div style="text-align:center;margin-bottom:32px">
-      <div style="font-size:48px;margin-bottom:8px">🇩🇪</div>
+      <div style="font-size:48px;margin-bottom:8px"></div>
       <div style="font-size:28px;font-weight:900;color:white">
-        Deutsch<span style="color:#10b981">CM</span>
+        Yema
       </div>
     </div>
 
@@ -51,7 +51,7 @@ export function emailWelcome(name: string, role: string): string {
         Willkommen, ${name}! 🎉
       </h1>
       <p style="color:rgba(255,255,255,0.65);font-size:15px;line-height:1.7;margin:0 0 20px">
-        Votre compte ${roleLabel[role] || "utilisateur"} DeutschCM est créé avec succès.
+        Votre compte ${roleLabel[role] || "utilisateur"} Yema est créé avec succès.
         Commencez votre voyage linguistique dès maintenant !
       </p>
 
@@ -74,7 +74,7 @@ export function emailWelcome(name: string, role: string): string {
     <!-- Footer -->
     <div style="text-align:center;margin-top:24px">
       <p style="color:rgba(255,255,255,0.25);font-size:11px">
-        DeutschCM · Fait avec ❤️ au Cameroun 🇨🇲<br>
+        Yema · Fait avec ❤️ au Cameroun 🇨🇲<br>
         <a href="https://deutschcm.vercel.app" style="color:#10b981">deutschcm.vercel.app</a>
       </p>
     </div>
@@ -98,8 +98,8 @@ export function emailJoinRequest(
 <body style="margin:0;padding:0;background:#080c10;font-family:'Helvetica Neue',Arial,sans-serif">
   <div style="max-width:600px;margin:0 auto;padding:40px 20px">
     <div style="text-align:center;margin-bottom:24px">
-      <div style="font-size:36px;margin-bottom:4px">🇩🇪</div>
-      <div style="font-size:22px;font-weight:900;color:white">Deutsch<span style="color:#10b981">CM</span></div>
+      <div style="font-size:36px;margin-bottom:4px"></div>
+      <div style="font-size:22px;font-weight:900;color:white">Yema</div>
     </div>
     <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(16,185,129,0.2);border-radius:20px;padding:28px">
       <h2 style="color:white;font-size:20px;margin:0 0 12px">📩 Nouvelle demande d'inscription</h2>
@@ -123,7 +123,7 @@ export function emailJoinRequest(
       </div>
     </div>
     <p style="text-align:center;color:rgba(255,255,255,0.2);font-size:11px;margin-top:20px">
-      DeutschCM · <a href="https://deutschcm.vercel.app" style="color:#10b981">deutschcm.vercel.app</a>
+      Yema · <a href="https://deutschcm.vercel.app" style="color:#10b981">deutschcm.vercel.app</a>
     </p>
   </div>
 </body>
@@ -144,7 +144,7 @@ export function emailRequestAccepted(
   <div style="max-width:600px;margin:0 auto;padding:40px 20px">
     <div style="text-align:center;margin-bottom:24px">
       <div style="font-size:48px;margin-bottom:8px">🎉</div>
-      <div style="font-size:22px;font-weight:900;color:white">Deutsch<span style="color:#10b981">CM</span></div>
+      <div style="font-size:22px;font-weight:900;color:white">Yema</div>
     </div>
     <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.25);border-radius:20px;padding:28px">
       <h2 style="color:#10b981;font-size:22px;margin:0 0 12px">✅ Demande acceptée !</h2>
@@ -159,7 +159,7 @@ export function emailRequestAccepted(
       </a>
     </div>
     <p style="text-align:center;color:rgba(255,255,255,0.2);font-size:11px;margin-top:20px">
-      DeutschCM · <a href="https://deutschcm.vercel.app" style="color:#10b981">deutschcm.vercel.app</a>
+      Yema · <a href="https://deutschcm.vercel.app" style="color:#10b981">deutschcm.vercel.app</a>
     </p>
   </div>
 </body>
@@ -175,7 +175,7 @@ export function emailStreakReminder(name: string, streak: number): string {
   <div style="max-width:600px;margin:0 auto;padding:40px 20px">
     <div style="text-align:center;margin-bottom:24px">
       <div style="font-size:56px;margin-bottom:8px">🔥</div>
-      <div style="font-size:22px;font-weight:900;color:white">Deutsch<span style="color:#10b981">CM</span></div>
+      <div style="font-size:22px;font-weight:900;color:white">Yema</div>
     </div>
     <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.25);border-radius:20px;padding:28px;text-align:center">
       <h2 style="color:#f59e0b;font-size:22px;margin:0 0 8px">Ne perdez pas votre streak !</h2>
@@ -190,7 +190,7 @@ export function emailStreakReminder(name: string, streak: number): string {
       </a>
     </div>
     <p style="text-align:center;color:rgba(255,255,255,0.2);font-size:11px;margin-top:20px">
-      DeutschCM · <a href="https://deutschcm.vercel.app" style="color:#10b981">deutschcm.vercel.app</a>
+      Yema · <a href="https://deutschcm.vercel.app" style="color:#10b981">deutschcm.vercel.app</a>
     </p>
   </div>
 </body>
@@ -206,7 +206,7 @@ export function emailBadgeEarned(name: string, badgeName: string, badgeIcon: str
   <div style="max-width:600px;margin:0 auto;padding:40px 20px">
     <div style="text-align:center;margin-bottom:24px">
       <div style="font-size:64px;margin-bottom:8px">${badgeIcon}</div>
-      <div style="font-size:22px;font-weight:900;color:white">Deutsch<span style="color:#10b981">CM</span></div>
+      <div style="font-size:22px;font-weight:900;color:white">Yema</div>
     </div>
     <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.25);border-radius:20px;padding:28px;text-align:center">
       <h2 style="color:#10b981;font-size:22px;margin:0 0 8px">🏆 Nouveau badge débloqué !</h2>
@@ -220,7 +220,7 @@ export function emailBadgeEarned(name: string, badgeName: string, badgeIcon: str
       </a>
     </div>
     <p style="text-align:center;color:rgba(255,255,255,0.2);font-size:11px;margin-top:20px">
-      DeutschCM · <a href="https://deutschcm.vercel.app" style="color:#10b981">deutschcm.vercel.app</a>
+      Yema · <a href="https://deutschcm.vercel.app" style="color:#10b981">deutschcm.vercel.app</a>
     </p>
   </div>
 </body>

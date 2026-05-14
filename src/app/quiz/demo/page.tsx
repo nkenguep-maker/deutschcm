@@ -23,10 +23,10 @@ export default function QuizDemo() {
 
       <div style={{ maxWidth: 700, margin: "0 auto" }}>
         <h1 style={{ fontFamily: "'Syne',sans-serif", color: "white", fontSize: 24, fontWeight: 800, marginBottom: 4 }}>
-          🎯 Quiz Adaptatif — DeutschCM
+          🎯 Quiz Adaptatif — Yema
         </h1>
         <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginBottom: 24 }}>
-          Difficulté ajustée selon vos performances · Généré par Gemini IA
+          Difficulté ajustée selon vos performances · Généré par notre IA
         </p>
 
         {/* Config */}

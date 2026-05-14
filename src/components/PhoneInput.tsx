@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 
 const COUNTRIES = [
   { code: "CM", flag: "🇨🇲", name: "Cameroun",        prefix: "+237" },
-  { code: "DE", flag: "🇩🇪", name: "Allemagne",       prefix: "+49"  },
+  { code: "DE", flag: "", name: "Allemagne",       prefix: "+49"  },
   { code: "FR", flag: "🇫🇷", name: "France",          prefix: "+33"  },
   { code: "BE", flag: "🇧🇪", name: "Belgique",        prefix: "+32"  },
   { code: "CH", flag: "🇨🇭", name: "Suisse",          prefix: "+41"  },

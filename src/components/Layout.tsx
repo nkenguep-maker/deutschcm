@@ -207,10 +207,10 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
                 background: "linear-gradient(135deg, rgba(16,185,129,0.22), rgba(5,150,105,0.08))",
                 border: "1px solid rgba(16,185,129,0.28)",
                 boxShadow: "0 0 20px rgba(16,185,129,0.12)",
-              }}>🇩🇪</div>
+              }}></div>
               <div>
                 <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.05rem", lineHeight: 1.2 }}>
-                  Deutsch<span style={{ color: "#10b981" }}>CM</span>
+                  Yema
                 </p>
                 <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem", letterSpacing: "0.08em" }}>
                   {tl("goethe")}

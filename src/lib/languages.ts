@@ -2,7 +2,7 @@ export const LANGUAGES = {
   deutsch: {
     id: "deutsch",
     name: "Allemand",
-    flag: "🇩🇪",
+    flag: "",
     available: true,
     levels: ["A1","A2","B1","B2","C1"],
     framework: "CEFR + Goethe-Institut",

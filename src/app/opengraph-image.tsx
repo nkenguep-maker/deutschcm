@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og"
 
 export const runtime = "edge"
-export const alt = "DeutschCM — Apprenez l'allemand au Cameroun"
+export const alt = "Yema — Apprenez l'allemand au Cameroun"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -25,9 +25,9 @@ export default async function Image() {
 
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32 }}>
-          <div style={{ fontSize: 64 }}>🇩🇪</div>
+          <div style={{ fontSize: 64 }}></div>
           <div style={{ fontWeight: 900, fontSize: 56, color: "white" }}>
-            Deutsch<span style={{ color: "#10b981" }}>CM</span>
+            Yema
           </div>
         </div>
 

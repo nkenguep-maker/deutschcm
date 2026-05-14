@@ -181,7 +181,7 @@ export default function LessonViewer({ content, level = "A1", title = "Lektion",
             background: "rgba(255,255,255,0.04)",
             borderBottom: "1px solid rgba(255,255,255,0.07)",
           }}>
-            {["Deutsch 🇩🇪", "Français 🇫🇷", "Exemple"].map((h) => (
+            {["Deutsch", "Français 🇫🇷", "Exemple"].map((h) => (
               <span key={h} style={{
                 color: "rgba(255,255,255,0.3)",
                 fontSize: "0.62rem",

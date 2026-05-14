@@ -81,7 +81,7 @@ export default function TestResultsPage() {
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 32 }} className="fadeUp">
-          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.3)", marginBottom: 8 }}>🇩🇪 Test CEFR — Résultats officiels</div>
+          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.3)", marginBottom: 8 }}>Test CEFR — Résultats officiels</div>
           <h1 style={{ margin: 0, color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 26 }}>
             Votre niveau d'allemand
           </h1>
