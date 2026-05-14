@@ -6,8 +6,6 @@ import prisma from "@/lib/prisma";
 import { buildSystemPrompt } from "@/lib/systemPrompt";
 import type { AmbassadeRequest, AmbassadeResponse, AmbassadeError } from "@/types/ambassade";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-
 function errorResponse(code: AmbassadeError["code"], message: string, status: number) {
   return NextResponse.json({ code, message } satisfies AmbassadeError, { status });
 }
@@ -44,6 +42,7 @@ export async function POST(request: NextRequest) {
 
   const systemInstruction = buildSystemPrompt(scenario, niveau);
 
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-pro",
     systemInstruction,

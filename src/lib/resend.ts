@@ -1,7 +1,5 @@
 import { Resend } from "resend"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export interface EmailParams {
   to: string
   subject: string
@@ -10,6 +8,7 @@ export interface EmailParams {
 }
 
 export async function sendEmail(params: EmailParams) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     const { data, error } = await resend.emails.send({
       from: params.from || "DeutschCM <noreply@deutschcm.vercel.app>",
