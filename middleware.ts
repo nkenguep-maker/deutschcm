@@ -54,6 +54,11 @@ const intlMiddleware = createMiddleware(routing)
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // DEBUG PROBE: return immediately to confirm middleware is running
+  if (pathname === "/middleware-probe") {
+    return NextResponse.json({ running: true, pathname, ts: Date.now() })
+  }
+
   // Skip static assets and API routes
   if (
     pathname.startsWith("/_next") ||
