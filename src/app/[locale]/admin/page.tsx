@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
 import { BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 
 interface AdminStats {
@@ -31,6 +32,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 export default function AdminDashboard() {
+  const tA = useTranslations("admin")
   const [activeTab, setActiveTab] = useState<"overview"|"users"|"courses"|"validations"|"system">("overview")
   const [searchUser, setSearchUser] = useState("")
   const [filterRole, setFilterRole] = useState("ALL")
@@ -63,9 +65,19 @@ export default function AdminDashboard() {
   }
 
   const roleLabel: Record<string, string> = {
-    STUDENT: "Élève", TEACHER: "Enseignant",
-    CENTER_MANAGER: "Centre", ADMIN: "Admin"
+    STUDENT: tA("roleLabelStudent"),
+    TEACHER: tA("roleLabelTeacher"),
+    CENTER_MANAGER: tA("roleLabelCenter"),
+    ADMIN: tA("roleLabelAdmin"),
   }
+
+  const navItems = [
+    { key: "overview", icon: "📊", label: tA("navOverview") },
+    { key: "users", icon: "👥", label: tA("navUsers") },
+    { key: "courses", icon: "📚", label: tA("navCourses") },
+    { key: "validations", icon: "✅", label: tA("navValidations"), badge: pendingValidations.length },
+    { key: "system", icon: "⚙️", label: tA("navSystem") },
+  ]
 
   return (
     <div style={{
@@ -94,13 +106,7 @@ export default function AdminDashboard() {
             <span style={{ fontSize: 8, padding: "2px 6px", borderRadius: 99, background: "rgba(239,68,68,0.15)", color: "#ef4444", fontWeight: 700, marginLeft: 4 }}>ADMIN</span>
           </div>
 
-          {[
-            { key: "overview", icon: "📊", label: "Vue d'ensemble" },
-            { key: "users", icon: "👥", label: "Utilisateurs" },
-            { key: "courses", icon: "📚", label: "Cours & Contenu" },
-            { key: "validations", icon: "✅", label: "Validations", badge: pendingValidations.length },
-            { key: "system", icon: "⚙️", label: "Système" },
-          ].map(item => (
+          {navItems.map(item => (
             <button key={item.key} onClick={() => setActiveTab(item.key as any)}
               style={{
                 width: "100%", display: "flex", alignItems: "center", gap: 10,
@@ -124,34 +130,34 @@ export default function AdminDashboard() {
 
           <div style={{ paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: 24 }}>
             <a href="/" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 10, color: "rgba(255,255,255,0.4)", fontSize: 12, textDecoration: "none" }}>
-              ← Retour au site
+              {tA("backToSite")}
             </a>
           </div>
         </div>
 
-        {/* ── Contenu ── */}
+        {/* ── Content ── */}
         <div style={{ flex: 1, overflowY: "auto", padding: "32px 36px" }}>
 
-          {/* ════ VUE D'ENSEMBLE ════ */}
+          {/* ════ OVERVIEW ════ */}
           {activeTab === "overview" && (
             <div>
               <div style={{ marginBottom: 28 }}>
                 <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>
-                  👋 Bonjour, Admin
+                  {tA("greeting")}
                 </h1>
                 <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: 0 }}>
-                  Yema · {new Date().toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+                  Yema · {new Date().toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
                 </p>
               </div>
 
               {/* KPIs */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 24 }}>
                 {[
-                  { label: "Total utilisateurs", value: stats.users.total.toLocaleString(), icon: "👥", color: "#10b981", sub: stats.users.growth + " ce mois" },
-                  { label: "Élèves actifs", value: stats.users.students.toLocaleString(), icon: "🎓", color: "#34d399", sub: "inscrits" },
-                  { label: "Enseignants", value: stats.users.teachers.toLocaleString(), icon: "👨‍🏫", color: "#60a5fa", sub: "vérifiés" },
-                  { label: "Centres", value: stats.users.centers.toLocaleString(), icon: "🏫", color: "#f59e0b", sub: "partenaires" },
-                  { label: "Sessions aujourd'hui", value: stats.sessions.today.toLocaleString(), icon: "⚡", color: "#a78bfa", sub: `moy. ${stats.sessions.avgDuration}min` },
+                  { label: tA("kpiTotal"), value: stats.users.total.toLocaleString(), icon: "👥", color: "#10b981", sub: tA("kpiTotalSub", { growth: stats.users.growth }) },
+                  { label: tA("kpiStudents"), value: stats.users.students.toLocaleString(), icon: "🎓", color: "#34d399", sub: tA("kpiStudentsSub") },
+                  { label: tA("kpiTeachers"), value: stats.users.teachers.toLocaleString(), icon: "👨‍🏫", color: "#60a5fa", sub: tA("kpiTeachersSub") },
+                  { label: tA("kpiCenters"), value: stats.users.centers.toLocaleString(), icon: "🏫", color: "#f59e0b", sub: tA("kpiCentersSub") },
+                  { label: tA("kpiSessions"), value: stats.sessions.today.toLocaleString(), icon: "⚡", color: "#a78bfa", sub: tA("kpiSessionsSub", { duration: stats.sessions.avgDuration }) },
                 ].map((kpi, i) => (
                   <div key={i} style={{ padding: "16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
                     <div style={{ fontSize: 22, marginBottom: 8 }}>{kpi.icon}</div>
@@ -162,12 +168,11 @@ export default function AdminDashboard() {
                 ))}
               </div>
 
-              {/* Graphiques */}
+              {/* Charts */}
               <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16, marginBottom: 20 }}>
 
-                {/* Inscriptions mensuelles */}
                 <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 20px" }}>📈 Inscriptions mensuelles</h3>
+                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 20px" }}>{tA("chartMonthly")}</h3>
                   <ResponsiveContainer width="100%" height={180}>
                     <AreaChart data={[]}>
                       <defs>
@@ -180,14 +185,13 @@ export default function AdminDashboard() {
                       <XAxis dataKey="month" stroke="rgba(255,255,255,0.3)" fontSize={10} />
                       <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} />
                       <Tooltip content={<CustomTooltip />} />
-                      <Area type="monotone" dataKey="users" stroke="#10b981" fill="url(#colorUsers)" strokeWidth={2} name="Utilisateurs" />
+                      <Area type="monotone" dataKey="users" stroke="#10b981" fill="url(#colorUsers)" strokeWidth={2} name={tA("chartSeriesUsers")} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
 
-                {/* Distribution niveaux */}
                 <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>🎯 Niveaux CEFR</h3>
+                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA("chartLevels")}</h3>
                   <ResponsiveContainer width="100%" height={140}>
                     <PieChart>
                       <Pie data={LEVEL_DISTRIBUTION} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value">
@@ -209,9 +213,8 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Activité hebdomadaire */}
               <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
-                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 20px" }}>📅 Activité cette semaine</h3>
+                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 20px" }}>{tA("chartWeekly")}</h3>
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={[]}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -219,65 +222,61 @@ export default function AdminDashboard() {
                     <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend wrapperStyle={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }} />
-                    <Bar dataKey="students" fill="#10b981" radius={[4,4,0,0]} name="Élèves" />
-                    <Bar dataKey="teachers" fill="#60a5fa" radius={[4,4,0,0]} name="Enseignants" />
-                    <Bar dataKey="centers" fill="#f59e0b" radius={[4,4,0,0]} name="Centres" />
+                    <Bar dataKey="students" fill="#10b981" radius={[4,4,0,0]} name={tA("chartSeriesStudents")} />
+                    <Bar dataKey="teachers" fill="#60a5fa" radius={[4,4,0,0]} name={tA("chartSeriesTeachers")} />
+                    <Bar dataKey="centers" fill="#f59e0b" radius={[4,4,0,0]} name={tA("chartSeriesCenters")} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-
-                {/* Activité récente */}
                 <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>🔔 Activité récente</h3>
+                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA("recentActivity")}</h3>
                   <div style={{ textAlign: "center", padding: "20px 0" }}>
                     <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: 0 }}>
-                      L&apos;activité récente apparaîtra ici
+                      {tA("recentActivityEmpty")}
                     </p>
                   </div>
                 </div>
 
-                {/* Top villes */}
                 <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>🌍 Top villes</h3>
+                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA("topCities")}</h3>
                   <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: 0, textAlign: "center", padding: "20px 0" }}>
-                    Données géographiques — bientôt disponibles
+                    {tA("topCitiesEmpty")}
                   </p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* ════ UTILISATEURS ════ */}
+          {/* ════ USERS ════ */}
           {activeTab === "users" && (
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-                <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, margin: 0 }}>👥 Utilisateurs</h1>
+                <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, margin: 0 }}>{tA("usersTitle")}</h1>
                 <div style={{ display: "flex", gap: 8 }}>
                   <input
                     value={searchUser}
                     onChange={e => setSearchUser(e.target.value)}
-                    placeholder="Rechercher un utilisateur..."
+                    placeholder={tA("searchPlaceholder")}
                     style={{ padding: "8px 14px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 12, outline: "none", width: 220 }}
                   />
                   <select value={filterRole} onChange={e => setFilterRole(e.target.value)}
                     style={{ padding: "8px 12px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 12, outline: "none" }}>
-                    <option value="ALL">Tous les rôles</option>
-                    <option value="STUDENT">Élèves</option>
-                    <option value="TEACHER">Enseignants</option>
-                    <option value="CENTER_MANAGER">Centres</option>
+                    <option value="ALL">{tA("filterAll")}</option>
+                    <option value="STUDENT">{tA("filterStudents")}</option>
+                    <option value="TEACHER">{tA("filterTeachers")}</option>
+                    <option value="CENTER_MANAGER">{tA("filterCenters")}</option>
                   </select>
                 </div>
               </div>
 
-              {/* Stats rapides */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 20 }}>
                 {[
-                  { label: "Élèves", value: stats.users.students, color: "#10b981" },
-                  { label: "Enseignants", value: stats.users.teachers, color: "#60a5fa" },
-                  { label: "Centres", value: stats.users.centers, color: "#f59e0b" },
-                  { label: "Nouveaux aujourd'hui", value: 12, color: "#a78bfa" },
+                  { label: tA("filterStudents"), value: stats.users.students, color: "#10b981" },
+                  { label: tA("filterTeachers"), value: stats.users.teachers, color: "#60a5fa" },
+                  { label: tA("filterCenters"), value: stats.users.centers, color: "#f59e0b" },
+                  { label: tA("quickStatNew"), value: 12, color: "#a78bfa" },
                 ].map((s, i) => (
                   <div key={i} style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", textAlign: "center" }}>
                     <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
@@ -286,12 +285,11 @@ export default function AdminDashboard() {
                 ))}
               </div>
 
-              {/* Tableau utilisateurs */}
               <div style={{ borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                   <thead>
                     <tr style={{ background: "rgba(255,255,255,0.04)" }}>
-                      {["Utilisateur", "Rôle", "Niveau", "Ville", "Inscription", "Statut", "Actions"].map(h => (
+                      {[tA("tableUser"), tA("tableRole"), tA("tableLevel"), tA("tableCity"), tA("tableDate"), tA("tableStatus"), tA("tableActions")].map(h => (
                         <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                           {h}
                         </th>
@@ -325,14 +323,14 @@ export default function AdminDashboard() {
                           <td style={{ padding: "12px 16px", color: "rgba(255,255,255,0.35)", fontSize: 10 }}>{u.date}</td>
                           <td style={{ padding: "12px 16px" }}>
                             <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: u.status === "active" ? "rgba(16,185,129,0.12)" : "rgba(245,158,11,0.12)", color: u.status === "active" ? "#10b981" : "#f59e0b", fontWeight: 700 }}>
-                              {u.status === "active" ? "Actif" : "En attente"}
+                              {u.status === "active" ? tA("statusActive") : tA("statusPending")}
                             </span>
                           </td>
                           <td style={{ padding: "12px 16px" }}>
                             <div style={{ display: "flex", gap: 8 }}>
-                              <button style={{ fontSize: 10, color: "#10b981", background: "none", border: "none", cursor: "pointer", padding: 0 }}>Voir</button>
-                              <button style={{ fontSize: 10, color: "#60a5fa", background: "none", border: "none", cursor: "pointer", padding: 0 }}>Modifier</button>
-                              <button style={{ fontSize: 10, color: "#ef4444", background: "none", border: "none", cursor: "pointer", padding: 0 }}>Bloquer</button>
+                              <button style={{ fontSize: 10, color: "#10b981", background: "none", border: "none", cursor: "pointer", padding: 0 }}>{tA("actionView")}</button>
+                              <button style={{ fontSize: 10, color: "#60a5fa", background: "none", border: "none", cursor: "pointer", padding: 0 }}>{tA("actionEdit")}</button>
+                              <button style={{ fontSize: 10, color: "#ef4444", background: "none", border: "none", cursor: "pointer", padding: 0 }}>{tA("actionBlock")}</button>
                             </div>
                           </td>
                         </tr>
@@ -343,25 +341,25 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* ════ COURS ════ */}
+          {/* ════ COURSES ════ */}
           {activeTab === "courses" && (
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-                <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, margin: 0 }}>📚 Cours & Contenu</h1>
+                <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, margin: 0 }}>{tA("coursesTitle")}</h1>
                 <div style={{ display: "flex", gap: 8 }}>
                   <a href="/admin/courses/generate"
                     style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#10b981,#059669)", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
-                    ✨ Générer avec Gemini
+                    {tA("generateBtn")}
                   </a>
                 </div>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 24 }}>
                 {[
-                  { label: "Cours total", value: stats.courses.total, color: "#10b981", icon: "📚" },
-                  { label: "Publiés", value: stats.courses.published, color: "#34d399", icon: "✅" },
-                  { label: "Brouillons", value: stats.courses.draft, color: "#f59e0b", icon: "📝" },
-                  { label: "Modules total", value: stats.courses.modules, color: "#60a5fa", icon: "🧩" },
+                  { label: tA("kpiCoursesTotal"), value: stats.courses.total, color: "#10b981", icon: "📚" },
+                  { label: tA("kpiPublished"), value: stats.courses.published, color: "#34d399", icon: "✅" },
+                  { label: tA("kpiDraft"), value: stats.courses.draft, color: "#f59e0b", icon: "📝" },
+                  { label: tA("kpiModules"), value: stats.courses.modules, color: "#60a5fa", icon: "🧩" },
                 ].map((s, i) => (
                   <div key={i} style={{ padding: "16px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", textAlign: "center" }}>
                     <div style={{ fontSize: 20, marginBottom: 6 }}>{s.icon}</div>
@@ -371,9 +369,11 @@ export default function AdminDashboard() {
                 ))}
               </div>
 
-              {/* Liste des cours par niveau */}
               {["A1","A2","B1","B2","C1"].map(level => {
                 const colors: Record<string, string> = { A1:"#10b981", A2:"#34d399", B1:"#60a5fa", B2:"#a78bfa", C1:"#f59e0b" }
+                const isA1 = level === "A1"
+                const total = level === "B2" || level === "C1" ? 10 : 12
+                const generated = isA1 ? 6 : 0
                 return (
                   <div key={level} style={{ marginBottom: 16, padding: "16px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: `1px solid ${colors[level]}20` }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -385,16 +385,16 @@ export default function AdminDashboard() {
                       </div>
                       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                         <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>
-                          {level === "A1" ? "6/12 générés" : level === "A2" ? "0/12 générés" : "0/10 générés"}
+                          {tA("levelGenerated", { generated, total })}
                         </span>
                         <a href="/admin/courses/generate"
                           style={{ padding: "5px 12px", borderRadius: 8, background: `${colors[level]}15`, border: `1px solid ${colors[level]}25`, color: colors[level], fontSize: 10, fontWeight: 700, textDecoration: "none" }}>
-                          + Générer
+                          {tA("generateCourseBtn")}
                         </a>
                       </div>
                     </div>
                     <div style={{ height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 99, marginTop: 12, overflow: "hidden" }}>
-                      <div style={{ height: "100%", width: level === "A1" ? "50%" : "0%", background: `linear-gradient(90deg,${colors[level]}88,${colors[level]})`, borderRadius: 99 }} />
+                      <div style={{ height: "100%", width: isA1 ? "50%" : "0%", background: `linear-gradient(90deg,${colors[level]}88,${colors[level]})`, borderRadius: 99 }} />
                     </div>
                   </div>
                 )
@@ -406,12 +406,12 @@ export default function AdminDashboard() {
           {activeTab === "validations" && (
             <div>
               <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 24 }}>
-                ✅ Validations en attente
+                {tA("validationsTitle")}
               </h1>
 
               {pendingValidations.length === 0 ? (
                 <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,0.4)", fontSize: 13 }}>
-                  ✅ Aucune validation en attente
+                  {tA("noValidations")}
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -427,14 +427,14 @@ export default function AdminDashboard() {
                         </p>
                       </div>
                       <span style={{ fontSize: 9, padding: "3px 10px", borderRadius: 99, background: "rgba(245,158,11,0.12)", color: "#f59e0b", fontWeight: 700 }}>
-                        {item.type === "center" ? "Centre" : "Enseignant"}
+                        {item.type === "center" ? tA("validTypeCenter") : tA("validTypeTeacher")}
                       </span>
                       <div style={{ display: "flex", gap: 8 }}>
                         <button style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#10b981", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                          ✅ Valider
+                          {tA("validateBtn")}
                         </button>
                         <button style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", color: "#ef4444", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-                          ❌ Refuser
+                          {tA("rejectBtn")}
                         </button>
                       </div>
                     </div>
@@ -444,16 +444,15 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* ════ SYSTÈME ════ */}
+          {/* ════ SYSTEM ════ */}
           {activeTab === "system" && (
             <div>
-              <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 24 }}>⚙️ Système</h1>
+              <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 24 }}>{tA("systemTitle")}</h1>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
 
-                {/* APIs */}
                 <div style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>🔌 APIs configurées</h3>
+                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA("apisTitle")}</h3>
                   {[
                     { name: "notre IA", status: "active", usage: "Quiz + Correction + Simulateur" },
                     { name: "voix natives", status: "active", usage: "Dialogues Hören" },
@@ -469,29 +468,28 @@ export default function AdminDashboard() {
                         <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, margin: 0 }}>{api.usage}</p>
                       </div>
                       <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 99, background: api.status === "active" ? "rgba(16,185,129,0.12)" : "rgba(245,158,11,0.12)", color: api.status === "active" ? "#10b981" : "#f59e0b" }}>
-                        {api.status === "active" ? "Actif" : "À configurer"}
+                        {api.status === "active" ? tA("apiStatusActive") : tA("apiStatusPending")}
                       </span>
                     </div>
                   ))}
                 </div>
 
-                {/* Pages */}
                 <div style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>📄 Pages de la plateforme</h3>
+                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA("pagesTitle")}</h3>
                   {[
                     { path: "/", name: "Landing page", status: "ok" },
-                    { path: "/dashboard", name: "Dashboard élève", status: "ok" },
-                    { path: "/courses", name: "Cours", status: "ok" },
-                    { path: "/simulateur", name: "Simulateur IA", status: "ok" },
-                    { path: "/discover", name: "Découvrir", status: "ok" },
-                    { path: "/progress", name: "Progression", status: "ok" },
-                    { path: "/teacher", name: "Dashboard enseignant", status: "ok" },
-                    { path: "/center", name: "Dashboard centre", status: "ok" },
+                    { path: "/dashboard", name: tA("pageDashboardStudent"), status: "ok" },
+                    { path: "/courses", name: tA("pageCourses"), status: "ok" },
+                    { path: "/simulateur", name: tA("pageSimulator"), status: "ok" },
+                    { path: "/discover", name: tA("pageDiscover"), status: "ok" },
+                    { path: "/progress", name: tA("pageProgress"), status: "ok" },
+                    { path: "/teacher", name: tA("pageDashboardTeacher"), status: "ok" },
+                    { path: "/center", name: tA("pageDashboardCenter"), status: "ok" },
                     { path: "/hoeren/demo", name: "Hören demo", status: "ok" },
                     { path: "/schreiben/demo", name: "Schreiben demo", status: "ok" },
-                    { path: "/quiz/demo", name: "Quiz adaptatif", status: "ok" },
-                    { path: "/video/preview", name: "Vidéos Remotion", status: "ok" },
-                    { path: "/pricing", name: "Tarifs", status: "ok" },
+                    { path: "/quiz/demo", name: tA("pageQuiz"), status: "ok" },
+                    { path: "/video/preview", name: tA("pageVideos"), status: "ok" },
+                    { path: "/pricing", name: tA("pagePricing"), status: "ok" },
                   ].map((page, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                       <div style={{ width: 6, height: 6, borderRadius: "50%", background: page.status === "ok" ? "#10b981" : "#ef4444", flexShrink: 0 }} />
@@ -504,9 +502,8 @@ export default function AdminDashboard() {
                   ))}
                 </div>
 
-                {/* Variables env */}
                 <div style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", gridColumn: "1/-1" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>🔐 Variables d'environnement</h3>
+                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA("envTitle")}</h3>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
                     {[
                       { key: "GEMINI_API_KEY", status: true },
