@@ -80,23 +80,30 @@ export async function middleware(request: NextRequest) {
 
   let response = intlResponse
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return request.cookies.getAll() },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options)
-          })
-        },
-      },
-    }
-  )
+  // Fast cookie check: Supabase stores the session in a cookie named
+  // "sb-<project-ref>-auth-token". If absent the user is definitely not logged in.
+  const hasSession = request.cookies.getAll().some(c => c.name.startsWith("sb-") && c.name.endsWith("-auth-token"))
+  if (!hasSession) {
+    return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
+  }
 
+  // Full Supabase session validation (verify token is not expired/revoked)
   let user = null
   try {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return request.cookies.getAll() },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options)
+            })
+          },
+        },
+      }
+    )
     const { data } = await supabase.auth.getUser()
     user = data.user
   } catch {
