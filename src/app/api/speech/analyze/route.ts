@@ -5,15 +5,19 @@ export async function POST(req: NextRequest) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "GEMINI_API_KEY manquante" }, { status: 500 });
 
-  const { transcript, expectedText, level, exerciseType } = await req.json();
+  let { transcript, expectedText, level, exerciseType } = await req.json();
 
   if (!transcript?.trim()) {
     return NextResponse.json({ error: "Transcription vide" }, { status: 400 });
   }
 
+  if (transcript.length > 300) {
+    transcript = transcript.slice(0, 300)
+  }
+
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: "gemini-1.5-flash",
     generationConfig: { temperature: 0.3, maxOutputTokens: 1000, responseMimeType: "application/json" }
   });
 

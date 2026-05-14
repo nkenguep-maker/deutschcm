@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import { getCached, setCached, cacheKey } from "@/lib/geminiCache"
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) return NextResponse.json({ error: "GEMINI_API_KEY manquante" }, { status: 500 })
 
   const { level, topic, moduleId, count = 10, adaptive = true, previousScores = [] } = await req.json()
+
+  const key = cacheKey("quiz", level, topic ?? "", String(count))
+  const cached = getCached(key)
+  if (cached) return NextResponse.json({ success: true, quiz: cached, fromCache: true })
 
   const avgPreviousScore = previousScores.length > 0
     ? previousScores.reduce((a: number, b: number) => a + b, 0) / previousScores.length
@@ -19,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   const genAI = new GoogleGenerativeAI(apiKey)
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: "gemini-2.0-flash-exp",
     generationConfig: {
       temperature: 0.4,
       maxOutputTokens: 3000,
@@ -70,6 +75,7 @@ Retourne UNIQUEMENT ce JSON valide :
     const result = await model.generateContent(prompt)
     const raw = result.response.text()
     const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim())
+    setCached(key, parsed)
     return NextResponse.json({ success: true, quiz: parsed }, {
       headers: { "Cache-Control": "no-store" }
     })

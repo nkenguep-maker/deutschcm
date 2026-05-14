@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import prisma from "@/lib/prisma";
 import { buildSystemPrompt } from "@/lib/systemPrompt";
 import type { AmbassadeRequest, AmbassadeResponse, AmbassadeError } from "@/types/ambassade";
 
@@ -10,6 +13,28 @@ function errorResponse(code: AmbassadeError["code"], message: string, status: nu
 }
 
 export async function POST(request: NextRequest) {
+  // ─── Auth + quota journalier ───
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { cookies: { getAll: () => cookieStore.getAll(), setAll: (list) => list.forEach(({ name, value, options }) => cookieStore.set(name, value, options)) } }
+  );
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    const profile = await prisma.user.findUnique({ where: { supabaseId: user.id }, select: { id: true, plan: true } });
+    if (profile) {
+      const today = new Date().toDateString();
+      const sessionCount = await prisma.conversationSession.count({
+        where: { userId: profile.id, startedAt: { gte: new Date(today) } }
+      });
+      const limit = profile.plan === "FREE" ? 3 : profile.plan === "BASIC" ? 10 : 999;
+      if (sessionCount >= limit) {
+        return NextResponse.json({ error: "Limite journalière atteinte", limit, plan: profile.plan, upgradeUrl: "/pricing" }, { status: 429 });
+      }
+    }
+  }
+
   const body: AmbassadeRequest = await request.json();
   const { message, scenario, niveau, history } = body;
 
@@ -20,7 +45,7 @@ export async function POST(request: NextRequest) {
   const systemInstruction = buildSystemPrompt(scenario, niveau);
 
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: "gemini-1.5-pro",
     systemInstruction,
     generationConfig: {
       temperature: 0.4,
@@ -72,7 +97,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     status: "ok",
-    model: "gemini-2.5-flash",
+    model: "gemini-1.5-pro",
     hasApiKey: !!process.env.GEMINI_API_KEY,
   });
 }

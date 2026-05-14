@@ -11,9 +11,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Texte vide" }, { status: 400 })
   }
 
+  if (text.length > 500) {
+    return NextResponse.json({ error: "Texte trop long (max 500 caractères)" }, { status: 400 })
+  }
+
   const genAI = new GoogleGenerativeAI(apiKey)
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: "gemini-1.5-flash",
     generationConfig: {
       temperature: 0.2,
       maxOutputTokens: 8192,
