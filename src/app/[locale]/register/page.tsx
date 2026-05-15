@@ -31,6 +31,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [consent, setConsent] = useState(false);
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
@@ -39,7 +40,12 @@ export default function RegisterPage() {
     setError(null);
 
     if (password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères.");
+      setError(t("passwordError"));
+      setLoading(false);
+      return;
+    }
+    if (!consent) {
+      setError(t("consentRequired"));
       setLoading(false);
       return;
     }
@@ -337,18 +343,35 @@ export default function RegisterPage() {
                     />
                   </div>
 
+                  {/* Consent checkbox */}
+                  <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+                    <input
+                      type="checkbox"
+                      checked={consent}
+                      onChange={e => setConsent(e.target.checked)}
+                      style={{ marginTop: 2, accentColor: "#10b981", flexShrink: 0, width: 15, height: 15 }}
+                    />
+                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem", lineHeight: 1.6 }}>
+                      {t("consentBefore")}
+                      <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "#10b981", textDecoration: "none" }}>{t("consentTerms")}</a>
+                      {t("consentMiddle")}
+                      <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#10b981", textDecoration: "none" }}>{t("consentPrivacy")}</a>
+                      {t("consentAfter")}
+                    </span>
+                  </label>
+
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || !consent}
                     className="w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-200 active:scale-95 mt-2"
                     style={{
-                      background: loading
+                      background: loading || !consent
                         ? "rgba(16,185,129,0.4)"
                         : "linear-gradient(135deg, #10b981, #059669)",
                       color: "white",
                       fontFamily: "'Syne', sans-serif",
-                      boxShadow: loading ? "none" : "0 4px 24px rgba(16,185,129,0.35)",
-                      cursor: loading ? "not-allowed" : "pointer",
+                      boxShadow: loading || !consent ? "none" : "0 4px 24px rgba(16,185,129,0.35)",
+                      cursor: loading || !consent ? "not-allowed" : "pointer",
                     }}
                   >
                     {loading ? tc("loading") : `${t("registerBtn")} →`}

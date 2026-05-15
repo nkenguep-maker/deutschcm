@@ -173,7 +173,13 @@
     "confirmClick": "Clique sur le lien pour activer ton compte et accéder à l'espace",
     "backToLogin": "Retour à la connexion",
     "createAccount": "Créer un compte",
-    "errorInvalid": "Email ou mot de passe incorrect."
+    "errorInvalid": "Email ou mot de passe incorrect.",
+    "consentBefore": "J'accepte les ",
+    "consentTerms": "Conditions d'utilisation",
+    "consentMiddle": " et la ",
+    "consentPrivacy": "Politique de confidentialité",
+    "consentAfter": ". Je confirme avoir au moins 16 ans.",
+    "consentRequired": "Vous devez accepter les conditions pour continuer."
   },
   "dashboard": {
     "xpLabel": "Points XP",
@@ -497,6 +503,8 @@
     "footerCopyright": "© 2025 Yema · Conçu au Cameroun 🇨🇲",
     "footerLogin": "Connexion",
     "footerRegister": "Inscription",
-    "footerCenter": "Espace Centre"
+    "footerCenter": "Espace Centre",
+    "footerPrivacy": "Confidentialité",
+    "footerTerms": "CGU"
   }
 }

@@ -6,10 +6,10 @@ import TeacherLayout from "@/components/TeacherLayout";
 const ASSIGNMENTS = [
   { id: "a1", title: "Quiz Lektion 4 — Wortschatz",       class: "Groupe A1 Matin",  due: "12 mai 2026", submitted: 12, total: 18, maxScore: 20, status: "open",   icon: "✏️" },
   { id: "a2", title: "Lesen Arbeit — Textverstehen",       class: "Groupe A1 Matin",  due: "15 mai 2026", submitted:  7, total: 18, maxScore: 20, status: "open",   icon: "📄" },
-  { id: "a3", title: "Simulation Ambassade",               class: "Prépa Goethe B1",  due: "—",           submitted: 14, total: 14, maxScore: 30, status: "closed", icon: "🎙️" },
+  { id: "a3", title: "Simulation Ambassade",               class: "Prépa CEFR B1",  due: "—",           submitted: 14, total: 14, maxScore: 30, status: "closed", icon: "🎙️" },
   { id: "a4", title: "Grammaire : Akkusativ & Dativ",      class: "Groupe A2 Soir",   due: "18 mai 2026", submitted:  3, total: 15, maxScore: 20, status: "open",   icon: "📝" },
   { id: "a5", title: "Hörverstehen — Dialog au Café",      class: "Groupe A2 Soir",   due: "22 mai 2026", submitted:  0, total: 15, maxScore: 15, status: "open",   icon: "🎧" },
-  { id: "a6", title: "Schreiben — Brief an einen Freund",  class: "Prépa Goethe B1",  due: "20 mai 2026", submitted:  9, total: 14, maxScore: 25, status: "open",   icon: "✉️" },
+  { id: "a6", title: "Schreiben — Brief an einen Freund",  class: "Prépa CEFR B1",  due: "20 mai 2026", submitted:  9, total: 14, maxScore: 25, status: "open",   icon: "✉️" },
 ];
 
 export default function AssignmentsPage() {

@@ -38,7 +38,7 @@ export default async function Image() {
 
         {/* Badges */}
         <div style={{ display: "flex", gap: 16 }}>
-          {["🏛️ Simulateur IA", "🎧 Audio natif", "🎯 Quiz adaptatif", "📊 Goethe A1-C1"].map(badge => (
+          {["🏛️ Simulateur IA", "🎧 Audio natif", "🎯 Quiz adaptatif", "📊 CEFR A1-C1"].map(badge => (
             <div key={badge} style={{
               padding: "8px 20px", borderRadius: 99,
               background: "rgba(16,185,129,0.15)",

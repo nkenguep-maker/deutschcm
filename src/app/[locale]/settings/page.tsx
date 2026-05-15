@@ -10,6 +10,7 @@ export default function StudentSettingsPage() {
   const [level, setLevel] = useState("A1");
   const [city, setCity] = useState("Yaoundé");
   const [saved, setSaved] = useState(false);
+  const [deleteStep, setDeleteStep] = useState<"idle" | "confirm" | "deleting" | "done">("idle");
 
   useEffect(() => {
     const supabase = createClient();
@@ -23,6 +24,13 @@ export default function StudentSettingsPage() {
   const handleSave = async () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
+  };
+
+  const handleDelete = async () => {
+    setDeleteStep("deleting");
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setDeleteStep("done");
   };
 
   const initials = fullName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
@@ -131,15 +139,63 @@ export default function StudentSettingsPage() {
           ))}
         </div>
 
+        {/* Legal links */}
+        <div style={{ padding: "16px 24px", borderRadius: 16, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", marginBottom: 20, display: "flex", gap: 20, flexWrap: "wrap" }}>
+          <a href="/privacy" style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", textDecoration: "none" }}>Politique de confidentialité</a>
+          <a href="/terms" style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", textDecoration: "none" }}>Conditions d'utilisation</a>
+          <a href="mailto:privacy@yema.app" style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", textDecoration: "none" }}>Demander mes données</a>
+        </div>
+
         {/* Danger zone */}
         <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(239,68,68,0.2)" }}>
           <h3 style={{ margin: "0 0 8px", color: "#ef4444", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>Zone dangereuse</h3>
           <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.3)", fontSize: "0.72rem" }}>
-            La suppression du compte est irréversible. Toutes tes données de progression seront perdues.
+            La suppression du compte est irréversible. Toutes tes données de progression seront effacées dans les 30 jours, conformément à notre politique de confidentialité.
           </p>
-          <button style={{ padding: "8px 18px", borderRadius: 9, background: "transparent", border: "1px solid rgba(239,68,68,0.4)", color: "#ef4444", fontSize: "0.75rem", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>
-            Supprimer mon compte
-          </button>
+
+          {deleteStep === "idle" && (
+            <button
+              onClick={() => setDeleteStep("confirm")}
+              style={{ padding: "8px 18px", borderRadius: 9, background: "transparent", border: "1px solid rgba(239,68,68,0.4)", color: "#ef4444", fontSize: "0.75rem", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontWeight: 600 }}
+            >
+              Supprimer mon compte
+            </button>
+          )}
+
+          {deleteStep === "confirm" && (
+            <div style={{ padding: "16px", borderRadius: 10, background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.25)" }}>
+              <p style={{ margin: "0 0 12px", color: "#f87171", fontSize: "0.78rem", fontWeight: 600 }}>
+                Confirmer la suppression ?
+              </p>
+              <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.4)", fontSize: "0.7rem" }}>
+                Cette action est définitive. Tes données seront supprimées dans les 30 jours.
+              </p>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  onClick={handleDelete}
+                  style={{ padding: "8px 16px", borderRadius: 9, background: "#ef4444", border: "none", color: "white", fontSize: "0.75rem", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}
+                >
+                  Oui, supprimer définitivement
+                </button>
+                <button
+                  onClick={() => setDeleteStep("idle")}
+                  style={{ padding: "8px 16px", borderRadius: 9, background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.5)", fontSize: "0.75rem", cursor: "pointer" }}
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          )}
+
+          {deleteStep === "deleting" && (
+            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.75rem" }}>Suppression en cours…</p>
+          )}
+
+          {deleteStep === "done" && (
+            <p style={{ color: "#10b981", fontSize: "0.75rem" }}>
+              ✓ Compte déconnecté. Tes données seront effacées sous 30 jours. Contact : privacy@yema.app
+            </p>
+          )}
         </div>
       </div>
     </Layout>

@@ -173,7 +173,13 @@
     "confirmClick": "Click the link to activate your account and get started.",
     "backToLogin": "Back to login",
     "createAccount": "Create account",
-    "errorInvalid": "Wrong email or password. Please try again."
+    "errorInvalid": "Wrong email or password. Please try again.",
+    "consentBefore": "I agree to the ",
+    "consentTerms": "Terms of Service",
+    "consentMiddle": " and ",
+    "consentPrivacy": "Privacy Policy",
+    "consentAfter": ". I am at least 16 years old.",
+    "consentRequired": "You must accept the terms to continue."
   },
   "dashboard": {
     "xpLabel": "XP earned",
@@ -497,6 +503,8 @@
     "footerCopyright": "© 2025 Yema · Built in Cameroon 🇨🇲",
     "footerLogin": "Log in",
     "footerRegister": "Sign up",
-    "footerCenter": "Center portal"
+    "footerCenter": "Center portal",
+    "footerPrivacy": "Privacy",
+    "footerTerms": "Terms"
   }
 }

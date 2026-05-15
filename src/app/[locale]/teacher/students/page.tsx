@@ -15,9 +15,9 @@ const ALL_STUDENTS = [
   { id: "s8",  name: "Paul Biya",          email: "paul.biya@gmail.com",       level: "A2", class: "Groupe A2 Soir",  xp: 1540, avgScore: 8.1, progress: 60, lastActive: "il y a 4h",  streak: 11 },
   { id: "s9",  name: "Sylvie Ntang",       email: "sylvie.ntang@gmail.com",    level: "A2", class: "Groupe A2 Soir",  xp: 1200, avgScore: 7.4, progress: 52, lastActive: "il y a 1j",  streak: 7  },
   { id: "s10", name: "Aminata Diallo",     email: "aminata.d@yahoo.fr",        level: "A2", class: "Groupe A2 Soir",  xp:  520, avgScore: 4.1, progress: 41, lastActive: "il y a 3j",  streak: 1  },
-  { id: "s11", name: "David Abomo",        email: "d.abomo@gmail.com",         level: "B1", class: "Prépa Goethe B1", xp: 3100, avgScore: 9.2, progress: 82, lastActive: "il y a 1h",  streak: 22 },
-  { id: "s12", name: "Claire Mballa",      email: "claire.mballa@gmail.com",   level: "B1", class: "Prépa Goethe B1", xp: 2780, avgScore: 8.6, progress: 76, lastActive: "il y a 3h",  streak: 18 },
-  { id: "s13", name: "Eric Mfou",          email: "eric.mfou@yahoo.fr",        level: "B1", class: "Prépa Goethe B1", xp: 2100, avgScore: 7.8, progress: 68, lastActive: "il y a 6h",  streak: 12 },
+  { id: "s11", name: "David Abomo",        email: "d.abomo@gmail.com",         level: "B1", class: "Prépa CEFR B1", xp: 3100, avgScore: 9.2, progress: 82, lastActive: "il y a 1h",  streak: 22 },
+  { id: "s12", name: "Claire Mballa",      email: "claire.mballa@gmail.com",   level: "B1", class: "Prépa CEFR B1", xp: 2780, avgScore: 8.6, progress: 76, lastActive: "il y a 3h",  streak: 18 },
+  { id: "s13", name: "Eric Mfou",          email: "eric.mfou@yahoo.fr",        level: "B1", class: "Prépa CEFR B1", xp: 2100, avgScore: 7.8, progress: 68, lastActive: "il y a 6h",  streak: 12 },
 ];
 
 type Filter = "all" | "danger" | "good";

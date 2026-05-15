@@ -13,7 +13,7 @@ interface CenterLayoutProps {
   centerCity?: string;
 }
 
-export default function CenterLayout({ children, title, centerName = "Institut Goethe Yaoundé", centerCity = "Yaoundé" }: CenterLayoutProps) {
+export default function CenterLayout({ children, title, centerName = "Centre de langues", centerCity = "Yaoundé" }: CenterLayoutProps) {
   const pathname = usePathname();
   const { nav: tNav, center: tC } = useT();
   const [userName, setUserName] = useState("Directeur");

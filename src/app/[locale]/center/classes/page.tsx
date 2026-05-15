@@ -29,7 +29,7 @@ const CLASSES = [
     schedule: "Mar · Jeu  18h–20h", enrolled: "22 jan 2026",
   },
   {
-    id: "cls5", name: "Prépa Goethe B1",  level: "B1", teacher: "Prof. Marie Tchamba",
+    id: "cls5", name: "Prépa CEFR B1",    level: "B1", teacher: "Prof. Marie Tchamba",
     code: "LINGUA-B1-GP2026", students: 14, maxStudents: 20,
     avgProgress: 71, avgScore: 8.1, isActive: true,
     schedule: "Sam  09h–13h", enrolled: "5 fév 2026",

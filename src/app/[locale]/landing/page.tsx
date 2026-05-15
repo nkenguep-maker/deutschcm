@@ -65,7 +65,7 @@ export default function LandingPage() {
     {
       name: "Pr. Henriette Ngo Biyong",
       role: t("testimonial1Role"),
-      center: "Institut Goethe Yaoundé",
+      center: "Deutsch Pro CM",
       city: "Yaoundé",
       flag: "🏛️",
       quote: t("testimonial1Quote"),
@@ -429,7 +429,7 @@ export default function LandingPage() {
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 {[
-                  { label: t("contactCenter"), key: "centre", placeholder: "Institut Goethe Yaoundé" },
+                  { label: t("contactCenter"), key: "centre", placeholder: "Centre Allemand de Yaoundé" },
                   { label: t("contactCity"), key: "ville", placeholder: "Yaoundé, Douala..." },
                 ].map(f => (
                   <div key={f.key}>
@@ -468,13 +468,16 @@ export default function LandingPage() {
       <footer style={{
         borderTop: "1px solid rgba(255,255,255,0.06)", padding: "24px 40px",
         display: "flex", justifyContent: "space-between", alignItems: "center",
+        flexWrap: "wrap", gap: 12,
         color: "rgba(255,255,255,0.25)", fontSize: 12,
       }}>
         <div>{t("footerCopyright")}</div>
-        <div style={{ display: "flex", gap: 24 }}>
+        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
           <Link href="/login" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{t("footerLogin")}</Link>
           <Link href="/register" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{t("footerRegister")}</Link>
           <Link href="/center" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{t("footerCenter")}</Link>
+          <Link href="/privacy" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{t("footerPrivacy")}</Link>
+          <Link href="/terms" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{t("footerTerms")}</Link>
         </div>
       </footer>
     </div>

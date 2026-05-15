@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
         level: level as DifficultyLevel,
         isPublished: publish,
         isFree: false,
-        tags: [level, "Goethe", manuel.split(" ")[0]],
+        tags: [level, "CEFR", manuel.split(" ")[0]],
         sortOrder: lektion_number,
       },
     });

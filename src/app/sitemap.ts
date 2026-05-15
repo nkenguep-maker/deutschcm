@@ -15,6 +15,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/hoeren/demo`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 },
     { url: `${baseUrl}/schreiben/demo`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 },
     { url: `${baseUrl}/quiz/demo`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 },
+    { url: `${baseUrl}/privacy`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.4 },
+    { url: `${baseUrl}/terms`, lastModified: now, changeFrequency: "monthly" as const, priority: 0.4 },
   ]
 
   const coursePages = [

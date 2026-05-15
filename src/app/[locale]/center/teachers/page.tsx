@@ -18,11 +18,11 @@ interface Teacher {
 }
 
 const MOCK_TEACHERS: Teacher[] = [
-  { id: "t1", name: "Dr. Beatrice Momo",  email: "b.momo@goethe-yde.cm",    specialty: "Grammaire · Littérature", classes: 3, students: 48, avgScore: 8.4, joinedAt: "2024-09-01", status: "active",   verified: true },
-  { id: "t2", name: "Jean-Pierre Nkolo",  email: "jp.nkolo@goethe-yde.cm",  specialty: "Conversation · B2-C1",    classes: 2, students: 31, avgScore: 7.9, joinedAt: "2024-10-15", status: "active",   verified: true },
-  { id: "t3", name: "Sophie Tanda",       email: "s.tanda@goethe-yde.cm",   specialty: "A1-A2 Débutants",         classes: 4, students: 52, avgScore: 8.7, joinedAt: "2024-09-01", status: "active",   verified: true },
-  { id: "t4", name: "Arsène Biyong",      email: "a.biyong@goethe-yde.cm",  specialty: "Préparation TELC/Goethe", classes: 2, students: 28, avgScore: 7.2, joinedAt: "2025-01-10", status: "active",   verified: false },
-  { id: "t5", name: "Claudine Ewane",     email: "c.ewane@goethe-yde.cm",   specialty: "Business Deutsch",        classes: 1, students: 11, avgScore: 6.8, joinedAt: "2025-02-01", status: "inactive", verified: false },
+  { id: "t1", name: "Dr. Beatrice Momo",  email: "b.momo@deutschpro.cm",    specialty: "Grammaire · Littérature", classes: 3, students: 48, avgScore: 8.4, joinedAt: "2024-09-01", status: "active",   verified: true },
+  { id: "t2", name: "Jean-Pierre Nkolo",  email: "jp.nkolo@deutschpro.cm",  specialty: "Conversation · B2-C1",    classes: 2, students: 31, avgScore: 7.9, joinedAt: "2024-10-15", status: "active",   verified: true },
+  { id: "t3", name: "Sophie Tanda",       email: "s.tanda@deutschpro.cm",   specialty: "A1-A2 Débutants",         classes: 4, students: 52, avgScore: 8.7, joinedAt: "2024-09-01", status: "active",   verified: true },
+  { id: "t4", name: "Arsène Biyong",      email: "a.biyong@deutschpro.cm",  specialty: "Préparation CEFR/TELC", classes: 2, students: 28, avgScore: 7.2, joinedAt: "2025-01-10", status: "active",   verified: false },
+  { id: "t5", name: "Claudine Ewane",     email: "c.ewane@deutschpro.cm",   specialty: "Business Deutsch",        classes: 1, students: 11, avgScore: 6.8, joinedAt: "2025-02-01", status: "inactive", verified: false },
   { id: "t6", name: "Dr. Samuel Kameni",  email: "s.kameni@gmail.com",       specialty: "Phonétique",              classes: 0, students: 0,  avgScore: 0,   joinedAt: "2025-05-01", status: "pending",  verified: false },
   { id: "t7", name: "Alice Fouda",        email: "a.fouda@gmail.com",        specialty: "Culture & Civilisation",  classes: 0, students: 0,  avgScore: 0,   joinedAt: "2025-05-03", status: "pending",  verified: false },
 ];

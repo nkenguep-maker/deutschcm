@@ -120,7 +120,7 @@ export default function ClassDetailPage() {
     createdAt: new Date().toISOString(),
     teacher: {
       id: "t1",
-      bio: "Professeur certifié Goethe-Institut avec 8 ans d'expérience. Spécialisé dans l'enseignement aux francophones africains.",
+      bio: "Professeur certifié DaF avec 8 ans d'expérience. Spécialisé dans l'enseignement aux francophones africains.",
       speciality: ["A1", "A2", "B1"],
       yearsExp: 8,
       isVerified: true,

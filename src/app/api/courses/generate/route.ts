@@ -139,7 +139,7 @@ function buildPrompt(
 }`);
   }
 
-  return `Tu es un expert en didactique de l'allemand langue étrangère (DaF), spécialisé dans le programme Goethe-Institut.
+  return `Tu es un expert en didactique de l'allemand langue étrangère (DaF), spécialisé dans le cadre CEFR (A1–C1).
 
 Génère le contenu pédagogique complet pour la lektion suivante, en JSON strict et sans texte autour.
 
@@ -281,7 +281,7 @@ export async function POST(request: NextRequest) {
           level: level as DifficultyLevel,
           isPublished: false,
           isFree: false,
-          tags: [level, "Goethe", manuel.split(" ")[0]],
+          tags: [level, "CEFR", manuel.split(" ")[0]],
           sortOrder: lektion_number,
         },
       });

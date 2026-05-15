@@ -30,7 +30,7 @@ const LEVEL_COLORS: Record<string, string> = {
 const CLASSES = [
   { id: "cls1", name: "Groupe A1 Matin", level: "A1" },
   { id: "cls2", name: "Groupe A2 Soir",  level: "A2" },
-  { id: "cls3", name: "Prépa Goethe B1", level: "B1" },
+  { id: "cls3", name: "Prépa CEFR B1",  level: "B1" },
 ];
 
 export default function TeacherCoursesPage() {

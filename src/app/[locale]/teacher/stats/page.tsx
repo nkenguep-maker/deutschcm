@@ -60,7 +60,7 @@ export default function StatsPage() {
               <Legend wrapperStyle={{ fontSize: 11, color: "rgba(255,255,255,0.4)", paddingTop: 8 }} />
               <Line type="monotone" dataKey="A1" stroke="#10b981" strokeWidth={2.5} dot={{ r: 3 }} name="A1 Matin" />
               <Line type="monotone" dataKey="A2" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 3 }} name="A2 Soir" />
-              <Line type="monotone" dataKey="B1" stroke="#f59e0b" strokeWidth={2.5} dot={{ r: 3 }} name="B1 Goethe" />
+              <Line type="monotone" dataKey="B1" stroke="#f59e0b" strokeWidth={2.5} dot={{ r: 3 }} name="B1 CEFR" />
             </LineChart>
           </ResponsiveContainer>
         </div>

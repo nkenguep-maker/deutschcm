@@ -6,7 +6,7 @@ import TeacherLayout from "@/components/TeacherLayout";
 const CLASSES = [
   { id: "cls1", name: "Groupe A1 Matin",  level: "A1", code: "LINGUA-A1-MT2026", students: 18, maxStudents: 25, avgProgress: 45, avgScore: 7.5, isActive: true,  schedule: "Lun · Mer · Ven  08h–10h" },
   { id: "cls2", name: "Groupe A2 Soir",   level: "A2", code: "LINGUA-A2-SR2026", students: 15, maxStudents: 20, avgProgress: 32, avgScore: 7.8, isActive: true,  schedule: "Mar · Jeu  18h–20h" },
-  { id: "cls3", name: "Prépa Goethe B1",  level: "B1", code: "LINGUA-B1-GP2026", students: 14, maxStudents: 20, avgProgress: 71, avgScore: 8.1, isActive: true,  schedule: "Sam  09h–13h" },
+  { id: "cls3", name: "Prépa CEFR B1",   level: "B1", code: "LINGUA-B1-GP2026", students: 14, maxStudents: 20, avgProgress: 71, avgScore: 8.1, isActive: true,  schedule: "Sam  09h–13h" },
 ];
 
 const LEVEL_COLORS: Record<string, string> = { A1: "#10b981", A2: "#14b8a6", B1: "#3b82f6", B2: "#8b5cf6", C1: "#f97316" };

@@ -5,7 +5,7 @@ export const LANGUAGES = {
     flag: "",
     available: true,
     levels: ["A1","A2","B1","B2","C1"],
-    framework: "CEFR + Goethe-Institut",
+    framework: "CEFR",
     exams: ["Goethe-Zertifikat","TestDaF","DSH"],
     ttsVoices: {
       female: "de-DE-KatjaNeural",

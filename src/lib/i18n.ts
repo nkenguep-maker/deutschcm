@@ -17,7 +17,7 @@ export const TRANSLATIONS = {
       badge: "🇨🇲 Conçu pour le marché camerounais",
       title: "Apprenez l'allemand",
       titleAccent: "comme à Berlin",
-      subtitle: "Le seul LMS d'allemand avec IA conversationnelle, correction vocale en temps réel et préparation Goethe-Zertifikat A1→C1.",
+      subtitle: "Le seul LMS d'allemand avec IA conversationnelle, correction vocale en temps réel et préparation aux examens A1→C1.",
       cta_primary: "🚀 Commencer gratuitement",
       cta_secondary: "🏛️ Voir le simulateur",
       stats: {
@@ -211,7 +211,7 @@ export const TRANSLATIONS = {
       badge: "🇨🇲 Built for the Cameroonian market",
       title: "Learn German",
       titleAccent: "like in Berlin",
-      subtitle: "The only German LMS with conversational AI, real-time voice correction and Goethe-Zertifikat preparation A1→C1.",
+      subtitle: "The only German LMS with conversational AI, real-time voice correction and German exam preparation A1→C1.",
       cta_primary: "🚀 Get started free",
       cta_secondary: "🏛️ Try the simulator",
       stats: {

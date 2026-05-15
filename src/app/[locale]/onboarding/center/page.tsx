@@ -186,7 +186,7 @@ export default function CenterOnboardingPage() {
               <h2 style={{ margin: 0, color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontSize: 17 }}>Identité du centre</h2>
               <div>
                 <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>NOM DU CENTRE *</label>
-                <input value={form.name} onChange={e => set("name", e.target.value)} placeholder="Institut Goethe de Yaoundé" style={inp()} />
+                <input value={form.name} onChange={e => set("name", e.target.value)} placeholder="ex: Centre Deutsch Pro CM" style={inp()} />
                 {errors.name && <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>{errors.name}</div>}
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
