@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 import { NextIntlClientProvider } from "next-intl"
-import { getMessages } from "next-intl/server"
 import { notFound } from "next/navigation"
 import { routing } from "@/i18n/routing"
 
@@ -63,7 +62,8 @@ export default async function LocaleLayout({
     notFound()
   }
 
-  const messages = await getMessages()
+  // Load messages directly from file to guarantee the right locale is used
+  const messages = (await import(`../../../messages/${locale}.json`)).default
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
