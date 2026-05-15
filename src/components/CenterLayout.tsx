@@ -4,7 +4,7 @@ import { Link } from "@/navigation";
 import { usePathname } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useT } from "@/hooks/useT";
 
 interface CenterLayoutProps {
   children: React.ReactNode;
@@ -15,19 +15,18 @@ interface CenterLayoutProps {
 
 export default function CenterLayout({ children, title, centerName = "Institut Goethe Yaoundé", centerCity = "Yaoundé" }: CenterLayoutProps) {
   const pathname = usePathname();
-  const tNav = useTranslations("nav");
-  const tC = useTranslations("center");
+  const { nav: tNav, center: tC } = useT();
   const [userName, setUserName] = useState("Directeur");
 
   const CENTER_NAV = [
-    { icon: "🏛️", label: tNav("overview"),       href: "/center"                   },
-    { icon: "👨‍🏫", label: tNav("teachers"),      href: "/center/teachers"          },
-    { icon: "🏫", label: "Classes",               href: "/center/classes"           },
-    { icon: "👥", label: tNav("students"),        href: "/center/students"          },
-    { icon: "✨", label: tNav("generateCourse"),  href: "/admin/courses/generate"   },
-    { icon: "💳", label: tNav("billing"),         href: "/center/billing"           },
-    { icon: "📊", label: tNav("stats"),           href: "/center/stats"             },
-    { icon: "⚙️", label: tNav("settings"),       href: "/center/settings"          },
+    { icon: "🏛️", label: tNav.overview,       href: "/center"                   },
+    { icon: "👨‍🏫", label: tNav.teachers,      href: "/center/teachers"          },
+    { icon: "🏫", label: "Classes",             href: "/center/classes"           },
+    { icon: "👥", label: tNav.students,         href: "/center/students"          },
+    { icon: "✨", label: tNav.generateCourse,   href: "/admin/courses/generate"   },
+    { icon: "💳", label: tNav.billing,          href: "/center/billing"           },
+    { icon: "📊", label: tNav.stats,            href: "/center/stats"             },
+    { icon: "⚙️", label: tNav.settings,        href: "/center/settings"          },
   ];
 
   useEffect(() => {
@@ -91,7 +90,7 @@ export default function CenterLayout({ children, title, centerName = "Institut G
                   Yema
                 </p>
                 <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.58rem", letterSpacing: "0.08em" }}>
-                  {tC("portal")}
+                  {tC.portal}
                 </p>
               </div>
             </Link>
@@ -112,7 +111,7 @@ export default function CenterLayout({ children, title, centerName = "Institut G
                 border: "1px solid rgba(234,179,8,0.35)", borderRadius: 20,
                 padding: "3px 10px", fontSize: 10, color: "#eab308", fontWeight: 700,
               }}>
-                {tC("partnerBadge")}
+                {tC.partnerBadge}
               </div>
             </div>
           </div>
@@ -171,7 +170,7 @@ export default function CenterLayout({ children, title, centerName = "Institut G
                 <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {userName}
                 </p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.6rem" }}>{tC("directorRole")}</p>
+                <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.6rem" }}>{tC.directorRole}</p>
               </div>
             </Link>
           </div>
@@ -198,7 +197,7 @@ export default function CenterLayout({ children, title, centerName = "Institut G
                 color: "rgba(255,255,255,0.5)", borderRadius: 8, padding: "6px 14px",
                 fontSize: 12, textDecoration: "none",
               }}>
-                {tC("studentPortal")}
+                {tC.studentPortal}
               </Link>
               <div style={{
                 width: 36, height: 36, borderRadius: 10,

@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { useTranslations } from "next-intl";
+import { useT } from "@/hooks/useT";
 
 const ACCENT_BY_ROLE: Record<string, string> = {
   STUDENT: "#10b981",
@@ -29,49 +29,48 @@ interface LayoutProps {
 export default function Layout({ children, title, searchQuery = "", onSearchChange }: LayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const tn = useTranslations("nav");
-  const tl = useTranslations("layout");
+  const { nav: tn, layout: tl } = useT();
 
   const STUDENT_NAV = [
-    { icon: "🏠", label: tn("home"),         href: "/dashboard"  },
-    { icon: "📚", label: tn("courses"),       href: "/courses"    },
-    { icon: "🏫", label: tn("myClasses"),     href: "/classroom"  },
-    { icon: "🔍", label: tn("discover"),      href: "/discover"   },
-    { icon: "🎙️", label: tn("simulator"),    href: "/simulateur" },
-    { icon: "📊", label: tn("progress"),      href: "/progress"   },
-    { icon: "⚙️", label: tn("settings"),     href: "/settings"   },
+    { icon: "🏠", label: tn.home,           href: "/dashboard"  },
+    { icon: "📚", label: tn.courses,         href: "/courses"    },
+    { icon: "🏫", label: tn.myClasses,       href: "/classroom"  },
+    { icon: "🔍", label: tn.discover,        href: "/discover"   },
+    { icon: "🎙️", label: tn.simulator,      href: "/simulateur" },
+    { icon: "📊", label: tn.progress,        href: "/progress"   },
+    { icon: "⚙️", label: tn.settings,       href: "/settings"   },
   ];
   const TEACHER_NAV = [
-    { icon: "🏠", label: tn("overview"),          href: "/teacher"                },
-    { icon: "🏫", label: tn("myClasses"),          href: "/teacher/classrooms"    },
-    { icon: "👥", label: tn("students"),           href: "/teacher/students"      },
-    { icon: "🔍", label: tn("discover"),           href: "/discover"              },
-    { icon: "📝", label: tn("assignments"),        href: "/teacher/assignments"   },
-    { icon: "✨", label: tn("generateCourse"),     href: "/admin/courses/generate"},
-    { icon: "📊", label: tn("stats"),              href: "/teacher/stats"         },
-    { icon: "⚙️", label: tn("settings"),          href: "/settings"              },
+    { icon: "🏠", label: tn.overview,        href: "/teacher"                },
+    { icon: "🏫", label: tn.myClasses,        href: "/teacher/classrooms"    },
+    { icon: "👥", label: tn.students,         href: "/teacher/students"      },
+    { icon: "🔍", label: tn.discover,         href: "/discover"              },
+    { icon: "📝", label: tn.assignments,      href: "/teacher/assignments"   },
+    { icon: "✨", label: tn.generateCourse,   href: "/admin/courses/generate"},
+    { icon: "📊", label: tn.stats,            href: "/teacher/stats"         },
+    { icon: "⚙️", label: tn.settings,        href: "/settings"              },
   ];
   const CENTER_NAV = [
-    { icon: "🏠", label: tn("overview"),          href: "/center"                },
-    { icon: "👨‍🏫", label: tn("teachers"),        href: "/center/teachers"       },
-    { icon: "👥", label: tn("students"),           href: "/center/students"       },
-    { icon: "🏫", label: tn("myClasses"),          href: "/center/classes"        },
-    { icon: "✨", label: tn("generateCourse"),     href: "/admin/courses/generate"},
-    { icon: "📊", label: tn("stats"),              href: "/center/stats"          },
-    { icon: "💳", label: tn("billing"),            href: "/center/billing"        },
+    { icon: "🏠", label: tn.overview,        href: "/center"                },
+    { icon: "👨‍🏫", label: tn.teachers,      href: "/center/teachers"       },
+    { icon: "👥", label: tn.students,         href: "/center/students"       },
+    { icon: "🏫", label: tn.myClasses,        href: "/center/classes"        },
+    { icon: "✨", label: tn.generateCourse,   href: "/admin/courses/generate"},
+    { icon: "📊", label: tn.stats,            href: "/center/stats"          },
+    { icon: "💳", label: tn.billing,          href: "/center/billing"        },
   ];
   const ADMIN_NAV = [
-    { icon: "🏠", label: "Dashboard",             href: "/admin"                 },
-    { icon: "✨", label: tn("generateCourse"),     href: "/admin/courses/generate"},
-    { icon: "👥", label: tn("users"),              href: "/teacher/students"      },
-    { icon: "🏫", label: tn("centers"),            href: "/center"               },
-    { icon: "📊", label: tn("globalStats"),        href: "/center/stats"         },
+    { icon: "🏠", label: "Dashboard",         href: "/admin"                 },
+    { icon: "✨", label: tn.generateCourse,   href: "/admin/courses/generate"},
+    { icon: "👥", label: tn.users,            href: "/teacher/students"      },
+    { icon: "🏫", label: tn.centers,          href: "/center"               },
+    { icon: "📊", label: tn.stats,            href: "/center/stats"         },
   ];
   const NAV_BY_ROLE: Record<string, typeof STUDENT_NAV> = {
     STUDENT: STUDENT_NAV, TEACHER: TEACHER_NAV, CENTER_MANAGER: CENTER_NAV, ADMIN: ADMIN_NAV,
   };
 
-  const [userName, setUserName] = useState(tl("userFallback"));
+  const [userName, setUserName] = useState(tl.userFallback);
   const [userEmail, setUserEmail] = useState("");
   const [userRole, setUserRole] = useState<string>("STUDENT");
   const [userLevel, setUserLevel] = useState<string | null>(null);
@@ -95,7 +94,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
         const name =
           data.user.user_metadata?.full_name ??
           data.user.email?.split("@")[0] ??
-          tl("userFallback");
+          tl.userFallback;
         setUserName(name);
       }
     });
@@ -213,7 +212,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
                   Yema
                 </p>
                 <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem", letterSpacing: "0.08em" }}>
-                  {tl("goethe")}
+                  {tl.goethe}
                 </p>
               </div>
             </Link>
@@ -293,18 +292,18 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
                   {userName}
                 </p>
                 <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.62rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {userLevel ? `${tl("levelPrefix")} ${userLevel}` : userEmail || ""}
+                  {userLevel ? `${tl.levelPrefix} ${userLevel}` : userEmail || ""}
                 </p>
               </div>
             </div>
             {/* Student type badge */}
             {userRole === "STUDENT" && studentType && (() => {
               if (studentType === "classroom" && isValidated)
-                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "4px 0", color: "#10b981", fontSize: "0.6rem", fontWeight: 700 }}>{tl("studentBadge")}</div>;
+                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "4px 0", color: "#10b981", fontSize: "0.6rem", fontWeight: 700 }}>{tl.studentBadge}</div>;
               if (studentType === "classroom" && !isValidated)
-                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, padding: "4px 0", color: "#f59e0b", fontSize: "0.6rem", fontWeight: 700 }}>{tl("pendingBadge")}</div>;
+                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, padding: "4px 0", color: "#f59e0b", fontSize: "0.6rem", fontWeight: 700 }}>{tl.pendingBadge}</div>;
               if (studentType === "group_creator")
-                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 8, padding: "4px 0", color: "#a5b4fc", fontSize: "0.6rem", fontWeight: 700 }}>{tl("groupLeader")}</div>;
+                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 8, padding: "4px 0", color: "#a5b4fc", fontSize: "0.6rem", fontWeight: 700 }}>{tl.groupLeader}</div>;
               return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "4px 0", color: "rgba(255,255,255,0.3)", fontSize: "0.6rem", fontWeight: 700 }}>Solo</div>;
             })()}
           </div>
@@ -359,7 +358,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
                   type="text"
                   value={searchQuery}
                   onChange={e => onSearchChange?.(e.target.value)}
-                  placeholder={tl("searchPlaceholder")}
+                  placeholder={tl.searchPlaceholder}
                   style={{
                     flex: 1, background: "transparent", border: "none", outline: "none",
                     color: "white", fontSize: "0.8rem", fontFamily: "'DM Mono', monospace",

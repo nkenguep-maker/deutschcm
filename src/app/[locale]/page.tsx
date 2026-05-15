@@ -1,13 +1,12 @@
 "use client"
 import { useState, useEffect } from "react"
-import { useRouter } from "@/navigation"
-import { useTranslations } from "next-intl"
+import { useRouter } from "next/navigation"
+import { useT } from "@/hooks/useT"
 import LanguageSwitcher from "@/components/LanguageSwitcher"
 
 export default function LandingPage() {
   const router = useRouter()
-  const t = useTranslations("landing")
-  const tNav = useTranslations("nav")
+  const { landing: t, nav: tNav } = useT()
   const [scrolled, setScrolled] = useState(false)
   const [faqOpen, setFaqOpen] = useState<number | null>(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -26,51 +25,51 @@ export default function LandingPage() {
   }, [])
 
   const stats = [
-    { value: "10.000+", label: t("statsUsers") },
-    { value: "A1→C1", label: t("statsLevels") },
-    { value: "95%", label: t("statsSuccess") },
-    { value: "50+", label: t("statsCenters") },
+    { value: "10.000+", label: t.statsUsers },
+    { value: "A1→C1", label: t.statsLevels },
+    { value: "95%", label: t.statsSuccess },
+    { value: "50+", label: t.statsCenters },
   ]
 
   const features = [
-    { icon: "🏛️", title: t("feature1Title"), desc: t("feature1Desc"), badge: t("feature1Badge") },
-    { icon: "🎧", title: t("feature2Title"), desc: t("feature2Desc") },
-    { icon: "🎙️", title: t("feature3Title"), desc: t("feature3Desc"), badge: t("feature3Badge") },
-    { icon: "✍️", title: t("feature4Title"), desc: t("feature4Desc"), badge: t("feature4Badge") },
-    { icon: "🎯", title: t("feature5Title"), desc: t("feature5Desc"), badge: t("feature5Badge") },
-    { icon: "👨‍🏫", title: t("feature6Title"), desc: t("feature6Desc"), badge: t("feature6Badge") },
-    { icon: "🏫", title: t("feature7Title"), desc: t("feature7Desc"), badge: t("feature7Badge") },
-    { icon: "📊", title: t("feature8Title"), desc: t("feature8Desc"), badge: t("feature8Badge") },
+    { icon: "🏛️", title: t.feature1Title, desc: t.feature1Desc, badge: t.feature1Badge },
+    { icon: "🎧", title: t.feature2Title, desc: t.feature2Desc },
+    { icon: "🎙️", title: t.feature3Title, desc: t.feature3Desc, badge: t.feature3Badge },
+    { icon: "✍️", title: t.feature4Title, desc: t.feature4Desc, badge: t.feature4Badge },
+    { icon: "🎯", title: t.feature5Title, desc: t.feature5Desc, badge: t.feature5Badge },
+    { icon: "👨‍🏫", title: t.feature6Title, desc: t.feature6Desc, badge: t.feature6Badge },
+    { icon: "🏫", title: t.feature7Title, desc: t.feature7Desc, badge: t.feature7Badge },
+    { icon: "📊", title: t.feature8Title, desc: t.feature8Desc, badge: t.feature8Badge },
   ]
 
   const levels = [
-    { level: "A1", name: t("level1Name"), desc: t("level1Desc"), modules: 48, color: "#10b981", locked: false },
-    { level: "A2", name: t("level2Name"), desc: t("level2Desc"), modules: 48, color: "#34d399", locked: false },
-    { level: "B1", name: t("level3Name"), desc: t("level3Desc"), modules: 60, color: "#60a5fa", locked: true },
-    { level: "B2", name: t("level4Name"), desc: t("level4Desc"), modules: 40, color: "#a78bfa", locked: true },
-    { level: "C1", name: t("level5Name"), desc: t("level5Desc"), modules: 40, color: "#f59e0b", locked: true },
+    { level: "A1", name: t.level1Name, desc: t.level1Desc, modules: 48, color: "#10b981", locked: false },
+    { level: "A2", name: t.level2Name, desc: t.level2Desc, modules: 48, color: "#34d399", locked: false },
+    { level: "B1", name: t.level3Name, desc: t.level3Desc, modules: 60, color: "#60a5fa", locked: true },
+    { level: "B2", name: t.level4Name, desc: t.level4Desc, modules: 40, color: "#a78bfa", locked: true },
+    { level: "C1", name: t.level5Name, desc: t.level5Desc, modules: 40, color: "#f59e0b", locked: true },
   ]
 
   const testimonials = [
-    { name: "Paul Nkengue", city: "Yaoundé", level: t("testimonial1Role"), text: t("testimonial1Text"), avatar: "🇨🇲", stars: 5 },
-    { name: "Prof. Marie Tchamba", city: "Douala", role: t("testimonial2Role"), text: t("testimonial2Text"), avatar: "👩‍🏫", stars: 5 },
-    { name: "Institut Lingua Plus", city: "Bafoussam", role: t("testimonial3Role"), text: t("testimonial3Text"), avatar: "🏫", stars: 5 },
+    { name: "Paul Nkengue", city: "Yaoundé", level: t.testimonial1Role, text: t.testimonial1Text, avatar: "🇨🇲", stars: 5 },
+    { name: "Prof. Marie Tchamba", city: "Douala", role: t.testimonial2Role, text: t.testimonial2Text, avatar: "👩‍🏫", stars: 5 },
+    { name: "Institut Lingua Plus", city: "Bafoussam", role: t.testimonial3Role, text: t.testimonial3Text, avatar: "🏫", stars: 5 },
   ]
 
   const faqs = [
-    { q: t("faq1Q"), a: t("faq1A") },
-    { q: t("faq2Q"), a: t("faq2A") },
-    { q: t("faq3Q"), a: t("faq3A") },
-    { q: t("faq4Q"), a: t("faq4A") },
-    { q: t("faq5Q"), a: t("faq5A") },
-    { q: t("faq6Q"), a: t("faq6A") },
+    { q: t.faq1Q, a: t.faq1A },
+    { q: t.faq2Q, a: t.faq2A },
+    { q: t.faq3Q, a: t.faq3A },
+    { q: t.faq4Q, a: t.faq4A },
+    { q: t.faq5Q, a: t.faq5A },
+    { q: t.faq6Q, a: t.faq6A },
   ]
 
   const navItems = [
-    { label: t("navFeatures"), href: "#features" },
-    { label: t("navLevels"), href: "#levels" },
-    { label: t("navPricing"), href: "#pricing" },
-    { label: t("navCenters"), href: "#centres" },
+    { label: t.navFeatures, href: "#features" },
+    { label: t.navLevels, href: "#levels" },
+    { label: t.navPricing, href: "#pricing" },
+    { label: t.navCenters, href: "#centres" },
   ]
 
   return (
@@ -119,11 +118,11 @@ export default function LandingPage() {
           <LanguageSwitcher style={{ marginRight: 4 }} />
           <button onClick={() => router.push("/login")}
             style={{ padding: isMobile ? "8px 14px" : "9px 20px", borderRadius: 10, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)", fontSize: 12, cursor: "pointer" }}>
-            {tNav("login")}
+            {tNav.login}
           </button>
           <button onClick={() => router.push("/register")}
             style={{ padding: isMobile ? "8px 14px" : "9px 20px", borderRadius: 10, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
-            {isMobile ? t("getStarted") : tNav("register")}
+            {isMobile ? t.getStarted : tNav.register}
           </button>
         </div>
       </nav>
@@ -137,29 +136,29 @@ export default function LandingPage() {
           {/* Badge */}
           <div className="fade-up" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 18px", borderRadius: 99, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", marginBottom: 28 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block", animation: "pulse 2s infinite" }} />
-            <span style={{ color: "#10b981", fontSize: 12, fontWeight: 600 }}>{t("badge")}</span>
+            <span style={{ color: "#10b981", fontSize: 12, fontWeight: 600 }}>{t.badge}</span>
           </div>
 
           {/* Titre */}
           <h1 className="fade-up" style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 36 : 64, fontWeight: 900, lineHeight: 1.1, marginBottom: 20, letterSpacing: "-0.02em" }}>
-            {t("title")}<br />
-            <span style={{ color: "#10b981" }}>{t("titleAccent")}</span>
+            {t.title}<br />
+            <span style={{ color: "#10b981" }}>{t.titleAccent}</span>
           </h1>
 
           {/* Sous-titre */}
           <p className="fade-up" style={{ fontSize: isMobile ? 14 : 18, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 36, maxWidth: 600, margin: "0 auto 36px" }}>
-            {t("subtitle")}
+            {t.subtitle}
           </p>
 
           {/* CTAs */}
           <div className="fade-up" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 48, flexWrap: "wrap" }}>
             <button onClick={() => router.push("/register")}
               style={{ padding: "16px 32px", borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 8px 32px rgba(16,185,129,0.3)", display: "flex", alignItems: "center", gap: 8 }}>
-              {t("ctaPrimary")}
+              {t.ctaPrimary}
             </button>
             <button onClick={() => router.push("/simulateur")}
               style={{ padding: "16px 32px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "white", fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
-              {t("ctaSecondary")}
+              {t.ctaSecondary}
             </button>
           </div>
 
@@ -179,10 +178,10 @@ export default function LandingPage() {
       <section id="features" style={{ padding: isMobile ? "60px 16px" : "80px 40px", maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12 }}>
-            {t("featuresTitle")}
+            {t.featuresTitle}
           </h2>
           <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15 }}>
-            {t("featuresSubtitle")}
+            {t.featuresSubtitle}
           </p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 10 : 16 }}>
@@ -207,10 +206,10 @@ export default function LandingPage() {
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12 }}>
-              {t("levelsTitle")}
+              {t.levelsTitle}
             </h2>
             <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15 }}>
-              {t("levelsSubtitle")}
+              {t.levelsSubtitle}
             </p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -222,14 +221,14 @@ export default function LandingPage() {
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
                     <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 700, margin: 0 }}>{lvl.name}</h3>
-                    {!lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: `${lvl.color}15`, color: lvl.color, fontWeight: 700 }}>{t("available")}</span>}
-                    {lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>{t("locked")}</span>}
+                    {!lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: `${lvl.color}15`, color: lvl.color, fontWeight: 700 }}>{t.available}</span>}
+                    {lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>{t.locked}</span>}
                   </div>
                   <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 12, margin: 0 }}>{lvl.desc}</p>
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800, color: lvl.color }}>{lvl.modules}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{t("modules")}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{t.modules}</div>
                 </div>
               </div>
             ))}
@@ -241,15 +240,15 @@ export default function LandingPage() {
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "center" }}>
           <div>
-            <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t("simTitle")}</span>
+            <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t.simTitle}</span>
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2 }}>
-              {t("simHeadline")}
+              {t.simHeadline}
             </h2>
             <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.8, marginBottom: 24 }}>
-              {t("simDesc")}
+              {t.simDesc}
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-              {[t("simVisa1"), t("simVisa2"), t("simVisa3"), t("simVisa4"), t("simVisa5")].map((s, i) => (
+              {[t.simVisa1, t.simVisa2, t.simVisa3, t.simVisa4, t.simVisa5].map((s, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ color: "#10b981", fontSize: 12 }}>✓</span>
                   <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>{s}</span>
@@ -258,7 +257,7 @@ export default function LandingPage() {
             </div>
             <button onClick={() => router.push("/simulateur")}
               style={{ padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
-              {t("simCta")}
+              {t.simCta}
             </button>
           </div>
 
@@ -268,13 +267,13 @@ export default function LandingPage() {
               <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🏛️</div>
               <div>
                 <p style={{ color: "white", fontSize: 12, fontWeight: 700, margin: 0 }}>Herr Klaus Bauer</p>
-                <p style={{ color: "#10b981", fontSize: 9, margin: 0 }}>{t("simConsulOnline")}</p>
+                <p style={{ color: "#10b981", fontSize: 9, margin: 0 }}>{t.simConsulOnline}</p>
               </div>
             </div>
             {[
-              { role: "consul", text: "Guten Tag. Bitte zeigen Sie mir Ihren Reisepass.", translation: t("simMsg1") },
-              { role: "user", text: "Guten Tag, Herr Bauer. Hier ist mein Reisepass.", translation: t("simMsg2") },
-              { role: "consul", text: "Warum möchten Sie in Deutschland studieren?", translation: t("simMsg3") },
+              { role: "consul", text: "Guten Tag. Bitte zeigen Sie mir Ihren Reisepass.", translation: t.simMsg1 },
+              { role: "user", text: "Guten Tag, Herr Bauer. Hier ist mein Reisepass.", translation: t.simMsg2 },
+              { role: "consul", text: "Warum möchten Sie in Deutschland studieren?", translation: t.simMsg3 },
             ].map((msg, i) => (
               <div key={i} style={{ marginBottom: 12, display: "flex", justifyContent: msg.role === "user" ? "flex-end" : "flex-start" }}>
                 <div style={{ maxWidth: "80%", padding: "10px 14px", borderRadius: msg.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px", background: msg.role === "user" ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.05)", border: msg.role === "user" ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.08)" }}>
@@ -284,9 +283,9 @@ export default function LandingPage() {
               </div>
             ))}
             <div style={{ padding: "8px 12px", borderRadius: 10, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)", marginTop: 8 }}>
-              <p style={{ color: "#10b981", fontSize: 10, fontWeight: 700, margin: "0 0 3px" }}>{t("simScoreLabel")}</p>
+              <p style={{ color: "#10b981", fontSize: 10, fontWeight: 700, margin: "0 0 3px" }}>{t.simScoreLabel}</p>
               <div style={{ display: "flex", gap: 12 }}>
-                {[[t("simGrammar"),"8/10"],[t("simVocab"),"7/10"],[t("simRelevance"),"9/10"]].map(([label,val]) => (
+                {[[t.simGrammar,"8/10"],[t.simVocab,"7/10"],[t.simRelevance,"9/10"]].map(([label,val]) => (
                   <div key={label}>
                     <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 9 }}>{label} </span>
                     <span style={{ color: "#10b981", fontSize: 10, fontWeight: 700 }}>{val}</span>
@@ -302,7 +301,7 @@ export default function LandingPage() {
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 26 : 36, fontWeight: 800, textAlign: "center", marginBottom: 48 }}>
-            {t("testimonialsTitle")}
+            {t.testimonialsTitle}
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: isMobile ? 12 : 20 }}>
             {testimonials.map((item, i) => (
@@ -328,19 +327,19 @@ export default function LandingPage() {
       <section id="centres" style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "center" }}>
           <div>
-            <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t("b2bLabel")}</span>
+            <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t.b2bLabel}</span>
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2 }}>
-              {t("centerTitle")}
+              {t.centerTitle}
             </h2>
             <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.8, marginBottom: 24 }}>
-              {t("centerDesc")}
+              {t.centerDesc}
             </p>
             {[
-              { icon: "👨‍🏫", text: t("centerFeature1") },
-              { icon: "📊", text: t("centerFeature2") },
-              { icon: "🏛️", text: t("centerFeature3") },
-              { icon: "📱", text: t("centerFeature4") },
-              { icon: "💳", text: t("centerFeature5") },
+              { icon: "👨‍🏫", text: t.centerFeature1 },
+              { icon: "📊", text: t.centerFeature2 },
+              { icon: "🏛️", text: t.centerFeature3 },
+              { icon: "📱", text: t.centerFeature4 },
+              { icon: "💳", text: t.centerFeature5 },
             ].map((item, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                 <span style={{ fontSize: 18 }}>{item.icon}</span>
@@ -350,7 +349,7 @@ export default function LandingPage() {
             <div style={{ display: "flex", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
               <button onClick={() => router.push("/register")}
                 style={{ padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
-                {t("centerCta")}
+                {t.centerCta}
               </button>
             </div>
           </div>
@@ -359,7 +358,7 @@ export default function LandingPage() {
             {[
               { plan: "Starter", price: "25.000", users: `5 teachers · 100 students`, color: "#10b981" },
               { plan: "Pro", price: "75.000", users: `20 teachers · 500 students`, color: "#f59e0b" },
-              { plan: "Enterprise", price: t("centerOnDemand"), users: `Unlimited · Dedicated support`, color: "#a78bfa" },
+              { plan: "Enterprise", price: t.centerOnDemand, users: `Unlimited · Dedicated support`, color: "#a78bfa" },
             ].map((p, i) => (
               <div key={i} style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: `1px solid ${p.color}25`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
@@ -368,9 +367,9 @@ export default function LandingPage() {
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <p style={{ fontFamily: "'Syne',sans-serif", color: p.color, fontSize: 16, fontWeight: 800, margin: "0 0 1px" }}>
-                    {p.price === t("centerOnDemand") ? p.price : `${p.price} XAF`}
+                    {p.price === t.centerOnDemand ? p.price : `${p.price} XAF`}
                   </p>
-                  {p.price !== t("centerOnDemand") && <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 9, margin: 0 }}>{t("centerPerMonth")}</p>}
+                  {p.price !== t.centerOnDemand && <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 9, margin: 0 }}>{t.centerPerMonth}</p>}
                 </div>
               </div>
             ))}
@@ -382,7 +381,7 @@ export default function LandingPage() {
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 24 : 36, fontWeight: 800, textAlign: "center", marginBottom: 40 }}>
-            {t("faqTitle")}
+            {t.faqTitle}
           </h2>
           {faqs.map((faq, i) => (
             <div key={i} style={{ marginBottom: 8, borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
@@ -408,18 +407,18 @@ export default function LandingPage() {
 
           </div>
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 28 : 40, fontWeight: 900, marginBottom: 16, lineHeight: 1.1 }}>
-            {t("ctaFinalTitle")}<br />
-            <span style={{ color: "#10b981" }}>{t("ctaFinalSub")}</span>
+            {t.ctaFinalTitle}<br />
+            <span style={{ color: "#10b981" }}>{t.ctaFinalSub}</span>
           </h2>
           <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, marginBottom: 32 }}>
-            {t("ctaFinalDesc")}
+            {t.ctaFinalDesc}
           </p>
           <button onClick={() => router.push("/register")}
             style={{ padding: "18px 48px", borderRadius: 16, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 12px 40px rgba(16,185,129,0.35)" }}>
-            {t("ctaFinalBtn")}
+            {t.ctaFinalBtn}
           </button>
           <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, marginTop: 16 }}>
-            {t("ctaFinalSocial")}
+            {t.ctaFinalSocial}
           </p>
         </div>
       </section>
@@ -432,11 +431,11 @@ export default function LandingPage() {
             Yema
           </span>
           <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, marginLeft: 8 }}>
-            {t("footerMade")}
+            {t.footerMade}
           </span>
         </div>
         <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-          {[t("footerLegal"), t("footerTerms"), t("footerPrivacy"), t("footerContact")].map(link => (
+          {[t.footerLegal, t.footerTerms, t.footerPrivacy, t.footerContact].map(link => (
             <a key={link} href="#" style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{link}</a>
           ))}
         </div>

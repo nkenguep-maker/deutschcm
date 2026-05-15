@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "@/navigation";
 import Layout from "@/components/Layout";
-import { useTranslations } from "next-intl";
+import { useT } from "@/hooks/useT";
 import { SCENARIOS as SIM_SCENARIOS } from "@/types/ambassade";
 import type { AmbassadeScenario } from "@/types/ambassade";
 
@@ -170,7 +170,7 @@ interface Analytics {
 
 export default function StudentDashboard() {
   const router = useRouter();
-  const t = useTranslations("dashboard");
+  const { dashboard: t, common: tCommon } = useT();
   const [userData, setUserData] = useState<{
     fullName?: string; germanLevel?: string | null; xpTotal?: number; streakDays?: number;
     city?: string | null; studentType?: string; isValidated?: boolean;
@@ -326,10 +326,10 @@ export default function StudentDashboard() {
           }}>
             <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
               <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                {t("skills")}
+                {t.skills}
               </p>
               <p style={{ margin: "4px 0 0", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
-                {t("detailedProgress")}
+                {t.detailedProgress}
               </p>
             </div>
             <div style={{ padding: "14px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
@@ -354,7 +354,7 @@ export default function StudentDashboard() {
                 </div>
               )) : (
                 <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", textAlign: "center", padding: "16px 0" }}>
-                  {t("noSkills")}
+                  {t.noSkills}
                 </p>
               )}
             </div>
@@ -364,13 +364,13 @@ export default function StudentDashboard() {
           {(!userData || userData.studentType === "solo") && (
             <div className="fade-up card-delay-3" style={{ borderRadius: 18, background: "rgba(99,102,241,0.05)", border: "1px solid rgba(99,102,241,0.2)", padding: "20px 20px 18px" }}>
               <p style={{ margin: "0 0 4px", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                {t("joinClassLabel")}
+                {t.joinClassLabel}
               </p>
               <p style={{ margin: "0 0 14px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.92rem" }}>
-                {t("joinClassTitle")}
+                {t.joinClassTitle}
               </p>
               <p style={{ margin: "0 0 14px", color: "rgba(255,255,255,0.35)", fontSize: "0.75rem", lineHeight: 1.5 }}>
-                {t("joinClassDesc")}
+                {t.joinClassDesc}
               </p>
               <div style={{ display: "flex", gap: 8 }}>
                 <input
@@ -467,17 +467,17 @@ export default function StudentDashboard() {
           }}>
             <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
               <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                {t("communityLabel")}
+                {t.communityLabel}
               </p>
               <p style={{ margin: "4px 0 0", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
-                {t("discoverLabel")}
+                {t.discoverLabel}
               </p>
             </div>
             <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
               {[
-                { icon: "🏫", label: t("classesAvailable"), desc: t("classesJoin"), href: "/discover?tab=classes" },
-                { icon: "👥", label: t("groupsLabel"), desc: t("studyGroup"), href: "/discover?tab=groups" },
-                { icon: "🤝", label: t("findPartner"), desc: t("soloStudents"), href: "/discover?tab=students" },
+                { icon: "🏫", label: t.classesAvailable, desc: t.classesJoin, href: "/discover?tab=classes" },
+                { icon: "👥", label: t.groupsLabel, desc: t.studyGroup, href: "/discover?tab=groups" },
+                { icon: "🤝", label: t.findPartner, desc: t.soloStudents, href: "/discover?tab=students" },
               ].map(item => (
                 <a key={item.href} href={item.href} style={{
                   display: "flex", gap: 10, alignItems: "center", padding: "10px 12px",

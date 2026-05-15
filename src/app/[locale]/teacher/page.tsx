@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Link } from "@/navigation";
 import { usePathname, useRouter } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { useTranslations } from "next-intl";
+import { useT } from "@/hooks/useT";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -38,16 +38,15 @@ interface RealClassroom {
 function TeacherSidebar({ teacherName }: { teacherName: string }) {
   const pathname = usePathname();
   const router = useRouter();
-  const tNav = useTranslations("nav");
-  const tT = useTranslations("teacher");
+  const { nav: tNav, teacher: tT, common: tCommon } = useT();
 
   const TEACHER_NAV = [
-    { icon: "📊", label: tNav("overview"),       href: "/teacher" },
-    { icon: "🏫", label: tNav("myClasses"),      href: "/teacher/classrooms" },
-    { icon: "👥", label: tNav("students"),       href: "/teacher/students" },
-    { icon: "📋", label: tNav("assignments"),    href: "/teacher/assignments" },
-    { icon: "📈", label: tNav("stats"),          href: "/teacher/stats" },
-    { icon: "⚙️", label: tNav("settings"),      href: "/teacher/settings" },
+    { icon: "📊", label: tNav.overview,       href: "/teacher" },
+    { icon: "🏫", label: tNav.myClasses,      href: "/teacher/classrooms" },
+    { icon: "👥", label: tNav.students,       href: "/teacher/students" },
+    { icon: "📋", label: tNav.assignments,    href: "/teacher/assignments" },
+    { icon: "📈", label: tNav.stats,          href: "/teacher/stats" },
+    { icon: "⚙️", label: tNav.settings,      href: "/teacher/settings" },
   ];
 
   const handleLogout = async () => {
@@ -83,8 +82,8 @@ function TeacherSidebar({ teacherName }: { teacherName: string }) {
       <div style={{ margin: "0 14px 12px", padding: "8px 12px", borderRadius: 10, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: "0.9rem" }}>👨‍🏫</span>
         <div>
-          <p style={{ margin: 0, color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.7rem" }}>{tT("space")}</p>
-          <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.58rem" }}>{tT("access")}</p>
+          <p style={{ margin: 0, color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.7rem" }}>{tT.space}</p>
+          <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.58rem" }}>{tT.access}</p>
         </div>
         <span style={{ marginLeft: "auto", padding: "2px 6px", borderRadius: 6, background: "rgba(16,185,129,0.15)", color: "#10b981", fontSize: "0.58rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>✓</span>
       </div>
@@ -125,11 +124,11 @@ function TeacherSidebar({ teacherName }: { teacherName: string }) {
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Prof. {teacherName}</p>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem" }}>{tT("role")}</p>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem" }}>{tT.role}</p>
           </div>
         </div>
         <button onClick={handleLogout} style={{ width: "100%", padding: "7px", borderRadius: 9, border: "1px solid rgba(239,68,68,0.15)", background: "transparent", color: "rgba(239,68,68,0.5)", fontFamily: "'DM Mono', monospace", fontSize: "0.68rem", cursor: "pointer" }}>
-          {tNav("logout")}
+          {tNav.logout}
         </button>
       </div>
     </aside>
@@ -156,9 +155,8 @@ function StatCard({ icon, label, value, sub, color = "#10b981" }: { icon: string
 
 // ─── Classroom card ───────────────────────────────────────────────────────────
 
-function ClassroomCard({ cls, tT }: { cls: RealClassroom; tT: ReturnType<typeof useTranslations> }) {
+function ClassroomCard({ cls, tT }: { cls: RealClassroom; tT: ReturnType<typeof useT>["teacher"] }) {
   const levelColors: Record<string, string> = { A1: "#10b981", A2: "#14b8a6", B1: "#3b82f6", B2: "#8b5cf6", C1: "#f97316" };
-  const tCommon = useTranslations("common");
   const c = levelColors[cls.level] ?? "#10b981";
 
   return (
@@ -178,11 +176,11 @@ function ClassroomCard({ cls, tT }: { cls: RealClassroom; tT: ReturnType<typeof 
           </div>
           <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
             <span style={{ padding: "2px 8px", borderRadius: 6, background: `${c}18`, color: c, border: `1px solid ${c}33`, fontSize: "0.62rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>{cls.level}</span>
-            <span style={{ padding: "2px 8px", borderRadius: 6, background: cls.isActive ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.05)", color: cls.isActive ? "#10b981" : "rgba(255,255,255,0.3)", fontSize: "0.6rem" }}>{cls.isActive ? tCommon("active") : tCommon("inactive")}</span>
+            <span style={{ padding: "2px 8px", borderRadius: 6, background: cls.isActive ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.05)", color: cls.isActive ? "#10b981" : "rgba(255,255,255,0.3)", fontSize: "0.6rem" }}>{cls.isActive ? tCommon.active : tCommon.inactive}</span>
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-          {[{ v: cls.students, l: tT("classStudents") }, { v: `${cls.avgProgress ?? 0}%`, l: tT("classProgress") }, { v: `${cls.avgScore ?? 0}/10`, l: tT("classAvgScore") }].map((s) => (
+          {[{ v: cls.students, l: tT.classStudents }, { v: `${cls.avgProgress ?? 0}%`, l: tT.classProgress }, { v: `${cls.avgScore ?? 0}/10`, l: tT.classAvgScore }].map((s) => (
             <div key={s.l} style={{ textAlign: "center" }}>
               <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>{s.v}</p>
               <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.3)", fontSize: "0.58rem" }}>{s.l}</p>
@@ -199,7 +197,7 @@ function ClassroomCard({ cls, tT }: { cls: RealClassroom; tT: ReturnType<typeof 
 
 // ─── Difficulty student ────────────────────────────────────────────────────────
 
-function DifficultyRow({ s, tT }: { s: RealStudent; tT: ReturnType<typeof useTranslations> }) {
+function DifficultyRow({ s, tT }: { s: RealStudent; tT: ReturnType<typeof useT>["teacher"] }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 12, background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.15)" }}>
       <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#f87171", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.75rem" }}>
@@ -213,7 +211,7 @@ function DifficultyRow({ s, tT }: { s: RealStudent; tT: ReturnType<typeof useTra
       </div>
       <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
         <span style={{ padding: "3px 10px", borderRadius: 8, background: "rgba(239,68,68,0.1)", color: "#f87171", fontSize: "0.68rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>{s.avgScore}/10</span>
-        <Link href={`/teacher/students/${s.id}`} style={{ padding: "3px 10px", borderRadius: 8, background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", fontSize: "0.68rem", fontFamily: "'Syne', sans-serif", textDecoration: "none" }}>{tT("viewStudent")}</Link>
+        <Link href={`/teacher/students/${s.id}`} style={{ padding: "3px 10px", borderRadius: 8, background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", fontSize: "0.68rem", fontFamily: "'Syne', sans-serif", textDecoration: "none" }}>{tT.viewStudent}</Link>
       </div>
     </div>
   );
@@ -222,8 +220,7 @@ function DifficultyRow({ s, tT }: { s: RealStudent; tT: ReturnType<typeof useTra
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function TeacherDashboard() {
-  const tT = useTranslations("teacher");
-  const tNav = useTranslations("nav");
+  const { nav: tNav, teacher: tT, common: tCommon } = useT();
   const [teacherName, setTeacherName] = useState("");
   const [teacherCode, setTeacherCode] = useState<string | null>(null);
   const [codeCopied, setCodeCopied] = useState(false);
@@ -316,9 +313,9 @@ export default function TeacherDashboard() {
                 background: "linear-gradient(135deg, #10b981, #059669)", color: "white",
                 fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.78rem", textDecoration: "none",
                 boxShadow: "0 4px 16px rgba(16,185,129,0.3)",
-              }}>{tT("newClass")}</Link>
+              }}>{tT.newClass}</Link>
               <Link href="/dashboard" style={{ padding: "8px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)", fontFamily: "'DM Mono', monospace", fontSize: "0.72rem", textDecoration: "none" }}>
-                {tT("studentView")}
+                {tT.studentView}
               </Link>
             </div>
           </header>
@@ -328,10 +325,10 @@ export default function TeacherDashboard() {
 
             {/* Stat cards */}
             <div className="fade-up" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 28 }}>
-              <StatCard icon="👥" label={tT("statStudentsLabel")} value={`${totalStudents}`} sub={`${totalStudents} enrolled · 3 classes`} color="#10b981" />
-              <StatCard icon="📊" label={tT("statAvgLabel")} value={globalAvg} sub={tT("statAvgSub")} color="#3b82f6" />
-              <StatCard icon="📋" label={tT("statAssignmentsLabel")} value={`${pendingAssignments}`} sub={tT("statAssignmentsSub")} color="#f59e0b" />
-              <StatCard icon="✅" label={tT("statCompletionLabel")} value={`${completionRate}%`} sub={tT("statCompletionSub")} color="#8b5cf6" />
+              <StatCard icon="👥" label={tT.statStudentsLabel} value={`${totalStudents}`} sub={`${totalStudents} enrolled · 3 classes`} color="#10b981" />
+              <StatCard icon="📊" label={tT.statAvgLabel} value={globalAvg} sub={tT.statAvgSub} color="#3b82f6" />
+              <StatCard icon="📋" label={tT.statAssignmentsLabel} value={`${pendingAssignments}`} sub={tT.statAssignmentsSub} color="#f59e0b" />
+              <StatCard icon="✅" label={tT.statCompletionLabel} value={`${completionRate}%`} sub={tT.statCompletionSub} color="#8b5cf6" />
             </div>
 
             {/* Access codes */}
@@ -340,18 +337,18 @@ export default function TeacherDashboard() {
               <div style={{ padding: "18px 20px", borderRadius: 16, background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.2)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                   <span style={{ fontSize: "1rem" }}>👨‍🏫</span>
-                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{tT("myTeacherCode")}</span>
+                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{tT.myTeacherCode}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <code style={{ flex: 1, background: "rgba(0,0,0,0.3)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 10, padding: "10px 14px", color: "#818cf8", fontSize: "1.1rem", fontFamily: "monospace", letterSpacing: "0.1em", fontWeight: 700 }}>
-                    {teacherCode ?? tT("loading")}
+                    {teacherCode ?? tT.loading}
                   </code>
                   <button onClick={() => teacherCode && copyCode(teacherCode)} style={{ padding: "10px 14px", borderRadius: 10, background: codeCopied ? "rgba(99,102,241,0.2)" : "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", color: codeCopied ? "#818cf8" : "rgba(255,255,255,0.5)", fontSize: "0.72rem", cursor: "pointer", whiteSpace: "nowrap" }}>
-                    {codeCopied ? tT("copied") : tT("copy")}
+                    {codeCopied ? tT.copied : tT.copy}
                   </button>
                 </div>
                 <p style={{ margin: "8px 0 0", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", fontFamily: "'DM Mono', monospace" }}>
-                  {tT("shareCodeStudents")}
+                  {tT.shareCodeStudents}
                 </p>
               </div>
 
@@ -359,12 +356,12 @@ export default function TeacherDashboard() {
               <div style={{ padding: "18px 20px", borderRadius: 16, background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.15)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                   <span style={{ fontSize: "1rem" }}>🏫</span>
-                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{tT("myClassCodes")}</span>
+                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{tT.myClassCodes}</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {classrooms.length === 0 ? (
                     <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.68rem", margin: 0 }}>
-                      {tT("shareClassCode")}
+                      {tT.shareClassCode}
                     </p>
                   ) : classrooms.map(cls => (
                     <div key={cls.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -383,19 +380,19 @@ export default function TeacherDashboard() {
               {/* My classes */}
               <div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                  <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{tT("sectionClasses")}</h2>
-                  <Link href="/teacher/classrooms" style={{ color: "#10b981", fontSize: "0.7rem", fontFamily: "'DM Mono', monospace", textDecoration: "none" }}>{tT("viewAll")}</Link>
+                  <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{tT.sectionClasses}</h2>
+                  <Link href="/teacher/classrooms" style={{ color: "#10b981", fontSize: "0.7rem", fontFamily: "'DM Mono', monospace", textDecoration: "none" }}>{tT.viewAll}</Link>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {loading ? (
-                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem" }}>{tT("loading")}</p>
+                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem" }}>{tT.loading}</p>
                   ) : classrooms.length === 0 ? (
                     <div style={{ padding: "24px", borderRadius: 16, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
                       <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem", margin: "0 0 12px" }}>
-                        {tT("classesEmpty")}
+                        {tT.classesEmpty}
                       </p>
                       <Link href="/teacher/classroom/new" style={{ color: "#10b981", fontSize: "0.78rem", textDecoration: "none" }}>
-                        {tT("createFirstClass")}
+                        {tT.createFirstClass}
                       </Link>
                     </div>
                   ) : classrooms.map((cls) => <ClassroomCard key={cls.id} cls={cls} tT={tT} />)}
@@ -405,12 +402,12 @@ export default function TeacherDashboard() {
               {/* Recent activity */}
               <div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                  <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{tT("sectionActivity")}</h2>
+                  <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{tT.sectionActivity}</h2>
                 </div>
                 <div style={{ borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
                   <div style={{ padding: "24px", textAlign: "center" }}>
                     <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", margin: 0 }}>
-                      {tT("activityEmpty")}
+                      {tT.activityEmpty}
                     </p>
                   </div>
                 </div>
@@ -423,10 +420,10 @@ export default function TeacherDashboard() {
               {/* Progress chart placeholder */}
               <div style={{ borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 240 }}>
                 <h2 style={{ margin: "0 0 12px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
-                  {tT("progressChart")}
+                  {tT.progressChart}
                 </h2>
                 <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", margin: 0 }}>
-                  {tT("progressEmpty")}
+                  {tT.progressEmpty}
                 </p>
               </div>
 
@@ -434,7 +431,7 @@ export default function TeacherDashboard() {
               <div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
                   <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>
-                    {tT("struggling")}
+                    {tT.struggling}
                   </h2>
                   <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(239,68,68,0.1)", color: "#f87171", fontSize: "0.65rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>
                     {difficultStudents.length}
@@ -444,7 +441,7 @@ export default function TeacherDashboard() {
                   {difficultStudents.map((s) => <DifficultyRow key={s.id} s={s} tT={tT} />)}
                   {difficultStudents.length === 0 && (
                     <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem", fontFamily: "'DM Mono', monospace", textAlign: "center", padding: "20px 0" }}>
-                      {tT("allGood")}
+                      {tT.allGood}
                     </p>
                   )}
                 </div>
@@ -454,12 +451,12 @@ export default function TeacherDashboard() {
             {/* Recent assignments */}
             <div style={{ marginTop: 24 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{tT("recentAssignments")}</h2>
-                <Link href="/teacher/assignments" style={{ color: "#10b981", fontSize: "0.7rem", fontFamily: "'DM Mono', monospace", textDecoration: "none" }}>{tT("viewAll")}</Link>
+                <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{tT.recentAssignments}</h2>
+                <Link href="/teacher/assignments" style={{ color: "#10b981", fontSize: "0.7rem", fontFamily: "'DM Mono', monospace", textDecoration: "none" }}>{tT.viewAll}</Link>
               </div>
               <div style={{ padding: "24px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
                 <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", margin: 0 }}>
-                  {tT("assignmentsEmpty")}
+                  {tT.assignmentsEmpty}
                 </p>
               </div>
             </div>
