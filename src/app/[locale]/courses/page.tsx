@@ -25,11 +25,11 @@ interface Course {
 // ─── Level config ─────────────────────────────────────────────────────────────
 
 const LEVEL_CONFIG: Record<Level, { color: string; bg: string; border: string; glow: string; manuel: string; certif: string }> = {
-  A1: { color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.2)", glow: "rgba(16,185,129,0.06)", manuel: "Netzwerk neu A1", certif: "Goethe-Zertifikat A1 · Start Deutsch 1" },
-  A2: { color: "#14b8a6", bg: "rgba(20,184,166,0.08)", border: "rgba(20,184,166,0.2)", glow: "rgba(20,184,166,0.06)", manuel: "Netzwerk neu A2", certif: "Goethe-Zertifikat A2 · telc Deutsch A2" },
-  B1: { color: "#3b82f6", bg: "rgba(59,130,246,0.08)", border: "rgba(59,130,246,0.2)", glow: "rgba(59,130,246,0.06)", manuel: "Netzwerk neu B1", certif: "Goethe-Zertifikat B1 · telc Deutsch B1" },
-  B2: { color: "#8b5cf6", bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.2)", glow: "rgba(139,92,246,0.06)", manuel: "Aspekte neu B2",   certif: "Goethe-Zertifikat B2" },
-  C1: { color: "#f97316", bg: "rgba(249,115,22,0.08)", border: "rgba(249,115,22,0.2)", glow: "rgba(249,115,22,0.06)", manuel: "Aspekte neu C1",   certif: "Goethe-Zertifikat C1" },
+  A1: { color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.2)", glow: "rgba(16,185,129,0.06)", manuel: "Netzwerk neu A1", certif: "CEFR A1 — exam preparation" },
+  A2: { color: "#14b8a6", bg: "rgba(20,184,166,0.08)", border: "rgba(20,184,166,0.2)", glow: "rgba(20,184,166,0.06)", manuel: "Netzwerk neu A2", certif: "CEFR A2 — exam preparation" },
+  B1: { color: "#3b82f6", bg: "rgba(59,130,246,0.08)", border: "rgba(59,130,246,0.2)", glow: "rgba(59,130,246,0.06)", manuel: "Netzwerk neu B1", certif: "CEFR B1 — exam preparation" },
+  B2: { color: "#8b5cf6", bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.2)", glow: "rgba(139,92,246,0.06)", manuel: "Aspekte neu B2",   certif: "CEFR B2 — exam preparation" },
+  C1: { color: "#f97316", bg: "rgba(249,115,22,0.08)", border: "rgba(249,115,22,0.2)", glow: "rgba(249,115,22,0.06)", manuel: "Aspekte neu C1",   certif: "CEFR C1 — exam preparation" },
 };
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -284,7 +284,7 @@ export default function CoursesPage() {
   const done = allCourses.filter(c => c.progress === 100).length;
 
   return (
-    <Layout title="Parcours Goethe" searchQuery={search} onSearchChange={setSearch}>
+    <Layout title="Mes cours" searchQuery={search} onSearchChange={setSearch}>
 
       {/* ── Page header ── */}
       <div className="fade-up" style={{ marginBottom: 28 }}>
@@ -296,10 +296,10 @@ export default function CoursesPage() {
               background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
               color: "#34d399", fontSize: "0.7rem",
             }}>
-              🎓 Manuel officiel Goethe-Institut
+              🎓 Programme CEFR aligné A1→C1
             </div>
             <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.7rem" }}>
-              Parcours Goethe
+              Mes cours
             </h2>
             <p style={{ margin: "6px 0 0", color: "rgba(255,255,255,0.35)", fontSize: "0.78rem" }}>
               {done}/{totalUnlocked} cours complétés · A1 → C1 · Netzwerk neu + Aspekte neu

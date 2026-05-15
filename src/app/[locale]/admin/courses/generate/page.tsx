@@ -34,7 +34,7 @@ const MANUELS = {
       { num: 9, title: "Arbeit und Alltag", theme: "Travail et administration" },
       { num: 10, title: "Reise und Verkehr", theme: "Réservations et réclamations" },
       { num: 11, title: "Konsum und Werbung", theme: "Consommation et publicité" },
-      { num: 12, title: "Fit für A2", theme: "Révision et simulation Goethe A2" },
+      { num: 12, title: "Fit für A2", theme: "Révision et simulation d'examen CEFR A2" },
     ]
   },
   "Netzwerk neu B1": {
@@ -51,7 +51,7 @@ const MANUELS = {
       { num: 9, title: "Geschichte und Erinnerung", theme: "Histoire allemande" },
       { num: 10, title: "Globalisierung", theme: "Migration et diversité" },
       { num: 11, title: "Zukunft und Träume", theme: "Rêves et vie en Allemagne" },
-      { num: 12, title: "Fit für B1", theme: "Simulation Goethe-Zertifikat B1" },
+      { num: 12, title: "Fit für B1", theme: "Simulation d'examen CEFR B1" },
     ]
   },
   "Aspekte neu B2": {
@@ -66,7 +66,7 @@ const MANUELS = {
       { num: 7, title: "Sprache", theme: "Linguistique et dialectes" },
       { num: 8, title: "Umwelt", theme: "Crise climatique" },
       { num: 9, title: "Gesundheit", theme: "Système de santé avancé" },
-      { num: 10, title: "Fit für B2", theme: "Simulation Goethe B2" },
+      { num: 10, title: "Fit für B2", theme: "Simulation d'examen CEFR B2" },
     ]
   },
   "Aspekte neu C1": {
@@ -81,13 +81,13 @@ const MANUELS = {
       { num: 7, title: "Wissenschaft und Ethik", theme: "Éthique scientifique et IA" },
       { num: 8, title: "Medien und Gesellschaft", theme: "Médias et démocratie" },
       { num: 9, title: "Deutsch als Weltsprache", theme: "Allemand dans le monde" },
-      { num: 10, title: "Fit für C1", theme: "Simulation Goethe C1" },
+      { num: 10, title: "Fit für C1", theme: "Simulation d'examen CEFR C1" },
     ]
   }
 };
 
 const PROGRESS_MESSAGES = [
-  "🔍 Analyse du programme Goethe...",
+  "🔍 Analyse du programme CEFR...",
   "📚 Génération du vocabulaire...",
   "✍️ Création des exercices Lesen...",
   "🎧 Préparation des dialogues Hören...",
@@ -368,7 +368,7 @@ export default function AdminGenerateCourse() {
             <Sparkles className="text-emerald-400" /> Yema — Générateur de Cours IA
           </h1>
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>
-            Programme officiel Goethe-Institut
+            Programme aligné CEFR A1–C1
           </p>
         </div>
 

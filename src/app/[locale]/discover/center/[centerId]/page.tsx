@@ -19,23 +19,23 @@ interface ClassData {
 
 const CENTERS: Record<string, CenterData> = {
   ctr1: { id: "ctr1", name: "Institut Lingua Plus", city: "Yaoundé", region: "Centre", avatar: "LP", verified: true, plan: "pro", teachers: 8, students: 245, classes: 12, languages: ["", "🇬🇧", "🇪🇸"], code: "CENTRE-LINGUA", successRate: 87, yearsActive: 6 },
-  ctr2: { id: "ctr2", name: "Goethe Center CM", city: "Douala", region: "Littoral", avatar: "GC", verified: true, plan: "enterprise", teachers: 12, students: 380, classes: 18, languages: ["", "🇬🇧"], code: "CENTRE-GOETHE", successRate: 92, yearsActive: 9 },
+  ctr2: { id: "ctr2", name: "Deutsch Pro CM", city: "Douala", region: "Littoral", avatar: "DP", verified: true, plan: "enterprise", teachers: 12, students: 380, classes: 18, languages: ["", "🇬🇧"], code: "CENTRE-DPRO", successRate: 92, yearsActive: 9 },
   ctr3: { id: "ctr3", name: "LangSchool Bafoussam", city: "Bafoussam", region: "Ouest", avatar: "LS", verified: false, plan: "starter", teachers: 4, students: 89, classes: 6, languages: ["", "🇫🇷"], code: "CENTRE-LANG01", successRate: 74, yearsActive: 3 },
   ctr4: { id: "ctr4", name: "DeutschAkademie Garoua", city: "Garoua", region: "Nord", avatar: "DA", verified: false, plan: "starter", teachers: 3, students: 45, classes: 4, languages: [""], code: "CENTRE-DEUT04", successRate: 68, yearsActive: 2 },
 };
 
 const CENTER_CLASSES: Record<string, ClassData[]> = {
   ctr1: [
-    { id: "cls1", teacherName: "Prof. Marie Tchamba", teacherAvatar: "MT", level: "A1", schedule: "Lun/Mer 18h–20h", students: 12, max: 20, description: "Cours pour grands débutants — accent sur l'oral et la phonétique. Méthode Netzwerk A1.", tags: ["Débutant", "Oral", "Goethe"], code: "DEUTSCH-A1-2024", rating: 4.9 },
-    { id: "cls4", teacherName: "Prof. Samuel Foto", teacherAvatar: "SF", level: "B2", schedule: "Mer/Sam 9h–11h", students: 5, max: 10, description: "B2 avancé — préparation TestDaF et études en Allemagne.", tags: ["B2", "TestDaF", "Académique"], code: "GOETHE-B2-SAM1", rating: 5.0 },
-    { id: "cls8", teacherName: "Prof. Robert Essama", teacherAvatar: "RE", level: "B1", schedule: "Lun/Jeu 17h–19h", students: 7, max: 10, description: "Prépa TestDaF B1 — lecture, écriture, écoute. Taux de réussite 89%.", tags: ["B1", "TestDaF", "Goethe"], code: "ESSA-B1-TDF8", rating: 4.8 },
+    { id: "cls1", teacherName: "Prof. Marie Tchamba", teacherAvatar: "MT", level: "A1", schedule: "Lun/Mer 18h–20h", students: 12, max: 20, description: "Cours pour grands débutants — accent sur l'oral et la phonétique. Méthode Netzwerk A1.", tags: ["Débutant", "Oral", "CEFR A1"], code: "DEUTSCH-A1-2024", rating: 4.9 },
+    { id: "cls4", teacherName: "Prof. Samuel Foto", teacherAvatar: "SF", level: "B2", schedule: "Mer/Sam 9h–11h", students: 5, max: 10, description: "B2 avancé — préparation TestDaF et études en Allemagne.", tags: ["B2", "TestDaF", "Académique"], code: "FOTO-B2-SAM1", rating: 5.0 },
+    { id: "cls8", teacherName: "Prof. Robert Essama", teacherAvatar: "RE", level: "B1", schedule: "Lun/Jeu 17h–19h", students: 7, max: 10, description: "Prépa TestDaF B1 — lecture, écriture, écoute. Taux de réussite 89%.", tags: ["B1", "TestDaF", "CEFR B1"], code: "ESSA-B1-TDF8", rating: 4.8 },
   ],
   ctr2: [
-    { id: "cls2", teacherName: "Prof. Jean Mbarga", teacherAvatar: "JB", level: "A2", schedule: "Mar/Jeu 14h–16h", students: 8, max: 15, description: "Préparation Goethe A2 avec focus sur la compréhension orale et écrite.", tags: ["A2", "TELC", "Prépa"], code: "LINGUA-A2-0512", rating: 4.7 },
+    { id: "cls2", teacherName: "Prof. Jean Mbarga", teacherAvatar: "JB", level: "A2", schedule: "Mar/Jeu 14h–16h", students: 8, max: 15, description: "Préparation CEFR A2 avec focus sur la compréhension orale et écrite. Examen TELC préparé.", tags: ["A2", "TELC", "Prépa"], code: "LINGUA-A2-0512", rating: 4.7 },
     { id: "cls6", teacherName: "Prof. David Kamga", teacherAvatar: "DK", level: "C1", schedule: "Sam/Dim 10h–12h", students: 6, max: 8, description: "Conversation niveau C1 — débats, actualités, culture allemande. 100% en ligne.", tags: ["C1", "Conversation", "En ligne"], code: "KAMG-C1-CONV", rating: 4.9 },
   ],
   ctr3: [
-    { id: "cls3", teacherName: "Prof. Alice Ngo", teacherAvatar: "AN", level: "B1", schedule: "Ven 10h–12h", students: 14, max: 15, description: "Classe B1 intensive — grammaire avancée, expression écrite, simulation d'examens Goethe.", tags: ["B1", "Avancé", "Intensif"], code: "LANG-B1-NGO1", rating: 4.8 },
+    { id: "cls3", teacherName: "Prof. Alice Ngo", teacherAvatar: "AN", level: "B1", schedule: "Ven 10h–12h", students: 14, max: 15, description: "Classe B1 intensive — grammaire avancée, expression écrite, simulation d'examens CEFR.", tags: ["B1", "Avancé", "Intensif"], code: "LANG-B1-NGO1", rating: 4.8 },
   ],
   ctr4: [
     { id: "cls5", teacherName: "Prof. Christine Bello", teacherAvatar: "CB", level: "A1", schedule: "Lun/Mer/Ven 16h–17h", students: 10, max: 12, description: "Allemand pour enfants (8–12 ans) — jeux, chansons, histoire. Pédagogie ludique.", tags: ["Enfants", "Ludique", "A1"], code: "BELL-A1-KID5", rating: 4.6 },
@@ -112,7 +112,7 @@ export default function CenterDetailPage() {
             <div style={{ textAlign: "right" }}>
               <div style={{ background: "rgba(16,185,129,0.15)", color: "#10b981", borderRadius: 10, padding: "8px 16px", marginBottom: 8 }}>
                 <div style={{ fontWeight: 800, fontSize: 22 }}>{center.successRate}%</div>
-                <div style={{ fontSize: 11, opacity: 0.7 }}>Réussite Goethe</div>
+                <div style={{ fontSize: 11, opacity: 0.7 }}>Taux de réussite</div>
               </div>
             </div>
           </div>

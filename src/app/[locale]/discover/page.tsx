@@ -237,7 +237,7 @@ function DualSearch({ onJoin }: { onJoin: (id: string, name: string, type: "clas
                     {ctr.verified && <span>✅</span>}
                     <span style={{ background: "rgba(234,179,8,0.12)", color: "#fbbf24", borderRadius: 5, padding: "1px 6px", fontSize: 10, fontWeight: 700 }}>Centre</span>
                   </div>
-                  <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>📍 {ctr.city} · {ctr.classes} classes · {ctr.successRate}% réussite Goethe</div>
+                  <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>📍 {ctr.city} · {ctr.classes} classes · {ctr.successRate}% taux de réussite</div>
                 </div>
                 <button onClick={() => { if (!sent) { setCodeSent(s => new Set([...s, ctr.id])); onJoin(ctr.id, ctr.name, "center"); } }} disabled={sent} style={{ padding: "9px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: sent ? "not-allowed" : "pointer", background: sent ? "rgba(234,179,8,0.1)" : "linear-gradient(135deg,#eab308,#ca8a04)", border: sent ? "1px solid rgba(234,179,8,0.3)" : "none", color: sent ? "#fbbf24" : "white", whiteSpace: "nowrap" as const }}>
                   {sent ? "✓ Envoyé" : "📩 Rejoindre"}
@@ -611,7 +611,7 @@ function CenterCard({ center, onJoin, faved, onFav, sent }: { center: CenterItem
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", gap: 4 }}>{center.languages.map(l => <span key={l} style={{ fontSize: 18 }}>{l}</span>)}</div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>Réussite Goethe</div>
+          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>Taux de réussite</div>
           <div style={{ background: "rgba(16,185,129,0.15)", color: "#10b981", borderRadius: 6, padding: "2px 8px", fontSize: 12, fontWeight: 700 }}>{center.successRate}%</div>
         </div>
       </div>

@@ -10,7 +10,7 @@ const GOALS = [
   { value: "Tourisme",   icon: "✈️",  label: "Tourisme",   desc: "Voyager en Allemagne ou en Autriche" },
   { value: "Travail",    icon: "💼",  label: "Travail",    desc: "Opportunités professionnelles" },
   { value: "Études",     icon: "🎓",  label: "Études",     desc: "Étudier dans un pays germanophone" },
-  { value: "Goethe",     icon: "📜",  label: "Certificat Goethe", desc: "Passer l'examen officiel" },
+  { value: "Goethe",     icon: "📜",  label: "Certification de langue", desc: "Préparer un examen officiel (Goethe, TELC, TestDaF...)" },
   { value: "Famille",    icon: "👨‍👩‍👧", label: "Famille",   desc: "Regroupement familial" },
   { value: "Personnel",  icon: "🌱",  label: "Personnel",  desc: "Épanouissement et culture" },
 ];

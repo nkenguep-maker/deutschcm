@@ -17,7 +17,7 @@ const LEVEL_MESSAGES: Record<string, string> = {
   A2: "Vous maîtrisez les bases. Vous pouvez vous présenter et comprendre des phrases simples. Place maintenant aux conjugaisons, aux articles et au vocabulaire quotidien.",
   B1: "Bon niveau intermédiaire ! Vous pouvez gérer la plupart des situations courantes. Concentrez-vous sur le Perfekt, le Konjunktiv et l'enrichissement du vocabulaire.",
   B2: "Excellent niveau ! Vous communiquez avec aisance. Travaillez la grammaire avancée et les nuances culturelles pour viser le C1.",
-  C1: "Niveau avancé. Vous maîtrisez l'allemand dans des contextes complexes. Préparez-vous au Goethe C1 ou visez la maîtrise complète.",
+  C1: "Niveau avancé. Vous maîtrisez l'allemand dans des contextes complexes. Préparez un examen CEFR C1 (Goethe-Zertifikat, TELC) ou visez la maîtrise complète.",
 };
 const LEVELS = ["A1", "A2", "B1", "B2", "C1"];
 
