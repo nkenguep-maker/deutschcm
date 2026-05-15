@@ -1,11 +1,13 @@
 "use client"
 import { useState, useEffect } from "react"
-import { useRouter } from "@/navigation"
+import { useRouter } from "next/navigation"
+import { useLocale } from "next-intl"
 import { useT } from "@/hooks/useT"
 import LanguageSwitcher from "@/components/LanguageSwitcher"
 
 export default function LandingPage() {
   const router = useRouter()
+  const locale = useLocale()
   const { landing: t, nav: tNav } = useT()
   const [scrolled, setScrolled] = useState(false)
   const [faqOpen, setFaqOpen] = useState<number | null>(null)
@@ -116,11 +118,11 @@ export default function LandingPage() {
         )}
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <LanguageSwitcher style={{ marginRight: 4 }} />
-          <button onClick={() => router.push("/login")}
+          <button onClick={() => router.push(`/${locale}/login`)}
             style={{ padding: isMobile ? "8px 14px" : "9px 20px", borderRadius: 10, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)", fontSize: 12, cursor: "pointer" }}>
             {tNav.login}
           </button>
-          <button onClick={() => router.push("/register")}
+          <button onClick={() => router.push(`/${locale}/register`)}
             style={{ padding: isMobile ? "8px 14px" : "9px 20px", borderRadius: 10, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
             {isMobile ? t.getStarted : tNav.register}
           </button>
@@ -152,11 +154,11 @@ export default function LandingPage() {
 
           {/* CTAs */}
           <div className="fade-up" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 48, flexWrap: "wrap" }}>
-            <button onClick={() => router.push("/register")}
+            <button onClick={() => router.push(`/${locale}/register`)}
               style={{ padding: "16px 32px", borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 8px 32px rgba(16,185,129,0.3)", display: "flex", alignItems: "center", gap: 8 }}>
               {t.ctaPrimary}
             </button>
-            <button onClick={() => router.push("/simulateur")}
+            <button onClick={() => router.push(`/${locale}/simulateur`)}
               style={{ padding: "16px 32px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "white", fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
               {t.ctaSecondary}
             </button>
@@ -255,7 +257,7 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
-            <button onClick={() => router.push("/simulateur")}
+            <button onClick={() => router.push(`/${locale}/simulateur`)}
               style={{ padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
               {t.simCta}
             </button>
@@ -347,7 +349,7 @@ export default function LandingPage() {
               </div>
             ))}
             <div style={{ display: "flex", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
-              <button onClick={() => router.push("/register")}
+              <button onClick={() => router.push(`/${locale}/register`)}
                 style={{ padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
                 {t.centerCta}
               </button>
@@ -413,7 +415,7 @@ export default function LandingPage() {
           <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, marginBottom: 32 }}>
             {t.ctaFinalDesc}
           </p>
-          <button onClick={() => router.push("/register")}
+          <button onClick={() => router.push(`/${locale}/register`)}
             style={{ padding: "18px 48px", borderRadius: 16, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 12px 40px rgba(16,185,129,0.35)" }}>
             {t.ctaFinalBtn}
           </button>
