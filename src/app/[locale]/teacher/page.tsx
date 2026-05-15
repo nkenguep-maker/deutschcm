@@ -155,7 +155,7 @@ function StatCard({ icon, label, value, sub, color = "#10b981" }: { icon: string
 
 // ─── Classroom card ───────────────────────────────────────────────────────────
 
-function ClassroomCard({ cls, tT }: { cls: RealClassroom; tT: ReturnType<typeof useT>["teacher"] }) {
+function ClassroomCard({ cls, tT, tCommon }: { cls: RealClassroom; tT: ReturnType<typeof useT>["teacher"]; tCommon: ReturnType<typeof useT>["common"] }) {
   const levelColors: Record<string, string> = { A1: "#10b981", A2: "#14b8a6", B1: "#3b82f6", B2: "#8b5cf6", C1: "#f97316" };
   const c = levelColors[cls.level] ?? "#10b981";
 
@@ -206,7 +206,7 @@ function DifficultyRow({ s, tT }: { s: RealStudent; tT: ReturnType<typeof useT>[
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ margin: 0, color: "rgba(255,255,255,0.85)", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.8rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.name}</p>
         <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", fontFamily: "'DM Mono', monospace" }}>
-          {tT("studentMeta", { score: s.avgScore, progress: s.progress, lastActive: s.lastActive })}
+          {`${s.avgScore}/10 · ${s.progress}% · ${s.lastActive}`}
         </p>
       </div>
       <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
@@ -303,7 +303,7 @@ export default function TeacherDashboard() {
           }}>
             <div>
               <h1 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1.05rem" }}>
-                {tT("greeting", { name: teacherName.split(" ")[0] })}
+                {tT.greeting.replace("{name}", teacherName.split(" ")[0])}
               </h1>
               <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.7rem", textTransform: "capitalize" }}>{today}</p>
             </div>
@@ -395,7 +395,7 @@ export default function TeacherDashboard() {
                         {tT.createFirstClass}
                       </Link>
                     </div>
-                  ) : classrooms.map((cls) => <ClassroomCard key={cls.id} cls={cls} tT={tT} />)}
+                  ) : classrooms.map((cls) => <ClassroomCard key={cls.id} cls={cls} tT={tT} tCommon={tCommon} />)}
                 </div>
               </div>
 
