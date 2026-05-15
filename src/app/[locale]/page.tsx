@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/navigation"
 import { useT } from "@/hooks/useT"
 import LanguageSwitcher from "@/components/LanguageSwitcher"
 
