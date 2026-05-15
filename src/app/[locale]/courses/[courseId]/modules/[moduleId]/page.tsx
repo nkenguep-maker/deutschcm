@@ -5,6 +5,7 @@ import dynamic from "next/dynamic"
 import AudioPlayer from "@/components/AudioPlayer"
 import VoiceRecorder from "@/components/VoiceRecorder"
 import SchreibenEditor from "@/components/SchreibenEditor"
+import { A1_BETA_MODULES, COURSE_TO_MODULE_IDS, COURSE_LABELS } from "@/data/a1-beta-modules"
 
 const AdaptiveQuiz = dynamic(() => import("@/components/AdaptiveQuiz"), { ssr: false })
 const DialogPlayer = dynamic(() => import("@/components/DialogPlayer"), { ssr: false })
@@ -165,6 +166,12 @@ const DEMO_MODULES: Record<string, Module> = {
   }
 }
 
+// ─── Merge demo + beta modules ───────────────────────────
+const ALL_MODULES: Record<string, Module> = {
+  ...DEMO_MODULES,
+  ...A1_BETA_MODULES as unknown as Record<string, Module>,
+}
+
 // ─── Composant principal ─────────────────────────────────
 export default function ModulePage() {
   const params = useParams<{ courseId: string; moduleId: string }>()
@@ -175,7 +182,7 @@ export default function ModulePage() {
   const [xpEarned, setXpEarned] = useState(0)
 
   useEffect(() => {
-    const mod = DEMO_MODULES[params.moduleId] || DEMO_MODULES["lektion-1-lesen"]
+    const mod = ALL_MODULES[params.moduleId] || ALL_MODULES["lektion-1-lesen"]
     setModule(mod)
   }, [params.moduleId])
 
@@ -213,10 +220,15 @@ export default function ModulePage() {
           </a>
 
           <p style={{ fontSize:9, color:"rgba(255,255,255,0.3)", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:12 }}>
-            Lektion 1 — Guten Tag!
+            {COURSE_LABELS[params.courseId] ?? params.courseId}
           </p>
 
-          {Object.values(DEMO_MODULES).map((mod) => {
+          {((): Module[] => {
+            const ids = COURSE_TO_MODULE_IDS[params.courseId]
+            return ids
+              ? ids.map(id => ALL_MODULES[id]).filter(Boolean) as Module[]
+              : Object.values(ALL_MODULES)
+          })().map((mod) => {
             const icons: Record<ModuleType, string> = {
               LESSON:"📖", HOEREN:"🎧", CONVERSATION:"🎙️",
               SCHREIBEN:"✍️", QUIZ:"🎯", VIDEO:"🎬"

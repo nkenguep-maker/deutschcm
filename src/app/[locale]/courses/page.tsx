@@ -25,16 +25,22 @@ interface Course {
 // ─── Level config ─────────────────────────────────────────────────────────────
 
 const LEVEL_CONFIG: Record<Level, { color: string; bg: string; border: string; glow: string; manuel: string; certif: string }> = {
-  A1: { color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.2)", glow: "rgba(16,185,129,0.06)", manuel: "Netzwerk neu A1", certif: "CEFR A1 — exam preparation" },
-  A2: { color: "#14b8a6", bg: "rgba(20,184,166,0.08)", border: "rgba(20,184,166,0.2)", glow: "rgba(20,184,166,0.06)", manuel: "Netzwerk neu A2", certif: "CEFR A2 — exam preparation" },
-  B1: { color: "#3b82f6", bg: "rgba(59,130,246,0.08)", border: "rgba(59,130,246,0.2)", glow: "rgba(59,130,246,0.06)", manuel: "Netzwerk neu B1", certif: "CEFR B1 — exam preparation" },
-  B2: { color: "#8b5cf6", bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.2)", glow: "rgba(139,92,246,0.06)", manuel: "Aspekte neu B2",   certif: "CEFR B2 — exam preparation" },
-  C1: { color: "#f97316", bg: "rgba(249,115,22,0.08)", border: "rgba(249,115,22,0.2)", glow: "rgba(249,115,22,0.06)", manuel: "Aspekte neu C1",   certif: "CEFR C1 — exam preparation" },
+  A1: { color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.2)", glow: "rgba(16,185,129,0.06)", manuel: "Yema A1 — CEFR aligné", certif: "CEFR-aligned German practice" },
+  A2: { color: "#14b8a6", bg: "rgba(20,184,166,0.08)", border: "rgba(20,184,166,0.2)", glow: "rgba(20,184,166,0.06)", manuel: "Yema A2 — CEFR aligné", certif: "CEFR-aligned German practice" },
+  B1: { color: "#3b82f6", bg: "rgba(59,130,246,0.08)", border: "rgba(59,130,246,0.2)", glow: "rgba(59,130,246,0.06)", manuel: "Yema B1 — CEFR aligné", certif: "CEFR-aligned German practice" },
+  B2: { color: "#8b5cf6", bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.2)", glow: "rgba(139,92,246,0.06)", manuel: "Yema B2 — CEFR aligné", certif: "CEFR-aligned German practice" },
+  C1: { color: "#f97316", bg: "rgba(249,115,22,0.08)", border: "rgba(249,115,22,0.2)", glow: "rgba(249,115,22,0.06)", manuel: "Yema C1 — CEFR aligné", certif: "CEFR-aligned German practice" },
 };
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const COURSES: Course[] = [
+  // ── A1 Beta Track — Yema Original Content ──────────────────────────────────
+  { id: "a1-beta-1", titleDE: "Willkommen!",        titleFR: "Begrüßungen & Vorstellungen", icon: "👋", level: "A1", lektionen: "Beta · Leçon 1", modules: 5, progress: 0, locked: false, firstModuleId: "a1-beta-1-lesen" },
+  { id: "a1-beta-2", titleDE: "Meine Familie",       titleFR: "Famille & Informations",     icon: "👨‍👩‍👧", level: "A1", lektionen: "Beta · Leçon 2", modules: 5, progress: 0, locked: false, firstModuleId: "a1-beta-2-lesen" },
+  { id: "a1-beta-3", titleDE: "Mein Alltag",         titleFR: "Quotidien & Chiffres",       icon: "🕐", level: "A1", lektionen: "Beta · Leçon 3", modules: 5, progress: 0, locked: false, firstModuleId: "a1-beta-3-lesen" },
+  { id: "a1-beta-4", titleDE: "Einkaufen & Essen",   titleFR: "Shopping & Cuisine",         icon: "🛒", level: "A1", lektionen: "Beta · Leçon 4", modules: 5, progress: 0, locked: false, firstModuleId: "a1-beta-4-lesen" },
+  { id: "a1-beta-5", titleDE: "Deutschland-Reise",   titleFR: "Voyage & Botschaft",         icon: "✈️", level: "A1", lektionen: "Beta · Leçon 5", modules: 5, progress: 0, locked: false, firstModuleId: "a1-beta-5-lesen" },
   // A1
   { id: "a1-1", titleDE: "Guten Tag!",                  titleFR: "Salutations",           icon: "👋",  level: "A1", lektionen: "Lektion 1-2",  modules: 4, progress: 100, locked: false },
   { id: "a1-2", titleDE: "Familie und Freunde",          titleFR: "Famille et amis",       icon: "👨‍👩‍👧",  level: "A1", lektionen: "Lektion 3-4",  modules: 4, progress: 75,  locked: false },
@@ -302,7 +308,7 @@ export default function CoursesPage() {
               Mes cours
             </h2>
             <p style={{ margin: "6px 0 0", color: "rgba(255,255,255,0.35)", fontSize: "0.78rem" }}>
-              {done}/{totalUnlocked} cours complétés · A1 → C1 · Netzwerk neu + Aspekte neu
+              {done}/{totalUnlocked} cours complétés · A1 → C1 · Contenu original CEFR aligné
             </p>
           </div>
 
@@ -366,6 +372,14 @@ export default function CoursesPage() {
           <LevelSection key={level} level={level} courses={filtered.filter(c => c.level === level)} isMobile={isMobile} />
         ))
       )}
+
+      {/* ── Legal disclaimer ── */}
+      <div style={{ marginTop: 48, padding: "14px 20px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", textAlign: "center" }}>
+        <p style={{ color: "rgba(255,255,255,0.22)", fontSize: "0.65rem", margin: 0, lineHeight: 1.6 }}>
+          Yema Languages provides independent CEFR-aligned language practice and is not affiliated with any official examination institute. ·
+          Yema Languages propose une pratique linguistique indépendante alignée sur le CECRL et n&apos;est affiliée à aucun organisme officiel d&apos;examen.
+        </p>
+      </div>
     </Layout>
   );
 }
