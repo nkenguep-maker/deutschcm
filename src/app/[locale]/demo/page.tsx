@@ -85,16 +85,40 @@ const DEMO_ACTIVITY = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+const DEMO_WRITING = {
+  task: "Vorstellung: Schreiben Sie 3–5 Sätze über sich selbst.",
+  original: "Hallo! Ich heiße Amara. Ich ist aus Kamerun und ich haben 24 Jahre. Ich studiere Informatik. Ich sprechen ein bisschen Deutsch.",
+  corrected: "Hallo! Ich heiße Amara. Ich bin aus Kamerun und ich bin 24 Jahre alt. Ich studiere Informatik. Ich spreche ein bisschen Deutsch.",
+  score: 74,
+  errors: [
+    { orig: "ich ist aus", fix: "ich bin aus", type: "grammaire", sev: "majeur" },
+    { orig: "ich haben 24", fix: "ich bin 24 Jahre alt", type: "grammaire", sev: "majeur" },
+    { orig: "Ich sprechen", fix: "Ich spreche", type: "grammaire", sev: "mineur" },
+  ],
+  feedback_fr: "Très bonne structure de base ! Travaillez la conjugaison de sein (ich bin) et sprechen (ich spreche).",
+  feedback_en: "Great basic structure! Work on the conjugation of sein (ich bin) and sprechen (ich spreche).",
+}
+
+const DEMO_ONBOARDING_STEPS = [
+  { icon: "🌍", label: "Langue d'interface", labelEN: "Interface language", value: "Français", done: true },
+  { icon: "🎯", label: "Objectif", labelEN: "Goal", value: "Visa étudiant Allemagne", done: true },
+  { icon: "📊", label: "Test de niveau", labelEN: "Level test", value: "A1 détecté — 7/10", done: true },
+  { icon: "👤", label: "Profil créé", labelEN: "Profile created", value: "Amara Diallo · Douala", done: true },
+  { icon: "📖", label: "Première leçon", labelEN: "First lesson", value: "Willkommen! terminé — 92%", done: true },
+]
+
 const scoreColor = (s: number) => s >= 80 ? "#10b981" : s >= 65 ? "#f59e0b" : "#ef4444"
 const scoreBg    = (s: number) => s >= 80 ? "rgba(16,185,129,0.12)" : s >= 65 ? "rgba(245,158,11,0.12)" : "rgba(239,68,68,0.12)"
 
-type Tab = "dashboard" | "simulator" | "pronunciation" | "courses" | "progress"
+type Tab = "onboarding" | "dashboard" | "simulator" | "pronunciation" | "writing" | "courses" | "progress"
 const TABS: { id: Tab; label: string; labelEN: string; icon: string }[] = [
-  { id: "dashboard",    label: "Tableau de bord", labelEN: "Dashboard",    icon: "🏠" },
-  { id: "simulator",   label: "Simulateur IA",   labelEN: "AI Simulator", icon: "🧑‍💼" },
-  { id: "pronunciation",label: "Prononciation",   labelEN: "Speaking",     icon: "🎙️" },
-  { id: "courses",     label: "Cours",           labelEN: "Courses",      icon: "📖" },
-  { id: "progress",    label: "Progression",     labelEN: "Progress",     icon: "📊" },
+  { id: "onboarding",   label: "Démarrage",       labelEN: "Onboarding",   icon: "🚀" },
+  { id: "dashboard",    label: "Tableau de bord",  labelEN: "Dashboard",    icon: "🏠" },
+  { id: "simulator",    label: "Simulateur IA",    labelEN: "AI Simulator", icon: "🧑‍💼" },
+  { id: "pronunciation",label: "Prononciation",    labelEN: "Speaking",     icon: "🎙️" },
+  { id: "writing",      label: "Écriture IA",      labelEN: "AI Writing",   icon: "✍️" },
+  { id: "courses",      label: "Cours",            labelEN: "Courses",      icon: "📖" },
+  { id: "progress",     label: "Progression",      labelEN: "Progress",     icon: "📊" },
 ]
 
 // ── Demo badge ────────────────────────────────────────────────────────────────
@@ -495,10 +519,170 @@ function ProgressScreen({ isMobile }: { isMobile: boolean }) {
   )
 }
 
+function OnboardingScreen({ lang }: { lang: "fr" | "en" }) {
+  const [revealed, setRevealed] = useState(false)
+  useEffect(() => { const t = setTimeout(() => setRevealed(true), 400); return () => clearTimeout(t) }, [])
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <p style={{ margin: 0, color: "rgba(255,255,255,0.5)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          {lang === "fr" ? "Configuration de votre profil" : "Setting up your profile"}
+        </p>
+        <DemoBadge />
+      </div>
+
+      {/* Steps */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {DEMO_ONBOARDING_STEPS.map((step, i) => (
+          <div key={i} style={{ padding: "13px 16px", borderRadius: 14, background: revealed ? "rgba(16,185,129,0.05)" : "rgba(255,255,255,0.03)", border: `1px solid ${revealed ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.07)"}`, display: "flex", alignItems: "center", gap: 14, transition: "all 0.4s ease", transitionDelay: `${i * 80}ms` }}>
+            <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>{step.icon}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.07em" }}>{lang === "fr" ? step.label : step.labelEN}</p>
+              <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.85)", fontSize: "0.8rem", fontWeight: 600 }}>{step.value}</p>
+            </div>
+            <div style={{ width: 24, height: 24, borderRadius: "50%", background: revealed ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${revealed ? "#10b981" : "rgba(255,255,255,0.1)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem", flexShrink: 0, transition: "all 0.4s ease", transitionDelay: `${i * 80}ms` }}>
+              {revealed ? "✓" : ""}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Celebration card */}
+      <div style={{ padding: "22px 20px", borderRadius: 18, background: "linear-gradient(135deg,rgba(16,185,129,0.1),rgba(5,150,105,0.04))", border: "1px solid rgba(16,185,129,0.25)", textAlign: "center", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: -50, left: "50%", transform: "translateX(-50%)", width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle,rgba(16,185,129,0.08),transparent)", pointerEvents: "none" }} />
+        <p style={{ margin: "0 0 8px", fontSize: "2.2rem" }}>🎉</p>
+        <p style={{ margin: "0 0 6px", fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: "1.15rem", color: "white" }}>
+          {lang === "fr" ? "Profil configuré !" : "Profile complete!"}
+        </p>
+        <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.45)", fontSize: "0.78rem", lineHeight: 1.6 }}>
+          {lang === "fr" ? "Niveau A1 confirmé. Votre parcours vers le visa étudiant commence maintenant." : "A1 level confirmed. Your path to the student visa starts now."}
+        </p>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 18px", borderRadius: 99, background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)" }}>
+          <span style={{ color: "#f59e0b", fontSize: "1rem" }}>⚡</span>
+          <span style={{ color: "#f59e0b", fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: "0.9rem" }}>+150 XP</span>
+          <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem" }}>bonus démarrage</span>
+        </div>
+      </div>
+
+      {/* Level badge */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <div style={{ padding: "16px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", textAlign: "center" }}>
+          <p style={{ margin: "0 0 4px", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{lang === "fr" ? "Niveau" : "Level"}</p>
+          <p style={{ margin: 0, color: "#10b981", fontFamily: "'Syne',sans-serif", fontWeight: 900, fontSize: "2rem" }}>A1</p>
+          <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.6rem" }}>CEFR certified</p>
+        </div>
+        <div style={{ padding: "16px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", textAlign: "center" }}>
+          <p style={{ margin: "0 0 4px", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{lang === "fr" ? "Objectif" : "Goal"}</p>
+          <p style={{ margin: 0, fontSize: "1.8rem" }}>✈️</p>
+          <p style={{ margin: 0, color: "rgba(255,255,255,0.5)", fontSize: "0.62rem", lineHeight: 1.4 }}>Visa étudiant<br/>Allemagne</p>
+        </div>
+      </div>
+
+      {/* Next step hint */}
+      <div style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(59,130,246,0.06)", border: "1px solid rgba(59,130,246,0.2)", display: "flex", alignItems: "center", gap: 12 }}>
+        <span style={{ fontSize: "1rem", flexShrink: 0 }}>💡</span>
+        <p style={{ margin: 0, color: "rgba(255,255,255,0.6)", fontSize: "0.75rem", lineHeight: 1.5 }}>
+          {lang === "fr" ? "Prochaine étape : Leçon 2 — Meine Familie (5 modules)" : "Next up: Lesson 2 — Meine Familie (5 modules)"}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function WritingScreen({ lang }: { lang: "fr" | "en" }) {
+  const w = DEMO_WRITING
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <p style={{ margin: 0, color: "rgba(255,255,255,0.5)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          {lang === "fr" ? "Correction écriture IA" : "AI Writing Correction"}
+        </p>
+        <DemoBadge />
+      </div>
+
+      {/* Task */}
+      <div style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(59,130,246,0.05)", border: "1px solid rgba(59,130,246,0.18)" }}>
+        <p style={{ margin: "0 0 3px", color: "rgba(255,255,255,0.35)", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>{lang === "fr" ? "Consigne" : "Task"}</p>
+        <p style={{ margin: 0, color: "rgba(255,255,255,0.75)", fontSize: "0.78rem" }}>{w.task}</p>
+      </div>
+
+      {/* Score ring */}
+      <div style={{ padding: "18px 20px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={{ width: 68, height: 68, borderRadius: "50%", background: `conic-gradient(${scoreColor(w.score)} ${w.score * 3.6}deg, rgba(255,255,255,0.06) 0deg)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, position: "relative" }}>
+          <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#0d1117", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+            <p style={{ margin: 0, color: scoreColor(w.score), fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: "1.2rem" }}>{w.score}</p>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.5rem" }}>/100</p>
+          </div>
+        </div>
+        <div style={{ flex: 1 }}>
+          <p style={{ margin: "0 0 8px", color: "rgba(255,255,255,0.7)", fontSize: "0.8rem", fontWeight: 600 }}>
+            {lang === "fr" ? "Score global" : "Overall score"}
+          </p>
+          {[
+            { l: lang === "fr" ? "Contenu" : "Content", v: 18, max: 25, c: "#10b981" },
+            { l: lang === "fr" ? "Grammaire" : "Grammar", v: 14, max: 25, c: "#f59e0b" },
+            { l: lang === "fr" ? "Vocabulaire" : "Vocabulary", v: 22, max: 25, c: "#10b981" },
+            { l: lang === "fr" ? "Format" : "Format", v: 20, max: 25, c: "#10b981" },
+          ].map((s, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <span style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.6rem", width: 60, flexShrink: 0 }}>{s.l}</span>
+              <div style={{ flex: 1, height: 4, borderRadius: 99, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${(s.v / s.max) * 100}%`, background: s.c, borderRadius: 99 }} />
+              </div>
+              <span style={{ color: s.c, fontSize: "0.6rem", fontWeight: 700, width: 28, flexShrink: 0, textAlign: "right" }}>{s.v}/{s.max}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Original vs corrected */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ padding: "13px 16px", borderRadius: 12, background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.18)" }}>
+          <p style={{ margin: "0 0 5px", color: "#ef4444", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>{lang === "fr" ? "Votre texte" : "Your text"}</p>
+          <p style={{ margin: 0, color: "rgba(255,255,255,0.7)", fontSize: "0.76rem", lineHeight: 1.7 }}>
+            Hallo! Ich heiße Amara. <span style={{ background: "rgba(239,68,68,0.2)", color: "#fca5a5", borderRadius: 3, padding: "0 2px", textDecoration: "line-through" }}>Ich ist</span> aus Kamerun und <span style={{ background: "rgba(239,68,68,0.2)", color: "#fca5a5", borderRadius: 3, padding: "0 2px", textDecoration: "line-through" }}>ich haben</span> 24 Jahre. Ich studiere Informatik. <span style={{ background: "rgba(239,68,68,0.2)", color: "#fca5a5", borderRadius: 3, padding: "0 2px", textDecoration: "line-through" }}>Ich sprechen</span> ein bisschen Deutsch.
+          </p>
+        </div>
+        <div style={{ padding: "13px 16px", borderRadius: 12, background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.2)" }}>
+          <p style={{ margin: "0 0 5px", color: "#10b981", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>{lang === "fr" ? "Texte corrigé" : "Corrected text"}</p>
+          <p style={{ margin: 0, color: "rgba(255,255,255,0.85)", fontSize: "0.76rem", lineHeight: 1.7 }}>
+            Hallo! Ich heiße Amara. <span style={{ background: "rgba(16,185,129,0.2)", color: "#6ee7b7", borderRadius: 3, padding: "0 2px" }}>Ich bin</span> aus Kamerun und <span style={{ background: "rgba(16,185,129,0.2)", color: "#6ee7b7", borderRadius: 3, padding: "0 2px" }}>ich bin 24 Jahre alt</span>. Ich studiere Informatik. <span style={{ background: "rgba(16,185,129,0.2)", color: "#6ee7b7", borderRadius: 3, padding: "0 2px" }}>Ich spreche</span> ein bisschen Deutsch.
+          </p>
+        </div>
+      </div>
+
+      {/* Errors */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+        {w.errors.map((e, i) => (
+          <div key={i} style={{ padding: "10px 14px", borderRadius: 11, background: e.sev === "majeur" ? "rgba(239,68,68,0.05)" : "rgba(245,158,11,0.05)", border: `1px solid ${e.sev === "majeur" ? "rgba(239,68,68,0.2)" : "rgba(245,158,11,0.18)"}`, display: "flex", gap: 10, alignItems: "flex-start" }}>
+            <span style={{ color: e.sev === "majeur" ? "#ef4444" : "#f59e0b", fontSize: "0.65rem", fontWeight: 700, flexShrink: 0, paddingTop: 1 }}>{e.sev === "majeur" ? "●" : "○"}</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+                <span style={{ color: "#fca5a5", fontSize: "0.73rem", textDecoration: "line-through" }}>{e.orig}</span>
+                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.65rem" }}>→</span>
+                <span style={{ color: "#6ee7b7", fontSize: "0.73rem", fontWeight: 600 }}>{e.fix}</span>
+              </div>
+              <span style={{ fontSize: "0.6rem", padding: "1px 7px", borderRadius: 5, background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.3)" }}>{e.type}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Feedback */}
+      <div style={{ padding: "13px 16px", borderRadius: 12, background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.18)" }}>
+        <p style={{ margin: "0 0 4px", color: "#10b981", fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>Feedback IA</p>
+        <p style={{ margin: 0, color: "rgba(255,255,255,0.7)", fontSize: "0.76rem", lineHeight: 1.6 }}>{lang === "fr" ? w.feedback_fr : w.feedback_en}</p>
+      </div>
+    </div>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function DemoPage() {
-  const [tab, setTab] = useState<Tab>("dashboard")
+  const [tab, setTab] = useState<Tab>("onboarding")
   const [isMobile, setIsMobile] = useState(false)
   const [lang, setLang] = useState<"fr" | "en">("fr")
 
@@ -573,25 +757,33 @@ export default function DemoPage() {
       <div style={{ padding: isMobile ? "20px 12px 40px" : "28px 32px 60px", maxWidth: 680, margin: "0 auto" }}>
         {isMobile ? (
           <div className="screen" key={tab}>
+            {tab === "onboarding"   && <OnboardingScreen lang={lang} />}
             {tab === "dashboard"    && <DashboardScreen isMobile={true} />}
             {tab === "simulator"    && <SimulatorScreen />}
             {tab === "pronunciation"&& <PronunciationScreen />}
+            {tab === "writing"      && <WritingScreen lang={lang} />}
             {tab === "courses"      && <CoursesScreen isMobile={true} />}
             {tab === "progress"     && <ProgressScreen isMobile={true} />}
           </div>
         ) : (
           <div style={{ display: "flex", gap: 24 }}>
             {/* Phone frame */}
-            <div style={{ width: 320, flexShrink: 0, borderRadius: 40, background: "#0d1117", border: "1.5px solid rgba(255,255,255,0.1)", boxShadow: "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset", overflow: "hidden", position: "relative" }}>
-              {/* Notch */}
-              <div style={{ height: 28, background: "#0d1117", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <div style={{ width: 90, height: 8, borderRadius: 99, background: "rgba(255,255,255,0.08)" }} />
+            <div style={{ width: 320, flexShrink: 0, borderRadius: 40, background: "#0d1117", border: "1.5px solid rgba(255,255,255,0.12)", boxShadow: "0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04) inset, 0 0 60px rgba(16,185,129,0.06)", overflow: "hidden", position: "relative" }}>
+              {/* Status bar */}
+              <div style={{ height: 32, background: "#0d1117", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px" }}>
+                <span style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.6rem", fontWeight: 600 }}>9:41</span>
+                <div style={{ width: 70, height: 9, borderRadius: 99, background: "rgba(255,255,255,0.07)" }} />
+                <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                  <span style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.55rem" }}>●●●</span>
+                </div>
               </div>
-              <div style={{ height: 560, overflowY: "auto", padding: "16px 14px 20px" }}>
+              <div style={{ height: 572, overflowY: "auto", padding: "14px 14px 20px" }}>
                 <div className="screen" key={tab}>
+                  {tab === "onboarding"   && <OnboardingScreen lang={lang} />}
                   {tab === "dashboard"    && <DashboardScreen isMobile={true} />}
                   {tab === "simulator"    && <SimulatorScreen />}
                   {tab === "pronunciation"&& <PronunciationScreen />}
+                  {tab === "writing"      && <WritingScreen lang={lang} />}
                   {tab === "courses"      && <CoursesScreen isMobile={true} />}
                   {tab === "progress"     && <ProgressScreen isMobile={true} />}
                 </div>
@@ -610,9 +802,11 @@ export default function DemoPage() {
                   {lang === "fr" ? activeTab.label : activeTab.labelEN}
                 </h2>
                 <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.82rem", lineHeight: 1.7, marginBottom: 20 }}>
+                  {tab === "onboarding"   && (lang === "fr" ? "En 5 minutes : test de niveau, objectif personnalisé et première leçon. Zéro configuration technique." : "In 5 minutes: level test, personalised goal and first lesson. Zero technical setup.")}
                   {tab === "dashboard"    && (lang === "fr" ? "Suivez vos XP, streak et progression par compétence en temps réel." : "Track your XP, streak and skill progress in real time.")}
                   {tab === "simulator"    && (lang === "fr" ? "Simulez un entretien consulaire avec Herr Bauer, consul allemand IA. Scoring grammaire, vocabulaire et fluidité." : "Simulate a consular interview with Herr Bauer, AI German consul. Grammar, vocabulary and fluency scoring.")}
                   {tab === "pronunciation"&& (lang === "fr" ? "Parlez en allemand et recevez un feedback IA instantané sur votre prononciation, grammaire et vocabulaire." : "Speak German and receive instant AI feedback on pronunciation, grammar and vocabulary.")}
+                  {tab === "writing"      && (lang === "fr" ? "Écrivez en allemand et recevez une correction IA mot par mot — erreurs surlignées en rouge, corrections en vert." : "Write in German and receive word-by-word AI correction — errors highlighted in red, fixes in green.")}
                   {tab === "courses"      && (lang === "fr" ? "5 leçons originales A1 : vocabulaire, lecture, écoute, expression orale et écrite + quiz adaptatif 8 questions." : "5 original A1 lessons: vocabulary, reading, listening, speaking, writing + 8-question adaptive quiz.")}
                   {tab === "progress"     && (lang === "fr" ? "Visualisez votre évolution par compétence CEFR et suivez votre trajectoire vers A2." : "Visualise your CEFR skill evolution and track your path to A2.")}
                 </p>
@@ -620,7 +814,12 @@ export default function DemoPage() {
 
               {/* Feature bullets */}
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {(tab === "dashboard" ? [
+                {(tab === "onboarding" ? [
+                  lang === "fr" ? "🎯 Objectif visa ou études personnalisé" : "🎯 Personalised visa or study goal",
+                  lang === "fr" ? "📊 Test de niveau CEFR en 10 questions" : "📊 10-question CEFR level test",
+                  lang === "fr" ? "⚡ +150 XP bonus de bienvenue" : "⚡ +150 XP welcome bonus",
+                  lang === "fr" ? "🚀 Première leçon débloquée immédiatement" : "🚀 First lesson unlocked immediately",
+                ] : tab === "dashboard" ? [
                   lang === "fr" ? "🔥 Streak quotidien motivant" : "🔥 Daily motivating streak",
                   lang === "fr" ? "⚡ Points XP par activité" : "⚡ XP points per activity",
                   lang === "fr" ? "🏆 Système de badges" : "🏆 Badge achievement system",
@@ -635,6 +834,11 @@ export default function DemoPage() {
                   lang === "fr" ? "✅ Correction grammaire automatique" : "✅ Automatic grammar correction",
                   lang === "fr" ? "💡 Conseils personnalisés EN/FR" : "💡 Personalised EN/FR advice",
                   lang === "fr" ? "🔒 Aucune forme incorrecte retournée" : "🔒 No incorrect German returned",
+                ] : tab === "writing" ? [
+                  lang === "fr" ? "✍️ Correction mot par mot surlignée" : "✍️ Word-by-word highlighted correction",
+                  lang === "fr" ? "🔴 Erreurs en rouge, corrections en vert" : "🔴 Errors in red, fixes in green",
+                  lang === "fr" ? "📊 Score contenu/grammaire/vocab/format" : "📊 Content/grammar/vocab/format score",
+                  lang === "fr" ? "💡 Feedback IA bilingue FR/EN" : "💡 Bilingual FR/EN AI feedback",
                 ] : tab === "courses" ? [
                   lang === "fr" ? "📖 Vocabulaire + lecture originaux" : "📖 Original vocabulary + reading",
                   lang === "fr" ? "🎧 Dialogues audio natifs" : "🎧 Native audio dialogues",
@@ -664,6 +868,15 @@ export default function DemoPage() {
                 </p>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Mobile: lang toggle */}
+        {isMobile && (
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}>
+            <button onClick={() => setLang(l => l === "fr" ? "en" : "fr")} style={{ padding: "6px 20px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)", fontSize: "0.7rem", cursor: "pointer" }}>
+              {lang === "fr" ? "Switch to English" : "Passer en français"}
+            </button>
           </div>
         )}
 
