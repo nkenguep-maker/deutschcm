@@ -4,12 +4,12 @@ import { usePathname } from "next/navigation"
 // ─── Landing page ─────────────────────────────────────────────────────────────
 const landing = {
   fr: {
-    badge: "🇨🇲 Conçu pour le marché camerounais",
+    badge: "Plateforme bêta ouverte · Cameroun",
     title: "Apprenez l'allemand",
     titleAccent: "comme à Berlin",
     subtitle: "La seule plateforme d'apprentissage de l'allemand conçue pour le Cameroun. De A1 à C1 — avec IA conversationnelle, correction vocale en temps réel et préparation aux examens de langue.",
-    ctaPrimary: "🚀 Commencer gratuitement",
-    ctaSecondary: "🏛️ Voir le simulateur",
+    ctaPrimary: "Commencer gratuitement",
+    ctaSecondary: "Voir le simulateur",
     connexion: "Connexion",
     getStarted: "Démarrer",
     navFeatures: "Fonctionnalités",
@@ -60,10 +60,11 @@ const landing = {
     faq4Q: "Puis-je rejoindre la classe d'un enseignant ?", faq4A: "Oui ! Entrez le code de classe de votre enseignant lors de l'inscription ou depuis votre tableau de bord. Votre enseignant validera votre accès.",
     faq5Q: "Y a-t-il une app mobile ?", faq5A: "La plateforme est optimisée pour mobile (iOS et Android) via le navigateur. Une app native est en développement.",
     faq6Q: "Comment devenir centre partenaire ?", faq6A: "Contactez-nous sur WhatsApp. Nous offrons 30 jours gratuits pour tester la solution centre avec votre équipe.",
-    ctaFinalTitle: "Commencez aujourd'hui.", ctaFinalSub: "C'est gratuit.",
+    ctaFinalTitle: "Apprends l'allemand.", ctaFinalSub: "Construis ton avenir.",
     ctaFinalDesc: "Pas de carte bancaire. Pas d'engagement. Accès immédiat au niveau A1 complet.",
-    ctaFinalBtn: "🚀 Créer mon compte gratuitement", ctaFinalSocial: "Déjà +10.000 apprenants au Cameroun et en Afrique",
-    footerMade: "Fait avec ❤️ au Cameroun 🇨🇲", footerLegal: "Mentions légales", footerTerms: "CGU", footerPrivacy: "Confidentialité", footerContact: "Contact",
+    ctaFinalBtn: "Rejoins la bêta", ctaFinalSocial: "Sans carte bancaire · A1 gratuit · CEFR A1→C1",
+    ctaFinalAppLabel: "Bientôt disponible sur", ctaFinalCities: "Disponible au Cameroun et en Afrique centrale",
+    footerMade: "Construit au Cameroun", footerLegal: "Mentions légales", footerTerms: "CGU", footerPrivacy: "Confidentialité", footerContact: "Contact",
   },
   en: {
     badge: "German Learning Platform",
@@ -122,10 +123,11 @@ const landing = {
     faq4Q: "Can I join a teacher's class?", faq4A: "Absolutely. Enter your teacher's class code when you sign up or from your dashboard. Your teacher approves your enrollment.",
     faq5Q: "Is there a mobile app?", faq5A: "The platform works great on mobile (iOS and Android) through your browser. A native app is on the roadmap.",
     faq6Q: "How do I become a partner center?", faq6A: "Reach out on WhatsApp. We offer 30 days free to try the center solution with your team — no commitment.",
-    ctaFinalTitle: "Start today.", ctaFinalSub: "It's free.",
+    ctaFinalTitle: "Learn German.", ctaFinalSub: "Build your future.",
     ctaFinalDesc: "No credit card. No commitment. Full access to A1 — right now.",
-    ctaFinalBtn: "🚀 Get started — it's free", ctaFinalSocial: "A growing community of learners across Cameroon and Africa",
-    footerMade: "Made with ❤️ in Cameroon 🇨🇲", footerLegal: "Legal", footerTerms: "Terms", footerPrivacy: "Privacy", footerContact: "Contact",
+    ctaFinalBtn: "Join the beta", ctaFinalSocial: "No credit card · Free A1 access · CEFR A1→C1",
+    ctaFinalAppLabel: "Coming soon on", ctaFinalCities: "Available across Cameroon and Central Africa",
+    footerMade: "Built in Cameroon", footerLegal: "Legal", footerTerms: "Terms", footerPrivacy: "Privacy", footerContact: "Contact",
   },
 }
 

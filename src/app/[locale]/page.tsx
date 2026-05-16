@@ -53,9 +53,9 @@ export default function LandingPage() {
   ]
 
   const testimonials = [
-    { name: "Paul Nkengue", city: "Yaoundé", level: t.testimonial1Role, text: t.testimonial1Text, avatar: "🇨🇲", stars: 5 },
-    { name: "Prof. Marie Tchamba", city: "Douala", role: t.testimonial2Role, text: t.testimonial2Text, avatar: "👩‍🏫", stars: 5 },
-    { name: "Institut Lingua Plus", city: "Bafoussam", role: t.testimonial3Role, text: t.testimonial3Text, avatar: "🏫", stars: 5 },
+    { name: "Paul Nkengue", city: "Yaoundé", level: t.testimonial1Role, text: t.testimonial1Text, initials: "PN", color: "#10b981", stars: 5 },
+    { name: "Prof. Marie Tchamba", city: "Douala", role: t.testimonial2Role, text: t.testimonial2Text, initials: "MT", color: "#3b82f6", stars: 5 },
+    { name: "Institut Lingua Plus", city: "Bafoussam", role: t.testimonial3Role, text: t.testimonial3Text, initials: "IL", color: "#8b5cf6", stars: 5 },
   ]
 
   const faqs = [
@@ -98,7 +98,9 @@ export default function LandingPage() {
         transition: "all 0.3s"
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 24 }}></span>
+          <div style={{ width: 32, height: 32, borderRadius: 9, background: "linear-gradient(135deg,rgba(16,185,129,0.2),rgba(5,150,105,0.08))", border: "1px solid rgba(16,185,129,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 900, fontSize: 13, color: "#10b981" }}>Y</span>
+          </div>
           <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800 }}>
             Yema
           </span>
@@ -313,7 +315,9 @@ export default function LandingPage() {
                 </div>
                 <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, lineHeight: 1.7, marginBottom: 16, fontStyle: "italic" }}>&ldquo;{item.text}&rdquo;</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 28 }}>{item.avatar}</span>
+                  <div style={{ width: 38, height: 38, borderRadius: 12, background: `${item.color}15`, border: `1px solid ${item.color}30`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 12, color: item.color }}>{item.initials}</span>
+                  </div>
                   <div>
                     <p style={{ color: "white", fontSize: 13, fontWeight: 700, margin: "0 0 2px", fontFamily: "'Syne',sans-serif" }}>{item.name}</p>
                     <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, margin: 0 }}>{item.city} · {item.level || item.role}</p>
@@ -403,48 +407,122 @@ export default function LandingPage() {
       </section>
 
       {/* ── FINAL CTA ── */}
-      <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", textAlign: "center" }}>
-        <div style={{ maxWidth: 600, margin: "0 auto" }}>
-          <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, margin: "0 auto 24px", animation: "float 3s ease-in-out infinite" }}>
+      <section style={{ padding: isMobile ? "80px 20px 100px" : "100px 40px 120px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+        {/* Ambient glow */}
+        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 900, height: 500, borderRadius: "50%", background: "radial-gradient(ellipse,rgba(16,185,129,0.07) 0%,transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg,transparent,rgba(16,185,129,0.25),transparent)" }} />
 
+        <div style={{ maxWidth: 640, margin: "0 auto", position: "relative", zIndex: 2 }}>
+          {/* Live badge */}
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 16px", borderRadius: 99, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", marginBottom: 32 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block", animation: "pulse 2s infinite" }} />
+            <span style={{ color: "#10b981", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>Beta · Open Access</span>
           </div>
-          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 28 : 40, fontWeight: 900, marginBottom: 16, lineHeight: 1.1 }}>
+
+          {/* Headline */}
+          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 36 : 56, fontWeight: 900, lineHeight: 1.08, letterSpacing: "-0.02em", marginBottom: 20 }}>
             {t.ctaFinalTitle}<br />
-            <span style={{ color: "#10b981" }}>{t.ctaFinalSub}</span>
+            <span style={{ color: "#10b981", textShadow: "0 0 60px rgba(16,185,129,0.35)" }}>{t.ctaFinalSub}</span>
           </h2>
-          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, marginBottom: 32 }}>
+
+          {/* Sub-description */}
+          <p style={{ color: "rgba(255,255,255,0.42)", fontSize: isMobile ? 14 : 16, lineHeight: 1.7, marginBottom: 40, maxWidth: 480, margin: "0 auto 40px" }}>
             {t.ctaFinalDesc}
           </p>
-          <button onClick={() => router.push(`/${locale}/register`)}
-            style={{ padding: "18px 48px", borderRadius: 16, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 12px 40px rgba(16,185,129,0.35)" }}>
-            {t.ctaFinalBtn}
+
+          {/* Primary CTA */}
+          <button
+            onClick={() => router.push(`/${locale}/register`)}
+            style={{ padding: isMobile ? "16px 36px" : "18px 52px", borderRadius: 16, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: isMobile ? 15 : 17, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 16px 48px rgba(16,185,129,0.32), 0 0 0 1px rgba(16,185,129,0.2) inset", transition: "box-shadow 0.2s, transform 0.15s", letterSpacing: "0.01em" }}
+            onMouseOver={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 20px 60px rgba(16,185,129,0.44), 0 0 0 1px rgba(16,185,129,0.3) inset"; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)" }}
+            onMouseOut={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 16px 48px rgba(16,185,129,0.32), 0 0 0 1px rgba(16,185,129,0.2) inset"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)" }}
+          >
+            {t.ctaFinalBtn} →
           </button>
-          <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, marginTop: 16 }}>
+
+          {/* Social proof pill */}
+          <p style={{ color: "rgba(255,255,255,0.28)", fontSize: 11, marginTop: 16, letterSpacing: "0.04em" }}>
             {t.ctaFinalSocial}
+          </p>
+
+          {/* Divider */}
+          <div style={{ margin: "44px auto", width: 48, height: 1, background: "rgba(255,255,255,0.08)" }} />
+
+          {/* App store section */}
+          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 20, fontWeight: 600 }}>
+            {t.ctaFinalAppLabel}
+          </p>
+
+          <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+            {/* App Store badge — not clickable */}
+            <div style={{ position: "relative", cursor: "default" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 20px", borderRadius: 13, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", minWidth: 160, opacity: 0.6 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" fill="rgba(255,255,255,0.7)" />
+                </svg>
+                <div style={{ textAlign: "left" }}>
+                  <p style={{ margin: 0, color: "rgba(255,255,255,0.35)", fontSize: 9, textTransform: "uppercase", letterSpacing: "0.08em" }}>Coming Soon</p>
+                  <p style={{ margin: 0, color: "rgba(255,255,255,0.7)", fontSize: 13, fontWeight: 700, fontFamily: "'Syne',sans-serif" }}>App Store</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Google Play badge — not clickable */}
+            <div style={{ position: "relative", cursor: "default" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 20px", borderRadius: 13, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", minWidth: 160, opacity: 0.6 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                  <path d="M3.18 23.76c.3.16.64.2.97.1L15.5 12 12 8.5 3.18 23.76z" fill="rgba(255,100,100,0.8)" />
+                  <path d="M21.54 10.27L18.78 8.7 15 12l3.78 3.3 2.76-1.57c.79-.45.79-1.57 0-2.02v-.44z" fill="rgba(255,200,0,0.8)" />
+                  <path d="M3.18.24C2.86.08 2.5.08 2.2.28 1.85.52 1.6.93 1.6 1.4v21.2c0 .47.25.88.6 1.12.3.2.64.2.97.1L15.5 12 3.18.24z" fill="rgba(100,200,100,0.8)" />
+                  <path d="M15.5 12L3.18.24c.3-.16.64-.14.97.1l11.35 6.16L15.5 12z" fill="rgba(100,160,255,0.8)" />
+                </svg>
+                <div style={{ textAlign: "left" }}>
+                  <p style={{ margin: 0, color: "rgba(255,255,255,0.35)", fontSize: 9, textTransform: "uppercase", letterSpacing: "0.08em" }}>Coming Soon</p>
+                  <p style={{ margin: 0, color: "rgba(255,255,255,0.7)", fontSize: 13, fontWeight: 700, fontFamily: "'Syne',sans-serif" }}>Google Play</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* City line */}
+          <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 11, marginTop: 28, letterSpacing: "0.06em" }}>
+            {t.ctaFinalCities}
           </p>
         </div>
       </section>
 
       {/* ── FOOTER ── */}
-      <footer style={{ padding: isMobile ? "32px 16px" : "40px", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", flexWrap: "wrap", gap: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 20 }}></span>
-          <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800 }}>
-            Yema
-          </span>
-          <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, marginLeft: 8 }}>
-            {t.footerMade}
-          </span>
+      <footer style={{ padding: isMobile ? "28px 20px" : "36px 40px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", gap: 20, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800 }}>Yema</span>
+            <span style={{ width: 1, height: 14, background: "rgba(255,255,255,0.12)" }} />
+            <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11 }}>{t.footerMade}</span>
+          </div>
+          <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+            {[t.footerLegal, t.footerTerms, t.footerPrivacy, t.footerContact].map(link => (
+              <a key={link} href="#" style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, transition: "color 0.2s" }}
+                onMouseOver={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.7)"}
+                onMouseOut={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.3)"}>
+                {link}
+              </a>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            {["WhatsApp", "Facebook", "Instagram"].map(s => (
+              <a key={s} href="#" style={{ padding: "5px 12px", borderRadius: 7, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.4)", fontSize: 11, transition: "border-color 0.2s, color 0.2s" }}
+                onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.3)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.7)" }}
+                onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.4)" }}>
+                {s}
+              </a>
+            ))}
+          </div>
         </div>
-        <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-          {[t.footerLegal, t.footerTerms, t.footerPrivacy, t.footerContact].map(link => (
-            <a key={link} href="#" style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{link}</a>
-          ))}
-        </div>
-        <div style={{ display: "flex", gap: 12 }}>
-          {["WhatsApp", "Facebook", "Instagram"].map(s => (
-            <a key={s} href="#" style={{ padding: "6px 12px", borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)", fontSize: 11 }}>{s}</a>
-          ))}
+        <div style={{ maxWidth: 1200, margin: "16px auto 0", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.04)", textAlign: "center" }}>
+          <p style={{ color: "rgba(255,255,255,0.14)", fontSize: 10, lineHeight: 1.6 }}>
+            Yema Languages provides independent CEFR-aligned language practice and is not affiliated with any official examination institute. ·
+            Yema Languages propose une pratique linguistique indépendante alignée sur le CECRL et n&apos;est affiliée à aucun organisme officiel d&apos;examen.
+          </p>
         </div>
       </footer>
     </div>
