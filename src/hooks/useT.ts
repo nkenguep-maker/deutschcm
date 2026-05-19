@@ -90,6 +90,8 @@ const landing = {
     ctaFinalDesc: "Pas de carte bancaire. Pas d'engagement. Accès immédiat au niveau A1 complet.",
     ctaFinalBtn: "Rejoins la bêta", ctaFinalSocial: "Sans carte bancaire · A1 gratuit · CECRL A1→C1",
     ctaFinalAppLabel: "Bientôt disponible sur", ctaFinalCities: "Disponible au Cameroun — bientôt en Afrique centrale",
+    footerTagline: "Apprendre. Se préparer. S'intégrer.",
+    footerDisclaimer: "Yema Languages propose une pratique linguistique indépendante alignée sur le CECRL et n'est affiliée à aucun organisme officiel d'examen.",
     footerMade: "Construit au Cameroun, pour l'Afrique", footerLegal: "Mentions légales", footerTerms: "CGU", footerPrivacy: "Confidentialité", footerContact: "Contact",
   },
   en: {
@@ -179,6 +181,8 @@ const landing = {
     ctaFinalDesc: "No credit card. No commitment. Full A1 access — start today.",
     ctaFinalBtn: "Join the beta", ctaFinalSocial: "Beta access · Free A1 · CEFR aligned",
     ctaFinalAppLabel: "Coming soon on", ctaFinalCities: "Starting with German and Germany — more languages coming.",
+    footerTagline: "Learn. Prepare. Belong.",
+    footerDisclaimer: "Yema Languages provides independent CEFR-aligned language practice and is not affiliated with any official examination institute.",
     footerMade: "Built from Cameroon for learners with international ambitions.", footerLegal: "Legal", footerTerms: "Terms", footerPrivacy: "Privacy", footerContact: "Contact",
   },
 }

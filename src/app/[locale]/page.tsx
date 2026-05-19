@@ -558,10 +558,10 @@ export default function LandingPage() {
       {/* ── FOOTER ── */}
       <footer style={{ padding: isMobile ? "28px 20px" : "36px 40px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", gap: 20, flexWrap: "wrap" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800 }}>Yema</span>
-            <span style={{ width: 1, height: 14, background: "rgba(255,255,255,0.12)" }} />
-            <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11 }}>{t.footerMade}</span>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 5 }}>
+            <span style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 17 : 18, fontWeight: 800, letterSpacing: "-0.01em" }}>Yema</span>
+            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: isMobile ? 13 : 15, letterSpacing: "0.01em", lineHeight: 1.4 }}>{t.footerTagline}</span>
+            <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 10 }}>{t.footerMade}</span>
           </div>
           <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
             {[t.footerLegal, t.footerTerms, t.footerPrivacy, t.footerContact].map(link => (
@@ -584,8 +584,7 @@ export default function LandingPage() {
         </div>
         <div style={{ maxWidth: 1200, margin: "16px auto 0", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.04)", textAlign: "center" }}>
           <p style={{ color: "rgba(255,255,255,0.14)", fontSize: 10, lineHeight: 1.6 }}>
-            Yema Languages provides independent CEFR-aligned language practice and is not affiliated with any official examination institute. ·
-            Yema Languages propose une pratique linguistique indépendante alignée sur le CECRL et n&apos;est affiliée à aucun organisme officiel d&apos;examen.
+            {t.footerDisclaimer}
           </p>
         </div>
       </footer>
