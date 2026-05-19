@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { useLocale } from "next-intl"
 import { useT } from "@/hooks/useT"
 import LanguageSwitcher from "@/components/LanguageSwitcher"
+import { createClient } from "@/lib/supabase/client"
 
 export default function LandingPage() {
   const router = useRouter()
@@ -66,6 +67,16 @@ export default function LandingPage() {
     { q: t.faq5Q, a: t.faq5A },
     { q: t.faq6Q, a: t.faq6A },
   ]
+
+  async function handleTestLevel() {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      router.push(`/${locale}/test-niveau`)
+    } else {
+      router.push(`/${locale}/register?next=/${locale}/test-niveau`)
+    }
+  }
 
   const navItems = [
     { label: t.navFeatures, href: "#features" },
@@ -163,7 +174,7 @@ export default function LandingPage() {
               style={{ padding: "16px 32px", borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 8px 32px rgba(16,185,129,0.3)", display: "flex", alignItems: "center", gap: 8 }}>
               {t.ctaPrimary}
             </button>
-            <button onClick={() => router.push(`/${locale}/simulateur`)}
+            <button onClick={handleTestLevel}
               style={{ padding: "16px 32px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "white", fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
               {t.ctaSecondary}
             </button>
@@ -425,23 +436,21 @@ export default function LandingPage() {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {[
-                { plan: "Starter", price: "25.000", users: `5 enseignants · 100 élèves`, color: "#10b981" },
-                { plan: "Pro", price: "75.000", users: `20 enseignants · 500 élèves`, color: "#f59e0b" },
-                { plan: "Enterprise", price: t.centerOnDemand, users: `Illimité · Support dédié`, color: "#a78bfa" },
+                { plan: "Essentiel", users: "Petit centre · équipe réduite", color: "#10b981" },
+                { plan: "Pro", users: "Centre en croissance · plusieurs classes", color: "#f59e0b" },
+                { plan: "Enterprise", users: "Illimité · support dédié", color: "#a78bfa" },
               ].map((p, i) => (
                 <div key={i} style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: `1px solid ${p.color}25`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div>
                     <p style={{ fontFamily: "'Syne',sans-serif", color: "white", fontSize: 15, fontWeight: 700, margin: "0 0 3px" }}>{p.plan}</p>
                     <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0 }}>{p.users}</p>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <p style={{ fontFamily: "'Syne',sans-serif", color: p.color, fontSize: 16, fontWeight: 800, margin: "0 0 1px" }}>
-                      {p.price === t.centerOnDemand ? p.price : `${p.price} XAF`}
-                    </p>
-                    {p.price !== t.centerOnDemand && <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 9, margin: 0 }}>{t.centerPerMonth}</p>}
-                  </div>
+                  <p style={{ fontFamily: "'Syne',sans-serif", color: p.color, fontSize: 14, fontWeight: 800, margin: 0 }}>{t.centerOnDemand}</p>
                 </div>
               ))}
+              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, lineHeight: 1.6, margin: "4px 0 0", fontStyle: "italic" }}>
+                {t.centerReassurance}
+              </p>
             </div>
           )}
         </div>

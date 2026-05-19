@@ -5,6 +5,7 @@ import { useRouter } from "@/navigation";
 import { Link } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 
 type Role = "STUDENT" | "TEACHER" | "CENTER_MANAGER";
 
@@ -16,6 +17,8 @@ const ROLES: { key: Role; emoji: string; label: string }[] = [
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
   const t = useTranslations("auth");
   const tc = useTranslations("common");
   const [selectedRole, setSelectedRole] = useState<Role>("STUDENT");
@@ -56,6 +59,7 @@ export default function LoginPage() {
         if (role === "ADMIN")          { router.push("/admin"); return; }
         router.push("/onboarding/student");
       } else {
+        if (next) { router.push(next); return; }
         if (role === "CENTER_MANAGER") { router.push("/center"); return; }
         if (role === "TEACHER")        { router.push("/teacher"); return; }
         if (role === "ADMIN")          { router.push("/admin"); return; }

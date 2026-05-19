@@ -8,7 +8,7 @@ type UserRole = "STUDENT" | "TEACHER" | "CENTER_MANAGER" | "ADMIN"
 
 const PUBLIC_ROUTES = [
   "/", "/login", "/register", "/pricing",
-  "/discover", "/test-niveau", "/auth",
+  "/discover", "/auth",
   "/hoeren/demo", "/schreiben/demo",
   "/quiz/demo", "/video/preview",
   "/privacy", "/terms", "/landing", "/demo",
@@ -85,6 +85,9 @@ export async function middleware(request: NextRequest) {
   // "sb-<project-ref>-auth-token". If absent the user is definitely not logged in.
   const hasSession = request.cookies.getAll().some(c => c.name.startsWith("sb-") && c.name.endsWith("-auth-token"))
   if (!hasSession) {
+    if (canonicalPath === "/test-niveau") {
+      return NextResponse.redirect(new URL(`/${locale}/register?next=/${locale}/test-niveau`, request.url))
+    }
     return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
   }
 

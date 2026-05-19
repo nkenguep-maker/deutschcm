@@ -5,6 +5,7 @@ import { useRouter } from "@/navigation";
 import { Link } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 
 type Role = "STUDENT" | "TEACHER" | "CENTER_MANAGER";
 
@@ -22,6 +23,8 @@ const ONBOARDING_DEST: Record<Role, string> = {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
   const t = useTranslations("auth");
   const tc = useTranslations("common");
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -56,7 +59,9 @@ export default function RegisterPage() {
       password,
       options: {
         data: { full_name: fullName, role: selectedRole },
-        emailRedirectTo: `${location.origin}/auth/callback`,
+        emailRedirectTo: next
+          ? `${location.origin}/auth/callback?next=${encodeURIComponent(next)}`
+          : `${location.origin}/auth/callback`,
       },
     });
 

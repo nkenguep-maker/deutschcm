@@ -71,10 +71,14 @@ export async function GET(request: NextRequest) {
       // Determine redirect destination
       let redirectUrl: string;
       if (onboardingDone) {
-        redirectUrl = dbRole === Role.ADMIN ? "/admin"
-          : dbRole === Role.TEACHER ? "/teacher"
-          : dbRole === Role.CENTER_MANAGER ? "/center"
-          : "/dashboard";
+        if (next && next !== "/dashboard") {
+          redirectUrl = next;
+        } else {
+          redirectUrl = dbRole === Role.ADMIN ? "/admin"
+            : dbRole === Role.TEACHER ? "/teacher"
+            : dbRole === Role.CENTER_MANAGER ? "/center"
+            : "/dashboard";
+        }
       } else {
         redirectUrl = dbRole === Role.ADMIN ? "/admin"
           : dbRole === Role.TEACHER ? "/onboarding/teacher"
