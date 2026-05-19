@@ -6,16 +6,15 @@ import { routing } from "@/i18n/routing"
 export const metadata: Metadata = {
   metadataBase: new URL("https://deutschcm.vercel.app"),
   title: {
-    default: "Yema — Apprenez l'allemand au Cameroun | IA + CEFR A1-C1",
+    default: "Yema — Apprendre. Se préparer. S'intégrer. | Allemand CECRL A1-C1",
     template: "%s | Yema"
   },
-  description: "Plateforme d'apprentissage de l'allemand conçue pour le Cameroun. Simulateur ambassade IA, correction vocale, quiz adaptatif. Préparation aux examens de langue CEFR A1→C1. Gratuit.",
+  description: "Plateforme d'apprentissage de l'allemand conçue pour le Cameroun. Pratique orale IA, correction vocale, quiz adaptatif. Programme CECRL A1→C1 indépendant. Gratuit.",
   keywords: [
     "allemand cameroun", "apprendre allemand", "CEFR A1 C1",
-    "visa allemagne", "yema", "cours allemand douala",
-    "cours allemand yaounde", "apprentissage allemand afrique",
-    "simulateur visa allemand", "test niveau allemand",
-    "netzwerk neu", "aspekte neu", "examen langue allemande"
+    "yema", "cours allemand douala", "cours allemand yaounde",
+    "apprentissage allemand afrique", "test niveau allemand",
+    "examen langue allemande", "apprendre allemand cameroun"
   ],
   authors: [{ name: "Yema Team" }],
   creator: "Yema",
@@ -27,14 +26,14 @@ export const metadata: Metadata = {
     alternateLocale: ["fr_FR", "en_US"],
     url: "https://deutschcm.vercel.app",
     siteName: "Yema",
-    title: "Yema — Apprenez l'allemand avec l'IA au Cameroun",
-    description: "La plateforme d'apprentissage de l'allemand conçue pour le Cameroun. Simulateur ambassade IA, voix natives, quiz adaptatif. Préparation CEFR A1→C1.",
+    title: "Yema — Apprendre. Se préparer. S'intégrer.",
+    description: "La plateforme d'apprentissage de l'allemand conçue pour le Cameroun. Pratique orale IA, voix natives, quiz adaptatif. Programme CECRL A1→C1 indépendant.",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Yema — Apprenez l'allemand au Cameroun" }]
   },
   twitter: {
     card: "summary_large_image",
     title: "Yema — Apprenez l'allemand avec l'IA",
-    description: "Simulateur ambassade IA · Correction vocale · Quiz adaptatif · CEFR A1-C1 · Cameroun",
+    description: "Pratique orale IA · Correction vocale · Quiz adaptatif · CECRL A1-C1 · Cameroun",
     images: ["/opengraph-image"],
     creator: "@yema"
   },

@@ -27,10 +27,10 @@ export default function LandingPage() {
   }, [])
 
   const stats = [
-    { value: "10.000+", label: t.statsUsers },
-    { value: "A1→C1", label: t.statsLevels },
-    { value: "95%", label: t.statsSuccess },
-    { value: "50+", label: t.statsCenters },
+    { value: t.stat1Value, label: t.stat1Label },
+    { value: t.stat2Value, label: t.stat2Label },
+    { value: t.stat3Value, label: t.stat3Label },
+    { value: t.stat4Value, label: t.stat4Label },
   ]
 
   const features = [
@@ -52,10 +52,10 @@ export default function LandingPage() {
     { level: "C1", name: t.level5Name, desc: t.level5Desc, modules: 40, color: "#f59e0b", locked: true },
   ]
 
-  const testimonials = [
-    { name: "Paul Nkengue", city: "Yaoundé", level: t.testimonial1Role, text: t.testimonial1Text, initials: "PN", color: "#10b981", stars: 5 },
-    { name: "Prof. Marie Tchamba", city: "Douala", role: t.testimonial2Role, text: t.testimonial2Text, initials: "MT", color: "#3b82f6", stars: 5 },
-    { name: "Institut Lingua Plus", city: "Bafoussam", role: t.testimonial3Role, text: t.testimonial3Text, initials: "IL", color: "#8b5cf6", stars: 5 },
+  const problems = [
+    { title: t.problem1Title, desc: t.problem1Desc, icon: "📚" },
+    { title: t.problem2Title, desc: t.problem2Desc, icon: "💸" },
+    { title: t.problem3Title, desc: t.problem3Desc, icon: "🌍" },
   ]
 
   const faqs = [
@@ -150,12 +150,15 @@ export default function LandingPage() {
           </h1>
 
           {/* Sous-titre */}
-          <p className="fade-up" style={{ fontSize: isMobile ? 14 : 18, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, marginBottom: 36, maxWidth: 600, margin: "0 auto 36px" }}>
+          <p className="fade-up" style={{ fontSize: isMobile ? 14 : 18, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, maxWidth: 600, margin: "0 auto 12px" }}>
             {t.subtitle}
+          </p>
+          <p className="fade-up" style={{ fontSize: isMobile ? 12 : 14, color: "rgba(255,255,255,0.3)", lineHeight: 1.6, maxWidth: 500, margin: "0 auto 32px" }}>
+            {t.subtitle2}
           </p>
 
           {/* CTAs */}
-          <div className="fade-up" style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 48, flexWrap: "wrap" }}>
+          <div className="fade-up" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             <button onClick={() => router.push(`/${locale}/register`)}
               style={{ padding: "16px 32px", borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 8px 32px rgba(16,185,129,0.3)", display: "flex", alignItems: "center", gap: 8 }}>
               {t.ctaPrimary}
@@ -165,6 +168,9 @@ export default function LandingPage() {
               {t.ctaSecondary}
             </button>
           </div>
+          <p className="fade-up" style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, marginTop: 10, marginBottom: 36, letterSpacing: "0.03em" }}>
+            {t.ctaMicro}
+          </p>
 
           {/* Stats */}
           <div className="fade-up" style={{ display: "flex", gap: 32, justifyContent: "center", flexWrap: "wrap" }}>
@@ -172,6 +178,34 @@ export default function LandingPage() {
               <div key={i} style={{ textAlign: "center" }}>
                 <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 28, fontWeight: 800, color: "#10b981" }}>{stat.value}</div>
                 <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── VISION ── */}
+      <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(16,185,129,0.02)" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 28 : 36, fontWeight: 800, marginBottom: 12 }}>
+              {t.visionTitle}
+            </h2>
+            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
+              {t.visionSubtitle}
+            </p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: isMobile ? 16 : 24 }}>
+            {[
+              { label: t.vision1Label, title: t.vision1Title, desc: t.vision1Desc, num: "01" },
+              { label: t.vision2Label, title: t.vision2Title, desc: t.vision2Desc, num: "02" },
+              { label: t.vision3Label, title: t.vision3Title, desc: t.vision3Desc, num: "03" },
+            ].map((v, i) => (
+              <div key={i} style={{ padding: "28px 24px", borderRadius: 18, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(16,185,129,0.12)", position: "relative", overflow: "hidden" }}>
+                <div style={{ position: "absolute", top: 16, right: 20, fontFamily: "'Syne',sans-serif", fontSize: 40, fontWeight: 900, color: "rgba(16,185,129,0.08)" }}>{v.num}</div>
+                <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, display: "block", marginBottom: 10 }}>{v.label}</span>
+                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800, margin: "0 0 12px" }}>{v.title}</h3>
+                <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, lineHeight: 1.7, margin: 0 }}>{v.desc}</p>
               </div>
             ))}
           </div>
@@ -240,6 +274,28 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── WHY GERMANY ── */}
+      <section style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
+        <div style={{ maxWidth: 860, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 56, alignItems: "start" }}>
+          <div>
+            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 26 : 34, fontWeight: 800, marginBottom: 16, lineHeight: 1.2 }}>
+              {t.germanyTitle}
+            </h2>
+            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.8, margin: 0 }}>
+              {t.germanyText}
+            </p>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {[t.germany1, t.germany2, t.germany3, t.germany4].map((item, i) => (
+              <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+                <span style={{ color: "#10b981", fontSize: 16, flexShrink: 0, marginTop: 1 }}>✓</span>
+                <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── SIMULATOR DEMO ── */}
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "center" }}>
@@ -275,9 +331,9 @@ export default function LandingPage() {
               </div>
             </div>
             {[
-              { role: "consul", text: "Guten Tag. Bitte zeigen Sie mir Ihren Reisepass.", translation: t.simMsg1 },
-              { role: "user", text: "Guten Tag, Herr Bauer. Hier ist mein Reisepass.", translation: t.simMsg2 },
-              { role: "consul", text: "Warum möchten Sie in Deutschland studieren?", translation: t.simMsg3 },
+              { role: "consul", text: "Hallo! Bitte stellen Sie sich vor.", translation: t.simMsg1 },
+              { role: "user", text: "Hallo. Ich heiße Paul. Ich komme aus Kamerun.", translation: t.simMsg2 },
+              { role: "consul", text: "Warum möchten Sie Deutsch lernen?", translation: t.simMsg3 },
             ].map((msg, i) => (
               <div key={i} style={{ marginBottom: 12, display: "flex", justifyContent: msg.role === "user" ? "flex-end" : "flex-start" }}>
                 <div style={{ maxWidth: "80%", padding: "10px 14px", borderRadius: msg.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px", background: msg.role === "user" ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.05)", border: msg.role === "user" ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.08)" }}>
@@ -301,28 +357,18 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ── */}
+      {/* ── PROBLEMS ── */}
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 26 : 36, fontWeight: 800, textAlign: "center", marginBottom: 48 }}>
             {t.testimonialsTitle}
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: isMobile ? 12 : 20 }}>
-            {testimonials.map((item, i) => (
-              <div key={i} style={{ padding: "24px", borderRadius: 18, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div style={{ display: "flex", gap: 3, marginBottom: 14 }}>
-                  {Array.from({ length: item.stars }).map((_, j) => <span key={j} style={{ color: "#f59e0b", fontSize: 14 }}>★</span>)}
-                </div>
-                <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, lineHeight: 1.7, marginBottom: 16, fontStyle: "italic" }}>&ldquo;{item.text}&rdquo;</p>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 12, background: `${item.color}15`, border: `1px solid ${item.color}30`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 12, color: item.color }}>{item.initials}</span>
-                  </div>
-                  <div>
-                    <p style={{ color: "white", fontSize: 13, fontWeight: 700, margin: "0 0 2px", fontFamily: "'Syne',sans-serif" }}>{item.name}</p>
-                    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, margin: 0 }}>{item.city} · {item.level || item.role}</p>
-                  </div>
-                </div>
+            {problems.map((p, i) => (
+              <div key={i} style={{ padding: "28px 24px", borderRadius: 18, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <div style={{ fontSize: 32, marginBottom: 16 }}>{p.icon}</div>
+                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 700, margin: "0 0 10px" }}>{p.title}</h3>
+                <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, lineHeight: 1.7, margin: 0 }}>{p.desc}</p>
               </div>
             ))}
           </div>
