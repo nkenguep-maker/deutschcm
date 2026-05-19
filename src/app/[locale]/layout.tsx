@@ -6,15 +6,15 @@ import { routing } from "@/i18n/routing"
 export const metadata: Metadata = {
   metadataBase: new URL("https://deutschcm.vercel.app"),
   title: {
-    default: "Yema — Apprendre. Se préparer. S'intégrer. | Allemand CECRL A1-C1",
+    default: "Yema Languages | Learn a language, prepare and belong",
     template: "%s | Yema"
   },
-  description: "Plateforme d'apprentissage de l'allemand conçue pour le Cameroun. Pratique orale IA, correction vocale, quiz adaptatif. Programme CECRL A1→C1 indépendant. Gratuit.",
+  description: "Yema helps learners build language skills, practice speaking and prepare for their international journey. First destination: German and Germany.",
   keywords: [
-    "allemand cameroun", "apprendre allemand", "CEFR A1 C1",
-    "yema", "cours allemand douala", "cours allemand yaounde",
-    "apprentissage allemand afrique", "test niveau allemand",
-    "examen langue allemande", "apprendre allemand cameroun"
+    "learn german", "german learning platform", "CEFR A1 C1",
+    "yema languages", "apprendre allemand", "cours allemand cameroun",
+    "language learning africa", "study in germany", "german for beginners",
+    "language preparation", "international learning platform"
   ],
   authors: [{ name: "Yema Team" }],
   creator: "Yema",
@@ -26,14 +26,14 @@ export const metadata: Metadata = {
     alternateLocale: ["fr_FR", "en_US"],
     url: "https://deutschcm.vercel.app",
     siteName: "Yema",
-    title: "Yema — Apprendre. Se préparer. S'intégrer.",
-    description: "La plateforme d'apprentissage de l'allemand conçue pour le Cameroun. Pratique orale IA, voix natives, quiz adaptatif. Programme CECRL A1→C1 indépendant.",
+    title: "Learn. Prepare. Belong. — Yema Languages",
+    description: "Start with German and prepare your international future with Yema. Interactive lessons, speaking practice and realistic simulations.",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Yema — Apprenez l'allemand au Cameroun" }]
   },
   twitter: {
     card: "summary_large_image",
     title: "Yema — Apprenez l'allemand avec l'IA",
-    description: "Pratique orale IA · Correction vocale · Quiz adaptatif · CECRL A1-C1 · Cameroun",
+    description: "Learn a language, prepare for life abroad, and belong. Starting with German and Germany.",
     images: ["/opengraph-image"],
     creator: "@yema"
   },

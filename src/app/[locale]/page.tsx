@@ -406,26 +406,44 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {[
-              { plan: "Starter", price: "25.000", users: `5 teachers · 100 students`, color: "#10b981" },
-              { plan: "Pro", price: "75.000", users: `20 teachers · 500 students`, color: "#f59e0b" },
-              { plan: "Enterprise", price: t.centerOnDemand, users: `Unlimited · Dedicated support`, color: "#a78bfa" },
-            ].map((p, i) => (
-              <div key={i} style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: `1px solid ${p.color}25`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div>
-                  <p style={{ fontFamily: "'Syne',sans-serif", color: "white", fontSize: 15, fontWeight: 700, margin: "0 0 3px" }}>{p.plan}</p>
-                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0 }}>{p.users}</p>
+          {locale === "en" ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {[
+                { icon: "🎓", label: t.centerAudience1Label, desc: t.centerAudience1Desc, color: "#10b981" },
+                { icon: "👨‍🏫", label: t.centerAudience2Label, desc: t.centerAudience2Desc, color: "#60a5fa" },
+                { icon: "🏫", label: t.centerAudience3Label, desc: t.centerAudience3Desc, color: "#a78bfa" },
+              ].map((a, i) => (
+                <div key={i} style={{ padding: "20px 22px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: `1px solid ${a.color}20` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                    <span style={{ fontSize: 20 }}>{a.icon}</span>
+                    <p style={{ fontFamily: "'Syne',sans-serif", color: "white", fontSize: 14, fontWeight: 700, margin: 0 }}>{a.label}</p>
+                  </div>
+                  <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, lineHeight: 1.65, margin: 0 }}>{a.desc}</p>
                 </div>
-                <div style={{ textAlign: "right" }}>
-                  <p style={{ fontFamily: "'Syne',sans-serif", color: p.color, fontSize: 16, fontWeight: 800, margin: "0 0 1px" }}>
-                    {p.price === t.centerOnDemand ? p.price : `${p.price} XAF`}
-                  </p>
-                  {p.price !== t.centerOnDemand && <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 9, margin: 0 }}>{t.centerPerMonth}</p>}
+              ))}
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {[
+                { plan: "Starter", price: "25.000", users: `5 enseignants · 100 élèves`, color: "#10b981" },
+                { plan: "Pro", price: "75.000", users: `20 enseignants · 500 élèves`, color: "#f59e0b" },
+                { plan: "Enterprise", price: t.centerOnDemand, users: `Illimité · Support dédié`, color: "#a78bfa" },
+              ].map((p, i) => (
+                <div key={i} style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: `1px solid ${p.color}25`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div>
+                    <p style={{ fontFamily: "'Syne',sans-serif", color: "white", fontSize: 15, fontWeight: 700, margin: "0 0 3px" }}>{p.plan}</p>
+                    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0 }}>{p.users}</p>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <p style={{ fontFamily: "'Syne',sans-serif", color: p.color, fontSize: 16, fontWeight: 800, margin: "0 0 1px" }}>
+                      {p.price === t.centerOnDemand ? p.price : `${p.price} XAF`}
+                    </p>
+                    {p.price !== t.centerOnDemand && <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 9, margin: 0 }}>{t.centerPerMonth}</p>}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
