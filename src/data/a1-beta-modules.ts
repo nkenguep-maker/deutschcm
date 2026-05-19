@@ -183,7 +183,66 @@ const L1_QUIZ: BetaModule = {
   topic: "Salutations, présentations et verbe sein — A1",
   xpReward: 80,
   duration: 12,
-  content: {},
+  content: {
+    questions: [
+      {
+        id: "l1q1",
+        question: "\"Guten Tag\" signifie…",
+        options: ["Bonne nuit", "Bonjour (formel)", "Au revoir", "Bonsoir"],
+        correct: 1,
+        explanation: "'Guten Tag' est le salut formel de jour. 'Gute Nacht' = bonne nuit, 'Auf Wiedersehen' = au revoir, 'Guten Abend' = bonsoir.",
+      },
+      {
+        id: "l1q2",
+        question: "Complétez : \"Ich _____ Student.\"",
+        options: ["ist", "sind", "bin", "bist"],
+        correct: 2,
+        explanation: "Avec 'ich', le verbe 'sein' se conjugue 'bin'. Ich bin, du bist, er/sie/es ist, wir sind, ihr seid, sie/Sie sind.",
+      },
+      {
+        id: "l1q3",
+        question: "Comment dit-on \"Comment allez-vous ?\" formellement ?",
+        options: ["Wie geht's?", "Wie geht es Ihnen?", "Was ist los?", "Wie alt bist du?"],
+        correct: 1,
+        explanation: "'Wie geht es Ihnen?' est la forme formelle (Sie). 'Wie geht's?' ou 'Wie geht es dir?' sont informels.",
+      },
+      {
+        id: "l1q4",
+        question: "\"Auf Wiedersehen\" est…",
+        options: ["Une salutation du matin", "Un au revoir formel", "Une question de politesse", "Un remerciement"],
+        correct: 1,
+        explanation: "'Auf Wiedersehen' signifie 'au revoir' dans un contexte formel. La version informelle est 'Tschüss'.",
+      },
+      {
+        id: "l1q5",
+        question: "Complétez : \"Wir _____ Studenten.\"",
+        options: ["ist", "bin", "bist", "sind"],
+        correct: 3,
+        explanation: "Avec 'wir', le verbe 'sein' se conjugue 'sind'. Wir sind = nous sommes.",
+      },
+      {
+        id: "l1q6",
+        question: "\"Danke schön\" signifie…",
+        options: ["S'il vous plaît", "Au revoir", "Merci beaucoup", "Excusez-moi"],
+        correct: 2,
+        explanation: "'Danke schön' = merci beaucoup. 'Bitte' = s'il vous plaît / de rien. 'Entschuldigung' = excusez-moi.",
+      },
+      {
+        id: "l1q7",
+        question: "Complétez : \"Du _____ nett.\"",
+        options: ["bin", "ist", "bist", "seid"],
+        correct: 2,
+        explanation: "Avec 'du', le verbe 'sein' se conjugue 'bist'. Du bist = tu es.",
+      },
+      {
+        id: "l1q8",
+        question: "Quelle phrase est correcte ?",
+        options: ["Ich ist Student.", "Ich bin Studentin.", "Ich sind Lehrer.", "Ich bist nett."],
+        correct: 1,
+        explanation: "'Ich bin Studentin.' est correct. Avec 'ich', on utilise toujours 'bin'. 'Ich ist' / 'Ich sind' / 'Ich bist' sont des erreurs fréquentes.",
+      },
+    ],
+  },
 }
 
 // ── LESSON 2 — Meine Familie (Personal Information & Family) ──────────────────
@@ -344,7 +403,66 @@ const L2_QUIZ: BetaModule = {
   topic: "Famille, informations personnelles et verbe haben — A1",
   xpReward: 80,
   duration: 12,
-  content: {},
+  content: {
+    questions: [
+      {
+        id: "l2q1",
+        question: "\"die Mutter\" signifie…",
+        options: ["le père", "la sœur", "la mère", "le frère"],
+        correct: 2,
+        explanation: "'die Mutter' = la mère. 'der Vater' = le père, 'die Schwester' = la sœur, 'der Bruder' = le frère.",
+      },
+      {
+        id: "l2q2",
+        question: "Complétez : \"Ich _____ einen Bruder.\"",
+        options: ["hat", "haben", "habe", "hast"],
+        correct: 2,
+        explanation: "Avec 'ich', le verbe 'haben' se conjugue 'habe'. Ich habe = j'ai.",
+      },
+      {
+        id: "l2q3",
+        question: "\"verheiratet\" signifie…",
+        options: ["célibataire", "divorcé(e)", "marié(e)", "veuf/veuve"],
+        correct: 2,
+        explanation: "'verheiratet' = marié(e). 'ledig' = célibataire. 'geschieden' = divorcé(e).",
+      },
+      {
+        id: "l2q4",
+        question: "Quel est le genre de \"der Vater\" ?",
+        options: ["Féminin (die)", "Masculin (der)", "Neutre (das)", "Pluriel"],
+        correct: 1,
+        explanation: "'der Vater' est masculin. 'die Mutter' (féminin), 'das Kind' (neutre).",
+      },
+      {
+        id: "l2q5",
+        question: "Complétez : \"Er _____ zwei Kinder.\"",
+        options: ["habe", "haben", "habt", "hat"],
+        correct: 3,
+        explanation: "Avec 'er/sie/es', le verbe 'haben' se conjugue 'hat'. Er hat = il a.",
+      },
+      {
+        id: "l2q6",
+        question: "\"ledig\" signifie…",
+        options: ["marié(e)", "âgé(e)", "célibataire", "jeune"],
+        correct: 2,
+        explanation: "'ledig' = célibataire. 'verheiratet' = marié(e). 'alt' = âgé(e). 'jung' = jeune.",
+      },
+      {
+        id: "l2q7",
+        question: "\"Wie alt bist du?\" signifie…",
+        options: ["Comment t'appelles-tu ?", "D'où viens-tu ?", "Quel âge as-tu ?", "Comment vas-tu ?"],
+        correct: 2,
+        explanation: "'Wie alt bist du?' = quel âge as-tu ? 'Wie heißt du?' = comment t'appelles-tu ? 'Woher kommst du?' = d'où viens-tu ?",
+      },
+      {
+        id: "l2q8",
+        question: "Complétez : \"Wir _____ eine große Familie.\"",
+        options: ["hat", "hast", "habt", "haben"],
+        correct: 3,
+        explanation: "Avec 'wir', 'haben' se conjugue 'haben'. Wir haben = nous avons.",
+      },
+    ],
+  },
 }
 
 // ── LESSON 3 — Mein Alltag (Daily Life & Numbers) ────────────────────────────
@@ -503,7 +621,66 @@ const L3_QUIZ: BetaModule = {
   topic: "Vie quotidienne, chiffres et verbes réguliers — A1",
   xpReward: 80,
   duration: 12,
-  content: {},
+  content: {
+    questions: [
+      {
+        id: "l3q1",
+        question: "\"aufstehen\" signifie…",
+        options: ["se coucher", "travailler", "se lever", "manger"],
+        correct: 2,
+        explanation: "'aufstehen' = se lever (verbe à particule séparable). 'schlafen' = se coucher / dormir. 'arbeiten' = travailler.",
+      },
+      {
+        id: "l3q2",
+        question: "\"Wie viel Uhr ist es?\" signifie…",
+        options: ["Quelle est ton adresse ?", "Quel âge as-tu ?", "Quelle heure est-il ?", "Où vas-tu ?"],
+        correct: 2,
+        explanation: "'Wie viel Uhr ist es?' = quelle heure est-il ? On répond 'Es ist... Uhr.' (Il est... heures.)",
+      },
+      {
+        id: "l3q3",
+        question: "Complétez : \"Ich _____ jeden Tag Deutsch.\" (lernen)",
+        options: ["lernt", "lernst", "lerne", "lernen"],
+        correct: 2,
+        explanation: "Avec 'ich', les verbes réguliers prennent la terminaison '-e'. Ich lerne = j'apprends.",
+      },
+      {
+        id: "l3q4",
+        question: "\"der Nachmittag\" signifie…",
+        options: ["le matin", "le soir", "la nuit", "l'après-midi"],
+        correct: 3,
+        explanation: "'der Nachmittag' = l'après-midi. 'der Morgen' = le matin. 'der Abend' = le soir. 'die Nacht' = la nuit.",
+      },
+      {
+        id: "l3q5",
+        question: "\"Ich stehe um sechs Uhr ___.\"",
+        options: ["aus", "auf", "ab", "an"],
+        correct: 1,
+        explanation: "'aufstehen' est un verbe à particule séparable. La particule 'auf' va à la fin : Ich stehe auf.",
+      },
+      {
+        id: "l3q6",
+        question: "Complétez : \"Er _____ von neun bis fünf.\" (arbeiten)",
+        options: ["arbeitest", "arbeite", "arbeiten", "arbeitet"],
+        correct: 3,
+        explanation: "Avec 'er/sie/es', les verbes réguliers prennent '-t'. Pour 'arbeiten', on ajoute '-et' : er arbeitet.",
+      },
+      {
+        id: "l3q7",
+        question: "\"frühstücken\" signifie…",
+        options: ["dîner", "faire la sieste", "prendre le petit-déjeuner", "déjeuner"],
+        correct: 2,
+        explanation: "'frühstücken' = prendre le petit-déjeuner. 'Frühstück' = le petit-déjeuner. 'zu Mittag essen' = déjeuner.",
+      },
+      {
+        id: "l3q8",
+        question: "\"jeden Tag\" signifie…",
+        options: ["quelquefois", "rarement", "chaque jour", "parfois"],
+        correct: 2,
+        explanation: "'jeden Tag' = chaque jour / tous les jours. 'manchmal' = parfois. 'selten' = rarement.",
+      },
+    ],
+  },
 }
 
 // ── LESSON 4 — Einkaufen & Essen (Food, Shopping & Appointments) ──────────────
@@ -663,7 +840,66 @@ const L4_QUIZ: BetaModule = {
   topic: "Alimentation, shopping, accusatif et rendez-vous — A1",
   xpReward: 80,
   duration: 12,
-  content: {},
+  content: {
+    questions: [
+      {
+        id: "l4q1",
+        question: "\"das Brot\" signifie…",
+        options: ["le lait", "la pomme", "le pain", "le café"],
+        correct: 2,
+        explanation: "'das Brot' = le pain. 'die Milch' = le lait. 'der Apfel' = la pomme. 'der Kaffee' = le café.",
+      },
+      {
+        id: "l4q2",
+        question: "Complétez : \"Ich möchte _____ Apfel.\" (der Apfel → accusatif)",
+        options: ["ein", "eine", "einen", "einem"],
+        correct: 2,
+        explanation: "Les noms masculins (der) prennent 'einen' à l'accusatif. Der Apfel → Ich möchte einen Apfel.",
+      },
+      {
+        id: "l4q3",
+        question: "\"Was kostet das?\" signifie…",
+        options: ["Qu'est-ce que c'est ?", "Combien ça coûte ?", "Où est-ce ?", "Qu'avez-vous ?"],
+        correct: 1,
+        explanation: "'Was kostet das?' = combien ça coûte ? On peut aussi dire 'Wie viel kostet das?'.",
+      },
+      {
+        id: "l4q4",
+        question: "\"kaufen\" signifie…",
+        options: ["vendre", "donner", "payer", "acheter"],
+        correct: 3,
+        explanation: "'kaufen' = acheter. 'verkaufen' = vendre. 'geben' = donner. 'bezahlen' = payer.",
+      },
+      {
+        id: "l4q5",
+        question: "\"der Termin\" signifie…",
+        options: ["le marché", "le prix", "le rendez-vous", "le supermarché"],
+        correct: 2,
+        explanation: "'der Termin' = le rendez-vous. 'der Markt' = le marché. 'der Preis' = le prix.",
+      },
+      {
+        id: "l4q6",
+        question: "Complétez : \"Ich möchte _____ Kaffee, bitte.\" (der Kaffee → accusatif)",
+        options: ["ein", "eine", "einer", "einen"],
+        correct: 3,
+        explanation: "'der Kaffee' est masculin → accusatif = 'einen'. Ich möchte einen Kaffee, bitte.",
+      },
+      {
+        id: "l4q7",
+        question: "\"bezahlen\" signifie…",
+        options: ["acheter", "rendre", "payer", "commander"],
+        correct: 2,
+        explanation: "'bezahlen' = payer. 'kaufen' = acheter. 'bestellen' = commander.",
+      },
+      {
+        id: "l4q8",
+        question: "\"Guten Appetit!\" signifie…",
+        options: ["Bonjour !", "Bon appétit !", "Au revoir !", "Merci !"],
+        correct: 1,
+        explanation: "'Guten Appetit!' = bon appétit ! C'est une formule courante avant de manger en Allemagne.",
+      },
+    ],
+  },
 }
 
 // ── LESSON 5 — Deutschland-Reise & Botschaft (Germany Journey & Embassy) ──────
@@ -830,7 +1066,71 @@ const L5_QUIZ: BetaModule = {
   topic: "Ambassade, voyage et verbes modaux können/müssen/möchten — A1",
   xpReward: 100,
   duration: 12,
-  content: {},
+  content: {
+    questions: [
+      {
+        id: "l5q1",
+        question: "\"die Botschaft\" signifie…",
+        options: ["le passeport", "le visa", "le billet d'avion", "l'ambassade"],
+        correct: 3,
+        explanation: "'die Botschaft' = l'ambassade. 'der Reisepass' = le passeport. 'das Visum' = le visa.",
+      },
+      {
+        id: "l5q2",
+        question: "Complétez : \"Ich _____ Ihnen helfen.\" (können, ich)",
+        options: ["kann", "kannst", "könnt", "können"],
+        correct: 0,
+        explanation: "La conjugaison de 'können' : ich kann, du kannst, er/sie/es kann, wir können, ihr könnt, sie/Sie können.",
+      },
+      {
+        id: "l5q3",
+        question: "\"das Visum\" signifie…",
+        options: ["le formulaire", "le visa", "le passeport", "le rendez-vous"],
+        correct: 1,
+        explanation: "'das Visum' = le visa. 'das Formular' = le formulaire. 'der Reisepass' = le passeport.",
+      },
+      {
+        id: "l5q4",
+        question: "Quelle phrase est grammaticalement correcte ?",
+        options: [
+          "Ich kann sprechen Deutsch.",
+          "Ich kann Deutsch sprechen.",
+          "Ich kann Deutsch sprach.",
+          "Ich kann spreche Deutsch.",
+        ],
+        correct: 1,
+        explanation: "Avec les verbes modaux, l'infinitif va TOUJOURS à la fin : 'Ich kann Deutsch sprechen.' 'Ich kann sprechen Deutsch.' est une erreur fréquente.",
+      },
+      {
+        id: "l5q5",
+        question: "\"der Reisepass\" signifie…",
+        options: ["le billet", "le passeport", "le visa", "l'avion"],
+        correct: 1,
+        explanation: "'der Reisepass' = le passeport. 'das Flugzeug' = l'avion. 'das Visum' = le visa.",
+      },
+      {
+        id: "l5q6",
+        question: "\"ankommen\" signifie…",
+        options: ["partir", "réserver", "annuler", "arriver"],
+        correct: 3,
+        explanation: "'ankommen' = arriver. 'abfahren' = partir. 'buchen' = réserver. Exemple : Ich komme um 14 Uhr an.",
+      },
+      {
+        id: "l5q7",
+        question: "Complétez : \"Wir _____ einen Termin haben.\" (müssen)",
+        options: ["müssen", "musst", "muss", "müsst"],
+        correct: 0,
+        explanation: "Avec 'wir', 'müssen' se conjugue 'müssen'. Wir müssen = nous devons.",
+      },
+      {
+        id: "l5q8",
+        question: "\"Können Sie mir helfen?\" signifie…",
+        options: ["Pouvez-vous me montrer ?", "Pouvez-vous m'aider ?", "Avez-vous un passeport ?", "Où est l'ambassade ?"],
+        correct: 1,
+        explanation: "'Können Sie mir helfen?' = pouvez-vous m'aider ? C'est une phrase essentielle pour les démarches administratives.",
+      },
+    ],
+  },
 }
 
 // ── Export ────────────────────────────────────────────────────────────────────
