@@ -246,6 +246,13 @@ const dashboard = {
     communityPartnerSoon: "Bientôt disponible",
     badgeStreak: "7 jours", badgeFirstA: "Premier A", badgePrecision: "Précision",
     badgeChampion: "Champion", badgeDiamond: "Diamant", badgeRocket: "Fusée",
+    progressWidgetTitle: "Ma progression",
+    progressZeroTitle: "Votre parcours commence ici",
+    progressZeroText: "Une première leçon suffit pour lancer votre progression.",
+    progressViewDetail: "Voir le détail",
+    progressStartA1: "Commencer A1",
+    progressTestLevel: "Tester mon niveau",
+    progressContinue: "Continuer mon parcours",
   },
   en: {
     xpLabel: "XP earned", lessonsLabel: "Lessons completed", scoreLabel: "Average score", streakLabel: "Day streak",
@@ -282,6 +289,13 @@ const dashboard = {
     communityPartnerSoon: "Coming soon",
     badgeStreak: "7-day streak", badgeFirstA: "First A", badgePrecision: "Precision",
     badgeChampion: "Champion", badgeDiamond: "Diamond", badgeRocket: "Rocket",
+    progressWidgetTitle: "My progress",
+    progressZeroTitle: "Your journey starts here",
+    progressZeroText: "One first lesson is enough to begin your progress.",
+    progressViewDetail: "View details",
+    progressStartA1: "Start A1",
+    progressTestLevel: "Test my level",
+    progressContinue: "Continue my path",
   },
 }
 

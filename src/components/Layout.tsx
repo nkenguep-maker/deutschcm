@@ -37,7 +37,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
     { icon: "🏫", label: tn.myClasses,       href: "/classroom"  },
     { icon: "🔍", label: tn.discover,        href: "/discover"   },
     { icon: "🎙️", label: tn.simulator,      href: "/simulateur" },
-    { icon: "📊", label: tn.progress,        href: "/progress"   },
+    { icon: "📊", label: tn.progress,        href: "/dashboard#progress"   },
     { icon: "⚙️", label: tn.settings,       href: "/settings"   },
   ];
   const TEACHER_NAV = [

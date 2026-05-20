@@ -316,6 +316,58 @@ export default function StudentDashboard() {
         </div>
       </div>
 
+      {/* ── Progress widget ── */}
+      <div id="progress" className="fade-up" style={{ marginBottom: 28 }}>
+        <div style={{
+          borderRadius: 18, padding: isMobile ? "16px 18px" : "20px 24px",
+          background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
+          display: "flex", flexDirection: isMobile ? "column" : "row",
+          alignItems: isMobile ? "flex-start" : "center",
+          justifyContent: "space-between", gap: isMobile ? 16 : 0,
+        }}>
+          <div style={{ flex: 1 }}>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              📊 {t.progressWidgetTitle}
+            </p>
+            {(xp === 0 && !hasLessons && !hasLevel) ? (
+              <>
+                <p style={{ margin: "8px 0 2px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
+                  {t.progressZeroTitle}
+                </p>
+                <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>
+                  {t.progressZeroText}
+                </p>
+              </>
+            ) : (
+              <p style={{ margin: "6px 0 0", color: level ? "#10b981" : "rgba(255,255,255,0.45)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1.1rem" }}>
+                {level ?? t.levelConfirm}
+              </p>
+            )}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <button
+              onClick={() => router.push(!hasLevel ? "/test-niveau" : "/courses")}
+              style={{
+                display: "flex", alignItems: "center", gap: 8,
+                padding: "10px 18px", borderRadius: 12, cursor: "pointer",
+                background: "linear-gradient(135deg, #10b981, #059669)",
+                border: "none", color: "white",
+                fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem",
+                boxShadow: "0 2px 12px rgba(16,185,129,0.3)",
+              }}
+            >
+              {!hasLevel ? t.progressTestLevel : (!hasLessons ? t.progressStartA1 : t.progressContinue)}
+            </button>
+            <a
+              href={`/${locale}/progress`}
+              style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.72rem", textDecoration: "none", whiteSpace: "nowrap" }}
+            >
+              {t.progressViewDetail} →
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* ── Stats grid ── */}
       <div className="fade-up card-delay-1" style={{
         display: "grid", gridTemplateColumns: isMobile ? "repeat(3, 1fr)" : "repeat(6, 1fr)",

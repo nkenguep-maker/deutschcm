@@ -75,6 +75,11 @@ export async function GET(req: NextRequest) {
             avgConvScore: Math.round(avgConvScore),
             totalCourses: profile.enrollments.length,
             totalBadges: profile.badges.length,
+            earnedBadges: profile.badges.map(ub => ({
+              name: ub.badge.name,
+              description: ub.badge.description,
+              iconUrl: ub.badge.iconUrl ?? null,
+            })),
           },
           weeklyProgress: generateWeeklyData(profile.moduleProgress),
           skillScores: {

@@ -218,7 +218,14 @@
     "groupsLabel": "Groupes d'élèves",
     "studyGroup": "Étudier en groupe",
     "findPartner": "Trouver un partenaire",
-    "soloStudents": "Élèves en solo"
+    "soloStudents": "Élèves en solo",
+    "progressWidgetTitle": "Ma progression",
+    "progressZeroTitle": "Votre parcours commence ici",
+    "progressZeroText": "Une première leçon suffit pour lancer votre progression.",
+    "progressViewDetail": "Voir le détail",
+    "progressStartA1": "Commencer A1",
+    "progressTestLevel": "Tester mon niveau",
+    "progressContinue": "Continuer mon parcours"
   },
   "layout": {
     "searchPlaceholder": "Rechercher un cours, un scénario...",

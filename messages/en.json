@@ -218,7 +218,14 @@
     "groupsLabel": "Study groups",
     "studyGroup": "Study in a group",
     "findPartner": "Find a partner",
-    "soloStudents": "Solo students"
+    "soloStudents": "Solo students",
+    "progressWidgetTitle": "My progress",
+    "progressZeroTitle": "Your journey starts here",
+    "progressZeroText": "One first lesson is enough to begin your progress.",
+    "progressViewDetail": "View details",
+    "progressStartA1": "Start A1",
+    "progressTestLevel": "Test my level",
+    "progressContinue": "Continue my path"
   },
   "layout": {
     "searchPlaceholder": "Search...",

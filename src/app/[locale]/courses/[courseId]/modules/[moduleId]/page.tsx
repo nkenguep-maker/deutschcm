@@ -375,6 +375,14 @@ export default function ModulePage() {
     setCompleted(true)
     if (earnedScore !== undefined) setScore(earnedScore)
     setXpEarned(module.xpReward)
+    // Save XP to DB — fire and forget, silent failure
+    if (module.xpReward > 0) {
+      fetch("/api/progress/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ xpEarned: module.xpReward }),
+      }).catch(() => {})
+    }
   }
 
   const courseModules = ((): Module[] => {
