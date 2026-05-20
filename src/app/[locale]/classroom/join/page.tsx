@@ -1,9 +1,74 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, usePathname } from "next/navigation";
 import { useRouter } from "@/navigation";
 import { Link } from "@/navigation";
+
+type Locale = "fr" | "en";
+
+// ─── Locale text ──────────────────────────────────────────────────────────────
+
+const LABELS = {
+  fr: {
+    pageTitle: "Rejoindre une classe",
+    pageSubtitle: "Entrez le code fourni par votre enseignant",
+    codeLabel: "Code de classe",
+    codePlaceholder: "DEUTSCH-A1-XXXX",
+    codeErrorInvalid: "Code invalide",
+    codeErrorNetwork: "Erreur réseau",
+    codeErrorGeneral: "Erreur inconnue",
+    previewTeacher: "Enseignant",
+    previewCenter: "Centre",
+    previewCity: "Ville",
+    previewEnrollment: "Effectif",
+    previewEnrollmentValue: (enrolled: number, max: number) => `${enrolled} / ${max} élèves`,
+    previewNotice: "Votre inscription sera validée par l'enseignant avant d'avoir accès à la classe.",
+    submitPending: "Entrez un code valide",
+    submitJoining: "Envoi de la demande...",
+    submitJoin: (name: string) => `Rejoindre ${name} →`,
+    successTitle: "Demande envoyée !",
+    successMsgA: "Votre demande a été transmise à",
+    successMsgB: "pour la classe",
+    successNote:
+      "Vous serez notifié dès que votre inscription sera validée. En attendant, vous pouvez continuer à apprendre en mode solo.",
+    successBackBtn: "→ Retour au tableau de bord",
+    successPracticeBtn: "🎙️ Pratiquer en attendant",
+    backLink: "← Retour au tableau de bord",
+    groupCodeLink: "Vous avez un code groupe ? →",
+  },
+  en: {
+    pageTitle: "Join a class",
+    pageSubtitle: "Enter the code your teacher gave you",
+    codeLabel: "Class code",
+    codePlaceholder: "DEUTSCH-A1-XXXX",
+    codeErrorInvalid: "Invalid code",
+    codeErrorNetwork: "Network error",
+    codeErrorGeneral: "Unknown error",
+    previewTeacher: "Teacher",
+    previewCenter: "Center",
+    previewCity: "City",
+    previewEnrollment: "Enrollment",
+    previewEnrollmentValue: (enrolled: number, max: number) => `${enrolled} / ${max} learners`,
+    previewNotice: "Your enrollment will be approved by the teacher before you can access the class.",
+    submitPending: "Enter a valid code",
+    submitJoining: "Sending request...",
+    submitJoin: (name: string) => `Join ${name} →`,
+    successTitle: "Request sent!",
+    successMsgA: "Your request has been sent to",
+    successMsgB: "for the class",
+    successNote:
+      "You will be notified as soon as your enrollment is approved. In the meantime, you can keep learning on your own.",
+    successBackBtn: "→ Back to dashboard",
+    successPracticeBtn: "🎙️ Practice while you wait",
+    backLink: "← Back to dashboard",
+    groupCodeLink: "Have a group code? →",
+  },
+};
+
+type LL = typeof LABELS.fr;
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface ClassroomPreview {
   id: string; name: string; level: string;
@@ -22,7 +87,11 @@ function inp(style?: React.CSSProperties): React.CSSProperties {
   };
 }
 
-const LEVEL_COLORS: Record<string, string> = { A1: "#10b981", A2: "#34d399", B1: "#6366f1", B2: "#8b5cf6", C1: "#f59e0b" };
+const LEVEL_COLORS: Record<string, string> = {
+  A1: "#10b981", A2: "#34d399", B1: "#6366f1", B2: "#8b5cf6", C1: "#f59e0b",
+};
+
+// ─── Page wrapper (Suspense boundary for useSearchParams) ─────────────────────
 
 export default function ClassroomJoinPage() {
   return (
@@ -32,9 +101,15 @@ export default function ClassroomJoinPage() {
   );
 }
 
+// ─── Content ──────────────────────────────────────────────────────────────────
+
 function ClassroomJoinContent() {
   const router = useRouter();
   const params = useSearchParams();
+  const pathname = usePathname();
+  const locale: Locale = pathname.startsWith("/en") ? "en" : "fr";
+  const labels = LABELS[locale] as LL;
+
   const [code, setCode] = useState(params.get("code") ?? "");
   const [checking, setChecking] = useState(false);
   const [preview, setPreview] = useState<ClassroomPreview | null>(null);
@@ -51,8 +126,8 @@ function ClassroomJoinContent() {
       const r = await fetch(`/api/classroom/check-code/${encodeURIComponent(trimmed)}`);
       const d = await r.json();
       if (d.valid) { setPreview(d.classroom); setCodeError(""); }
-      else { setPreview(null); setCodeError(d.error ?? "Code invalide"); }
-    } catch { setCodeError("Erreur réseau"); }
+      else { setPreview(null); setCodeError(d.error ?? labels.codeErrorInvalid); }
+    } catch { setCodeError(labels.codeErrorNetwork); }
     finally { setChecking(false); }
   };
 
@@ -73,7 +148,7 @@ function ClassroomJoinContent() {
       });
       const d = await r.json();
       if (r.ok) { setDone({ teacherName: d.teacherName, classroomName: d.classroomName }); }
-      else setCodeError(d.error ?? "Erreur inconnue");
+      else setCodeError(d.error ?? labels.codeErrorGeneral);
     } finally { setJoining(false); }
   };
 
@@ -90,43 +165,53 @@ function ClassroomJoinContent() {
       `}</style>
 
       <div style={{ width: "100%", maxWidth: 500 }} className="fadeUp">
+        {/* Title */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <div style={{ fontSize: 38, marginBottom: 10 }}>🏫</div>
           <h1 style={{ margin: 0, color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 24 }}>
-            Rejoindre une classe
+            {labels.pageTitle}
           </h1>
           <p style={{ margin: "8px 0 0", color: "rgba(255,255,255,0.35)", fontSize: 13 }}>
-            Entrez le code fourni par votre enseignant
+            {labels.pageSubtitle}
           </p>
         </div>
 
         {done ? (
+          /* Success state */
           <div style={{ background: "rgba(13,17,23,0.9)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 18, padding: "40px 32px", textAlign: "center" }}>
             <div style={{ fontSize: 52, marginBottom: 20 }}>✅</div>
-            <h2 style={{ margin: "0 0 10px", color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 22 }}>Demande envoyée !</h2>
+            <h2 style={{ margin: "0 0 10px", color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 22 }}>
+              {labels.successTitle}
+            </h2>
             <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>
-              Votre demande a été transmise à <strong style={{ color: "#f1f5f9" }}>Prof. {done.teacherName}</strong> pour la classe <strong style={{ color: "#f1f5f9" }}>{done.classroomName}</strong>.
+              {labels.successMsgA}{" "}
+              <strong style={{ color: "#f1f5f9" }}>Prof. {done.teacherName}</strong>{" "}
+              {labels.successMsgB}{" "}
+              <strong style={{ color: "#f1f5f9" }}>{done.classroomName}</strong>.
               <br /><br />
-              Vous serez notifié dès que votre inscription sera validée. En attendant, vous pouvez continuer à apprendre en mode solo.
+              {labels.successNote}
             </p>
             <div style={{ display: "flex", gap: 12, flexDirection: "column" }}>
               <Link href="/dashboard" style={{ background: "#10b981", color: "#fff", borderRadius: 12, padding: "14px 24px", fontWeight: 700, fontSize: 14, textDecoration: "none", textAlign: "center", display: "block" }}>
-                → Retour au tableau de bord
+                {labels.successBackBtn}
               </Link>
               <Link href="/simulateur" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "13px 24px", fontWeight: 600, fontSize: 13, textDecoration: "none", textAlign: "center", display: "block" }}>
-                🎙️ Pratiquer en attendant
+                {labels.successPracticeBtn}
               </Link>
             </div>
           </div>
         ) : (
+          /* Input + preview state */
           <div style={{ background: "rgba(13,17,23,0.9)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: 28 }}>
             <div>
-              <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.07em" }}>Code de classe</label>
+              <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.07em" }}>
+                {labels.codeLabel}
+              </label>
               <div style={{ position: "relative" }}>
                 <input
                   value={code}
                   onChange={e => setCode(e.target.value.toUpperCase())}
-                  placeholder="DEUTSCH-A1-XXXX"
+                  placeholder={labels.codePlaceholder}
                   style={{ ...inp(), color: preview ? "#10b981" : "#f1f5f9", borderColor: preview ? "rgba(16,185,129,0.4)" : codeError ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.1)" }}
                   autoFocus
                 />
@@ -144,15 +229,21 @@ function ClassroomJoinContent() {
             {preview && (
               <div style={{ marginTop: 20, background: `${levelColor}08`, border: `1px solid ${levelColor}25`, borderTop: `3px solid ${levelColor}`, borderRadius: 14, padding: "18px 20px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                  <span style={{ background: `${levelColor}20`, color: levelColor, border: `1px solid ${levelColor}40`, borderRadius: 6, padding: "2px 9px", fontSize: 11, fontWeight: 800 }}>{preview.level}</span>
-                  <h3 style={{ margin: 0, color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontSize: 16, fontWeight: 700 }}>{preview.name}</h3>
+                  <span style={{ background: `${levelColor}20`, color: levelColor, border: `1px solid ${levelColor}40`, borderRadius: 6, padding: "2px 9px", fontSize: 11, fontWeight: 800 }}>
+                    {preview.level}
+                  </span>
+                  <h3 style={{ margin: 0, color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontSize: 16, fontWeight: 700 }}>
+                    {preview.name}
+                  </h3>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {[
-                    { icon: "👨‍🏫", label: "Enseignant", value: `Prof. ${preview.teacherName}` },
-                    ...(preview.centerName ? [{ icon: "🏫", label: "Centre", value: `${preview.centerName} — ${preview.centerCity}` }] : []),
-                    { icon: "📍", label: "Ville", value: preview.teacherCity ?? "–" },
-                    { icon: "👥", label: "Effectif", value: `${preview.enrolledCount} / ${preview.maxStudents} élèves` },
+                    { icon: "👨‍🏫", label: labels.previewTeacher, value: `Prof. ${preview.teacherName}` },
+                    ...(preview.centerName
+                      ? [{ icon: "🏫", label: labels.previewCenter, value: `${preview.centerName} — ${preview.centerCity}` }]
+                      : []),
+                    { icon: "📍", label: labels.previewCity, value: preview.teacherCity ?? "–" },
+                    { icon: "👥", label: labels.previewEnrollment, value: labels.previewEnrollmentValue(preview.enrolledCount, preview.maxStudents) },
                   ].map(({ icon, label, value }) => (
                     <div key={label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <span style={{ fontSize: 15, width: 22, textAlign: "center", flexShrink: 0 }}>{icon}</span>
@@ -162,7 +253,7 @@ function ClassroomJoinContent() {
                   ))}
                 </div>
                 <div style={{ marginTop: 14, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, padding: "10px 12px" }}>
-                  <div style={{ color: "#f59e0b", fontSize: 12 }}>ℹ️ Votre inscription sera validée par l'enseignant avant d'avoir accès à la classe.</div>
+                  <div style={{ color: "#f59e0b", fontSize: 12 }}>ℹ️ {labels.previewNotice}</div>
                 </div>
               </div>
             )}
@@ -179,19 +270,25 @@ function ClassroomJoinContent() {
                 transition: "all 0.2s",
               }}
             >
-              {joining ? "Envoi de la demande..." : preview ? `Rejoindre ${preview.name} →` : "Entrez un code valide"}
+              {joining
+                ? labels.submitJoining
+                : preview
+                  ? labels.submitJoin(preview.name)
+                  : labels.submitPending}
             </button>
 
             <div style={{ marginTop: 16, textAlign: "center" }}>
               <Link href="/group/join" style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, textDecoration: "underline" }}>
-                Vous avez un code groupe ? →
+                {labels.groupCodeLink}
               </Link>
             </div>
           </div>
         )}
 
         <div style={{ textAlign: "center", marginTop: 20 }}>
-          <Link href="/dashboard" style={{ color: "rgba(255,255,255,0.25)", fontSize: 12 }}>← Retour au tableau de bord</Link>
+          <Link href="/dashboard" style={{ color: "rgba(255,255,255,0.25)", fontSize: 12 }}>
+            {labels.backLink}
+          </Link>
         </div>
       </div>
     </div>
