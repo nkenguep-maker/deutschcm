@@ -6,13 +6,14 @@ import { Link } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
+import BrandLogo from "@/components/BrandLogo";
 
 type Role = "STUDENT" | "TEACHER" | "CENTER_MANAGER";
 
-const ROLES: { key: Role; emoji: string; label: string }[] = [
-  { key: "STUDENT", emoji: "🎓", label: "Étudiant" },
-  { key: "TEACHER", emoji: "👨‍🏫", label: "Enseignant" },
-  { key: "CENTER_MANAGER", emoji: "🏫", label: "Centre" },
+const ROLE_KEYS: { key: Role; emoji: string }[] = [
+  { key: "STUDENT",        emoji: "🎓" },
+  { key: "TEACHER",        emoji: "👨‍🏫" },
+  { key: "CENTER_MANAGER", emoji: "🏫" },
 ];
 
 export default function LoginPage() {
@@ -27,6 +28,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const getRoleLabel = (key: Role) =>
+    t(key === "STUDENT" ? "roleStudent" : key === "TEACHER" ? "roleTeacher" : "roleCenter");
+
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -36,20 +40,18 @@ export default function LoginPage() {
     const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
     if (signInError || !data.user) {
-      setError("Email ou mot de passe incorrect.");
+      setError(t("errorInvalid"));
       setLoading(false);
       return;
     }
 
     try {
-      // Get true role from DB (user_metadata may be stale for old accounts)
       const profileRes = await fetch("/api/auth/profile");
       const profile = await profileRes.json();
 
       const role: string = profile.role || "STUDENT";
       const onboardingDone: boolean = profile.onboardingDone || false;
 
-      // Persist in cookies so proxy.ts can read them without a DB hit
       document.cookie = `user_role=${role};path=/;max-age=2592000`;
       document.cookie = `onboarding_done=${onboardingDone};path=/;max-age=2592000`;
 
@@ -90,7 +92,6 @@ export default function LoginPage() {
         className="relative min-h-screen w-full flex items-center justify-center px-5"
         style={{ background: "#080c10", fontFamily: "'DM Mono', monospace" }}
       >
-        {/* Ambient glow */}
         <div className="fixed inset-0 pointer-events-none">
           <div
             className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full opacity-10"
@@ -103,30 +104,10 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10 w-full fade-up" style={{ maxWidth: 400 }}>
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4"
-              style={{
-                background: "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.1))",
-                border: "1px solid rgba(16,185,129,0.3)",
-                boxShadow: "0 0 40px rgba(16,185,129,0.1)",
-              }}
-            >
-             
-            </div>
-            <h1
-              className="text-2xl font-bold"
-              style={{ color: "white", fontFamily: "'Syne', sans-serif" }}
-            >
-              Yema
-            </h1>
-            <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
-              Apprends l'allemand, vis en Allemagne
-            </p>
+          <div className="flex justify-center mb-8">
+            <BrandLogo tagline={t("tagline")} />
           </div>
 
-          {/* Card */}
           <div
             className="rounded-3xl p-6"
             style={{
@@ -146,9 +127,8 @@ export default function LoginPage() {
               {t("loginSubtitle")} 👋
             </p>
 
-            {/* Role selector */}
             <div className="flex gap-2 mb-6">
-              {ROLES.map(({ key, emoji, label }) => {
+              {ROLE_KEYS.map(({ key, emoji }) => {
                 const active = selectedRole === key;
                 return (
                   <button
@@ -165,7 +145,7 @@ export default function LoginPage() {
                     }}
                   >
                     <span className="text-base">{emoji}</span>
-                    <span>{label}</span>
+                    <span>{getRoleLabel(key)}</span>
                   </button>
                 );
               })}
@@ -185,7 +165,6 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleLogin} className="flex flex-col gap-4">
-              {/* Email */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
                   {t("email")}
@@ -194,7 +173,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="toi@example.com"
+                  placeholder={t("emailPlaceholder")}
                   required
                   className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
                   style={{
@@ -208,7 +187,6 @@ export default function LoginPage() {
                 />
               </div>
 
-              {/* Password */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
                   {t("password")}
@@ -231,7 +209,6 @@ export default function LoginPage() {
                 />
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
@@ -251,14 +228,10 @@ export default function LoginPage() {
             </form>
           </div>
 
-          {/* Footer */}
           <p className="text-center text-xs mt-6" style={{ color: "rgba(255,255,255,0.3)" }}>
             {t("noAccount")}{" "}
-            <Link
-              href="/register"
-              style={{ color: "#10b981", textDecoration: "none" }}
-            >
-              S'inscrire
+            <Link href="/register" style={{ color: "#10b981", textDecoration: "none" }}>
+              {t("subscribe")}
             </Link>
           </p>
         </div>

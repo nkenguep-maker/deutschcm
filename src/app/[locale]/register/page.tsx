@@ -6,13 +6,14 @@ import { Link } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
+import BrandLogo from "@/components/BrandLogo";
 
 type Role = "STUDENT" | "TEACHER" | "CENTER_MANAGER";
 
-const ROLES: { key: Role; emoji: string; label: string; sub: string; color: string }[] = [
-  { key: "STUDENT",        emoji: "🎓", label: "Je suis apprenant",   sub: "J'apprends l'allemand (A1→C1)", color: "#10b981" },
-  { key: "TEACHER",        emoji: "👨‍🏫", label: "Je suis enseignant", sub: "J'enseigne et gère des classes",  color: "#6366f1" },
-  { key: "CENTER_MANAGER", emoji: "🏫", label: "Je gère un centre",   sub: "Centre de langues / établissement", color: "#eab308" },
+const ROLES: { key: Role; emoji: string; color: string }[] = [
+  { key: "STUDENT",        emoji: "🎓", color: "#10b981" },
+  { key: "TEACHER",        emoji: "👨‍🏫", color: "#6366f1" },
+  { key: "CENTER_MANAGER", emoji: "🏫", color: "#eab308" },
 ];
 
 const ONBOARDING_DEST: Record<Role, string> = {
@@ -35,6 +36,9 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [consent, setConsent] = useState(false);
+
+  const getRoleLabel = (key: Role) =>
+    t(key === "STUDENT" ? "roleStudent" : key === "TEACHER" ? "roleTeacher" : "roleCenter");
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
@@ -110,7 +114,6 @@ export default function RegisterPage() {
         className="relative min-h-screen w-full flex items-center justify-center px-5 py-10"
         style={{ background: "#080c10", fontFamily: "'DM Mono', monospace" }}
       >
-        {/* Ambient glow */}
         <div className="fixed inset-0 pointer-events-none">
           <div
             className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full opacity-10"
@@ -123,30 +126,10 @@ export default function RegisterPage() {
         </div>
 
         <div className="relative z-10 w-full fade-up" style={{ maxWidth: 420 }}>
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4"
-              style={{
-                background: "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.1))",
-                border: "1px solid rgba(16,185,129,0.3)",
-                boxShadow: "0 0 40px rgba(16,185,129,0.1)",
-              }}
-            >
-             
-            </div>
-            <h1
-              className="text-2xl font-bold"
-              style={{ color: "white", fontFamily: "'Syne', sans-serif" }}
-            >
-              Yema
-            </h1>
-            <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
-              Commence ton voyage linguistique
-            </p>
+          <div className="flex justify-center mb-8">
+            <BrandLogo tagline={t("tagline")} />
           </div>
 
-          {/* Card */}
           <div
             className="rounded-3xl p-6"
             style={{
@@ -156,7 +139,6 @@ export default function RegisterPage() {
               boxShadow: "0 8px 40px rgba(0,0,0,0.4)",
             }}
           >
-            {/* ── Success state ── */}
             {success ? (
               <div className="text-center py-4">
                 <div
@@ -169,15 +151,15 @@ export default function RegisterPage() {
                   className="text-lg font-bold mb-2"
                   style={{ color: "white", fontFamily: "'Syne', sans-serif" }}
                 >
-                  Vérifie ta boîte mail
+                  {t("confirmTitle")}
                 </h2>
                 <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-                  Un lien de confirmation a été envoyé à{" "}
+                  {t("confirmSent")}{" "}
                   <span style={{ color: "#10b981" }}>{email}</span>.
                   <br /><br />
-                  Clique sur le lien pour activer ton compte et accéder à l'espace{" "}
+                  {t("confirmClick")}{" "}
                   <span style={{ color: "#10b981" }}>
-                    {activeRole?.label ?? ""}
+                    {activeRole ? getRoleLabel(activeRole.key) : ""}
                   </span>.
                 </p>
                 <Link
@@ -191,25 +173,24 @@ export default function RegisterPage() {
                     boxShadow: "0 4px 20px rgba(16,185,129,0.3)",
                   }}
                 >
-                  Retour à la connexion
+                  {t("backToLogin")}
                 </Link>
               </div>
 
             ) : selectedRole === null ? (
-              /* ── Step 1 : role picker ── */
               <div className="slide-in">
                 <h2
                   className="text-lg font-bold mb-1"
                   style={{ color: "white", fontFamily: "'Syne', sans-serif" }}
                 >
-                  Créer un compte
+                  {t("createAccount")}
                 </h2>
                 <p className="text-xs mb-6" style={{ color: "rgba(255,255,255,0.35)" }}>
                   {t("chooseRoleHint")}
                 </p>
 
                 <div className="flex flex-col gap-3">
-                  {ROLES.map(({ key, emoji, label, sub, color }) => (
+                  {ROLES.map(({ key, emoji, color }) => (
                     <button
                       key={key}
                       type="button"
@@ -247,30 +228,26 @@ export default function RegisterPage() {
               </div>
 
             ) : (
-              /* ── Step 2 : form ── */
               <div className="slide-in">
-                {/* Role indicator + back button */}
                 <div className="flex items-center justify-between mb-5">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="px-3 py-1 rounded-full text-xs font-bold"
-                      style={{
-                        background: `${activeRole!.color}15`,
-                        border: `1px solid ${activeRole!.color}30`,
-                        color: activeRole!.color,
-                        fontFamily: "'Syne', sans-serif",
-                      }}
-                    >
-                      {activeRole!.emoji} {activeRole!.label}
-                    </span>
-                  </div>
+                  <span
+                    className="px-3 py-1 rounded-full text-xs font-bold"
+                    style={{
+                      background: `${activeRole!.color}15`,
+                      border: `1px solid ${activeRole!.color}30`,
+                      color: activeRole!.color,
+                      fontFamily: "'Syne', sans-serif",
+                    }}
+                  >
+                    {activeRole!.emoji} {getRoleLabel(activeRole!.key)}
+                  </span>
                   <button
                     type="button"
                     onClick={() => setSelectedRole(null)}
                     className="text-xs transition-all"
                     style={{ color: "rgba(255,255,255,0.3)", background: "none", border: "none", cursor: "pointer" }}
                   >
-                    ← Changer
+                    {t("changeRole")}
                   </button>
                 </div>
 
@@ -289,12 +266,12 @@ export default function RegisterPage() {
 
                 <form onSubmit={handleRegister} className="flex flex-col gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>Nom complet</label>
+                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{t("fullName")}</label>
                     <input
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Paul Nkengue"
+                      placeholder={t("fullNamePlaceholder")}
                       required
                       className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
                       style={{
@@ -309,12 +286,12 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>Adresse email</label>
+                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{t("email")}</label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="toi@example.com"
+                      placeholder={t("emailPlaceholder")}
                       required
                       className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
                       style={{
@@ -329,12 +306,12 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>Mot de passe</label>
+                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{t("password")}</label>
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Min. 6 caractères"
+                      placeholder={t("passwordMin")}
                       required
                       className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
                       style={{
@@ -348,7 +325,6 @@ export default function RegisterPage() {
                     />
                   </div>
 
-                  {/* Consent checkbox */}
                   <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
                     <input
                       type="checkbox"
@@ -386,12 +362,11 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* Footer */}
           {!success && (
             <p className="text-center text-xs mt-6" style={{ color: "rgba(255,255,255,0.3)" }}>
-              Déjà un compte ?{" "}
+              {t("hasAccount")}{" "}
               <Link href="/login" style={{ color: "#10b981", textDecoration: "none" }}>
-                Se connecter
+                {t("signIn")}
               </Link>
             </p>
           )}
