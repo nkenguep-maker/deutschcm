@@ -223,15 +223,6 @@ export default function StudentDashboard() {
     { id: "6", icon: "🚀", label: t.badgeRocket,    earned: false },
   ];
 
-  const dynamicStats = [
-    { icon: "⚡", value: xp > 0 ? (xp > 1000 ? `${(xp / 1000).toFixed(1)}K` : String(xp)) : "—", label: t.xpLabel },
-    { icon: "✅", value: analytics ? String(analytics.completedModules) : "—", label: t.lessonsLabel },
-    { icon: "🎯", value: analytics ? `${analytics.avgQuizScore}%` : "—", label: t.scoreLabel },
-    { icon: "🔥", value: streak > 0 ? String(streak) : "—", label: t.streakLabel },
-    { icon: "🏆", value: analytics ? String(analytics.totalBadges) : "—", label: t.badgesLabel },
-    { icon: "📖", value: level ?? "—", label: t.levelLabel },
-  ];
-
   const skills = analytics?.skillScores ? [
     { label: t.grammar,       icon: "📝", score: analytics.skillScores.grammatik ?? 0 },
     { label: t.vocabulary,    icon: "📖", score: analytics.skillScores.lesen ?? 0 },
@@ -245,8 +236,15 @@ export default function StudentDashboard() {
   // Smart CTA: test level → first lesson → continue
   const hasLevel = !!level;
   const hasLessons = analytics ? analytics.completedModules > 0 : false;
-  const ctaLabel = !hasLevel ? t.ctaTestLevel : !hasLessons ? t.ctaFirstLesson : t.ctaContinue;
-  const ctaHref = !hasLevel ? "/test-niveau" : "/courses";
+
+  const isLoaded = userData !== null;
+  const isNewUser = isLoaded && xp === 0 && !hasLessons && !hasLevel;
+  const headerTitle = isNewUser ? t.greetNew : firstName ? `${t.greetReturn} ${firstName}` : t.greetReturn;
+  const headerSubtitle = isNewUser ? t.greetSubtitleNew : t.greetSubtitleReturn;
+  const nextStepTitle = !hasLevel ? t.nextStep1Title : !hasLessons ? t.nextStep2Title : t.nextStep3Title;
+  const nextStepText = !hasLevel ? t.nextStep1Text : !hasLessons ? t.nextStep2Text : t.nextStep3Text;
+  const nextStepCTA = !hasLevel ? t.nextStep1CTA : !hasLessons ? t.nextStep2CTA : t.nextStep3CTA;
+  const nextStepHref = !hasLevel ? "/test-niveau" : "/courses";
 
   const pillars = [
     { label: t.pillar1Label, desc: t.pillar1Desc, color: "#10b981", badge: null },
@@ -257,143 +255,135 @@ export default function StudentDashboard() {
   return (
     <Layout title={tn.home}>
 
-      {/* ── Welcome row ── */}
-      <div className="fade-up" style={{ marginBottom: 28 }}>
+      {/* ── 1. Human header ── */}
+      <div className="fade-up" style={{ marginBottom: 24 }}>
         <div style={{
-          display: "flex", flexDirection: isMobile ? "column" : "row",
-          alignItems: isMobile ? "flex-start" : "center",
-          justifyContent: "space-between", gap: isMobile ? 16 : 0,
-          padding: isMobile ? "16px 18px" : "20px 24px", borderRadius: 18,
+          padding: isMobile ? "20px 18px" : "24px 28px", borderRadius: 20,
           background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
         }}>
-          <div>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.5)", fontSize: "0.82rem", fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>
-              {t.greetReturn}{firstName ? ` ${firstName}` : ""}
-            </p>
-            <h2 style={{ margin: "6px 0 10px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: isMobile ? "1.25rem" : "1.6rem" }}>
-              {t.greetSubtitle}
+          <div style={{ marginBottom: 14 }}>
+            <h2 style={{ margin: "0 0 6px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: isMobile ? "1.4rem" : "1.7rem", lineHeight: 1.2 }}>
+              {headerTitle}
             </h2>
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "6px 14px", borderRadius: 10,
-              background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.18)",
-            }}>
-              <span>🔥</span>
-              <span style={{ color: "#34d399", fontSize: "0.78rem" }}>
-                {streak > 0 ? `${streak} ${t.streakActive}` : t.streakEmpty}
-              </span>
-            </div>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.5)", fontSize: "0.88rem", lineHeight: 1.55 }}>
+              {headerSubtitle}
+            </p>
           </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "5px 12px", borderRadius: 20,
+              background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
+            }}>
+              <span style={{ fontSize: "0.75rem" }}>✦</span>
+              <span style={{ color: "#34d399", fontSize: "0.78rem", fontWeight: 600 }}>{t.encouragementPill}</span>
+            </div>
+            {streak > 0 && (
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                padding: "5px 12px", borderRadius: 20,
+                background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)",
+              }}>
+                <span style={{ fontSize: "0.75rem" }}>🔥</span>
+                <span style={{ color: "#f59e0b", fontSize: "0.78rem" }}>{streak} {t.streakActive}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, width: isMobile ? "100%" : "auto" }}>
+      {/* ── 2. Next step card (dominant) ── */}
+      <div className="fade-up" style={{ marginBottom: 24 }}>
+        <div style={{
+          padding: isMobile ? "20px 18px" : "24px 28px", borderRadius: 20,
+          background: "linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(16,185,129,0.03) 100%)",
+          border: "1px solid rgba(16,185,129,0.22)",
+        }}>
+          <p style={{ margin: "0 0 6px", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+            {t.nextStepCardTitle}
+          </p>
+          <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? 16 : 24, justifyContent: "space-between" }}>
+            <div style={{ flex: 1 }}>
+              <h3 style={{ margin: "0 0 6px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: isMobile ? "1.05rem" : "1.15rem" }}>
+                {nextStepTitle}
+              </h3>
+              <p style={{ margin: 0, color: "rgba(255,255,255,0.45)", fontSize: "0.82rem", lineHeight: 1.55 }}>
+                {nextStepText}
+              </p>
+            </div>
             <button
-              onClick={() => router.push(ctaHref)}
+              onClick={() => router.push(nextStepHref)}
               style={{
-                display: "flex", alignItems: "center", gap: 10,
-                padding: isMobile ? "12px 18px" : "14px 22px", borderRadius: 14, cursor: "pointer",
+                flexShrink: 0, display: "flex", alignItems: "center", gap: 8,
+                padding: "13px 22px", borderRadius: 14, cursor: "pointer",
                 background: "linear-gradient(135deg, #10b981, #059669)",
                 border: "none", color: "white",
                 fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem",
-                boxShadow: "0 4px 24px rgba(16,185,129,0.35)",
-                width: isMobile ? "100%" : "auto", justifyContent: isMobile ? "center" : "flex-start",
+                boxShadow: "0 4px 20px rgba(16,185,129,0.3)",
+                width: isMobile ? "100%" : "auto", justifyContent: "center",
               }}
             >
-              {ctaLabel}
-            </button>
-            <button
-              onClick={() => router.push("/simulateur")}
-              style={{
-                display: "flex", alignItems: "center", gap: 8, justifyContent: "center",
-                padding: "9px 16px", borderRadius: 12, cursor: "pointer",
-                background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
-                color: "#10b981", fontFamily: "'DM Mono', monospace", fontSize: "0.8rem",
-                width: isMobile ? "100%" : "auto",
-              }}
-            >
-              <span>🎙️</span> {t.ctaSimulator}
+              {nextStepCTA} →
             </button>
           </div>
         </div>
       </div>
 
-      {/* ── Progress widget ── */}
+      {/* ── 3. Progress widget ── */}
       <div id="progress" className="fade-up" style={{ marginBottom: 28 }}>
         <div style={{
-          borderRadius: 18, padding: isMobile ? "16px 18px" : "20px 24px",
+          borderRadius: 20, padding: isMobile ? "18px" : "22px 26px",
           background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
-          display: "flex", flexDirection: isMobile ? "column" : "row",
-          alignItems: isMobile ? "flex-start" : "center",
-          justifyContent: "space-between", gap: isMobile ? 16 : 0,
         }}>
-          <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
               📊 {t.progressWidgetTitle}
             </p>
-            {(xp === 0 && !hasLessons && !hasLevel) ? (
-              <>
-                <p style={{ margin: "8px 0 2px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
-                  {t.progressZeroTitle}
-                </p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>
-                  {t.progressZeroText}
-                </p>
-              </>
-            ) : (
-              <p style={{ margin: "6px 0 0", color: level ? "#10b981" : "rgba(255,255,255,0.45)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1.1rem" }}>
-                {level ?? t.levelConfirm}
-              </p>
-            )}
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-            <button
-              onClick={() => router.push(!hasLevel ? "/test-niveau" : "/courses")}
-              style={{
-                display: "flex", alignItems: "center", gap: 8,
-                padding: "10px 18px", borderRadius: 12, cursor: "pointer",
-                background: "linear-gradient(135deg, #10b981, #059669)",
-                border: "none", color: "white",
-                fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem",
-                boxShadow: "0 2px 12px rgba(16,185,129,0.3)",
-              }}
-            >
-              {!hasLevel ? t.progressTestLevel : (!hasLessons ? t.progressStartA1 : t.progressContinue)}
-            </button>
-            <a
-              href={`/${locale}/progress`}
-              style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.72rem", textDecoration: "none", whiteSpace: "nowrap" }}
-            >
+            <a href={`/${locale}/progress`} style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.72rem", textDecoration: "none" }}>
               {t.progressViewDetail} →
             </a>
           </div>
+          {(!isLoaded || (xp === 0 && !hasLessons && !hasLevel)) ? (
+            <div style={{ padding: "8px 0 4px" }}>
+              <p style={{ margin: "0 0 4px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
+                {t.progressZeroTitle}
+              </p>
+              <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>
+                {t.progressZeroText}
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: 12 }}>
+              <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                <p style={{ margin: "0 0 4px", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{t.progressLevelLabel}</p>
+                <p style={{ margin: 0, color: level ? "#10b981" : "rgba(255,255,255,0.4)", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: level ? "1.3rem" : "0.85rem" }}>
+                  {level ?? t.levelConfirm}
+                </p>
+              </div>
+              <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                <p style={{ margin: "0 0 4px", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{t.progressXpLabel}</p>
+                <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.3rem" }}>{xp}</p>
+              </div>
+              <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                <p style={{ margin: "0 0 4px", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{t.progressModulesLabel}</p>
+                <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.3rem" }}>{analytics?.completedModules ?? 0}</p>
+              </div>
+              <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                <p style={{ margin: "0 0 4px", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{t.progressDaysLabel}</p>
+                <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.3rem" }}>{streak}</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ── Stats grid ── */}
-      <div className="fade-up card-delay-1" style={{
-        display: "grid", gridTemplateColumns: isMobile ? "repeat(3, 1fr)" : "repeat(6, 1fr)",
-        gap: isMobile ? 10 : 14, marginBottom: 28,
-      }}>
-        {dynamicStats.map(s => <StatCard key={s.label} {...s} />)}
-      </div>
-
-      {/* ── Main grid ── */}
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 380px", gap: 24, alignItems: "start" }}>
+      {/* ── 4. Main grid ── */}
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 360px", gap: 24, alignItems: "start" }}>
 
         {/* ── Left col ── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-          {/* Level bar */}
-          <div className="fade-up card-delay-2">
-            <LevelBar
-              level={level}
-              percent={level ? Math.min(Math.round((xp % 1000) / 10), 99) : 0}
-              currentLabel={t.levelCurrentLabel}
-              towardsLabel={t.levelTowardsLabel}
-              confirmLabel={t.levelConfirm}
-            />
-          </div>
-
-          {/* Yema journey */}
+          {/* Learn / Prepare / Belong */}
           <div className="fade-up card-delay-2" style={{
             borderRadius: 18, overflow: "hidden",
             background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
@@ -403,22 +393,22 @@ export default function StudentDashboard() {
                 {t.journeyTitle}
               </p>
             </div>
-            <div style={{ padding: "14px 16px", display: "flex", gap: 10 }}>
+            <div style={{ padding: "14px 16px", display: "flex", flexDirection: isMobile ? "column" : "row", gap: 10 }}>
               {pillars.map(pillar => (
                 <div key={pillar.label} style={{
-                  flex: 1, padding: "14px 12px", borderRadius: 14,
+                  flex: 1, padding: "16px 14px", borderRadius: 14,
                   background: pillar.badge ? "rgba(255,255,255,0.02)" : `${pillar.color}08`,
                   border: `1px solid ${pillar.badge ? "rgba(255,255,255,0.07)" : pillar.color + "25"}`,
-                  opacity: pillar.badge ? 0.65 : 1,
+                  opacity: pillar.badge ? 0.7 : 1,
                 }}>
-                  <p style={{ margin: "0 0 6px", color: pillar.badge ? "rgba(255,255,255,0.45)" : pillar.color, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem" }}>
+                  <p style={{ margin: "0 0 8px", color: pillar.badge ? "rgba(255,255,255,0.45)" : pillar.color, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.88rem" }}>
                     {pillar.label}
                   </p>
-                  <p style={{ margin: 0, color: "rgba(255,255,255,0.35)", fontSize: "0.67rem", lineHeight: 1.45 }}>
+                  <p style={{ margin: 0, color: "rgba(255,255,255,0.38)", fontSize: "0.72rem", lineHeight: 1.5 }}>
                     {pillar.desc}
                   </p>
                   {pillar.badge && (
-                    <span style={{ display: "inline-block", marginTop: 8, background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.35)", fontSize: "0.58rem", padding: "2px 8px", borderRadius: 6, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                    <span style={{ display: "inline-block", marginTop: 10, background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.35)", fontSize: "0.58rem", padding: "2px 8px", borderRadius: 6, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                       {pillar.badge}
                     </span>
                   )}
@@ -432,16 +422,26 @@ export default function StudentDashboard() {
             borderRadius: 18, overflow: "hidden",
             background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
           }}>
-            <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                  {t.simPracticeTitle}
+            <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+              <div style={{ flex: 1 }}>
+                <p style={{ margin: "0 0 3px", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                  🎙️ {t.simPracticeTitle}
                 </p>
-                <p style={{ margin: "4px 0 0", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
+                <p style={{ margin: "0 0 10px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>
                   {t.simPracticeDesc}
                 </p>
+                <button
+                  onClick={() => router.push("/simulateur")}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 7,
+                    padding: "9px 16px", borderRadius: 10, cursor: "pointer",
+                    background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)",
+                    color: "#10b981", fontSize: "0.78rem", fontWeight: 600,
+                  }}
+                >
+                  {t.simCTA} →
+                </button>
               </div>
-              <span style={{ fontSize: "1.4rem" }}>🎙️</span>
             </div>
             <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
               {SIM_SCENARIOS.map(s => {
@@ -462,6 +462,17 @@ export default function StudentDashboard() {
 
         {/* ── Right col ── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+          {/* Level bar */}
+          <div className="fade-up card-delay-2">
+            <LevelBar
+              level={level}
+              percent={level ? Math.min(Math.round((xp % 1000) / 10), 99) : 0}
+              currentLabel={t.levelCurrentLabel}
+              towardsLabel={t.levelTowardsLabel}
+              confirmLabel={t.levelConfirm}
+            />
+          </div>
 
           {/* Skills progress */}
           <div className="fade-up card-delay-2" style={{
@@ -503,17 +514,17 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Join class — solo students only */}
+          {/* Classes / Support card (solo students + pending validation) */}
           {(!userData || userData.studentType === "solo") && (
-            <div className="fade-up card-delay-3" style={{ borderRadius: 18, background: "rgba(99,102,241,0.05)", border: "1px solid rgba(99,102,241,0.2)", padding: "20px 20px 18px" }}>
+            <div className="fade-up card-delay-3" style={{ borderRadius: 18, background: "rgba(99,102,241,0.05)", border: "1px solid rgba(99,102,241,0.2)", padding: "20px" }}>
               <p style={{ margin: "0 0 4px", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 {t.joinClassLabel}
               </p>
-              <p style={{ margin: "0 0 14px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.92rem" }}>
-                {t.joinClassTitle}
+              <p style={{ margin: "0 0 8px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>
+                {t.classCardTitle}
               </p>
-              <p style={{ margin: "0 0 14px", color: "rgba(255,255,255,0.35)", fontSize: "0.75rem", lineHeight: 1.5 }}>
-                {t.joinClassDesc}
+              <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.38)", fontSize: "0.75rem", lineHeight: 1.55 }}>
+                {t.classCardText}
               </p>
               <div style={{ display: "flex", gap: 8 }}>
                 <input
@@ -541,7 +552,6 @@ export default function StudentDashboard() {
             </div>
           )}
 
-          {/* Pending validation */}
           {userData?.studentType === "classroom" && !userData.isValidated && (
             <div className="fade-up card-delay-3" style={{ borderRadius: 18, background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.25)", padding: "18px 20px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -591,65 +601,28 @@ export default function StudentDashboard() {
             )}
           </div>
 
-          {/* Community */}
+          {/* Community preview */}
           <div className="fade-up card-delay-3" style={{
-            borderRadius: 18, overflow: "hidden",
-            background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
+            borderRadius: 18, padding: "20px",
+            background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
+            opacity: 0.75,
           }}>
-            <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-              <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                {t.communityLabel}
-              </p>
-              <p style={{ margin: "4px 0 0", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
-                {t.discoverLabel}
-              </p>
-            </div>
-            <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
-              {/* Available classes — active link */}
-              <a href="/discover?tab=classes" style={{
-                display: "flex", gap: 10, alignItems: "center", padding: "10px 12px",
-                borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)",
-                textDecoration: "none",
-              }}>
-                <span style={{ fontSize: 20, flexShrink: 0 }}>🏫</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 600 }}>{t.classesAvailable}</div>
-                  <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{t.classesJoin}</div>
-                </div>
-                <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 12 }}>→</span>
-              </a>
-              {/* Study groups — coming soon */}
-              <div style={{
-                display: "flex", gap: 10, alignItems: "center", padding: "10px 12px",
-                borderRadius: 12, background: "rgba(255,255,255,0.01)", border: "1px solid rgba(255,255,255,0.04)",
-                opacity: 0.6,
-              }}>
-                <span style={{ fontSize: 20, flexShrink: 0 }}>👥</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600 }}>{t.groupsLabel}</div>
-                  <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>{t.communityGroupsSoon}</div>
-                </div>
-                <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)", fontSize: 9, padding: "2px 8px", borderRadius: 6, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", flexShrink: 0 }}>
-                  {t.pillar3Badge}
-                </span>
-              </div>
-              {/* Find a partner — coming soon */}
-              <div style={{
-                display: "flex", gap: 10, alignItems: "center", padding: "10px 12px",
-                borderRadius: 12, background: "rgba(255,255,255,0.01)", border: "1px solid rgba(255,255,255,0.04)",
-                opacity: 0.6,
-              }}>
-                <span style={{ fontSize: 20, flexShrink: 0 }}>🤝</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600 }}>{t.findPartner}</div>
-                  <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>{t.communityPartnerSoon}</div>
-                </div>
-                <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)", fontSize: 9, padding: "2px 8px", borderRadius: 6, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", flexShrink: 0 }}>
-                  {t.pillar3Badge}
-                </span>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: "1.3rem" }}>🌍</span>
+              <div>
+                <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
+                  {t.communityCardTitle}
+                </p>
               </div>
             </div>
+            <p style={{ margin: "0 0 12px", color: "rgba(255,255,255,0.38)", fontSize: "0.73rem", lineHeight: 1.55 }}>
+              {t.communityCardText}
+            </p>
+            <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)", fontSize: "0.6rem", padding: "3px 10px", borderRadius: 6, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em" }}>
+              {t.pillar3Badge}
+            </span>
           </div>
+
         </div>
       </div>
 
