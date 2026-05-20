@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import { callAI } from "@/lib/ai/provider"
 import { getCached, setCached, cacheKey } from "@/lib/geminiCache"
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.GEMINI_API_KEY
-  if (!apiKey) return NextResponse.json({ error: "GEMINI_API_KEY manquante" }, { status: 500 })
-
   const { level, topic, moduleId, count = 10, adaptive = true, previousScores = [] } = await req.json()
 
   const key = cacheKey("quiz", level, topic ?? "", String(count))
@@ -22,19 +19,9 @@ export async function POST(req: NextRequest) {
     : level
     : level
 
-  const genAI = new GoogleGenerativeAI(apiKey)
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash-exp",
-    generationConfig: {
-      temperature: 0.4,
-      maxOutputTokens: 3000,
-      responseMimeType: "application/json"
-    }
-  })
+  const systemPrompt = `Tu es un expert en didactique de l'allemand (DaF) pour apprenants francophones. Tu retournes UNIQUEMENT du JSON valide.`
 
-  const prompt = `Tu es un expert en didactique de l'allemand (DaF) pour apprenants francophones.
-
-Génère exactement ${count} questions de quiz pour :
+  const userMessage = `Génère exactement ${count} questions de quiz pour :
 - Niveau CEFR : ${adjustedLevel}
 - Thème/Leçon : ${topic || "Allemand général"}
 - Score moyen précédent : ${Math.round(avgPreviousScore)}% ${adaptive ? "(adaptatif activé)" : ""}
@@ -72,15 +59,19 @@ Retourne UNIQUEMENT ce JSON valide :
 }`
 
   try {
-    const result = await model.generateContent(prompt)
-    const raw = result.response.text()
-    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim())
+    const result = await callAI({
+      feature: "quiz",
+      systemPrompt,
+      userMessage,
+      temperature: 0.4,
+      maxTokens: 3000,
+    })
+    const parsed = JSON.parse(result.text.replace(/```json|```/g, "").trim())
     setCached(key, parsed)
     return NextResponse.json({ success: true, quiz: parsed }, {
       headers: { "Cache-Control": "no-store" }
     })
-  } catch (err) {
-    // Fallback questions statiques si Gemini indisponible
+  } catch {
     const fallbackQuestions = {
       level: level,
       adjustedLevel: level,
@@ -205,7 +196,7 @@ Retourne UNIQUEMENT ce JSON valide :
       success: true,
       quiz: fallbackQuestions,
       fallback: true,
-      note: "Questions statiques (Gemini indisponible)"
+      note: "Questions statiques (AI indisponible)"
     })
   }
 }

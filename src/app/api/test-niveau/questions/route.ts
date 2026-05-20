@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import { callAI } from "@/lib/ai/provider"
 import { getCached, setCached, cacheKey } from "@/lib/geminiCache"
 
-const PROMPT: Record<string, string> = {
+const SYSTEM_PROMPT = "Tu es un expert en tests de niveau CEFR allemand. Tu retournes UNIQUEMENT du JSON valide."
+
+const USER_PROMPT: Record<string, string> = {
   fr: `Génère exactement 30 questions de test de niveau allemand CEFR pour apprenants francophones.
 Distribution : A1(6) A2(6) B1(6) B2(6) C1(6)
 
@@ -49,15 +51,15 @@ export async function GET(request: NextRequest) {
   const cached = getCached(key)
   if (cached) return NextResponse.json({ success: true, questions: cached, fromCache: true })
 
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    generationConfig: { temperature: 0.2, maxOutputTokens: 4000, responseMimeType: "application/json" }
-  })
-
   try {
-    const result = await model.generateContent(PROMPT[locale])
-    const parsed = JSON.parse(result.response.text().replace(/```json|```/g, "").trim())
+    const result = await callAI({
+      feature: "level-test",
+      systemPrompt: SYSTEM_PROMPT,
+      userMessage: USER_PROMPT[locale],
+      temperature: 0.2,
+      maxTokens: 4000,
+    })
+    const parsed = JSON.parse(result.text.replace(/```json|```/g, "").trim())
     setCached(key, parsed.questions)
     return NextResponse.json({ success: true, questions: parsed.questions })
   } catch {

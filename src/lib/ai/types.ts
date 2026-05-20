@@ -32,6 +32,8 @@ export function getProviderForFeature(feature: AIFeature): ProviderName {
       return (process.env.SPEECH_AI_PROVIDER as ProviderName | undefined) ?? "openai";
     case "writing":
       return (process.env.WRITING_AI_PROVIDER as ProviderName | undefined) ?? "openai";
+    case "quiz":
+      return (process.env.QUIZ_AI_PROVIDER as ProviderName | undefined) ?? "openai";
     case "level-test":
       return (process.env.LEVEL_TEST_AI_PROVIDER as ProviderName | undefined) ?? "openai";
     case "course-gen":

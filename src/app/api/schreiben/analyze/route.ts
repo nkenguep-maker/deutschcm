@@ -1,49 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { callAI } from "@/lib/ai/provider";
-
-function fixA1Grammar(text: string): string {
-  return text
-    .replace(/\bich\s+ist\b/gi,   "ich bin")
-    .replace(/\bich\s+bist\b/gi,  "ich bin")
-    .replace(/\bich\s+sind\b/gi,  "ich bin")
-    .replace(/\bich\s+seid\b/gi,  "ich bin")
-    .replace(/\bdu\s+bin\b/gi,    "du bist")
-    .replace(/\bdu\s+ist\b/gi,    "du bist")
-    .replace(/\bdu\s+sind\b/gi,   "du bist")
-    .replace(/\bdu\s+seid\b/gi,   "du bist")
-    .replace(/\ber\s+bin\b/gi,    "er ist")
-    .replace(/\ber\s+bist\b/gi,   "er ist")
-    .replace(/\ber\s+sind\b/gi,   "er ist")
-    .replace(/\ber\s+seid\b/gi,   "er ist")
-    .replace(/\bwir\s+bin\b/gi,   "wir sind")
-    .replace(/\bwir\s+bist\b/gi,  "wir sind")
-    .replace(/\bwir\s+ist\b/gi,   "wir sind")
-    .replace(/\bwir\s+seid\b/gi,  "wir sind")
-    .replace(/\bihr\s+bin\b/gi,   "ihr seid")
-    .replace(/\bihr\s+bist\b/gi,  "ihr seid")
-    .replace(/\bihr\s+ist\b/gi,   "ihr seid")
-    .replace(/\bihr\s+sind\b/gi,  "ihr seid")
-    .replace(/\bich\s+hat\b/gi,   "ich habe")
-    .replace(/\bich\s+hast\b/gi,  "ich habe")
-    .replace(/\bich\s+habt\b/gi,  "ich habe")
-    .replace(/\bich\s+haben\b/gi, "ich habe")
-    .replace(/\bdu\s+habe\b/gi,   "du hast")
-    .replace(/\bdu\s+hat\b/gi,    "du hast")
-    .replace(/\bdu\s+habt\b/gi,   "du hast")
-    .replace(/\bdu\s+haben\b/gi,  "du hast")
-    .replace(/\ber\s+habe\b/gi,   "er hat")
-    .replace(/\ber\s+hast\b/gi,   "er hat")
-    .replace(/\ber\s+habt\b/gi,   "er hat")
-    .replace(/\ber\s+haben\b/gi,  "er hat")
-    .replace(/\bwir\s+habe\b/gi,  "wir haben")
-    .replace(/\bwir\s+hast\b/gi,  "wir haben")
-    .replace(/\bwir\s+hat\b/gi,   "wir haben")
-    .replace(/\bwir\s+habt\b/gi,  "wir haben")
-    .replace(/\bihr\s+habe\b/gi,  "ihr habt")
-    .replace(/\bihr\s+hast\b/gi,  "ihr habt")
-    .replace(/\bihr\s+hat\b/gi,   "ihr habt")
-    .replace(/\bihr\s+haben\b/gi, "ihr habt");
-}
+import { fixA1Grammar } from "@/lib/ai/guardrails";
 
 function applyGrammarGuardrail(correction: Record<string, unknown>): Record<string, unknown> {
   if (typeof correction.texte_corrige === "string") {
