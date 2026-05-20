@@ -13,14 +13,12 @@ const T = {
   fr: {
     layoutTitle: "Mes Classes",
     pageTitle: "Mes classes",
-    pageSubtitle: (n: number) =>
-      n === 0 ? "Aucune classe inscrite" : `${n} classe${n > 1 ? "s" : ""} inscrite${n > 1 ? "s" : ""}`,
+    pageSubtitle: "Vos espaces d'apprentissage avec enseignants, centres et groupes accompagnés.",
     joinCta: "+ Rejoindre une classe",
     positionTitle: "Apprendre seul, ou avancer accompagné",
     positionDesc:
       "Les classes vous connectent à un enseignant et à d'autres apprenants. Progressez ensemble, restez motivé.",
-    demoLabel: "Démo",
-    cardEnterBtn: "Entrer →",
+    demoLabel: "Classe démo",
     cardViewBtn: "Voir la classe",
     cardLearnersLabel: "apprenants",
     cardProgressLabel: "Progression du cours",
@@ -40,7 +38,7 @@ const T = {
     modalSuccessTitle: "Classe rejointe !",
     modalError: "Erreur inconnue",
     modalNetworkError: "Erreur réseau",
-    communityTitle: "Bientôt : groupes d'étude et partenaires",
+    communityTitle: "Bientôt : groupes d'étude et partenaires d'apprentissage",
     communityDesc:
       "Trouvez des apprenants au même niveau, partagez vos progrès et progressez ensemble.",
     communitySoon: "Bientôt disponible",
@@ -48,14 +46,12 @@ const T = {
   en: {
     layoutTitle: "My Classes",
     pageTitle: "My classes",
-    pageSubtitle: (n: number) =>
-      n === 0 ? "No classes enrolled" : `${n} class${n > 1 ? "es" : ""} enrolled`,
+    pageSubtitle: "Your learning spaces with teachers, centers and guided groups.",
     joinCta: "+ Join a class",
     positionTitle: "Learn on your own, or move forward with support",
     positionDesc:
       "Classes connect you to a teacher and fellow learners. Progress together and stay motivated.",
-    demoLabel: "Demo",
-    cardEnterBtn: "Enter →",
+    demoLabel: "Demo class",
     cardViewBtn: "View class",
     cardLearnersLabel: "learners",
     cardProgressLabel: "Course progress",
@@ -75,7 +71,7 @@ const T = {
     modalSuccessTitle: "Class joined!",
     modalError: "Unknown error",
     modalNetworkError: "Network error",
-    communityTitle: "Coming soon: study groups and partners",
+    communityTitle: "Coming soon: study groups and learning partners",
     communityDesc:
       "Find learners at your level, share your progress and grow together.",
     communitySoon: "Coming soon",
@@ -106,37 +102,72 @@ interface Classroom {
   isDemo?: boolean;
 }
 
-const MOCK_CLASSROOMS: Classroom[] = [
-  {
-    id: "cls-1",
-    name: "Allemand A1 — Débutants",
-    teacher: "Prof. Sophie Tanda",
-    level: "A1",
-    code: "DEUTSCH-A1-2024",
-    students: 24,
-    progress: 68,
-    color: "#10b981",
-    isDemo: true,
-    nextAssignments: [
-      { id: "a1", title: "Vocabulaire : Se présenter", dueDate: "2025-05-15", submitted: false },
-      { id: "a2", title: "Grammaire : Der/Die/Das",    dueDate: "2025-05-22", submitted: true  },
-    ],
-  },
-  {
-    id: "cls-2",
-    name: "Préparation TELC A2",
-    teacher: "Prof. Jean-Pierre Nkolo",
-    level: "A2",
-    code: "DEUTSCH-A2-TELC",
-    students: 18,
-    progress: 45,
-    color: "#6366f1",
-    isDemo: true,
-    nextAssignments: [
-      { id: "a3", title: "Exercices de lecture", dueDate: "2025-05-18", submitted: false },
-    ],
-  },
-];
+function getMockClassrooms(locale: Locale): Classroom[] {
+  if (locale === "en") {
+    return [
+      {
+        id: "cls-1",
+        name: "German A1 — Beginners",
+        teacher: "Prof. Sophie Tanda",
+        level: "A1",
+        code: "DEUTSCH-A1-2024",
+        students: 24,
+        progress: 68,
+        color: "#10b981",
+        isDemo: true,
+        nextAssignments: [
+          { id: "a1", title: "Vocabulary: Introducing yourself", dueDate: "2025-05-15", submitted: false },
+          { id: "a2", title: "Grammar: Der/Die/Das",            dueDate: "2025-05-22", submitted: true  },
+        ],
+      },
+      {
+        id: "cls-2",
+        name: "TELC A2 preparation",
+        teacher: "Prof. Jean-Pierre Nkolo",
+        level: "A2",
+        code: "DEUTSCH-A2-TELC",
+        students: 18,
+        progress: 45,
+        color: "#6366f1",
+        isDemo: true,
+        nextAssignments: [
+          { id: "a3", title: "Reading exercises", dueDate: "2025-05-18", submitted: false },
+        ],
+      },
+    ];
+  }
+  return [
+    {
+      id: "cls-1",
+      name: "Allemand A1 — Débutants",
+      teacher: "Prof. Sophie Tanda",
+      level: "A1",
+      code: "DEUTSCH-A1-2024",
+      students: 24,
+      progress: 68,
+      color: "#10b981",
+      isDemo: true,
+      nextAssignments: [
+        { id: "a1", title: "Vocabulaire : se présenter", dueDate: "2025-05-15", submitted: false },
+        { id: "a2", title: "Grammaire : Der/Die/Das",    dueDate: "2025-05-22", submitted: true  },
+      ],
+    },
+    {
+      id: "cls-2",
+      name: "Préparation TELC A2",
+      teacher: "Prof. Jean-Pierre Nkolo",
+      level: "A2",
+      code: "DEUTSCH-A2-TELC",
+      students: 18,
+      progress: 45,
+      color: "#6366f1",
+      isDemo: true,
+      nextAssignments: [
+        { id: "a3", title: "Exercices de lecture", dueDate: "2025-05-18", submitted: false },
+      ],
+    },
+  ];
+}
 
 const LEVEL_COLORS: Record<string, string> = {
   A1: "#10b981", A2: "#34d399", B1: "#6366f1", B2: "#8b5cf6", C1: "#f59e0b",
@@ -189,11 +220,11 @@ function ClassCard({ cls, t }: { cls: Classroom; t: TT }) {
           </div>
         </div>
         <Link href={`/classroom/${cls.id}`} style={{
-          background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)",
-          border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8,
-          padding: "6px 14px", fontSize: 12, textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0,
+          background: `${levelColor}22`, color: levelColor,
+          border: `1px solid ${levelColor}44`, borderRadius: 8,
+          padding: "6px 14px", fontSize: 12, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0,
         }}>
-          {t.cardEnterBtn}
+          {t.cardViewBtn}
         </Link>
       </div>
 
@@ -262,6 +293,8 @@ export default function ClassroomListPage() {
   const locale: Locale = pathname.startsWith("/en") ? "en" : "fr";
   const t = T[locale] as TT;
 
+  const classrooms = getMockClassrooms(locale);
+
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [code, setCode] = useState("");
   const [joining, setJoining] = useState(false);
@@ -306,7 +339,7 @@ export default function ClassroomListPage() {
             {t.pageTitle}
           </h2>
           <p style={{ margin: "4px 0 0", color: "rgba(255,255,255,0.35)", fontSize: 13 }}>
-            {t.pageSubtitle(MOCK_CLASSROOMS.length)}
+            {t.pageSubtitle}
           </p>
         </div>
         <button onClick={() => setShowJoinModal(true)} style={{
@@ -335,10 +368,10 @@ export default function ClassroomListPage() {
 
       {/* Class grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))", gap: 20 }}>
-        {MOCK_CLASSROOMS.map(cls => <ClassCard key={cls.id} cls={cls} t={t} />)}
+        {classrooms.map(cls => <ClassCard key={cls.id} cls={cls} t={t} />)}
 
         {/* Empty state */}
-        {MOCK_CLASSROOMS.length === 0 && (
+        {classrooms.length === 0 && (
           <div style={{
             gridColumn: "1/-1", textAlign: "center", padding: "60px 20px",
             background: "rgba(13,17,23,0.6)", border: "1px solid rgba(255,255,255,0.06)",
