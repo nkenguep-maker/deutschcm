@@ -70,8 +70,15 @@ const LABELS = {
     aiGemini: "✨ Gemini correction",
     aiQuiz: "🧠 Adaptive quiz",
     min: "min",
+    loading: "Loading module…",
     disclaimer: "Yema Languages provides independent CEFR-aligned language practice and is not affiliated with any official examination institute.",
     menuLabel: "Modules",
+    typeLesson: "Lesson",
+    typeHoeren: "Listening",
+    typeConversation: "Speaking",
+    typeSchreiben: "Writing",
+    typeQuiz: "Quiz",
+    typeVideo: "Video",
   },
   fr: {
     back: "← Retour aux cours",
@@ -114,8 +121,15 @@ const LABELS = {
     aiGemini: "✨ Correction Gemini",
     aiQuiz: "🧠 Quiz adaptatif",
     min: "min",
+    loading: "Chargement du module…",
     disclaimer: "Yema Languages propose une pratique linguistique indépendante alignée sur le CECRL et n'est affiliée à aucun organisme officiel d'examen.",
     menuLabel: "Modules",
+    typeLesson: "Leçon",
+    typeHoeren: "Écoute",
+    typeConversation: "Expression orale",
+    typeSchreiben: "Écriture",
+    typeQuiz: "Quiz",
+    typeVideo: "Vidéo",
   },
 } as const
 
@@ -339,9 +353,21 @@ export default function ModulePage() {
     setModule(mod)
   }, [params.moduleId])
 
+  const localizedType = (type: ModuleType): string => {
+    const map: Record<ModuleType, string> = {
+      LESSON: labels.typeLesson,
+      HOEREN: labels.typeHoeren,
+      CONVERSATION: labels.typeConversation,
+      SCHREIBEN: labels.typeSchreiben,
+      QUIZ: labels.typeQuiz,
+      VIDEO: labels.typeVideo,
+    };
+    return map[type] ?? type;
+  };
+
   if (!module) return (
     <div style={{ minHeight: "100vh", background: "#080c10", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <p style={{ color: "#10b981" }}>⏳ Chargement du module…</p>
+      <p style={{ color: "#10b981" }}>⏳ {labels.loading}</p>
     </div>
   )
 
@@ -462,7 +488,7 @@ export default function ModulePage() {
                 {module.level}
               </span>
               <span style={{ fontSize: 10, padding: "3px 10px", borderRadius: 99, background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)" }}>
-                {module.type}
+                {localizedType(module.type)}
               </span>
               <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>⏱ {module.duration} {labels.min}</span>
               <span style={{ fontSize: 10, color: "#f59e0b" }}>+{module.xpReward} XP</span>
