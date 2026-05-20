@@ -8,15 +8,15 @@ import type {
   HistoryItem,
   AmbassadeError,
   AmbassadeResponse,
-  VisaDecision,
+  SessionResult,
 } from "@/types/ambassade";
 
-export function useAmbassade() {
+export function useAmbassade(locale: "fr" | "en" = "fr") {
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<AmbassadeError | null>(null);
   const [concluded, setConcluded] = useState(false);
-  const [visaDecision, setVisaDecision] = useState<VisaDecision>("pending");
+  const [sessionResult, setSessionResult] = useState<SessionResult>("in_progress");
   const [scenario, setScenarioState] = useState<ScenarioType>("visa_etudiant");
   const [niveau, setNiveauState] = useState<NiveauType>("A1");
   const historyRef = useRef<HistoryItem[]>([]);
@@ -26,7 +26,7 @@ export function useAmbassade() {
     setIsLoading(false);
     setError(null);
     setConcluded(false);
-    setVisaDecision("pending");
+    setSessionResult("in_progress");
     historyRef.current = [];
   }, []);
 
@@ -50,7 +50,7 @@ export function useAmbassade() {
           id: userId,
           role: "user",
           textDE: text,
-          translationFR: "",
+          translation: "",
           timestamp: new Date(),
         },
       ]);
@@ -65,6 +65,7 @@ export function useAmbassade() {
             message: text,
             scenario,
             niveau,
+            locale,
             history: historyRef.current,
           }),
         });
@@ -81,7 +82,12 @@ export function useAmbassade() {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === userId
-              ? { ...m, evaluation: data.evaluation, pedagogicalTip: data.pedagogicalTip }
+              ? {
+                  ...m,
+                  evaluation: data.evaluation,
+                  pedagogicalTip: data.pedagogicalTip,
+                  correctionDE: data.correctionDE,
+                }
               : m
           )
         );
@@ -92,7 +98,7 @@ export function useAmbassade() {
             id: `${Date.now()}-agent`,
             role: "agent",
             textDE: data.agentResponseDE,
-            translationFR: data.translationFR,
+            translation: data.translation,
             timestamp: new Date(),
           },
         ]);
@@ -103,18 +109,23 @@ export function useAmbassade() {
           { role: "model", parts: [{ text: data.agentResponseDE }] },
         ];
 
-        if (data.interviewConcluded) {
+        if (data.sessionConcluded) {
           setConcluded(true);
-          setVisaDecision(data.visaDecision);
+          setSessionResult(data.sessionResult);
         }
       } catch {
-        setError({ code: "GEMINI_ERROR", message: "Erreur de connexion. Vérifie ta connexion internet." });
+        setError({
+          code: "AI_ERROR",
+          message: locale === "en"
+            ? "Connection error. Check your internet connection."
+            : "Erreur de connexion. Vérifie ta connexion internet.",
+        });
         setMessages((prev) => prev.filter((m) => m.id !== userId));
       } finally {
         setIsLoading(false);
       }
     },
-    [scenario, niveau, concluded]
+    [scenario, niveau, locale, concluded]
   );
 
   const startInterview = useCallback(async () => {
@@ -127,9 +138,12 @@ export function useAmbassade() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: "Bonjour, je voudrais commencer à pratiquer.",
+          message: locale === "en"
+            ? "Hello, I would like to start practicing."
+            : "Bonjour, je voudrais commencer à pratiquer.",
           scenario,
           niveau,
+          locale,
           history: [],
         }),
       });
@@ -147,28 +161,37 @@ export function useAmbassade() {
           id: `${Date.now()}-agent`,
           role: "agent",
           textDE: data.agentResponseDE,
-          translationFR: data.translationFR,
+          translation: data.translation,
           timestamp: new Date(),
         },
       ]);
 
+      const startMsg = locale === "en"
+        ? "Hello, I would like to start practicing."
+        : "Bonjour, je voudrais commencer à pratiquer.";
+
       historyRef.current = [
-        { role: "user", parts: [{ text: "Bonjour, je voudrais commencer à pratiquer." }] },
+        { role: "user", parts: [{ text: startMsg }] },
         { role: "model", parts: [{ text: data.agentResponseDE }] },
       ];
     } catch {
-      setError({ code: "GEMINI_ERROR", message: "Impossible de démarrer l'entretien." });
+      setError({
+        code: "AI_ERROR",
+        message: locale === "en"
+          ? "Unable to start the session."
+          : "Impossible de démarrer l'entretien.",
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [scenario, niveau]);
+  }, [scenario, niveau, locale]);
 
   return {
     messages,
     isLoading,
     error,
     concluded,
-    visaDecision,
+    sessionResult,
     scenario,
     niveau,
     sendMessage,

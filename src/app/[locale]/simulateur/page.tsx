@@ -7,7 +7,7 @@ import VoiceRecorder from "@/components/VoiceRecorder";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useAmbassade } from "@/hooks/useAmbassade";
 import { SCENARIOS, NIVEAUX } from "@/types/ambassade";
-import type { ConversationMessage, EvaluationScore, NiveauType, ScenarioType } from "@/types/ambassade";
+import type { ConversationMessage, CorrectionDE, EvaluationScore, NiveauType, ScenarioType } from "@/types/ambassade";
 
 // ─── Locale text ──────────────────────────────────────────────────────────────
 
@@ -47,6 +47,9 @@ const T = {
     conclusionEndTitle: "Session terminée",
     conclusionEndText: "Continuez à pratiquer pour progresser en allemand.",
     disclaimer: "Yema propose des simulations de pratique linguistique. Ces scénarios ne remplacent aucun entretien officiel et ne garantissent aucun résultat administratif.",
+    correctionLabel: "Correction",
+    correctionOriginal: "Vous avez écrit",
+    correctionCorrected: "Version correcte",
     scoreLabels: { grammar: "Grammaire", vocabulary: "Vocabulaire", relevance: "Pertinence" },
     scenarioLabels: {
       visa_etudiant: "Études en Allemagne",
@@ -90,6 +93,9 @@ const T = {
     conclusionEndTitle: "Session complete",
     conclusionEndText: "Keep practicing — this is how progress happens.",
     disclaimer: "Yema provides language practice simulations. These scenarios do not replace any official interview and do not guarantee any administrative outcome.",
+    correctionLabel: "Correction",
+    correctionOriginal: "You wrote",
+    correctionCorrected: "Correct version",
     scoreLabels: { grammar: "Grammar", vocabulary: "Vocabulary", relevance: "Relevance" },
     scenarioLabels: {
       visa_etudiant: "Studies in Germany",
@@ -219,7 +225,7 @@ function AgentBubble({
           </div>
           {showTranslation && (
             <p style={{ margin: "8px 0 0", color: "rgba(16,185,129,0.7)", fontSize: "0.75rem", lineHeight: 1.5, fontFamily: "'DM Mono', monospace", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 8 }}>
-              {msg.translationFR}
+              {msg.translation}
             </p>
           )}
         </div>
@@ -236,6 +242,8 @@ function AgentBubble({
 
 function UserBubble({ msg, t }: { msg: ConversationMessage; t: TT }) {
   const hasScores = !!msg.evaluation;
+  const correction = msg.correctionDE as CorrectionDE | undefined;
+  const showCorrection = correction && !correction.wasCorrect;
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
       <p style={{ margin: 0, fontSize: "0.62rem", color: "rgba(255,255,255,0.3)", fontFamily: "'DM Mono', monospace" }}>
@@ -253,6 +261,24 @@ function UserBubble({ msg, t }: { msg: ConversationMessage; t: TT }) {
           {msg.textDE}
         </p>
       </div>
+      {showCorrection && (
+        <div style={{ maxWidth: "72%", padding: "10px 14px", borderRadius: 12, background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", flexDirection: "column", gap: 4 }}>
+          <p style={{ margin: 0, fontSize: "0.6rem", color: "rgba(245,158,11,0.7)", fontFamily: "'Syne', sans-serif", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            {t.correctionLabel}
+          </p>
+          <p style={{ margin: 0, fontSize: "0.72rem", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.45)", textDecoration: "line-through" }}>
+            {correction.original}
+          </p>
+          <p style={{ margin: 0, fontSize: "0.78rem", fontFamily: "'DM Mono', monospace", color: "#10b981" }}>
+            {correction.corrected}
+          </p>
+          {correction.grammarNote && (
+            <p style={{ margin: "2px 0 0", fontSize: "0.65rem", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.35)", lineHeight: 1.5 }}>
+              {correction.grammarNote}
+            </p>
+          )}
+        </div>
+      )}
       {hasScores && (
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
           <ScoreBadge label={t.scoreLabels.grammar} value={(msg.evaluation as EvaluationScore).grammar} />
@@ -304,9 +330,9 @@ function SimulateurPage() {
   const t = T[locale] as TT;
 
   const {
-    messages, isLoading, error, concluded, visaDecision,
+    messages, isLoading, error, concluded, sessionResult,
     scenario, niveau, sendMessage, resetSession, setScenario, setNiveau, startInterview,
-  } = useAmbassade();
+  } = useAmbassade(locale);
 
   const searchParams = useSearchParams();
   const [input, setInput] = useState("");
@@ -535,18 +561,18 @@ function SimulateurPage() {
                 className="msg-in"
                 style={{
                   textAlign: "center", padding: "24px", borderRadius: 16,
-                  background: visaDecision === "approved" ? "rgba(16,185,129,0.08)" : "rgba(245,158,11,0.08)",
-                  border: `1px solid ${visaDecision === "approved" ? "rgba(16,185,129,0.25)" : "rgba(245,158,11,0.25)"}`,
+                  background: sessionResult === "strong" ? "rgba(16,185,129,0.08)" : "rgba(245,158,11,0.08)",
+                  border: `1px solid ${sessionResult === "strong" ? "rgba(16,185,129,0.25)" : "rgba(245,158,11,0.25)"}`,
                 }}
               >
                 <p style={{ margin: "0 0 6px", fontSize: "2rem" }}>
-                  {visaDecision === "approved" ? "✅" : "💪"}
+                  {sessionResult === "strong" ? "✅" : "💪"}
                 </p>
                 <p style={{ margin: "0 0 4px", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem", color: "white" }}>
-                  {visaDecision === "approved" ? t.conclusionSuccessTitle : t.conclusionEndTitle}
+                  {sessionResult === "strong" ? t.conclusionSuccessTitle : t.conclusionEndTitle}
                 </p>
                 <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.75rem", fontFamily: "'DM Mono', monospace" }}>
-                  {visaDecision === "approved" ? t.conclusionSuccessText : t.conclusionEndText}
+                  {sessionResult === "strong" ? t.conclusionSuccessText : t.conclusionEndText}
                 </p>
               </div>
             )}

@@ -7,7 +7,7 @@ export type ScenarioType =
 
 export type NiveauType = "A1" | "A2" | "B1" | "B2" | "C1";
 
-export type VisaDecision = "pending" | "approved" | "rejected";
+export type SessionResult = "in_progress" | "strong" | "needs_work";
 
 export interface EvaluationScore {
   grammar: number;
@@ -16,20 +16,29 @@ export interface EvaluationScore {
   global: number;
 }
 
+export interface CorrectionDE {
+  original: string;
+  corrected: string;
+  wasCorrect: boolean;
+  grammarNote: string;
+}
+
 export interface AmbassadeResponse {
   agentResponseDE: string;
-  translationFR: string;
+  translation: string;
+  correctionDE: CorrectionDE;
   evaluation: EvaluationScore;
   pedagogicalTip: string;
-  interviewConcluded: boolean;
-  visaDecision: VisaDecision;
+  sessionConcluded: boolean;
+  sessionResult: SessionResult;
 }
 
 export interface ConversationMessage {
   id: string;
   role: "user" | "agent";
   textDE: string;
-  translationFR: string;
+  translation: string;
+  correctionDE?: CorrectionDE;
   evaluation?: EvaluationScore;
   pedagogicalTip?: string;
   timestamp: Date;
@@ -44,10 +53,11 @@ export interface AmbassadeRequest {
   message: string;
   scenario: ScenarioType;
   niveau: NiveauType;
+  locale: "fr" | "en";
   history: HistoryItem[];
 }
 
-export type AmbassadeErrorCode = "RATE_LIMIT" | "PARSE_ERROR" | "GEMINI_ERROR";
+export type AmbassadeErrorCode = "RATE_LIMIT" | "PARSE_ERROR" | "AI_ERROR";
 
 export interface AmbassadeError {
   code: AmbassadeErrorCode;
