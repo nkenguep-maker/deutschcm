@@ -567,11 +567,16 @@ export default function LandingPage() {
             <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 10 }}>{t.footerMade}</span>
           </div>
           <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
-            {[t.footerLegal, t.footerTerms, t.footerPrivacy, t.footerContact].map(link => (
-              <a key={link} href="#" style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, transition: "color 0.2s" }}
+            {[
+              { label: t.footerLegal, href: `/${locale}/terms` },
+              { label: t.footerTerms, href: `/${locale}/terms` },
+              { label: t.footerPrivacy, href: `/${locale}/privacy` },
+              { label: t.footerContact, href: "mailto:legal@yema.app" },
+            ].map(({ label, href }) => (
+              <a key={label} href={href} style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, transition: "color 0.2s" }}
                 onMouseOver={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.7)"}
                 onMouseOut={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.3)"}>
-                {link}
+                {label}
               </a>
             ))}
           </div>

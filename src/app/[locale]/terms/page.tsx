@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { useT } from "@/hooks/useT"
 
-const EFFECTIVE_DATE = "15 May 2025"
+const EFFECTIVE_DATE = "15 May 2026"
 const CONTACT_EMAIL = "legal@yema.app"
 const COMPANY = "Yema Languages"
 

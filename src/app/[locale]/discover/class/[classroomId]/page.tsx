@@ -243,7 +243,8 @@ export default function ClassDetailPage() {
 
         {/* Reviews */}
         <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: 24 }}>
-          <h2 style={{ color: "white", fontSize: 14, fontWeight: 700, margin: "0 0 16px", textTransform: "uppercase", letterSpacing: "0.05em" }}>⭐ Avis des anciens élèves</h2>
+          <h2 style={{ color: "white", fontSize: 14, fontWeight: 700, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>⭐ Avis des anciens élèves</h2>
+          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: "0 0 16px" }}>Avis illustratifs — les vrais avis seront affichés une fois la classe active.</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {MOCK_REVIEWS.map((r, i) => (
               <div key={i} style={{ padding: "14px 16px", background: "rgba(255,255,255,0.02)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.05)" }}>

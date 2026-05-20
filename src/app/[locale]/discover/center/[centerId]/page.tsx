@@ -86,6 +86,14 @@ export default function CenterDetailPage() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap')`}</style>
       <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 0 60px" }}>
 
+        {/* Demo notice */}
+        <div style={{ marginBottom: 20, padding: "12px 18px", borderRadius: 12, background: "rgba(234,179,8,0.08)", border: "1px solid rgba(234,179,8,0.25)", display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 16 }}>🧪</span>
+          <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 13 }}>
+            <strong style={{ color: "#fbbf24" }}>Données illustratives</strong> — Ce profil de centre est un exemple. Les vrais centres apparaîtront ici après leur inscription sur Yema.
+          </span>
+        </div>
+
         {/* Back */}
         <button
           onClick={() => router.back()}
