@@ -32,7 +32,7 @@ const SCENARIO_OVERRIDES: Record<"fr" | "en", Record<string, { label: string; de
 interface Badge { id: string; icon: string; label: string; earned: boolean }
 interface Analytics {
   xpTotal: number; streakDays: number; completedModules: number;
-  avgQuizScore: number; totalBadges: number;
+  avgQuizScore: number; totalBadges: number; level?: string | null;
   skillScores?: { lesen?: number; hoeren?: number; sprechen?: number; schreiben?: number; grammatik?: number };
 }
 
@@ -208,7 +208,7 @@ export default function StudentDashboard() {
   }, []);
 
   const firstName = userData?.fullName?.split(" ")[0] ?? "";
-  const level = userData?.germanLevel ?? null;
+  const level = analytics?.level ?? userData?.germanLevel ?? null;
   const xp = analytics?.xpTotal ?? userData?.xpTotal ?? 0;
   const streak = analytics?.streakDays ?? userData?.streakDays ?? 0;
 

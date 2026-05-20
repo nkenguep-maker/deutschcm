@@ -77,6 +77,7 @@ const T = {
     loading: "Chargement…",
     headerSub: "Test CEFR · Résultats",
     heading: "Votre niveau d'allemand",
+    recommendedLevel: "Niveau recommandé",
     totalScore: "Score total",
     outOf: "/100",
     correctAnswers: (n: number, tot: number) => `${n} bonnes réponses sur ${tot}`,
@@ -99,6 +100,7 @@ const T = {
     loading: "Loading…",
     headerSub: "CEFR Test · Results",
     heading: "Your German Level",
+    recommendedLevel: "Recommended level",
     totalScore: "Total score",
     outOf: "/100",
     correctAnswers: (n: number, tot: number) => `${n} correct answers out of ${tot}`,
@@ -220,8 +222,13 @@ export default function TestResultsPage() {
             </span>
           </div>
 
-          <div style={{ color: levelColor, fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 17 }}>
-            {labels[result.level]}
+          <div style={{ textAlign: "center" }}>
+            <div style={{ color: "rgba(255,255,255,0.28)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 5 }}>
+              {t.recommendedLevel}
+            </div>
+            <div style={{ color: levelColor, fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 17 }}>
+              {labels[result.level]}
+            </div>
           </div>
 
           {/* Score chip */}
