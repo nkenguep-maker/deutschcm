@@ -30,6 +30,13 @@ function levelFromTotal(correct: number): string {
   return "C1";
 }
 
+function typeToSkill(type?: string): "grammar" | "vocabulary" | "expression" | "comprehension" {
+  if (type === "article" || type === "error") return "grammar";
+  if (type === "fill") return "vocabulary";
+  if (type === "translate") return "expression";
+  return "comprehension";
+}
+
 const T = {
   fr: {
     typeLabels: { qcm: "QCM", fill: "Compléter", translate: "Traduction", error: "Erreur", article: "Article" } as Record<string, string>,
@@ -114,7 +121,15 @@ export default function TestNiveauPage() {
     const detectedLevel = levelFromTotal(totalCorrect);
     const score = Math.round((totalCorrect / qs.length) * 100);
 
-    sessionStorage.setItem("testResult", JSON.stringify({ level: detectedLevel, score, breakdown, totalCorrect, total: qs.length }));
+    const skillBreakdown: Record<string, { correct: number; total: number }> = {};
+    qs.forEach((q, i) => {
+      const skill = typeToSkill(q.type);
+      if (!skillBreakdown[skill]) skillBreakdown[skill] = { correct: 0, total: 0 };
+      skillBreakdown[skill].total++;
+      if (finalAnswers[i] === q.correct) skillBreakdown[skill].correct++;
+    });
+
+    sessionStorage.setItem("testResult", JSON.stringify({ level: detectedLevel, score, breakdown, skillBreakdown, totalCorrect, total: qs.length }));
 
     fetch("/api/test-niveau", {
       method: "POST",
