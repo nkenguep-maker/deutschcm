@@ -32,6 +32,7 @@ export async function openaiChat(opts: AICallOptions): Promise<AICallResult> {
     messages,
     temperature: opts.temperature ?? 0.4,
     response_format: { type: "json_object" },
+    ...(opts.maxTokens ? { max_tokens: opts.maxTokens } : {}),
   });
 
   const text = response.choices[0]?.message?.content ?? "";

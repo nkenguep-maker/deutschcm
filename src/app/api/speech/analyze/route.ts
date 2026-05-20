@@ -1,63 +1,51 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { callAI } from "@/lib/ai/provider";
 
-// ── A1 grammar guardrail ──────────────────────────────────────────────────────
-// Applies deterministic corrections AFTER Gemini responds, as a backstop.
+// Post-processing guardrail — deterministic backstop applied AFTER the AI responds.
 function fixA1Grammar(text: string): string {
   return text
-    // sein — ich
-    .replace(/\bich\s+ist\b/gi,  "ich bin")
-    .replace(/\bich\s+bist\b/gi, "ich bin")
-    .replace(/\bich\s+sind\b/gi, "ich bin")
-    .replace(/\bich\s+seid\b/gi, "ich bin")
-    // sein — du
-    .replace(/\bdu\s+bin\b/gi,   "du bist")
-    .replace(/\bdu\s+ist\b/gi,   "du bist")
-    .replace(/\bdu\s+sind\b/gi,  "du bist")
-    .replace(/\bdu\s+seid\b/gi,  "du bist")
-    // sein — er
-    .replace(/\ber\s+bin\b/gi,   "er ist")
-    .replace(/\ber\s+bist\b/gi,  "er ist")
-    .replace(/\ber\s+sind\b/gi,  "er ist")
-    .replace(/\ber\s+seid\b/gi,  "er ist")
-    // sein — wir
-    .replace(/\bwir\s+bin\b/gi,  "wir sind")
-    .replace(/\bwir\s+bist\b/gi, "wir sind")
-    .replace(/\bwir\s+ist\b/gi,  "wir sind")
-    .replace(/\bwir\s+seid\b/gi, "wir sind")
-    // sein — ihr
-    .replace(/\bihr\s+bin\b/gi,  "ihr seid")
-    .replace(/\bihr\s+bist\b/gi, "ihr seid")
-    .replace(/\bihr\s+ist\b/gi,  "ihr seid")
-    .replace(/\bihr\s+sind\b/gi, "ihr seid")
-    // haben — ich
+    .replace(/\bich\s+ist\b/gi,   "ich bin")
+    .replace(/\bich\s+bist\b/gi,  "ich bin")
+    .replace(/\bich\s+sind\b/gi,  "ich bin")
+    .replace(/\bich\s+seid\b/gi,  "ich bin")
+    .replace(/\bdu\s+bin\b/gi,    "du bist")
+    .replace(/\bdu\s+ist\b/gi,    "du bist")
+    .replace(/\bdu\s+sind\b/gi,   "du bist")
+    .replace(/\bdu\s+seid\b/gi,   "du bist")
+    .replace(/\ber\s+bin\b/gi,    "er ist")
+    .replace(/\ber\s+bist\b/gi,   "er ist")
+    .replace(/\ber\s+sind\b/gi,   "er ist")
+    .replace(/\ber\s+seid\b/gi,   "er ist")
+    .replace(/\bwir\s+bin\b/gi,   "wir sind")
+    .replace(/\bwir\s+bist\b/gi,  "wir sind")
+    .replace(/\bwir\s+ist\b/gi,   "wir sind")
+    .replace(/\bwir\s+seid\b/gi,  "wir sind")
+    .replace(/\bihr\s+bin\b/gi,   "ihr seid")
+    .replace(/\bihr\s+bist\b/gi,  "ihr seid")
+    .replace(/\bihr\s+ist\b/gi,   "ihr seid")
+    .replace(/\bihr\s+sind\b/gi,  "ihr seid")
     .replace(/\bich\s+hat\b/gi,   "ich habe")
     .replace(/\bich\s+hast\b/gi,  "ich habe")
     .replace(/\bich\s+habt\b/gi,  "ich habe")
     .replace(/\bich\s+haben\b/gi, "ich habe")
-    // haben — du
-    .replace(/\bdu\s+habe\b/gi,  "du hast")
-    .replace(/\bdu\s+hat\b/gi,   "du hast")
-    .replace(/\bdu\s+habt\b/gi,  "du hast")
-    .replace(/\bdu\s+haben\b/gi, "du hast")
-    // haben — er
-    .replace(/\ber\s+habe\b/gi,  "er hat")
-    .replace(/\ber\s+hast\b/gi,  "er hat")
-    .replace(/\ber\s+habt\b/gi,  "er hat")
-    .replace(/\ber\s+haben\b/gi, "er hat")
-    // haben — wir
-    .replace(/\bwir\s+habe\b/gi, "wir haben")
-    .replace(/\bwir\s+hast\b/gi, "wir haben")
-    .replace(/\bwir\s+hat\b/gi,  "wir haben")
-    .replace(/\bwir\s+habt\b/gi, "wir haben")
-    // haben — ihr
+    .replace(/\bdu\s+habe\b/gi,   "du hast")
+    .replace(/\bdu\s+hat\b/gi,    "du hast")
+    .replace(/\bdu\s+habt\b/gi,   "du hast")
+    .replace(/\bdu\s+haben\b/gi,  "du hast")
+    .replace(/\ber\s+habe\b/gi,   "er hat")
+    .replace(/\ber\s+hast\b/gi,   "er hat")
+    .replace(/\ber\s+habt\b/gi,   "er hat")
+    .replace(/\ber\s+haben\b/gi,  "er hat")
+    .replace(/\bwir\s+habe\b/gi,  "wir haben")
+    .replace(/\bwir\s+hast\b/gi,  "wir haben")
+    .replace(/\bwir\s+hat\b/gi,   "wir haben")
+    .replace(/\bwir\s+habt\b/gi,  "wir haben")
     .replace(/\bihr\s+habe\b/gi,  "ihr habt")
     .replace(/\bihr\s+hast\b/gi,  "ihr habt")
     .replace(/\bihr\s+hat\b/gi,   "ihr habt")
     .replace(/\bihr\s+haben\b/gi, "ihr habt");
 }
 
-// Apply guardrail to all free-text German fields in the analysis object
 function applyGrammarGuardrail(analysis: Record<string, unknown>): Record<string, unknown> {
   if (typeof analysis.texte_corrige === "string") {
     analysis.texte_corrige = fixA1Grammar(analysis.texte_corrige);
@@ -73,27 +61,7 @@ function applyGrammarGuardrail(analysis: Record<string, unknown>): Record<string
   return analysis;
 }
 
-export async function POST(req: NextRequest) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return NextResponse.json({ error: "GEMINI_API_KEY manquante" }, { status: 500 });
-
-  let { transcript, expectedText, level, exerciseType } = await req.json();
-
-  if (!transcript?.trim()) {
-    return NextResponse.json({ error: "Transcription vide" }, { status: 400 });
-  }
-
-  if (transcript.length > 300) {
-    transcript = transcript.slice(0, 300);
-  }
-
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    generationConfig: { temperature: 0.2, maxOutputTokens: 1200, responseMimeType: "application/json" },
-  });
-
-  const prompt = `Tu es un correcteur expert en allemand pour apprenants CEFR francophones.
+const SYSTEM_PROMPT = `Tu es un correcteur expert en allemand pour apprenants CEFR francophones.
 Tu DOIS toujours produire du texte allemand grammaticalement CORRECT.
 Ne produis JAMAIS d'allemand incorrect dans tes corrections ou exemples.
 
@@ -131,12 +99,7 @@ EXEMPLES DE CORRECTIONS ATTENDUES
 Le champ "texte_corrige" DOIT TOUJOURS être grammaticalement correct.
 Le champ "correction" dans errors DOIT TOUJOURS être grammaticalement correct.
 
-Niveau CEFR : ${level || "A1"}
-Type d'exercice : ${exerciseType || "expression_libre"}
-${expectedText ? `Texte attendu : "${expectedText}"` : ""}
-Transcription de l'élève : "${transcript}"
-
-Analyse et retourne UNIQUEMENT ce JSON valide :
+Retourne UNIQUEMENT ce JSON valide :
 {
   "score_global": <1-10>,
   "score_grammaire": <1-10>,
@@ -160,15 +123,39 @@ Analyse et retourne UNIQUEMENT ce JSON valide :
   "peut_continuer": true
 }`;
 
+export async function POST(req: NextRequest) {
+  let { transcript, expectedText, level, exerciseType } = await req.json();
+
+  if (!transcript?.trim()) {
+    return NextResponse.json({ error: "Transcription vide" }, { status: 400 });
+  }
+
+  if (transcript.length > 300) {
+    transcript = transcript.slice(0, 300);
+  }
+
+  const userMessage = [
+    `Niveau CEFR : ${level || "A1"}`,
+    `Type d'exercice : ${exerciseType || "expression_libre"}`,
+    expectedText ? `Texte attendu : "${expectedText}"` : null,
+    `Transcription de l'élève : "${transcript}"`,
+  ].filter(Boolean).join("\n");
+
   try {
-    const result = await model.generateContent(prompt);
-    const raw = result.response.text();
+    const result = await callAI({
+      feature: "speech",
+      systemPrompt: SYSTEM_PROMPT,
+      userMessage,
+      temperature: 0.2,
+      maxTokens: 1200,
+    });
+    const raw = result.text;
     const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
     const safe = applyGrammarGuardrail(parsed);
     return NextResponse.json({ success: true, analysis: safe }, {
       headers: { "Cache-Control": "no-store" },
     });
   } catch (err) {
-    return NextResponse.json({ error: "Erreur analyse Gemini", details: String(err) }, { status: 502 });
+    return NextResponse.json({ error: "Erreur analyse", details: String(err) }, { status: 502 });
   }
 }

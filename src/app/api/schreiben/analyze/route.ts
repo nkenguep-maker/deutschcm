@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from "next/server"
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import { NextRequest, NextResponse } from "next/server";
+import { callAI } from "@/lib/ai/provider";
 
-// ── A1 grammar guardrail ──────────────────────────────────────────────────────
 function fixA1Grammar(text: string): string {
   return text
     .replace(/\bich\s+ist\b/gi,   "ich bin")
@@ -64,31 +63,7 @@ function applyGrammarGuardrail(correction: Record<string, unknown>): Record<stri
   return correction;
 }
 
-export async function POST(req: NextRequest) {
-  const apiKey = process.env.GEMINI_API_KEY
-  if (!apiKey) return NextResponse.json({ error: "GEMINI_API_KEY manquante" }, { status: 500 })
-
-  const { text, task, level, exerciseType } = await req.json()
-
-  if (!text?.trim()) {
-    return NextResponse.json({ error: "Texte vide" }, { status: 400 })
-  }
-
-  if (text.length > 500) {
-    return NextResponse.json({ error: "Texte trop long (max 500 caractères)" }, { status: 400 })
-  }
-
-  const genAI = new GoogleGenerativeAI(apiKey)
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    generationConfig: {
-      temperature: 0.2,
-      maxOutputTokens: 8192,
-      responseMimeType: "application/json"
-    }
-  })
-
-  const prompt = `Tu es un correcteur expert en productions écrites allemandes pour apprenants CEFR francophones.
+const SYSTEM_PROMPT = `Tu es un correcteur expert en productions écrites allemandes pour apprenants CEFR francophones.
 Tu DOIS toujours produire du texte allemand grammaticalement CORRECT dans tes corrections.
 
 ══════════════════════════════════════════
@@ -117,12 +92,7 @@ Si l'élève écrit "wir ist aus Kamerun" → texte_corrige doit contenir "Wir s
 
 Le champ "texte_corrige" et "exemple_modele" DOIVENT être grammaticalement corrects.
 
-Niveau CEFR : ${level || "A1"}
-Type d'exercice : ${exerciseType || "expression_libre"}
-Consigne : ${task || "Écrivez un texte en allemand"}
-Texte de l'élève : "${text}"
-
-Analyse et retourne UNIQUEMENT ce JSON valide :
+Retourne UNIQUEMENT ce JSON valide :
 {
   "score_global": <0-100>,
   "scores": {
@@ -151,20 +121,41 @@ Analyse et retourne UNIQUEMENT ce JSON valide :
   "exemple_modele": "exemple de très bonne réponse en allemand (DOIT être correct)",
   "mots_bien_utilises": ["mot1", "mot2"],
   "structures_a_retenir": ["structure grammaticale 1", "structure 2"]
-}`
+}`;
+
+export async function POST(req: NextRequest) {
+  const { text, task, level, exerciseType } = await req.json();
+
+  if (!text?.trim()) {
+    return NextResponse.json({ error: "Texte vide" }, { status: 400 });
+  }
+
+  if (text.length > 500) {
+    return NextResponse.json({ error: "Texte trop long (max 500 caractères)" }, { status: 400 });
+  }
+
+  const userMessage = [
+    `Niveau CEFR : ${level || "A1"}`,
+    `Type d'exercice : ${exerciseType || "expression_libre"}`,
+    `Consigne : ${task || "Écrivez un texte en allemand"}`,
+    `Texte de l'élève : "${text}"`,
+  ].join("\n");
 
   try {
-    const result = await model.generateContent(prompt)
-    const raw = result.response.text()
-    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim())
-    const safe = applyGrammarGuardrail(parsed)
+    const result = await callAI({
+      feature: "writing",
+      systemPrompt: SYSTEM_PROMPT,
+      userMessage,
+      temperature: 0.2,
+      maxTokens: 2048,
+    });
+    const raw = result.text;
+    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+    const safe = applyGrammarGuardrail(parsed);
     return NextResponse.json({ success: true, correction: safe }, {
-      headers: { "Cache-Control": "no-store" }
-    })
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (err) {
-    return NextResponse.json({
-      error: "Erreur analyse",
-      details: String(err)
-    }, { status: 502 })
+    return NextResponse.json({ error: "Erreur analyse", details: String(err) }, { status: 502 });
   }
 }

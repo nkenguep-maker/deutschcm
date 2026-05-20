@@ -21,6 +21,7 @@ export async function geminiChat(opts: AICallOptions): Promise<AICallResult> {
     generationConfig: {
       temperature: opts.temperature ?? 0.4,
       responseMimeType: "application/json",
+      ...(opts.maxTokens ? { maxOutputTokens: opts.maxTokens } : {}),
     },
   });
 

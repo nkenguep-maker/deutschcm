@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
+import { callAI } from "@/lib/ai/provider";
 
 async function getAuthUser() {
   const cookieStore = await cookies();
@@ -95,27 +96,30 @@ const FALLBACK_QUESTIONS_EN = [
   { id:"q30", level:"C1", type:"fill",      question:"Complete with the correct form: «Es ___ wichtig, dass alle Beteiligten informiert werden.»", options:["ist","sei","wäre","würde sein"], correct:1, explanation:"«es sei wichtig, dass...» = formal reported speech (Konjunktiv I). Introduces a clause with an indirect citation nuance." },
 ];
 
-const GEMINI_PROMPT: Record<string, string> = {
-  fr: `Génère exactement 30 questions de test de niveau CEFR d'allemand (A1 à C1) en JSON strict.
-Format: array d'objets avec ces clés exactes:
-{ "id": "q01", "level": "A1", "type": "qcm", "question": "...", "options": ["...", "...", "...", "..."], "correct": 0, "explanation": "..." }
-Distribution OBLIGATOIRE: 6 questions A1 + 6 questions A2 + 6 questions B1 + 6 questions B2 + 6 questions C1
-Types à varier: "qcm" (choix multiple), "fill" (compléter la phrase), "translate" (choisir bonne traduction), "error" (identifier erreur grammaticale), "article" (choisir der/die/das)
-- options: exactement 4 chaînes
-- correct: index 0-3 de la bonne réponse
-- explanation: en français, 1-2 phrases claires
-- questions progressives et variées dans chaque niveau
-Réponds UNIQUEMENT avec le JSON array, sans markdown ni texte.`,
-  en: `Generate exactly 30 CEFR German level test questions (A1 to C1) in strict JSON.
-Format: array of objects with these exact keys:
-{ "id": "q01", "level": "A1", "type": "qcm", "question": "...", "options": ["...", "...", "...", "..."], "correct": 0, "explanation": "..." }
-REQUIRED distribution: 6 A1 + 6 A2 + 6 B1 + 6 B2 + 6 C1 questions
-Types to vary: "qcm" (multiple choice), "fill" (fill in the blank), "translate" (choose correct translation), "error" (identify grammar error), "article" (choose der/die/das)
-- options: exactly 4 strings
-- correct: index 0-3 of the correct answer
-- explanation: in English, 1-2 clear sentences
-- progressive and varied questions within each level
-Reply ONLY with the JSON array, no markdown or extra text.`,
+const LEVEL_TEST_SYSTEM_PROMPT: Record<string, string> = {
+  fr: `Tu es un générateur de questions de test de niveau CEFR d'allemand.
+Distribution OBLIGATOIRE : 6 questions A1 + 6 A2 + 6 B1 + 6 B2 + 6 C1 = 30 questions au total.
+Types à varier : "qcm" (choix multiple), "fill" (compléter la phrase), "translate" (choisir bonne traduction), "error" (identifier erreur grammaticale), "article" (choisir der/die/das).
+Chaque question a exactement 4 options.
+Les explications sont en français, claires, 1-2 phrases.
+Les questions sont progressives et variées dans chaque niveau.
+
+Retourne UNIQUEMENT ce JSON valide :
+{ "questions": [ { "id": "q01", "level": "A1", "type": "qcm", "question": "...", "options": ["...", "...", "...", "..."], "correct": 0, "explanation": "..." }, ... ] }`,
+  en: `You are a CEFR German level test question generator.
+REQUIRED distribution: 6 A1 + 6 A2 + 6 B1 + 6 B2 + 6 C1 = 30 questions total.
+Types to vary: "qcm" (multiple choice), "fill" (fill in the blank), "translate" (choose correct translation), "error" (identify grammar error), "article" (choose der/die/das).
+Each question has exactly 4 options.
+Explanations are in English, clear, 1-2 sentences.
+Questions are progressive and varied within each level.
+
+Return ONLY this valid JSON:
+{ "questions": [ { "id": "q01", "level": "A1", "type": "qcm", "question": "...", "options": ["...", "...", "...", "..."], "correct": 0, "explanation": "..." }, ... ] }`,
+};
+
+const LEVEL_TEST_USER_MESSAGE: Record<string, string> = {
+  fr: "Génère maintenant les 30 questions de test CEFR d'allemand.",
+  en: "Generate the 30 CEFR German level test questions now.",
 };
 
 // GET /api/test-niveau?locale=fr|en — returns 30 CEFR questions
@@ -123,31 +127,24 @@ export async function GET(request: NextRequest) {
   const locale = new URL(request.url).searchParams.get("locale") === "en" ? "en" : "fr";
   const fallback = locale === "en" ? FALLBACK_QUESTIONS_EN : FALLBACK_QUESTIONS_FR;
 
-  const geminiKey = process.env.GEMINI_API_KEY;
-  if (geminiKey) {
-    try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: [{ parts: [{ text: GEMINI_PROMPT[locale] }] }] }),
-          signal: AbortSignal.timeout(12000),
-        }
-      );
-      if (res.ok) {
-        const data = await res.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-        const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-        const questions = JSON.parse(cleaned);
-        if (Array.isArray(questions) && questions.length >= 25) {
-          return NextResponse.json({ questions });
-        }
-      }
-    } catch {
-      // Fall through to static questions
+  try {
+    const result = await callAI({
+      feature: "level-test",
+      systemPrompt: LEVEL_TEST_SYSTEM_PROMPT[locale],
+      userMessage: LEVEL_TEST_USER_MESSAGE[locale],
+      temperature: 0.6,
+      maxTokens: 4096,
+    });
+    const raw = result.text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    const parsed = JSON.parse(raw);
+    const questions = Array.isArray(parsed) ? parsed : parsed.questions;
+    if (Array.isArray(questions) && questions.length >= 25) {
+      return NextResponse.json({ questions });
     }
+  } catch {
+    // Fall through to static questions
   }
+
   return NextResponse.json({ questions: fallback });
 }
 

@@ -11,6 +11,7 @@ export interface AICallOptions {
   userMessage: string;
   history?: ChatMessage[];
   temperature?: number;
+  maxTokens?: number;
 }
 
 export interface AICallResult {
@@ -27,6 +28,12 @@ export function getProviderForFeature(feature: AIFeature): ProviderName {
   switch (feature) {
     case "simulator":
       return (process.env.SIMULATOR_AI_PROVIDER as ProviderName | undefined) ?? "openai";
+    case "speech":
+      return (process.env.SPEECH_AI_PROVIDER as ProviderName | undefined) ?? "openai";
+    case "writing":
+      return (process.env.WRITING_AI_PROVIDER as ProviderName | undefined) ?? "openai";
+    case "level-test":
+      return (process.env.LEVEL_TEST_AI_PROVIDER as ProviderName | undefined) ?? "openai";
     case "course-gen":
       return "gemini";
     default:
