@@ -5,7 +5,7 @@ export type ScenarioType =
   | "visa_famille"
   | "renouvellement";
 
-export type NiveauType = "A2" | "B1" | "B2" | "C1";
+export type NiveauType = "A1" | "A2" | "B1" | "B2" | "C1";
 
 export type VisaDecision = "pending" | "approved" | "rejected";
 
@@ -60,50 +60,44 @@ export interface AmbassadeScenario {
   description: string;
   icon: string;
   defaultLevel: NiveauType;
-  legalRef: string;
 }
 
 export const SCENARIOS: AmbassadeScenario[] = [
   {
     id: "visa_etudiant",
-    label: "Visa Étudiant",
-    description: "Demande de visa pour études",
+    label: "Études en Allemagne",
+    description: "Présentez votre projet d'études et répondez à des questions simples.",
     icon: "🎓",
     defaultLevel: "B1",
-    legalRef: "§16b AufenthG",
   },
   {
     id: "visa_travail",
-    label: "Visa Travail",
-    description: "Visa pour emploi qualifié",
+    label: "Travail et carrière",
+    description: "Parlez de votre expérience, de vos objectifs et de votre parcours.",
     icon: "💼",
-    defaultLevel: "B2",
-    legalRef: "§18 AufenthG",
+    defaultLevel: "B1",
   },
   {
     id: "visa_touriste",
-    label: "Visa Touriste",
-    description: "Visa Schengen court séjour",
+    label: "Voyage et quotidien",
+    description: "Pratiquez des situations utiles pour voyager et vivre au quotidien.",
     icon: "✈️",
-    defaultLevel: "A2",
-    legalRef: "§6 AufenthG",
+    defaultLevel: "A1",
   },
   {
     id: "visa_famille",
-    label: "Regroupement Familial",
-    description: "Rejoindre un conjoint en Allemagne",
+    label: "Famille et intégration",
+    description: "Expliquez votre situation personnelle et vos liens familiaux.",
     icon: "👨‍👩‍👧",
-    defaultLevel: "B2",
-    legalRef: "§27 AufenthG",
+    defaultLevel: "A2",
   },
   {
     id: "renouvellement",
-    label: "Renouvellement",
-    description: "Prolonger un titre de séjour",
-    icon: "🔄",
-    defaultLevel: "B1",
-    legalRef: "§8 AufenthG",
+    label: "Démarches administratives",
+    description: "Préparez des échanges simples autour de documents, rendez-vous et formalités.",
+    icon: "📋",
+    defaultLevel: "A2",
   },
 ];
 
-export const NIVEAUX: NiveauType[] = ["A2", "B1", "B2", "C1"];
+export const NIVEAUX: NiveauType[] = ["A1", "A2", "B1", "B2", "C1"];

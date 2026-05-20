@@ -18,7 +18,7 @@ export function useAmbassade() {
   const [concluded, setConcluded] = useState(false);
   const [visaDecision, setVisaDecision] = useState<VisaDecision>("pending");
   const [scenario, setScenarioState] = useState<ScenarioType>("visa_etudiant");
-  const [niveau, setNiveauState] = useState<NiveauType>("B1");
+  const [niveau, setNiveauState] = useState<NiveauType>("A1");
   const historyRef = useRef<HistoryItem[]>([]);
 
   const resetSession = useCallback(() => {
@@ -127,7 +127,7 @@ export function useAmbassade() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: "Bonjour, je viens déposer ma demande de visa.",
+          message: "Bonjour, je voudrais commencer à pratiquer.",
           scenario,
           niveau,
           history: [],
@@ -153,7 +153,7 @@ export function useAmbassade() {
       ]);
 
       historyRef.current = [
-        { role: "user", parts: [{ text: "Bonjour, je viens déposer ma demande de visa." }] },
+        { role: "user", parts: [{ text: "Bonjour, je voudrais commencer à pratiquer." }] },
         { role: "model", parts: [{ text: data.agentResponseDE }] },
       ];
     } catch {
