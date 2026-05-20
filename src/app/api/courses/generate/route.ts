@@ -4,6 +4,10 @@ import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
 import { DifficultyLevel, ModuleType } from "@prisma/client";
 
+// ── Feature flag ───────────────────────────────────────────────────────────────
+
+const COURSE_GEN_ENABLED = process.env.ENABLE_COURSE_GENERATION !== "false";
+
 // ── Auth helper ────────────────────────────────────────────────────────────────
 
 async function getAdminUser() {
@@ -220,6 +224,9 @@ function moduleTypeFor(competence: string): ModuleType {
 // ── POST handler ───────────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
+  if (!COURSE_GEN_ENABLED) {
+    return NextResponse.json({ error: "Course generation is disabled." }, { status: 503 });
+  }
   const admin = await getAdminUser();
   if (!admin) return NextResponse.json({ error: "Forbidden — ADMIN only" }, { status: 403 });
 
