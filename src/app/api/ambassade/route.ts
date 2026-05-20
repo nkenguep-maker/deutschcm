@@ -1,11 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import prisma from "@/lib/prisma";
 import { buildSystemPrompt } from "@/lib/systemPrompt";
 import { callAI } from "@/lib/ai/provider";
 import type { ChatMessage } from "@/lib/ai/types";
 import type { AmbassadeRequest, AmbassadeResponse, AmbassadeError, HistoryItem } from "@/types/ambassade";
+
+// ── Per-user in-memory rate limiter ─────────────────────────────────────────
+// Module-level Map shared within one serverless instance.
+// Auth users: 20 requests / 5 min. Anonymous: 5 requests / 5 min.
+
+const RL = new Map<string, { count: number; windowStart: number }>();
+const RL_WINDOW_MS = 5 * 60 * 1000;
+const RL_MAX_AUTH = 20;
+const RL_MAX_ANON = 5;
+
+function isRateLimited(key: string, max: number): boolean {
+  const now = Date.now();
+  // Prune old entries to avoid unbounded growth
+  for (const [k, v] of RL) {
+    if (now - v.windowStart > RL_WINDOW_MS) RL.delete(k);
+  }
+  const entry = RL.get(key);
+  if (!entry || now - entry.windowStart > RL_WINDOW_MS) {
+    RL.set(key, { count: 1, windowStart: now });
+    return false;
+  }
+  if (entry.count >= max) return true;
+  entry.count++;
+  return false;
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
 function errorResponse(code: AmbassadeError["code"], message: string, status: number) {
   return NextResponse.json({ code, message } satisfies AmbassadeError, { status });
@@ -86,7 +112,7 @@ function applyGuardrails(parsed: AmbassadeResponse): AmbassadeResponse {
 // ────────────────────────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
-  // ─── Auth + daily quota ───
+  // ─── Auth ───
   const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -94,21 +120,35 @@ export async function POST(request: NextRequest) {
     { cookies: { getAll: () => cookieStore.getAll(), setAll: (list) => list.forEach(({ name, value, options }) => cookieStore.set(name, value, options)) } }
   );
   const { data: { user } } = await supabase.auth.getUser();
-  if (user) {
-    const profile = await prisma.user.findUnique({ where: { supabaseId: user.id }, select: { id: true, plan: true } });
-    if (profile) {
-      const today = new Date().toDateString();
-      const sessionCount = await prisma.conversationSession.count({
-        where: { userId: profile.id, startedAt: { gte: new Date(today) } }
-      });
-      const limit = profile.plan === "FREE" ? 3 : profile.plan === "BASIC" ? 10 : 999;
-      if (sessionCount >= limit) {
-        return NextResponse.json({ error: "Limite journalière atteinte", limit, plan: profile.plan, upgradeUrl: "/pricing" }, { status: 429 });
-      }
-    }
+
+  // ─── Per-user rate limit ───
+  const rlKey = user?.id ?? (request.headers.get("x-forwarded-for") ?? "anon").split(",")[0].trim();
+  const rlMax = user ? RL_MAX_AUTH : RL_MAX_ANON;
+  const limited = isRateLimited(rlKey, rlMax);
+
+  console.info("[ambassade] request", {
+    hasUser: !!user,
+    rlKey: user ? `user:${user.id.slice(0, 8)}` : "anon",
+    limited,
+  });
+
+  if (limited) {
+    const locale = (() => {
+      try { return (request.headers.get("accept-language") ?? "").startsWith("en") ? "en" : "fr"; }
+      catch { return "fr"; }
+    })();
+    return errorResponse("RATE_LIMIT", locale === "en"
+      ? "You sent several messages very quickly. Wait a few seconds, then try again."
+      : "Tu as envoyé plusieurs messages très vite. Attends quelques secondes, puis réessaie.", 429);
   }
 
-  const body: AmbassadeRequest = await request.json();
+  // ─── Parse body ───
+  let body: AmbassadeRequest;
+  try {
+    body = await request.json();
+  } catch {
+    return errorResponse("AI_ERROR", "Invalid request body.", 400);
+  }
   const { message, scenario, niveau, locale = "fr", history } = body;
 
   if (!message?.trim() || !scenario || !niveau) {
@@ -117,6 +157,7 @@ export async function POST(request: NextRequest) {
 
   const systemPrompt = buildSystemPrompt(scenario, niveau, locale);
 
+  // ─── Call AI ───
   let rawText = "";
   try {
     const result = await callAI({
@@ -127,19 +168,42 @@ export async function POST(request: NextRequest) {
       temperature: 0.4,
     });
     rawText = result.text;
+    console.info("[ambassade] AI ok", { provider: result.provider });
   } catch (err: unknown) {
-    console.error("AI provider error:", err);
     const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes("429") || msg.toLowerCase().includes("quota") || msg.toLowerCase().includes("rate")) {
+    // Log without leaking key content
+    console.error("[ambassade] AI error", { message: msg.slice(0, 120) });
+
+    // Config error: missing or invalid API key — show unavailable, not rate limit
+    const isConfigError =
+      msg.toLowerCase().includes("not set") ||
+      msg.toLowerCase().includes("api key") ||
+      msg.toLowerCase().includes("api_key") ||
+      msg.toLowerCase().includes("invalid key") ||
+      msg.toLowerCase().includes("invalid_api_key");
+
+    // Provider rate limit: OpenAI 429, Gemini RESOURCE_EXHAUSTED, etc.
+    const isProviderRateLimit =
+      !isConfigError && (
+        msg.includes("429") ||
+        msg.toLowerCase().includes("rate limit") ||
+        msg.toLowerCase().includes("too many requests") ||
+        msg.toLowerCase().includes("quota") ||
+        msg.toLowerCase().includes("resource_exhausted")
+      );
+
+    if (isProviderRateLimit) {
       return errorResponse("RATE_LIMIT", locale === "en"
-        ? "Request limit reached. Please try again in a few seconds."
-        : "Limite de requêtes atteinte. Réessaie dans quelques secondes.", 429);
+        ? "You sent several messages very quickly. Wait a few seconds, then try again."
+        : "Tu as envoyé plusieurs messages très vite. Attends quelques secondes, puis réessaie.", 429);
     }
+
     return errorResponse("AI_ERROR", locale === "en"
-      ? "AI service unavailable. Please try again."
-      : "Erreur du service IA. Réessaie.", 502);
+      ? "The AI coach is not available right now. Please try again in a moment."
+      : "Le coach IA n'est pas disponible pour le moment. Réessaie dans quelques instants.", 502);
   }
 
+  // ─── Parse AI response ───
   let parsed: AmbassadeResponse;
   try {
     const raw = JSON.parse(rawText.replace(/```json|```/g, "").trim()) as AmbassadeResponse;
@@ -166,6 +230,7 @@ export async function POST(request: NextRequest) {
 
     parsed = applyGuardrails(raw);
   } catch {
+    console.error("[ambassade] parse error", { rawLength: rawText.length });
     return errorResponse("PARSE_ERROR", locale === "en"
       ? "Invalid model response. Please try again."
       : "Réponse du modèle invalide. Réessaie.", 502);

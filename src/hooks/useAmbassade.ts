@@ -20,10 +20,17 @@ export function useAmbassade(locale: "fr" | "en" = "fr") {
   const [scenario, setScenarioState] = useState<ScenarioType>("visa_etudiant");
   const [niveau, setNiveauState] = useState<NiveauType>("A1");
   const historyRef = useRef<HistoryItem[]>([]);
+  // Ref-based loading guard prevents concurrent calls even if state hasn't re-rendered yet
+  const isLoadingRef = useRef(false);
+
+  const setLoadingState = (val: boolean) => {
+    isLoadingRef.current = val;
+    setIsLoading(val);
+  };
 
   const resetSession = useCallback(() => {
     setMessages([]);
-    setIsLoading(false);
+    setLoadingState(false);
     setError(null);
     setConcluded(false);
     setSessionResult("in_progress");
@@ -40,7 +47,7 @@ export function useAmbassade(locale: "fr" | "en" = "fr") {
 
   const sendMessage = useCallback(
     async (text: string) => {
-      if (!text.trim() || concluded) return;
+      if (!text.trim() || concluded || isLoadingRef.current) return;
 
       const userId = `${Date.now()}-user`;
 
@@ -54,7 +61,7 @@ export function useAmbassade(locale: "fr" | "en" = "fr") {
           timestamp: new Date(),
         },
       ]);
-      setIsLoading(true);
+      setLoadingState(true);
       setError(null);
 
       try {
@@ -122,25 +129,29 @@ export function useAmbassade(locale: "fr" | "en" = "fr") {
         });
         setMessages((prev) => prev.filter((m) => m.id !== userId));
       } finally {
-        setIsLoading(false);
+        setLoadingState(false);
       }
     },
     [scenario, niveau, locale, concluded]
   );
 
   const startInterview = useCallback(async () => {
-    if (historyRef.current.length > 0) return;
-    setIsLoading(true);
+    // Guard: prevent duplicate calls from double-click or React Strict Mode
+    if (historyRef.current.length > 0 || isLoadingRef.current) return;
+
+    setLoadingState(true);
     setError(null);
 
     try {
+      const startMsg = locale === "en"
+        ? "Hello, I would like to start practicing."
+        : "Bonjour, je voudrais commencer à pratiquer.";
+
       const res = await fetch("/api/ambassade", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: locale === "en"
-            ? "Hello, I would like to start practicing."
-            : "Bonjour, je voudrais commencer à pratiquer.",
+          message: startMsg,
           scenario,
           niveau,
           locale,
@@ -166,10 +177,6 @@ export function useAmbassade(locale: "fr" | "en" = "fr") {
         },
       ]);
 
-      const startMsg = locale === "en"
-        ? "Hello, I would like to start practicing."
-        : "Bonjour, je voudrais commencer à pratiquer.";
-
       historyRef.current = [
         { role: "user", parts: [{ text: startMsg }] },
         { role: "model", parts: [{ text: data.agentResponseDE }] },
@@ -178,11 +185,11 @@ export function useAmbassade(locale: "fr" | "en" = "fr") {
       setError({
         code: "AI_ERROR",
         message: locale === "en"
-          ? "Unable to start the session."
-          : "Impossible de démarrer l'entretien.",
+          ? "The AI coach is not available right now. Please try again in a moment."
+          : "Le coach IA n'est pas disponible pour le moment. Réessaie dans quelques instants.",
       });
     } finally {
-      setIsLoading(false);
+      setLoadingState(false);
     }
   }, [scenario, niveau, locale]);
 
