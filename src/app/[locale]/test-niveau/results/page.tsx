@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "@/navigation";
+import { usePathname } from "next/navigation";
 
 interface Breakdown { [level: string]: { correct: number; total: number } }
 interface Result { level: string; score: number; breakdown: Breakdown; totalCorrect?: number; total?: number }
@@ -9,16 +10,64 @@ interface Result { level: string; score: number; breakdown: Breakdown; totalCorr
 const LEVEL_COLORS: Record<string, string> = {
   A1: "#10b981", A2: "#34d399", B1: "#6366f1", B2: "#8b5cf6", C1: "#f59e0b",
 };
-const LEVEL_LABELS: Record<string, string> = {
-  A1: "Débutant", A2: "Élémentaire", B1: "Intermédiaire", B2: "Intermédiaire supérieur", C1: "Avancé",
+
+const LEVEL_LABELS: Record<string, Record<string, string>> = {
+  fr: { A1: "Débutant", A2: "Élémentaire", B1: "Intermédiaire", B2: "Intermédiaire supérieur", C1: "Avancé" },
+  en: { A1: "Beginner", A2: "Elementary", B1: "Intermediate", B2: "Upper Intermediate", C1: "Advanced" },
 };
-const LEVEL_MESSAGES: Record<string, string> = {
-  A1: "Vous débutez en allemand. Commencez par les fondamentaux : alphabet, salutations, chiffres et présentations. Avec 15-30 min par jour, vous atteindrez A2 en 3 mois !",
-  A2: "Vous maîtrisez les bases. Vous pouvez vous présenter et comprendre des phrases simples. Place maintenant aux conjugaisons, aux articles et au vocabulaire quotidien.",
-  B1: "Bon niveau intermédiaire ! Vous pouvez gérer la plupart des situations courantes. Concentrez-vous sur le Perfekt, le Konjunktiv et l'enrichissement du vocabulaire.",
-  B2: "Excellent niveau ! Vous communiquez avec aisance. Travaillez la grammaire avancée et les nuances culturelles pour viser le C1.",
-  C1: "Niveau avancé. Vous maîtrisez l'allemand dans des contextes complexes. Préparez un examen CEFR C1 (Goethe-Zertifikat, TELC) ou visez la maîtrise complète.",
+
+const LEVEL_MESSAGES: Record<string, Record<string, string>> = {
+  fr: {
+    A1: "Vous débutez en allemand. Commencez par les fondamentaux : alphabet, salutations, chiffres et présentations. Avec 15-30 min par jour, vous atteindrez A2 en 3 mois !",
+    A2: "Vous maîtrisez les bases. Vous pouvez vous présenter et comprendre des phrases simples. Place maintenant aux conjugaisons, aux articles et au vocabulaire quotidien.",
+    B1: "Bon niveau intermédiaire ! Vous pouvez gérer la plupart des situations courantes. Concentrez-vous sur le Perfekt, le Konjunktiv et l'enrichissement du vocabulaire.",
+    B2: "Excellent niveau ! Vous communiquez avec aisance. Travaillez la grammaire avancée et les nuances culturelles pour viser le C1.",
+    C1: "Niveau avancé. Vous maîtrisez l'allemand dans des contextes complexes. Préparez un examen de langue de niveau C1 reconnu ou visez la maîtrise complète.",
+  },
+  en: {
+    A1: "You are starting your German journey. Begin with the fundamentals: alphabet, greetings, numbers and introductions. With 15-30 minutes a day you can reach A2 in 3 months!",
+    A2: "You have the basics covered. You can introduce yourself and understand simple sentences. Focus now on conjugations, articles and everyday vocabulary.",
+    B1: "Good intermediate level! You can handle most everyday situations. Work on the Perfekt, Konjunktiv and expanding your vocabulary.",
+    B2: "Excellent level! You communicate with ease. Focus on advanced grammar and cultural nuances to aim for C1.",
+    C1: "Advanced level. You use German confidently in complex contexts. Consider taking a recognised C1 language exam or aiming for full mastery.",
+  },
 };
+
+const T = {
+  fr: {
+    loading: "Chargement…",
+    headerSub: "Test CEFR — Résultats officiels",
+    heading: "Votre niveau d'allemand",
+    breakdownTitle: "Résultats par niveau",
+    yourLevel: "✓ Votre niveau",
+    legendMastered: "≥ 4/6 Maîtrisé",
+    legendPartial: "2-3/6 Partiel",
+    legendReview: "0-1/6 À revoir",
+    lockedMsg: "🔒 Niveau assigné définitivement — vous avez utilisé vos 2 tentatives.",
+    attemptMsg: (n: number) => `ℹ️ Tentative ${n}/2 — vous pouvez reprendre le test une fois.`,
+    acceptBtn: (level: string) => `🚀 Accepter ce niveau (${level}) et commencer →`,
+    redirecting: "Redirection…",
+    retakeBtn: "🔄 Reprendre le test (1 tentative restante)",
+    savedNote: "Votre niveau est sauvegardé automatiquement — cette page peut être fermée.",
+  },
+  en: {
+    loading: "Loading…",
+    headerSub: "CEFR Test — Official Results",
+    heading: "Your German Level",
+    breakdownTitle: "Results by Level",
+    yourLevel: "✓ Your level",
+    legendMastered: "≥ 4/6 Mastered",
+    legendPartial: "2-3/6 Partial",
+    legendReview: "0-1/6 To review",
+    lockedMsg: "🔒 Level permanently assigned — you have used your 2 attempts.",
+    attemptMsg: (n: number) => `ℹ️ Attempt ${n}/2 — you can retake the test once.`,
+    acceptBtn: (level: string) => `🚀 Accept this level (${level}) and get started →`,
+    redirecting: "Redirecting…",
+    retakeBtn: "🔄 Retake the test (1 attempt remaining)",
+    savedNote: "Your level is automatically saved — this page can be closed.",
+  },
+};
+
 const LEVELS = ["A1", "A2", "B1", "B2", "C1"];
 
 function levelIcon(correct: number, total: number) {
@@ -30,6 +79,12 @@ function levelIcon(correct: number, total: number) {
 
 export default function TestResultsPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.startsWith("/en") ? "en" : "fr";
+  const t = T[locale];
+  const labels = LEVEL_LABELS[locale];
+  const messages = LEVEL_MESSAGES[locale];
+
   const [result, setResult] = useState<Result | null>(null);
   const [attempts, setAttempts] = useState<number | null>(null);
   const [animated, setAnimated] = useState(false);
@@ -60,7 +115,7 @@ export default function TestResultsPage() {
 
   if (!result) return (
     <div style={{ minHeight: "100vh", background: "#080c10", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>Chargement…</div>
+      <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>{t.loading}</div>
     </div>
   );
 
@@ -81,9 +136,9 @@ export default function TestResultsPage() {
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 32 }} className="fadeUp">
-          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.3)", marginBottom: 8 }}>Test CEFR — Résultats officiels</div>
+          <div style={{ fontSize: 14, color: "rgba(255,255,255,0.3)", marginBottom: 8 }}>{t.headerSub}</div>
           <h1 style={{ margin: 0, color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 26 }}>
-            Votre niveau d'allemand
+            {t.heading}
           </h1>
         </div>
 
@@ -102,21 +157,21 @@ export default function TestResultsPage() {
             </div>
           </div>
           <div style={{ marginTop: 14, color: levelColor, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 20 }}>
-            {LEVEL_LABELS[result.level]}
+            {labels[result.level]}
           </div>
         </div>
 
         {/* Personal message */}
         <div style={{ background: `${levelColor}08`, border: `1px solid ${levelColor}20`, borderRadius: 16, padding: "18px 22px", marginBottom: 24, textAlign: "center" }} className="fadeUp">
           <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: 14, lineHeight: 1.7 }}>
-            {LEVEL_MESSAGES[result.level]}
+            {messages[result.level]}
           </p>
         </div>
 
         {/* Score breakdown per level */}
         <div style={{ background: "rgba(13,17,23,0.85)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: "22px", marginBottom: 24 }} className="fadeUp">
           <h3 style={{ margin: "0 0 16px", color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontSize: 14, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-            Résultats par niveau
+            {t.breakdownTitle}
           </h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {LEVELS.filter(l => result.breakdown[l]).map(l => {
@@ -128,23 +183,19 @@ export default function TestResultsPage() {
               return (
                 <div key={l}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                    {/* Level pill */}
                     <span style={{
                       background: `${lc}20`, color: lc, border: `1px solid ${lc}40`,
                       borderRadius: 5, padding: "2px 9px", fontSize: 11, fontWeight: 800, flexShrink: 0,
                     }}>{l}</span>
-                    {/* Status icon */}
                     <span style={{ fontSize: 14, flexShrink: 0 }}>{icon}</span>
-                    {/* Label */}
                     <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 12, flex: 1 }}>
-                      {LEVEL_LABELS[l]}
+                      {labels[l]}
                       {isDetected && (
                         <span style={{ marginLeft: 8, background: `${lc}15`, color: lc, border: `1px solid ${lc}30`, borderRadius: 10, padding: "1px 7px", fontSize: 10, fontWeight: 700 }}>
-                          ✓ Votre niveau
+                          {t.yourLevel}
                         </span>
                       )}
                     </span>
-                    {/* Score */}
                     <span style={{ color: iconColor, fontSize: 13, fontWeight: 700, fontFamily: "monospace", flexShrink: 0 }}>{b.correct}/{b.total}</span>
                   </div>
                   <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 4, height: 6, overflow: "hidden" }}>
@@ -157,7 +208,11 @@ export default function TestResultsPage() {
 
           {/* Legend */}
           <div style={{ display: "flex", gap: 18, marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-            {[{ icon: "✅", label: "≥ 4/6 Maîtrisé" }, { icon: "⚠️", label: "2-3/6 Partiel" }, { icon: "❌", label: "0-1/6 À revoir" }].map(e => (
+            {[
+              { icon: "✅", label: t.legendMastered },
+              { icon: "⚠️", label: t.legendPartial },
+              { icon: "❌", label: t.legendReview },
+            ].map(e => (
               <div key={e.icon} style={{ display: "flex", alignItems: "center", gap: 5, color: "rgba(255,255,255,0.3)", fontSize: 11 }}>
                 <span>{e.icon}</span><span>{e.label}</span>
               </div>
@@ -173,12 +228,10 @@ export default function TestResultsPage() {
             borderRadius: 12, padding: "12px 16px", marginBottom: 20, textAlign: "center",
           }} className="fadeUp">
             {attempts >= 2 ? (
-              <span style={{ color: "#ef4444", fontSize: 13 }}>
-                🔒 Niveau assigné définitivement — vous avez utilisé vos 2 tentatives.
-              </span>
+              <span style={{ color: "#ef4444", fontSize: 13 }}>{t.lockedMsg}</span>
             ) : (
               <span style={{ color: "#f59e0b", fontSize: 13 }}>
-                ℹ️ Tentative {attempts}/2 — vous pouvez reprendre le test <strong>une fois</strong>.
+                {t.attemptMsg(attempts)}
               </span>
             )}
           </div>
@@ -196,7 +249,7 @@ export default function TestResultsPage() {
               boxShadow: `0 8px 24px ${levelColor}30`,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
             }}>
-            {accepting ? "Redirection…" : `🚀 Accepter ce niveau (${result.level}) et commencer →`}
+            {accepting ? t.redirecting : t.acceptBtn(result.level)}
           </button>
 
           {canRetake && (
@@ -207,13 +260,13 @@ export default function TestResultsPage() {
                 border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12,
                 padding: "13px 24px", fontWeight: 600, fontSize: 14, cursor: "pointer",
               }}>
-              🔄 Reprendre le test (1 tentative restante)
+              {t.retakeBtn}
             </button>
           )}
         </div>
 
         <div style={{ textAlign: "center", marginTop: 20, color: "rgba(255,255,255,0.2)", fontSize: 11 }}>
-          Votre niveau est sauvegardé automatiquement — cette page peut être fermée.
+          {t.savedNote}
         </div>
       </div>
     </div>

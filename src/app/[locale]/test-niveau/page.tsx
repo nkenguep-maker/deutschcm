@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "@/navigation";
+import { usePathname } from "next/navigation";
 
 interface Question {
   id: string;
@@ -17,10 +18,6 @@ const LEVEL_COLORS: Record<string, string> = {
   A1: "#10b981", A2: "#34d399", B1: "#6366f1", B2: "#8b5cf6", C1: "#f59e0b",
 };
 
-const TYPE_LABELS: Record<string, string> = {
-  qcm: "QCM", fill: "Compléter", translate: "Traduction", error: "Erreur", article: "Article",
-};
-
 const TOTAL_TIME = 1200; // 20 minutes
 
 function pad(n: number) { return String(n).padStart(2, "0"); }
@@ -33,8 +30,51 @@ function levelFromTotal(correct: number): string {
   return "C1";
 }
 
+const T = {
+  fr: {
+    typeLabels: { qcm: "QCM", fill: "Compléter", translate: "Traduction", error: "Erreur", article: "Article" } as Record<string, string>,
+    loading1: "Génération des questions CEFR...",
+    loading2: "Notre IA prépare votre test de 30 questions A1→C1",
+    loadError: "Erreur de chargement — Rechargez la page",
+    header: "Test de niveau CEFR",
+    headerSub: "30 questions A1→C1",
+    timerLabel: "souple",
+    questionLabel: "Question",
+    progressSuffix: "% complété",
+    feedbackSkipped: "⏭ Question passée",
+    feedbackCorrect: "✓ Correct !",
+    feedbackWrong: "✗ Incorrect",
+    skip: "Passer ⏭",
+    confirm: "Valider ma réponse",
+    next: "Question suivante →",
+    finish: "Voir mes résultats CEFR →",
+  },
+  en: {
+    typeLabels: { qcm: "MCQ", fill: "Fill in", translate: "Translation", error: "Error", article: "Article" } as Record<string, string>,
+    loading1: "Generating CEFR questions...",
+    loading2: "Our AI is preparing your 30-question A1→C1 test",
+    loadError: "Loading error — Please refresh the page",
+    header: "CEFR Level Test",
+    headerSub: "30 questions A1→C1",
+    timerLabel: "soft",
+    questionLabel: "Question",
+    progressSuffix: "% complete",
+    feedbackSkipped: "⏭ Question skipped",
+    feedbackCorrect: "✓ Correct!",
+    feedbackWrong: "✗ Incorrect",
+    skip: "Skip ⏭",
+    confirm: "Submit answer",
+    next: "Next question →",
+    finish: "See my CEFR results →",
+  },
+};
+
 export default function TestNiveauPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.startsWith("/en") ? "en" : "fr";
+  const t = T[locale];
+
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [current, setCurrent] = useState(0);
@@ -47,7 +87,7 @@ export default function TestNiveauPage() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    fetch("/api/test-niveau")
+    fetch(`/api/test-niveau?locale=${locale}`)
       .then(r => r.json())
       .then(d => {
         const qs = d.questions ?? [];
@@ -56,7 +96,7 @@ export default function TestNiveauPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []);
+  }, [locale]);
 
   const submitResults = useCallback((finalAnswers: (number | null)[], qs: Question[]) => {
     if (submitted) return;
@@ -88,13 +128,13 @@ export default function TestNiveauPage() {
   useEffect(() => {
     if (loading || questions.length === 0) return;
     intervalRef.current = setInterval(() => {
-      setTimeLeft(t => {
-        if (t <= 1) {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
           clearInterval(intervalRef.current!);
           submitResults([...answers], questions);
           return 0;
         }
-        return t - 1;
+        return prev - 1;
       });
     }, 1000);
     return () => clearInterval(intervalRef.current!);
@@ -118,8 +158,7 @@ export default function TestNiveauPage() {
 
   const next = () => {
     if (current === questions.length - 1) {
-      const finalAnswers = [...answers];
-      submitResults(finalAnswers, questions);
+      submitResults([...answers], questions);
       return;
     }
     setCurrent(c => c + 1);
@@ -132,26 +171,24 @@ export default function TestNiveauPage() {
     <div style={{ minHeight: "100vh", background: "#080c10", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 44, marginBottom: 16 }}>⏳</div>
-        <div style={{ color: "#10b981", fontWeight: 700, fontSize: 16 }}>Génération des questions CEFR...</div>
-        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, marginTop: 6 }}>notre IA prépare votre test de 30 questions A1→C1</div>
+        <div style={{ color: "#10b981", fontWeight: 700, fontSize: 16 }}>{t.loading1}</div>
+        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, marginTop: 6 }}>{t.loading2}</div>
       </div>
     </div>
   );
 
   if (questions.length === 0) return (
     <div style={{ minHeight: "100vh", background: "#080c10", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ color: "#ef4444", fontSize: 16 }}>Erreur de chargement — Rechargez la page</div>
+      <div style={{ color: "#ef4444", fontSize: 16 }}>{t.loadError}</div>
     </div>
   );
 
   const q = questions[current];
   const levelColor = LEVEL_COLORS[q.level] ?? "#10b981";
   const progress = (current / questions.length) * 100;
-  const timePercent = (timeLeft / TOTAL_TIME) * 100;
   const timerUrgent = timeLeft < 120;
   const isLast = current === questions.length - 1;
 
-  // Level mini-progression bar (6 per level)
   const levelOrder = ["A1", "A2", "B1", "B2", "C1"];
   const levelCounts = { A1: 6, A2: 6, B1: 6, B2: 6, C1: 6 };
 
@@ -176,10 +213,10 @@ export default function TestNiveauPage() {
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 20 }}></span>
+              <span style={{ fontSize: 20 }}>🎯</span>
               <div>
-                <span style={{ color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 15 }}>Test de niveau CEFR</span>
-                <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, marginLeft: 8 }}>30 questions A1→C1</span>
+                <span style={{ color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 15 }}>{t.header}</span>
+                <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, marginLeft: 8 }}>{t.headerSub}</span>
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -193,7 +230,7 @@ export default function TestNiveauPage() {
                 <span style={{ color: timerUrgent ? "#ef4444" : "#f1f5f9", fontFamily: "monospace", fontWeight: 700, fontSize: 16 }}>
                   {pad(Math.floor(timeLeft / 60))}:{pad(timeLeft % 60)}
                 </span>
-                {timerUrgent && <span style={{ color: "#ef4444", fontSize: 10 }}>souple</span>}
+                {timerUrgent && <span style={{ color: "#ef4444", fontSize: 10 }}>{t.timerLabel}</span>}
               </div>
               <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>{current + 1} / {questions.length}</span>
             </div>
@@ -220,7 +257,7 @@ export default function TestNiveauPage() {
             })}
           </div>
 
-          {/* Overall progress bar */}
+          {/* Overall progress indicator */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div style={{ display: "flex", gap: 8 }}>
               {levelOrder.map(lvl => (
@@ -231,7 +268,7 @@ export default function TestNiveauPage() {
                 }}>{lvl}</span>
               ))}
             </div>
-            <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 10 }}>{Math.round(progress)}% complété</span>
+            <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 10 }}>{Math.round(progress)}{t.progressSuffix}</span>
           </div>
         </div>
       </div>
@@ -251,9 +288,9 @@ export default function TestNiveauPage() {
                 background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.35)",
                 border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6,
                 padding: "3px 9px", fontSize: 11,
-              }}>{TYPE_LABELS[q.type] ?? q.type}</span>
+              }}>{t.typeLabels[q.type] ?? q.type}</span>
             )}
-            <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 12 }}>Question {current + 1}</span>
+            <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 12 }}>{t.questionLabel} {current + 1}</span>
           </div>
 
           {/* Question card */}
@@ -276,8 +313,8 @@ export default function TestNiveauPage() {
               let icon = "";
 
               if (confirmed && !skipped) {
-                if (i === q.correct) { bg = "rgba(16,185,129,0.1)"; border = "rgba(16,185,129,0.4)"; color = "#10b981"; icon = "✓"; }
-                else if (i === selected) { bg = "rgba(239,68,68,0.08)"; border = "rgba(239,68,68,0.3)"; color = "#ef4444"; icon = "✗"; }
+                if (i === q.correct)       { bg = "rgba(16,185,129,0.1)"; border = "rgba(16,185,129,0.4)"; color = "#10b981"; icon = "✓"; }
+                else if (i === selected)   { bg = "rgba(239,68,68,0.08)"; border = "rgba(239,68,68,0.3)";  color = "#ef4444"; icon = "✗"; }
               } else if (skipped && i === q.correct) {
                 bg = "rgba(16,185,129,0.08)"; border = "rgba(16,185,129,0.3)"; color = "#10b981"; icon = "✓";
               } else if (!confirmed && selected === i) {
@@ -306,7 +343,7 @@ export default function TestNiveauPage() {
             })}
           </div>
 
-          {/* Feedback (after confirm or skip) */}
+          {/* Feedback */}
           {confirmed && (
             <div style={{
               background: skipped ? "rgba(245,158,11,0.06)" : selected === q.correct ? "rgba(16,185,129,0.06)" : "rgba(239,68,68,0.06)",
@@ -314,7 +351,7 @@ export default function TestNiveauPage() {
               borderRadius: 12, padding: "14px 18px", marginBottom: 20,
             }}>
               <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6, color: skipped ? "#f59e0b" : selected === q.correct ? "#10b981" : "#ef4444" }}>
-                {skipped ? "⏭ Question passée" : selected === q.correct ? "✓ Correct !" : "✗ Incorrect"}
+                {skipped ? t.feedbackSkipped : selected === q.correct ? t.feedbackCorrect : t.feedbackWrong}
               </div>
               <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, lineHeight: 1.5 }}>{q.explanation}</div>
             </div>
@@ -328,7 +365,7 @@ export default function TestNiveauPage() {
                 color: "rgba(255,255,255,0.35)", border: "1px solid rgba(255,255,255,0.08)",
                 borderRadius: 12, padding: "14px 20px", fontWeight: 600, fontSize: 14, cursor: "pointer",
               }}>
-                Passer ⏭
+                {t.skip}
               </button>
               <button onClick={confirm} disabled={selected === null} style={{
                 flex: 1, background: selected !== null ? levelColor : "rgba(255,255,255,0.05)",
@@ -337,7 +374,7 @@ export default function TestNiveauPage() {
                 fontWeight: 700, fontSize: 15, cursor: selected !== null ? "pointer" : "default",
                 transition: "all 0.2s",
               }}>
-                Valider ma réponse
+                {t.confirm}
               </button>
             </div>
           ) : (
@@ -347,7 +384,7 @@ export default function TestNiveauPage() {
               fontWeight: 700, fontSize: 15, cursor: "pointer",
               boxShadow: "0 4px 16px rgba(16,185,129,0.25)",
             }}>
-              {isLast ? "Voir mes résultats CEFR →" : "Question suivante →"}
+              {isLast ? t.finish : t.next}
             </button>
           )}
         </div>
