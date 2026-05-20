@@ -13,7 +13,7 @@ export async function geminiChat(opts: AICallOptions): Promise<AICallResult> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY is not set.");
 
-  const model = process.env.GEMINI_MODEL ?? DEFAULT_GEMINI_MODEL;
+  const model = process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
   const genAI = new GoogleGenerativeAI(apiKey);
   const geminiModel = genAI.getGenerativeModel({
     model,

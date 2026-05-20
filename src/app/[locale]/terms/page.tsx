@@ -107,7 +107,7 @@ function TermsEN() {
 
       <H2>5. AI features and content</H2>
       <P>
-        Yema uses AI (Google Gemini, speech recognition APIs) to generate learning content, correct writing,
+        Yema uses AI to generate learning content, correct writing,
         and simulate embassy interviews. AI-generated content may contain errors. Yema does not guarantee the
         accuracy or completeness of AI outputs. Do not rely solely on Yema for official exam preparation
         without consulting licensed educators.
@@ -212,7 +212,7 @@ function TermsFR() {
 
       <H2>5. Fonctionnalités IA</H2>
       <P>
-        Yema utilise des APIs IA (Gemini, reconnaissance vocale) pour générer du contenu, corriger les écrits
+        Yema utilise des APIs IA pour générer du contenu, corriger les écrits
         et simuler des entretiens consulaires. Les contenus générés par IA peuvent contenir des erreurs.
         Yema ne garantit pas leur exactitude.
       </P>

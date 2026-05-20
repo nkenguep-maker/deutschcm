@@ -90,7 +90,7 @@ export function checkGermanGrammar(text: string): GrammarError[] {
   return errors
 }
 
-// System-prompt addition for Gemini to enforce these guardrails on the AI side.
+// System-prompt addition to enforce these guardrails on the AI side.
 export const GRAMMAR_GUARDRAIL_SYSTEM_PROMPT = `
 GERMAN GRAMMAR GUARDRAILS — A1 LEVEL
 Verb "sein" (to be): ich bin · du bist · er/sie/es ist · wir sind · ihr seid · sie/Sie sind

@@ -28,7 +28,7 @@ export default function SchreibenEditor({
   const [showModel, setShowModel] = useState(false)
   const [showErrors, setShowErrors] = useState(true)
   const [activeTab, setActiveTab] = useState<"correction"|"conseils"|"modele">("correction")
-  const [apiUnavailable, setApiUnavailable] = useState(false)
+  const [apiError, setApiError] = useState<string | null>(null)
 
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length
   const charCount = text.length
@@ -38,7 +38,7 @@ export default function SchreibenEditor({
     if (!text.trim()) return
     setAnalyzing(true)
     setCorrection(null)
-    setApiUnavailable(false)
+    setApiError(null)
     try {
       const res = await fetch("/api/schreiben/analyze", {
         method: "POST",
@@ -48,13 +48,14 @@ export default function SchreibenEditor({
       const data = await res.json()
       if (data.success) {
         setCorrection(data.correction)
-        onComplete?.(data.correction.score_global, text)
+        if (data.correction?.score_global !== undefined) {
+          onComplete?.(data.correction.score_global, text)
+        }
       } else {
-        setApiUnavailable(true)
+        setApiError(data.message_fr || "Le coach IA n'est pas disponible pour le moment. Réessayez dans quelques instants.")
       }
-    } catch (e) {
-      console.error(e)
-      setApiUnavailable(true)
+    } catch {
+      setApiError("Le coach IA n'est pas disponible pour le moment. Réessayez dans quelques instants.")
     } finally {
       setAnalyzing(false)
     }
@@ -184,16 +185,16 @@ export default function SchreibenEditor({
       </div>
 
       {/* API unavailable notice */}
-      {apiUnavailable && (
+      {apiError && (
         <div style={{
           padding: "12px 16px", borderRadius: 12, marginBottom: 16,
           background: "rgba(245,158,11,0.06)",
           border: "1px solid rgba(245,158,11,0.25)",
-          display: "flex", alignItems: "center", gap: 8
+          display: "flex", alignItems: "flex-start", gap: 8
         }}>
           <span>⚠️</span>
-          <p style={{ color: "#f59e0b", fontSize: 13, margin: 0 }}>
-            Correction IA temporairement indisponible — réessayez dans quelques instants.
+          <p style={{ color: "#f59e0b", fontSize: 13, margin: 0, lineHeight: 1.55 }}>
+            {apiError}
           </p>
         </div>
       )}

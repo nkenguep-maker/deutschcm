@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 
 interface VoiceRecorderProps {
   level?: string;
@@ -35,17 +34,15 @@ export default function VoiceRecorder({
   expectedText,
   exerciseType = "expression_libre",
   onResult,
-  placeholder = "Appuyez sur le micro et parlez en allemand…",
+  placeholder = "Écrivez votre réponse en allemand…",
 }: VoiceRecorderProps) {
-  const { isListening, transcript, interimTranscript, error, isSupported, startListening, stopListening, resetTranscript } =
-    useSpeechRecognition("de-DE");
+  const [typedText, setTypedText] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
 
-  const handleStop = async () => {
-    stopListening();
-    const text = transcript.trim();
+  const handleAnalyze = async () => {
+    const text = typedText.trim();
     if (!text) return;
     setAnalyzing(true);
     setApiError(null);
@@ -60,148 +57,142 @@ export default function VoiceRecorder({
         setAnalysis(data.analysis);
         onResult?.(data.analysis, text);
       } else {
-        setApiError(data.error || "Erreur d'analyse");
+        setApiError(data.error || "Le coach IA n'est pas disponible pour le moment. Réessayez dans quelques instants.");
       }
     } catch {
-      setApiError("Impossible de contacter l'API");
+      setApiError("Le coach IA n'est pas disponible pour le moment. Réessayez dans quelques instants.");
     } finally {
       setAnalyzing(false);
     }
   };
 
   const handleReset = () => {
-    resetTranscript();
+    setTypedText("");
     setAnalysis(null);
     setApiError(null);
   };
 
-  if (!isSupported) {
-    return (
-      <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
-        La reconnaissance vocale n'est pas supportée par votre navigateur. Utilisez Chrome ou Edge.
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-4">
-      {/* Coming soon banner */}
-      <div style={{padding:16, borderRadius:12, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", textAlign:"center"}}>
-        <p style={{color:"#f59e0b", fontSize:13, margin:0}}>
-          🎙️ Correction vocale IA — Bientôt disponible
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+      {/* Coming-soon banner for voice recording */}
+      <div style={{ padding: "14px 18px", borderRadius: 12, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)" }}>
+        <p style={{ color: "#f59e0b", fontSize: 13, margin: "0 0 4px", fontWeight: 600 }}>
+          🎙️ Analyse vocale — bientôt disponible
         </p>
-        <p style={{color:"rgba(255,255,255,0.4)", fontSize:11, margin:"6px 0 0"}}>
-          L&apos;enregistrement vocal sera actif dans la prochaine mise à jour.
+        <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, margin: 0, lineHeight: 1.55 }}>
+          L&apos;analyse de la voix sera disponible dans une prochaine mise à jour.
+          En attendant, écrivez votre réponse ci-dessous.
         </p>
       </div>
-      {/* Mic button + waveform */}
-      <div className="flex flex-col items-center gap-3">
+
+      {/* Typed input as fallback */}
+      <div>
+        <textarea
+          value={typedText}
+          onChange={e => setTypedText(e.target.value)}
+          placeholder={placeholder}
+          rows={4}
+          style={{
+            width: "100%",
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: 12,
+            padding: "12px 14px",
+            color: "white",
+            fontSize: 14,
+            resize: "vertical",
+            outline: "none",
+            lineHeight: 1.7,
+            fontFamily: "'DM Mono', monospace",
+            boxSizing: "border-box",
+          }}
+        />
+      </div>
+
+      <div style={{ display: "flex", gap: 8 }}>
         <button
-          onClick={isListening ? handleStop : startListening}
-          disabled={analyzing}
-          className={`relative flex h-16 w-16 items-center justify-center rounded-full text-white shadow-lg transition-all ${
-            isListening
-              ? "bg-red-500 hover:bg-red-600"
-              : "bg-blue-600 hover:bg-blue-700"
-          } disabled:opacity-50`}
+          onClick={handleAnalyze}
+          disabled={analyzing || !typedText.trim()}
+          style={{
+            padding: "10px 20px", borderRadius: 12,
+            background: analyzing || !typedText.trim()
+              ? "rgba(255,255,255,0.05)"
+              : "linear-gradient(135deg,#10b981,#059669)",
+            border: "none",
+            color: analyzing || !typedText.trim() ? "rgba(255,255,255,0.3)" : "white",
+            fontSize: 13, fontWeight: 700,
+            cursor: analyzing || !typedText.trim() ? "not-allowed" : "pointer",
+          }}
         >
-          {analyzing ? (
-            <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-          ) : isListening ? (
-            <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-              <rect x="6" y="4" width="4" height="16" rx="1" />
-              <rect x="14" y="4" width="4" height="16" rx="1" />
-            </svg>
-          ) : (
-            <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm-7 10a7 7 0 0 0 14 0h2a9 9 0 0 1-8 8.94V22h-2v-2.06A9 9 0 0 1 3 11H5z" />
-            </svg>
-          )}
-          {isListening && (
-            <span className="absolute inset-0 animate-ping rounded-full bg-red-400 opacity-30" />
-          )}
+          {analyzing ? "⏳ Analyse en cours…" : "✨ Analyser avec IA"}
         </button>
 
-        {isListening && (
-          <div className="flex items-end gap-0.5 h-6">
-            {[...Array(12)].map((_, i) => (
-              <span
-                key={i}
-                className="inline-block w-1 rounded-full bg-blue-500"
-                style={{
-                  animation: `waveBar 0.8s ease-in-out ${(i * 0.07).toFixed(2)}s infinite alternate`,
-                  height: "4px",
-                }}
-              />
-            ))}
-          </div>
+        {(typedText || analysis) && (
+          <button
+            onClick={handleReset}
+            style={{
+              padding: "10px 16px", borderRadius: 12,
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: "rgba(255,255,255,0.4)", fontSize: 13, cursor: "pointer",
+            }}
+          >
+            🔄 Recommencer
+          </button>
         )}
-
-        <p className="text-xs text-gray-500">
-          {isListening ? "Enregistrement… cliquez pour arrêter et analyser" : analyzing ? "Analyse en cours…" : placeholder}
-        </p>
       </div>
 
-      {/* Transcript */}
-      {(transcript || interimTranscript) && (
-        <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm">
-          <span className="text-gray-800">{transcript}</span>
-          {interimTranscript && <span className="text-gray-400 italic"> {interimTranscript}</span>}
+      {/* Error state */}
+      {apiError && (
+        <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}>
+          <p style={{ color: "#f59e0b", fontSize: 13, margin: 0 }}>⚠️ {apiError}</p>
         </div>
-      )}
-
-      {/* Errors */}
-      {(error || apiError) && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error || apiError}</p>
       )}
 
       {/* Analysis result */}
       {analysis && (
-        <div className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-          {/* Score grid */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {(
-              [
-                { label: "Global", value: analysis.score_global },
-                { label: "Grammaire", value: analysis.score_grammaire },
-                { label: "Vocabulaire", value: analysis.score_vocabulaire },
-                { label: "Prononciation", value: analysis.score_prononciation },
-              ] as const
-            ).map(({ label, value }) => (
-              <div key={label} className="flex flex-col items-center rounded-lg bg-gray-50 p-3">
-                <span className={`text-2xl font-bold ${value >= 7 ? "text-green-600" : value >= 5 ? "text-yellow-600" : "text-red-600"}`}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, padding: 20, borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
+          {/* Scores */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {[
+              { label: "Global", value: analysis.score_global },
+              { label: "Grammaire", value: analysis.score_grammaire },
+              { label: "Vocabulaire", value: analysis.score_vocabulaire },
+              { label: "Prononciation", value: analysis.score_prononciation },
+            ].map(({ label, value }) => (
+              <div key={label} style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+                <div style={{ fontSize: 20, fontWeight: 800, color: value >= 7 ? "#10b981" : value >= 5 ? "#f59e0b" : "#ef4444" }}>
                   {value}/10
-                </span>
-                <span className="text-xs text-gray-500">{label}</span>
+                </div>
+                <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{label}</div>
               </div>
             ))}
           </div>
 
-          {/* Positive feedback */}
+          {/* Feedback positif */}
           {analysis.feedback_positif_fr && (
-            <div className="flex items-start gap-2 rounded-lg bg-green-50 p-3 text-sm text-green-800">
-              <span>✓</span>
-              <span>{analysis.feedback_positif_fr}</span>
+            <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", color: "#34d399", fontSize: 13 }}>
+              ✅ {analysis.feedback_positif_fr}
             </div>
           )}
 
           {/* Errors */}
           {analysis.errors.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <h4 className="text-sm font-semibold text-gray-700">Corrections</h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <p style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>
+                Corrections ({analysis.errors.length})
+              </p>
               {analysis.errors.map((err, i) => (
-                <div
-                  key={i}
-                  className={`rounded-lg border p-3 text-sm ${err.severite === "majeur" ? "border-red-200 bg-red-50" : "border-yellow-100 bg-yellow-50"}`}
-                >
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${err.severite === "majeur" ? "bg-red-200 text-red-800" : "bg-yellow-200 text-yellow-800"}`}>
+                <div key={i} style={{ padding: "10px 12px", borderRadius: 10, background: err.severite === "majeur" ? "rgba(239,68,68,0.06)" : "rgba(245,158,11,0.06)", border: `1px solid ${err.severite === "majeur" ? "rgba(239,68,68,0.2)" : "rgba(245,158,11,0.2)"}` }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 4, background: err.severite === "majeur" ? "rgba(239,68,68,0.15)" : "rgba(245,158,11,0.15)", color: err.severite === "majeur" ? "#ef4444" : "#f59e0b", fontWeight: 700, textTransform: "uppercase" as const }}>
                       {err.type}
                     </span>
-                    <span className="line-through text-gray-400">{err.original}</span>
-                    <span className="font-medium text-gray-800">→ {err.correction}</span>
+                    <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", textDecoration: "line-through" }}>{err.original}</span>
+                    <span style={{ fontSize: 12, color: "#10b981", fontWeight: 600 }}>→ {err.correction}</span>
                   </div>
-                  <p className="mt-1 text-gray-600">{err.explication_fr}</p>
+                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", margin: 0 }}>{err.explication_fr}</p>
                 </div>
               ))}
             </div>
@@ -209,35 +200,20 @@ export default function VoiceRecorder({
 
           {/* Corrected text */}
           {analysis.texte_corrige && (
-            <div className="rounded-lg bg-blue-50 p-3 text-sm">
-              <span className="font-medium text-blue-800">Texte corrigé : </span>
-              <span className="text-blue-700">{analysis.texte_corrige}</span>
+            <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}>
+              <span style={{ fontSize: 10, color: "#818cf8", textTransform: "uppercase" as const, letterSpacing: "0.08em" }}>Texte corrigé </span>
+              <span style={{ color: "rgba(255,255,255,0.8)", fontSize: 13 }}>{analysis.texte_corrige}</span>
             </div>
           )}
 
           {/* Conseil */}
           {analysis.conseil_fr && (
-            <div className="flex items-start gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-700">
-              <span>💡</span>
-              <span>{analysis.conseil_fr}</span>
+            <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)", fontSize: 12 }}>
+              💡 {analysis.conseil_fr}
             </div>
           )}
         </div>
       )}
-
-      {/* Reset */}
-      {(transcript || analysis) && !isListening && (
-        <button onClick={handleReset} className="self-center text-xs text-gray-400 hover:text-gray-600 underline">
-          Recommencer
-        </button>
-      )}
-
-      <style>{`
-        @keyframes waveBar {
-          from { height: 4px; }
-          to { height: 20px; }
-        }
-      `}</style>
     </div>
   );
 }

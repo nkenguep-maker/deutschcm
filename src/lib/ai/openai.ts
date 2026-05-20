@@ -19,7 +19,7 @@ function toOpenAIHistory(history: ChatMessage[]): OpenAI.Chat.ChatCompletionMess
 
 export async function openaiChat(opts: AICallOptions): Promise<AICallResult> {
   const client = getClient();
-  const model = process.env.OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
+  const model = process.env.OPENAI_MODEL || DEFAULT_OPENAI_MODEL;
 
   const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
     { role: "system", content: opts.systemPrompt },

@@ -80,6 +80,7 @@ Retourne UNIQUEMENT ce JSON valide :
 }`;
 
 export async function POST(req: NextRequest) {
+  const locale = req.headers.get("accept-language")?.startsWith("en") ? "en" : "fr";
   let { transcript, expectedText, level, exerciseType } = await req.json();
 
   if (!transcript?.trim()) {
@@ -89,6 +90,13 @@ export async function POST(req: NextRequest) {
   if (transcript.length > 300) {
     transcript = transcript.slice(0, 300);
   }
+
+  console.info("[speech] analyze request", {
+    level: level || "A1",
+    transcriptLength: transcript.length,
+    exerciseType: exerciseType || "expression_libre",
+    locale,
+  });
 
   const userMessage = [
     `Niveau CEFR : ${level || "A1"}`,
@@ -105,6 +113,9 @@ export async function POST(req: NextRequest) {
       temperature: 0.2,
       maxTokens: 1200,
     });
+
+    console.info("[speech] AI ok", { provider: result.provider });
+
     const raw = result.text;
     const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
     const safe = applyGrammarGuardrail(parsed);
@@ -112,6 +123,12 @@ export async function POST(req: NextRequest) {
       headers: { "Cache-Control": "no-store" },
     });
   } catch (err) {
-    return NextResponse.json({ error: "Erreur analyse", details: String(err) }, { status: 502 });
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[speech] AI error", { message: msg.slice(0, 120) });
+    return NextResponse.json({
+      error: locale === "en"
+        ? "The AI coach is not available right now. Please try again in a moment."
+        : "Le coach IA n'est pas disponible pour le moment. Réessayez dans quelques instants.",
+    }, { status: 502 });
   }
 }

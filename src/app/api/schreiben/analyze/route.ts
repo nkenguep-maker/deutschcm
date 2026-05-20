@@ -20,6 +20,44 @@ function applyGrammarGuardrail(correction: Record<string, unknown>): Record<stri
   return correction;
 }
 
+// Heuristic: single token with no space, no punctuation, and not resembling German/Latin words
+function looksLikeNonsense(text: string): boolean {
+  const trimmed = text.trim();
+  if (trimmed.length < 3) return true;
+  const words = trimmed.split(/\s+/).filter(Boolean);
+  // Single "word" that's very short or has no vowels (not German-like)
+  if (words.length === 1 && trimmed.length < 15) {
+    const vowels = (trimmed.match(/[aeiouäöüAEIOUÄÖÜ]/g) || []).length;
+    if (vowels === 0) return true;
+    // Random-looking: high proportion of unusual character combos
+    if (trimmed.length > 5 && vowels / trimmed.length < 0.1) return true;
+  }
+  return false;
+}
+
+const NONSENSE_RESPONSE_FR = {
+  success: true,
+  correction: {
+    score_global: 0,
+    scores: { contenu: 0, vocabulaire: 0, grammaire: 0, format: 0 },
+    niveau_detecte: "A1",
+    texte_corrige: "",
+    errors: [],
+    feedback_positif_fr: "Pas encore de phrase allemande complète — mais on va y arriver ensemble !",
+    feedback_positif_en: "No complete German sentence yet — but we will get there together!",
+    conseil_principal_fr: "Essaie une phrase simple comme : « Ich heiße Paul. Ich komme aus Kamerun. »",
+    conseil_principal_en: "Try a simple sentence like: Ich heiße Paul. Ich komme aus Kamerun.",
+    conseils_fr: [
+      "Commence par te présenter : Ich heiße [ton prénom].",
+      "Dis d'où tu viens : Ich komme aus [ton pays].",
+      "Ajoute ta profession : Ich bin Student / Ingenieur / Krankenpfleger.",
+    ],
+    exemple_modele: "Hallo! Ich heiße Paul. Ich komme aus Kamerun. Ich bin Student. Ich lerne Deutsch.",
+    mots_bien_utilises: [],
+    structures_a_retenir: ["Ich heiße …", "Ich komme aus …", "Ich bin …"],
+  }
+};
+
 const SYSTEM_PROMPT = `Tu es un correcteur expert en productions écrites allemandes pour apprenants CEFR francophones.
 Tu DOIS toujours produire du texte allemand grammaticalement CORRECT dans tes corrections.
 
@@ -48,6 +86,11 @@ Si l'élève écrit "er bin Lehrer"   → texte_corrige doit contenir "Er ist Le
 Si l'élève écrit "wir ist aus Kamerun" → texte_corrige doit contenir "Wir sind aus Kamerun."
 
 Le champ "texte_corrige" et "exemple_modele" DOIVENT être grammaticalement corrects.
+
+Si le texte reçu n'est pas reconnaissable comme de l'allemand (charabia, trop court, pas de mots reconnaissables) :
+- score_global: 0
+- conseil_principal_fr: "Je n'arrive pas encore à reconnaître une phrase allemande complète. Essaie une phrase simple comme : Ich heiße Paul. Ich komme aus Kamerun."
+- exemple_modele: "Hallo! Ich heiße Paul. Ich komme aus Kamerun. Ich bin Student."
 
 Retourne UNIQUEMENT ce JSON valide :
 {
@@ -91,12 +134,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Texte trop long (max 500 caractères)" }, { status: 400 });
   }
 
+  // Nonsense short input — return gentle message without hitting AI
+  if (looksLikeNonsense(text)) {
+    console.info("[schreiben] nonsense input detected, returning gentle response");
+    return NextResponse.json(NONSENSE_RESPONSE_FR);
+  }
+
   const userMessage = [
     `Niveau CEFR : ${level || "A1"}`,
     `Type d'exercice : ${exerciseType || "expression_libre"}`,
     `Consigne : ${task || "Écrivez un texte en allemand"}`,
     `Texte de l'élève : "${text}"`,
   ].join("\n");
+
+  console.info("[schreiben] analyze request", {
+    level: level || "A1",
+    textLength: text.length,
+    exerciseType: exerciseType || "expression_libre",
+  });
 
   try {
     const result = await callAI({
@@ -106,6 +161,9 @@ export async function POST(req: NextRequest) {
       temperature: 0.2,
       maxTokens: 2048,
     });
+
+    console.info("[schreiben] AI ok", { provider: result.provider });
+
     const raw = result.text;
     const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
     const safe = applyGrammarGuardrail(parsed);
@@ -113,6 +171,12 @@ export async function POST(req: NextRequest) {
       headers: { "Cache-Control": "no-store" },
     });
   } catch (err) {
-    return NextResponse.json({ error: "Erreur analyse", details: String(err) }, { status: 502 });
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[schreiben] AI error", { message: msg.slice(0, 120) });
+    return NextResponse.json({
+      error: "Correction IA temporairement indisponible",
+      message_fr: "Le coach IA n'est pas disponible pour le moment. Réessayez dans quelques instants.",
+      message_en: "The AI coach is not available right now. Please try again in a moment.",
+    }, { status: 502 });
   }
 }

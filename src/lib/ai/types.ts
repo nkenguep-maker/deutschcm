@@ -21,25 +21,23 @@ export interface AICallResult {
 
 export type ProviderName = "openai" | "gemini";
 
+function resolveProvider(envVal: string | undefined, defaultProvider: ProviderName): ProviderName {
+  if (envVal === "openai" || envVal === "gemini") return envVal;
+  return defaultProvider;
+}
+
 export function getProviderForFeature(feature: AIFeature): ProviderName {
-  const env = process.env.AI_PROVIDER_OVERRIDE;
-  if (env === "openai" || env === "gemini") return env;
+  const override = process.env.AI_PROVIDER_OVERRIDE;
+  if (override === "openai" || override === "gemini") return override;
 
   switch (feature) {
-    case "simulator":
-      return (process.env.SIMULATOR_AI_PROVIDER as ProviderName | undefined) ?? "openai";
-    case "speech":
-      return (process.env.SPEECH_AI_PROVIDER as ProviderName | undefined) ?? "openai";
-    case "writing":
-      return (process.env.WRITING_AI_PROVIDER as ProviderName | undefined) ?? "openai";
-    case "quiz":
-      return (process.env.QUIZ_AI_PROVIDER as ProviderName | undefined) ?? "openai";
-    case "level-test":
-      return (process.env.LEVEL_TEST_AI_PROVIDER as ProviderName | undefined) ?? "openai";
-    case "course-gen":
-      return "gemini";
-    default:
-      return "gemini";
+    case "simulator":  return resolveProvider(process.env.SIMULATOR_AI_PROVIDER, "openai");
+    case "speech":     return resolveProvider(process.env.SPEECH_AI_PROVIDER, "openai");
+    case "writing":    return resolveProvider(process.env.WRITING_AI_PROVIDER, "openai");
+    case "quiz":       return resolveProvider(process.env.QUIZ_AI_PROVIDER, "openai");
+    case "level-test": return resolveProvider(process.env.LEVEL_TEST_AI_PROVIDER, "openai");
+    case "course-gen": return "gemini";
+    default:           return "gemini";
   }
 }
 

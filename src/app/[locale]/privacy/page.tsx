@@ -97,7 +97,7 @@ function PrivacyEN() {
       <H2>3. AI and voice processing</H2>
       <P>
         The Embassy Simulator and Voice Recognition features process audio input using third-party AI APIs
-        (Google Cloud Speech, Gemini). Audio is transmitted securely via HTTPS and is not stored after processing.
+        (third-party AI providers). Audio is transmitted securely via HTTPS and is not stored after processing.
         By using these features, you consent to this real-time processing.
       </P>
 
@@ -105,7 +105,7 @@ function PrivacyEN() {
       <P>We do not sell your personal data. We may share data with:</P>
       <Ul items={[
         "Supabase (database and authentication infrastructure, hosted in the EU)",
-        "Google Cloud / Gemini API (AI features — data not used to train models)",
+        "AI providers (AI features — data not used to train models)",
         "Vercel (hosting infrastructure)",
         "Your teacher or center manager (learning progress only, if you are enrolled in a class)",
       ]} />
@@ -188,7 +188,7 @@ function PrivacyFR() {
 
       <H2>3. Traitement IA et voix</H2>
       <P>
-        Le simulateur ambassade et la reconnaissance vocale utilisent des APIs IA tierces (Google Cloud, Gemini).
+        Le simulateur ambassade et la reconnaissance vocale utilisent des APIs IA tierces.
         L'audio est transmis en HTTPS et non stocké après traitement. En utilisant ces fonctionnalités, vous consentez à ce traitement.
       </P>
 
