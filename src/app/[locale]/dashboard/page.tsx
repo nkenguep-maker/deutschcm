@@ -2,37 +2,54 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "@/navigation";
+import { usePathname } from "next/navigation";
 import Layout from "@/components/Layout";
 import { useT } from "@/hooks/useT";
 import { SCENARIOS as SIM_SCENARIOS } from "@/types/ambassade";
 import type { AmbassadeScenario } from "@/types/ambassade";
 
+// ─── Scenario locale overrides ────────────────────────────────────────────────
+
+const SCENARIO_OVERRIDES: Record<"fr" | "en", Record<string, { label: string; description: string }>> = {
+  fr: {
+    visa_etudiant:  { label: "Visa étudiant",          description: "Pratique pour vos études en Allemagne" },
+    visa_travail:   { label: "Visa de travail",         description: "Simulation pour un emploi qualifié" },
+    visa_touriste:  { label: "Court séjour",            description: "Voyage et découverte" },
+    visa_famille:   { label: "Regroupement familial",   description: "Rejoindre votre famille en Allemagne" },
+    renouvellement: { label: "Renouvellement de titre", description: "Prolonger votre séjour" },
+  },
+  en: {
+    visa_etudiant:  { label: "Student visa",            description: "Practice for studying in Germany" },
+    visa_travail:   { label: "Work visa",               description: "Simulation for a skilled job application" },
+    visa_touriste:  { label: "Short stay",              description: "Travel and discovery" },
+    visa_famille:   { label: "Family reunification",    description: "Join your family in Germany" },
+    renouvellement: { label: "Permit renewal",          description: "Extend your stay" },
+  },
+};
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface Badge {
-  id: string;
-  icon: string;
-  label: string;
-  earned: boolean;
+interface Badge { id: string; icon: string; label: string; earned: boolean }
+interface Analytics {
+  xpTotal: number; streakDays: number; completedModules: number;
+  avgQuizScore: number; totalBadges: number;
+  skillScores?: { lesen?: number; hoeren?: number; sprechen?: number; schreiben?: number; grammatik?: number };
 }
-
-const BADGE_DEFS: Badge[] = [
-  { id: "1", icon: "🔥", label: "7 jours",   earned: false },
-  { id: "2", icon: "⭐", label: "Premier A",  earned: false },
-  { id: "3", icon: "🎯", label: "Précision",  earned: false },
-  { id: "4", icon: "🏆", label: "Champion",   earned: false },
-  { id: "5", icon: "💎", label: "Diamant",    earned: false },
-  { id: "6", icon: "🚀", label: "Rocket",     earned: false },
-];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function LevelBar({ level, percent }: { level: string; percent: number }) {
+function LevelBar({ level, percent, currentLabel, towardsLabel, confirmLabel }: {
+  level: string | null; percent: number;
+  currentLabel: string; towardsLabel: string; confirmLabel: string;
+}) {
   const [animated, setAnimated] = useState(0);
   useEffect(() => {
-    const t = setTimeout(() => setAnimated(percent), 300);
-    return () => clearTimeout(t);
-  }, [percent]);
+    const timer = setTimeout(() => setAnimated(level ? percent : 0), 300);
+    return () => clearTimeout(timer);
+  }, [percent, level]);
+
+  const displayLevel = level ?? confirmLabel;
+  const nextLevel = level === "A1" ? "A2" : level === "A2" ? "B1" : level === "B1" ? "B2" : level === "B2" ? "C1" : "—";
 
   return (
     <div style={{
@@ -50,42 +67,46 @@ function LevelBar({ level, percent }: { level: string; percent: number }) {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
         <div>
           <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-            Niveau actuel
+            {currentLabel}
           </p>
-          <p style={{ margin: "4px 0 0", color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "2rem" }}>
-            {level}
-          </p>
-        </div>
-        <div style={{ textAlign: "right" }}>
-          <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "2.2rem" }}>
-            {percent}%
-          </p>
-          <p style={{ margin: 0, color: "rgba(255,255,255,0.35)", fontSize: "0.72rem" }}>
-            vers {level === "A1" ? "A2" : level === "A2" ? "B1" : "B2"}
+          <p style={{ margin: "4px 0 0", color: level ? "#10b981" : "rgba(255,255,255,0.4)", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: level ? "2rem" : "1.1rem" }}>
+            {displayLevel}
           </p>
         </div>
+        {level && (
+          <div style={{ textAlign: "right" }}>
+            <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "2.2rem" }}>
+              {percent}%
+            </p>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.35)", fontSize: "0.72rem" }}>
+              {towardsLabel} {nextLevel}
+            </p>
+          </div>
+        )}
       </div>
       <div style={{ height: 10, borderRadius: 99, overflow: "hidden", background: "rgba(255,255,255,0.06)", position: "relative" }}>
         <div style={{
           position: "absolute", inset: "0 auto 0 0",
           width: `${animated}%`,
-          background: "linear-gradient(90deg, #059669, #10b981, #34d399)",
-          boxShadow: "0 0 14px rgba(16,185,129,0.6)",
-          borderRadius: 99,
-          transition: "width 1s ease-out",
+          background: level ? "linear-gradient(90deg, #059669, #10b981, #34d399)" : "rgba(255,255,255,0.06)",
+          boxShadow: level ? "0 0 14px rgba(16,185,129,0.6)" : "none",
+          borderRadius: 99, transition: "width 1s ease-out",
         }} />
-        <div style={{
-          position: "absolute", inset: "0 auto 0 0",
-          left: `${animated - 4}%`, width: "4%",
-          background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)",
-          borderRadius: 99, opacity: 0.6,
-          transition: "left 1s ease-out",
-        }} />
+        {level && (
+          <div style={{
+            position: "absolute", inset: "0 auto 0 0",
+            left: `${animated - 4}%`, width: "4%",
+            background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)",
+            borderRadius: 99, opacity: 0.6, transition: "left 1s ease-out",
+          }} />
+        )}
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
-        <span style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.65rem" }}>650 XP</span>
-        <span style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.65rem" }}>1000 XP</span>
-      </div>
+      {level && (
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+          <span style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.65rem" }}>0 XP</span>
+          <span style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.65rem" }}>1000 XP</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -104,7 +125,9 @@ function StatCard({ icon, value, label }: { icon: string; value: string; label: 
   );
 }
 
-function SimulateurCard({ scenario, onTap }: { scenario: AmbassadeScenario; onTap: () => void }) {
+function SimulateurCard({ scenario, label, description, onTap }: {
+  scenario: AmbassadeScenario; label: string; description: string; onTap: () => void;
+}) {
   const [pressed, setPressed] = useState(false);
   return (
     <button
@@ -125,52 +148,39 @@ function SimulateurCard({ scenario, onTap }: { scenario: AmbassadeScenario; onTa
       <div style={{
         width: 44, height: 44, borderRadius: 12, flexShrink: 0,
         display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.3rem",
-        background: "rgba(16,185,129,0.12)",
-        border: "1px solid rgba(16,185,129,0.2)",
+        background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)",
       }}>
         {scenario.icon}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.88rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {scenario.label}
+          {label}
         </p>
         <p style={{ margin: "3px 0 6px", color: "rgba(255,255,255,0.4)", fontSize: "0.7rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {scenario.description}
+          {description}
         </p>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <span style={{ background: "rgba(16,185,129,0.15)", color: "#34d399", fontSize: "0.65rem", padding: "2px 7px", borderRadius: 6 }}>
-            {scenario.defaultLevel}
-          </span>
-          <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.68rem" }}>{scenario.legalRef}</span>
-        </div>
+        <span style={{ background: "rgba(16,185,129,0.15)", color: "#34d399", fontSize: "0.65rem", padding: "2px 7px", borderRadius: 6 }}>
+          {scenario.defaultLevel}
+        </span>
       </div>
       <div style={{
         width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
         display: "flex", alignItems: "center", justifyContent: "center",
-        background: "rgba(16,185,129,0.08)",
-        border: "1px solid rgba(16,185,129,0.2)",
+        background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
         color: "#10b981", fontSize: "0.75rem",
-      }}>
-        →
-      </div>
+      }}>→</div>
     </button>
   );
 }
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-interface Analytics {
-  xpTotal: number;
-  streakDays: number;
-  completedModules: number;
-  avgQuizScore: number;
-  totalBadges: number;
-  skillScores?: { lesen?: number; hoeren?: number; sprechen?: number; schreiben?: number; grammatik?: number };
-}
-
 export default function StudentDashboard() {
   const router = useRouter();
-  const { dashboard: t, common: tCommon } = useT();
+  const pathname = usePathname();
+  const locale = pathname.startsWith("/en") ? "en" as const : "fr" as const;
+  const { dashboard: t, nav: tn } = useT();
+
   const [userData, setUserData] = useState<{
     fullName?: string; germanLevel?: string | null; xpTotal?: number; streakDays?: number;
     city?: string | null; studentType?: string; isValidated?: boolean;
@@ -197,35 +207,55 @@ export default function StudentDashboard() {
       .catch(() => {});
   }, []);
 
-  const firstName = userData?.fullName?.split(" ")[0] ?? "Apprenant";
-  const level = userData?.germanLevel ?? "A1";
+  const firstName = userData?.fullName?.split(" ")[0] ?? "";
+  const level = userData?.germanLevel ?? null;
   const xp = analytics?.xpTotal ?? userData?.xpTotal ?? 0;
   const streak = analytics?.streakDays ?? userData?.streakDays ?? 0;
-  const greet = new Date().getHours() < 12 ? "Guten Morgen" : new Date().getHours() < 18 ? "Guten Tag" : "Guten Abend";
 
-  const dynamicStats = [
-    { icon: "⚡", value: xp > 1000 ? `${(xp/1000).toFixed(1)}K` : String(xp), label: "Points XP" },
-    { icon: "✅", value: analytics ? String(analytics.completedModules) : "—", label: "Leçons" },
-    { icon: "🎯", value: analytics ? `${analytics.avgQuizScore}%` : "—", label: "Score moy." },
-    { icon: "🔥", value: String(streak), label: "Jours streak" },
-    { icon: "🏆", value: analytics ? String(analytics.totalBadges) : "—", label: "Badges" },
-    { icon: "📖", value: level, label: "Niveau actuel" },
+  const scenarioOverrides = SCENARIO_OVERRIDES[locale];
+
+  const badgeDefs: Badge[] = [
+    { id: "1", icon: "🔥", label: t.badgeStreak,    earned: false },
+    { id: "2", icon: "⭐", label: t.badgeFirstA,    earned: false },
+    { id: "3", icon: "🎯", label: t.badgePrecision, earned: false },
+    { id: "4", icon: "🏆", label: t.badgeChampion,  earned: false },
+    { id: "5", icon: "💎", label: t.badgeDiamond,   earned: false },
+    { id: "6", icon: "🚀", label: t.badgeRocket,    earned: false },
   ];
 
-  const skills = analytics?.skillScores
-    ? [
-        { label: "Grammaire",    icon: "📝", score: analytics.skillScores.grammatik ?? 0 },
-        { label: "Vocabulaire",  icon: "📖", score: analytics.skillScores.lesen ?? 0 },
-        { label: "Prononciation",icon: "🗣️", score: analytics.skillScores.sprechen ?? 0 },
-        { label: "Compréhension",icon: "👂", score: analytics.skillScores.hoeren ?? 0 },
-      ]
-    : null;
+  const dynamicStats = [
+    { icon: "⚡", value: xp > 0 ? (xp > 1000 ? `${(xp / 1000).toFixed(1)}K` : String(xp)) : "—", label: t.xpLabel },
+    { icon: "✅", value: analytics ? String(analytics.completedModules) : "—", label: t.lessonsLabel },
+    { icon: "🎯", value: analytics ? `${analytics.avgQuizScore}%` : "—", label: t.scoreLabel },
+    { icon: "🔥", value: streak > 0 ? String(streak) : "—", label: t.streakLabel },
+    { icon: "🏆", value: analytics ? String(analytics.totalBadges) : "—", label: t.badgesLabel },
+    { icon: "📖", value: level ?? "—", label: t.levelLabel },
+  ];
+
+  const skills = analytics?.skillScores ? [
+    { label: t.grammar,       icon: "📝", score: analytics.skillScores.grammatik ?? 0 },
+    { label: t.vocabulary,    icon: "📖", score: analytics.skillScores.lesen ?? 0 },
+    { label: t.pronunciation, icon: "🗣️", score: analytics.skillScores.sprechen ?? 0 },
+    { label: t.comprehension, icon: "👂", score: analytics.skillScores.hoeren ?? 0 },
+  ] : null;
 
   const earnedCount = analytics?.totalBadges ?? 0;
-  const badges = BADGE_DEFS.map((b, i) => ({ ...b, earned: i < earnedCount }));
+  const earnedBadges = badgeDefs.map((b, i) => ({ ...b, earned: i < earnedCount }));
+
+  // Smart CTA: test level → first lesson → continue
+  const hasLevel = !!level;
+  const hasLessons = analytics ? analytics.completedModules > 0 : false;
+  const ctaLabel = !hasLevel ? t.ctaTestLevel : !hasLessons ? t.ctaFirstLesson : t.ctaContinue;
+  const ctaHref = !hasLevel ? "/test-niveau" : "/courses";
+
+  const pillars = [
+    { label: t.pillar1Label, desc: t.pillar1Desc, color: "#10b981", badge: null },
+    { label: t.pillar2Label, desc: t.pillar2Desc, color: "#6366f1", badge: null },
+    { label: t.pillar3Label, desc: t.pillar3Desc, color: "rgba(255,255,255,0.2)", badge: t.pillar3Badge },
+  ];
 
   return (
-    <Layout title="Dashboard">
+    <Layout title={tn.home}>
 
       {/* ── Welcome row ── */}
       <div className="fade-up" style={{ marginBottom: 28 }}>
@@ -237,11 +267,11 @@ export default function StudentDashboard() {
           background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
         }}>
           <div>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.68rem", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-              {greet} 👋
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.5)", fontSize: "0.82rem", fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>
+              {t.greetReturn}{firstName ? ` ${firstName}` : ""}
             </p>
-            <h2 style={{ margin: "6px 0 10px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: isMobile ? "1.4rem" : "1.8rem" }}>
-              {firstName}
+            <h2 style={{ margin: "6px 0 10px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: isMobile ? "1.25rem" : "1.6rem" }}>
+              {t.greetSubtitle}
             </h2>
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 8,
@@ -249,35 +279,52 @@ export default function StudentDashboard() {
               background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.18)",
             }}>
               <span>🔥</span>
-              <span style={{ color: "#34d399", fontSize: "0.78rem" }}>{streak > 0 ? `${streak} jours consécutifs — continuez !` : "Connectez-vous chaque jour pour démarrer votre série"}</span>
+              <span style={{ color: "#34d399", fontSize: "0.78rem" }}>
+                {streak > 0 ? `${streak} ${t.streakActive}` : t.streakEmpty}
+              </span>
             </div>
           </div>
-          <button
-            onClick={() => router.push("/simulateur")}
-            style={{
-              display: "flex", alignItems: "center", gap: 10,
-              padding: isMobile ? "12px 18px" : "14px 22px", borderRadius: 14, cursor: "pointer",
-              background: "linear-gradient(135deg, #10b981, #059669)",
-              border: "none", color: "white",
-              fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem",
-              boxShadow: "0 4px 24px rgba(16,185,129,0.35)",
-              width: isMobile ? "100%" : "auto", justifyContent: isMobile ? "center" : "flex-start",
-            }}
-          >
-            <span style={{ fontSize: "1.2rem" }}>🎙️</span>
-            Lancer une simulation
-          </button>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, width: isMobile ? "100%" : "auto" }}>
+            <button
+              onClick={() => router.push(ctaHref)}
+              style={{
+                display: "flex", alignItems: "center", gap: 10,
+                padding: isMobile ? "12px 18px" : "14px 22px", borderRadius: 14, cursor: "pointer",
+                background: "linear-gradient(135deg, #10b981, #059669)",
+                border: "none", color: "white",
+                fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem",
+                boxShadow: "0 4px 24px rgba(16,185,129,0.35)",
+                width: isMobile ? "100%" : "auto", justifyContent: isMobile ? "center" : "flex-start",
+              }}
+            >
+              {ctaLabel}
+            </button>
+            <button
+              onClick={() => router.push("/simulateur")}
+              style={{
+                display: "flex", alignItems: "center", gap: 8, justifyContent: "center",
+                padding: "9px 16px", borderRadius: 12, cursor: "pointer",
+                background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
+                color: "#10b981", fontFamily: "'DM Mono', monospace", fontSize: "0.8rem",
+                width: isMobile ? "100%" : "auto",
+              }}
+            >
+              <span>🎙️</span> {t.ctaSimulator}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* ── Stats grid (6 cols) ── */}
+      {/* ── Stats grid ── */}
       <div className="fade-up card-delay-1" style={{
-        display: "grid", gridTemplateColumns: isMobile ? "repeat(3, 1fr)" : "repeat(6, 1fr)", gap: isMobile ? 10 : 14, marginBottom: 28,
+        display: "grid", gridTemplateColumns: isMobile ? "repeat(3, 1fr)" : "repeat(6, 1fr)",
+        gap: isMobile ? 10 : 14, marginBottom: 28,
       }}>
         {dynamicStats.map(s => <StatCard key={s.label} {...s} />)}
       </div>
 
-      {/* ── Main grid (2 cols) ── */}
+      {/* ── Main grid ── */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 380px", gap: 24, alignItems: "start" }}>
 
         {/* ── Left col ── */}
@@ -285,10 +332,50 @@ export default function StudentDashboard() {
 
           {/* Level bar */}
           <div className="fade-up card-delay-2">
-            <LevelBar level={level} percent={Math.min(Math.round((xp % 1000) / 10), 99)} />
+            <LevelBar
+              level={level}
+              percent={level ? Math.min(Math.round((xp % 1000) / 10), 99) : 0}
+              currentLabel={t.levelCurrentLabel}
+              towardsLabel={t.levelTowardsLabel}
+              confirmLabel={t.levelConfirm}
+            />
           </div>
 
-          {/* Simulateurs IA */}
+          {/* Yema journey */}
+          <div className="fade-up card-delay-2" style={{
+            borderRadius: 18, overflow: "hidden",
+            background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
+          }}>
+            <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+              <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
+                {t.journeyTitle}
+              </p>
+            </div>
+            <div style={{ padding: "14px 16px", display: "flex", gap: 10 }}>
+              {pillars.map(pillar => (
+                <div key={pillar.label} style={{
+                  flex: 1, padding: "14px 12px", borderRadius: 14,
+                  background: pillar.badge ? "rgba(255,255,255,0.02)" : `${pillar.color}08`,
+                  border: `1px solid ${pillar.badge ? "rgba(255,255,255,0.07)" : pillar.color + "25"}`,
+                  opacity: pillar.badge ? 0.65 : 1,
+                }}>
+                  <p style={{ margin: "0 0 6px", color: pillar.badge ? "rgba(255,255,255,0.45)" : pillar.color, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem" }}>
+                    {pillar.label}
+                  </p>
+                  <p style={{ margin: 0, color: "rgba(255,255,255,0.35)", fontSize: "0.67rem", lineHeight: 1.45 }}>
+                    {pillar.desc}
+                  </p>
+                  {pillar.badge && (
+                    <span style={{ display: "inline-block", marginTop: 8, background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.35)", fontSize: "0.58rem", padding: "2px 8px", borderRadius: 6, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                      {pillar.badge}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Speaking practice */}
           <div className="fade-up card-delay-3" style={{
             borderRadius: 18, overflow: "hidden",
             background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
@@ -296,22 +383,27 @@ export default function StudentDashboard() {
             <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
                 <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                  Simulateurs d'ambassade
+                  {t.simPracticeTitle}
                 </p>
                 <p style={{ margin: "4px 0 0", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
-                  Conversations IA avec Herr Bauer
+                  {t.simPracticeDesc}
                 </p>
               </div>
-              <span style={{ fontSize: "1.4rem" }}>🤖</span>
+              <span style={{ fontSize: "1.4rem" }}>🎙️</span>
             </div>
             <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
-              {SIM_SCENARIOS.map(s => (
-                <SimulateurCard
-                  key={s.id}
-                  scenario={s}
-                  onTap={() => router.push(`/simulateur?scenario=${s.id}&niveau=${s.defaultLevel}`)}
-                />
-              ))}
+              {SIM_SCENARIOS.map(s => {
+                const override = scenarioOverrides[s.id] ?? { label: s.label, description: s.description };
+                return (
+                  <SimulateurCard
+                    key={s.id}
+                    scenario={s}
+                    label={override.label}
+                    description={override.description}
+                    onTap={() => router.push(`/simulateur?scenario=${s.id}&niveau=${s.defaultLevel}`)}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
@@ -345,8 +437,7 @@ export default function StudentDashboard() {
                   </div>
                   <div style={{ height: 7, borderRadius: 99, overflow: "hidden", background: "rgba(255,255,255,0.06)" }}>
                     <div style={{
-                      height: "100%", borderRadius: 99,
-                      width: `${skill.score}%`,
+                      height: "100%", borderRadius: 99, width: `${skill.score}%`,
                       background: "linear-gradient(90deg, #059669, #10b981)",
                       boxShadow: "0 0 8px rgba(16,185,129,0.4)",
                     }} />
@@ -360,7 +451,7 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Join class widget — solo students only */}
+          {/* Join class — solo students only */}
           {(!userData || userData.studentType === "solo") && (
             <div className="fade-up card-delay-3" style={{ borderRadius: 18, background: "rgba(99,102,241,0.05)", border: "1px solid rgba(99,102,241,0.2)", padding: "20px 20px 18px" }}>
               <p style={{ margin: "0 0 4px", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
@@ -376,7 +467,7 @@ export default function StudentDashboard() {
                 <input
                   value={classJoinCode}
                   onChange={e => setClassJoinCode(e.target.value.toUpperCase())}
-                  placeholder="DEUTSCH-A1-XXXX"
+                  placeholder={t.joinCodePlaceholder}
                   onKeyDown={e => { if (e.key === "Enter" && classJoinCode.length >= 6) router.push(`/classroom/join?code=${encodeURIComponent(classJoinCode)}`); }}
                   style={{
                     flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(99,102,241,0.2)",
@@ -393,23 +484,19 @@ export default function StudentDashboard() {
                     cursor: classJoinCode.length >= 6 ? "pointer" : "default",
                     fontSize: "0.8rem", fontWeight: 700, transition: "all 0.2s", flexShrink: 0,
                   }}
-                >
-                  →
-                </button>
+                >→</button>
               </div>
             </div>
           )}
 
-          {/* Pending validation notice */}
+          {/* Pending validation */}
           {userData?.studentType === "classroom" && !userData.isValidated && (
             <div className="fade-up card-delay-3" style={{ borderRadius: 18, background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.25)", padding: "18px 20px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ fontSize: "1.4rem" }}>⏳</span>
                 <div>
-                  <div style={{ color: "#f59e0b", fontWeight: 700, fontSize: "0.88rem" }}>Inscription en attente</div>
-                  <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", marginTop: 2 }}>
-                    Votre enseignant doit valider votre demande.
-                  </div>
+                  <div style={{ color: "#f59e0b", fontWeight: 700, fontSize: "0.88rem" }}>{t.pendingTitle}</div>
+                  <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", marginTop: 2 }}>{t.pendingDesc}</div>
                 </div>
               </div>
             </div>
@@ -422,34 +509,26 @@ export default function StudentDashboard() {
           }}>
             <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
               <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                Récompenses
+                {t.rewardsLabel}
               </p>
               <p style={{ margin: "4px 0 0", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
-                Badges obtenus
+                {t.badgesTitle}
               </p>
             </div>
             {earnedCount === 0 ? (
               <div style={{ padding: "24px 16px", textAlign: "center" }}>
-                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", margin: 0 }}>
-                  Complétez votre première leçon pour gagner un badge
-                </p>
+                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", margin: 0 }}>{t.noBadge}</p>
               </div>
             ) : (
-              <div style={{
-                padding: "16px", display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)", gap: 10,
-              }}>
-                {badges.map(badge => (
-                  <div
-                    key={badge.id}
-                    style={{
-                      display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-                      padding: "14px 8px", borderRadius: 14,
-                      background: badge.earned ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.03)",
-                      border: badge.earned ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.06)",
-                      opacity: badge.earned ? 1 : 0.4,
-                    }}
-                  >
+              <div style={{ padding: "16px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+                {earnedBadges.map(badge => (
+                  <div key={badge.id} style={{
+                    display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                    padding: "14px 8px", borderRadius: 14,
+                    background: badge.earned ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.03)",
+                    border: badge.earned ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.06)",
+                    opacity: badge.earned ? 1 : 0.4,
+                  }}>
                     <span style={{ fontSize: "1.6rem" }}>{badge.icon}</span>
                     <span style={{ color: badge.earned ? "#34d399" : "rgba(255,255,255,0.3)", fontSize: "0.62rem", textAlign: "center" }}>
                       {badge.label}
@@ -460,7 +539,7 @@ export default function StudentDashboard() {
             )}
           </div>
 
-          {/* Social — Découvrir */}
+          {/* Community */}
           <div className="fade-up card-delay-3" style={{
             borderRadius: 18, overflow: "hidden",
             background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
@@ -474,24 +553,49 @@ export default function StudentDashboard() {
               </p>
             </div>
             <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
-              {[
-                { icon: "🏫", label: t.classesAvailable, desc: t.classesJoin, href: "/discover?tab=classes" },
-                { icon: "👥", label: t.groupsLabel, desc: t.studyGroup, href: "/discover?tab=groups" },
-                { icon: "🤝", label: t.findPartner, desc: t.soloStudents, href: "/discover?tab=students" },
-              ].map(item => (
-                <a key={item.href} href={item.href} style={{
-                  display: "flex", gap: 10, alignItems: "center", padding: "10px 12px",
-                  borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)",
-                  textDecoration: "none", transition: "background 0.15s",
-                }}>
-                  <span style={{ fontSize: 20, flexShrink: 0 }}>{item.icon}</span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 600 }}>{item.label}</div>
-                    <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{item.desc}</div>
-                  </div>
-                  <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 12 }}>→</span>
-                </a>
-              ))}
+              {/* Available classes — active link */}
+              <a href="/discover?tab=classes" style={{
+                display: "flex", gap: 10, alignItems: "center", padding: "10px 12px",
+                borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)",
+                textDecoration: "none",
+              }}>
+                <span style={{ fontSize: 20, flexShrink: 0 }}>🏫</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 600 }}>{t.classesAvailable}</div>
+                  <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{t.classesJoin}</div>
+                </div>
+                <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 12 }}>→</span>
+              </a>
+              {/* Study groups — coming soon */}
+              <div style={{
+                display: "flex", gap: 10, alignItems: "center", padding: "10px 12px",
+                borderRadius: 12, background: "rgba(255,255,255,0.01)", border: "1px solid rgba(255,255,255,0.04)",
+                opacity: 0.6,
+              }}>
+                <span style={{ fontSize: 20, flexShrink: 0 }}>👥</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600 }}>{t.groupsLabel}</div>
+                  <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>{t.communityGroupsSoon}</div>
+                </div>
+                <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)", fontSize: 9, padding: "2px 8px", borderRadius: 6, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", flexShrink: 0 }}>
+                  {t.pillar3Badge}
+                </span>
+              </div>
+              {/* Find a partner — coming soon */}
+              <div style={{
+                display: "flex", gap: 10, alignItems: "center", padding: "10px 12px",
+                borderRadius: 12, background: "rgba(255,255,255,0.01)", border: "1px solid rgba(255,255,255,0.04)",
+                opacity: 0.6,
+              }}>
+                <span style={{ fontSize: 20, flexShrink: 0 }}>🤝</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600 }}>{t.findPartner}</div>
+                  <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>{t.communityPartnerSoon}</div>
+                </div>
+                <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)", fontSize: 9, padding: "2px 8px", borderRadius: 6, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", flexShrink: 0 }}>
+                  {t.pillar3Badge}
+                </span>
+              </div>
             </div>
           </div>
         </div>

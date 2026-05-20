@@ -60,7 +60,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
     { icon: "💳", label: tn.billing,          href: "/center/billing"        },
   ];
   const ADMIN_NAV = [
-    { icon: "🏠", label: "Dashboard",         href: "/admin"                 },
+    { icon: "🏠", label: tn.overview,          href: "/admin"                 },
     { icon: "✨", label: tn.generateCourse,   href: "/admin/courses/generate"},
     { icon: "👥", label: tn.users,            href: "/teacher/students"      },
     { icon: "🏫", label: tn.centers,          href: "/center"               },
@@ -233,7 +233,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
             {userRole !== "STUDENT" && (
               <div style={{ margin: "0 4px 8px", padding: "6px 12px", borderRadius: 8, background: `${accentColor}10`, border: `1px solid ${accentColor}25`, textAlign: "center" }}>
                 <span style={{ color: accentColor, fontSize: 10, fontWeight: 700, letterSpacing: "0.06em" }}>
-                  {userRole === "TEACHER" ? "👨‍🏫 ENSEIGNANT" : userRole === "CENTER_MANAGER" ? "⭐ CENTRE" : "🛡️ ADMIN"}
+                  {userRole === "TEACHER" ? tl.teacherRole : userRole === "CENTER_MANAGER" ? tl.centerRole : tl.adminRole}
                 </span>
               </div>
             )}
