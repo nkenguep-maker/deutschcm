@@ -67,7 +67,7 @@ const LABELS = {
     aiTools: "AI Tools",
     aiTts: "🔊 Azure TTS Audio",
     aiVoice: "🎙️ Voice recognition",
-    aiGemini: "✨ AI correction",
+    aiCorrection: "✨ AI correction",
     aiQuiz: "🧠 Adaptive quiz",
     min: "min",
     loading: "Loading module…",
@@ -118,7 +118,7 @@ const LABELS = {
     aiTools: "Outils IA disponibles",
     aiTts: "🔊 Audio TTS Azure",
     aiVoice: "🎙️ Reconnaissance vocale",
-    aiGemini: "✨ Correction IA",
+    aiCorrection: "✨ Correction IA",
     aiQuiz: "🧠 Quiz adaptatif",
     min: "min",
     loading: "Chargement du module…",
@@ -825,7 +825,7 @@ export default function ModulePage() {
               {[
                 { icon: "🔊", label: labels.aiTts },
                 { icon: "🎙️", label: labels.aiVoice },
-                { icon: "✨", label: labels.aiGemini },
+                { icon: "✨", label: labels.aiCorrection },
                 { icon: "🧠", label: labels.aiQuiz },
               ].map((tool, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
