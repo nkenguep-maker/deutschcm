@@ -55,6 +55,15 @@ const LABELS = {
     scoreLabel: "Score:",
     xpEarned: "{xp} XP earned",
     nextModule: "→ Next module",
+    nextLesson: "→ Next lesson",
+    viewProgress: "→ View my progress",
+    moduleCompleted: "Module completed!",
+    completionText: "Well done, you just completed this module. Every step matters.",
+    finalModuleTitle: "Path completed for now",
+    finalModuleText: "Well done. You completed the available content. Your progress is waiting in your dashboard.",
+    backToCourses: "Back to courses",
+    practiceSimulator: "Practice with the simulator",
+    lockedMessage: "The next step will be available when this path is unlocked.",
     xpThisModule: "XP this module",
     xpPoints: "⚡ Experience points",
     infoPanel: "Info",
@@ -106,6 +115,15 @@ const LABELS = {
     scoreLabel: "Score :",
     xpEarned: "{xp} XP gagnés",
     nextModule: "→ Module suivant",
+    nextLesson: "→ Leçon suivante",
+    viewProgress: "→ Voir ma progression",
+    moduleCompleted: "Module terminé !",
+    completionText: "Bravo, tu viens de terminer ce module. Chaque étape compte.",
+    finalModuleTitle: "Parcours terminé pour le moment",
+    finalModuleText: "Bravo. Tu as terminé les contenus disponibles. Ta progression t'attend dans ton tableau de bord.",
+    backToCourses: "Retour aux cours",
+    practiceSimulator: "Pratiquer avec le simulateur",
+    lockedMessage: "La suite sera disponible lorsque ce parcours sera débloqué.",
     xpThisModule: "XP ce module",
     xpPoints: "⚡ Points d'expérience",
     infoPanel: "Informations",
@@ -325,6 +343,62 @@ const DEMO_MODULES: Record<string, Module> = {
 const ALL_MODULES: Record<string, Module> = {
   ...DEMO_MODULES,
   ...A1_BETA_MODULES as unknown as Record<string, Module>,
+}
+
+// ─── Course order for sequential navigation ───────────────
+const COURSE_SEQUENCE = [
+  "a1-beta-1", "a1-beta-2", "a1-beta-3", "a1-beta-4", "a1-beta-5",
+]
+
+interface NextStep {
+  type: "next_module" | "next_lesson" | "progress"
+  href: string
+  label: string
+  isFinal: boolean
+}
+
+function getNextLearningStep(
+  courseId: string,
+  moduleId: string,
+  locale: string,
+  labels: AnyLabels
+): NextStep {
+  const courseModuleIds = COURSE_TO_MODULE_IDS[courseId]
+  const currentIndex = courseModuleIds?.indexOf(moduleId) ?? -1
+
+  // Case 1: there is a next module in the same course
+  if (courseModuleIds && currentIndex >= 0 && currentIndex < courseModuleIds.length - 1) {
+    const nextId = courseModuleIds[currentIndex + 1]
+    return {
+      type: "next_module",
+      href: `/${locale}/courses/${courseId}/modules/${nextId}`,
+      label: labels.nextModule,
+      isFinal: false,
+    }
+  }
+
+  // Case 2: last module of this course — look for the next course in sequence
+  const seqIndex = COURSE_SEQUENCE.indexOf(courseId)
+  if (seqIndex >= 0 && seqIndex < COURSE_SEQUENCE.length - 1) {
+    const nextCourseId = COURSE_SEQUENCE[seqIndex + 1]
+    const nextIds = COURSE_TO_MODULE_IDS[nextCourseId]
+    if (nextIds && nextIds.length > 0) {
+      return {
+        type: "next_lesson",
+        href: `/${locale}/courses/${nextCourseId}/modules/${nextIds[0]}`,
+        label: labels.nextLesson,
+        isFinal: false,
+      }
+    }
+  }
+
+  // Case 3: no more available content — send to progress dashboard
+  return {
+    type: "progress",
+    href: `/${locale}/dashboard#progress`,
+    label: labels.viewProgress,
+    isFinal: true,
+  }
 }
 
 // ─── Main page ───────────────────────────────────────────
@@ -757,26 +831,64 @@ export default function ModulePage() {
           )}
 
           {/* ── Completion banner ── */}
-          {completed && (
-            <div style={{ marginTop: 24, padding: "20px 24px", borderRadius: 16, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", textAlign: "center" }}>
-              <div style={{ fontSize: 40, marginBottom: 8 }}>🎉</div>
-              <h3 style={{ fontFamily: "'Syne',sans-serif", color: "#10b981", fontSize: 20, margin: "0 0 4px" }}>
-                {labels.moduleComplete}
-              </h3>
-              {score !== null && (
-                <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, margin: "0 0 12px" }}>
-                  {labels.scoreLabel} {score}%
+          {completed && (() => {
+            const step = getNextLearningStep(params.courseId, params.moduleId, locale, labels)
+            return (
+              <div style={{
+                marginTop: 24, padding: "28px 24px", borderRadius: 16, textAlign: "center",
+                background: step.isFinal ? "rgba(99,102,241,0.08)" : "rgba(16,185,129,0.1)",
+                border: `1px solid ${step.isFinal ? "rgba(99,102,241,0.25)" : "rgba(16,185,129,0.25)"}`,
+              }}>
+                <div style={{ fontSize: 40, marginBottom: 12 }}>🎉</div>
+                <h3 style={{
+                  fontFamily: "'Syne',sans-serif", fontSize: 20, margin: "0 0 8px",
+                  color: step.isFinal ? "#a5b4fc" : "#10b981",
+                }}>
+                  {step.isFinal ? labels.finalModuleTitle : labels.moduleCompleted}
+                </h3>
+                <p style={{
+                  color: "rgba(255,255,255,0.55)", fontSize: 13, lineHeight: 1.7,
+                  margin: "0 auto 10px", maxWidth: 420,
+                }}>
+                  {step.isFinal ? labels.finalModuleText : labels.completionText}
                 </p>
-              )}
-              <p style={{ color: "#f59e0b", fontSize: 14, fontWeight: 700, margin: "0 0 16px" }}>
-                {labels.xpEarned.replace("{xp}", String(xpEarned))} ⚡
-              </p>
-              <a href={`/${locale}/courses/${params.courseId}`}
-                style={{ display: "inline-block", padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", color: "white", textDecoration: "none", fontSize: 13, fontWeight: 700, fontFamily: "'Syne',sans-serif" }}>
-                {labels.nextModule}
-              </a>
-            </div>
-          )}
+                {score !== null && (
+                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: "0 0 10px" }}>
+                    {labels.scoreLabel} {score}%
+                  </p>
+                )}
+                <p style={{ color: "#f59e0b", fontSize: 14, fontWeight: 700, margin: "0 0 20px" }}>
+                  {labels.xpEarned.replace("{xp}", String(xpEarned))} ⚡
+                </p>
+
+                {/* Primary CTA — always has a valid href */}
+                <a
+                  href={step.href}
+                  style={{
+                    display: "inline-block", padding: "13px 28px", borderRadius: 12,
+                    background: step.isFinal
+                      ? "linear-gradient(135deg,#6366f1,#4f46e5)"
+                      : "linear-gradient(135deg,#10b981,#059669)",
+                    color: "white", textDecoration: "none", fontSize: 14,
+                    fontWeight: 700, fontFamily: "'Syne',sans-serif",
+                  }}
+                >
+                  {step.label}
+                </a>
+
+                {/* Secondary actions */}
+                <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginTop: 16 }}>
+                  <a href={`/${locale}/courses`} style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, textDecoration: "none" }}>
+                    {labels.backToCourses}
+                  </a>
+                  <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 12 }}>·</span>
+                  <a href={`/${locale}/simulateur`} style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, textDecoration: "none" }}>
+                    {labels.practiceSimulator}
+                  </a>
+                </div>
+              </div>
+            )
+          })()}
 
           {/* Disclaimer */}
           <div style={{ marginTop: 40, padding: "10px 16px", borderRadius: 10, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
