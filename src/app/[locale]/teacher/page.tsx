@@ -125,17 +125,21 @@ function TeacherSidebar({ teacherName, isMobile, open, onClose }: {
 function AttentionCard({ icon, title, desc, count, cta, href, color, isMobile }: {
   icon: string; title: string; desc: string; count: number; cta: string; href: string; color: string; isMobile: boolean;
 }) {
+  const isEmpty = count === 0;
   return (
-    <div style={{ padding: isMobile ? "14px" : "16px 18px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: `1px solid ${color}22`, display: "flex", flexDirection: "column", gap: 10 }}>
+    <div style={{ padding: isMobile ? "14px" : "16px 18px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: `1px solid ${isEmpty ? "rgba(255,255,255,0.07)" : color + "22"}`, display: "flex", flexDirection: "column", gap: 10 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{ fontSize: "1.1rem" }}>{icon}</span>
-        <span style={{ padding: "2px 10px", borderRadius: 99, background: `${color}18`, color, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem" }}>{count}</span>
+        <span style={{ fontSize: "1.1rem", opacity: isEmpty ? 0.5 : 1 }}>{icon}</span>
+        {isEmpty
+          ? <span style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.72rem", fontFamily: "'DM Mono', monospace" }}>—</span>
+          : <span style={{ padding: "2px 10px", borderRadius: 99, background: `${color}18`, color, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem" }}>{count}</span>
+        }
       </div>
       <div>
-        <p style={{ margin: "0 0 3px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem" }}>{title}</p>
+        <p style={{ margin: "0 0 3px", color: isEmpty ? "rgba(255,255,255,0.45)" : "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem" }}>{title}</p>
         <p style={{ margin: 0, color: "rgba(255,255,255,0.32)", fontSize: "0.65rem", lineHeight: 1.4 }}>{desc}</p>
       </div>
-      <Link href={href} style={{ fontSize: "0.68rem", color, textDecoration: "none", fontFamily: "'DM Mono', monospace" }}>{cta} →</Link>
+      <Link href={href} style={{ fontSize: "0.68rem", color: isEmpty ? "rgba(255,255,255,0.25)" : color, textDecoration: "none", fontFamily: "'DM Mono', monospace" }}>{cta} →</Link>
     </div>
   );
 }
@@ -296,11 +300,16 @@ export default function TeacherDashboard() {
 
             {/* Welcome */}
             {firstName && (
-              <div className="fade-up" style={{ marginBottom: 22 }}>
+              <div className="fade-up" style={{ marginBottom: 18 }}>
                 <p style={{ margin: "0 0 4px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: isMobile ? "1.25rem" : "1.4rem" }}>
                   {tT.greeting.replace("{name}", firstName)}
                 </p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.38)", fontSize: "0.75rem" }}>{tT.todaySubtitle}</p>
+                <p style={{ margin: "0 0 12px", color: "rgba(255,255,255,0.38)", fontSize: "0.75rem" }}>{tT.todaySubtitle}</p>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "10px 16px", borderRadius: 12, background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.15)" }}>
+                  <span style={{ color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.8rem" }}>{tT.expertiseCenter}</span>
+                  {!isMobile && <span style={{ width: 1, height: 14, background: "rgba(255,255,255,0.1)" }} />}
+                  {!isMobile && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.65rem", maxWidth: 360 }}>{tT.expertiseSupportCopy}</span>}
+                </div>
               </div>
             )}
 
@@ -319,6 +328,14 @@ export default function TeacherDashboard() {
               }}>
                 {pendingCorrections > 0 ? tT.todayPriorityPendingCTA : tT.todayPriorityCalmCTA} →
               </Link>
+            </div>
+
+            {/* Attention section header */}
+            <div className="fade-up" style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: 10 }}>
+              <h2 style={{ margin: 0, color: "rgba(255,255,255,0.6)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                {tT.todayAttnSection}
+              </h2>
+              <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.06)" }} />
             </div>
 
             {/* 4 Attention cards */}
@@ -414,9 +431,33 @@ export default function TeacherDashboard() {
             </div>
 
             {/* Empty corrections note */}
-            <div style={{ padding: "20px 24px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+            <div style={{ padding: "20px 24px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
               <p style={{ color: "rgba(255,255,255,0.28)", fontSize: "0.75rem", margin: 0 }}>{tT.assignmentsEmpty}</p>
               <Link href="/teacher/assignments" style={{ color: "#10b981", fontSize: "0.72rem", textDecoration: "none", fontFamily: "'Syne', sans-serif", fontWeight: 600, whiteSpace: "nowrap" }}>{tT.viewAll}</Link>
+            </div>
+
+            {/* Impact block */}
+            <div style={{ padding: "20px 22px", borderRadius: 16, background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.12)" }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
+                <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>{tT.impactTitle}</h2>
+                <span style={{ color: "rgba(255,255,255,0.28)", fontSize: "0.65rem" }}>{tT.impactSubtitle}</span>
+              </div>
+              {totalStudents === 0 ? (
+                <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.72rem" }}>{tT.impactEmpty}</p>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(150px, 100%), 1fr))", gap: 10, marginTop: 14 }}>
+                  {[
+                    { label: tT.impactLearnersGuided, value: totalStudents, color: "#10b981" },
+                    { label: tT.impactProgressObserved, value: toCelebrate,   color: "#6366f1" },
+                  ].map(m => (
+                    <div key={m.label} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                      <p style={{ margin: "0 0 2px", color: m.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.4rem" }}>{m.value}</p>
+                      <p style={{ margin: 0, color: "rgba(255,255,255,0.35)", fontSize: "0.62rem" }}>{m.label}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p style={{ margin: "14px 0 0", color: "rgba(255,255,255,0.18)", fontSize: "0.6rem", fontFamily: "'DM Mono', monospace" }}>{tT.microcopy2}</p>
             </div>
           </main>
         </div>

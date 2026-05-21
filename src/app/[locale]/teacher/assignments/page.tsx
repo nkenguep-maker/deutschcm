@@ -34,14 +34,32 @@ export default function CorrectionsPage() {
     <TeacherLayout title={tNav.corrections}>
       <div style={{ maxWidth: 860 }}>
 
-        {/* Subtitle */}
-        <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>
+        {/* Subtitle + positioning */}
+        <p style={{ margin: "0 0 6px", color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>
           {tT.correctionsSubtitle2}
+        </p>
+        <p style={{ margin: "0 0 16px", color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.72rem" }}>
+          {tT.expertiseCenter}
         </p>
 
         {/* Trust note */}
-        <div style={{ marginBottom: 22, padding: "12px 16px", borderRadius: 12, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.18)", color: "rgba(255,255,255,0.5)", fontSize: "0.72rem" }}>
-          {tT.trustNote}
+        <div style={{ marginBottom: 18, padding: "14px 16px", borderRadius: 12, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.18)" }}>
+          <p style={{ margin: "0 0 12px", color: "rgba(255,255,255,0.6)", fontSize: "0.72rem", lineHeight: 1.5 }}>{tT.correctionsTrustCopy}</p>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {[
+              { step: "1", label: tT.correctionStepLearner, color: "#6366f1" },
+              { step: "2", label: tT.correctionStepAI,      color: "#f59e0b" },
+              { step: "3", label: tT.correctionStepFinal,   color: "#10b981" },
+              { step: "4", label: tT.correctionStepSend,    color: "#10b981" },
+            ].map((s, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                {i > 0 && <span style={{ color: "rgba(255,255,255,0.15)", fontSize: "0.6rem" }}>→</span>}
+                <span style={{ padding: "2px 8px", borderRadius: 6, background: `${s.color}12`, border: `1px solid ${s.color}28`, color: s.color, fontSize: "0.6rem", fontFamily: "'DM Mono', monospace" }}>
+                  {s.step}. {s.label}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Demo banner */}
@@ -143,9 +161,12 @@ export default function CorrectionsPage() {
                   </div>
                 ))}
                 {/* Teacher review always ON */}
-                <div style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ color: "#10b981", fontSize: "0.85rem" }}>✓</span>
-                  <span style={{ color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.75rem" }}>{tT.activityValidationRequired}</span>
+                <div style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", flexDirection: "column", gap: 6 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ color: "#10b981", fontSize: "0.85rem" }}>✓</span>
+                    <span style={{ color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.75rem" }}>{tT.activityValidationRequired}</span>
+                  </div>
+                  <p style={{ margin: 0, color: "rgba(255,255,255,0.25)", fontSize: "0.62rem", paddingLeft: 24 }}>{tT.microcopy1}</p>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 22 }}>

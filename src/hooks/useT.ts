@@ -431,10 +431,10 @@ const teacher = {
     todayPriorityCalmText: "Tout est calme pour le moment. Vous pouvez préparer une activité ou consulter la progression de vos apprenants.",
     todayPriorityCalmCTA: "Préparer une activité",
     // Today — attention cards
-    todayAttnTitle1: "À corriger", todayAttnDesc1: "Réponses en attente de votre regard.", todayAttnCTA1: "Voir les corrections",
-    todayAttnTitle2: "À encourager", todayAttnDesc2: "Apprenants qui n'ont pas pratiqué récemment.", todayAttnCTA2: "Voir les apprenants",
-    todayAttnTitle3: "À féliciter", todayAttnDesc3: "Apprenants qui ont terminé une étape.", todayAttnCTA3: "Voir la progression",
-    todayAttnTitle4: "À préparer", todayAttnDesc4: "Activités utiles pour vos prochaines classes.", todayAttnCTA4: "Préparer une activité",
+    todayAttnTitle1: "Où votre présence compte", todayAttnDesc1: "Yema met en avant les moments où votre intervention peut vraiment aider.", todayAttnCTA1: "Voir les corrections",
+    todayAttnTitle2: "À encourager", todayAttnDesc2: "Un petit message peut relancer la motivation d'un apprenant.", todayAttnCTA2: "Voir les apprenants",
+    todayAttnTitle3: "À féliciter", todayAttnDesc3: "Reconnaître un progrès aide souvent à continuer.", todayAttnCTA3: "Voir la progression",
+    todayAttnTitle4: "À préparer", todayAttnDesc4: "Préparez une activité courte pour soutenir le prochain pas.", todayAttnCTA4: "Préparer une activité",
     // Learners page
     learnersSubtitle: "Voyez qui avance, qui bloque et qui a besoin d'un encouragement.",
     filterNeedsEncouragement: "À encourager", filterProgressing: "En progression", filterNeedsSupport: "Besoin d'aide", filterInactive: "Inactifs",
@@ -472,6 +472,31 @@ const teacher = {
     trackingSkillsTitle: "Compétences à renforcer", trackingActivityTitle: "Activité récente",
     trackingNextTitle: "Prochaine action recommandée",
     trackingNoData: "Les données apparaîtront lorsque vos apprenants commenceront leurs activités.",
+    // Part 1 — positioning
+    expertiseCenter: "Votre expertise reste au centre.",
+    expertiseSupportCopy: "Yema vous aide à mieux voir vos apprenants, gagner du temps et montrer l'impact réel de votre accompagnement.",
+    // Part 2 — impact block
+    impactTitle: "Votre impact",
+    impactSubtitle: "Un aperçu de ce que votre accompagnement rend possible.",
+    impactLearnersGuided: "Apprenants accompagnés",
+    impactFeedbackReviewed: "Feedbacks validés",
+    impactProgressObserved: "Progrès observés",
+    impactEmpty: "Votre impact apparaîtra ici lorsque vos apprenants commenceront à utiliser Yema.",
+    // Part 3 — today section + warm state
+    todayAttnSection: "Votre radar humain",
+    attnEmptyHint: "Tout est calme. Votre accompagnement porte ses fruits.",
+    // Part 4 — corrections
+    correctionsTrustCopy: "L'IA peut proposer une base. Votre feedback final donne le ton, le contexte et l'encouragement.",
+    correctionStepLearner: "Réponse de l'apprenant",
+    correctionStepAI: "Suggestion IA",
+    correctionStepFinal: "Votre feedback final",
+    correctionStepSend: "Envoyer avec votre validation",
+    // Part 5 — studio
+    studioAdaptNote: "Adapter avant publication",
+    studioReviewRequired: "Votre validation est requise",
+    // Part 6 — microcopy
+    microcopy1: "Vous connaissez vos apprenants mieux que n'importe quel algorithme.",
+    microcopy2: "Les données montrent où regarder. Vous décidez comment accompagner.",
   },
   en: {
     space: "Teacher Space", access: "Teacher Access · Verified", role: "Teacher · Yema",
@@ -521,10 +546,10 @@ const teacher = {
     todayPriorityCalmText: "Everything is calm for now. You can prepare an activity or review learner progress.",
     todayPriorityCalmCTA: "Prepare activity",
     // Today — attention cards
-    todayAttnTitle1: "To review", todayAttnDesc1: "Responses waiting for your guidance.", todayAttnCTA1: "Review corrections",
-    todayAttnTitle2: "To encourage", todayAttnDesc2: "Learners who have not practiced recently.", todayAttnCTA2: "View learners",
-    todayAttnTitle3: "To celebrate", todayAttnDesc3: "Learners who completed a step.", todayAttnCTA3: "View progress",
-    todayAttnTitle4: "To prepare", todayAttnDesc4: "Useful activities for your next classes.", todayAttnCTA4: "Prepare activity",
+    todayAttnTitle1: "Where your presence matters", todayAttnDesc1: "Yema highlights the moments where your guidance can truly help.", todayAttnCTA1: "Review corrections",
+    todayAttnTitle2: "To encourage", todayAttnDesc2: "A small message can restart a learner's motivation.", todayAttnCTA2: "View learners",
+    todayAttnTitle3: "To celebrate", todayAttnDesc3: "Recognizing progress often helps learners continue.", todayAttnCTA3: "View progress",
+    todayAttnTitle4: "To prepare", todayAttnDesc4: "Prepare a short activity to support the next step.", todayAttnCTA4: "Prepare activity",
     // Learners page
     learnersSubtitle: "See who is progressing, who is stuck and who may need encouragement.",
     filterNeedsEncouragement: "Needs encouragement", filterProgressing: "Progressing", filterNeedsSupport: "Needs support", filterInactive: "Inactive",
@@ -562,6 +587,31 @@ const teacher = {
     trackingSkillsTitle: "Skills to strengthen", trackingActivityTitle: "Recent activity",
     trackingNextTitle: "Recommended next action",
     trackingNoData: "Data will appear when learners start their activities.",
+    // Part 1 — positioning
+    expertiseCenter: "Your expertise stays at the center.",
+    expertiseSupportCopy: "Yema helps you understand your learners better, save time and show the real impact of your guidance.",
+    // Part 2 — impact block
+    impactTitle: "Your impact",
+    impactSubtitle: "A view of what your guidance makes possible.",
+    impactLearnersGuided: "Learners guided",
+    impactFeedbackReviewed: "Feedback reviewed",
+    impactProgressObserved: "Progress observed",
+    impactEmpty: "Your impact will appear here when your learners start using Yema.",
+    // Part 3 — today section + warm state
+    todayAttnSection: "Your human radar",
+    attnEmptyHint: "All is calm. Your guidance is working.",
+    // Part 4 — corrections
+    correctionsTrustCopy: "AI can suggest a first draft. Your final feedback adds tone, context and encouragement.",
+    correctionStepLearner: "Learner response",
+    correctionStepAI: "AI suggestion",
+    correctionStepFinal: "Your final feedback",
+    correctionStepSend: "Send with your review",
+    // Part 5 — studio
+    studioAdaptNote: "Adapt before publishing",
+    studioReviewRequired: "Your review is required",
+    // Part 6 — microcopy
+    microcopy1: "You know your learners better than any algorithm.",
+    microcopy2: "Data shows where to look. You decide how to guide.",
   },
 }
 

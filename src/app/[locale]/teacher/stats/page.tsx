@@ -21,10 +21,14 @@ export default function TrackingPage() {
     <TeacherLayout title={tNav.tracking}>
       <div style={{ maxWidth: 900 }}>
 
-        {/* Subtitle */}
-        <p style={{ margin: "0 0 20px", color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>
+        {/* Subtitle + positioning */}
+        <p style={{ margin: "0 0 8px", color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>
           {tT.trackingSubtitle}
         </p>
+        <div style={{ marginBottom: 20, padding: "12px 16px", borderRadius: 12, background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.15)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+          <span style={{ color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.78rem" }}>{tT.expertiseCenter}</span>
+          <span style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.65rem", maxWidth: 420 }}>{tT.microcopy2}</span>
+        </div>
 
         {/* Demo data banner */}
         {hasDemoData && (
@@ -124,7 +128,18 @@ export default function TrackingPage() {
           </div>
         </section>
 
-        {/* 5 — Prochaine action recommandée */}
+        {/* 5b — Votre impact (empty state, no real data on this page) */}
+        <section style={{ marginBottom: 28 }}>
+          <h2 style={{ margin: "0 0 14px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
+            {tT.impactTitle}
+          </h2>
+          <div style={{ padding: "20px 22px", borderRadius: 14, background: "rgba(16,185,129,0.03)", border: "1px solid rgba(16,185,129,0.1)" }}>
+            <p style={{ margin: "0 0 6px", color: "rgba(255,255,255,0.25)", fontSize: "0.72rem" }}>{tT.impactEmpty}</p>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.15)", fontSize: "0.6rem", fontFamily: "'DM Mono', monospace" }}>{tT.impactSubtitle}</p>
+          </div>
+        </section>
+
+        {/* 6 — Prochaine action recommandée */}
         <section>
           <h2 style={{ margin: "0 0 14px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
             {tT.trackingNextTitle}

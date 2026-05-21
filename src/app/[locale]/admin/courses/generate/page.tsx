@@ -370,8 +370,16 @@ export default function AdminGenerateCourse() {
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>
             Préparez des brouillons d'activités avec l'aide de l'IA. Vous gardez toujours la validation finale.
           </p>
-          <div style={{ marginTop: 10, display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 20, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)" }}>
-            <span style={{ color: "#10b981", fontSize: 12, fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>🛡️ L'IA assiste. Vous validez.</span>
+          <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 12px", borderRadius: 20, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)" }}>
+              <span style={{ color: "#10b981", fontSize: 12, fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>🛡️ L'IA assiste. Vous validez.</span>
+            </div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 20, background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.2)" }}>
+              <span style={{ color: "rgba(245,158,11,0.8)", fontSize: 11, fontFamily: "'DM Mono',monospace" }}>Adapter avant publication</span>
+            </div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 20, background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.2)" }}>
+              <span style={{ color: "#818cf8", fontSize: 11, fontFamily: "'DM Mono',monospace" }}>✓ Votre validation est requise</span>
+            </div>
           </div>
         </div>
 
@@ -470,11 +478,11 @@ export default function AdminGenerateCourse() {
                   onChange={e => setPublishNow(e.target.checked)}
                   style={{ width: 16, height: 16, accentColor: "#10b981", cursor: "pointer" }}
                 />
-                <span style={{ color: publishNow ? "#10b981" : "rgba(255,255,255,0.5)", fontSize: 13, fontWeight: 600 }}>
-                  Publier immédiatement
+                <span style={{ color: publishNow ? "#f59e0b" : "rgba(255,255,255,0.5)", fontSize: 13, fontWeight: 600 }}>
+                  Publier après validation
                 </span>
                 <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginLeft: "auto" }}>
-                  {publishNow ? "Visible par les élèves" : "Brouillon privé"}
+                  {publishNow ? "⚠️ Visible par les élèves" : "Brouillon privé"}
                 </span>
               </label>
             </div>
