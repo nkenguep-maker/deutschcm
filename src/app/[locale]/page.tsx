@@ -137,52 +137,74 @@ export default function LandingPage() {
       </nav>
 
       {/* ── HERO ── */}
-      <section style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: isMobile ? "100px 20px 60px" : "120px 40px 80px", position: "relative", textAlign: "center" }}>
+      <section style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: isMobile ? "100px 20px 72px" : "120px 40px 96px", position: "relative", textAlign: "center" }}>
         {/* Glows */}
         <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)", width: 800, height: 800, borderRadius: "50%", background: "radial-gradient(circle,rgba(16,185,129,0.08),transparent 70%)", pointerEvents: "none", animation: "pulse 4s ease-in-out infinite" }} />
 
         <div style={{ maxWidth: 860, position: "relative", zIndex: 2 }}>
           {/* Badge */}
-          <div className="fade-up" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 18px", borderRadius: 99, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", marginBottom: 28 }}>
+          <div className="fade-up" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 18px", borderRadius: 99, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.28)", marginBottom: 36 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block", animation: "pulse 2s infinite" }} />
             <span style={{ color: "#10b981", fontSize: 12, fontWeight: 600 }}>{t.badge}</span>
           </div>
 
           {/* Titre */}
-          <h1 className="fade-up" style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 36 : 64, fontWeight: 900, lineHeight: 1.1, marginBottom: 20, letterSpacing: "-0.02em" }}>
+          <h1 className="fade-up" style={{
+            fontFamily: "'Syne',sans-serif",
+            fontSize: isMobile ? 38 : 66,
+            fontWeight: 900,
+            lineHeight: 1.12,
+            marginBottom: 28,
+            letterSpacing: "-0.025em",
+            color: "#f0f4f8",
+          }}>
             {t.title}<br />
             <span style={{ color: "#10b981" }}>{t.titleAccent}</span>
           </h1>
 
           {/* Sous-titre */}
-          <p className="fade-up" style={{ fontSize: isMobile ? 14 : 18, color: "rgba(255,255,255,0.55)", lineHeight: 1.7, maxWidth: 600, margin: "0 auto 12px" }}>
+          <p className="fade-up" style={{
+            fontSize: isMobile ? 15 : 18,
+            color: "rgba(255,255,255,0.82)",
+            lineHeight: 1.75,
+            maxWidth: 580,
+            margin: "0 auto 16px",
+            fontWeight: 400,
+          }}>
             {t.subtitle}
           </p>
-          <p className="fade-up" style={{ fontSize: isMobile ? 12 : 14, color: "rgba(255,255,255,0.3)", lineHeight: 1.6, maxWidth: 500, margin: "0 auto 32px" }}>
+          <p className="fade-up" style={{
+            fontSize: isMobile ? 13 : 14,
+            color: "rgba(255,255,255,0.58)",
+            lineHeight: 1.65,
+            maxWidth: 480,
+            margin: "0 auto 40px",
+            letterSpacing: "0.01em",
+          }}>
             {t.subtitle2}
           </p>
 
           {/* CTAs */}
-          <div className="fade-up" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+          <div className="fade-up" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 12 }}>
             <button onClick={() => router.push(`/${locale}/register`)}
-              style={{ padding: "16px 32px", borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 8px 32px rgba(16,185,129,0.3)", display: "flex", alignItems: "center", gap: 8 }}>
+              style={{ padding: isMobile ? "14px 28px" : "16px 34px", borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: isMobile ? 14 : 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 8px 32px rgba(16,185,129,0.32)", display: "flex", alignItems: "center", gap: 8 }}>
               {t.ctaPrimary}
             </button>
             <button onClick={handleTestLevel}
-              style={{ padding: "16px 32px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "white", fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
+              style={{ padding: isMobile ? "14px 28px" : "16px 34px", borderRadius: 14, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.9)", fontSize: isMobile ? 14 : 15, fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
               {t.ctaSecondary}
             </button>
           </div>
-          <p className="fade-up" style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, marginTop: 10, marginBottom: 36, letterSpacing: "0.03em" }}>
+          <p className="fade-up" style={{ color: "rgba(255,255,255,0.48)", fontSize: 11, marginTop: 8, marginBottom: 44, letterSpacing: "0.03em" }}>
             {t.ctaMicro}
           </p>
 
           {/* Stats */}
-          <div className="fade-up" style={{ display: "flex", gap: 32, justifyContent: "center", flexWrap: "wrap" }}>
+          <div className="fade-up" style={{ display: "flex", gap: isMobile ? 24 : 40, justifyContent: "center", flexWrap: "wrap", paddingTop: 4 }}>
             {stats.map((stat, i) => (
-              <div key={i} style={{ textAlign: "center" }}>
-                <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 28, fontWeight: 800, color: "#10b981" }}>{stat.value}</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{stat.label}</div>
+              <div key={i} style={{ textAlign: "center", minWidth: isMobile ? 64 : 80 }}>
+                <div style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 24 : 28, fontWeight: 800, color: "#10b981", lineHeight: 1.1 }}>{stat.value}</div>
+                <div style={{ fontSize: isMobile ? 11 : 11, color: "rgba(255,255,255,0.62)", marginTop: 4, lineHeight: 1.3 }}>{stat.label}</div>
               </div>
             ))}
           </div>
