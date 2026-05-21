@@ -12,6 +12,7 @@ const PUBLIC_ROUTES = [
   "/hoeren/demo", "/schreiben/demo",
   "/quiz/demo", "/video/preview",
   "/privacy", "/terms", "/landing", "/demo",
+  "/goodbye",
 ]
 
 const PROTECTED_ROUTES: Record<string, UserRole[]> = {

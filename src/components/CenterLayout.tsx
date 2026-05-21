@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from "@/navigation";
-import { usePathname } from "@/navigation";
+import { usePathname, useRouter } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
 import { useT } from "@/hooks/useT";
@@ -16,6 +16,7 @@ interface CenterLayoutProps {
 
 export default function CenterLayout({ children, title, centerName = "Centre de langues", centerCity = "Yaoundé" }: CenterLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { nav: tNav, center: tC } = useT();
   const [userName, setUserName] = useState("Directeur");
 
@@ -45,6 +46,12 @@ export default function CenterLayout({ children, title, centerName = "Centre de 
       }
     });
   }, []);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/goodbye");
+  };
 
   const initials = userName.slice(0, 2).toUpperCase();
 
@@ -144,6 +151,7 @@ export default function CenterLayout({ children, title, centerName = "Centre de 
               display: "flex", alignItems: "center", gap: 10,
               padding: "10px 12px", borderRadius: 12, textDecoration: "none",
               background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
+              marginBottom: 8,
             }}>
               <div style={{
                 width: 36, height: 36, borderRadius: 10, flexShrink: 0,
@@ -160,6 +168,17 @@ export default function CenterLayout({ children, title, centerName = "Centre de 
                 <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.6rem" }}>{tC.directorRole}</p>
               </div>
             </Link>
+            <button
+              onClick={handleLogout}
+              style={{
+                width: "100%", padding: "7px", borderRadius: 9,
+                border: "1px solid rgba(239,68,68,0.15)", background: "transparent",
+                color: "rgba(239,68,68,0.5)", fontFamily: "'DM Mono', monospace",
+                fontSize: "0.68rem", cursor: "pointer",
+              }}
+            >
+              {tNav.logout}
+            </button>
           </div>
         </aside>
 

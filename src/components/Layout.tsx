@@ -133,6 +133,12 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
     }).catch(() => {});
   }, [pathname, router]);
 
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/goodbye");
+  };
+
   const initials = userName.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
   const activeNav = NAV_BY_ROLE[userRole] ?? STUDENT_NAV;
   const accentColor = ACCENT_BY_ROLE[userRole] ?? "#10b981";
@@ -293,6 +299,17 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
                 return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 8, padding: "4px 0", color: "#a5b4fc", fontSize: "0.6rem", fontWeight: 700 }}>{tl.groupLeader}</div>;
               return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "4px 0", color: "rgba(255,255,255,0.3)", fontSize: "0.6rem", fontWeight: 700 }}>Solo</div>;
             })()}
+            <button
+              onClick={handleLogout}
+              style={{
+                width: "100%", padding: "7px", borderRadius: 9, marginTop: 8,
+                border: "1px solid rgba(239,68,68,0.15)", background: "transparent",
+                color: "rgba(239,68,68,0.5)", fontFamily: "'DM Mono', monospace",
+                fontSize: "0.68rem", cursor: "pointer",
+              }}
+            >
+              {tn.logout}
+            </button>
           </div>
         </aside>
 
