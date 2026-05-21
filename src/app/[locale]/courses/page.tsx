@@ -299,7 +299,7 @@ function LevelSection({ level, courses, isMobile, locale, t }: {
       </div>
 
       {/* Cards grid */}
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(3, 1fr)", gap: isMobile ? 10 : 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: isMobile ? 10 : 14 }}>
         {courses.map(course =>
           course.locked ? (
             <CourseCard key={course.id} course={course} locale={locale} t={t} />

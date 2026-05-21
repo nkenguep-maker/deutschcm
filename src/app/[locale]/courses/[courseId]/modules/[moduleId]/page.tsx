@@ -605,7 +605,7 @@ export default function ModulePage() {
               {/* Vocabulary */}
               <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                 <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 17, margin: "0 0 16px" }}>{labels.vocabulary}</h2>
-                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(3,1fr)", gap: 10 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10 }}>
                   {module.content.wortschatz?.map((word: { de: string; fr: string; example: string }, i: number) => (
                     <div key={i} style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>

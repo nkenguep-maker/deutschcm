@@ -684,7 +684,7 @@ function FilterSidebar({ filters, onChange, onReset, count, t }: { filters: Filt
   );
 
   return (
-    <div style={{ width: 220, flexShrink: 0, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 16, height: "fit-content", position: "sticky", top: 140 }}>
+    <div style={{ width: "100%", maxWidth: 220, flexShrink: 0, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 16, height: "fit-content", position: "sticky", top: 140 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>{t.filterSidebarLabel}</span>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -1252,7 +1252,7 @@ export default function DiscoverPage() {
           </div>
         </div>
       ) : (
-        <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
+        <div style={{ display: "flex", gap: 20, alignItems: "flex-start", flexDirection: isMobile && showFilters ? "column" : "row" }}>
           {showFilters && (
             <FilterSidebar filters={filters} onChange={setFilters} onReset={() => setFilters(DEFAULT_FILTERS)} count={totalCount} t={t} />
           )}

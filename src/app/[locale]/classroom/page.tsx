@@ -367,7 +367,7 @@ export default function ClassroomListPage() {
       </div>
 
       {/* Class grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))", gap: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(380px, 100%), 1fr))", gap: 20 }}>
         {classrooms.map(cls => <ClassCard key={cls.id} cls={cls} t={t} />)}
 
         {/* Empty state */}

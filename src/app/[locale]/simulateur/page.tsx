@@ -340,6 +340,14 @@ function SimulateurPage() {
   const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     const urlScenario = searchParams.get("scenario") as ScenarioType | null;
@@ -424,12 +432,68 @@ function SimulateurPage() {
         .mic-active { animation: pulseRing 1.2s infinite; }
       `}</style>
 
-      <div style={{ margin: "-32px -28px -48px", height: "calc(100vh - 64px)", display: "flex", overflow: "hidden", background: "#080c10" }}>
+      {/* ════ MOBILE CONTROLS (level + scenario selector) ════ */}
+      {isMobile && (
+        <div style={{
+          margin: "-16px -14px 0",
+          padding: "10px 14px 12px",
+          borderBottom: "1px solid rgba(255,255,255,0.07)",
+          background: "#080c10",
+        }}>
+          {/* Level row */}
+          <div style={{ display: "flex", gap: 5, marginBottom: 10 }}>
+            {NIVEAUX.map(n => (
+              <button
+                key={n}
+                onClick={() => handleNiveauChange(n)}
+                style={{
+                  flex: 1, padding: "7px 0", borderRadius: 8, cursor: "pointer",
+                  border: niveau === n ? "1px solid rgba(16,185,129,0.45)" : "1px solid rgba(255,255,255,0.08)",
+                  background: niveau === n ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.03)",
+                  color: niveau === n ? "#10b981" : "rgba(255,255,255,0.4)",
+                  fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.68rem",
+                }}
+              >{n}</button>
+            ))}
+          </div>
+          {/* Scenario horizontal scroll */}
+          <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 2 }}>
+            {SCENARIOS.map(s => {
+              const active = scenario === s.id;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => handleScenarioChange(s.id)}
+                  style={{
+                    flexShrink: 0, padding: "5px 10px", borderRadius: 8, cursor: "pointer",
+                    border: active ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.07)",
+                    background: active ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.02)",
+                    color: active ? "#10b981" : "rgba(255,255,255,0.6)",
+                    fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.65rem",
+                    display: "flex", alignItems: "center", gap: 5, whiteSpace: "nowrap",
+                  }}
+                >
+                  <span style={{ fontSize: "0.85rem" }}>{s.icon}</span>
+                  <span>{t.scenarioLabels[s.id] ?? s.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
-        {/* ════ LEFT PANEL — Scenarios ════ */}
+      <div style={{
+        margin: isMobile ? "-16px -14px -32px" : "-32px -28px -48px",
+        height: isMobile ? "auto" : "calc(100vh - 64px)",
+        display: "flex",
+        overflow: isMobile ? "visible" : "hidden",
+        background: "#080c10",
+      }}>
+
+        {/* ════ LEFT PANEL — Scenarios (desktop only) ════ */}
         <aside
           className="sim-scroll"
-          style={{ width: 230, borderRight: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", overflowY: "auto", padding: "16px 10px", gap: 8, flexShrink: 0 }}
+          style={{ width: 230, borderRight: "1px solid rgba(255,255,255,0.07)", display: isMobile ? "none" : "flex", flexDirection: "column", overflowY: "auto", padding: "16px 10px", gap: 8, flexShrink: 0 }}
         >
           {/* Level selector */}
           <div style={{ marginBottom: 4 }}>
@@ -506,7 +570,7 @@ function SimulateurPage() {
         {/* ════ CENTER — Chat ════ */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
 
-          <div className="sim-scroll" style={{ flex: 1, overflowY: "auto", padding: "24px 28px", display: "flex", flexDirection: "column", gap: 20 }}>
+          <div className="sim-scroll" style={{ flex: 1, overflowY: "auto", padding: isMobile ? "16px 14px" : "24px 28px", display: "flex", flexDirection: "column", gap: isMobile ? 14 : 20, maxHeight: isMobile ? "55vh" : undefined }}>
 
             {/* Empty state */}
             {messages.length === 0 && !isLoading && (
@@ -581,7 +645,7 @@ function SimulateurPage() {
           </div>
 
           {/* Input area */}
-          <div style={{ padding: "12px 20px 16px", borderTop: "1px solid rgba(255,255,255,0.07)", background: "rgba(8,12,16,0.95)" }}>
+          <div style={{ padding: isMobile ? "10px 14px 14px" : "12px 20px 16px", borderTop: "1px solid rgba(255,255,255,0.07)", background: "rgba(8,12,16,0.98)" }}>
             {concluded ? (
               <div style={{ textAlign: "center" }}>
                 <button
@@ -634,10 +698,10 @@ function SimulateurPage() {
           </div>
         </div>
 
-        {/* ════ RIGHT PANEL — Scores & Tips ════ */}
+        {/* ════ RIGHT PANEL — Scores & Tips (desktop only) ════ */}
         <aside
           className="sim-scroll"
-          style={{ width: 280, borderLeft: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", padding: "20px 16px", gap: 16, overflowY: "auto", flexShrink: 0 }}
+          style={{ width: 280, borderLeft: "1px solid rgba(255,255,255,0.07)", display: isMobile ? "none" : "flex", flexDirection: "column", padding: "20px 16px", gap: 16, overflowY: "auto", flexShrink: 0 }}
         >
           {/* Session score */}
           <div style={{ borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", padding: "16px", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
