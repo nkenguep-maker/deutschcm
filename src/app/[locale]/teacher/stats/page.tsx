@@ -1,6 +1,7 @@
 "use client";
 
 import TeacherLayout from "@/components/TeacherLayout";
+import { useT } from "@/hooks/useT";
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Legend,
@@ -21,25 +22,38 @@ const MODULE_COMPLETION = [
   { module: "Lektion 5", A1: 28, A2: 18 },
 ];
 
-const SUMMARY = [
-  { label: "Score moyen global", value: "7.8/10",  color: "#10b981" },
-  { label: "Taux de complétion", value: "53%",      color: "#6366f1" },
-  { label: "Sessions simulateur", value: "86",      color: "#f59e0b" },
-  { label: "Quiz complétés",      value: "247",     color: "#e879f9" },
-  { label: "Élèves actifs/semaine", value: "41/47", color: "#14b8a6" },
-  { label: "Devoirs corrigés",    value: "5/6",     color: "#fb923c" },
-];
-
 const TT = { contentStyle: { background: "#0d1a12", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 10, fontSize: 12, fontFamily: "DM Mono" }, labelStyle: { color: "#10b981" }, itemStyle: { color: "rgba(255,255,255,0.7)" } };
 
-export default function StatsPage() {
+export default function TrackingPage() {
+  const { teacher: tT, nav: tNav } = useT();
+
+  const SUMMARY = [
+    { label: "Score moyen global",    value: "7.8/10",  color: "#10b981" },
+    { label: "Taux de complétion",    value: "53%",     color: "#6366f1" },
+    { label: "Sessions simulateur",   value: "86",      color: "#f59e0b" },
+    { label: "Quiz complétés",        value: "247",     color: "#e879f9" },
+    { label: "Apprenants actifs/sem", value: "41/47",   color: "#14b8a6" },
+    { label: "Activités corrigées",   value: "5/6",     color: "#fb923c" },
+  ];
+
   return (
-    <TeacherLayout title="Statistiques">
+    <TeacherLayout title={tNav.tracking}>
       <div style={{ maxWidth: 900 }}>
+
+        {/* Subtitle */}
+        <p style={{ margin: "0 0 20px", color: "rgba(255,255,255,0.4)", fontSize: "0.78rem", fontFamily: "'DM Mono', monospace" }}>
+          {tT.trackingSubtitle}
+        </p>
+
+        {/* Demo data banner */}
+        <div style={{ marginBottom: 24, padding: "12px 16px", borderRadius: 12, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)", color: "rgba(245,158,11,0.7)", fontSize: "0.72rem", fontFamily: "'DM Mono', monospace" }}>
+          {tT.demoDataBanner}
+        </div>
+
         {/* Summary grid */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 28 }}>
           {SUMMARY.map(s => (
-            <div key={s.label} style={{ padding: "18px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderTop: `2px solid ${s.color}` }}>
+            <div key={s.label} style={{ padding: "18px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderTop: `2px solid ${s.color}`, opacity: 0.75 }}>
               <div style={{ color: s.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.6rem", marginBottom: 4 }}>{s.value}</div>
               <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.7rem" }}>{s.label}</div>
             </div>
@@ -47,9 +61,9 @@ export default function StatsPage() {
         </div>
 
         {/* Score progression chart */}
-        <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
+        <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20, opacity: 0.8 }}>
           <h3 style={{ margin: "0 0 20px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
-            Progression des scores — 4 semaines
+            {tT.chartWeeksLabel}
           </h3>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={WEEKLY} margin={{ top: 4, right: 16, left: -24, bottom: 0 }}>
@@ -66,9 +80,9 @@ export default function StatsPage() {
         </div>
 
         {/* Module completion chart */}
-        <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+        <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", opacity: 0.8 }}>
           <h3 style={{ margin: "0 0 20px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
-            Complétion par lektion (A1 vs A2)
+            {tT.chartModulesLabel}
           </h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={MODULE_COMPLETION} margin={{ top: 4, right: 16, left: -24, bottom: 0 }}>

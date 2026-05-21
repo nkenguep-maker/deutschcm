@@ -2,36 +2,55 @@
 
 import { useState } from "react";
 import TeacherLayout from "@/components/TeacherLayout";
+import { useT } from "@/hooks/useT";
 
-const ASSIGNMENTS = [
-  { id: "a1", title: "Quiz Lektion 4 — Wortschatz",       class: "Groupe A1 Matin",  due: "12 mai 2026", submitted: 12, total: 18, maxScore: 20, status: "open",   icon: "✏️" },
-  { id: "a2", title: "Lesen Arbeit — Textverstehen",       class: "Groupe A1 Matin",  due: "15 mai 2026", submitted:  7, total: 18, maxScore: 20, status: "open",   icon: "📄" },
-  { id: "a3", title: "Simulation Ambassade",               class: "Prépa CEFR B1",  due: "—",           submitted: 14, total: 14, maxScore: 30, status: "closed", icon: "🎙️" },
-  { id: "a4", title: "Grammaire : Akkusativ & Dativ",      class: "Groupe A2 Soir",   due: "18 mai 2026", submitted:  3, total: 15, maxScore: 20, status: "open",   icon: "📝" },
-  { id: "a5", title: "Hörverstehen — Dialog au Café",      class: "Groupe A2 Soir",   due: "22 mai 2026", submitted:  0, total: 15, maxScore: 15, status: "open",   icon: "🎧" },
-  { id: "a6", title: "Schreiben — Brief an einen Freund",  class: "Prépa CEFR B1",  due: "20 mai 2026", submitted:  9, total: 14, maxScore: 25, status: "open",   icon: "✉️" },
+const SAMPLE_ACTIVITIES = [
+  { id: "a1", title: "Quiz Lektion 4 — Wortschatz",      class: "Groupe A1 Matin", due: "12 mai 2026", submitted: 12, total: 18, maxScore: 20, status: "open",   icon: "✏️" },
+  { id: "a2", title: "Lesen Arbeit — Textverstehen",      class: "Groupe A1 Matin", due: "15 mai 2026", submitted:  7, total: 18, maxScore: 20, status: "open",   icon: "📄" },
+  { id: "a3", title: "Simulation Ambassade",              class: "Prépa CEFR B1",   due: "—",           submitted: 14, total: 14, maxScore: 30, status: "closed", icon: "🎙️" },
+  { id: "a4", title: "Grammaire : Akkusativ & Dativ",     class: "Groupe A2 Soir",  due: "18 mai 2026", submitted:  3, total: 15, maxScore: 20, status: "open",   icon: "📝" },
+  { id: "a5", title: "Hörverstehen — Dialog au Café",     class: "Groupe A2 Soir",  due: "22 mai 2026", submitted:  0, total: 15, maxScore: 15, status: "open",   icon: "🎧" },
+  { id: "a6", title: "Schreiben — Brief an einen Freund", class: "Prépa CEFR B1",   due: "20 mai 2026", submitted:  9, total: 14, maxScore: 25, status: "open",   icon: "✉️" },
 ];
 
-export default function AssignmentsPage() {
+export default function CorrectionsPage() {
+  const { teacher: tT, common: tC, nav: tNav } = useT();
   const [filter, setFilter] = useState<"all" | "open" | "closed">("all");
   const [showModal, setShowModal] = useState(false);
 
-  const filtered = ASSIGNMENTS.filter(a => filter === "all" || a.status === filter);
+  const filtered = SAMPLE_ACTIVITIES.filter(a => filter === "all" || a.status === filter);
   const scoreColor = (pct: number) => pct >= 80 ? "#10b981" : pct >= 40 ? "#f59e0b" : "#ef4444";
 
+  const tabs: { key: "all" | "open" | "closed"; label: string }[] = [
+    { key: "open",   label: tT.filterToReview },
+    { key: "closed", label: tT.filterDone },
+    { key: "all",    label: tT.filterAll },
+  ];
+
   return (
-    <TeacherLayout title="Devoirs">
+    <TeacherLayout title={tNav.corrections}>
       <div style={{ maxWidth: 860 }}>
+
+        {/* Subtitle */}
+        <p style={{ margin: "0 0 20px", color: "rgba(255,255,255,0.4)", fontSize: "0.78rem", fontFamily: "'DM Mono', monospace" }}>
+          {tT.correctionsSubtitle}
+        </p>
+
+        {/* AI trust note */}
+        <div style={{ marginBottom: 24, padding: "12px 16px", borderRadius: 12, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.18)", color: "rgba(255,255,255,0.5)", fontSize: "0.72rem", fontFamily: "'DM Mono', monospace" }}>
+          {tT.aiTrustNote}
+        </div>
+
         {/* Controls */}
-        <div style={{ display: "flex", gap: 10, marginBottom: 24, alignItems: "center" }}>
-          {(["all", "open", "closed"] as const).map(f => (
-            <button key={f} onClick={() => setFilter(f)} style={{
+        <div style={{ display: "flex", gap: 10, marginBottom: 24, alignItems: "center", flexWrap: "wrap" }}>
+          {tabs.map(tab => (
+            <button key={tab.key} onClick={() => setFilter(tab.key)} style={{
               padding: "7px 16px", borderRadius: 9, border: "none", cursor: "pointer",
               fontSize: "0.78rem", fontFamily: "'Syne', sans-serif", fontWeight: 600,
-              background: filter === f ? "#10b981" : "rgba(255,255,255,0.05)",
-              color: filter === f ? "white" : "rgba(255,255,255,0.4)",
+              background: filter === tab.key ? "#10b981" : "rgba(255,255,255,0.05)",
+              color: filter === tab.key ? "white" : "rgba(255,255,255,0.4)",
             }}>
-              {f === "all" ? "Tous" : f === "open" ? "En cours" : "Terminés"}
+              {tab.label}
             </button>
           ))}
           <span style={{ flex: 1 }} />
@@ -40,10 +59,10 @@ export default function AssignmentsPage() {
             background: "linear-gradient(135deg, #10b981, #059669)", color: "white",
             fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.8rem",
             boxShadow: "0 4px 16px rgba(16,185,129,0.3)",
-          }}>+ Créer un devoir</button>
+          }}>{tT.prepareActivity}</button>
         </div>
 
-        {/* Cards */}
+        {/* Activity cards */}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {filtered.map(a => {
             const pct = Math.round((a.submitted / a.total) * 100);
@@ -56,47 +75,51 @@ export default function AssignmentsPage() {
                       <span style={{ color: "rgba(255,255,255,0.9)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.88rem" }}>{a.title}</span>
                       <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(99,102,241,0.12)", color: "#818cf8", fontSize: "0.62rem" }}>{a.class}</span>
                       <span style={{ padding: "1px 8px", borderRadius: 5, background: a.status === "open" ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.06)", color: a.status === "open" ? "#10b981" : "rgba(255,255,255,0.3)", fontSize: "0.62rem" }}>
-                        {a.status === "open" ? "Ouvert" : "Fermé"}
+                        {a.status === "open" ? tT.statusOpen : tT.statusClosed}
+                      </span>
+                      {/* Sample label — makes clear this is demo data */}
+                      <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(245,158,11,0.1)", color: "rgba(245,158,11,0.7)", fontSize: "0.6rem", border: "1px solid rgba(245,158,11,0.2)" }}>
+                        {tT.sampleLabel}
                       </span>
                     </div>
                     <div style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.68rem", marginBottom: 12 }}>
-                      Échéance : {a.due} · Note max : {a.maxScore} pts
+                      {tT.deadline} : {a.due} · {tT.maxScoreLabel} : {a.maxScore} pts
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                       <div style={{ flex: 1, maxWidth: 240 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                          <span style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.65rem" }}>Rendus</span>
+                          <span style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.65rem" }}>{tT.submittedLabel}</span>
                           <span style={{ color: scoreColor(pct), fontSize: "0.68rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>{a.submitted}/{a.total}</span>
                         </div>
                         <div style={{ height: 5, borderRadius: 99, background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
                           <div style={{ height: "100%", borderRadius: 99, width: `${pct}%`, background: scoreColor(pct) }} />
                         </div>
                       </div>
-                      <span style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.68rem" }}>{pct}% remis</span>
+                      <span style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.68rem" }}>{pct}% {tT.submittedPctLabel}</span>
                     </div>
                   </div>
                   <button style={{
                     padding: "7px 16px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)",
                     background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)",
-                    fontSize: "0.72rem", cursor: "pointer", flexShrink: 0,
-                  }}>Corriger</button>
+                    fontSize: "0.72rem", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap",
+                  }}>{tT.reviewBtn}</button>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* Create modal */}
+        {/* Prepare activity modal */}
         {showModal && (
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}
             onClick={e => e.target === e.currentTarget && setShowModal(false)}>
             <div style={{ background: "#0d1117", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 18, padding: 32, width: 480, maxWidth: "90vw" }}>
-              <h2 style={{ margin: "0 0 24px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>Nouveau devoir</h2>
+              <h2 style={{ margin: "0 0 24px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>{tT.newActivityTitle}</h2>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {[
-                  { label: "Titre", ph: "Ex: Vocabulaire Lektion 5" },
-                  { label: "Classe", ph: "Groupe A1 Matin" },
-                  { label: "Date limite", ph: "" },
+                  { label: tT.fieldTitle, ph: tT.fieldTitlePh },
+                  { label: tT.fieldClass, ph: tT.fieldClassPh },
+                  { label: tT.fieldDue,   ph: "" },
                 ].map(f => (
                   <div key={f.label}>
                     <label style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.72rem", display: "block", marginBottom: 6 }}>{f.label}</label>
@@ -105,8 +128,8 @@ export default function AssignmentsPage() {
                 ))}
               </div>
               <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 24 }}>
-                <button onClick={() => setShowModal(false)} style={{ padding: "8px 20px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.4)", cursor: "pointer" }}>Annuler</button>
-                <button onClick={() => setShowModal(false)} style={{ padding: "8px 20px", borderRadius: 9, border: "none", background: "#10b981", color: "white", fontWeight: 700, cursor: "pointer" }}>Créer</button>
+                <button onClick={() => setShowModal(false)} style={{ padding: "8px 20px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.4)", cursor: "pointer" }}>{tC.cancel}</button>
+                <button onClick={() => setShowModal(false)} style={{ padding: "8px 20px", borderRadius: 9, border: "none", background: "#10b981", color: "white", fontWeight: 700, cursor: "pointer" }}>{tC.confirm}</button>
               </div>
             </div>
           </div>

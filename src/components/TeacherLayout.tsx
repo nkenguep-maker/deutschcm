@@ -19,13 +19,13 @@ export default function TeacherLayout({ children, title }: TeacherLayoutProps) {
   const [teacherName, setTeacherName] = useState("Prof. Tchamba");
 
   const TEACHER_NAV = [
-    { icon: "📊", label: tNav.overview,       href: "/teacher"                },
-    { icon: "🏫", label: tNav.myClasses,      href: "/teacher/classrooms"     },
-    { icon: "👥", label: tNav.students,       href: "/teacher/students"       },
-    { icon: "📋", label: tNav.assignments,    href: "/teacher/assignments"    },
-    { icon: "✨", label: tNav.generateCourse, href: "/admin/courses/generate" },
-    { icon: "📈", label: tNav.stats,          href: "/teacher/stats"          },
-    { icon: "⚙️", label: tNav.settings,      href: "/teacher/settings"       },
+    { icon: "🗓️", label: tNav.today,       href: "/teacher"                },
+    { icon: "🏫", label: tNav.myClasses,   href: "/teacher/classrooms"     },
+    { icon: "👤", label: tNav.learners,    href: "/teacher/students"       },
+    { icon: "✏️", label: tNav.corrections, href: "/teacher/assignments"    },
+    { icon: "📈", label: tNav.tracking,    href: "/teacher/stats"          },
+    { icon: "📚", label: tNav.resources,   href: "/admin/courses/generate" },
+    { icon: "⚙️", label: tNav.settings,   href: "/teacher/settings"       },
   ];
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function TeacherLayout({ children, title }: TeacherLayoutProps) {
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/login");
+    router.push("/goodbye");
   };
 
   const initials = teacherName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);

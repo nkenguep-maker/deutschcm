@@ -41,18 +41,19 @@ function TeacherSidebar({ teacherName }: { teacherName: string }) {
   const { nav: tNav, teacher: tT, common: tCommon } = useT();
 
   const TEACHER_NAV = [
-    { icon: "📊", label: tNav.overview,       href: "/teacher" },
-    { icon: "🏫", label: tNav.myClasses,      href: "/teacher/classrooms" },
-    { icon: "👥", label: tNav.students,       href: "/teacher/students" },
-    { icon: "📋", label: tNav.assignments,    href: "/teacher/assignments" },
-    { icon: "📈", label: tNav.stats,          href: "/teacher/stats" },
-    { icon: "⚙️", label: tNav.settings,      href: "/teacher/settings" },
+    { icon: "🗓️", label: tNav.today,       href: "/teacher" },
+    { icon: "🏫", label: tNav.myClasses,   href: "/teacher/classrooms" },
+    { icon: "👤", label: tNav.learners,    href: "/teacher/students" },
+    { icon: "✏️", label: tNav.corrections, href: "/teacher/assignments" },
+    { icon: "📈", label: tNav.tracking,    href: "/teacher/stats" },
+    { icon: "📚", label: tNav.resources,   href: "/admin/courses/generate" },
+    { icon: "⚙️", label: tNav.settings,   href: "/teacher/settings" },
   ];
 
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/login");
+    router.push("/goodbye");
   };
 
   const initials = teacherName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
@@ -70,7 +71,7 @@ function TeacherSidebar({ teacherName }: { teacherName: string }) {
       {/* Logo */}
       <div style={{ padding: "24px 20px 16px" }}>
         <Link href="/teacher" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 11 }}>
-          <div style={{ width: 42, height: 42, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.35rem", background: "linear-gradient(135deg, rgba(16,185,129,0.22), rgba(5,150,105,0.08))", border: "1px solid rgba(16,185,129,0.28)", boxShadow: "0 0 20px rgba(16,185,129,0.12)" }}></div>
+          <div style={{ width: 42, height: 42, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.35rem", background: "linear-gradient(135deg, rgba(16,185,129,0.22), rgba(5,150,105,0.08))", border: "1px solid rgba(16,185,129,0.28)", boxShadow: "0 0 20px rgba(16,185,129,0.12)" }}>🌿</div>
           <div>
             <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.05rem", lineHeight: 1.2 }}>Yema</p>
             <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem", letterSpacing: "0.08em" }}>CEFR · A1 → C1</p>
@@ -123,7 +124,7 @@ function TeacherSidebar({ teacherName }: { teacherName: string }) {
             {initials}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Prof. {teacherName}</p>
+            <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{teacherName}</p>
             <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem" }}>{tT.role}</p>
           </div>
         </div>
@@ -142,13 +143,27 @@ function StatCard({ icon, label, value, sub, color = "#10b981" }: { icon: string
     <div style={{ padding: "18px 20px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", gap: 10 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span style={{ fontSize: "1.2rem" }}>{icon}</span>
-        <span style={{ padding: "3px 8px", borderRadius: 6, background: `${color}15`, color, fontSize: "0.6rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>↑</span>
       </div>
       <div>
         <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.7rem", lineHeight: 1 }}>{value}</p>
         <p style={{ margin: "4px 0 0", color: "rgba(255,255,255,0.35)", fontSize: "0.7rem", fontFamily: "'DM Mono', monospace" }}>{label}</p>
       </div>
       <p style={{ margin: 0, color: "rgba(255,255,255,0.25)", fontSize: "0.65rem", fontFamily: "'DM Mono', monospace" }}>{sub}</p>
+    </div>
+  );
+}
+
+// ─── Action card ──────────────────────────────────────────────────────────────
+
+function ActionCard({ icon, title, desc, cta, href, color }: { icon: string; title: string; desc: string; cta: string; href: string; color: string }) {
+  return (
+    <div style={{ padding: "22px 20px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", gap: 14, transition: "border-color 0.15s" }}>
+      <div style={{ width: 44, height: 44, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", background: `${color}12`, border: `1px solid ${color}28` }}>{icon}</div>
+      <div>
+        <p style={{ margin: "0 0 6px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.92rem" }}>{title}</p>
+        <p style={{ margin: 0, color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", fontFamily: "'DM Mono', monospace", lineHeight: 1.5 }}>{desc}</p>
+      </div>
+      <Link href={href} style={{ alignSelf: "flex-start", padding: "7px 16px", borderRadius: 9, background: `${color}14`, border: `1px solid ${color}30`, color, fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 600, textDecoration: "none" }}>{cta}</Link>
     </div>
   );
 }
@@ -270,6 +285,7 @@ export default function TeacherDashboard() {
     });
   };
 
+  const firstName = teacherName.split(" ")[0];
   const today = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
   const difficultStudents = students.filter((s) => s.avgScore < 5);
   const totalStudents = classrooms.reduce((s, c) => s + c.students, 0);
@@ -303,11 +319,15 @@ export default function TeacherDashboard() {
           }}>
             <div>
               <h1 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1.05rem" }}>
-                {tT.greeting.replace("{name}", teacherName.split(" ")[0])}
+                {tNav.today}
               </h1>
               <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.7rem", textTransform: "capitalize" }}>{today}</p>
             </div>
-            <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {/* Positioning pill */}
+              <span style={{ padding: "5px 12px", borderRadius: 20, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", color: "#10b981", fontSize: "0.68rem", fontFamily: "'Syne', sans-serif", fontWeight: 600, whiteSpace: "nowrap" }}>
+                {tT.aiPill}
+              </span>
               <Link href="/teacher/classroom/new" style={{
                 padding: "8px 18px", borderRadius: 10, border: "none",
                 background: "linear-gradient(135deg, #10b981, #059669)", color: "white",
@@ -323,11 +343,30 @@ export default function TeacherDashboard() {
           {/* Main content */}
           <main style={{ flex: 1, padding: "28px 32px 48px", overflowY: "auto" }}>
 
+            {/* Welcome message */}
+            {firstName && (
+              <div className="fade-up" style={{ marginBottom: 24 }}>
+                <p style={{ margin: "0 0 4px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.4rem" }}>
+                  {tT.greeting.replace("{name}", firstName)}
+                </p>
+                <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.78rem", fontFamily: "'DM Mono', monospace" }}>
+                  {tT.todaySubtitle}
+                </p>
+              </div>
+            )}
+
+            {/* Action cards */}
+            <div className="fade-up" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 28 }}>
+              <ActionCard icon="👤" title={tT.action1Title} desc={tT.action1Desc} cta={tT.action1CTA} href="/teacher/students" color="#10b981" />
+              <ActionCard icon="✏️" title={tT.action2Title} desc={tT.action2Desc} cta={tT.action2CTA} href="/teacher/assignments" color="#6366f1" />
+              <ActionCard icon="📈" title={tT.action3Title} desc={tT.action3Desc} cta={tT.action3CTA} href="/teacher/stats" color="#f59e0b" />
+            </div>
+
             {/* Stat cards */}
             <div className="fade-up" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 28 }}>
-              <StatCard icon="👥" label={tT.statStudentsLabel} value={`${totalStudents}`} sub={`${totalStudents} enrolled · 3 classes`} color="#10b981" />
+              <StatCard icon="👤" label={tT.statStudentsLabel} value={`${totalStudents}`} sub={`${totalStudents} enrolled · ${classrooms.length} classes`} color="#10b981" />
               <StatCard icon="📊" label={tT.statAvgLabel} value={globalAvg} sub={tT.statAvgSub} color="#3b82f6" />
-              <StatCard icon="📋" label={tT.statAssignmentsLabel} value={`${pendingAssignments}`} sub={tT.statAssignmentsSub} color="#f59e0b" />
+              <StatCard icon="✏️" label={tT.statAssignmentsLabel} value={`${pendingAssignments}`} sub={tT.statAssignmentsSub} color="#f59e0b" />
               <StatCard icon="✅" label={tT.statCompletionLabel} value={`${completionRate}%`} sub={tT.statCompletionSub} color="#8b5cf6" />
             </div>
 
