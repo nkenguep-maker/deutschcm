@@ -561,8 +561,8 @@ export default function LandingPage() {
       {/* ── FOOTER ── */}
       <footer style={{ padding: isMobile ? "28px 20px" : "36px 40px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", gap: 20, flexWrap: "wrap" }}>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 5 }}>
-            <span style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 17 : 18, fontWeight: 800, letterSpacing: "-0.01em" }}>Yema</span>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+            <BrandLogo variant="nav" />
             <span style={{ color: "rgba(255,255,255,0.55)", fontSize: isMobile ? 13 : 15, letterSpacing: "0.01em", lineHeight: 1.4 }}>{t.footerTagline}</span>
             <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 10 }}>{t.footerMade}</span>
           </div>

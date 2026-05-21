@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import { Link } from "@/navigation"
+import BrandLogo from "@/components/BrandLogo"
 
 // ── Demo data — static, believable, no real user data ────────────────────────
 
@@ -708,9 +709,8 @@ export default function DemoPage() {
       {/* Top nav */}
       <div style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(8,12,16,0.96)", backdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: isMobile ? "12px 16px" : "14px 32px" }}>
         <div style={{ maxWidth: 680, margin: "0 auto", display: "flex", alignItems: "center", gap: 12 }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-            <span style={{ fontSize: "1.2rem" }}>🇩🇪</span>
-            <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, color: "white", fontSize: "1rem" }}>Yema</span>
+          <Link href="/" style={{ textDecoration: "none" }}>
+            <BrandLogo variant="nav" />
           </Link>
           <div style={{ flex: 1 }} />
           {/* Lang toggle */}

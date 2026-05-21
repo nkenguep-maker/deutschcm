@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useT } from "@/hooks/useT";
+import BrandLogo from "@/components/BrandLogo";
 
 const ACCENT_BY_ROLE: Record<string, string> = {
   STUDENT: "#10b981",
@@ -199,22 +200,8 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
 
           {/* ── Logo ── */}
           <div style={{ padding: "26px 20px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <Link href="/dashboard" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 11 }}>
-              <div style={{
-                width: 42, height: 42, borderRadius: 13, flexShrink: 0,
-                display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.35rem",
-                background: "linear-gradient(135deg, rgba(16,185,129,0.22), rgba(5,150,105,0.08))",
-                border: "1px solid rgba(16,185,129,0.28)",
-                boxShadow: "0 0 20px rgba(16,185,129,0.12)",
-              }}></div>
-              <div>
-                <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.05rem", lineHeight: 1.2 }}>
-                  Yema
-                </p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem", letterSpacing: "0.08em" }}>
-                  {tl.goethe}
-                </p>
-              </div>
+            <Link href="/dashboard" style={{ textDecoration: "none" }}>
+              <BrandLogo variant="sidebar" subtitle={tl.goethe} />
             </Link>
             {isMobile && (
               <button

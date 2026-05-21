@@ -5,6 +5,7 @@ import { usePathname } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
 import { useT } from "@/hooks/useT";
+import BrandLogo from "@/components/BrandLogo";
 
 interface CenterLayoutProps {
   children: React.ReactNode;
@@ -77,22 +78,8 @@ export default function CenterLayout({ children, title, centerName = "Centre de 
 
           {/* ── Logo + centre name ── */}
           <div style={{ padding: "24px 20px 16px" }}>
-            <Link href="/center" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 11, marginBottom: 14 }}>
-              <div style={{
-                width: 42, height: 42, borderRadius: 13, flexShrink: 0,
-                display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.35rem",
-                background: "linear-gradient(135deg, rgba(234,179,8,0.2), rgba(161,120,0,0.08))",
-                border: "1px solid rgba(234,179,8,0.3)",
-                boxShadow: "0 0 20px rgba(234,179,8,0.1)",
-              }}></div>
-              <div>
-                <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1rem", lineHeight: 1.2 }}>
-                  Yema
-                </p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.58rem", letterSpacing: "0.08em" }}>
-                  {tC.portal}
-                </p>
-              </div>
+            <Link href="/center" style={{ textDecoration: "none", display: "block", marginBottom: 14 }}>
+              <BrandLogo variant="sidebar" subtitle={tC.portal} />
             </Link>
 
             {/* Centre card */}
