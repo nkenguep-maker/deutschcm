@@ -80,7 +80,7 @@ interface ClassroomPreview {
 function inp(style?: React.CSSProperties): React.CSSProperties {
   return {
     width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 10, padding: "13px 16px", color: "#f1f5f9", fontSize: 15,
+    borderRadius: 10, padding: "13px 16px", color: "#f1f5f9", fontSize: 16,
     outline: "none", boxSizing: "border-box", fontFamily: "monospace",
     letterSpacing: "0.06em", transition: "border-color 0.2s",
     ...style,
@@ -171,7 +171,7 @@ function ClassroomJoinContent() {
           <h1 style={{ margin: 0, color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 24 }}>
             {labels.pageTitle}
           </h1>
-          <p style={{ margin: "8px 0 0", color: "rgba(255,255,255,0.35)", fontSize: 13 }}>
+          <p style={{ margin: "8px 0 0", color: "rgba(255,255,255,0.65)", fontSize: 13 }}>
             {labels.pageSubtitle}
           </p>
         </div>
@@ -195,7 +195,7 @@ function ClassroomJoinContent() {
               <Link href="/dashboard" style={{ background: "#10b981", color: "#fff", borderRadius: 12, padding: "14px 24px", fontWeight: 700, fontSize: 14, textDecoration: "none", textAlign: "center", display: "block" }}>
                 {labels.successBackBtn}
               </Link>
-              <Link href="/simulateur" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "13px 24px", fontWeight: 600, fontSize: 13, textDecoration: "none", textAlign: "center", display: "block" }}>
+              <Link href="/simulateur" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.70)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "13px 24px", fontWeight: 600, fontSize: 13, textDecoration: "none", textAlign: "center", display: "block" }}>
                 {labels.successPracticeBtn}
               </Link>
             </div>
@@ -204,7 +204,7 @@ function ClassroomJoinContent() {
           /* Input + preview state */
           <div style={{ background: "rgba(13,17,23,0.9)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: 28 }}>
             <div>
-              <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.07em" }}>
+              <label style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, fontWeight: 600, display: "block", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.07em" }}>
                 {labels.codeLabel}
               </label>
               <div style={{ position: "relative" }}>
@@ -222,7 +222,7 @@ function ClassroomJoinContent() {
                   <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", color: "#10b981", fontSize: 18 }}>✓</div>
                 )}
               </div>
-              {codeError && <div style={{ color: "#ef4444", fontSize: 12, marginTop: 6 }}>⚠ {codeError}</div>}
+              {codeError && <div style={{ color: "#ef4444", fontSize: 13, marginTop: 6 }}>⚠ {codeError}</div>}
             </div>
 
             {/* Preview card */}
@@ -247,13 +247,13 @@ function ClassroomJoinContent() {
                   ].map(({ icon, label, value }) => (
                     <div key={label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <span style={{ fontSize: 15, width: 22, textAlign: "center", flexShrink: 0 }}>{icon}</span>
-                      <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, width: 80, flexShrink: 0 }}>{label}</span>
+                      <span style={{ color: "rgba(255,255,255,0.62)", fontSize: 13, width: 80, flexShrink: 0 }}>{label}</span>
                       <span style={{ color: "rgba(255,255,255,0.75)", fontSize: 13, fontWeight: 500 }}>{value}</span>
                     </div>
                   ))}
                 </div>
                 <div style={{ marginTop: 14, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, padding: "10px 12px" }}>
-                  <div style={{ color: "#f59e0b", fontSize: 12 }}>ℹ️ {labels.previewNotice}</div>
+                  <div style={{ color: "#f59e0b", fontSize: 13 }}>ℹ️ {labels.previewNotice}</div>
                 </div>
               </div>
             )}
@@ -264,7 +264,7 @@ function ClassroomJoinContent() {
               style={{
                 width: "100%", marginTop: 20,
                 background: preview && !joining ? "#10b981" : "rgba(255,255,255,0.05)",
-                color: preview && !joining ? "#fff" : "rgba(255,255,255,0.2)",
+                color: preview && !joining ? "#fff" : "rgba(255,255,255,0.45)",
                 border: "none", borderRadius: 12, padding: "14px",
                 fontWeight: 700, fontSize: 15, cursor: preview && !joining ? "pointer" : "default",
                 transition: "all 0.2s",
@@ -278,7 +278,7 @@ function ClassroomJoinContent() {
             </button>
 
             <div style={{ marginTop: 16, textAlign: "center" }}>
-              <Link href="/group/join" style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, textDecoration: "underline" }}>
+              <Link href="/group/join" style={{ color: "rgba(255,255,255,0.58)", fontSize: 13, textDecoration: "underline" }}>
                 {labels.groupCodeLink}
               </Link>
             </div>
@@ -286,7 +286,7 @@ function ClassroomJoinContent() {
         )}
 
         <div style={{ textAlign: "center", marginTop: 20 }}>
-          <Link href="/dashboard" style={{ color: "rgba(255,255,255,0.25)", fontSize: 12 }}>
+          <Link href="/dashboard" style={{ color: "rgba(255,255,255,0.55)", fontSize: 13 }}>
             {labels.backLink}
           </Link>
         </div>

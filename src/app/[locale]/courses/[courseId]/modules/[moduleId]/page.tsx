@@ -167,10 +167,10 @@ function GrammarInspector({ locale, labels }: { locale: Locale; labels: AnyLabel
 
   return (
     <div style={{ marginBottom: 20, padding: "16px 20px", borderRadius: 14, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)" }}>
-      <p style={{ fontSize: 10, color: "#f59e0b", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 8px", fontWeight: 700 }}>
+      <p style={{ fontSize: 12, color: "#f59e0b", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 8px", fontWeight: 700 }}>
         🔍 {labels.grammarInspector}
       </p>
-      <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, margin: "0 0 10px" }}>
+      <p style={{ color: "rgba(255,255,255,0.68)", fontSize: 13, margin: "0 0 10px" }}>
         {labels.grammarInspectorHint}
       </p>
       <input
@@ -181,23 +181,23 @@ function GrammarInspector({ locale, labels }: { locale: Locale; labels: AnyLabel
           width: "100%", boxSizing: "border-box",
           padding: "10px 14px", borderRadius: 10,
           background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-          color: "white", fontSize: 14, fontFamily: "'DM Mono', monospace",
+          color: "white", fontSize: 16, fontFamily: "'DM Mono', monospace",
           outline: "none",
         }}
       />
       {input.trim() !== "" && (
         <div style={{ marginTop: 12 }}>
           {errors.length === 0 ? (
-            <p style={{ color: "#10b981", fontSize: 12 }}>✅ {labels.noErrors}</p>
+            <p style={{ color: "#10b981", fontSize: 13 }}>✅ {labels.noErrors}</p>
           ) : (
             errors.map((err, i) => (
               <div key={i} style={{ padding: "8px 12px", borderRadius: 8, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.18)", marginBottom: 6 }}>
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 4 }}>
                   <span style={{ color: "#ef4444", fontSize: 13, textDecoration: "line-through", fontFamily: "'DM Mono', monospace" }}>{err.input}</span>
-                  <span style={{ color: "rgba(255,255,255,0.4)" }}>→</span>
+                  <span style={{ color: "rgba(255,255,255,0.65)" }}>→</span>
                   <span style={{ color: "#10b981", fontSize: 13, fontWeight: 700, fontFamily: "'DM Mono', monospace" }}>{err.correction}</span>
                 </div>
-                <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, margin: 0 }}>
+                <p style={{ color: "rgba(255,255,255,0.68)", fontSize: 13, margin: 0 }}>
                   {locale === "en" ? err.explanationEN : err.explanationFR}
                 </p>
               </div>
@@ -476,10 +476,10 @@ export default function ModulePage() {
   // ── Sidebar nav content (shared between desktop + mobile) ──
   const SidebarNav = () => (
     <>
-      <a href={`/${locale}/courses`} style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, textDecoration: "none", display: "flex", alignItems: "center", gap: 6, marginBottom: 20 }}>
+      <a href={`/${locale}/courses`} style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, textDecoration: "none", display: "flex", alignItems: "center", gap: 6, marginBottom: 20 }}>
         {labels.back}
       </a>
-      <p style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>
+      <p style={{ fontSize: 11, color: "rgba(255,255,255,0.58)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>
         {courseLabel}
       </p>
       {courseModules.map((mod) => {
@@ -495,10 +495,10 @@ export default function ModulePage() {
             }}>
             <span style={{ fontSize: 16 }}>{icons[mod.type]}</span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ color: isActive ? "#10b981" : "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: isActive ? 700 : 400, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <p style={{ color: isActive ? "#10b981" : "rgba(255,255,255,0.75)", fontSize: 12, fontWeight: isActive ? 700 : 400, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {mod.title.split("—")[1]?.trim() ?? mod.title}
               </p>
-              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 9, margin: 0 }}>
+              <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 11, margin: 0 }}>
                 {mod.duration} {labels.min} · +{mod.xpReward} XP
               </p>
             </div>
@@ -526,7 +526,7 @@ export default function ModulePage() {
             <p style={{ margin: 0, color: "white", fontSize: 13, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               {module.title.split("—")[1]?.trim() ?? module.title}
             </p>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.35)", fontSize: 10 }}>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.62)", fontSize: 12 }}>
               {module.level} · {module.duration} {labels.min} · +{module.xpReward} XP
             </p>
           </div>
@@ -569,16 +569,16 @@ export default function ModulePage() {
               <span style={{ fontSize: 10, padding: "3px 10px", borderRadius: 99, fontWeight: 700, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.25)", color: "#10b981" }}>
                 {module.level}
               </span>
-              <span style={{ fontSize: 10, padding: "3px 10px", borderRadius: 99, background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)" }}>
+              <span style={{ fontSize: 12, padding: "3px 10px", borderRadius: 99, background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.65)" }}>
                 {localizedType(module.type)}
               </span>
-              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>⏱ {module.duration} {labels.min}</span>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.60)" }}>⏱ {module.duration} {labels.min}</span>
               <span style={{ fontSize: 10, color: "#f59e0b" }}>+{module.xpReward} XP</span>
             </div>
             <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 20 : 26, fontWeight: 800, margin: "0 0 4px" }}>
               {module.title}
             </h1>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: 0, fontStyle: "italic" }}>
+            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: 0, fontStyle: "italic" }}>
               {module.titleDE}
             </p>
           </div>
@@ -596,7 +596,7 @@ export default function ModulePage() {
                   {module.content.introduction}
                 </p>
                 {module.content.kulturhinweis && (
-                  <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 12, margin: 0, fontStyle: "italic" }}>
+                  <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: 0, fontStyle: "italic" }}>
                     {module.content.kulturhinweis}
                   </p>
                 )}
@@ -612,8 +612,8 @@ export default function ModulePage() {
                         <span style={{ color: "#10b981", fontSize: 15, fontWeight: 700 }}>{word.de}</span>
                         <AudioPlayer text={word.de} gender="female" accent="de" rate="0.8" label={word.de} />
                       </div>
-                      <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, margin: "0 0 6px" }}>{word.fr}</p>
-                      <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, margin: 0, fontStyle: "italic" }}>{word.example}</p>
+                      <p style={{ color: "rgba(255,255,255,0.70)", fontSize: 13, margin: "0 0 6px" }}>{word.fr}</p>
+                      <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 12, margin: 0, fontStyle: "italic" }}>{word.example}</p>
                     </div>
                   ))}
                 </div>
@@ -623,7 +623,7 @@ export default function ModulePage() {
               {module.content.grammatik && (
                 <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 17, margin: "0 0 6px" }}>{labels.grammar}</h2>
-                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: "0 0 16px", fontStyle: "italic" }}>
+                  <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: "0 0 16px", fontStyle: "italic" }}>
                     {module.content.grammatik.ruleDE}
                   </p>
                   <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, margin: "0 0 16px", lineHeight: 1.7 }}>
@@ -651,15 +651,15 @@ export default function ModulePage() {
 
                   {/* Common mistakes */}
                   <div>
-                    <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
+                    <p style={{ fontSize: 12, color: "rgba(255,255,255,0.58)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
                       {labels.commonMistakes}
                     </p>
                     {module.content.grammatik.commonMistakes?.map((err: { wrong: string; correct: string; explanation: string }, i: number) => (
                       <div key={i} style={{ padding: "8px 12px", borderRadius: 8, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", marginBottom: 6, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                        <span style={{ color: "#ef4444", fontSize: 11, textDecoration: "line-through" }}>{err.wrong}</span>
-                        <span style={{ color: "rgba(255,255,255,0.4)" }}>→</span>
-                        <span style={{ color: "#10b981", fontSize: 11, fontWeight: 700 }}>{err.correct}</span>
-                        <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 10 }}>{err.explanation}</span>
+                        <span style={{ color: "#ef4444", fontSize: 13, textDecoration: "line-through" }}>{err.wrong}</span>
+                        <span style={{ color: "rgba(255,255,255,0.65)" }}>→</span>
+                        <span style={{ color: "#10b981", fontSize: 13, fontWeight: 700 }}>{err.correct}</span>
+                        <span style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}>{err.explanation}</span>
                       </div>
                     ))}
                   </div>
@@ -678,7 +678,7 @@ export default function ModulePage() {
                       {showTranslation ? labels.hideTranslation : labels.showTranslation}
                     </button>
                   </div>
-                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: "0 0 12px", fontStyle: "italic" }}>
+                  <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: "0 0 12px", fontStyle: "italic" }}>
                     {module.content.lesetext.context}
                   </p>
                   <div style={{ padding: "14px 18px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", marginBottom: 12 }}>
@@ -689,7 +689,7 @@ export default function ModulePage() {
                   {showTranslation && (
                     <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.12)" }}>
                       {module.content.lesetext.translation.split("\n").map((line: string, i: number) => (
-                        <p key={i} style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, margin: "0 0 4px", fontStyle: "italic" }}>{line}</p>
+                        <p key={i} style={{ color: "rgba(255,255,255,0.68)", fontSize: 13, margin: "0 0 4px", fontStyle: "italic" }}>{line}</p>
                       ))}
                     </div>
                   )}
@@ -764,7 +764,7 @@ export default function ModulePage() {
                   <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, margin: "0 0 8px" }}>
                     {labels.freeExpression}
                   </h3>
-                  <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, margin: "0 0 16px" }}>
+                  <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 13, margin: "0 0 16px" }}>
                     {module.content.freeTask.instruction}
                   </p>
                   <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.15)", marginBottom: 16 }}>
@@ -847,13 +847,13 @@ export default function ModulePage() {
                   {step.isFinal ? labels.finalModuleTitle : labels.moduleCompleted}
                 </h3>
                 <p style={{
-                  color: "rgba(255,255,255,0.55)", fontSize: 13, lineHeight: 1.7,
+                  color: "rgba(255,255,255,0.72)", fontSize: 13, lineHeight: 1.7,
                   margin: "0 auto 10px", maxWidth: 420,
                 }}>
                   {step.isFinal ? labels.finalModuleText : labels.completionText}
                 </p>
                 {score !== null && (
-                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: "0 0 10px" }}>
+                  <p style={{ color: "rgba(255,255,255,0.62)", fontSize: 13, margin: "0 0 10px" }}>
                     {labels.scoreLabel} {score}%
                   </p>
                 )}
@@ -878,11 +878,11 @@ export default function ModulePage() {
 
                 {/* Secondary actions */}
                 <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginTop: 16 }}>
-                  <a href={`/${locale}/courses`} style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, textDecoration: "none" }}>
+                  <a href={`/${locale}/courses`} style={{ color: "rgba(255,255,255,0.58)", fontSize: 13, textDecoration: "none" }}>
                     {labels.backToCourses}
                   </a>
-                  <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 12 }}>·</span>
-                  <a href={`/${locale}/simulateur`} style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, textDecoration: "none" }}>
+                  <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}>·</span>
+                  <a href={`/${locale}/simulateur`} style={{ color: "rgba(255,255,255,0.58)", fontSize: 13, textDecoration: "none" }}>
                     {labels.practiceSimulator}
                   </a>
                 </div>
@@ -892,7 +892,7 @@ export default function ModulePage() {
 
           {/* Disclaimer */}
           <div style={{ marginTop: 40, padding: "10px 16px", borderRadius: 10, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
-            <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.6rem", margin: 0, lineHeight: 1.6, textAlign: "center" }}>
+            <p style={{ color: "rgba(255,255,255,0.42)", fontSize: "0.72rem", margin: 0, lineHeight: 1.6, textAlign: "center" }}>
               {labels.disclaimer}
             </p>
           </div>
@@ -904,16 +904,16 @@ export default function ModulePage() {
 
             {/* XP */}
             <div style={{ padding: "16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 16, textAlign: "center" }}>
-              <p style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 8px" }}>{labels.xpThisModule}</p>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.58)", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 8px" }}>{labels.xpThisModule}</p>
               <div style={{ fontSize: 28, fontWeight: 800, fontFamily: "'Syne',sans-serif", color: "#f59e0b" }}>
                 +{xpEarned || module.xpReward}
               </div>
-              <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", margin: "4px 0 0" }}>{labels.xpPoints}</p>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", margin: "4px 0 0" }}>{labels.xpPoints}</p>
             </div>
 
             {/* Info */}
             <div style={{ padding: "14px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", marginBottom: 16 }}>
-              <p style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 10px" }}>{labels.infoPanel}</p>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.58)", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 10px" }}>{labels.infoPanel}</p>
               {[
                 { label: labels.typeLabel,     value: module.type },
                 { label: labels.levelLabel,    value: module.level },
@@ -921,8 +921,8 @@ export default function ModulePage() {
                 { label: labels.statusLabel,   value: completed ? labels.done : labels.inProgress },
               ].map((info, i) => (
                 <div key={i} style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                  <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{info.label}</span>
-                  <span style={{ fontSize: 10, color: info.label === labels.statusLabel && completed ? "#10b981" : "rgba(255,255,255,0.7)", fontWeight: 600 }}>
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.60)" }}>{info.label}</span>
+                  <span style={{ fontSize: 12, color: info.label === labels.statusLabel && completed ? "#10b981" : "rgba(255,255,255,0.8)", fontWeight: 600 }}>
                     {info.value}
                   </span>
                 </div>
@@ -931,7 +931,7 @@ export default function ModulePage() {
 
             {/* AI tools */}
             <div style={{ padding: "14px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-              <p style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 10px" }}>
+              <p style={{ fontSize: 11, color: "rgba(255,255,255,0.58)", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 10px" }}>
                 {labels.aiTools}
               </p>
               {[
@@ -942,7 +942,7 @@ export default function ModulePage() {
               ].map((tool, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                   <span style={{ fontSize: 14 }}>{tool.icon}</span>
-                  <span style={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }}>{tool.label}</span>
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>{tool.label}</span>
                 </div>
               ))}
             </div>

@@ -173,7 +173,7 @@ export default function TestResultsPage() {
 
   if (!result) return (
     <div style={{ minHeight: "100vh", background: "#080c10", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>{t.loading}</div>
+      <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 14 }}>{t.loading}</div>
     </div>
   );
 
@@ -197,7 +197,7 @@ export default function TestResultsPage() {
 
         {/* ── Header ── */}
         <div style={{ textAlign: "center", marginBottom: 36 }} className="fade-up">
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.22)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>
+          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>
             {t.headerSub}
           </div>
           <h1 style={{ margin: 0, color: "#f1f5f9", fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 24 }}>
@@ -223,7 +223,7 @@ export default function TestResultsPage() {
           </div>
 
           <div style={{ textAlign: "center" }}>
-            <div style={{ color: "rgba(255,255,255,0.28)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 5 }}>
+            <div style={{ color: "rgba(255,255,255,0.58)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 5 }}>
               {t.recommendedLevel}
             </div>
             <div style={{ color: levelColor, fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 17 }}>
@@ -238,18 +238,18 @@ export default function TestResultsPage() {
             borderRadius: 18, padding: "16px 36px", textAlign: "center",
             minWidth: 220,
           }}>
-            <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>
+            <div style={{ color: "rgba(255,255,255,0.58)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>
               {t.totalScore}
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 2, justifyContent: "center" }}>
               <span style={{ color: levelColor, fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 48, lineHeight: 1 }}>
                 {result.score}
               </span>
-              <span style={{ color: "rgba(255,255,255,0.22)", fontWeight: 600, fontSize: 22, marginLeft: 2 }}>
+              <span style={{ color: "rgba(255,255,255,0.55)", fontWeight: 600, fontSize: 22, marginLeft: 2 }}>
                 {t.outOf}
               </span>
             </div>
-            <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 8 }}>
+            <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 13, marginTop: 8 }}>
               {t.correctAnswers(result.totalCorrect ?? 0, result.total ?? 30)}
             </div>
             {/* Score bar */}
@@ -297,13 +297,13 @@ export default function TestResultsPage() {
             🗺️
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ color: "rgba(255,255,255,0.28)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
+            <div style={{ color: "rgba(255,255,255,0.58)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
               {t.nextStepTitle}
             </div>
             <div style={{ color: levelColor, fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 15, marginBottom: 6, lineHeight: 1.3 }}>
               {nextStep.label}
             </div>
-            <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, lineHeight: 1.55 }}>
+            <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 1.55 }}>
               {nextStep.desc}
             </div>
           </div>
@@ -333,7 +333,7 @@ export default function TestResultsPage() {
                       borderRadius: 5, padding: "2px 9px", fontSize: 11, fontWeight: 800, flexShrink: 0,
                     }}>{l}</span>
                     <span style={{ fontSize: 13, flexShrink: 0 }}>{icon}</span>
-                    <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 12, flex: 1 }}>
+                    <span style={{ color: "rgba(255,255,255,0.68)", fontSize: 13, flex: 1 }}>
                       {labels[l]}
                       {isDetected && (
                         <span style={{ marginLeft: 8, background: `${lc}15`, color: lc, border: `1px solid ${lc}30`, borderRadius: 10, padding: "1px 7px", fontSize: 10, fontWeight: 700 }}>
@@ -341,7 +341,7 @@ export default function TestResultsPage() {
                         </span>
                       )}
                     </span>
-                    <span style={{ color: iconColor, fontSize: 12, fontWeight: 700, fontFamily: "monospace", flexShrink: 0 }}>
+                    <span style={{ color: iconColor, fontSize: 13, fontWeight: 700, fontFamily: "monospace", flexShrink: 0 }}>
                       {b.correct}/{b.total}
                     </span>
                   </div>
@@ -368,13 +368,13 @@ export default function TestResultsPage() {
                   return (
                     <div key={s}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-                        <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 12, flex: 1 }}>
+                        <span style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, flex: 1 }}>
                           {skillLabels[s]}
                         </span>
-                        <span style={{ color: sc, fontSize: 12, fontWeight: 700, fontFamily: "monospace", flexShrink: 0 }}>
+                        <span style={{ color: sc, fontSize: 13, fontWeight: 700, fontFamily: "monospace", flexShrink: 0 }}>
                           {sk.correct}/{sk.total}
                         </span>
-                        <span style={{ color: "rgba(255,255,255,0.28)", fontSize: 11, flexShrink: 0, minWidth: 34, textAlign: "right" }}>
+                        <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, flexShrink: 0, minWidth: 34, textAlign: "right" }}>
                           {pct}%
                         </span>
                       </div>
@@ -395,7 +395,7 @@ export default function TestResultsPage() {
               { icon: "⚠️", label: t.legendPartial },
               { icon: "❌", label: t.legendReview },
             ].map(e => (
-              <div key={e.icon} style={{ display: "flex", alignItems: "center", gap: 5, color: "rgba(255,255,255,0.28)", fontSize: 11 }}>
+              <div key={e.icon} style={{ display: "flex", alignItems: "center", gap: 5, color: "rgba(255,255,255,0.58)", fontSize: 13 }}>
                 <span>{e.icon}</span><span>{e.label}</span>
               </div>
             ))}
@@ -413,7 +413,7 @@ export default function TestResultsPage() {
             className="fade-up"
           >
             {attempts >= 2 ? (
-              <span style={{ color: "rgba(255,255,255,0.38)", fontSize: 12 }}>
+              <span style={{ color: "rgba(255,255,255,0.62)", fontSize: 13 }}>
                 ℹ️ {t.lockedMsg}
               </span>
             ) : (
@@ -474,7 +474,7 @@ export default function TestResultsPage() {
           )}
         </div>
 
-        <div style={{ textAlign: "center", marginTop: 22, color: "rgba(255,255,255,0.16)", fontSize: 11 }}>
+        <div style={{ textAlign: "center", marginTop: 22, color: "rgba(255,255,255,0.45)", fontSize: 13 }}>
           {t.savedNote}
         </div>
       </div>
