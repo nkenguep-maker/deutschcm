@@ -6,48 +6,35 @@ import { usePathname, useRouter } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/hooks/useT";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 interface RealStudent {
-  id: string;
-  name: string;
-  email: string;
-  level: string | null;
-  xp: number;
-  avgScore: number;
-  lastActive: string;
-  progress: number;
-  streak: number;
-  classId: string;
-  className: string;
+  id: string; name: string; email: string; level: string | null;
+  xp: number; avgScore: number; lastActive: string; progress: number;
+  streak: number; classId: string; className: string;
 }
 
 interface RealClassroom {
-  id: string;
-  name: string;
-  level: string;
-  code: string;
-  students: number;
-  avgProgress: number;
-  avgScore: number;
-  isActive: boolean;
+  id: string; name: string; level: string; code: string;
+  students: number; avgProgress: number; avgScore: number; isActive: boolean;
 }
 
-// ─── Teacher Sidebar ──────────────────────────────────────────────────────────
+// ─── Inline Sidebar ───────────────────────────────────────────────────────────
 
-function TeacherSidebar({ teacherName }: { teacherName: string }) {
+function TeacherSidebar({ teacherName, isMobile, open, onClose }: {
+  teacherName: string; isMobile: boolean; open: boolean; onClose: () => void;
+}) {
   const pathname = usePathname();
   const router = useRouter();
-  const { nav: tNav, teacher: tT, common: tCommon } = useT();
+  const { nav: tNav, teacher: tT } = useT();
 
   const TEACHER_NAV = [
-    { icon: "🗓️", label: tNav.today,       href: "/teacher" },
-    { icon: "🏫", label: tNav.myClasses,   href: "/teacher/classrooms" },
-    { icon: "👤", label: tNav.learners,    href: "/teacher/students" },
-    { icon: "✏️", label: tNav.corrections, href: "/teacher/assignments" },
-    { icon: "📈", label: tNav.tracking,    href: "/teacher/stats" },
-    { icon: "📚", label: tNav.resources,   href: "/admin/courses/generate" },
-    { icon: "⚙️", label: tNav.settings,   href: "/teacher/settings" },
+    { icon: "🗓️", label: tNav.today,        href: "/teacher"              },
+    { icon: "🏫", label: tNav.myClasses,    href: "/teacher/classrooms"   },
+    { icon: "👤", label: tNav.learners,     href: "/teacher/students"     },
+    { icon: "🎯", label: tNav.activities,   href: "/teacher/activities"   },
+    { icon: "✏️", label: tNav.corrections,  href: "/teacher/assignments"  },
+    { icon: "📈", label: tNav.tracking,     href: "/teacher/stats"        },
+    { icon: "📚", label: tNav.resources,    href: "/teacher/resources"    },
+    { icon: "⚙️", label: tNav.settings,    href: "/teacher/settings"     },
   ];
 
   const handleLogout = async () => {
@@ -56,20 +43,21 @@ function TeacherSidebar({ teacherName }: { teacherName: string }) {
     router.push("/goodbye");
   };
 
-  const initials = teacherName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+  const initials = teacherName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) || "YE";
 
   return (
     <aside style={{
       position: "fixed", top: 0, left: 0, bottom: 0, width: 260, zIndex: 40,
       display: "flex", flexDirection: "column",
-      background: "rgba(8,12,16,0.97)",
+      background: "rgba(8,12,16,0.98)",
       borderRight: "1px solid rgba(255,255,255,0.07)",
       backdropFilter: "blur(24px)",
+      transform: isMobile ? (open ? "translateX(0)" : "translateX(-100%)") : "translateX(0)",
+      transition: "transform 0.25s ease",
     }}>
       <div style={{ position: "absolute", top: -40, left: -40, width: 200, height: 200, borderRadius: "50%", opacity: 0.07, background: "radial-gradient(circle, #10b981, transparent)", filter: "blur(40px)", pointerEvents: "none" }} />
 
-      {/* Logo */}
-      <div style={{ padding: "24px 20px 16px" }}>
+      <div style={{ padding: "20px 20px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/teacher" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 11 }}>
           <div style={{ width: 42, height: 42, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.35rem", background: "linear-gradient(135deg, rgba(16,185,129,0.22), rgba(5,150,105,0.08))", border: "1px solid rgba(16,185,129,0.28)", boxShadow: "0 0 20px rgba(16,185,129,0.12)" }}>🌿</div>
           <div>
@@ -77,9 +65,11 @@ function TeacherSidebar({ teacherName }: { teacherName: string }) {
             <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem", letterSpacing: "0.08em" }}>CEFR · A1 → C1</p>
           </div>
         </Link>
+        {isMobile && (
+          <button onClick={onClose} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: "1.2rem", cursor: "pointer", padding: 4 }}>✕</button>
+        )}
       </div>
 
-      {/* Teacher badge */}
       <div style={{ margin: "0 14px 12px", padding: "8px 12px", borderRadius: 10, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: "0.9rem" }}>👨‍🏫</span>
         <div>
@@ -91,8 +81,7 @@ function TeacherSidebar({ teacherName }: { teacherName: string }) {
 
       <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "0 16px 8px" }} />
 
-      {/* Nav */}
-      <nav style={{ flex: 1, padding: "8px 10px", display: "flex", flexDirection: "column", gap: 2, overflow: "auto" }}>
+      <nav style={{ flex: 1, padding: "8px 10px", display: "flex", flexDirection: "column", gap: 2, overflowY: "auto" }}>
         {TEACHER_NAV.map((item) => {
           const active = pathname === item.href || (item.href !== "/teacher" && pathname.startsWith(item.href));
           return (
@@ -103,9 +92,7 @@ function TeacherSidebar({ teacherName }: { teacherName: string }) {
               border: active ? "1px solid rgba(16,185,129,0.2)" : "1px solid transparent",
               color: active ? "#10b981" : "rgba(255,255,255,0.45)",
               fontFamily: active ? "'Syne', sans-serif" : "'DM Mono', monospace",
-              fontWeight: active ? 600 : 400,
-              fontSize: "0.82rem",
-              transition: "all 0.15s ease",
+              fontWeight: active ? 600 : 400, fontSize: "0.82rem", transition: "all 0.15s ease",
             }}>
               <span style={{ width: 22, textAlign: "center", flexShrink: 0, fontSize: "1rem" }}>{item.icon}</span>
               <span style={{ flex: 1 }}>{item.label}</span>
@@ -117,12 +104,9 @@ function TeacherSidebar({ teacherName }: { teacherName: string }) {
 
       <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "8px 16px 0" }} />
 
-      {/* Teacher info + logout */}
       <div style={{ padding: "12px 14px 16px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 8 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "white", background: "linear-gradient(135deg, rgba(16,185,129,0.25), rgba(5,150,105,0.1))", border: "1px solid rgba(16,185,129,0.28)" }}>
-            {initials}
-          </div>
+          <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "white", background: "linear-gradient(135deg, rgba(16,185,129,0.25), rgba(5,150,105,0.1))", border: "1px solid rgba(16,185,129,0.28)" }}>{initials}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{teacherName}</p>
             <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem" }}>{tT.role}</p>
@@ -136,54 +120,36 @@ function TeacherSidebar({ teacherName }: { teacherName: string }) {
   );
 }
 
-// ─── Stat card ────────────────────────────────────────────────────────────────
+// ─── Attention card ───────────────────────────────────────────────────────────
 
-function StatCard({ icon, label, value, sub, color = "#10b981" }: { icon: string; label: string; value: string; sub: string; color?: string }) {
+function AttentionCard({ icon, title, desc, count, cta, href, color, isMobile }: {
+  icon: string; title: string; desc: string; count: number; cta: string; href: string; color: string; isMobile: boolean;
+}) {
   return (
-    <div style={{ padding: "18px 20px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", gap: 10 }}>
+    <div style={{ padding: isMobile ? "14px" : "16px 18px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: `1px solid ${color}22`, display: "flex", flexDirection: "column", gap: 10 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{ fontSize: "1.2rem" }}>{icon}</span>
+        <span style={{ fontSize: "1.1rem" }}>{icon}</span>
+        <span style={{ padding: "2px 10px", borderRadius: 99, background: `${color}18`, color, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem" }}>{count}</span>
       </div>
       <div>
-        <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.7rem", lineHeight: 1 }}>{value}</p>
-        <p style={{ margin: "4px 0 0", color: "rgba(255,255,255,0.35)", fontSize: "0.7rem", fontFamily: "'DM Mono', monospace" }}>{label}</p>
+        <p style={{ margin: "0 0 3px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem" }}>{title}</p>
+        <p style={{ margin: 0, color: "rgba(255,255,255,0.32)", fontSize: "0.65rem", lineHeight: 1.4 }}>{desc}</p>
       </div>
-      <p style={{ margin: 0, color: "rgba(255,255,255,0.25)", fontSize: "0.65rem", fontFamily: "'DM Mono', monospace" }}>{sub}</p>
-    </div>
-  );
-}
-
-// ─── Action card ──────────────────────────────────────────────────────────────
-
-function ActionCard({ icon, title, desc, cta, href, color }: { icon: string; title: string; desc: string; cta: string; href: string; color: string }) {
-  return (
-    <div style={{ padding: "22px 20px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", gap: 14, transition: "border-color 0.15s" }}>
-      <div style={{ width: 44, height: 44, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", background: `${color}12`, border: `1px solid ${color}28` }}>{icon}</div>
-      <div>
-        <p style={{ margin: "0 0 6px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.92rem" }}>{title}</p>
-        <p style={{ margin: 0, color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", fontFamily: "'DM Mono', monospace", lineHeight: 1.5 }}>{desc}</p>
-      </div>
-      <Link href={href} style={{ alignSelf: "flex-start", padding: "7px 16px", borderRadius: 9, background: `${color}14`, border: `1px solid ${color}30`, color, fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 600, textDecoration: "none" }}>{cta}</Link>
+      <Link href={href} style={{ fontSize: "0.68rem", color, textDecoration: "none", fontFamily: "'DM Mono', monospace" }}>{cta} →</Link>
     </div>
   );
 }
 
 // ─── Classroom card ───────────────────────────────────────────────────────────
 
-function ClassroomCard({ cls, tT, tCommon }: { cls: RealClassroom; tT: ReturnType<typeof useT>["teacher"]; tCommon: ReturnType<typeof useT>["common"] }) {
+function ClassroomCard({ cls, tT, tCommon }: {
+  cls: RealClassroom; tT: ReturnType<typeof useT>["teacher"]; tCommon: ReturnType<typeof useT>["common"];
+}) {
   const levelColors: Record<string, string> = { A1: "#10b981", A2: "#14b8a6", B1: "#3b82f6", B2: "#8b5cf6", C1: "#f97316" };
   const c = levelColors[cls.level] ?? "#10b981";
-
   return (
     <Link href={`/teacher/classroom/${cls.id}`} style={{ textDecoration: "none" }}>
-      <div style={{
-        padding: "16px 18px", borderRadius: 16,
-        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
-        display: "flex", flexDirection: "column", gap: 12,
-        transition: "border-color 0.15s, background 0.15s",
-        cursor: "pointer",
-        opacity: cls.isActive ? 1 : 0.55,
-      }}>
+      <div style={{ padding: "16px 18px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", gap: 12, cursor: "pointer", opacity: cls.isActive ? 1 : 0.55 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cls.name}</p>
@@ -203,36 +169,14 @@ function ClassroomCard({ cls, tT, tCommon }: { cls: RealClassroom; tT: ReturnTyp
           ))}
         </div>
         <div style={{ height: 5, borderRadius: 99, overflow: "hidden", background: "rgba(255,255,255,0.07)" }}>
-          <div style={{ height: "100%", borderRadius: 99, width: `${cls.avgProgress ?? 0}%`, background: `linear-gradient(90deg, ${c}88, ${c})`, transition: "width 0.6s ease" }} />
+          <div style={{ height: "100%", borderRadius: 99, width: `${cls.avgProgress ?? 0}%`, background: `linear-gradient(90deg, ${c}88, ${c})` }} />
         </div>
       </div>
     </Link>
   );
 }
 
-// ─── Difficulty student ────────────────────────────────────────────────────────
-
-function DifficultyRow({ s, tT }: { s: RealStudent; tT: ReturnType<typeof useT>["teacher"] }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 12, background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.15)" }}>
-      <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#f87171", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.75rem" }}>
-        {s.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ margin: 0, color: "rgba(255,255,255,0.85)", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.8rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.name}</p>
-        <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", fontFamily: "'DM Mono', monospace" }}>
-          {`${s.avgScore}/10 · ${s.progress}% · ${s.lastActive}`}
-        </p>
-      </div>
-      <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-        <span style={{ padding: "3px 10px", borderRadius: 8, background: "rgba(239,68,68,0.1)", color: "#f87171", fontSize: "0.68rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>{s.avgScore}/10</span>
-        <Link href={`/teacher/students/${s.id}`} style={{ padding: "3px 10px", borderRadius: 8, background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", fontSize: "0.68rem", fontFamily: "'Syne', sans-serif", textDecoration: "none" }}>{tT.viewStudent}</Link>
-      </div>
-    </div>
-  );
-}
-
-// ─── Main page ────────────────────────────────────────────────────────────────
+// ─── Main dashboard ───────────────────────────────────────────────────────────
 
 export default function TeacherDashboard() {
   const { nav: tNav, teacher: tT, common: tCommon } = useT();
@@ -242,26 +186,27 @@ export default function TeacherDashboard() {
   const [classrooms, setClassrooms] = useState<RealClassroom[]>([]);
   const [students, setStudents] = useState<RealStudent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     fetch("/api/me").then(r => r.ok ? r.json() : null).then(d => {
-      if (d && d.role && d.role !== "TEACHER" && d.role !== "ADMIN") {
-        window.location.replace("/dashboard");
-      }
+      if (d && d.role && d.role !== "TEACHER" && d.role !== "ADMIN") window.location.replace("/dashboard");
     }).catch(() => {});
 
     const supabase = createClient();
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) return;
-      if (data.user.user_metadata?.full_name) {
-        setTeacherName(data.user.user_metadata.full_name);
-      }
+      if (data.user.user_metadata?.full_name) setTeacherName(data.user.user_metadata.full_name);
       if (!data.user.user_metadata?.role) {
-        await fetch("/api/fix-role", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ role: "TEACHER" }),
-        });
+        await fetch("/api/fix-role", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ role: "TEACHER" }) });
       }
     });
 
@@ -279,21 +224,23 @@ export default function TeacherDashboard() {
   }, []);
 
   const copyCode = (code: string) => {
-    navigator.clipboard.writeText(code).then(() => {
-      setCodeCopied(true);
-      setTimeout(() => setCodeCopied(false), 2000);
-    });
+    navigator.clipboard.writeText(code).then(() => { setCodeCopied(true); setTimeout(() => setCodeCopied(false), 2000); });
   };
 
   const firstName = teacherName.split(" ")[0];
   const today = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
-  const difficultStudents = students.filter((s) => s.avgScore < 5);
+
+  // Attention counts from real data
+  const pendingCorrections = 0; // real API, currently 0
+  const toEncourage = students.filter(s => s.streak === 0).length;
+  const toCelebrate = students.filter(s => s.avgScore >= 8).length;
   const totalStudents = classrooms.reduce((s, c) => s + c.students, 0);
+  const difficultStudents = students.filter((s) => s.avgScore < 5);
   const globalAvg = classrooms.length > 0
     ? (classrooms.reduce((s, c) => s + (c.avgScore ?? 0), 0) / classrooms.length).toFixed(1)
     : "—";
-  const pendingAssignments = 0;
-  const completionRate = 0;
+
+  const pad = isMobile ? "20px 16px 48px" : "28px 32px 48px";
 
   return (
     <>
@@ -303,95 +250,103 @@ export default function TeacherDashboard() {
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-        .fade-up { animation: fadeUp 0.4s ease forwards; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeUp 0.35s ease forwards; }
       `}</style>
 
       <div style={{ display: "flex", minHeight: "100vh", background: "#080c10", fontFamily: "'DM Mono', monospace" }}>
-        <TeacherSidebar teacherName={teacherName} />
+        {/* Mobile overlay */}
+        {isMobile && sidebarOpen && (
+          <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", zIndex: 39 }} />
+        )}
 
-        <div style={{ marginLeft: 260, flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+        <TeacherSidebar teacherName={teacherName} isMobile={isMobile} open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+        <div style={{ marginLeft: isMobile ? 0 : 260, flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
           {/* Header */}
           <header style={{
-            position: "sticky", top: 0, zIndex: 30, height: 64,
-            display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px",
-            background: "rgba(8,12,16,0.92)", borderBottom: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(20px)",
+            position: "sticky", top: 0, zIndex: 30, height: 56,
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: isMobile ? "0 16px" : "0 32px", gap: 10,
+            background: "rgba(8,12,16,0.94)", borderBottom: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(20px)",
           }}>
-            <div>
-              <h1 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1.05rem" }}>
-                {tNav.today}
-              </h1>
-              <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.7rem", textTransform: "capitalize" }}>{today}</p>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
+              {isMobile && (
+                <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontSize: "1.3rem", cursor: "pointer", padding: "4px 6px", flexShrink: 0 }}>☰</button>
+              )}
+              <div style={{ minWidth: 0 }}>
+                <h1 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: isMobile ? "0.92rem" : "1.05rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tNav.today}</h1>
+                {!isMobile && <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.68rem", textTransform: "capitalize" }}>{today}</p>}
+              </div>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              {/* Positioning pill */}
-              <span style={{ padding: "5px 12px", borderRadius: 20, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", color: "#10b981", fontSize: "0.68rem", fontFamily: "'Syne', sans-serif", fontWeight: 600, whiteSpace: "nowrap" }}>
-                {tT.aiPill}
-              </span>
-              <Link href="/teacher/classroom/new" style={{
-                padding: "8px 18px", borderRadius: 10, border: "none",
-                background: "linear-gradient(135deg, #10b981, #059669)", color: "white",
-                fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.78rem", textDecoration: "none",
-                boxShadow: "0 4px 16px rgba(16,185,129,0.3)",
-              }}>{tT.newClass}</Link>
-              <Link href="/dashboard" style={{ padding: "8px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)", fontFamily: "'DM Mono', monospace", fontSize: "0.72rem", textDecoration: "none" }}>
-                {tT.studentView}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              {!isMobile && (
+                <span style={{ padding: "5px 12px", borderRadius: 20, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", color: "#10b981", fontSize: "0.68rem", fontFamily: "'Syne', sans-serif", fontWeight: 600, whiteSpace: "nowrap" }}>
+                  {tT.aiPill}
+                </span>
+              )}
+              <Link href="/teacher/classroom/new" style={{ padding: isMobile ? "7px 12px" : "7px 16px", borderRadius: 10, border: "none", background: "linear-gradient(135deg, #10b981, #059669)", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.75rem", textDecoration: "none" }}>
+                {isMobile ? "+" : tT.newClass}
               </Link>
             </div>
           </header>
 
-          {/* Main content */}
-          <main style={{ flex: 1, padding: "28px 32px 48px", overflowY: "auto" }}>
+          {/* Content */}
+          <main style={{ flex: 1, padding: pad, overflowY: "auto", overflowX: "hidden" }}>
 
-            {/* Welcome message */}
+            {/* Welcome */}
             {firstName && (
-              <div className="fade-up" style={{ marginBottom: 24 }}>
-                <p style={{ margin: "0 0 4px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.4rem" }}>
+              <div className="fade-up" style={{ marginBottom: 22 }}>
+                <p style={{ margin: "0 0 4px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: isMobile ? "1.25rem" : "1.4rem" }}>
                   {tT.greeting.replace("{name}", firstName)}
                 </p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.78rem", fontFamily: "'DM Mono', monospace" }}>
-                  {tT.todaySubtitle}
-                </p>
+                <p style={{ margin: 0, color: "rgba(255,255,255,0.38)", fontSize: "0.75rem" }}>{tT.todaySubtitle}</p>
               </div>
             )}
 
-            {/* Action cards */}
-            <div className="fade-up" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 28 }}>
-              <ActionCard icon="👤" title={tT.action1Title} desc={tT.action1Desc} cta={tT.action1CTA} href="/teacher/students" color="#10b981" />
-              <ActionCard icon="✏️" title={tT.action2Title} desc={tT.action2Desc} cta={tT.action2CTA} href="/teacher/assignments" color="#6366f1" />
-              <ActionCard icon="📈" title={tT.action3Title} desc={tT.action3Desc} cta={tT.action3CTA} href="/teacher/stats" color="#f59e0b" />
+            {/* Priority card */}
+            <div className="fade-up" style={{ marginBottom: 22, padding: "18px 20px", borderRadius: 16, background: pendingCorrections > 0 ? "rgba(99,102,241,0.07)" : "rgba(16,185,129,0.05)", border: `1px solid ${pendingCorrections > 0 ? "rgba(99,102,241,0.25)" : "rgba(16,185,129,0.18)"}` }}>
+              <p style={{ margin: "0 0 6px", color: "rgba(255,255,255,0.5)", fontSize: "0.62rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{tT.todayPriorityTitle}</p>
+              <p style={{ margin: "0 0 14px", color: "rgba(255,255,255,0.75)", fontSize: "0.8rem", lineHeight: 1.55 }}>
+                {pendingCorrections > 0 ? tT.todayPriorityPendingText : tT.todayPriorityCalmText}
+              </p>
+              <Link href={pendingCorrections > 0 ? "/teacher/assignments" : "/teacher/activities"} style={{
+                display: "inline-block", padding: "8px 18px", borderRadius: 9,
+                background: pendingCorrections > 0 ? "rgba(99,102,241,0.15)" : "rgba(16,185,129,0.12)",
+                border: `1px solid ${pendingCorrections > 0 ? "rgba(99,102,241,0.3)" : "rgba(16,185,129,0.25)"}`,
+                color: pendingCorrections > 0 ? "#818cf8" : "#10b981",
+                fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 600, textDecoration: "none",
+              }}>
+                {pendingCorrections > 0 ? tT.todayPriorityPendingCTA : tT.todayPriorityCalmCTA} →
+              </Link>
             </div>
 
-            {/* Stat cards */}
-            <div className="fade-up" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 28 }}>
-              <StatCard icon="👤" label={tT.statStudentsLabel} value={`${totalStudents}`} sub={`${totalStudents} enrolled · ${classrooms.length} classes`} color="#10b981" />
-              <StatCard icon="📊" label={tT.statAvgLabel} value={globalAvg} sub={tT.statAvgSub} color="#3b82f6" />
-              <StatCard icon="✏️" label={tT.statAssignmentsLabel} value={`${pendingAssignments}`} sub={tT.statAssignmentsSub} color="#f59e0b" />
-              <StatCard icon="✅" label={tT.statCompletionLabel} value={`${completionRate}%`} sub={tT.statCompletionSub} color="#8b5cf6" />
+            {/* 4 Attention cards */}
+            <div className="fade-up" style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 12, marginBottom: 26 }}>
+              <AttentionCard icon="✏️" title={tT.todayAttnTitle1} desc={tT.todayAttnDesc1} count={pendingCorrections} cta={tT.todayAttnCTA1} href="/teacher/assignments" color="#6366f1" isMobile={isMobile} />
+              <AttentionCard icon="💬" title={tT.todayAttnTitle2} desc={tT.todayAttnDesc2} count={toEncourage} cta={tT.todayAttnCTA2} href="/teacher/students" color="#f59e0b" isMobile={isMobile} />
+              <AttentionCard icon="⭐" title={tT.todayAttnTitle3} desc={tT.todayAttnDesc3} count={toCelebrate} cta={tT.todayAttnCTA3} href="/teacher/stats" color="#10b981" isMobile={isMobile} />
+              <AttentionCard icon="🎯" title={tT.todayAttnTitle4} desc={tT.todayAttnDesc4} count={0} cta={tT.todayAttnCTA4} href="/teacher/activities" color="#e879f9" isMobile={isMobile} />
             </div>
 
             {/* Access codes */}
-            <div className="fade-up" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 24 }}>
-              {/* Teacher code */}
+            <div className="fade-up" style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14, marginBottom: 24 }}>
               <div style={{ padding: "18px 20px", borderRadius: 16, background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.2)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                   <span style={{ fontSize: "1rem" }}>👨‍🏫</span>
                   <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{tT.myTeacherCode}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <code style={{ flex: 1, background: "rgba(0,0,0,0.3)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 10, padding: "10px 14px", color: "#818cf8", fontSize: "1.1rem", fontFamily: "monospace", letterSpacing: "0.1em", fontWeight: 700 }}>
+                  <code style={{ flex: 1, background: "rgba(0,0,0,0.3)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 10, padding: "10px 14px", color: "#818cf8", fontSize: "1rem", fontFamily: "monospace", letterSpacing: "0.1em", fontWeight: 700 }}>
                     {teacherCode ?? tT.loading}
                   </code>
                   <button onClick={() => teacherCode && copyCode(teacherCode)} style={{ padding: "10px 14px", borderRadius: 10, background: codeCopied ? "rgba(99,102,241,0.2)" : "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", color: codeCopied ? "#818cf8" : "rgba(255,255,255,0.5)", fontSize: "0.72rem", cursor: "pointer", whiteSpace: "nowrap" }}>
                     {codeCopied ? tT.copied : tT.copy}
                   </button>
                 </div>
-                <p style={{ margin: "8px 0 0", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", fontFamily: "'DM Mono', monospace" }}>
-                  {tT.shareCodeStudents}
-                </p>
+                <p style={{ margin: "8px 0 0", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem" }}>{tT.shareCodeStudents}</p>
               </div>
 
-              {/* Class codes */}
               <div style={{ padding: "18px 20px", borderRadius: 16, background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.15)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                   <span style={{ fontSize: "1rem" }}>🏫</span>
@@ -399,9 +354,7 @@ export default function TeacherDashboard() {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {classrooms.length === 0 ? (
-                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.68rem", margin: 0 }}>
-                      {tT.shareClassCode}
-                    </p>
+                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.68rem", margin: 0 }}>{tT.shareClassCode}</p>
                   ) : classrooms.map(cls => (
                     <div key={cls.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.68rem", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cls.name}</span>
@@ -413,91 +366,57 @@ export default function TeacherDashboard() {
               </div>
             </div>
 
-            {/* Classes + Activity */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 20, marginBottom: 24 }}>
-
-              {/* My classes */}
+            {/* Classes + stats summary */}
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 320px", gap: 20, marginBottom: 24 }}>
               <div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                  <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{tT.sectionClasses}</h2>
-                  <Link href="/teacher/classrooms" style={{ color: "#10b981", fontSize: "0.7rem", fontFamily: "'DM Mono', monospace", textDecoration: "none" }}>{tT.viewAll}</Link>
+                  <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>{tT.sectionClasses}</h2>
+                  <Link href="/teacher/classrooms" style={{ color: "#10b981", fontSize: "0.68rem", fontFamily: "'DM Mono', monospace", textDecoration: "none" }}>{tT.viewAll}</Link>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {loading ? (
                     <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem" }}>{tT.loading}</p>
                   ) : classrooms.length === 0 ? (
                     <div style={{ padding: "24px", borderRadius: 16, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
-                      <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem", margin: "0 0 12px" }}>
-                        {tT.classesEmpty}
-                      </p>
-                      <Link href="/teacher/classroom/new" style={{ color: "#10b981", fontSize: "0.78rem", textDecoration: "none" }}>
-                        {tT.createFirstClass}
-                      </Link>
+                      <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem", margin: "0 0 12px" }}>{tT.classesEmpty}</p>
+                      <Link href="/teacher/classroom/new" style={{ color: "#10b981", fontSize: "0.78rem", textDecoration: "none" }}>{tT.createFirstClass}</Link>
                     </div>
                   ) : classrooms.map((cls) => <ClassroomCard key={cls.id} cls={cls} tT={tT} tCommon={tCommon} />)}
                 </div>
               </div>
 
-              {/* Recent activity */}
-              <div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                  <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{tT.sectionActivity}</h2>
-                </div>
-                <div style={{ borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
-                  <div style={{ padding: "24px", textAlign: "center" }}>
-                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", margin: 0 }}>
-                      {tT.activityEmpty}
-                    </p>
+              {/* Quick stats */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <h2 style={{ margin: "0 0 2px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>{tT.sectionActivity}</h2>
+                {[
+                  { label: tT.statStudentsLabel, value: `${totalStudents}`, color: "#10b981" },
+                  { label: tT.statAvgLabel,       value: globalAvg,          color: "#3b82f6" },
+                  { label: tT.statAssignmentsLabel, value: `${pendingCorrections}`, color: "#f59e0b" },
+                ].map(s => (
+                  <div key={s.label} style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem" }}>{s.label}</span>
+                    <span style={{ color: s.color, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{s.value}</span>
                   </div>
+                ))}
+
+                {/* Struggling students */}
+                {difficultStudents.length > 0 && (
+                  <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.15)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem" }}>{tT.struggling}</span>
+                    <span style={{ color: "#f87171", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{difficultStudents.length}</span>
+                  </div>
+                )}
+
+                <div style={{ padding: "16px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+                  <p style={{ color: "rgba(255,255,255,0.28)", fontSize: "0.7rem", margin: 0 }}>{tT.activityEmpty}</p>
                 </div>
               </div>
             </div>
 
-            {/* Chart + Difficulty */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: 20 }}>
-
-              {/* Progress chart placeholder */}
-              <div style={{ borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 240 }}>
-                <h2 style={{ margin: "0 0 12px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
-                  {tT.progressChart}
-                </h2>
-                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", margin: 0 }}>
-                  {tT.progressEmpty}
-                </p>
-              </div>
-
-              {/* Struggling students */}
-              <div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                  <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>
-                    {tT.struggling}
-                  </h2>
-                  <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(239,68,68,0.1)", color: "#f87171", fontSize: "0.65rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>
-                    {difficultStudents.length}
-                  </span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {difficultStudents.map((s) => <DifficultyRow key={s.id} s={s} tT={tT} />)}
-                  {difficultStudents.length === 0 && (
-                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem", fontFamily: "'DM Mono', monospace", textAlign: "center", padding: "20px 0" }}>
-                      {tT.allGood}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Recent assignments */}
-            <div style={{ marginTop: 24 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{tT.recentAssignments}</h2>
-                <Link href="/teacher/assignments" style={{ color: "#10b981", fontSize: "0.7rem", fontFamily: "'DM Mono', monospace", textDecoration: "none" }}>{tT.viewAll}</Link>
-              </div>
-              <div style={{ padding: "24px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
-                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", margin: 0 }}>
-                  {tT.assignmentsEmpty}
-                </p>
-              </div>
+            {/* Empty corrections note */}
+            <div style={{ padding: "20px 24px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+              <p style={{ color: "rgba(255,255,255,0.28)", fontSize: "0.75rem", margin: 0 }}>{tT.assignmentsEmpty}</p>
+              <Link href="/teacher/assignments" style={{ color: "#10b981", fontSize: "0.72rem", textDecoration: "none", fontFamily: "'Syne', sans-serif", fontWeight: 600, whiteSpace: "nowrap" }}>{tT.viewAll}</Link>
             </div>
           </main>
         </div>

@@ -2,100 +2,150 @@
 
 import TeacherLayout from "@/components/TeacherLayout";
 import { useT } from "@/hooks/useT";
-import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend,
-} from "recharts";
+import { Link } from "@/navigation";
 
-const WEEKLY = [
-  { name: "Sem 1", A1: 6.2, A2: 5.8, B1: 7.1 },
-  { name: "Sem 2", A1: 6.8, A2: 6.3, B1: 7.4 },
-  { name: "Sem 3", A1: 7.1, A2: 6.9, B1: 7.8 },
-  { name: "Sem 4", A1: 7.4, A2: 7.2, B1: 8.1 },
+// Demo chart data — clearly labeled
+const WEEKLY_DEMO = [
+  { name: "Sem 1", A1: 6.2, A2: 5.8 },
+  { name: "Sem 2", A1: 6.8, A2: 6.3 },
+  { name: "Sem 3", A1: 7.1, A2: 6.9 },
+  { name: "Sem 4", A1: 7.4, A2: 7.2 },
 ];
-
-const MODULE_COMPLETION = [
-  { module: "Lektion 1", A1: 95, A2: 88 },
-  { module: "Lektion 2", A1: 82, A2: 74 },
-  { module: "Lektion 3", A1: 70, A2: 61 },
-  { module: "Lektion 4", A1: 55, A2: 45 },
-  { module: "Lektion 5", A1: 28, A2: 18 },
-];
-
-const TT = { contentStyle: { background: "#0d1a12", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 10, fontSize: 12, fontFamily: "DM Mono" }, labelStyle: { color: "#10b981" }, itemStyle: { color: "rgba(255,255,255,0.7)" } };
 
 export default function TrackingPage() {
   const { teacher: tT, nav: tNav } = useT();
 
-  const SUMMARY = [
-    { label: "Score moyen global",    value: "7.8/10",  color: "#10b981" },
-    { label: "Taux de complétion",    value: "53%",     color: "#6366f1" },
-    { label: "Sessions simulateur",   value: "86",      color: "#f59e0b" },
-    { label: "Quiz complétés",        value: "247",     color: "#e879f9" },
-    { label: "Apprenants actifs/sem", value: "41/47",   color: "#14b8a6" },
-    { label: "Activités corrigées",   value: "5/6",     color: "#fb923c" },
-  ];
+  const hasDemoData = true; // switch to false when real API data available
 
   return (
     <TeacherLayout title={tNav.tracking}>
       <div style={{ maxWidth: 900 }}>
 
         {/* Subtitle */}
-        <p style={{ margin: "0 0 20px", color: "rgba(255,255,255,0.4)", fontSize: "0.78rem", fontFamily: "'DM Mono', monospace" }}>
+        <p style={{ margin: "0 0 20px", color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>
           {tT.trackingSubtitle}
         </p>
 
         {/* Demo data banner */}
-        <div style={{ marginBottom: 24, padding: "12px 16px", borderRadius: 12, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)", color: "rgba(245,158,11,0.7)", fontSize: "0.72rem", fontFamily: "'DM Mono', monospace" }}>
-          {tT.demoDataBanner}
-        </div>
+        {hasDemoData && (
+          <div style={{ marginBottom: 28, padding: "12px 16px", borderRadius: 12, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(245,158,11,0.15)", color: "#f59e0b", fontSize: "0.6rem", fontFamily: "'Syne', sans-serif", fontWeight: 700, flexShrink: 0 }}>Démo</span>
+            <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem" }}>{tT.demoDataBanner}</span>
+          </div>
+        )}
 
-        {/* Summary grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 28 }}>
-          {SUMMARY.map(s => (
-            <div key={s.label} style={{ padding: "18px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderTop: `2px solid ${s.color}`, opacity: 0.75 }}>
-              <div style={{ color: s.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.6rem", marginBottom: 4 }}>{s.value}</div>
-              <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.7rem" }}>{s.label}</div>
+        {/* 1 — Points d'attention */}
+        <section style={{ marginBottom: 28 }}>
+          <h2 style={{ margin: "0 0 14px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
+            {tT.trackingAttnTitle}
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(240px, 100%), 1fr))", gap: 12 }}>
+            {[
+              { icon: "⚠️", label: "Apprenants en difficulté",    value: "2",    color: "#ef4444", hint: "Score < 5/10" },
+              { icon: "💤", label: "Inactifs cette semaine",      value: "1",    color: "#6b7280", hint: "Pas de connexion depuis 7j" },
+              { icon: "📈", label: "En forte progression",        value: "3",    color: "#10b981", hint: "Score en hausse" },
+              { icon: "🏆", label: "Objectif atteint",            value: "5",    color: "#f59e0b", hint: "Module complété" },
+            ].map(s => (
+              <div key={s.label} style={{ padding: "16px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: `1px solid ${s.color}20`, opacity: hasDemoData ? 0.7 : 1 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                  <span style={{ fontSize: "1.1rem" }}>{s.icon}</span>
+                  <span style={{ color: s.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.5rem" }}>{s.value}</span>
+                </div>
+                <p style={{ margin: "0 0 2px", color: "rgba(255,255,255,0.7)", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem" }}>{s.label}</p>
+                <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.62rem" }}>{s.hint}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 2 — Progression par classe */}
+        <section style={{ marginBottom: 28 }}>
+          <h2 style={{ margin: "0 0 14px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
+            {tT.trackingClassTitle}
+          </h2>
+          <div style={{ padding: "20px 22px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", opacity: hasDemoData ? 0.75 : 1 }}>
+            <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.35)", fontSize: "0.7rem" }}>{tT.chartWeeksLabel}</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {WEEKLY_DEMO.map(week => (
+                <div key={week.name} style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem", width: 44, flexShrink: 0 }}>{week.name}</span>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div style={{ height: 6, borderRadius: 99, background: "rgba(255,255,255,0.07)", flex: 1, overflow: "hidden" }}>
+                        <div style={{ height: "100%", borderRadius: 99, width: `${(week.A1 / 10) * 100}%`, background: "#10b981" }} />
+                      </div>
+                      <span style={{ color: "#10b981", fontSize: "0.65rem", width: 40, textAlign: "right" }}>A1: {week.A1}</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div style={{ height: 6, borderRadius: 99, background: "rgba(255,255,255,0.07)", flex: 1, overflow: "hidden" }}>
+                        <div style={{ height: "100%", borderRadius: 99, width: `${(week.A2 / 10) * 100}%`, background: "#6366f1" }} />
+                      </div>
+                      <span style={{ color: "#6366f1", fontSize: "0.65rem", width: 40, textAlign: "right" }}>A2: {week.A2}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        </section>
 
-        {/* Score progression chart */}
-        <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20, opacity: 0.8 }}>
-          <h3 style={{ margin: "0 0 20px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
-            {tT.chartWeeksLabel}
-          </h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={WEEKLY} margin={{ top: 4, right: 16, left: -24, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-              <XAxis dataKey="name" tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }} axisLine={false} tickLine={false} domain={[5, 10]} />
-              <Tooltip {...TT} />
-              <Legend wrapperStyle={{ fontSize: 11, color: "rgba(255,255,255,0.4)", paddingTop: 8 }} />
-              <Line type="monotone" dataKey="A1" stroke="#10b981" strokeWidth={2.5} dot={{ r: 3 }} name="A1 Matin" />
-              <Line type="monotone" dataKey="A2" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 3 }} name="A2 Soir" />
-              <Line type="monotone" dataKey="B1" stroke="#f59e0b" strokeWidth={2.5} dot={{ r: 3 }} name="B1 CEFR" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        {/* 3 — Compétences à renforcer */}
+        <section style={{ marginBottom: 28 }}>
+          <h2 style={{ margin: "0 0 14px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
+            {tT.trackingSkillsTitle}
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(180px, 100%), 1fr))", gap: 10 }}>
+            {[
+              { skill: "Grammaire",     pct: 58, color: "#ef4444" },
+              { skill: "Vocabulaire",   pct: 72, color: "#f59e0b" },
+              { skill: "Compréhension", pct: 81, color: "#10b981" },
+              { skill: "Expression",    pct: 44, color: "#ef4444" },
+            ].map(s => (
+              <div key={s.skill} style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", opacity: hasDemoData ? 0.75 : 1 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                  <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.75rem" }}>{s.skill}</span>
+                  <span style={{ color: s.color, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.75rem" }}>{s.pct}%</span>
+                </div>
+                <div style={{ height: 5, borderRadius: 99, background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
+                  <div style={{ height: "100%", borderRadius: 99, width: `${s.pct}%`, background: s.color }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
-        {/* Module completion chart */}
-        <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", opacity: 0.8 }}>
-          <h3 style={{ margin: "0 0 20px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
-            {tT.chartModulesLabel}
-          </h3>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={MODULE_COMPLETION} margin={{ top: 4, right: 16, left: -24, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-              <XAxis dataKey="module" tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }} axisLine={false} tickLine={false} domain={[0, 100]} />
-              <Tooltip {...TT} formatter={(v) => [`${v}%`, ""]} />
-              <Legend wrapperStyle={{ fontSize: 11, color: "rgba(255,255,255,0.4)", paddingTop: 8 }} />
-              <Bar dataKey="A1" fill="#10b981" radius={[4, 4, 0, 0]} name="A1 Matin" />
-              <Bar dataKey="A2" fill="#6366f1" radius={[4, 4, 0, 0]} name="A2 Soir" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        {/* 4 — Activité récente */}
+        <section style={{ marginBottom: 28 }}>
+          <h2 style={{ margin: "0 0 14px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
+            {tT.trackingActivityTitle}
+          </h2>
+          <div style={{ padding: "24px", borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", margin: 0 }}>{tT.trackingNoData}</p>
+          </div>
+        </section>
+
+        {/* 5 — Prochaine action recommandée */}
+        <section>
+          <h2 style={{ margin: "0 0 14px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
+            {tT.trackingNextTitle}
+          </h2>
+          <div style={{ padding: "20px 22px", borderRadius: 14, background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.18)", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <p style={{ margin: "0 0 4px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem" }}>
+                Encourager les apprenants inactifs
+              </p>
+              <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.72rem" }}>
+                1 apprenant n'a pas pratiqué depuis plus de 7 jours. Un message peut faire la différence.
+              </p>
+            </div>
+            <Link href="/teacher/students" style={{
+              padding: "8px 18px", borderRadius: 10, background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.28)",
+              color: "#10b981", fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap",
+            }}>
+              {tT.todayAttnCTA2} →
+            </Link>
+          </div>
+        </section>
       </div>
     </TeacherLayout>
   );

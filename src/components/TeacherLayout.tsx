@@ -17,16 +17,30 @@ export default function TeacherLayout({ children, title }: TeacherLayoutProps) {
   const router = useRouter();
   const { nav: tNav, teacher: tT } = useT();
   const [teacherName, setTeacherName] = useState("Prof. Tchamba");
+  const [isMobile, setIsMobile] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const TEACHER_NAV = [
-    { icon: "🗓️", label: tNav.today,       href: "/teacher"                },
-    { icon: "🏫", label: tNav.myClasses,   href: "/teacher/classrooms"     },
-    { icon: "👤", label: tNav.learners,    href: "/teacher/students"       },
-    { icon: "✏️", label: tNav.corrections, href: "/teacher/assignments"    },
-    { icon: "📈", label: tNav.tracking,    href: "/teacher/stats"          },
-    { icon: "📚", label: tNav.resources,   href: "/admin/courses/generate" },
-    { icon: "⚙️", label: tNav.settings,   href: "/teacher/settings"       },
+    { icon: "🗓️", label: tNav.today,        href: "/teacher"              },
+    { icon: "🏫", label: tNav.myClasses,    href: "/teacher/classrooms"   },
+    { icon: "👤", label: tNav.learners,     href: "/teacher/students"     },
+    { icon: "🎯", label: tNav.activities,   href: "/teacher/activities"   },
+    { icon: "✏️", label: tNav.corrections,  href: "/teacher/assignments"  },
+    { icon: "📈", label: tNav.tracking,     href: "/teacher/stats"        },
+    { icon: "📚", label: tNav.resources,    href: "/teacher/resources"    },
+    { icon: "⚙️", label: tNav.settings,    href: "/teacher/settings"     },
   ];
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -51,6 +65,84 @@ export default function TeacherLayout({ children, title }: TeacherLayoutProps) {
 
   const initials = teacherName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
 
+  const sidebar = (
+    <aside style={{
+      position: "fixed", top: 0, left: 0, bottom: 0, width: 260, zIndex: 40,
+      display: "flex", flexDirection: "column",
+      background: "rgba(8,12,16,0.98)",
+      borderRight: "1px solid rgba(255,255,255,0.07)",
+      backdropFilter: "blur(24px)",
+      transform: isMobile ? (sidebarOpen ? "translateX(0)" : "translateX(-100%)") : "translateX(0)",
+      transition: "transform 0.25s ease",
+    }}>
+      <div style={{ position: "absolute", top: -40, left: -40, width: 200, height: 200, borderRadius: "50%", opacity: 0.07, background: "radial-gradient(circle, #10b981, transparent)", filter: "blur(40px)", pointerEvents: "none" }} />
+
+      {/* Logo + mobile close */}
+      <div style={{ padding: "20px 20px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Link href="/teacher" style={{ textDecoration: "none" }}>
+          <BrandLogo variant="sidebar" subtitle="CEFR · A1 → C1" />
+        </Link>
+        {isMobile && (
+          <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: "1.2rem", cursor: "pointer", padding: 4 }}>✕</button>
+        )}
+      </div>
+
+      {/* Teacher badge */}
+      <div style={{ margin: "0 14px 12px", padding: "8px 12px", borderRadius: 10, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ fontSize: "0.9rem" }}>👨‍🏫</span>
+        <div>
+          <p style={{ margin: 0, color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.7rem" }}>{tT.space}</p>
+          <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.58rem" }}>{tT.access}</p>
+        </div>
+        <span style={{ marginLeft: "auto", padding: "2px 6px", borderRadius: 6, background: "rgba(16,185,129,0.15)", color: "#10b981", fontSize: "0.58rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>✓</span>
+      </div>
+
+      <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "0 16px 8px" }} />
+
+      {/* Nav */}
+      <nav style={{ flex: 1, padding: "8px 10px", display: "flex", flexDirection: "column", gap: 2, overflowY: "auto" }}>
+        {TEACHER_NAV.map((item) => {
+          const active = pathname === item.href || (item.href !== "/teacher" && pathname.startsWith(item.href));
+          return (
+            <Link key={item.href} href={item.href} style={{
+              display: "flex", alignItems: "center", gap: 11,
+              padding: "10px 13px", borderRadius: 11, textDecoration: "none",
+              background: active ? "rgba(16,185,129,0.1)" : "transparent",
+              border: active ? "1px solid rgba(16,185,129,0.2)" : "1px solid transparent",
+              color: active ? "#10b981" : "rgba(255,255,255,0.45)",
+              fontFamily: active ? "'Syne', sans-serif" : "'DM Mono', monospace",
+              fontWeight: active ? 600 : 400,
+              fontSize: "0.82rem",
+              transition: "all 0.15s ease",
+            }}>
+              <span style={{ width: 22, textAlign: "center", flexShrink: 0, fontSize: "1rem" }}>{item.icon}</span>
+              <span style={{ flex: 1 }}>{item.label}</span>
+              {active && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", flexShrink: 0 }} />}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "8px 16px 0" }} />
+
+      {/* User + logout */}
+      <div style={{ padding: "12px 14px 16px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 8 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "white", background: "linear-gradient(135deg, rgba(16,185,129,0.25), rgba(5,150,105,0.1))", border: "1px solid rgba(16,185,129,0.28)" }}>
+            {initials}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{teacherName}</p>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem" }}>{tT.role}</p>
+          </div>
+        </div>
+        <button onClick={handleLogout} style={{ width: "100%", padding: "7px", borderRadius: 9, border: "1px solid rgba(239,68,68,0.15)", background: "transparent", color: "rgba(239,68,68,0.5)", fontFamily: "'DM Mono', monospace", fontSize: "0.68rem", cursor: "pointer" }}>
+          {tNav.logout}
+        </button>
+      </div>
+    </aside>
+  );
+
   return (
     <>
       <style>{`
@@ -62,90 +154,26 @@ export default function TeacherLayout({ children, title }: TeacherLayoutProps) {
 
       <div style={{ display: "flex", minHeight: "100vh", background: "#080c10", fontFamily: "'DM Mono', monospace" }}>
 
-        {/* ── Sidebar ── */}
-        <aside style={{
-          position: "fixed", top: 0, left: 0, bottom: 0, width: 260, zIndex: 40,
-          display: "flex", flexDirection: "column",
-          background: "rgba(8,12,16,0.97)",
-          borderRight: "1px solid rgba(255,255,255,0.07)",
-          backdropFilter: "blur(24px)",
-        }}>
-          <div style={{ position: "absolute", top: -40, left: -40, width: 200, height: 200, borderRadius: "50%", opacity: 0.07, background: "radial-gradient(circle, #10b981, transparent)", filter: "blur(40px)", pointerEvents: "none" }} />
+        {/* Mobile overlay */}
+        {isMobile && sidebarOpen && (
+          <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", zIndex: 39 }} />
+        )}
 
-          {/* Logo */}
-          <div style={{ padding: "24px 20px 16px" }}>
-            <Link href="/teacher" style={{ textDecoration: "none" }}>
-              <BrandLogo variant="sidebar" subtitle="CEFR · A1 → C1" />
-            </Link>
-          </div>
-
-          {/* Teacher badge */}
-          <div style={{ margin: "0 14px 12px", padding: "8px 12px", borderRadius: 10, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: "0.9rem" }}>👨‍🏫</span>
-            <div>
-              <p style={{ margin: 0, color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.7rem" }}>{tT.space}</p>
-              <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.58rem" }}>{tT.access}</p>
-            </div>
-            <span style={{ marginLeft: "auto", padding: "2px 6px", borderRadius: 6, background: "rgba(16,185,129,0.15)", color: "#10b981", fontSize: "0.58rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>✓</span>
-          </div>
-
-          <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "0 16px 8px" }} />
-
-          {/* Nav */}
-          <nav style={{ flex: 1, padding: "8px 10px", display: "flex", flexDirection: "column", gap: 2, overflow: "auto" }}>
-            {TEACHER_NAV.map((item) => {
-              const active = pathname === item.href || (item.href !== "/teacher" && pathname.startsWith(item.href));
-              return (
-                <Link key={item.href} href={item.href} style={{
-                  display: "flex", alignItems: "center", gap: 11,
-                  padding: "10px 13px", borderRadius: 11, textDecoration: "none",
-                  background: active ? "rgba(16,185,129,0.1)" : "transparent",
-                  border: active ? "1px solid rgba(16,185,129,0.2)" : "1px solid transparent",
-                  color: active ? "#10b981" : "rgba(255,255,255,0.45)",
-                  fontFamily: active ? "'Syne', sans-serif" : "'DM Mono', monospace",
-                  fontWeight: active ? 600 : 400,
-                  fontSize: "0.82rem",
-                  transition: "all 0.15s ease",
-                }}>
-                  <span style={{ width: 22, textAlign: "center", flexShrink: 0, fontSize: "1rem" }}>{item.icon}</span>
-                  <span style={{ flex: 1 }}>{item.label}</span>
-                  {active && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", flexShrink: 0 }} />}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "8px 16px 0" }} />
-
-          {/* User + logout */}
-          <div style={{ padding: "12px 14px 16px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 8 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "white", background: "linear-gradient(135deg, rgba(16,185,129,0.25), rgba(5,150,105,0.1))", border: "1px solid rgba(16,185,129,0.28)" }}>
-                {initials}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{teacherName}</p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem" }}>{tT.role}</p>
-              </div>
-            </div>
-            <button onClick={handleLogout} style={{ width: "100%", padding: "7px", borderRadius: 9, border: "1px solid rgba(239,68,68,0.15)", background: "transparent", color: "rgba(239,68,68,0.5)", fontFamily: "'DM Mono', monospace", fontSize: "0.68rem", cursor: "pointer" }}>
-              {tNav.logout}
-            </button>
-          </div>
-        </aside>
+        {sidebar}
 
         {/* ── Main ── */}
-        <div style={{ marginLeft: 260, flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
-          {title && (
-            <header style={{
-              position: "sticky", top: 0, zIndex: 30, height: 64,
-              display: "flex", alignItems: "center", padding: "0 32px",
-              background: "rgba(8,12,16,0.92)", borderBottom: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(20px)",
-            }}>
-              <h1 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1.05rem" }}>{title}</h1>
-            </header>
-          )}
-          <main style={{ flex: 1, padding: "28px 32px 48px", overflowY: "auto" }}>
+        <div style={{ marginLeft: isMobile ? 0 : 260, flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+          <header style={{
+            position: "sticky", top: 0, zIndex: 30, height: 56,
+            display: "flex", alignItems: "center", padding: isMobile ? "0 16px" : "0 32px", gap: 12,
+            background: "rgba(8,12,16,0.94)", borderBottom: "1px solid rgba(255,255,255,0.06)", backdropFilter: "blur(20px)",
+          }}>
+            {isMobile && (
+              <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontSize: "1.3rem", cursor: "pointer", padding: "4px 6px", flexShrink: 0 }}>☰</button>
+            )}
+            {title && <h1 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: isMobile ? "0.95rem" : "1.05rem", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</h1>}
+          </header>
+          <main style={{ flex: 1, padding: isMobile ? "20px 16px 40px" : "28px 32px 48px", overflowY: "auto", overflowX: "hidden" }}>
             {children}
           </main>
         </div>

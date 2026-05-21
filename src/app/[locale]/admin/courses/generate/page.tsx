@@ -126,7 +126,7 @@ export default function AdminGenerateCourse() {
   const [activeTab, setActiveTab] = useState("lesen");
   const [savedCourses, setSavedCourses] = useState<SavedCourse[]>(SAVED_COURSES);
   const [videoUrl, setVideoUrl] = useState("");
-  const [publishNow, setPublishNow] = useState(true);
+  const [publishNow, setPublishNow] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [uploadDone, setUploadDone] = useState(false);
@@ -365,11 +365,14 @@ export default function AdminGenerateCourse() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold flex items-center gap-3 mb-1" style={{ fontFamily: "'Syne',sans-serif" }}>
-            <Sparkles className="text-emerald-400" /> Yema — Générateur de Cours IA
+            <Sparkles className="text-emerald-400" /> Studio pédagogique
           </h1>
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>
-            Programme aligné CEFR A1–C1
+            Préparez des brouillons d'activités avec l'aide de l'IA. Vous gardez toujours la validation finale.
           </p>
+          <div style={{ marginTop: 10, display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 20, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)" }}>
+            <span style={{ color: "#10b981", fontSize: 12, fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>🛡️ L'IA assiste. Vous validez.</span>
+          </div>
         </div>
 
         {/* Formulaire */}
@@ -491,6 +494,13 @@ export default function AdminGenerateCourse() {
             <p style={{ color: "#10b981", fontSize: 12, marginBottom: 12 }}>{statusMsg}</p>
           )}
 
+          {/* Warning when publish is checked */}
+          {publishNow && (
+            <div style={{ marginBottom: 12, padding: "10px 14px", borderRadius: 10, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)", color: "rgba(245,158,11,0.8)", fontSize: 12 }}>
+              ⚠️ Les contenus générés doivent être relus avant publication.
+            </div>
+          )}
+
           {/* Bouton générer */}
           <button
             onClick={handleGenerate}
@@ -506,7 +516,7 @@ export default function AdminGenerateCourse() {
             }}
           >
             {loading ? <RefreshCw size={16} className="animate-spin" /> : <Sparkles size={16} />}
-            {loading ? "Génération en cours..." : "Générer avec notre IA"}
+            {loading ? "Création du brouillon..." : "Créer un brouillon"}
           </button>
         </div>
 

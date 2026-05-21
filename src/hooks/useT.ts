@@ -200,7 +200,7 @@ const nav = {
     login: "Se connecter", register: "Commencer gratuitement", logout: "Se déconnecter",
     // Teacher-centered nav labels
     today: "Aujourd'hui", learners: "Apprenants", corrections: "Corrections",
-    tracking: "Suivi", resources: "Ressources",
+    tracking: "Suivi", resources: "Ressources", activities: "Activités",
   },
   en: {
     home: "Home", courses: "Courses", myClasses: "My Classes", discover: "Explore",
@@ -211,7 +211,7 @@ const nav = {
     login: "Log in", register: "Get started free", logout: "Log out",
     // Teacher-centered nav labels
     today: "Today", learners: "Learners", corrections: "Corrections",
-    tracking: "Tracking", resources: "Resources",
+    tracking: "Tracking", resources: "Resources", activities: "Activities",
   },
 }
 
@@ -424,6 +424,54 @@ const teacher = {
     demoDataBanner: "Ces données sont des exemples. Vos vraies statistiques apparaîtront ici dès que vos apprenants seront actifs.",
     chartWeeksLabel: "Progression des scores — 4 semaines",
     chartModulesLabel: "Complétion par lektion (A1 vs A2)",
+    // Today — priority card
+    todayPriorityTitle: "Votre priorité aujourd'hui",
+    todayPriorityPendingText: "Des réponses attendent votre regard. L'IA peut proposer une correction, mais votre validation donne du sens.",
+    todayPriorityPendingCTA: "Voir les corrections",
+    todayPriorityCalmText: "Tout est calme pour le moment. Vous pouvez préparer une activité ou consulter la progression de vos apprenants.",
+    todayPriorityCalmCTA: "Préparer une activité",
+    // Today — attention cards
+    todayAttnTitle1: "À corriger", todayAttnDesc1: "Réponses en attente de votre regard.", todayAttnCTA1: "Voir les corrections",
+    todayAttnTitle2: "À encourager", todayAttnDesc2: "Apprenants qui n'ont pas pratiqué récemment.", todayAttnCTA2: "Voir les apprenants",
+    todayAttnTitle3: "À féliciter", todayAttnDesc3: "Apprenants qui ont terminé une étape.", todayAttnCTA3: "Voir la progression",
+    todayAttnTitle4: "À préparer", todayAttnDesc4: "Activités utiles pour vos prochaines classes.", todayAttnCTA4: "Préparer une activité",
+    // Learners page
+    learnersSubtitle: "Voyez qui avance, qui bloque et qui a besoin d'un encouragement.",
+    filterNeedsEncouragement: "À encourager", filterProgressing: "En progression", filterNeedsSupport: "Besoin d'aide", filterInactive: "Inactifs",
+    learnersEmpty: "Aucun apprenant pour le moment. Invitez une classe pour commencer à accompagner vos apprenants.",
+    learnerNeedsSupport: "Besoin d'aide", learnerGoodProgress: "En progression", learnerInactive: "Inactif",
+    learnerLastActive: "Dernière activité",
+    demoLabel: "Démo", demoLearnersBanner: "Ces apprenants sont des données d'exemple. Vos vrais apprenants apparaîtront ici.",
+    // Corrections tabs
+    tabToReview: "À revoir", tabAISuggestions: "Suggestions IA", tabApproved: "Validées", tabAll: "Toutes",
+    aiSuggestionAvailable: "Suggestion IA disponible",
+    correctionsSubtitle2: "Validez les réponses, ajoutez votre regard humain et aidez chaque apprenant à avancer.",
+    trustNote: "Yema peut préparer une première suggestion. Vous validez toujours le feedback final.",
+    // Activities page
+    activitiesTitle: "Activités",
+    activitiesSubtitle: "Préparez des activités pour vos classes. L'IA peut vous aider, mais vous gardez la validation finale.",
+    activityTypeWriting: "Exercice écrit", activityTypeSpeaking: "Pratique orale", activityTypeQuiz: "Quiz",
+    activityTypeComprehension: "Compréhension", activityTypeReview: "Révision", activityTypeFree: "Devoir libre",
+    activityFieldClass: "Classe", activityFieldGoal: "Objectif", activityFieldLevel: "Niveau",
+    activityFieldType: "Type d'activité", activityFieldInstructions: "Consigne", activityFieldDeadline: "Date limite",
+    activityValidationRequired: "Validation enseignant requise",
+    activitiesComingSoon: "La création avancée d'activités est en cours de développement. Pour l'instant, créez des devoirs simples depuis la page Corrections.",
+    createActivityDraft: "Créer un brouillon",
+    // Teaching Studio
+    studioTitle: "Studio pédagogique",
+    studioSubtitle: "Préparez des brouillons d'activités avec l'aide de l'IA. Vous gardez toujours la validation finale.",
+    studioGenerateBtn: "Créer un brouillon",
+    studioPublishWarning: "Les contenus générés doivent être relus avant publication.",
+    // Resources
+    resourcesSubtitle: "Des supports pour préparer vos cours, encourager vos apprenants et gagner du temps.",
+    resource1Title: "Phrases utiles en classe", resource2Title: "Conseils pour motiver les apprenants",
+    resource3Title: "Activités A1 prêtes à adapter", resource4Title: "Préparation intégration",
+    resourcesComingSoon: "En préparation",
+    // Tracking sections
+    trackingAttnTitle: "Points d'attention", trackingClassTitle: "Progression par classe",
+    trackingSkillsTitle: "Compétences à renforcer", trackingActivityTitle: "Activité récente",
+    trackingNextTitle: "Prochaine action recommandée",
+    trackingNoData: "Les données apparaîtront lorsque vos apprenants commenceront leurs activités.",
   },
   en: {
     space: "Teacher Space", access: "Teacher Access · Verified", role: "Teacher · Yema",
@@ -466,6 +514,54 @@ const teacher = {
     demoDataBanner: "These are sample figures. Your real data will appear here once your learners are active.",
     chartWeeksLabel: "Score progression — 4 weeks",
     chartModulesLabel: "Completion by lesson (A1 vs A2)",
+    // Today — priority card
+    todayPriorityTitle: "Your priority today",
+    todayPriorityPendingText: "Some learner responses are waiting for your review. AI can suggest feedback, but your validation gives it meaning.",
+    todayPriorityPendingCTA: "Review corrections",
+    todayPriorityCalmText: "Everything is calm for now. You can prepare an activity or review learner progress.",
+    todayPriorityCalmCTA: "Prepare activity",
+    // Today — attention cards
+    todayAttnTitle1: "To review", todayAttnDesc1: "Responses waiting for your guidance.", todayAttnCTA1: "Review corrections",
+    todayAttnTitle2: "To encourage", todayAttnDesc2: "Learners who have not practiced recently.", todayAttnCTA2: "View learners",
+    todayAttnTitle3: "To celebrate", todayAttnDesc3: "Learners who completed a step.", todayAttnCTA3: "View progress",
+    todayAttnTitle4: "To prepare", todayAttnDesc4: "Useful activities for your next classes.", todayAttnCTA4: "Prepare activity",
+    // Learners page
+    learnersSubtitle: "See who is progressing, who is stuck and who may need encouragement.",
+    filterNeedsEncouragement: "Needs encouragement", filterProgressing: "Progressing", filterNeedsSupport: "Needs support", filterInactive: "Inactive",
+    learnersEmpty: "No learners yet. Invite a class to start guiding your learners.",
+    learnerNeedsSupport: "Needs support", learnerGoodProgress: "Progressing", learnerInactive: "Inactive",
+    learnerLastActive: "Last activity",
+    demoLabel: "Demo", demoLearnersBanner: "These learners are sample data. Your real learners will appear here.",
+    // Corrections tabs
+    tabToReview: "To review", tabAISuggestions: "AI suggestions", tabApproved: "Approved", tabAll: "All",
+    aiSuggestionAvailable: "AI suggestion available",
+    correctionsSubtitle2: "Review responses, add your human guidance and help each learner move forward.",
+    trustNote: "Yema can prepare a first suggestion. You always validate the final feedback.",
+    // Activities page
+    activitiesTitle: "Activities",
+    activitiesSubtitle: "Prepare activities for your classes. AI can help, but you always keep final review.",
+    activityTypeWriting: "Writing exercise", activityTypeSpeaking: "Speaking practice", activityTypeQuiz: "Quiz",
+    activityTypeComprehension: "Comprehension", activityTypeReview: "Review", activityTypeFree: "Free assignment",
+    activityFieldClass: "Class", activityFieldGoal: "Goal", activityFieldLevel: "Level",
+    activityFieldType: "Activity type", activityFieldInstructions: "Instructions", activityFieldDeadline: "Deadline",
+    activityValidationRequired: "Teacher review required",
+    activitiesComingSoon: "Advanced activity creation is under development. For now, create simple assignments from the Corrections page.",
+    createActivityDraft: "Create draft",
+    // Teaching Studio
+    studioTitle: "Teaching studio",
+    studioSubtitle: "Prepare draft activities with AI support. You always keep final review.",
+    studioGenerateBtn: "Create draft",
+    studioPublishWarning: "Generated content should be reviewed before publishing.",
+    // Resources
+    resourcesSubtitle: "Support materials to prepare lessons, encourage learners and save time.",
+    resource1Title: "Useful classroom phrases", resource2Title: "Tips to motivate learners",
+    resource3Title: "A1 activities to adapt", resource4Title: "Integration preparation",
+    resourcesComingSoon: "Coming soon",
+    // Tracking sections
+    trackingAttnTitle: "Attention points", trackingClassTitle: "Class progress",
+    trackingSkillsTitle: "Skills to strengthen", trackingActivityTitle: "Recent activity",
+    trackingNextTitle: "Recommended next action",
+    trackingNoData: "Data will appear when learners start their activities.",
   },
 }
 
