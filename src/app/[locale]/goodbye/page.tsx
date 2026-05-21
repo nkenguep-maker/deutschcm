@@ -130,7 +130,7 @@ export default function GoodbyePage() {
           </p>
           <p style={{
             margin: 0,
-            color: "rgba(255,255,255,0.45)",
+            color: "rgba(255,255,255,0.68)",
             fontSize: "0.88rem",
             lineHeight: 1.7,
           }}>
@@ -183,7 +183,7 @@ export default function GoodbyePage() {
               border: "1px solid rgba(16,185,129,0.18)",
             }}>
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
-              <span style={{ color: "#10b981", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.08em" }}>
+              <span style={{ color: "#10b981", fontSize: "0.84rem", fontWeight: 700, letterSpacing: "0.08em" }}>
                 {t.comingSoon.toUpperCase()}
               </span>
             </div>
@@ -214,8 +214,8 @@ export default function GoodbyePage() {
                 </p>
                 <p style={{
                   margin: 0,
-                  color: "rgba(255,255,255,0.38)",
-                  fontSize: "0.76rem",
+                  color: "rgba(255,255,255,0.62)",
+                  fontSize: "0.82rem",
                   lineHeight: 1.65,
                 }}>
                   {f.desc}

@@ -232,7 +232,7 @@ export default function LandingPage() {
                 <div style={{ position: "absolute", top: 16, right: 20, fontFamily: "'Syne',sans-serif", fontSize: 40, fontWeight: 900, color: "rgba(16,185,129,0.08)" }}>{v.num}</div>
                 <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, display: "block", marginBottom: 10 }}>{v.label}</span>
                 <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800, margin: "0 0 12px" }}>{v.title}</h3>
-                <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, lineHeight: 1.7, margin: 0 }}>{v.desc}</p>
+                <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 14, lineHeight: 1.7, margin: 0 }}>{v.desc}</p>
               </div>
             ))}
           </div>
@@ -260,7 +260,7 @@ export default function LandingPage() {
                 <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, fontWeight: 700, margin: 0 }}>{f.title}</h3>
                 {f.badge && <span style={{ fontSize: 8, padding: "2px 6px", borderRadius: 99, background: "rgba(16,185,129,0.12)", color: "#10b981", fontWeight: 700, whiteSpace: "nowrap" }}>{f.badge}</span>}
               </div>
-              <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
+              <p style={{ color: "rgba(255,255,255,0.70)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
             </div>
           ))}
         </div>
@@ -289,11 +289,11 @@ export default function LandingPage() {
                     {!lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: `${lvl.color}15`, color: lvl.color, fontWeight: 700 }}>{t.available}</span>}
                     {lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>{t.locked}</span>}
                   </div>
-                  <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 12, margin: 0 }}>{lvl.desc}</p>
+                  <p style={{ color: "rgba(255,255,255,0.70)", fontSize: 13, margin: 0 }}>{lvl.desc}</p>
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800, color: lvl.color }}>{lvl.modules}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{t.modules}</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.62)" }}>{t.modules}</div>
                 </div>
               </div>
             ))}
@@ -308,7 +308,7 @@ export default function LandingPage() {
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 26 : 34, fontWeight: 800, marginBottom: 16, lineHeight: 1.2 }}>
               {t.germanyTitle}
             </h2>
-            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.8, margin: 0 }}>
+            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 15, lineHeight: 1.8, margin: 0 }}>
               {t.germanyText}
             </p>
           </div>
@@ -316,7 +316,7 @@ export default function LandingPage() {
             {[t.germany1, t.germany2, t.germany3, t.germany4].map((item, i) => (
               <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
                 <span style={{ color: "#10b981", fontSize: 16, flexShrink: 0, marginTop: 1 }}>✓</span>
-                <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>{item}</p>
+                <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 14, lineHeight: 1.6, margin: 0 }}>{item}</p>
               </div>
             ))}
           </div>
@@ -331,7 +331,7 @@ export default function LandingPage() {
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2 }}>
               {t.simHeadline}
             </h2>
-            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.8, marginBottom: 24 }}>
+            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 15, lineHeight: 1.8, marginBottom: 24 }}>
               {t.simDesc}
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
@@ -395,7 +395,7 @@ export default function LandingPage() {
               <div key={i} style={{ padding: "28px 24px", borderRadius: 18, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <div style={{ fontSize: 32, marginBottom: 16 }}>{p.icon}</div>
                 <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 700, margin: "0 0 10px" }}>{p.title}</h3>
-                <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, lineHeight: 1.7, margin: 0 }}>{p.desc}</p>
+                <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 14, lineHeight: 1.7, margin: 0 }}>{p.desc}</p>
               </div>
             ))}
           </div>
@@ -410,7 +410,7 @@ export default function LandingPage() {
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2 }}>
               {t.centerTitle}
             </h2>
-            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.8, marginBottom: 24 }}>
+            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 15, lineHeight: 1.8, marginBottom: 24 }}>
               {t.centerDesc}
             </p>
             {[
@@ -459,7 +459,7 @@ export default function LandingPage() {
                 <div key={i} style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: `1px solid ${p.color}25`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div>
                     <p style={{ fontFamily: "'Syne',sans-serif", color: "white", fontSize: 15, fontWeight: 700, margin: "0 0 3px" }}>{p.plan}</p>
-                    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0 }}>{p.users}</p>
+                    <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: 0 }}>{p.users}</p>
                   </div>
                   <p style={{ fontFamily: "'Syne',sans-serif", color: p.color, fontSize: 14, fontWeight: 800, margin: 0 }}>{t.centerOnDemand}</p>
                 </div>
@@ -486,7 +486,7 @@ export default function LandingPage() {
                 <span style={{ color: "#10b981", fontSize: 18, transition: "transform 0.2s", transform: faqOpen === i ? "rotate(45deg)" : "none" }}>+</span>
               </button>
               {faqOpen === i && (
-                <div style={{ padding: "0 20px 16px", color: "rgba(255,255,255,0.55)", fontSize: 12, lineHeight: 1.7 }}>
+                <div style={{ padding: "0 20px 16px", color: "rgba(255,255,255,0.75)", fontSize: 14, lineHeight: 1.7 }}>
                   {faq.a}
                 </div>
               )}

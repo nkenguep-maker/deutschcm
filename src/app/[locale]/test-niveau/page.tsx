@@ -187,7 +187,7 @@ export default function TestNiveauPage() {
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 44, marginBottom: 16 }}>⏳</div>
         <div style={{ color: "#10b981", fontWeight: 700, fontSize: 16 }}>{t.loading1}</div>
-        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, marginTop: 6 }}>{t.loading2}</div>
+        <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, marginTop: 6 }}>{t.loading2}</div>
       </div>
     </div>
   );
@@ -231,7 +231,7 @@ export default function TestNiveauPage() {
               <span style={{ fontSize: 20 }}>🎯</span>
               <div>
                 <span style={{ color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 15 }}>{t.header}</span>
-                <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, marginLeft: 8 }}>{t.headerSub}</span>
+                <span style={{ color: "rgba(255,255,255,0.60)", fontSize: 13, marginLeft: 8 }}>{t.headerSub}</span>
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -245,9 +245,9 @@ export default function TestNiveauPage() {
                 <span style={{ color: timerUrgent ? "#ef4444" : "#f1f5f9", fontFamily: "monospace", fontWeight: 700, fontSize: 16 }}>
                   {pad(Math.floor(timeLeft / 60))}:{pad(timeLeft % 60)}
                 </span>
-                {timerUrgent && <span style={{ color: "#ef4444", fontSize: 10 }}>{t.timerLabel}</span>}
+                {timerUrgent && <span style={{ color: "#ef4444", fontSize: 12 }}>{t.timerLabel}</span>}
               </div>
-              <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>{current + 1} / {questions.length}</span>
+              <span style={{ color: "rgba(255,255,255,0.68)", fontSize: 13 }}>{current + 1} / {questions.length}</span>
             </div>
           </div>
 
@@ -278,12 +278,12 @@ export default function TestNiveauPage() {
               {levelOrder.map(lvl => (
                 <span key={lvl} style={{
                   fontSize: 10, fontWeight: 700,
-                  color: q.level === lvl ? LEVEL_COLORS[lvl] : "rgba(255,255,255,0.2)",
+                  color: q.level === lvl ? LEVEL_COLORS[lvl] : "rgba(255,255,255,0.40)",
                   transition: "color 0.3s",
                 }}>{lvl}</span>
               ))}
             </div>
-            <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 10 }}>{Math.round(progress)}{t.progressSuffix}</span>
+            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 12 }}>{Math.round(progress)}{t.progressSuffix}</span>
           </div>
         </div>
       </div>
@@ -300,12 +300,12 @@ export default function TestNiveauPage() {
             }}>{q.level}</span>
             {q.type && (
               <span style={{
-                background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.35)",
+                background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.68)",
                 border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6,
-                padding: "3px 9px", fontSize: 11,
+                padding: "3px 9px", fontSize: 13,
               }}>{t.typeLabels[q.type] ?? q.type}</span>
             )}
-            <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 12 }}>{t.questionLabel} {current + 1}</span>
+            <span style={{ color: "rgba(255,255,255,0.58)", fontSize: 13 }}>{t.questionLabel} {current + 1}</span>
           </div>
 
           {/* Question card */}
@@ -377,7 +377,7 @@ export default function TestNiveauPage() {
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={skip} style={{
                 flex: "0 0 auto", background: "rgba(255,255,255,0.03)",
-                color: "rgba(255,255,255,0.35)", border: "1px solid rgba(255,255,255,0.08)",
+                color: "rgba(255,255,255,0.65)", border: "1px solid rgba(255,255,255,0.08)",
                 borderRadius: 12, padding: "14px 20px", fontWeight: 600, fontSize: 14, cursor: "pointer",
               }}>
                 {t.skip}

@@ -386,7 +386,7 @@ function CameroonMap({ onCityClick, t }: { onCityClick: (city: string) => void; 
           </g>
         ))}
       </svg>
-      <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 10, color: "rgba(255,255,255,0.35)" }}>
+      <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 10, color: "rgba(255,255,255,0.60)" }}>
         <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", display: "inline-block" }} /> {t.mapLegendClass}</span>
         <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "inline-block" }} /> {t.mapLegendCity}</span>
       </div>
@@ -446,7 +446,7 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
             <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>{t.joinByCodeTitle}</span>
             <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>{t.codeSubtitle}</span>
           </div>
-          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, marginBottom: 12 }}>{t.joinByCodeDesc}</div>
+          <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 13, marginBottom: 12 }}>{t.joinByCodeDesc}</div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <input
@@ -539,7 +539,7 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
             <span style={{ fontSize: 14 }}>🔍</span>
             <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>{t.searchByNameTitle}</span>
           </div>
-          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}>{t.searchByNameDesc}</div>
+          <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 13 }}>{t.searchByNameDesc}</div>
         </div>
         <div style={{ position: "relative" as const, marginBottom: 10 }}>
           <input
@@ -563,11 +563,11 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
 
         {nameQuery.length >= 3 && (
           <div style={{ marginTop: 12 }}>
-            <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginBottom: 8 }}>
+            <div style={{ color: "rgba(255,255,255,0.56)", fontSize: 13, marginBottom: 8 }}>
               {t.nameResultsLabel(nameResults.length, nameQuery)}
             </div>
             {nameResults.length === 0 ? (
-              <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, textAlign: "center" as const, padding: "10px 0" }}>
+              <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 13, textAlign: "center" as const, padding: "10px 0" }}>
                 {t.nameNoResults(nameQuery)}
               </div>
             ) : (
@@ -689,7 +689,7 @@ function FilterSidebar({ filters, onChange, onReset, count, t }: { filters: Filt
         <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>{t.filterSidebarLabel}</span>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <span style={{ background: "rgba(16,185,129,0.15)", color: "#10b981", borderRadius: 8, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{t.filterResultsLabel(count)}</span>
-          <button onClick={onReset} style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, background: "none", border: "none", cursor: "pointer" }}>{t.filterReset}</button>
+          <button onClick={onReset} style={{ color: "rgba(255,255,255,0.60)", fontSize: 11, background: "none", border: "none", cursor: "pointer" }}>{t.filterReset}</button>
         </div>
       </div>
 
@@ -758,7 +758,7 @@ function ClassCard({ cls, recommended, onJoin, faved, onFav, sent, t }: { cls: C
             {cls.verified && <span title="✅" style={{ fontSize: 12 }}>✅</span>}
             {cls.isOnline && <span style={{ background: "rgba(99,102,241,0.15)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 10 }}>{t.cardOnline}</span>}
           </div>
-          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>🏛️ {cls.center} · 📍 {cls.city}</div>
+          <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 11 }}>🏛️ {cls.center} · 📍 {cls.city}</div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
             <code style={{ fontSize: 9, color: "rgba(255,255,255,0.28)", letterSpacing: "0.03em" }}>{cls.code}</code>
             <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(cls.code).catch(() => {}); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 9, opacity: 0.4, lineHeight: 1 }} title={t.cardProgram}>📋</button>
@@ -772,7 +772,7 @@ function ClassCard({ cls, recommended, onJoin, faved, onFav, sent, t }: { cls: C
         </div>
       </div>
 
-      <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: 12, lineHeight: 1.6 }}>{cls.description}</p>
+      <p style={{ margin: 0, color: "rgba(255,255,255,0.75)", fontSize: 13, lineHeight: 1.6 }}>{cls.description}</p>
 
       <SpotsBar current={cls.students} max={cls.max} t={t} />
 
@@ -833,7 +833,7 @@ function CenterCard({ center, onJoin, faved, onFav, sent, t }: { center: CenterI
             <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{center.name}</span>
             {center.verified && <span title="Vérifié" style={{ fontSize: 12 }}>✅</span>}
           </div>
-          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>📍 {center.city}, {center.region} · {center.yearsActive} ans</div>
+          <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 11 }}>📍 {center.city}, {center.region} · {center.yearsActive} ans</div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
             <code style={{ fontSize: 9, color: "rgba(255,255,255,0.28)", letterSpacing: "0.03em" }}>{center.code}</code>
             <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(center.code).catch(() => {}); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 9, opacity: 0.4, lineHeight: 1 }}>📋</button>
@@ -851,7 +851,7 @@ function CenterCard({ center, onJoin, faved, onFav, sent, t }: { center: CenterI
         {[{ v: center.teachers, l: t.cardTeachersLabel }, { v: center.students, l: t.cardStudentsLabel }, { v: center.classes, l: t.cardClassesLabel }].map(s => (
           <div key={s.l} style={{ textAlign: "center", background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: "8px 4px" }}>
             <div style={{ color: "#fbbf24", fontWeight: 800, fontSize: 16 }}>{s.v}</div>
-            <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 10 }}>{s.l}</div>
+            <div style={{ color: "rgba(255,255,255,0.56)", fontSize: 10 }}>{s.l}</div>
           </div>
         ))}
       </div>
@@ -859,7 +859,7 @@ function CenterCard({ center, onJoin, faved, onFav, sent, t }: { center: CenterI
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", gap: 4 }}>{center.languages.map(l => <span key={l} style={{ fontSize: 18 }}>{l}</span>)}</div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>{t.cardSuccessRate}</div>
+          <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 11 }}>{t.cardSuccessRate}</div>
           <div style={{ background: "rgba(16,185,129,0.15)", color: "#10b981", borderRadius: 6, padding: "2px 8px", fontSize: 12, fontWeight: 700 }}>{center.successRate}%</div>
         </div>
       </div>
@@ -900,7 +900,7 @@ function GroupCard({ group, onJoin, faved, onFav, sent, t }: { group: GroupItem;
         <Av initials={group.creatorAvatar} size={40} color="#6366f1" />
         <div style={{ flex: 1 }}>
           <div style={{ color: "white", fontWeight: 700, fontSize: 14, marginBottom: 2 }}>{group.name}</div>
-          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{t.cardGroupBy} {group.creatorName} · 📍 {group.city}</div>
+          <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 11 }}>{t.cardGroupBy} {group.creatorName} · 📍 {group.city}</div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
             <code style={{ fontSize: 9, color: "rgba(255,255,255,0.28)", letterSpacing: "0.03em" }}>{group.code}</code>
             <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(group.code).catch(() => {}); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 9, opacity: 0.4, lineHeight: 1 }}>📋</button>
@@ -924,7 +924,7 @@ function GroupCard({ group, onJoin, faved, onFav, sent, t }: { group: GroupItem;
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{t.cardMembers(group.members, group.max)}</div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4, fontSize: 11 }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: isActive ? "#10b981" : "rgba(255,255,255,0.2)", display: "inline-block", flexShrink: 0 }} />
-          <span style={{ color: "rgba(255,255,255,0.35)" }}>{group.lastActive}</span>
+          <span style={{ color: "rgba(255,255,255,0.60)" }}>{group.lastActive}</span>
         </div>
       </div>
 
@@ -969,7 +969,7 @@ function SoloCard({ student, onInvite, invited, t }: { student: SoloItem; onInvi
         <Av initials={student.avatar} size={44} color="#f59e0b" />
         <div style={{ flex: 1 }}>
           <div style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{student.name}</div>
-          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>📍 {student.city}</div>
+          <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 11 }}>📍 {student.city}</div>
         </div>
         <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
           <LvlBadge level={student.level} />
@@ -978,7 +978,7 @@ function SoloCard({ student, onInvite, invited, t }: { student: SoloItem; onInvi
         </div>
       </div>
 
-      <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: 12, lineHeight: 1.6, fontStyle: "italic" }}>&ldquo;{student.desc}&rdquo;</p>
+      <p style={{ margin: 0, color: "rgba(255,255,255,0.75)", fontSize: 13, lineHeight: 1.6, fontStyle: "italic" }}>&ldquo;{student.desc}&rdquo;</p>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
         <div>🎯 {student.goal}</div>
@@ -1185,7 +1185,7 @@ export default function DiscoverPage() {
             <h1 className="syne" style={{ margin: 0, color: "white", fontWeight: 800, fontSize: 20 }}>
               {t.pageTitle}
             </h1>
-            <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.35)", fontSize: 12 }}>
+            <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.60)", fontSize: 13 }}>
               {t.pageSubtitle}
             </p>
           </div>
@@ -1240,7 +1240,7 @@ export default function DiscoverPage() {
       <DualSearch onJoin={openJoin} t={t} />
 
       {/* Results count line */}
-      <div style={{ marginBottom: 20, color: "rgba(255,255,255,0.35)", fontSize: 12 }}>
+      <div style={{ marginBottom: 20, color: "rgba(255,255,255,0.60)", fontSize: 13 }}>
         {t.resultsLabel(totalCount, userLevel, userCity)}
       </div>
 
@@ -1264,7 +1264,7 @@ export default function DiscoverPage() {
               <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>🌍</span>
               <div>
                 <div className="syne" style={{ color: "#10b981", fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{t.positionTitle}</div>
-                <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 12, lineHeight: 1.6 }}>{t.positionDesc}</div>
+                <div style={{ color: "rgba(255,255,255,0.68)", fontSize: 13, lineHeight: 1.6 }}>{t.positionDesc}</div>
               </div>
             </div>
 
@@ -1274,7 +1274,7 @@ export default function DiscoverPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                   <span style={{ color: "#f59e0b", fontSize: 16 }}>⭐</span>
                   <h2 className="syne" style={{ margin: 0, color: "white", fontWeight: 700, fontSize: 16 }}>{t.sectionRecommended}</h2>
-                  {userLevel && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 12 }}>{t.sectionRecommendedSub(userLevel)}</span>}
+                  {userLevel && <span style={{ color: "rgba(255,255,255,0.56)", fontSize: 13 }}>{t.sectionRecommendedSub(userLevel)}</span>}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
                   {filteredClasses.filter(c => recommendedIds.has(c.id)).map(cls => (
@@ -1342,7 +1342,7 @@ export default function DiscoverPage() {
               <div style={{ textAlign: "center", padding: "52px 20px", background: "rgba(13,17,23,0.6)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 18 }}>
                 <div style={{ fontSize: 44, marginBottom: 14 }}>🔍</div>
                 <div className="syne" style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 18, marginBottom: 8 }}>{t.emptyTitle}</div>
-                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, lineHeight: 1.6, marginBottom: 24, maxWidth: 380, margin: "0 auto 24px" }}>
+                <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 1.6, marginBottom: 24, maxWidth: 380, margin: "0 auto 24px" }}>
                   {t.emptyText}
                 </div>
                 <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
@@ -1361,7 +1361,7 @@ export default function DiscoverPage() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <div className="syne" style={{ color: "#a5b4fc", fontWeight: 700, fontSize: 14, marginBottom: 6 }}>{t.communityTitle}</div>
-                  <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, lineHeight: 1.6 }}>{t.communityText}</div>
+                  <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 1.6 }}>{t.communityText}</div>
                 </div>
                 <span style={{ background: "rgba(99,102,241,0.12)", color: "#a5b4fc", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 20, padding: "5px 14px", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", flexShrink: 0 }}>
                   {t.tabPartnersSoon}
@@ -1381,7 +1381,7 @@ export default function DiscoverPage() {
             <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 800, margin: "0 0 6px" }}>
               {selectedItem.type === "group" ? t.modalJoinGroup : selectedItem.type === "center" ? t.modalJoinCenter : t.modalJoinClass}
             </h2>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: "0 0 20px" }}>{selectedItem.name}</p>
+            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: "0 0 20px" }}>{selectedItem.name}</p>
             <label style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", display: "block", marginBottom: 8 }}>
               {t.modalMsgLabel}
             </label>

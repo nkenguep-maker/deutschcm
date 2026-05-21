@@ -207,7 +207,7 @@ function AgentBubble({
         🤖
       </div>
       <div style={{ maxWidth: "72%", display: "flex", flexDirection: "column", gap: 6 }}>
-        <p style={{ margin: 0, fontSize: "0.62rem", color: "rgba(255,255,255,0.3)", fontFamily: "'DM Mono', monospace" }}>
+        <p style={{ margin: 0, fontSize: "0.78rem", color: "rgba(255,255,255,0.56)", fontFamily: "'DM Mono', monospace" }}>
           {t.coachName} •{" "}
           {msg.timestamp.toLocaleTimeString(t.dateLocale, { hour: "2-digit", minute: "2-digit" })}
         </p>

@@ -19,7 +19,7 @@ export default function ResourcesPage() {
       <div style={{ maxWidth: 800 }}>
 
         {/* Subtitle */}
-        <p style={{ margin: "0 0 28px", color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>
+        <p style={{ margin: "0 0 28px", color: "rgba(255,255,255,0.65)", fontSize: "0.86rem" }}>
           {tT.resourcesSubtitle}
         </p>
 
@@ -45,7 +45,7 @@ export default function ResourcesPage() {
           <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem", flexShrink: 0 }}>🎓</div>
           <div style={{ flex: 1, minWidth: 200 }}>
             <p style={{ margin: "0 0 4px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>{tT.studioTitle}</p>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.72rem", lineHeight: 1.5 }}>{tT.studioSubtitle}</p>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.68)", fontSize: "0.84rem", lineHeight: 1.55 }}>{tT.studioSubtitle}</p>
           </div>
           <Link href="/admin/courses/generate" style={{
             padding: "9px 18px", borderRadius: 10, background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.28)",
@@ -56,7 +56,7 @@ export default function ResourcesPage() {
         </div>
 
         {/* Teaching studio note */}
-        <p style={{ marginTop: 12, color: "rgba(255,255,255,0.22)", fontSize: "0.65rem", fontFamily: "'DM Mono', monospace" }}>
+        <p style={{ marginTop: 12, color: "rgba(255,255,255,0.55)", fontSize: "0.78rem", fontFamily: "'DM Mono', monospace" }}>
           {tT.studioPublishWarning}
         </p>
       </div>

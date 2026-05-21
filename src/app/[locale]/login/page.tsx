@@ -123,7 +123,7 @@ export default function LoginPage() {
             >
               {t("loginTitle")}
             </h2>
-            <p className="text-xs mb-5" style={{ color: "rgba(255,255,255,0.35)" }}>
+            <p className="text-xs mb-5" style={{ color: "rgba(255,255,255,0.60)" }}>
               {t("loginSubtitle")} 👋
             </p>
 
@@ -139,7 +139,7 @@ export default function LoginPage() {
                     style={{
                       background: active ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)",
                       border: active ? "1px solid rgba(16,185,129,0.5)" : "1px solid rgba(255,255,255,0.08)",
-                      color: active ? "#10b981" : "rgba(255,255,255,0.4)",
+                      color: active ? "#10b981" : "rgba(255,255,255,0.65)",
                       fontFamily: "'Syne', sans-serif",
                       cursor: "pointer",
                     }}
@@ -166,7 +166,7 @@ export default function LoginPage() {
 
             <form onSubmit={handleLogin} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                <label className="text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>
                   {t("email")}
                 </label>
                 <input
@@ -188,7 +188,7 @@ export default function LoginPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                <label className="text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>
                   {t("password")}
                 </label>
                 <input
@@ -228,7 +228,7 @@ export default function LoginPage() {
             </form>
           </div>
 
-          <p className="text-center text-xs mt-6" style={{ color: "rgba(255,255,255,0.3)" }}>
+          <p className="text-center text-xs mt-6" style={{ color: "rgba(255,255,255,0.56)" }}>
             {t("noAccount")}{" "}
             <Link href="/register" style={{ color: "#10b981", textDecoration: "none" }}>
               {t("subscribe")}

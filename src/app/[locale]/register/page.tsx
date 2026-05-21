@@ -153,7 +153,7 @@ export default function RegisterPage() {
                 >
                   {t("confirmTitle")}
                 </h2>
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.72)" }}>
                   {t("confirmSent")}{" "}
                   <span style={{ color: "#10b981" }}>{email}</span>.
                   <br /><br />
@@ -185,7 +185,7 @@ export default function RegisterPage() {
                 >
                   {t("createAccount")}
                 </h2>
-                <p className="text-xs mb-6" style={{ color: "rgba(255,255,255,0.35)" }}>
+                <p className="text-xs mb-6" style={{ color: "rgba(255,255,255,0.60)" }}>
                   {t("chooseRoleHint")}
                 </p>
 
@@ -217,7 +217,7 @@ export default function RegisterPage() {
                         >
                           {t(key === "STUDENT" ? "roleStudent" : key === "TEACHER" ? "roleTeacher" : "roleCenter")}
                         </div>
-                        <div className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+                        <div className="text-xs" style={{ color: "rgba(255,255,255,0.60)" }}>
                           {t(key === "STUDENT" ? "roleStudentDesc" : key === "TEACHER" ? "roleTeacherDesc" : "roleCenterDesc")}
                         </div>
                       </div>
@@ -245,7 +245,7 @@ export default function RegisterPage() {
                     type="button"
                     onClick={() => setSelectedRole(null)}
                     className="text-xs transition-all"
-                    style={{ color: "rgba(255,255,255,0.3)", background: "none", border: "none", cursor: "pointer" }}
+                    style={{ color: "rgba(255,255,255,0.56)", background: "none", border: "none", cursor: "pointer" }}
                   >
                     {t("changeRole")}
                   </button>
@@ -266,7 +266,7 @@ export default function RegisterPage() {
 
                 <form onSubmit={handleRegister} className="flex flex-col gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{t("fullName")}</label>
+                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>{t("fullName")}</label>
                     <input
                       type="text"
                       value={fullName}
@@ -286,7 +286,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{t("email")}</label>
+                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>{t("email")}</label>
                     <input
                       type="email"
                       value={email}
@@ -306,7 +306,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{t("password")}</label>
+                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>{t("password")}</label>
                     <input
                       type="password"
                       value={password}
@@ -332,7 +332,7 @@ export default function RegisterPage() {
                       onChange={e => setConsent(e.target.checked)}
                       style={{ marginTop: 2, accentColor: "#10b981", flexShrink: 0, width: 15, height: 15 }}
                     />
-                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem", lineHeight: 1.6 }}>
+                    <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", lineHeight: 1.6 }}>
                       {t("consentBefore")}
                       <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "#10b981", textDecoration: "none" }}>{t("consentTerms")}</a>
                       {t("consentMiddle")}
@@ -363,7 +363,7 @@ export default function RegisterPage() {
           </div>
 
           {!success && (
-            <p className="text-center text-xs mt-6" style={{ color: "rgba(255,255,255,0.3)" }}>
+            <p className="text-center text-xs mt-6" style={{ color: "rgba(255,255,255,0.56)" }}>
               {t("hasAccount")}{" "}
               <Link href="/login" style={{ color: "#10b981", textDecoration: "none" }}>
                 {t("signIn")}

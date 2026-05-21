@@ -18,7 +18,7 @@ export default function ClassroomsPage() {
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
           <div>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: "0.86rem" }}>
               {CLASSES.length} classes · {CLASSES.reduce((s, c) => s + c.students, 0)} élèves au total
             </p>
           </div>
@@ -49,13 +49,13 @@ export default function ClassroomsPage() {
                       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 5 }}>
                         <span style={{ color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>{cls.name}</span>
                         <span style={{ padding: "2px 10px", borderRadius: 6, background: `${c}18`, color: c, border: `1px solid ${c}33`, fontSize: "0.68rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>{cls.level}</span>
-                        <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(16,185,129,0.1)", color: "#10b981", fontSize: "0.62rem" }}>Active</span>
+                        <span style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(16,185,129,0.1)", color: "#10b981", fontSize: "0.72rem" }}>Active</span>
                       </div>
-                      <div style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.65rem" }}>🕐 {cls.schedule}</div>
+                      <div style={{ color: "rgba(255,255,255,0.62)", fontSize: "0.80rem" }}>🕐 {cls.schedule}</div>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <code style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "4px 10px", color: c, fontSize: "0.68rem" }}>{cls.code}</code>
-                      <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 18 }}>›</span>
+                      <code style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "4px 10px", color: c, fontSize: "0.80rem" }}>{cls.code}</code>
+                      <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 18 }}>›</span>
                     </div>
                   </div>
 
@@ -68,7 +68,7 @@ export default function ClassroomsPage() {
                     ].map(s => (
                       <div key={s.l} style={{ textAlign: "center", padding: "10px 0", borderRadius: 10, background: "rgba(255,255,255,0.03)" }}>
                         <div style={{ color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1.05rem" }}>{s.v}</div>
-                        <div style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.6rem", marginTop: 2 }}>{s.l}</div>
+                        <div style={{ color: "rgba(255,255,255,0.60)", fontSize: "0.75rem", marginTop: 2 }}>{s.l}</div>
                       </div>
                     ))}
                   </div>

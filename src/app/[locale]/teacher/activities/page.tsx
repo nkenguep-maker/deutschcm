@@ -26,7 +26,7 @@ export default function ActivitiesPage() {
       <div style={{ maxWidth: 760 }}>
 
         {/* Subtitle */}
-        <p style={{ margin: "0 0 24px", color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>
+        <p style={{ margin: "0 0 24px", color: "rgba(255,255,255,0.65)", fontSize: "0.86rem" }}>
           {tT.activitiesSubtitle}
         </p>
 
@@ -35,7 +35,7 @@ export default function ActivitiesPage() {
           <span style={{ fontSize: "1.1rem", flexShrink: 0, marginTop: 1 }}>🛡️</span>
           <div>
             <p style={{ margin: "0 0 2px", color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.75rem" }}>{tT.activityValidationRequired}</p>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.7rem" }}>{tT.trustNote}</p>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>{tT.trustNote}</p>
           </div>
         </div>
 
@@ -62,7 +62,7 @@ export default function ActivitiesPage() {
               <p style={{ margin: "0 0 8px", color: "rgba(255,255,255,0.5)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.78rem" }}>
                 ⚙️ {tC.comingSoon}
               </p>
-              <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.72rem", lineHeight: 1.5 }}>
+              <p style={{ margin: 0, color: "rgba(255,255,255,0.60)", fontSize: "0.84rem", lineHeight: 1.55 }}>
                 {tT.activitiesComingSoon}
               </p>
               <Link href="/teacher/assignments" style={{ display: "inline-block", marginTop: 12, color: "#10b981", fontSize: "0.72rem", textDecoration: "none" }}>
@@ -92,7 +92,7 @@ export default function ActivitiesPage() {
                 { label: tT.activityFieldDeadline,     ph: "JJ/MM/AAAA" },
               ].map(f => (
                 <div key={f.label}>
-                  <label style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.72rem", display: "block", marginBottom: 6 }}>{f.label}</label>
+                  <label style={{ color: "rgba(255,255,255,0.70)", fontSize: "0.86rem", display: "block", marginBottom: 6 }}>{f.label}</label>
                   <input placeholder={f.ph} style={{ width: "100%", padding: "10px 14px", borderRadius: 9, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: "0.82rem", outline: "none", boxSizing: "border-box" }} />
                 </div>
               ))}
@@ -113,7 +113,7 @@ export default function ActivitiesPage() {
               </button>
             </div>
 
-            <p style={{ marginTop: 12, color: "rgba(255,255,255,0.25)", fontSize: "0.65rem" }}>{tT.studioPublishWarning}</p>
+            <p style={{ marginTop: 12, color: "rgba(255,255,255,0.55)", fontSize: "0.78rem" }}>{tT.studioPublishWarning}</p>
           </div>
         )}
       </div>

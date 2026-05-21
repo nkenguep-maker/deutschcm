@@ -35,16 +35,16 @@ export default function CorrectionsPage() {
       <div style={{ maxWidth: 860 }}>
 
         {/* Subtitle + positioning */}
-        <p style={{ margin: "0 0 6px", color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>
+        <p style={{ margin: "0 0 6px", color: "rgba(255,255,255,0.65)", fontSize: "0.86rem" }}>
           {tT.correctionsSubtitle2}
         </p>
-        <p style={{ margin: "0 0 16px", color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.72rem" }}>
+        <p style={{ margin: "0 0 16px", color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem" }}>
           {tT.expertiseCenter}
         </p>
 
         {/* Trust note */}
         <div style={{ marginBottom: 18, padding: "14px 16px", borderRadius: 12, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.18)" }}>
-          <p style={{ margin: "0 0 12px", color: "rgba(255,255,255,0.6)", fontSize: "0.72rem", lineHeight: 1.5 }}>{tT.correctionsTrustCopy}</p>
+          <p style={{ margin: "0 0 12px", color: "rgba(255,255,255,0.78)", fontSize: "0.84rem", lineHeight: 1.55 }}>{tT.correctionsTrustCopy}</p>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {[
               { step: "1", label: tT.correctionStepLearner, color: "#6366f1" },
@@ -65,7 +65,7 @@ export default function CorrectionsPage() {
         {/* Demo banner */}
         <div style={{ marginBottom: 20, padding: "10px 14px", borderRadius: 10, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(245,158,11,0.15)", color: "#f59e0b", fontSize: "0.6rem", fontFamily: "'Syne', sans-serif", fontWeight: 700, flexShrink: 0 }}>{tT.sampleLabel}</span>
-          <span style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.68rem" }}>{tT.aiTrustNote}</span>
+          <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>{tT.aiTrustNote}</span>
         </div>
 
         {/* Controls */}
@@ -75,7 +75,7 @@ export default function CorrectionsPage() {
               padding: "7px 14px", borderRadius: 9, border: "none", cursor: "pointer",
               fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 600,
               background: activeTab === tab.key ? "#10b981" : "rgba(255,255,255,0.05)",
-              color: activeTab === tab.key ? "white" : "rgba(255,255,255,0.4)",
+              color: activeTab === tab.key ? "white" : "rgba(255,255,255,0.72)",
               display: "flex", alignItems: "center", gap: 6,
             }}>
               {tab.label}
@@ -116,26 +116,26 @@ export default function CorrectionsPage() {
                         {tT.sampleLabel}
                       </span>
                     </div>
-                    <p style={{ margin: "0 0 10px", color: "rgba(255,255,255,0.28)", fontSize: "0.66rem" }}>
+                    <p style={{ margin: "0 0 10px", color: "rgba(255,255,255,0.60)", fontSize: "0.80rem" }}>
                       {tT.deadline} : {a.due} · {tT.maxScoreLabel} : {a.maxScore} pts
                     </p>
                     <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                       <div style={{ flex: 1, maxWidth: 220 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                          <span style={{ color: "rgba(255,255,255,0.32)", fontSize: "0.63rem" }}>{tT.submittedLabel}</span>
+                          <span style={{ color: "rgba(255,255,255,0.62)", fontSize: "0.78rem" }}>{tT.submittedLabel}</span>
                           <span style={{ color: scoreColor(pct), fontSize: "0.68rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>{a.submitted}/{a.total}</span>
                         </div>
                         <div style={{ height: 4, borderRadius: 99, background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
                           <div style={{ height: "100%", borderRadius: 99, width: `${pct}%`, background: scoreColor(pct) }} />
                         </div>
                       </div>
-                      <span style={{ color: "rgba(255,255,255,0.22)", fontSize: "0.65rem" }}>{pct}% {tT.submittedPctLabel}</span>
+                      <span style={{ color: "rgba(255,255,255,0.58)", fontSize: "0.78rem" }}>{pct}% {tT.submittedPctLabel}</span>
                     </div>
                   </div>
                   <button style={{
                     padding: "7px 14px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)",
-                    background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)",
-                    fontSize: "0.7rem", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap",
+                    background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.72)",
+                    fontSize: "0.82rem", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap",
                   }}>{tT.reviewBtn}</button>
                 </div>
               </div>
@@ -156,7 +156,7 @@ export default function CorrectionsPage() {
                   { label: tT.fieldDue,   ph: "" },
                 ].map(f => (
                   <div key={f.label}>
-                    <label style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem", display: "block", marginBottom: 6 }}>{f.label}</label>
+                    <label style={{ color: "rgba(255,255,255,0.68)", fontSize: "0.86rem", display: "block", marginBottom: 6 }}>{f.label}</label>
                     <input placeholder={f.ph} style={{ width: "100%", padding: "10px 14px", borderRadius: 9, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: "0.82rem", outline: "none", boxSizing: "border-box" }} />
                   </div>
                 ))}
@@ -166,7 +166,7 @@ export default function CorrectionsPage() {
                     <span style={{ color: "#10b981", fontSize: "0.85rem" }}>✓</span>
                     <span style={{ color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.75rem" }}>{tT.activityValidationRequired}</span>
                   </div>
-                  <p style={{ margin: 0, color: "rgba(255,255,255,0.25)", fontSize: "0.62rem", paddingLeft: 24 }}>{tT.microcopy1}</p>
+                  <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: "0.78rem", paddingLeft: 24 }}>{tT.microcopy1}</p>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 22 }}>
