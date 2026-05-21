@@ -5,6 +5,7 @@ import { Link } from "@/navigation";
 import { usePathname, useRouter } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useT } from "@/hooks/useT";
+import BrandLogo from "@/components/BrandLogo";
 
 interface RealStudent {
   id: string; name: string; email: string; level: string | null;
@@ -58,12 +59,8 @@ function TeacherSidebar({ teacherName, isMobile, open, onClose }: {
       <div style={{ position: "absolute", top: -40, left: -40, width: 200, height: 200, borderRadius: "50%", opacity: 0.07, background: "radial-gradient(circle, #10b981, transparent)", filter: "blur(40px)", pointerEvents: "none" }} />
 
       <div style={{ padding: "20px 20px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Link href="/teacher" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 11 }}>
-          <div style={{ width: 42, height: 42, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.35rem", background: "linear-gradient(135deg, rgba(16,185,129,0.22), rgba(5,150,105,0.08))", border: "1px solid rgba(16,185,129,0.28)", boxShadow: "0 0 20px rgba(16,185,129,0.12)" }}>🌿</div>
-          <div>
-            <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.05rem", lineHeight: 1.2 }}>Yema</p>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem", letterSpacing: "0.08em" }}>CEFR · A1 → C1</p>
-          </div>
+        <Link href="/teacher" style={{ textDecoration: "none" }}>
+          <BrandLogo variant="sidebar" subtitle="CEFR · A1 → C1" />
         </Link>
         {isMobile && (
           <button onClick={onClose} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: "1.2rem", cursor: "pointer", padding: 4 }}>✕</button>
