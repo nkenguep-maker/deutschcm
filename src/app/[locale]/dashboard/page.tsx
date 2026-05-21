@@ -28,11 +28,11 @@ function PillarCard({ label, desc, color, badge }: {
       <p style={{ margin: "0 0 8px", color: badge ? "rgba(255,255,255,0.45)" : color, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
         {label}
       </p>
-      <p style={{ margin: 0, color: "rgba(255,255,255,0.62)", fontSize: "0.82rem", lineHeight: 1.55 }}>
+      <p style={{ margin: 0, color: "rgba(255,255,255,0.72)", fontSize: "0.85rem", lineHeight: 1.55 }}>
         {desc}
       </p>
       {badge && (
-        <span style={{ display: "inline-block", marginTop: 10, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)", fontSize: "0.58rem", padding: "2px 8px", borderRadius: 6, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.06em" }}>
+        <span style={{ display: "inline-block", marginTop: 10, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.55)", fontSize: "0.75rem", padding: "2px 8px", borderRadius: 6, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.06em" }}>
           {badge}
         </span>
       )}
@@ -143,7 +143,7 @@ export default function StudentDashboard() {
           <p style={{ margin: "0 0 10px", color: "rgba(255,255,255,0.75)", fontSize: "0.9rem", lineHeight: 1.6 }}>
             {t.greetSubtitleReturn}
           </p>
-          <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.56)", fontSize: "0.82rem", lineHeight: 1.55 }}>
+          <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.65)", fontSize: "0.85rem", lineHeight: 1.55 }}>
             {t.greetEmotional}
           </p>
           <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 8 }}>
@@ -176,7 +176,7 @@ export default function StudentDashboard() {
           background: "linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(16,185,129,0.03) 100%)",
           border: "1px solid rgba(16,185,129,0.22)",
         }}>
-          <p style={{ margin: "0 0 8px", color: "rgba(255,255,255,0.56)", fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase" as const }}>
+          <p style={{ margin: "0 0 8px", color: "rgba(255,255,255,0.65)", fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase" as const }}>
             {t.nextStepCardTitle}
           </p>
           <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? 18 : 28, justifyContent: "space-between" }}>

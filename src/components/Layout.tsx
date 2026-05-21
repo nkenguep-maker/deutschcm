@@ -225,7 +225,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
             {/* Role badge */}
             {userRole !== "STUDENT" && (
               <div style={{ margin: "0 4px 8px", padding: "6px 12px", borderRadius: 8, background: `${accentColor}10`, border: `1px solid ${accentColor}25`, textAlign: "center" }}>
-                <span style={{ color: accentColor, fontSize: 10, fontWeight: 700, letterSpacing: "0.06em" }}>
+                <span style={{ color: accentColor, fontSize: 13, fontWeight: 700, letterSpacing: "0.06em" }}>
                   {userRole === "TEACHER" ? tl.teacherRole : userRole === "CENTER_MANAGER" ? tl.centerRole : tl.adminRole}
                 </span>
               </div>
@@ -244,7 +244,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
                     padding: "10px 13px", borderRadius: 11, textDecoration: "none",
                     background: active ? `${accentColor}15` : "transparent",
                     border: active ? `1px solid ${accentColor}30` : "1px solid transparent",
-                    color: active ? accentColor : "rgba(255,255,255,0.62)",
+                    color: active ? accentColor : "rgba(255,255,255,0.72)",
                     fontFamily: active ? "'Syne', sans-serif" : "'DM Mono', monospace",
                     fontWeight: active ? 600 : 400,
                     fontSize: "0.82rem",
@@ -284,7 +284,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
                 <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {userName}
                 </p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {userLevel ? `${tl.levelPrefix} ${userLevel}` : userEmail || ""}
                 </p>
               </div>
@@ -292,12 +292,12 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
             {/* Student type badge */}
             {userRole === "STUDENT" && studentType && (() => {
               if (studentType === "classroom" && isValidated)
-                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "4px 0", color: "#10b981", fontSize: "0.72rem", fontWeight: 700 }}>{tl.studentBadge}</div>;
+                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "4px 0", color: "#10b981", fontSize: "0.78rem", fontWeight: 700 }}>{tl.studentBadge}</div>;
               if (studentType === "classroom" && !isValidated)
-                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, padding: "4px 0", color: "#f59e0b", fontSize: "0.72rem", fontWeight: 700 }}>{tl.pendingBadge}</div>;
+                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, padding: "4px 0", color: "#f59e0b", fontSize: "0.78rem", fontWeight: 700 }}>{tl.pendingBadge}</div>;
               if (studentType === "group_creator")
-                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 8, padding: "4px 0", color: "#a5b4fc", fontSize: "0.72rem", fontWeight: 700 }}>{tl.groupLeader}</div>;
-              return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "4px 0", color: "rgba(255,255,255,0.56)", fontSize: "0.72rem", fontWeight: 700 }}>Solo</div>;
+                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 8, padding: "4px 0", color: "#a5b4fc", fontSize: "0.78rem", fontWeight: 700 }}>{tl.groupLeader}</div>;
+              return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "4px 0", color: "rgba(255,255,255,0.65)", fontSize: "0.78rem", fontWeight: 700 }}>Solo</div>;
             })()}
             <button
               onClick={handleLogout}
@@ -365,7 +365,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
                   placeholder={tl.searchPlaceholder}
                   style={{
                     flex: 1, background: "transparent", border: "none", outline: "none",
-                    color: "white", fontSize: "0.8rem", fontFamily: "'DM Mono', monospace",
+                    color: "white", fontSize: "1rem", fontFamily: "'DM Mono', monospace",
                     minWidth: 0,
                   }}
                 />

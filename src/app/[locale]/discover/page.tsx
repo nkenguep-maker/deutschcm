@@ -321,12 +321,12 @@ function Av({ initials, size = 38, color = "#10b981" }: { initials: string; size
 
 function LvlBadge({ level }: { level: string }) {
   const c = LEVEL_COLORS[level] ?? "#64748b";
-  return <span style={{ background: `${c}20`, color: c, border: `1px solid ${c}40`, borderRadius: 7, padding: "2px 8px", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{level}</span>;
+  return <span style={{ background: `${c}20`, color: c, border: `1px solid ${c}40`, borderRadius: 7, padding: "2px 8px", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{level}</span>;
 }
 
 function Stars({ rating }: { rating: number }) {
   return (
-    <span style={{ color: "#fbbf24", fontSize: 11 }}>
+    <span style={{ color: "#fbbf24", fontSize: 13 }}>
       {"★".repeat(Math.floor(rating))}
       {rating % 1 >= 0.5 ? "½" : ""}
       <span style={{ color: "rgba(255,255,255,0.2)" }}>{"★".repeat(5 - Math.ceil(rating))}</span>
@@ -339,7 +339,7 @@ function SpotsBar({ current, max, t }: { current: number; max: number; t: TT }) 
   const color = pct >= 90 ? "#ef4444" : pct >= 70 ? "#f59e0b" : "#10b981";
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 10, color: "rgba(255,255,255,0.4)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 13, color: "rgba(255,255,255,0.65)" }}>
         <span>{t.cardSpotsLabel(current, max)}</span>
         <span style={{ color: pct >= 90 ? "#ef4444" : "#10b981", fontWeight: 600 }}>{t.cardSpotsRemaining(max - current)}</span>
       </div>
@@ -368,7 +368,7 @@ function CameroonMap({ onCityClick, t }: { onCityClick: (city: string) => void; 
 
   return (
     <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 16, display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, marginBottom: 12 }}>{t.mapTitle}</div>
+      <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, marginBottom: 12 }}>{t.mapTitle}</div>
       <svg viewBox="0 0 200 300" width={200} height={300} style={{ overflow: "visible" }}>
         <path d="M 30,275 C 40,280 65,285 85,282 L 130,278 C 155,265 175,240 185,210 L 190,175 L 185,145 C 182,120 175,100 165,78 L 152,50 C 140,28 122,10 100,3 L 72,0 C 48,5 25,22 14,50 L 3,82 C 0,108 8,132 12,158 L 16,192 L 22,228 Z"
           fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.25)" strokeWidth="1.5" />
@@ -386,7 +386,7 @@ function CameroonMap({ onCityClick, t }: { onCityClick: (city: string) => void; 
           </g>
         ))}
       </svg>
-      <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 10, color: "rgba(255,255,255,0.60)" }}>
+      <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 13, color: "rgba(255,255,255,0.72)" }}>
         <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", display: "inline-block" }} /> {t.mapLegendClass}</span>
         <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "inline-block" }} /> {t.mapLegendCity}</span>
       </div>
@@ -444,7 +444,7 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 3 }}>
             <span style={{ fontSize: 14 }}>🔑</span>
             <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>{t.joinByCodeTitle}</span>
-            <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>{t.codeSubtitle}</span>
+            <span style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>{t.codeSubtitle}</span>
           </div>
           <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 13, marginBottom: 12 }}>{t.joinByCodeDesc}</div>
         </div>
@@ -454,7 +454,7 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
             onChange={e => { setCode(e.target.value.toUpperCase()); setCodeResult(null); }}
             onKeyDown={e => e.key === "Enter" && code.trim().length >= 4 && handleCodeSearch()}
             placeholder={t.joinByCodePlaceholder}
-            style={{ flex: 1, padding: "10px 12px", borderRadius: 11, background: "rgba(255,255,255,0.06)", border: `1px solid ${codeResult === "notfound" ? "rgba(239,68,68,0.5)" : codeResult ? "rgba(16,185,129,0.5)" : "rgba(255,255,255,0.12)"}`, color: "white", fontSize: 12, outline: "none", fontFamily: "monospace", letterSpacing: "0.04em", boxSizing: "border-box" as const }}
+            style={{ flex: 1, padding: "10px 12px", borderRadius: 11, background: "rgba(255,255,255,0.06)", border: `1px solid ${codeResult === "notfound" ? "rgba(239,68,68,0.5)" : codeResult ? "rgba(16,185,129,0.5)" : "rgba(255,255,255,0.12)"}`, color: "white", fontSize: 16, outline: "none", fontFamily: "monospace", letterSpacing: "0.04em", boxSizing: "border-box" as const }}
           />
           <button onClick={handleCodeSearch} disabled={code.trim().length < 4} style={{ padding: "10px 18px", borderRadius: 11, fontSize: 13, fontWeight: 700, cursor: code.trim().length >= 4 ? "pointer" : "not-allowed", background: code.trim().length >= 4 ? `linear-gradient(135deg,${ac},#059669)` : "rgba(255,255,255,0.05)", color: code.trim().length >= 4 ? "white" : "rgba(255,255,255,0.3)", border: "none", whiteSpace: "nowrap" as const }}>
             {t.joinByCodeBtn} →
@@ -480,9 +480,9 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
                   <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" as const, marginBottom: 3 }}>
                     <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{cls.teacherName}</span>
                     <LvlBadge level={cls.level} />
-                    <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 10, fontWeight: 700 }}>{t.teacherBadge}</span>
+                    <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 13, fontWeight: 700 }}>{t.teacherBadge}</span>
                   </div>
-                  <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>📍 {cls.city} · 📅 {cls.schedule} · {spots > 0 ? t.spotsAvail(spots) : t.spotsFull}</div>
+                  <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>📍 {cls.city} · 📅 {cls.schedule} · {spots > 0 ? t.spotsAvail(spots) : t.spotsFull}</div>
                 </div>
                 <button onClick={() => { if (!sent && spots > 0) { setCodeSent(s => new Set([...s, cls.id])); onJoin(cls.id, `${cls.teacherName} — ${cls.level}`, "class", cls.teacherName); } }} disabled={sent || spots <= 0} style={{ padding: "9px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: (!sent && spots > 0) ? "pointer" : "not-allowed", background: sent ? `${ac}15` : `linear-gradient(135deg,${ac},#059669)`, border: sent ? `1px solid ${ac}40` : "none", color: sent ? ac : "white", whiteSpace: "nowrap" as const }}>
                   {sent ? t.spotsSent : spots <= 0 ? t.spotsFull : t.joinBtn}
@@ -500,9 +500,9 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
                   <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" as const, marginBottom: 3 }}>
                     <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{ctr.name}</span>
                     {ctr.verified && <span>✅</span>}
-                    <span style={{ background: "rgba(234,179,8,0.12)", color: "#fbbf24", borderRadius: 5, padding: "1px 6px", fontSize: 10, fontWeight: 700 }}>{t.centerBadge}</span>
+                    <span style={{ background: "rgba(234,179,8,0.12)", color: "#fbbf24", borderRadius: 5, padding: "1px 6px", fontSize: 13, fontWeight: 700 }}>{t.centerBadge}</span>
                   </div>
-                  <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>📍 {ctr.city} · {ctr.classes} {t.cardClassesLabel}</div>
+                  <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>📍 {ctr.city} · {ctr.classes} {t.cardClassesLabel}</div>
                 </div>
                 <button onClick={() => { if (!sent) { setCodeSent(s => new Set([...s, ctr.id])); onJoin(ctr.id, ctr.name, "center"); } }} disabled={sent} style={{ padding: "9px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: sent ? "not-allowed" : "pointer", background: sent ? "rgba(234,179,8,0.1)" : "linear-gradient(135deg,#eab308,#ca8a04)", border: sent ? "1px solid rgba(234,179,8,0.3)" : "none", color: sent ? "#fbbf24" : "white", whiteSpace: "nowrap" as const }}>
                   {sent ? t.spotsSent : t.joinBtn}
@@ -520,9 +520,9 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
                 <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" as const, marginBottom: 3 }}>
                   <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{grp.name}</span>
                   <LvlBadge level={grp.level} />
-                  <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 10, fontWeight: 700 }}>{t.groupBadge}</span>
+                  <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 13, fontWeight: 700 }}>{t.groupBadge}</span>
                 </div>
-                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>📍 {grp.city} · {t.cardMembers(grp.members, grp.max)} · {grp.schedule}</div>
+                <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>📍 {grp.city} · {t.cardMembers(grp.members, grp.max)} · {grp.schedule}</div>
               </div>
               <button onClick={() => { if (!isFull && !sent) { setCodeSent(s => new Set([...s, grp.id])); onJoin(grp.id, grp.name, "group"); } }} disabled={sent || isFull} style={{ padding: "9px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: (sent || isFull) ? "not-allowed" : "pointer", background: sent ? "rgba(99,102,241,0.1)" : isFull ? "rgba(255,255,255,0.04)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: sent ? "1px solid rgba(99,102,241,0.3)" : isFull ? "1px solid rgba(255,255,255,0.07)" : "none", color: sent ? "#818cf8" : isFull ? "rgba(255,255,255,0.3)" : "white", whiteSpace: "nowrap" as const }}>
                 {sent ? t.spotsSent : isFull ? t.fullBtn : t.joinBtn}
@@ -546,7 +546,7 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
             value={nameQuery}
             onChange={e => setNameQuery(e.target.value)}
             placeholder={t.searchByNamePlaceholder}
-            style={{ width: "100%", padding: "10px 36px 10px 36px", borderRadius: 11, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 13, outline: "none", boxSizing: "border-box" as const }}
+            style={{ width: "100%", padding: "10px 36px 10px 36px", borderRadius: 11, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 16, outline: "none", boxSizing: "border-box" as const }}
             onFocus={e => (e.target.style.borderColor = "rgba(255,255,255,0.3)")}
             onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
           />
@@ -555,7 +555,7 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" as const }}>
           {(["all", "teachers", "centers", "classes", "groups"] as NameFilter[]).map(f => (
-            <button key={f} onClick={() => setNameFilter(f)} style={{ padding: "4px 11px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", background: nameFilter === f ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.04)", border: nameFilter === f ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.07)", color: nameFilter === f ? "white" : "rgba(255,255,255,0.4)" }}>
+            <button key={f} onClick={() => setNameFilter(f)} style={{ padding: "4px 11px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", background: nameFilter === f ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.04)", border: nameFilter === f ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.07)", color: nameFilter === f ? "white" : "rgba(255,255,255,0.65)" }}>
               {nameFilterLabels[f]}
             </button>
           ))}
@@ -563,7 +563,7 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
 
         {nameQuery.length >= 3 && (
           <div style={{ marginTop: 12 }}>
-            <div style={{ color: "rgba(255,255,255,0.56)", fontSize: 13, marginBottom: 8 }}>
+            <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, marginBottom: 8 }}>
               {t.nameResultsLabel(nameResults.length, nameQuery)}
             </div>
             {nameResults.length === 0 ? (
@@ -581,13 +581,13 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
                         <Av initials={cls.teacherAvatar} size={32} color={lc} />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: "flex", gap: 5, alignItems: "center", flexWrap: "wrap" as const }}>
-                            <span style={{ color: "white", fontSize: 12, fontWeight: 700 }}>{cls.teacherName}</span>
+                            <span style={{ color: "white", fontSize: 13, fontWeight: 700 }}>{cls.teacherName}</span>
                             <LvlBadge level={cls.level} />
-                            <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 5px", fontSize: 9, fontWeight: 700 }}>{t.teacherBadge}</span>
+                            <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 5px", fontSize: 13, fontWeight: 700 }}>{t.teacherBadge}</span>
                           </div>
-                          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 10 }}>📍 {cls.city} · {t.cardSpotsRemaining(cls.max - cls.students)}</div>
+                          <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>📍 {cls.city} · {t.cardSpotsRemaining(cls.max - cls.students)}</div>
                         </div>
-                        <button onClick={() => onJoin(cls.id, `${cls.teacherName} — ${cls.level}`, "class", cls.teacherName)} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: "pointer", background: `linear-gradient(135deg,${ac},#059669)`, color: "white", border: "none", whiteSpace: "nowrap" as const }}>{t.seeBtn}</button>
+                        <button onClick={() => onJoin(cls.id, `${cls.teacherName} — ${cls.level}`, "class", cls.teacherName)} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", background: `linear-gradient(135deg,${ac},#059669)`, color: "white", border: "none", whiteSpace: "nowrap" as const }}>{t.seeBtn}</button>
                       </div>
                     );
                   }
@@ -598,12 +598,12 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
                         <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(234,179,8,0.15)", border: "1px solid rgba(234,179,8,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fbbf24", fontWeight: 800, fontSize: 12, flexShrink: 0 }}>{ctr.avatar}</div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
-                            <span style={{ color: "white", fontSize: 12, fontWeight: 700 }}>{ctr.name}</span>
-                            <span style={{ background: "rgba(234,179,8,0.12)", color: "#fbbf24", borderRadius: 5, padding: "1px 5px", fontSize: 9, fontWeight: 700 }}>{t.centerBadge}</span>
+                            <span style={{ color: "white", fontSize: 13, fontWeight: 700 }}>{ctr.name}</span>
+                            <span style={{ background: "rgba(234,179,8,0.12)", color: "#fbbf24", borderRadius: 5, padding: "1px 5px", fontSize: 13, fontWeight: 700 }}>{t.centerBadge}</span>
                           </div>
-                          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 10 }}>📍 {ctr.city} · {ctr.classes} {t.cardClassesLabel}</div>
+                          <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>📍 {ctr.city} · {ctr.classes} {t.cardClassesLabel}</div>
                         </div>
-                        <button onClick={() => onJoin(ctr.id, ctr.name, "center")} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg,#eab308,#ca8a04)", color: "white", border: "none", whiteSpace: "nowrap" as const }}>{t.seeBtn}</button>
+                        <button onClick={() => onJoin(ctr.id, ctr.name, "center")} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg,#eab308,#ca8a04)", color: "white", border: "none", whiteSpace: "nowrap" as const }}>{t.seeBtn}</button>
                       </div>
                     );
                   }
@@ -614,13 +614,13 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
                       <Av initials={grp.creatorAvatar} size={32} color="#6366f1" />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: "flex", gap: 5, alignItems: "center", flexWrap: "wrap" as const }}>
-                          <span style={{ color: "white", fontSize: 12, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, maxWidth: 120 }}>{grp.name}</span>
+                          <span style={{ color: "white", fontSize: 13, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, maxWidth: 120 }}>{grp.name}</span>
                           <LvlBadge level={grp.level} />
-                          <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 5px", fontSize: 9, fontWeight: 700 }}>{t.groupBadge}</span>
+                          <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 5px", fontSize: 13, fontWeight: 700 }}>{t.groupBadge}</span>
                         </div>
-                        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 10 }}>📍 {grp.city} · {t.cardMembers(grp.members, grp.max)}</div>
+                        <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>📍 {grp.city} · {t.cardMembers(grp.members, grp.max)}</div>
                       </div>
-                      <button onClick={() => onJoin(grp.id, grp.name, "group")} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", border: "none", whiteSpace: "nowrap" as const }}>{t.seeBtn}</button>
+                      <button onClick={() => onJoin(grp.id, grp.name, "group")} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", border: "none", whiteSpace: "nowrap" as const }}>{t.seeBtn}</button>
                     </div>
                   );
                 })}
@@ -651,11 +651,11 @@ function OnboardingOverlay({ onClose, t }: { onClose: () => void; t: TT }) {
           {steps.map((_, i) => <div key={i} style={{ width: i === step ? 20 : 6, height: 6, borderRadius: 3, background: i === step ? "#10b981" : "rgba(255,255,255,0.15)", transition: "width 0.3s" }} />)}
         </div>
         <h3 style={{ color: "white", fontSize: 18, fontWeight: 800, margin: "0 0 10px" }}>{current.title}</h3>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>{current.desc}</p>
+        <p style={{ color: "rgba(255,255,255,0.78)", fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>{current.desc}</p>
         <div style={{ display: "flex", gap: 10 }}>
           {step < steps.length - 1 ? (
             <>
-              <button onClick={onClose} style={{ flex: 1, padding: "11px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)", fontSize: 13, cursor: "pointer" }}>{t.onboardSkip}</button>
+              <button onClick={onClose} style={{ flex: 1, padding: "11px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.72)", fontSize: 13, cursor: "pointer" }}>{t.onboardSkip}</button>
               <button onClick={() => setStep(s => s + 1)} style={{ flex: 2, padding: "11px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", color: "white", border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{t.onboardNext}</button>
             </>
           ) : (
@@ -678,7 +678,7 @@ function FilterSidebar({ filters, onChange, onReset, count, t }: { filters: Filt
   };
 
   const Chip = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
-    <button onClick={onClick} style={{ padding: "5px 10px", borderRadius: 8, fontSize: 11, fontWeight: 600, cursor: "pointer", background: active ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)", border: active ? "1px solid rgba(16,185,129,0.4)" : "1px solid rgba(255,255,255,0.07)", color: active ? "#10b981" : "rgba(255,255,255,0.45)", transition: "all 0.15s" }}>
+    <button onClick={onClick} style={{ padding: "5px 10px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", background: active ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)", border: active ? "1px solid rgba(16,185,129,0.4)" : "1px solid rgba(255,255,255,0.07)", color: active ? "#10b981" : "rgba(255,255,255,0.65)", transition: "all 0.15s" }}>
       {label}
     </button>
   );
@@ -688,8 +688,8 @@ function FilterSidebar({ filters, onChange, onReset, count, t }: { filters: Filt
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>{t.filterSidebarLabel}</span>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <span style={{ background: "rgba(16,185,129,0.15)", color: "#10b981", borderRadius: 8, padding: "2px 8px", fontSize: 11, fontWeight: 700 }}>{t.filterResultsLabel(count)}</span>
-          <button onClick={onReset} style={{ color: "rgba(255,255,255,0.60)", fontSize: 11, background: "none", border: "none", cursor: "pointer" }}>{t.filterReset}</button>
+          <span style={{ background: "rgba(16,185,129,0.15)", color: "#10b981", borderRadius: 8, padding: "2px 8px", fontSize: 13, fontWeight: 700 }}>{t.filterResultsLabel(count)}</span>
+          <button onClick={onReset} style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, background: "none", border: "none", cursor: "pointer" }}>{t.filterReset}</button>
         </div>
       </div>
 
@@ -699,7 +699,7 @@ function FilterSidebar({ filters, onChange, onReset, count, t }: { filters: Filt
         { label: t.filterAvailability, key: "availability" as const, items: t.availList },
       ].map(section => (
         <div key={section.key} style={{ marginBottom: 16 }}>
-          <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{section.label}</div>
+          <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{section.label}</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
             {section.items.map(item => (
               <Chip key={item} label={item} active={filters[section.key].includes(item)} onClick={() => toggle(section.key, item)} />
@@ -717,7 +717,7 @@ function FilterSidebar({ filters, onChange, onReset, count, t }: { filters: Filt
             <div onClick={() => onChange({ ...filters, [opt.key]: !filters[opt.key as keyof Filters] })} style={{ width: 16, height: 16, borderRadius: 4, border: "1px solid rgba(255,255,255,0.2)", background: filters[opt.key as keyof Filters] ? "#10b981" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
               {filters[opt.key as keyof Filters] && <span style={{ color: "white", fontSize: 10 }}>✓</span>}
             </div>
-            <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 11 }}>{opt.label}</span>
+            <span style={{ color: "rgba(255,255,255,0.72)", fontSize: 13 }}>{opt.label}</span>
           </label>
         ))}
       </div>
@@ -748,7 +748,7 @@ function ClassCard({ cls, recommended, onJoin, faved, onFav, sent, t }: { cls: C
       boxShadow: hovered ? "0 12px 40px rgba(0,0,0,0.3)" : "none",
       transition: "all 0.25s ease", position: "relative",
     }}>
-      {recommended && <div style={{ position: "absolute", top: -8, left: 16, background: "#f59e0b", color: "#000", fontSize: 10, fontWeight: 800, padding: "2px 10px", borderRadius: 99, letterSpacing: "0.05em" }}>{t.cardRecommended}</div>}
+      {recommended && <div style={{ position: "absolute", top: -8, left: 16, background: "#f59e0b", color: "#000", fontSize: 12, fontWeight: 800, padding: "2px 10px", borderRadius: 99, letterSpacing: "0.05em" }}>{t.cardRecommended}</div>}
 
       <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
         <Av initials={cls.teacherAvatar} size={44} color="#6366f1" />
@@ -756,11 +756,11 @@ function ClassCard({ cls, recommended, onJoin, faved, onFav, sent, t }: { cls: C
           <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", marginBottom: 2 }}>
             <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{cls.teacherName}</span>
             {cls.verified && <span title="✅" style={{ fontSize: 12 }}>✅</span>}
-            {cls.isOnline && <span style={{ background: "rgba(99,102,241,0.15)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 10 }}>{t.cardOnline}</span>}
+            {cls.isOnline && <span style={{ background: "rgba(99,102,241,0.15)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 13 }}>{t.cardOnline}</span>}
           </div>
-          <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 11 }}>🏛️ {cls.center} · 📍 {cls.city}</div>
+          <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13 }}>🏛️ {cls.center} · 📍 {cls.city}</div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
-            <code style={{ fontSize: 9, color: "rgba(255,255,255,0.28)", letterSpacing: "0.03em" }}>{cls.code}</code>
+            <code style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", letterSpacing: "0.03em" }}>{cls.code}</code>
             <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(cls.code).catch(() => {}); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 9, opacity: 0.4, lineHeight: 1 }} title={t.cardProgram}>📋</button>
           </div>
         </div>
@@ -776,15 +776,15 @@ function ClassCard({ cls, recommended, onJoin, faved, onFav, sent, t }: { cls: C
 
       <SpotsBar current={cls.students} max={cls.max} t={t} />
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 13, color: "rgba(255,255,255,0.65)" }}>
         <div>📅 {cls.schedule}</div>
         <div style={{ color: "#10b981" }}>⏭ {cls.nextSession}</div>
         <div style={{ display: "flex", gap: 4, alignItems: "center" }}><Stars rating={cls.rating} /> <span>{cls.rating} ({cls.reviews})</span></div>
-        <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 10 }}>🕐 {cls.lastActive}</div>
+        <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 13 }}>🕐 {cls.lastActive}</div>
       </div>
 
       <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-        {cls.tags.map(tag => <span key={tag} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 5, padding: "1px 7px", fontSize: 10, color: "rgba(255,255,255,0.4)" }}>#{tag}</span>)}
+        {cls.tags.map(tag => <span key={tag} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 5, padding: "1px 7px", fontSize: 13, color: "rgba(255,255,255,0.65)" }}>#{tag}</span>)}
       </div>
 
       <div style={{ display: "flex", gap: 8 }}>
@@ -833,9 +833,9 @@ function CenterCard({ center, onJoin, faved, onFav, sent, t }: { center: CenterI
             <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{center.name}</span>
             {center.verified && <span title="Vérifié" style={{ fontSize: 12 }}>✅</span>}
           </div>
-          <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 11 }}>📍 {center.city}, {center.region} · {center.yearsActive} ans</div>
+          <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13 }}>📍 {center.city}, {center.region} · {center.yearsActive} ans</div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
-            <code style={{ fontSize: 9, color: "rgba(255,255,255,0.28)", letterSpacing: "0.03em" }}>{center.code}</code>
+            <code style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", letterSpacing: "0.03em" }}>{center.code}</code>
             <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(center.code).catch(() => {}); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 9, opacity: 0.4, lineHeight: 1 }}>📋</button>
           </div>
         </div>
@@ -851,7 +851,7 @@ function CenterCard({ center, onJoin, faved, onFav, sent, t }: { center: CenterI
         {[{ v: center.teachers, l: t.cardTeachersLabel }, { v: center.students, l: t.cardStudentsLabel }, { v: center.classes, l: t.cardClassesLabel }].map(s => (
           <div key={s.l} style={{ textAlign: "center", background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: "8px 4px" }}>
             <div style={{ color: "#fbbf24", fontWeight: 800, fontSize: 16 }}>{s.v}</div>
-            <div style={{ color: "rgba(255,255,255,0.56)", fontSize: 10 }}>{s.l}</div>
+            <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13 }}>{s.l}</div>
           </div>
         ))}
       </div>
@@ -900,9 +900,9 @@ function GroupCard({ group, onJoin, faved, onFav, sent, t }: { group: GroupItem;
         <Av initials={group.creatorAvatar} size={40} color="#6366f1" />
         <div style={{ flex: 1 }}>
           <div style={{ color: "white", fontWeight: 700, fontSize: 14, marginBottom: 2 }}>{group.name}</div>
-          <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 11 }}>{t.cardGroupBy} {group.creatorName} · 📍 {group.city}</div>
+          <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13 }}>{t.cardGroupBy} {group.creatorName} · 📍 {group.city}</div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
-            <code style={{ fontSize: 9, color: "rgba(255,255,255,0.28)", letterSpacing: "0.03em" }}>{group.code}</code>
+            <code style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", letterSpacing: "0.03em" }}>{group.code}</code>
             <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(group.code).catch(() => {}); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 9, opacity: 0.4, lineHeight: 1 }}>📋</button>
           </div>
         </div>
@@ -921,17 +921,17 @@ function GroupCard({ group, onJoin, faved, onFav, sent, t }: { group: GroupItem;
           ))}
           {group.members > 5 && <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "2px solid #0d1117", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.5)", fontSize: 9, marginLeft: -8, zIndex: 0 }}>+{group.members - 5}</div>}
         </div>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{t.cardMembers(group.members, group.max)}</div>
+        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)" }}>{t.cardMembers(group.members, group.max)}</div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4, fontSize: 11 }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: isActive ? "#10b981" : "rgba(255,255,255,0.2)", display: "inline-block", flexShrink: 0 }} />
-          <span style={{ color: "rgba(255,255,255,0.60)" }}>{group.lastActive}</span>
+          <span style={{ color: "rgba(255,255,255,0.72)" }}>{group.lastActive}</span>
         </div>
       </div>
 
       <SpotsBar current={group.members} max={group.max} t={t} />
 
-      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
-        <div style={{ marginBottom: 4 }}>🎯 <strong style={{ color: "rgba(255,255,255,0.6)" }}>{group.goal}</strong></div>
+      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)" }}>
+        <div style={{ marginBottom: 4 }}>🎯 <strong style={{ color: "rgba(255,255,255,0.85)" }}>{group.goal}</strong></div>
         <div>📅 {group.schedule}</div>
       </div>
 
@@ -969,7 +969,7 @@ function SoloCard({ student, onInvite, invited, t }: { student: SoloItem; onInvi
         <Av initials={student.avatar} size={44} color="#f59e0b" />
         <div style={{ flex: 1 }}>
           <div style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{student.name}</div>
-          <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 11 }}>📍 {student.city}</div>
+          <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13 }}>📍 {student.city}</div>
         </div>
         <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
           <LvlBadge level={student.level} />
@@ -980,7 +980,7 @@ function SoloCard({ student, onInvite, invited, t }: { student: SoloItem; onInvi
 
       <p style={{ margin: 0, color: "rgba(255,255,255,0.75)", fontSize: 13, lineHeight: 1.6, fontStyle: "italic" }}>&ldquo;{student.desc}&rdquo;</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 13, color: "rgba(255,255,255,0.65)" }}>
         <div>🎯 {student.goal}</div>
         <div>⏰ {student.availability}</div>
       </div>
@@ -1190,10 +1190,10 @@ export default function DiscoverPage() {
             </p>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={() => setShowFilters(f => !f)} style={{ padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: "pointer", background: showFilters ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.05)", border: showFilters ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.08)", color: showFilters ? accentColor : "rgba(255,255,255,0.5)" }}>
+            <button onClick={() => setShowFilters(f => !f)} style={{ padding: "7px 14px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", background: showFilters ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.05)", border: showFilters ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.08)", color: showFilters ? accentColor : "rgba(255,255,255,0.72)" }}>
               {t.filtersBtn}
             </button>
-            <button onClick={() => setViewMode(v => v === "list" ? "map" : "list")} style={{ padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: "pointer", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
+            <button onClick={() => setViewMode(v => v === "list" ? "map" : "list")} style={{ padding: "7px 14px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.72)" }}>
               {viewMode === "list" ? t.mapBtnList : t.mapBtnGrid}
             </button>
           </div>
@@ -1205,7 +1205,7 @@ export default function DiscoverPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder={t.searchPlaceholder}
-            style={{ width: "100%", padding: "11px 14px 11px 38px", borderRadius: 12, boxSizing: "border-box", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 13, outline: "none", transition: "border-color 0.2s" }}
+            style={{ width: "100%", padding: "11px 14px 11px 38px", borderRadius: 12, boxSizing: "border-box", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 16, outline: "none", transition: "border-color 0.2s" }}
             onFocus={e => e.target.style.borderColor = "rgba(16,185,129,0.5)"}
             onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
           />
@@ -1217,8 +1217,8 @@ export default function DiscoverPage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
             {tabs.map(tb => (
-              <button key={tb.key} onClick={() => setTab(tb.key)} style={{ padding: "6px 12px", borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: "pointer", background: tab === tb.key ? `${accentColor}18` : "rgba(255,255,255,0.04)", border: tab === tb.key ? `1px solid ${accentColor}40` : "1px solid rgba(255,255,255,0.07)", color: tab === tb.key ? accentColor : "rgba(255,255,255,0.5)" }}>
-                {tb.label} <span style={{ opacity: 0.6, fontSize: 11 }}>({tb.count})</span>
+              <button key={tb.key} onClick={() => setTab(tb.key)} style={{ padding: "6px 12px", borderRadius: 99, fontSize: 13, fontWeight: 600, cursor: "pointer", background: tab === tb.key ? `${accentColor}18` : "rgba(255,255,255,0.04)", border: tab === tb.key ? `1px solid ${accentColor}40` : "1px solid rgba(255,255,255,0.07)", color: tab === tb.key ? accentColor : "rgba(255,255,255,0.72)" }}>
+                {tb.label} <span style={{ opacity: 0.7, fontSize: 13 }}>({tb.count})</span>
               </button>
             ))}
             {/* Learning partners — coming soon (non-interactive) */}
@@ -1247,7 +1247,7 @@ export default function DiscoverPage() {
       {viewMode === "map" ? (
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "220px 1fr", gap: 20 }}>
           <CameroonMap onCityClick={(city) => { setFilters(f => ({ ...f, cities: [city] })); setViewMode("list"); }} t={t} />
-          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
+          <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
             {t.mapClickNote}
           </div>
         </div>
@@ -1382,7 +1382,7 @@ export default function DiscoverPage() {
               {selectedItem.type === "group" ? t.modalJoinGroup : selectedItem.type === "center" ? t.modalJoinCenter : t.modalJoinClass}
             </h2>
             <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: "0 0 20px" }}>{selectedItem.name}</p>
-            <label style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", display: "block", marginBottom: 8 }}>
+            <label style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, textTransform: "uppercase", letterSpacing: "0.1em", display: "block", marginBottom: 8 }}>
               {t.modalMsgLabel}
             </label>
             <textarea
@@ -1390,7 +1390,7 @@ export default function DiscoverPage() {
               onChange={e => setMessageText(e.target.value)}
               placeholder={t.modalMsgPlaceholder}
               rows={4}
-              style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: 12, color: "white", fontSize: 13, resize: "none", outline: "none", marginBottom: 20, boxSizing: "border-box" }}
+              style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: 12, color: "white", fontSize: 16, resize: "none", outline: "none", marginBottom: 20, boxSizing: "border-box" }}
             />
             <div style={{ display: "flex", gap: 12 }}>
               <button
@@ -1415,7 +1415,7 @@ export default function DiscoverPage() {
                 style={{ flex: 1, padding: "14px", borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", opacity: sending ? 0.7 : 1 }}>
                 {sending ? t.modalSending : t.modalSend}
               </button>
-              <button onClick={() => setModalOpen(false)} style={{ padding: "14px 20px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: 13 }}>
+              <button onClick={() => setModalOpen(false)} style={{ padding: "14px 20px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.72)", cursor: "pointer", fontSize: 14 }}>
                 {t.modalCancel}
               </button>
             </div>

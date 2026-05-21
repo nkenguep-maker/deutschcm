@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Layout from "@/components/Layout";
-import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 export default function StudentSettingsPage() {
   const [fullName, setFullName] = useState("Fatima Oumarou");
@@ -38,7 +37,7 @@ export default function StudentSettingsPage() {
 
   const Field = ({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (v: string) => void; type?: string }) => (
     <div>
-      <label style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.72rem", display: "block", marginBottom: 6 }}>{label}</label>
+      <label style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.88rem", display: "block", marginBottom: 6 }}>{label}</label>
       <input
         type={type}
         value={value}
@@ -46,7 +45,7 @@ export default function StudentSettingsPage() {
         style={{
           width: "100%", padding: "10px 14px", borderRadius: 10,
           background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-          color: "white", fontSize: "0.82rem", outline: "none", boxSizing: "border-box",
+          color: "white", fontSize: "1rem", outline: "none", boxSizing: "border-box",
           fontFamily: "'DM Mono', monospace",
         }}
         onFocus={e => (e.target.style.borderColor = "rgba(16,185,129,0.5)")}
@@ -71,9 +70,9 @@ export default function StudentSettingsPage() {
             }}>{initials}</div>
             <div>
               <div style={{ color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>{fullName}</div>
-              <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.7rem" }}>Apprenant · Niveau {level} · {city}</div>
+              <div style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.85rem" }}>Apprenant · Niveau {level} · {city}</div>
             </div>
-            <span style={{ marginLeft: "auto", padding: "3px 10px", borderRadius: 20, background: "rgba(16,185,129,0.12)", color: "#10b981", border: "1px solid rgba(16,185,129,0.25)", fontSize: "0.65rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>✓ Inscrit</span>
+            <span style={{ marginLeft: "auto", padding: "3px 10px", borderRadius: 20, background: "rgba(16,185,129,0.12)", color: "#10b981", border: "1px solid rgba(16,185,129,0.25)", fontSize: "0.78rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>✓ Inscrit</span>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -81,14 +80,14 @@ export default function StudentSettingsPage() {
             <Field label="Adresse email" value={email} onChange={setEmail} type="email" />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div>
-                <label style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.72rem", display: "block", marginBottom: 6 }}>Niveau actuel</label>
+                <label style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.88rem", display: "block", marginBottom: 6 }}>Niveau actuel</label>
                 <select
                   value={level}
                   onChange={e => setLevel(e.target.value)}
                   style={{
                     width: "100%", padding: "10px 14px", borderRadius: 10,
                     background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-                    color: "white", fontSize: "0.82rem", outline: "none",
+                    color: "white", fontSize: "1rem", outline: "none",
                     fontFamily: "'DM Mono', monospace",
                   }}
                 >
@@ -112,13 +111,6 @@ export default function StudentSettingsPage() {
           >
             {saved ? "✓ Sauvegardé" : "Enregistrer les modifications"}
           </button>
-        </div>
-
-        {/* Appearance */}
-        <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
-          <h3 style={{ margin: "0 0 6px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>Apparence</h3>
-          <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.35)", fontSize: "0.72rem" }}>Choisissez le mode d'affichage. Auto suit vos préférences système.</p>
-          <ThemeSwitcher />
         </div>
 
         {/* Notifications */}
@@ -148,15 +140,15 @@ export default function StudentSettingsPage() {
 
         {/* Legal links */}
         <div style={{ padding: "16px 24px", borderRadius: 16, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", marginBottom: 20, display: "flex", gap: 20, flexWrap: "wrap" }}>
-          <a href="/privacy" style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", textDecoration: "none" }}>Politique de confidentialité</a>
-          <a href="/terms" style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", textDecoration: "none" }}>Conditions d'utilisation</a>
-          <a href="mailto:privacy@yema.app" style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", textDecoration: "none" }}>Demander mes données</a>
+          <a href="/privacy" style={{ color: "rgba(255,255,255,0.60)", fontSize: "0.82rem", textDecoration: "none" }}>Politique de confidentialité</a>
+          <a href="/terms" style={{ color: "rgba(255,255,255,0.60)", fontSize: "0.82rem", textDecoration: "none" }}>Conditions d'utilisation</a>
+          <a href="mailto:privacy@yema.app" style={{ color: "rgba(255,255,255,0.60)", fontSize: "0.82rem", textDecoration: "none" }}>Demander mes données</a>
         </div>
 
         {/* Danger zone */}
         <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(239,68,68,0.2)" }}>
           <h3 style={{ margin: "0 0 8px", color: "#ef4444", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>Zone dangereuse</h3>
-          <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.3)", fontSize: "0.72rem" }}>
+          <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.65)", fontSize: "0.84rem" }}>
             La suppression du compte est irréversible. Toutes tes données de progression seront effacées dans les 30 jours, conformément à notre politique de confidentialité.
           </p>
 
@@ -174,7 +166,7 @@ export default function StudentSettingsPage() {
               <p style={{ margin: "0 0 12px", color: "#f87171", fontSize: "0.78rem", fontWeight: 600 }}>
                 Confirmer la suppression ?
               </p>
-              <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.4)", fontSize: "0.7rem" }}>
+              <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.65)", fontSize: "0.84rem" }}>
                 Cette action est définitive. Tes données seront supprimées dans les 30 jours.
               </p>
               <div style={{ display: "flex", gap: 10 }}>
@@ -213,7 +205,7 @@ function NotifToggle({ label, defaultOn }: { label: string; defaultOn: boolean }
   const [on, setOn] = useState(defaultOn);
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-      <span style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.78rem" }}>{label}</span>
+      <span style={{ color: "rgba(255,255,255,0.75)", fontSize: "0.88rem" }}>{label}</span>
       <button onClick={() => setOn(!on)} style={{
         width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
         background: on ? "#10b981" : "rgba(255,255,255,0.1)", position: "relative", transition: "background 0.2s",

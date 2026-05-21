@@ -185,7 +185,7 @@ function CourseCard({ course, locale, t }: { course: Course; locale: Locale; t: 
             {course.titleDE}
             {course.progress === 100 && <span style={{ color: "#10b981", marginLeft: 6 }}>✓</span>}
           </p>
-          <p style={{ margin: "3px 0 0", color: "rgba(255,255,255,0.62)", fontSize: "0.82rem" }}>
+          <p style={{ margin: "3px 0 0", color: "rgba(255,255,255,0.72)", fontSize: "0.85rem" }}>
             {description}
           </p>
         </div>
@@ -193,20 +193,20 @@ function CourseCard({ course, locale, t }: { course: Course; locale: Locale; t: 
 
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
         <span style={{
-          fontSize: "0.62rem", padding: "2px 8px", borderRadius: 6,
+          fontSize: "0.75rem", padding: "2px 8px", borderRadius: 6,
           background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}`,
         }}>
           {course.level}
         </span>
         <span style={{
-          fontSize: "0.62rem", padding: "2px 8px", borderRadius: 6,
-          background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)",
+          fontSize: "0.75rem", padding: "2px 8px", borderRadius: 6,
+          background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.65)",
         }}>
           {tag}
         </span>
         <span style={{
-          fontSize: "0.62rem", padding: "2px 8px", borderRadius: 6,
-          background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)",
+          fontSize: "0.75rem", padding: "2px 8px", borderRadius: 6,
+          background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.65)",
         }}>
           {course.modules} {t.modulesLabel}
         </span>
@@ -222,7 +222,7 @@ function CourseCard({ course, locale, t }: { course: Course; locale: Locale; t: 
               boxShadow: course.progress > 0 ? `0 0 8px ${cfg.color}55` : "none",
             }} />
           </div>
-          <p style={{ margin: "5px 0 0", color: "rgba(255,255,255,0.52)", fontSize: "0.78rem" }}>
+          <p style={{ margin: "5px 0 0", color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>
             {course.progress === 0
               ? t.statusNotStarted
               : course.progress === 100
@@ -231,7 +231,7 @@ function CourseCard({ course, locale, t }: { course: Course; locale: Locale; t: 
           </p>
         </div>
       ) : (
-        <p style={{ margin: 0, color: "rgba(255,255,255,0.50)", fontSize: "0.80rem" }}>
+        <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>
           {t.unlockHint}
         </p>
       )}
@@ -270,17 +270,17 @@ function LevelSection({ level, courses, isMobile, locale, t }: {
                 {meta.title}
               </p>
               {meta.recommended && (
-                <span style={{ fontSize: "0.6rem", padding: "2px 10px", borderRadius: 99, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#10b981", fontWeight: 700, letterSpacing: "0.06em" }}>
+                <span style={{ fontSize: "0.75rem", padding: "2px 10px", borderRadius: 99, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#10b981", fontWeight: 700, letterSpacing: "0.06em" }}>
                   ✦ Beta
                 </span>
               )}
             </div>
-            <p style={{ margin: "0 0 8px", color: "rgba(255,255,255,0.68)", fontSize: "0.84rem", lineHeight: 1.5 }}>
+            <p style={{ margin: "0 0 8px", color: "rgba(255,255,255,0.78)", fontSize: "0.86rem", lineHeight: 1.5 }}>
               {meta.subtitle}
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
               <span style={{
-                fontSize: "0.62rem", padding: "2px 10px", borderRadius: 6,
+                fontSize: "0.75rem", padding: "2px 10px", borderRadius: 6,
                 background: isLocked ? "rgba(255,255,255,0.04)" : cfg.bg,
                 color: isLocked ? "rgba(255,255,255,0.25)" : cfg.color,
                 border: `1px solid ${isLocked ? "rgba(255,255,255,0.07)" : cfg.border}`,
@@ -289,7 +289,7 @@ function LevelSection({ level, courses, isMobile, locale, t }: {
                 {meta.status}
               </span>
               {!isLocked && (
-                <span style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.80rem" }}>
+                <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>
                   {done}/{courses.length} · {t.levelBadge}
                 </span>
               )}
@@ -330,15 +330,15 @@ function JourneyBlock({ t }: { t: typeof T["fr"] }) {
       <p style={{ margin: "0 0 6px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>
         {t.journeyTitle}
       </p>
-      <p style={{ margin: "0 0 14px", color: "rgba(255,255,255,0.68)", fontSize: "0.86rem", lineHeight: 1.6 }}>
+      <p style={{ margin: "0 0 14px", color: "rgba(255,255,255,0.78)", fontSize: "0.88rem", lineHeight: 1.6 }}>
         {t.journeyText}
       </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         {pillars.map((p, i) => (
           <span key={i} style={{
-            fontSize: "0.68rem", padding: "4px 12px", borderRadius: 8,
+            fontSize: "0.78rem", padding: "4px 12px", borderRadius: 8,
             background: `${p.color}08`, border: `1px solid ${p.color}20`,
-            color: "rgba(255,255,255,0.55)",
+            color: "rgba(255,255,255,0.72)",
           }}>
             <span style={{ color: p.color, fontWeight: 700, marginRight: 4 }}>✦</span>
             {p.text}
@@ -441,7 +441,7 @@ export default function CoursesPage() {
             <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.7rem" }}>
               {t.pageTitle}
             </h2>
-            <p style={{ margin: "6px 0 0", color: "rgba(255,255,255,0.60)", fontSize: "0.88rem" }}>
+            <p style={{ margin: "6px 0 0", color: "rgba(255,255,255,0.72)", fontSize: "0.88rem" }}>
               {t.coursesDone(done, totalUnlocked)}
             </p>
           </div>
@@ -460,7 +460,7 @@ export default function CoursesPage() {
                     opacity: allCourses.filter(c => c.level === l && !c.locked).length === 0 ? 0.4 : 1,
                   }}>
                     <p style={{ margin: 0, color: cfg.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1rem" }}>{l}</p>
-                    <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.3)", fontSize: "0.58rem" }}>{lvlDone}/{lvlTotal}</p>
+                    <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.65)", fontSize: "0.75rem" }}>{lvlDone}/{lvlTotal}</p>
                   </div>
                 );
               })}
@@ -485,7 +485,7 @@ export default function CoursesPage() {
                 padding: "8px 18px", borderRadius: 10, cursor: "pointer",
                 fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.8rem",
                 background: active ? (cfg ? cfg.bg : "rgba(255,255,255,0.1)") : "rgba(255,255,255,0.04)",
-                color: active ? (cfg ? cfg.color : "white") : "rgba(255,255,255,0.4)",
+                color: active ? (cfg ? cfg.color : "white") : "rgba(255,255,255,0.65)",
                 border: active ? `1px solid ${cfg ? cfg.border : "rgba(255,255,255,0.2)"}` : "1px solid rgba(255,255,255,0.06)",
                 transition: "all 0.15s ease",
               }}
@@ -500,10 +500,10 @@ export default function CoursesPage() {
       {filtered.length === 0 ? (
         <div style={{ textAlign: "center", padding: "60px 20px" }}>
           <p style={{ fontSize: "2.5rem", marginBottom: 12 }}>🔍</p>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontFamily: "'Syne', sans-serif", fontSize: "0.95rem", margin: "0 0 6px" }}>
+          <p style={{ color: "rgba(255,255,255,0.78)", fontFamily: "'Syne', sans-serif", fontSize: "0.95rem", margin: "0 0 6px" }}>
             {t.noResults}
           </p>
-          <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.86rem", margin: 0 }}>
+          <p style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.86rem", margin: 0 }}>
             {t.noResultsSub}
           </p>
         </div>
@@ -522,7 +522,7 @@ export default function CoursesPage() {
 
       {/* ── Disclaimer ── */}
       <div style={{ marginTop: 48, padding: "14px 20px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", textAlign: "center" }}>
-        <p style={{ color: "rgba(255,255,255,0.50)", fontSize: "0.80rem", margin: 0, lineHeight: 1.6 }}>
+        <p style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", margin: 0, lineHeight: 1.6 }}>
           {t.disclaimer}
         </p>
       </div>

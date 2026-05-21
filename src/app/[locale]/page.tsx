@@ -195,16 +195,16 @@ export default function LandingPage() {
               {t.ctaSecondary}
             </button>
           </div>
-          <p className="fade-up" style={{ color: "rgba(255,255,255,0.48)", fontSize: 11, marginTop: 8, marginBottom: 44, letterSpacing: "0.03em" }}>
+          <p className="fade-up" style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, marginTop: 8, marginBottom: 44, letterSpacing: "0.03em" }}>
             {t.ctaMicro}
           </p>
 
           {/* Stats */}
           <div className="fade-up" style={{ display: "flex", gap: isMobile ? 24 : 40, justifyContent: "center", flexWrap: "wrap", paddingTop: 4 }}>
             {stats.map((stat, i) => (
-              <div key={i} style={{ textAlign: "center", minWidth: isMobile ? 64 : 80 }}>
-                <div style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 24 : 28, fontWeight: 800, color: "#10b981", lineHeight: 1.1 }}>{stat.value}</div>
-                <div style={{ fontSize: isMobile ? 11 : 11, color: "rgba(255,255,255,0.62)", marginTop: 4, lineHeight: 1.3 }}>{stat.label}</div>
+              <div key={i} style={{ textAlign: "center", minWidth: isMobile ? 64 : 80, maxWidth: isMobile ? 120 : 160 }}>
+                <div style={{ fontFamily: "'Syne',sans-serif", fontSize: stat.value.length > 4 ? (isMobile ? 14 : 16) : (isMobile ? 24 : 28), fontWeight: 800, color: "#10b981", lineHeight: 1.2 }}>{stat.value}</div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.70)", marginTop: 4, lineHeight: 1.3 }}>{stat.label}</div>
               </div>
             ))}
           </div>
@@ -218,7 +218,7 @@ export default function LandingPage() {
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 28 : 36, fontWeight: 800, marginBottom: 12 }}>
               {t.visionTitle}
             </h2>
-            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, maxWidth: 560, margin: "0 auto" }}>
+            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 16, maxWidth: 560, margin: "0 auto" }}>
               {t.visionSubtitle}
             </p>
           </div>
@@ -230,7 +230,7 @@ export default function LandingPage() {
             ].map((v, i) => (
               <div key={i} style={{ padding: "28px 24px", borderRadius: 18, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(16,185,129,0.12)", position: "relative", overflow: "hidden" }}>
                 <div style={{ position: "absolute", top: 16, right: 20, fontFamily: "'Syne',sans-serif", fontSize: 40, fontWeight: 900, color: "rgba(16,185,129,0.08)" }}>{v.num}</div>
-                <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, display: "block", marginBottom: 10 }}>{v.label}</span>
+                <span style={{ fontSize: 12, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, display: "block", marginBottom: 10 }}>{v.label}</span>
                 <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800, margin: "0 0 12px" }}>{v.title}</h3>
                 <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 14, lineHeight: 1.7, margin: 0 }}>{v.desc}</p>
               </div>
@@ -245,7 +245,7 @@ export default function LandingPage() {
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12 }}>
             {t.featuresTitle}
           </h2>
-          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15 }}>
+          <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 16 }}>
             {t.featuresSubtitle}
           </p>
         </div>
@@ -273,7 +273,7 @@ export default function LandingPage() {
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12 }}>
               {t.levelsTitle}
             </h2>
-            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15 }}>
+            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 16 }}>
               {t.levelsSubtitle}
             </p>
           </div>
@@ -327,7 +327,7 @@ export default function LandingPage() {
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "center" }}>
           <div>
-            <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t.simTitle}</span>
+            <span style={{ fontSize: 12, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t.simTitle}</span>
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2 }}>
               {t.simHeadline}
             </h2>
@@ -338,7 +338,7 @@ export default function LandingPage() {
               {[t.simVisa1, t.simVisa2, t.simVisa3, t.simVisa4, t.simVisa5].map((s, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ color: "#10b981", fontSize: 12 }}>✓</span>
-                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>{s}</span>
+                  <span style={{ fontSize: 14, color: "rgba(255,255,255,0.78)" }}>{s}</span>
                 </div>
               ))}
             </div>
@@ -353,8 +353,8 @@ export default function LandingPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, paddingBottom: 12, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
               <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🏛️</div>
               <div>
-                <p style={{ color: "white", fontSize: 12, fontWeight: 700, margin: 0 }}>Herr Klaus Bauer</p>
-                <p style={{ color: "#10b981", fontSize: 9, margin: 0 }}>{t.simConsulOnline}</p>
+                <p style={{ color: "white", fontSize: 13, fontWeight: 700, margin: 0 }}>Herr Klaus Bauer</p>
+                <p style={{ color: "#10b981", fontSize: 12, margin: 0 }}>{t.simConsulOnline}</p>
               </div>
             </div>
             {[
@@ -365,7 +365,7 @@ export default function LandingPage() {
               <div key={i} style={{ marginBottom: 12, display: "flex", justifyContent: msg.role === "user" ? "flex-end" : "flex-start" }}>
                 <div style={{ maxWidth: "80%", padding: "10px 14px", borderRadius: msg.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px", background: msg.role === "user" ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.05)", border: msg.role === "user" ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.08)" }}>
                   <p style={{ color: "white", fontSize: 12, margin: "0 0 3px" }}>{msg.text}</p>
-                  <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, margin: 0, fontStyle: "italic" }}>{msg.translation}</p>
+                  <p style={{ color: "rgba(255,255,255,0.62)", fontSize: 12, margin: 0, fontStyle: "italic" }}>{msg.translation}</p>
                 </div>
               </div>
             ))}
@@ -374,8 +374,8 @@ export default function LandingPage() {
               <div style={{ display: "flex", gap: 12 }}>
                 {[[t.simGrammar,"8/10"],[t.simVocab,"7/10"],[t.simRelevance,"9/10"]].map(([label,val]) => (
                   <div key={label}>
-                    <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 9 }}>{label} </span>
-                    <span style={{ color: "#10b981", fontSize: 10, fontWeight: 700 }}>{val}</span>
+                    <span style={{ color: "rgba(255,255,255,0.62)", fontSize: 12 }}>{label} </span>
+                    <span style={{ color: "#10b981", fontSize: 12, fontWeight: 700 }}>{val}</span>
                   </div>
                 ))}
               </div>
@@ -406,7 +406,7 @@ export default function LandingPage() {
       <section id="centres" style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "center" }}>
           <div>
-            <span style={{ fontSize: 9, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t.b2bLabel}</span>
+            <span style={{ fontSize: 12, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t.b2bLabel}</span>
             <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2 }}>
               {t.centerTitle}
             </h2>
@@ -422,7 +422,7 @@ export default function LandingPage() {
             ].map((item, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                 <span style={{ fontSize: 18 }}>{item.icon}</span>
-                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.65)" }}>{item.text}</span>
+                <span style={{ fontSize: 14, color: "rgba(255,255,255,0.78)" }}>{item.text}</span>
               </div>
             ))}
             <div style={{ display: "flex", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
@@ -445,7 +445,7 @@ export default function LandingPage() {
                     <span style={{ fontSize: 20 }}>{a.icon}</span>
                     <p style={{ fontFamily: "'Syne',sans-serif", color: "white", fontSize: 14, fontWeight: 700, margin: 0 }}>{a.label}</p>
                   </div>
-                  <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, lineHeight: 1.65, margin: 0 }}>{a.desc}</p>
+                  <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 14, lineHeight: 1.65, margin: 0 }}>{a.desc}</p>
                 </div>
               ))}
             </div>
@@ -464,7 +464,7 @@ export default function LandingPage() {
                   <p style={{ fontFamily: "'Syne',sans-serif", color: p.color, fontSize: 14, fontWeight: 800, margin: 0 }}>{t.centerOnDemand}</p>
                 </div>
               ))}
-              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, lineHeight: 1.6, margin: "4px 0 0", fontStyle: "italic" }}>
+              <p style={{ color: "rgba(255,255,255,0.62)", fontSize: 13, lineHeight: 1.6, margin: "4px 0 0", fontStyle: "italic" }}>
                 {t.centerReassurance}
               </p>
             </div>
@@ -515,7 +515,7 @@ export default function LandingPage() {
           </h2>
 
           {/* Sub-description */}
-          <p style={{ color: "rgba(255,255,255,0.42)", fontSize: isMobile ? 14 : 16, lineHeight: 1.7, marginBottom: 40, maxWidth: 480, margin: "0 auto 40px" }}>
+          <p style={{ color: "rgba(255,255,255,0.68)", fontSize: isMobile ? 14 : 16, lineHeight: 1.7, marginBottom: 40, maxWidth: 480, margin: "0 auto 40px" }}>
             {t.ctaFinalDesc}
           </p>
 
@@ -530,7 +530,7 @@ export default function LandingPage() {
           </button>
 
           {/* Social proof pill */}
-          <p style={{ color: "rgba(255,255,255,0.28)", fontSize: 11, marginTop: 16, letterSpacing: "0.04em" }}>
+          <p style={{ color: "rgba(255,255,255,0.58)", fontSize: 13, marginTop: 16, letterSpacing: "0.04em" }}>
             {t.ctaFinalSocial}
           </p>
 
@@ -538,7 +538,7 @@ export default function LandingPage() {
           <div style={{ margin: "44px auto", width: 48, height: 1, background: "rgba(255,255,255,0.08)" }} />
 
           {/* App store section */}
-          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 20, fontWeight: 600 }}>
+          <p style={{ color: "rgba(255,255,255,0.62)", fontSize: 13, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 20, fontWeight: 600 }}>
             {t.ctaFinalAppLabel}
           </p>
 
@@ -550,7 +550,7 @@ export default function LandingPage() {
                   <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" fill="rgba(255,255,255,0.7)" />
                 </svg>
                 <div style={{ textAlign: "left" }}>
-                  <p style={{ margin: 0, color: "rgba(255,255,255,0.35)", fontSize: 9, textTransform: "uppercase", letterSpacing: "0.08em" }}>Coming Soon</p>
+                  <p style={{ margin: 0, color: "rgba(255,255,255,0.62)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.08em" }}>Coming Soon</p>
                   <p style={{ margin: 0, color: "rgba(255,255,255,0.7)", fontSize: 13, fontWeight: 700, fontFamily: "'Syne',sans-serif" }}>App Store</p>
                 </div>
               </div>
@@ -566,7 +566,7 @@ export default function LandingPage() {
                   <path d="M15.5 12L3.18.24c.3-.16.64-.14.97.1l11.35 6.16L15.5 12z" fill="rgba(100,160,255,0.8)" />
                 </svg>
                 <div style={{ textAlign: "left" }}>
-                  <p style={{ margin: 0, color: "rgba(255,255,255,0.35)", fontSize: 9, textTransform: "uppercase", letterSpacing: "0.08em" }}>Coming Soon</p>
+                  <p style={{ margin: 0, color: "rgba(255,255,255,0.62)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.08em" }}>Coming Soon</p>
                   <p style={{ margin: 0, color: "rgba(255,255,255,0.7)", fontSize: 13, fontWeight: 700, fontFamily: "'Syne',sans-serif" }}>Google Play</p>
                 </div>
               </div>
@@ -574,7 +574,7 @@ export default function LandingPage() {
           </div>
 
           {/* City line */}
-          <p style={{ color: "rgba(255,255,255,0.2)", fontSize: 11, marginTop: 28, letterSpacing: "0.06em" }}>
+          <p style={{ color: "rgba(255,255,255,0.52)", fontSize: 13, marginTop: 28, letterSpacing: "0.06em" }}>
             {t.ctaFinalCities}
           </p>
         </div>
@@ -586,7 +586,7 @@ export default function LandingPage() {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
             <BrandLogo variant="nav" />
             <span style={{ color: "rgba(255,255,255,0.55)", fontSize: isMobile ? 13 : 15, letterSpacing: "0.01em", lineHeight: 1.4 }}>{t.footerTagline}</span>
-            <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 10 }}>{t.footerMade}</span>
+            <span style={{ color: "rgba(255,255,255,0.48)", fontSize: 13 }}>{t.footerMade}</span>
           </div>
           <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
             {[
@@ -595,25 +595,25 @@ export default function LandingPage() {
               { label: t.footerPrivacy, href: `/${locale}/privacy` },
               { label: t.footerContact, href: "mailto:legal@yema.app" },
             ].map(({ label, href }) => (
-              <a key={label} href={href} style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, transition: "color 0.2s" }}
-                onMouseOver={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.7)"}
-                onMouseOut={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.3)"}>
+              <a key={label} href={href} style={{ color: "rgba(255,255,255,0.58)", fontSize: 13, transition: "color 0.2s" }}
+                onMouseOver={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.9)"}
+                onMouseOut={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.58)"}>
                 {label}
               </a>
             ))}
           </div>
           <div style={{ display: "flex", gap: 10 }}>
             {["WhatsApp", "Facebook", "Instagram"].map(s => (
-              <a key={s} href="#" style={{ padding: "5px 12px", borderRadius: 7, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.4)", fontSize: 11, transition: "border-color 0.2s, color 0.2s" }}
-                onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.3)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.7)" }}
-                onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.4)" }}>
+              <a key={s} href="#" style={{ padding: "5px 12px", borderRadius: 7, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.65)", fontSize: 13, transition: "border-color 0.2s, color 0.2s" }}
+                onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.3)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.9)" }}
+                onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.65)" }}>
                 {s}
               </a>
             ))}
           </div>
         </div>
         <div style={{ maxWidth: 1200, margin: "16px auto 0", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.04)", textAlign: "center" }}>
-          <p style={{ color: "rgba(255,255,255,0.14)", fontSize: 10, lineHeight: 1.6 }}>
+          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 12, lineHeight: 1.6 }}>
             {t.footerDisclaimer}
           </p>
         </div>

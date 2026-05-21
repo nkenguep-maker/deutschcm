@@ -5,8 +5,8 @@ import { ThemeProvider } from "@/contexts/ThemeContext"
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
 
-// Runs before React hydration to avoid flash of wrong theme
-const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('yema-theme');var e='dark';if(t==='light')e='light';else if(t==='dark')e='dark';else{if(window.matchMedia('(prefers-color-scheme: light)').matches)e='light';else if(window.matchMedia('(prefers-color-scheme: dark)').matches)e='dark';else{var h=new Date().getHours();e=(h>=7&&h<19)?'light':'dark';}}document.documentElement.dataset.theme=e;}catch(err){}})();`
+// Always force dark mode — light mode not yet released
+const THEME_SCRIPT = `document.documentElement.dataset.theme='dark';`
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
