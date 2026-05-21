@@ -197,7 +197,7 @@ const nav = {
     overview: "Vue d'ensemble", students: "Élèves", assignments: "Devoirs",
     generateCourse: "Générer cours", stats: "Statistiques", teachers: "Enseignants",
     billing: "Facturation", users: "Utilisateurs", centers: "Centres",
-    login: "Se connecter", register: "Commencer gratuitement", logout: "Se déconnecter",
+    login: "Se connecter", register: "Commencer gratuitement", logout: "Se déconnecter", logoutHint: "À bientôt",
     // Teacher-centered nav labels
     today: "Aujourd'hui", learners: "Apprenants", corrections: "Corrections",
     tracking: "Suivi", resources: "Ressources", activities: "Activités",
@@ -208,7 +208,7 @@ const nav = {
     overview: "Overview", students: "Students", assignments: "Assignments",
     generateCourse: "Generate Course", stats: "Statistics", teachers: "Teachers",
     billing: "Billing", users: "Users", centers: "Centers",
-    login: "Log in", register: "Get started free", logout: "Log out",
+    login: "Log in", register: "Get started free", logout: "Log out", logoutHint: "See you soon",
     // Teacher-centered nav labels
     today: "Today", learners: "Learners", corrections: "Corrections",
     tracking: "Tracking", resources: "Resources", activities: "Activities",

@@ -40,7 +40,7 @@ function TeacherSidebar({ teacherName, isMobile, open, onClose }: {
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/goodbye");
+    router.push("/teacher/goodbye");
   };
 
   const initials = teacherName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) || "YE";
@@ -112,8 +112,9 @@ function TeacherSidebar({ teacherName, isMobile, open, onClose }: {
             <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem" }}>{tT.role}</p>
           </div>
         </div>
-        <button onClick={handleLogout} style={{ width: "100%", padding: "7px", borderRadius: 9, border: "1px solid rgba(239,68,68,0.15)", background: "transparent", color: "rgba(239,68,68,0.5)", fontFamily: "'DM Mono', monospace", fontSize: "0.68rem", cursor: "pointer" }}>
-          {tNav.logout}
+        <button onClick={handleLogout} style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.07)", background: "transparent", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+          <span style={{ color: "rgba(255,255,255,0.38)", fontFamily: "'DM Mono', monospace", fontSize: "0.68rem" }}>{tNav.logout}</span>
+          <span style={{ color: "rgba(255,255,255,0.16)", fontSize: "0.55rem", fontFamily: "'DM Mono', monospace" }}>{tNav.logoutHint}</span>
         </button>
       </div>
     </aside>
