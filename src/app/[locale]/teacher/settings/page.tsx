@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import TeacherLayout from "@/components/TeacherLayout";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 export default function TeacherSettingsPage() {
   const [fullName, setFullName] = useState("Marie Tchamba");
@@ -91,6 +92,13 @@ export default function TeacherSettingsPage() {
           >
             {saved ? "✓ Sauvegardé" : "Enregistrer les modifications"}
           </button>
+        </div>
+
+        {/* Appearance */}
+        <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
+          <h3 style={{ margin: "0 0 6px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>Apparence</h3>
+          <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.35)", fontSize: "0.72rem" }}>Choisissez le mode d'affichage. Auto suit vos préférences système.</p>
+          <ThemeSwitcher />
         </div>
 
         {/* Notifications */}

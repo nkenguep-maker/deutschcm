@@ -1,10 +1,81 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS — dark (default) + light overrides
+   ═══════════════════════════════════════════════ */
+
+:root,
+html[data-theme="dark"] {
+  /* backgrounds */
+  --bg:            #080c10;
+  --bg-elevated:   #0d1117;
+  --surface:       rgba(255,255,255,0.03);
+  --surface-hover: rgba(255,255,255,0.05);
+
+  /* borders */
+  --border:        rgba(255,255,255,0.07);
+  --border-strong: rgba(255,255,255,0.13);
+
+  /* text */
+  --fg:            #f0f2f5;
+  --fg-secondary:  rgba(255,255,255,0.68);
+  --fg-muted:      rgba(255,255,255,0.45);
+  --fg-faint:      rgba(255,255,255,0.26);
+
+  /* accent — Yema green */
+  --accent:        #10b981;
+  --accent-soft:   rgba(16,185,129,0.10);
+  --accent-border: rgba(16,185,129,0.25);
+
+  /* forms */
+  --input-bg:      rgba(255,255,255,0.05);
+  --input-border:  rgba(255,255,255,0.12);
+  --placeholder:   rgba(255,255,255,0.32);
+
+  /* sidebar */
+  --sidebar-bg:    rgba(8,12,16,0.98);
+
+  /* Tailwind aliases */
+  --background: #080c10;
+  --foreground: #f0f2f5;
 }
 
+html[data-theme="light"] {
+  /* backgrounds */
+  --bg:            #f3f4f6;
+  --bg-elevated:   #ffffff;
+  --surface:       #ffffff;
+  --surface-hover: #f9fafb;
+
+  /* borders */
+  --border:        rgba(0,0,0,0.08);
+  --border-strong: rgba(0,0,0,0.14);
+
+  /* text */
+  --fg:            #0f172a;
+  --fg-secondary:  #374151;
+  --fg-muted:      #6b7280;
+  --fg-faint:      #9ca3af;
+
+  /* accent — slightly deeper green for contrast on white */
+  --accent:        #059669;
+  --accent-soft:   rgba(5,150,105,0.08);
+  --accent-border: rgba(5,150,105,0.22);
+
+  /* forms */
+  --input-bg:      #ffffff;
+  --input-border:  rgba(0,0,0,0.14);
+  --placeholder:   #9ca3af;
+
+  /* sidebar */
+  --sidebar-bg:    #ffffff;
+
+  /* Tailwind aliases */
+  --background: #f3f4f6;
+  --foreground: #0f172a;
+}
+
+/* ── Tailwind v4 theme bridge ── */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -12,29 +83,102 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ═══════════════════════════════════════════════
+   BASE TYPOGRAPHY & LAYOUT
+   ═══════════════════════════════════════════════ */
 
-/* ── Global mobile safeguards ── */
 html {
+  font-size: 16px;
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
+  /* smooth theme transitions without flash */
+  transition: background 0.2s ease;
 }
 
 body {
   overflow-x: hidden;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'DM Mono', var(--font-geist-mono), monospace;
+  font-size: 1rem;          /* 16px base */
+  line-height: 1.6;
+  transition: background 0.2s ease, color 0.15s ease;
 }
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  color: var(--fg);
+}
+
+/* Body paragraphs */
+p { line-height: 1.65; }
+
+/* ═══════════════════════════════════════════════
+   FORM ACCESSIBILITY
+   ═══════════════════════════════════════════════ */
+
+/* Prevent iOS Safari auto-zoom on focus (needs 16px minimum) */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+textarea,
+select {
+  font-size: max(16px, 1em);
+}
+
+/* Placeholder contrast */
+::placeholder {
+  color: var(--placeholder);
+  opacity: 1;
+}
+
+/* ── Readable form controls on mobile ── */
+button, [role="button"] {
+  min-height: 36px;  /* soft minimum — components can override */
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════
+   FOCUS — VISIBLE & ACCESSIBLE
+   ═══════════════════════════════════════════════ */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove browser default focus ring where we handle it ourselves */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ═══════════════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════════════ */
+
+::-webkit-scrollbar        { width: 4px; height: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--border-strong); border-radius: 4px; }
+
+/* ═══════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════ */
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
   min-width: 0;
+}
+
+/* Readable text selection */
+::selection {
+  background: var(--accent-soft);
+  color: var(--fg);
 }

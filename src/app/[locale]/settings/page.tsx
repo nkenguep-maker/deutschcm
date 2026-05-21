@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Layout from "@/components/Layout";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 export default function StudentSettingsPage() {
   const [fullName, setFullName] = useState("Fatima Oumarou");
@@ -113,6 +114,13 @@ export default function StudentSettingsPage() {
           </button>
         </div>
 
+        {/* Appearance */}
+        <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
+          <h3 style={{ margin: "0 0 6px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>Apparence</h3>
+          <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.35)", fontSize: "0.72rem" }}>Choisissez le mode d'affichage. Auto suit vos préférences système.</p>
+          <ThemeSwitcher />
+        </div>
+
         {/* Notifications */}
         <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
           <h3 style={{ margin: "0 0 18px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>Notifications</h3>
@@ -131,7 +139,6 @@ export default function StudentSettingsPage() {
         <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
           <h3 style={{ margin: "0 0 18px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>Préférences d'apprentissage</h3>
           {[
-            { label: "Mode sombre (actif par défaut)",  defaultOn: true },
             { label: "Sons de feedback lors des quiz",  defaultOn: true },
             { label: "Afficher le tableau des scores",  defaultOn: false },
           ].map(item => (
