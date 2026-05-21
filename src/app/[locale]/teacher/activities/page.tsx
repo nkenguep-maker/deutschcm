@@ -59,7 +59,7 @@ export default function ActivitiesPage() {
 
             {/* Coming soon note */}
             <div style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.1)" }}>
-              <p style={{ margin: "0 0 8px", color: "rgba(255,255,255,0.5)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.78rem" }}>
+              <p style={{ margin: "0 0 8px", color: "rgba(255,255,255,0.72)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem" }}>
                 ⚙️ {tC.comingSoon}
               </p>
               <p style={{ margin: 0, color: "rgba(255,255,255,0.60)", fontSize: "0.84rem", lineHeight: 1.55 }}>
@@ -73,7 +73,7 @@ export default function ActivitiesPage() {
         ) : (
           /* Draft creation form */
           <div>
-            <button onClick={() => { setShowForm(false); setSelectedType(null); }} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: "0.75rem", cursor: "pointer", marginBottom: 20, padding: 0 }}>
+            <button onClick={() => { setShowForm(false); setSelectedType(null); }} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", cursor: "pointer", marginBottom: 20, padding: 0 }}>
               ← {tC.back}
             </button>
 
@@ -92,8 +92,8 @@ export default function ActivitiesPage() {
                 { label: tT.activityFieldDeadline,     ph: "JJ/MM/AAAA" },
               ].map(f => (
                 <div key={f.label}>
-                  <label style={{ color: "rgba(255,255,255,0.70)", fontSize: "0.86rem", display: "block", marginBottom: 6 }}>{f.label}</label>
-                  <input placeholder={f.ph} style={{ width: "100%", padding: "10px 14px", borderRadius: 9, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: "0.82rem", outline: "none", boxSizing: "border-box" }} />
+                  <label style={{ color: "rgba(255,255,255,0.78)", fontSize: "0.875rem", display: "block", marginBottom: 6 }}>{f.label}</label>
+                  <input placeholder={f.ph} style={{ width: "100%", padding: "10px 14px", borderRadius: 9, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: "1rem", outline: "none", boxSizing: "border-box" }} />
                 </div>
               ))}
 
@@ -105,7 +105,7 @@ export default function ActivitiesPage() {
             </div>
 
             <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
-              <button onClick={() => { setShowForm(false); setSelectedType(null); }} style={{ padding: "9px 20px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: "0.8rem" }}>
+              <button onClick={() => { setShowForm(false); setSelectedType(null); }} style={{ padding: "9px 20px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.65)", cursor: "pointer", fontSize: "0.875rem" }}>
                 {tC.cancel}
               </button>
               <button style={{ padding: "9px 24px", borderRadius: 9, border: "none", background: "linear-gradient(135deg, #10b981, #059669)", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.8rem", cursor: "pointer", boxShadow: "0 4px 16px rgba(16,185,129,0.25)" }}>
@@ -113,7 +113,7 @@ export default function ActivitiesPage() {
               </button>
             </div>
 
-            <p style={{ marginTop: 12, color: "rgba(255,255,255,0.55)", fontSize: "0.78rem" }}>{tT.studioPublishWarning}</p>
+            <p style={{ marginTop: 12, color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>{tT.studioPublishWarning}</p>
           </div>
         )}
       </div>

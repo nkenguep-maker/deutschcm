@@ -95,7 +95,7 @@ export default function TeacherCoursesPage() {
           ].map(s => (
             <div key={s.label} style={{ padding: "18px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderTop: `2px solid ${s.color}` }}>
               <div style={{ color: s.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.6rem", marginBottom: 4 }}>{s.value}</div>
-              <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.7rem" }}>{s.label}</div>
+              <div style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.78rem" }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -106,14 +106,14 @@ export default function TeacherCoursesPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Rechercher un cours…"
-            style={{ flex: 1, minWidth: 200, padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: "0.8rem", outline: "none" }}
+            style={{ flex: 1, minWidth: 200, padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: "1rem", outline: "none" }}
           />
           {(["all", "A1", "A2", "B1", "B2", "C1"] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: "7px 14px", borderRadius: 9, border: "none", cursor: "pointer",
               fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 600,
               background: filter === f ? "#6366f1" : "rgba(255,255,255,0.05)",
-              color: filter === f ? "white" : "rgba(255,255,255,0.4)",
+              color: filter === f ? "white" : "rgba(255,255,255,0.68)",
             }}>
               {f === "all" ? "Tous" : f}
             </button>
@@ -122,13 +122,13 @@ export default function TeacherCoursesPage() {
 
         {/* Course list */}
         {loading ? (
-          <div style={{ textAlign: "center", padding: "60px 0", color: "rgba(255,255,255,0.3)", fontSize: "0.85rem" }}>
+          <div style={{ textAlign: "center", padding: "60px 0", color: "rgba(255,255,255,0.55)", fontSize: "0.875rem" }}>
             Chargement des cours…
           </div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 0" }}>
             <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>📭</div>
-            <div style={{ color: "rgba(255,255,255,0.4)", fontFamily: "'Syne', sans-serif", fontSize: "0.9rem" }}>
+            <div style={{ color: "rgba(255,255,255,0.65)", fontFamily: "'Syne', sans-serif", fontSize: "0.9rem" }}>
               {courses.length === 0 ? "Aucun cours en base — demandez à l'admin de générer des cours." : "Aucun cours trouvé pour ce filtre."}
             </div>
           </div>
@@ -150,14 +150,14 @@ export default function TeacherCoursesPage() {
                         <span style={{ color: "rgba(255,255,255,0.9)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.88rem" }}>
                           {course.titleDE}
                         </span>
-                        <span style={{ padding: "1px 8px", borderRadius: 5, background: `${c}18`, color: c, border: `1px solid ${c}33`, fontSize: "0.62rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>
+                        <span style={{ padding: "1px 8px", borderRadius: 5, background: `${c}18`, color: c, border: `1px solid ${c}33`, fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>
                           {course.level}
                         </span>
-                        <span style={{ padding: "1px 8px", borderRadius: 5, background: course.isPublished ? "rgba(16,185,129,0.12)" : "rgba(245,158,11,0.12)", color: course.isPublished ? "#10b981" : "#f59e0b", fontSize: "0.62rem" }}>
+                        <span style={{ padding: "1px 8px", borderRadius: 5, background: course.isPublished ? "rgba(16,185,129,0.12)" : "rgba(245,158,11,0.12)", color: course.isPublished ? "#10b981" : "#f59e0b", fontSize: "0.75rem" }}>
                           {course.isPublished ? "Publié" : "Brouillon"}
                         </span>
                       </div>
-                      <div style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.68rem" }}>
+                      <div style={{ color: "rgba(255,255,255,0.60)", fontSize: "0.78rem" }}>
                         {course.lektionen} · {course.modules} modules
                         {assignedClasses.length > 0 && (
                           <span style={{ marginLeft: 8, color: "#6366f1" }}>
@@ -171,7 +171,7 @@ export default function TeacherCoursesPage() {
                       <button
                         onClick={() => handlePublish(course.courseId, !course.isPublished)}
                         style={{
-                          padding: "6px 14px", borderRadius: 8, border: "1px solid", cursor: "pointer", fontSize: "0.7rem",
+                          padding: "6px 14px", borderRadius: 8, border: "1px solid", cursor: "pointer", fontSize: "0.78rem",
                           borderColor: course.isPublished ? "rgba(239,68,68,0.3)" : "rgba(16,185,129,0.3)",
                           background: "transparent",
                           color: course.isPublished ? "#ef4444" : "#10b981",
@@ -181,7 +181,7 @@ export default function TeacherCoursesPage() {
                       </button>
                       <button
                         onClick={() => setAssignModal(course)}
-                        style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(99,102,241,0.3)", background: "transparent", color: "#818cf8", fontSize: "0.7rem", cursor: "pointer" }}
+                        style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(99,102,241,0.3)", background: "transparent", color: "#818cf8", fontSize: "0.78rem", cursor: "pointer" }}
                       >
                         Assigner
                       </button>
@@ -201,7 +201,7 @@ export default function TeacherCoursesPage() {
               <h2 style={{ margin: "0 0 6px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
                 Assigner à une classe
               </h2>
-              <p style={{ margin: "0 0 20px", color: "rgba(255,255,255,0.35)", fontSize: "0.72rem" }}>
+              <p style={{ margin: "0 0 20px", color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>
                 {assignModal.icon} {assignModal.titleDE} — {assignModal.level}
               </p>
 
@@ -229,7 +229,7 @@ export default function TeacherCoursesPage() {
                         }}
                       >
                         <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.82rem" }}>{cls.name}</span>
-                        <span style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.3)" }}>
+                        <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.60)" }}>
                           {alreadyAssigned ? "✓ Déjà assigné" : cls.level}
                         </span>
                       </button>
@@ -240,7 +240,7 @@ export default function TeacherCoursesPage() {
 
               {!assignSuccess && (
                 <div style={{ marginTop: 20, textAlign: "right" }}>
-                  <button onClick={() => setAssignModal(null)} style={{ padding: "8px 20px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.4)", cursor: "pointer" }}>
+                  <button onClick={() => setAssignModal(null)} style={{ padding: "8px 20px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.65)", cursor: "pointer" }}>
                     Fermer
                   </button>
                 </div>

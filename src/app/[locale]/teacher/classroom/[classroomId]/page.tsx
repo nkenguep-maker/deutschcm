@@ -205,7 +205,7 @@ function ElevesTab({ classroomId }: { classroomId: string }) {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ color: "#e2e8f0", fontWeight: 600, fontSize: 14 }}>{p.fromUser.fullName}</div>
-                  <div style={{ color: "#64748b", fontSize: 12 }}>{p.fromUser.email} · Niveau {p.fromUser.germanLevel ?? "?"} · {timeAgo(p.createdAt)}</div>
+                  <div style={{ color: "#94a3b8", fontSize: 13 }}>{p.fromUser.email} · Niveau {p.fromUser.germanLevel ?? "?"} · {timeAgo(p.createdAt)}</div>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <button
@@ -249,7 +249,7 @@ function ElevesTab({ classroomId }: { classroomId: string }) {
             {f.label}
           </button>
         ))}
-        <div style={{ marginLeft: "auto", color: "#64748b", fontSize: 13, alignSelf: "center" }}>
+        <div style={{ marginLeft: "auto", color: "#94a3b8", fontSize: 13, alignSelf: "center" }}>
           {filtered.length} élève{filtered.length > 1 ? "s" : ""}
         </div>
       </div>
@@ -260,7 +260,7 @@ function ElevesTab({ classroomId }: { classroomId: string }) {
           <thead>
             <tr style={{ borderBottom: "1px solid #1e2d3d" }}>
               {["Élève", "Niveau", "XP", "Score moy.", "Progression", "Dernière activité", ""].map(h => (
-                <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "#64748b", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "#94a3b8", fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   {h}
                 </th>
               ))}
@@ -274,7 +274,7 @@ function ElevesTab({ classroomId }: { classroomId: string }) {
                     <Avatar initials={s.avatar} />
                     <div>
                       <div style={{ color: "#e2e8f0", fontWeight: 600, fontSize: 14 }}>{s.fullName}</div>
-                      <div style={{ color: "#64748b", fontSize: 12 }}>{s.email}</div>
+                      <div style={{ color: "#94a3b8", fontSize: 13 }}>{s.email}</div>
                     </div>
                   </div>
                 </td>
@@ -292,10 +292,10 @@ function ElevesTab({ classroomId }: { classroomId: string }) {
                 <td style={{ padding: "14px 16px", minWidth: 120 }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                     <ProgressBar value={s.progress} />
-                    <span style={{ color: "#64748b", fontSize: 11 }}>{s.progress}%</span>
+                    <span style={{ color: "#94a3b8", fontSize: 12 }}>{s.progress}%</span>
                   </div>
                 </td>
-                <td style={{ padding: "14px 16px", color: "#64748b", fontSize: 13 }}>
+                <td style={{ padding: "14px 16px", color: "#94a3b8", fontSize: 13 }}>
                   {timeAgo(s.lastActiveAt)}
                 </td>
                 <td style={{ padding: "14px 16px" }}>
@@ -327,7 +327,7 @@ function DevoirsTab() {
     <div>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-        <div style={{ color: "#94a3b8", fontSize: 14 }}>{MOCK_ASSIGNMENTS.length} devoirs créés</div>
+        <div style={{ color: "#cbd5e1", fontSize: 14 }}>{MOCK_ASSIGNMENTS.length} devoirs créés</div>
         <button
           onClick={() => setShowModal(true)}
           style={{
@@ -353,33 +353,33 @@ function DevoirsTab() {
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
                     <span style={{ color: "#e2e8f0", fontWeight: 700, fontSize: 15 }}>{a.title}</span>
                     {a.module && (
-                      <span style={{ background: "#1e2530", color: "#64748b", borderRadius: 6, padding: "2px 8px", fontSize: 11 }}>
+                      <span style={{ background: "#1e2530", color: "#94a3b8", borderRadius: 6, padding: "2px 8px", fontSize: 12 }}>
                         {a.module}
                       </span>
                     )}
                     {isOverdue && (
-                      <span style={{ background: "#ef444422", color: "#ef4444", border: "1px solid #ef444444", borderRadius: 6, padding: "2px 8px", fontSize: 11 }}>
+                      <span style={{ background: "#ef444422", color: "#ef4444", border: "1px solid #ef444444", borderRadius: 6, padding: "2px 8px", fontSize: 12 }}>
                         Expiré
                       </span>
                     )}
                   </div>
-                  <div style={{ color: "#64748b", fontSize: 13, marginBottom: 12 }}>{a.description}</div>
+                  <div style={{ color: "#94a3b8", fontSize: 13, marginBottom: 12 }}>{a.description}</div>
                   <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                     <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1, maxWidth: 200 }}>
                       <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <span style={{ color: "#94a3b8", fontSize: 12 }}>Remis</span>
+                        <span style={{ color: "#cbd5e1", fontSize: 12 }}>Remis</span>
                         <span style={{ color: "#10b981", fontSize: 12, fontWeight: 600 }}>
                           {a.submittedCount}/{a.totalStudents}
                         </span>
                       </div>
                       <ProgressBar value={a.submittedCount} max={a.totalStudents} />
                     </div>
-                    <div style={{ color: "#64748b", fontSize: 12 }}>
-                      <span style={{ color: "#94a3b8" }}>Note max: </span>{a.maxScore} pts
+                    <div style={{ color: "#94a3b8", fontSize: 12 }}>
+                      <span style={{ color: "#cbd5e1" }}>Note max: </span>{a.maxScore} pts
                     </div>
                     {a.dueDate && (
-                      <div style={{ color: "#64748b", fontSize: 12 }}>
-                        <span style={{ color: "#94a3b8" }}>Échéance: </span>{formatDate(a.dueDate)}
+                      <div style={{ color: "#94a3b8", fontSize: 12 }}>
+                        <span style={{ color: "#cbd5e1" }}>Échéance: </span>{formatDate(a.dueDate)}
                       </div>
                     )}
                   </div>
@@ -422,7 +422,7 @@ function DevoirsTab() {
                 { label: "Note maximale", key: "maxScore", type: "number", placeholder: "20" },
               ].map(({ label, key, type, placeholder }) => (
                 <div key={key}>
-                  <label style={{ color: "#94a3b8", fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>
+                  <label style={{ color: "#cbd5e1", fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>
                     {label}
                   </label>
                   {type === "textarea" ? (
@@ -486,7 +486,7 @@ function DevoirsTab() {
             <div style={{ color: "#e2e8f0", fontWeight: 700, fontSize: 18, marginBottom: 6 }}>
               Correction — {selectedAssignment.title}
             </div>
-            <div style={{ color: "#64748b", fontSize: 13, marginBottom: 24 }}>
+            <div style={{ color: "#94a3b8", fontSize: 13, marginBottom: 24 }}>
               Note sur {selectedAssignment.maxScore} pts
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -509,7 +509,7 @@ function DevoirsTab() {
                       textAlign: "center", outline: "none",
                     }}
                   />
-                  <span style={{ color: "#64748b", fontSize: 12 }}>/{selectedAssignment.maxScore}</span>
+                  <span style={{ color: "#94a3b8", fontSize: 13 }}>/{selectedAssignment.maxScore}</span>
                   <input
                     type="text"
                     placeholder="Commentaire..."
@@ -555,8 +555,8 @@ function StatistiquesTab() {
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={STATS_30_DAYS}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e2d3d" />
-            <XAxis dataKey="day" stroke="#64748b" tick={{ fontSize: 11 }} tickLine={false} />
-            <YAxis stroke="#64748b" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+            <XAxis dataKey="day" stroke="#94a3b8" tick={{ fontSize: 12 }} tickLine={false} />
+            <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
             <Tooltip
               contentStyle={{ background: "#161b22", border: "1px solid #1e2d3d", borderRadius: 8, color: "#e2e8f0" }}
             />
@@ -574,8 +574,8 @@ function StatistiquesTab() {
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={MODULE_STATS}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e2d3d" />
-            <XAxis dataKey="module" stroke="#64748b" tick={{ fontSize: 12 }} tickLine={false} />
-            <YAxis stroke="#64748b" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} domain={[0, 100]} />
+            <XAxis dataKey="module" stroke="#94a3b8" tick={{ fontSize: 12 }} tickLine={false} />
+            <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} domain={[0, 100]} />
             <Tooltip
               contentStyle={{ background: "#161b22", border: "1px solid #1e2d3d", borderRadius: 8, color: "#e2e8f0" }}
               formatter={(v) => [`${v ?? ""}%`, "Complétion"] as [string, string]}
@@ -598,7 +598,7 @@ function StatistiquesTab() {
             padding: "20px 16px", textAlign: "center",
           }}>
             <div style={{ color: stat.color, fontSize: 26, fontWeight: 800, marginBottom: 6 }}>{stat.value}</div>
-            <div style={{ color: "#64748b", fontSize: 12 }}>{stat.label}</div>
+            <div style={{ color: "#94a3b8", fontSize: 13 }}>{stat.label}</div>
           </div>
         ))}
       </div>
@@ -623,7 +623,7 @@ function ParametresTab({ classroom }: { classroom: Classroom }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Name */}
           <div>
-            <label style={{ color: "#94a3b8", fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>
+            <label style={{ color: "#cbd5e1", fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>
               Nom de la classe
             </label>
             <input
@@ -639,7 +639,7 @@ function ParametresTab({ classroom }: { classroom: Classroom }) {
 
           {/* Description */}
           <div>
-            <label style={{ color: "#94a3b8", fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>
+            <label style={{ color: "#cbd5e1", fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>
               Description
             </label>
             <textarea
@@ -656,7 +656,7 @@ function ParametresTab({ classroom }: { classroom: Classroom }) {
 
           {/* Max students */}
           <div>
-            <label style={{ color: "#94a3b8", fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>
+            <label style={{ color: "#cbd5e1", fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>
               Nombre max d&apos;élèves
             </label>
             <input
@@ -676,7 +676,7 @@ function ParametresTab({ classroom }: { classroom: Classroom }) {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div>
               <div style={{ color: "#e2e8f0", fontSize: 14, fontWeight: 600 }}>Classe active</div>
-              <div style={{ color: "#64748b", fontSize: 12 }}>Les élèves peuvent rejoindre et accéder au contenu</div>
+              <div style={{ color: "#94a3b8", fontSize: 13 }}>Les élèves peuvent rejoindre et accéder au contenu</div>
             </div>
             <button
               onClick={() => setIsActive(!isActive)}
@@ -696,7 +696,7 @@ function ParametresTab({ classroom }: { classroom: Classroom }) {
 
           {/* Code */}
           <div>
-            <label style={{ color: "#94a3b8", fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>
+            <label style={{ color: "#cbd5e1", fontSize: 13, fontWeight: 600, display: "block", marginBottom: 6 }}>
               Code d&apos;accès
             </label>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -735,7 +735,7 @@ function ParametresTab({ classroom }: { classroom: Classroom }) {
         <div style={{ color: "#ef4444", fontWeight: 700, fontSize: 15, marginBottom: 8 }}>
           Zone dangereuse
         </div>
-        <div style={{ color: "#64748b", fontSize: 13, marginBottom: 16 }}>
+        <div style={{ color: "#94a3b8", fontSize: 13, marginBottom: 16 }}>
           La suppression d&apos;une classe est irréversible. Tous les devoirs et résultats seront perdus.
         </div>
         <button style={{
@@ -788,14 +788,14 @@ export default function ClassroomPage() {
           <button
             onClick={() => router.push("/teacher")}
             style={{
-              background: "none", border: "none", color: "#64748b", cursor: "pointer",
+              background: "none", border: "none", color: "#94a3b8", cursor: "pointer",
               fontSize: 13, display: "flex", alignItems: "center", gap: 6,
             }}
           >
             ← Tableau de bord
           </button>
-          <span style={{ color: "#2a3441" }}>›</span>
-          <span style={{ color: "#94a3b8", fontSize: 13 }}>Mes classes</span>
+          <span style={{ color: "#4a5568" }}>›</span>
+          <span style={{ color: "#cbd5e1", fontSize: 13 }}>Mes classes</span>
           <span style={{ color: "#2a3441" }}>›</span>
           <span style={{ color: "#10b981", fontSize: 13, fontWeight: 600 }}>{classroom.name}</span>
         </div>
@@ -821,17 +821,17 @@ export default function ClassroomPage() {
                 {classroom.level}
               </span>
               <span style={{
-                background: classroom.isActive ? "#10b98122" : "#64748b22",
-                color: classroom.isActive ? "#10b981" : "#64748b",
-                border: `1px solid ${classroom.isActive ? "#10b98144" : "#64748b44"}`,
+                background: classroom.isActive ? "#10b98122" : "#94a3b822",
+                color: classroom.isActive ? "#10b981" : "#94a3b8",
+                border: `1px solid ${classroom.isActive ? "#10b98144" : "#94a3b844"}`,
                 borderRadius: 6, padding: "2px 10px", fontSize: 12,
               }}>
                 {classroom.isActive ? "Active" : "Inactive"}
               </span>
             </div>
-            <div style={{ color: "#64748b", fontSize: 14 }}>{classroom.description}</div>
+            <div style={{ color: "#94a3b8", fontSize: 14 }}>{classroom.description}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10 }}>
-              <span style={{ color: "#94a3b8", fontSize: 13 }}>Code d&apos;accès :</span>
+              <span style={{ color: "#cbd5e1", fontSize: 13 }}>Code d&apos;accès :</span>
               <code style={{
                 background: "#161b22", border: "1px solid #2a3441", borderRadius: 6,
                 padding: "2px 10px", color: "#10b981", fontSize: 13, fontFamily: "monospace",
@@ -842,7 +842,7 @@ export default function ClassroomPage() {
                 onClick={copyCode}
                 style={{
                   background: copied ? "#10b98122" : "none",
-                  color: copied ? "#10b981" : "#64748b",
+                  color: copied ? "#10b981" : "#94a3b8",
                   border: "none", cursor: "pointer", fontSize: 12, padding: "2px 6px",
                 }}
               >
@@ -863,7 +863,7 @@ export default function ClassroomPage() {
                 padding: "14px 20px", textAlign: "center", minWidth: 90,
               }}>
                 <div style={{ color: "#10b981", fontSize: 22, fontWeight: 800 }}>{stat.value}</div>
-                <div style={{ color: "#64748b", fontSize: 11, marginTop: 2 }}>{stat.label}</div>
+                <div style={{ color: "#94a3b8", fontSize: 12, marginTop: 2 }}>{stat.label}</div>
               </div>
             ))}
           </div>
@@ -878,7 +878,7 @@ export default function ClassroomPage() {
               style={{
                 background: "none", border: "none", cursor: "pointer",
                 padding: "12px 20px", fontSize: 14, fontWeight: 600,
-                color: activeTab === tab.key ? "#10b981" : "#64748b",
+                color: activeTab === tab.key ? "#10b981" : "#94a3b8",
                 borderBottom: activeTab === tab.key ? "2px solid #10b981" : "2px solid transparent",
                 marginBottom: -1, transition: "all 0.2s",
                 display: "flex", alignItems: "center", gap: 6,
@@ -886,7 +886,7 @@ export default function ClassroomPage() {
             >
               {tab.icon} {tab.label}
               {tab.badge && tab.badge > 0 ? (
-                <span style={{ background: "#f59e0b22", color: "#f59e0b", border: "1px solid #f59e0b44", borderRadius: 99, padding: "0 7px", fontSize: 11, fontWeight: 700 }}>
+                <span style={{ background: "#f59e0b22", color: "#f59e0b", border: "1px solid #f59e0b44", borderRadius: 99, padding: "0 7px", fontSize: 12, fontWeight: 700 }}>
                   {tab.badge}
                 </span>
               ) : null}

@@ -27,13 +27,13 @@ export default function TrackingPage() {
         </p>
         <div style={{ marginBottom: 20, padding: "12px 16px", borderRadius: 12, background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.15)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
           <span style={{ color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem" }}>{tT.expertiseCenter}</span>
-          <span style={{ color: "rgba(255,255,255,0.58)", fontSize: "0.80rem", maxWidth: 420 }}>{tT.microcopy2}</span>
+          <span style={{ color: "rgba(255,255,255,0.68)", fontSize: "0.875rem", maxWidth: 420 }}>{tT.microcopy2}</span>
         </div>
 
         {/* Demo data banner */}
         {hasDemoData && (
           <div style={{ marginBottom: 28, padding: "12px 16px", borderRadius: 12, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(245,158,11,0.15)", color: "#f59e0b", fontSize: "0.6rem", fontFamily: "'Syne', sans-serif", fontWeight: 700, flexShrink: 0 }}>Démo</span>
+            <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(245,158,11,0.15)", color: "#f59e0b", fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 700, flexShrink: 0 }}>Démo</span>
             <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>{tT.demoDataBanner}</span>
           </div>
         )}
@@ -55,8 +55,8 @@ export default function TrackingPage() {
                   <span style={{ fontSize: "1.1rem" }}>{s.icon}</span>
                   <span style={{ color: s.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.5rem" }}>{s.value}</span>
                 </div>
-                <p style={{ margin: "0 0 2px", color: "rgba(255,255,255,0.7)", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem" }}>{s.label}</p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.60)", fontSize: "0.76rem" }}>{s.hint}</p>
+                <p style={{ margin: "0 0 2px", color: "rgba(255,255,255,0.85)", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.82rem" }}>{s.label}</p>
+                <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: "0.78rem" }}>{s.hint}</p>
               </div>
             ))}
           </div>
@@ -72,7 +72,7 @@ export default function TrackingPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {WEEKLY_DEMO.map(week => (
                 <div key={week.name} style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                  <span style={{ color: "rgba(255,255,255,0.68)", fontSize: "0.82rem", width: 44, flexShrink: 0 }}>{week.name}</span>
+                  <span style={{ color: "rgba(255,255,255,0.78)", fontSize: "0.875rem", width: 44, flexShrink: 0 }}>{week.name}</span>
                   <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <div style={{ height: 6, borderRadius: 99, background: "rgba(255,255,255,0.07)", flex: 1, overflow: "hidden" }}>
@@ -107,7 +107,7 @@ export default function TrackingPage() {
             ].map(s => (
               <div key={s.skill} style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", opacity: hasDemoData ? 0.75 : 1 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.75rem" }}>{s.skill}</span>
+                  <span style={{ color: "rgba(255,255,255,0.82)", fontSize: "0.82rem" }}>{s.skill}</span>
                   <span style={{ color: s.color, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.75rem" }}>{s.pct}%</span>
                 </div>
                 <div style={{ height: 5, borderRadius: 99, background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
@@ -135,7 +135,7 @@ export default function TrackingPage() {
           </h2>
           <div style={{ padding: "20px 22px", borderRadius: 14, background: "rgba(16,185,129,0.03)", border: "1px solid rgba(16,185,129,0.1)" }}>
             <p style={{ margin: "0 0 6px", color: "rgba(255,255,255,0.62)", fontSize: "0.84rem" }}>{tT.impactEmpty}</p>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.50)", fontSize: "0.78rem", fontFamily: "'DM Mono', monospace" }}>{tT.impactSubtitle}</p>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", fontFamily: "'DM Mono', monospace" }}>{tT.impactSubtitle}</p>
           </div>
         </section>
 

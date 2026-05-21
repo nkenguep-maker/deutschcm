@@ -32,7 +32,7 @@ export default function ResourcesPage() {
               </div>
               <div>
                 <p style={{ margin: "0 0 6px", color: "rgba(255,255,255,0.85)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.88rem" }}>{r.title}</p>
-                <span style={{ display: "inline-block", padding: "2px 10px", borderRadius: 20, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>
+                <span style={{ display: "inline-block", padding: "2px 10px", borderRadius: 20, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.55)", fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>
                   {tT.resourcesComingSoon}
                 </span>
               </div>
@@ -56,7 +56,7 @@ export default function ResourcesPage() {
         </div>
 
         {/* Teaching studio note */}
-        <p style={{ marginTop: 12, color: "rgba(255,255,255,0.55)", fontSize: "0.78rem", fontFamily: "'DM Mono', monospace" }}>
+        <p style={{ marginTop: 12, color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", fontFamily: "'DM Mono', monospace" }}>
           {tT.studioPublishWarning}
         </p>
       </div>

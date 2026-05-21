@@ -92,9 +92,9 @@ export default function TeacherLayout({ children, title }: TeacherLayoutProps) {
         <span style={{ fontSize: "0.9rem" }}>👨‍🏫</span>
         <div>
           <p style={{ margin: 0, color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.7rem" }}>{tT.space}</p>
-          <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.58rem" }}>{tT.access}</p>
+          <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: "0.72rem" }}>{tT.access}</p>
         </div>
-        <span style={{ marginLeft: "auto", padding: "2px 6px", borderRadius: 6, background: "rgba(16,185,129,0.15)", color: "#10b981", fontSize: "0.58rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>✓</span>
+        <span style={{ marginLeft: "auto", padding: "2px 6px", borderRadius: 6, background: "rgba(16,185,129,0.15)", color: "#10b981", fontSize: "0.72rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>✓</span>
       </div>
 
       <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "0 16px 8px" }} />
@@ -109,7 +109,7 @@ export default function TeacherLayout({ children, title }: TeacherLayoutProps) {
               padding: "10px 13px", borderRadius: 11, textDecoration: "none",
               background: active ? "rgba(16,185,129,0.1)" : "transparent",
               border: active ? "1px solid rgba(16,185,129,0.2)" : "1px solid transparent",
-              color: active ? "#10b981" : "rgba(255,255,255,0.45)",
+              color: active ? "#10b981" : "rgba(255,255,255,0.65)",
               fontFamily: active ? "'Syne', sans-serif" : "'DM Mono', monospace",
               fontWeight: active ? 600 : 400,
               fontSize: "0.82rem",
@@ -133,12 +133,12 @@ export default function TeacherLayout({ children, title }: TeacherLayoutProps) {
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{teacherName}</p>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem" }}>{tT.role}</p>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: "0.72rem" }}>{tT.role}</p>
           </div>
         </div>
         <button onClick={handleLogout} style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.07)", background: "transparent", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-          <span style={{ color: "rgba(255,255,255,0.38)", fontFamily: "'DM Mono', monospace", fontSize: "0.68rem" }}>{tNav.logout}</span>
-          <span style={{ color: "rgba(255,255,255,0.16)", fontSize: "0.55rem", fontFamily: "'DM Mono', monospace" }}>{tNav.logoutHint}</span>
+          <span style={{ color: "rgba(255,255,255,0.55)", fontFamily: "'DM Mono', monospace", fontSize: "0.75rem" }}>{tNav.logout}</span>
+          <span style={{ color: "rgba(255,255,255,0.38)", fontSize: "0.72rem", fontFamily: "'DM Mono', monospace" }}>{tNav.logoutHint}</span>
         </button>
       </div>
     </aside>

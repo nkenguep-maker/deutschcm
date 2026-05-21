@@ -71,9 +71,9 @@ function TeacherSidebar({ teacherName, isMobile, open, onClose }: {
         <span style={{ fontSize: "0.9rem" }}>👨‍🏫</span>
         <div>
           <p style={{ margin: 0, color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.7rem" }}>{tT.space}</p>
-          <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.58rem" }}>{tT.access}</p>
+          <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: "0.72rem" }}>{tT.access}</p>
         </div>
-        <span style={{ marginLeft: "auto", padding: "2px 6px", borderRadius: 6, background: "rgba(16,185,129,0.15)", color: "#10b981", fontSize: "0.58rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>✓</span>
+        <span style={{ marginLeft: "auto", padding: "2px 6px", borderRadius: 6, background: "rgba(16,185,129,0.15)", color: "#10b981", fontSize: "0.72rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>✓</span>
       </div>
 
       <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "0 16px 8px" }} />
@@ -87,7 +87,7 @@ function TeacherSidebar({ teacherName, isMobile, open, onClose }: {
               padding: "10px 13px", borderRadius: 11, textDecoration: "none",
               background: active ? "rgba(16,185,129,0.1)" : "transparent",
               border: active ? "1px solid rgba(16,185,129,0.2)" : "1px solid transparent",
-              color: active ? "#10b981" : "rgba(255,255,255,0.45)",
+              color: active ? "#10b981" : "rgba(255,255,255,0.65)",
               fontFamily: active ? "'Syne', sans-serif" : "'DM Mono', monospace",
               fontWeight: active ? 600 : 400, fontSize: "0.82rem", transition: "all 0.15s ease",
             }}>
@@ -106,12 +106,12 @@ function TeacherSidebar({ teacherName, isMobile, open, onClose }: {
           <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "white", background: "linear-gradient(135deg, rgba(16,185,129,0.25), rgba(5,150,105,0.1))", border: "1px solid rgba(16,185,129,0.28)" }}>{initials}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{teacherName}</p>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.6rem" }}>{tT.role}</p>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: "0.72rem" }}>{tT.role}</p>
           </div>
         </div>
         <button onClick={handleLogout} style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.07)", background: "transparent", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-          <span style={{ color: "rgba(255,255,255,0.38)", fontFamily: "'DM Mono', monospace", fontSize: "0.68rem" }}>{tNav.logout}</span>
-          <span style={{ color: "rgba(255,255,255,0.16)", fontSize: "0.55rem", fontFamily: "'DM Mono', monospace" }}>{tNav.logoutHint}</span>
+          <span style={{ color: "rgba(255,255,255,0.55)", fontFamily: "'DM Mono', monospace", fontSize: "0.75rem" }}>{tNav.logout}</span>
+          <span style={{ color: "rgba(255,255,255,0.38)", fontSize: "0.72rem", fontFamily: "'DM Mono', monospace" }}>{tNav.logoutHint}</span>
         </button>
       </div>
     </aside>
@@ -129,15 +129,15 @@ function AttentionCard({ icon, title, desc, count, cta, href, color, isMobile }:
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span style={{ fontSize: "1.1rem", opacity: isEmpty ? 0.5 : 1 }}>{icon}</span>
         {isEmpty
-          ? <span style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.72rem", fontFamily: "'DM Mono', monospace" }}>—</span>
+          ? <span style={{ color: "rgba(255,255,255,0.40)", fontSize: "0.75rem", fontFamily: "'DM Mono', monospace" }}>—</span>
           : <span style={{ padding: "2px 10px", borderRadius: 99, background: `${color}18`, color, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem" }}>{count}</span>
         }
       </div>
       <div>
-        <p style={{ margin: "0 0 3px", color: isEmpty ? "rgba(255,255,255,0.45)" : "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem" }}>{title}</p>
-        <p style={{ margin: 0, color: "rgba(255,255,255,0.32)", fontSize: "0.65rem", lineHeight: 1.4 }}>{desc}</p>
+        <p style={{ margin: "0 0 3px", color: isEmpty ? "rgba(255,255,255,0.55)" : "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem" }}>{title}</p>
+        <p style={{ margin: 0, color: "rgba(255,255,255,0.60)", fontSize: "0.75rem", lineHeight: 1.4 }}>{desc}</p>
       </div>
-      <Link href={href} style={{ fontSize: "0.68rem", color: isEmpty ? "rgba(255,255,255,0.25)" : color, textDecoration: "none", fontFamily: "'DM Mono', monospace" }}>{cta} →</Link>
+      <Link href={href} style={{ fontSize: "0.75rem", color: isEmpty ? "rgba(255,255,255,0.40)" : color, textDecoration: "none", fontFamily: "'DM Mono', monospace" }}>{cta} →</Link>
     </div>
   );
 }
@@ -155,18 +155,18 @@ function ClassroomCard({ cls, tT, tCommon }: {
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cls.name}</p>
-            <p style={{ margin: "3px 0 0", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem", fontFamily: "'DM Mono', monospace" }}>{cls.code}</p>
+            <p style={{ margin: "3px 0 0", color: "rgba(255,255,255,0.55)", fontSize: "0.75rem", fontFamily: "'DM Mono', monospace" }}>{cls.code}</p>
           </div>
           <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-            <span style={{ padding: "2px 8px", borderRadius: 6, background: `${c}18`, color: c, border: `1px solid ${c}33`, fontSize: "0.62rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>{cls.level}</span>
-            <span style={{ padding: "2px 8px", borderRadius: 6, background: cls.isActive ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.05)", color: cls.isActive ? "#10b981" : "rgba(255,255,255,0.3)", fontSize: "0.6rem" }}>{cls.isActive ? tCommon.active : tCommon.inactive}</span>
+            <span style={{ padding: "2px 8px", borderRadius: 6, background: `${c}18`, color: c, border: `1px solid ${c}33`, fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>{cls.level}</span>
+            <span style={{ padding: "2px 8px", borderRadius: 6, background: cls.isActive ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.05)", color: cls.isActive ? "#10b981" : "rgba(255,255,255,0.55)", fontSize: "0.75rem" }}>{cls.isActive ? tCommon.active : tCommon.inactive}</span>
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
           {[{ v: cls.students, l: tT.classStudents }, { v: `${cls.avgProgress ?? 0}%`, l: tT.classProgress }, { v: `${cls.avgScore ?? 0}/10`, l: tT.classAvgScore }].map((s) => (
             <div key={s.l} style={{ textAlign: "center" }}>
               <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>{s.v}</p>
-              <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.3)", fontSize: "0.58rem" }}>{s.l}</p>
+              <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.60)", fontSize: "0.75rem" }}>{s.l}</p>
             </div>
           ))}
         </div>
@@ -278,12 +278,12 @@ export default function TeacherDashboard() {
               )}
               <div style={{ minWidth: 0 }}>
                 <h1 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: isMobile ? "0.92rem" : "1.05rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tNav.today}</h1>
-                {!isMobile && <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.68rem", textTransform: "capitalize" }}>{today}</p>}
+                {!isMobile && <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: "0.75rem", textTransform: "capitalize" }}>{today}</p>}
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
               {!isMobile && (
-                <span style={{ padding: "5px 12px", borderRadius: 20, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", color: "#10b981", fontSize: "0.68rem", fontFamily: "'Syne', sans-serif", fontWeight: 600, whiteSpace: "nowrap" }}>
+                <span style={{ padding: "5px 12px", borderRadius: 20, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", color: "#10b981", fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 600, whiteSpace: "nowrap" }}>
                   {tT.aiPill}
                 </span>
               )}
@@ -302,19 +302,19 @@ export default function TeacherDashboard() {
                 <p style={{ margin: "0 0 4px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: isMobile ? "1.25rem" : "1.4rem" }}>
                   {tT.greeting.replace("{name}", firstName)}
                 </p>
-                <p style={{ margin: "0 0 12px", color: "rgba(255,255,255,0.38)", fontSize: "0.75rem" }}>{tT.todaySubtitle}</p>
+                <p style={{ margin: "0 0 12px", color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>{tT.todaySubtitle}</p>
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "10px 16px", borderRadius: 12, background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.15)" }}>
                   <span style={{ color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.8rem" }}>{tT.expertiseCenter}</span>
                   {!isMobile && <span style={{ width: 1, height: 14, background: "rgba(255,255,255,0.1)" }} />}
-                  {!isMobile && <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.65rem", maxWidth: 360 }}>{tT.expertiseSupportCopy}</span>}
+                  {!isMobile && <span style={{ color: "rgba(255,255,255,0.60)", fontSize: "0.78rem", maxWidth: 360 }}>{tT.expertiseSupportCopy}</span>}
                 </div>
               </div>
             )}
 
             {/* Priority card */}
             <div className="fade-up" style={{ marginBottom: 22, padding: "18px 20px", borderRadius: 16, background: pendingCorrections > 0 ? "rgba(99,102,241,0.07)" : "rgba(16,185,129,0.05)", border: `1px solid ${pendingCorrections > 0 ? "rgba(99,102,241,0.25)" : "rgba(16,185,129,0.18)"}` }}>
-              <p style={{ margin: "0 0 6px", color: "rgba(255,255,255,0.5)", fontSize: "0.62rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{tT.todayPriorityTitle}</p>
-              <p style={{ margin: "0 0 14px", color: "rgba(255,255,255,0.75)", fontSize: "0.8rem", lineHeight: 1.55 }}>
+              <p style={{ margin: "0 0 6px", color: "rgba(255,255,255,0.65)", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{tT.todayPriorityTitle}</p>
+              <p style={{ margin: "0 0 14px", color: "rgba(255,255,255,0.82)", fontSize: "0.875rem", lineHeight: 1.55 }}>
                 {pendingCorrections > 0 ? tT.todayPriorityPendingText : tT.todayPriorityCalmText}
               </p>
               <Link href={pendingCorrections > 0 ? "/teacher/assignments" : "/teacher/activities"} style={{
@@ -330,7 +330,7 @@ export default function TeacherDashboard() {
 
             {/* Attention section header */}
             <div className="fade-up" style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: 10 }}>
-              <h2 style={{ margin: 0, color: "rgba(255,255,255,0.6)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <h2 style={{ margin: 0, color: "rgba(255,255,255,0.72)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                 {tT.todayAttnSection}
               </h2>
               <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.06)" }} />
@@ -349,32 +349,32 @@ export default function TeacherDashboard() {
               <div style={{ padding: "18px 20px", borderRadius: 16, background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.2)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                   <span style={{ fontSize: "1rem" }}>👨‍🏫</span>
-                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{tT.myTeacherCode}</span>
+                  <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{tT.myTeacherCode}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <code style={{ flex: 1, background: "rgba(0,0,0,0.3)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 10, padding: "10px 14px", color: "#818cf8", fontSize: "1rem", fontFamily: "monospace", letterSpacing: "0.1em", fontWeight: 700 }}>
                     {teacherCode ?? tT.loading}
                   </code>
-                  <button onClick={() => teacherCode && copyCode(teacherCode)} style={{ padding: "10px 14px", borderRadius: 10, background: codeCopied ? "rgba(99,102,241,0.2)" : "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", color: codeCopied ? "#818cf8" : "rgba(255,255,255,0.5)", fontSize: "0.72rem", cursor: "pointer", whiteSpace: "nowrap" }}>
+                  <button onClick={() => teacherCode && copyCode(teacherCode)} style={{ padding: "10px 14px", borderRadius: 10, background: codeCopied ? "rgba(99,102,241,0.2)" : "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", color: codeCopied ? "#818cf8" : "rgba(255,255,255,0.72)", fontSize: "0.78rem", cursor: "pointer", whiteSpace: "nowrap" }}>
                     {codeCopied ? tT.copied : tT.copy}
                   </button>
                 </div>
-                <p style={{ margin: "8px 0 0", color: "rgba(255,255,255,0.3)", fontSize: "0.62rem" }}>{tT.shareCodeStudents}</p>
+                <p style={{ margin: "8px 0 0", color: "rgba(255,255,255,0.55)", fontSize: "0.75rem" }}>{tT.shareCodeStudents}</p>
               </div>
 
               <div style={{ padding: "18px 20px", borderRadius: 16, background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.15)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                   <span style={{ fontSize: "1rem" }}>🏫</span>
-                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{tT.myClassCodes}</span>
+                  <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{tT.myClassCodes}</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {classrooms.length === 0 ? (
-                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.68rem", margin: 0 }}>{tT.shareClassCode}</p>
+                    <p style={{ color: "rgba(255,255,255,0.60)", fontSize: "0.78rem", margin: 0 }}>{tT.shareClassCode}</p>
                   ) : classrooms.map(cls => (
                     <div key={cls.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.68rem", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cls.name}</span>
-                      <code style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 6, padding: "3px 8px", color: "#10b981", fontSize: "0.65rem", fontFamily: "monospace", flexShrink: 0 }}>{cls.code}</code>
-                      <button onClick={() => navigator.clipboard.writeText(cls.code)} style={{ padding: "3px 8px", borderRadius: 6, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", color: "rgba(255,255,255,0.4)", fontSize: "0.6rem", cursor: "pointer" }}>⎘</button>
+                      <span style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.78rem", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cls.name}</span>
+                      <code style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 6, padding: "3px 8px", color: "#10b981", fontSize: "0.75rem", fontFamily: "monospace", flexShrink: 0 }}>{cls.code}</code>
+                      <button onClick={() => navigator.clipboard.writeText(cls.code)} style={{ padding: "3px 8px", borderRadius: 6, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", color: "rgba(255,255,255,0.60)", fontSize: "0.75rem", cursor: "pointer" }}>⎘</button>
                     </div>
                   ))}
                 </div>
@@ -386,14 +386,14 @@ export default function TeacherDashboard() {
               <div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
                   <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>{tT.sectionClasses}</h2>
-                  <Link href="/teacher/classrooms" style={{ color: "#10b981", fontSize: "0.68rem", fontFamily: "'DM Mono', monospace", textDecoration: "none" }}>{tT.viewAll}</Link>
+                  <Link href="/teacher/classrooms" style={{ color: "#10b981", fontSize: "0.75rem", fontFamily: "'DM Mono', monospace", textDecoration: "none" }}>{tT.viewAll}</Link>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {loading ? (
                     <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem" }}>{tT.loading}</p>
                   ) : classrooms.length === 0 ? (
                     <div style={{ padding: "24px", borderRadius: 16, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
-                      <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem", margin: "0 0 12px" }}>{tT.classesEmpty}</p>
+                      <p style={{ color: "rgba(255,255,255,0.60)", fontSize: "0.875rem", margin: "0 0 12px" }}>{tT.classesEmpty}</p>
                       <Link href="/teacher/classroom/new" style={{ color: "#10b981", fontSize: "0.78rem", textDecoration: "none" }}>{tT.createFirstClass}</Link>
                     </div>
                   ) : classrooms.map((cls) => <ClassroomCard key={cls.id} cls={cls} tT={tT} tCommon={tCommon} />)}
@@ -409,7 +409,7 @@ export default function TeacherDashboard() {
                   { label: tT.statAssignmentsLabel, value: `${pendingCorrections}`, color: "#f59e0b" },
                 ].map(s => (
                   <div key={s.label} style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem" }}>{s.label}</span>
+                    <span style={{ color: "rgba(255,255,255,0.68)", fontSize: "0.78rem" }}>{s.label}</span>
                     <span style={{ color: s.color, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{s.value}</span>
                   </div>
                 ))}
@@ -417,20 +417,20 @@ export default function TeacherDashboard() {
                 {/* Struggling students */}
                 {difficultStudents.length > 0 && (
                   <div style={{ padding: "14px 16px", borderRadius: 12, background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.15)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem" }}>{tT.struggling}</span>
+                    <span style={{ color: "rgba(255,255,255,0.68)", fontSize: "0.78rem" }}>{tT.struggling}</span>
                     <span style={{ color: "#f87171", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{difficultStudents.length}</span>
                   </div>
                 )}
 
                 <div style={{ padding: "16px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
-                  <p style={{ color: "rgba(255,255,255,0.28)", fontSize: "0.7rem", margin: 0 }}>{tT.activityEmpty}</p>
+                  <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.78rem", margin: 0 }}>{tT.activityEmpty}</p>
                 </div>
               </div>
             </div>
 
             {/* Empty corrections note */}
             <div style={{ padding: "20px 24px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
-              <p style={{ color: "rgba(255,255,255,0.28)", fontSize: "0.75rem", margin: 0 }}>{tT.assignmentsEmpty}</p>
+              <p style={{ color: "rgba(255,255,255,0.60)", fontSize: "0.82rem", margin: 0 }}>{tT.assignmentsEmpty}</p>
               <Link href="/teacher/assignments" style={{ color: "#10b981", fontSize: "0.72rem", textDecoration: "none", fontFamily: "'Syne', sans-serif", fontWeight: 600, whiteSpace: "nowrap" }}>{tT.viewAll}</Link>
             </div>
 
@@ -438,10 +438,10 @@ export default function TeacherDashboard() {
             <div style={{ padding: "20px 22px", borderRadius: 16, background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.12)" }}>
               <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
                 <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>{tT.impactTitle}</h2>
-                <span style={{ color: "rgba(255,255,255,0.28)", fontSize: "0.65rem" }}>{tT.impactSubtitle}</span>
+                <span style={{ color: "rgba(255,255,255,0.60)", fontSize: "0.78rem" }}>{tT.impactSubtitle}</span>
               </div>
               {totalStudents === 0 ? (
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.28)", fontSize: "0.72rem" }}>{tT.impactEmpty}</p>
+                <p style={{ margin: 0, color: "rgba(255,255,255,0.60)", fontSize: "0.82rem" }}>{tT.impactEmpty}</p>
               ) : (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(150px, 100%), 1fr))", gap: 10, marginTop: 14 }}>
                   {[
@@ -450,12 +450,12 @@ export default function TeacherDashboard() {
                   ].map(m => (
                     <div key={m.label} style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                       <p style={{ margin: "0 0 2px", color: m.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.4rem" }}>{m.value}</p>
-                      <p style={{ margin: 0, color: "rgba(255,255,255,0.35)", fontSize: "0.62rem" }}>{m.label}</p>
+                      <p style={{ margin: 0, color: "rgba(255,255,255,0.60)", fontSize: "0.75rem" }}>{m.label}</p>
                     </div>
                   ))}
                 </div>
               )}
-              <p style={{ margin: "14px 0 0", color: "rgba(255,255,255,0.18)", fontSize: "0.6rem", fontFamily: "'DM Mono', monospace" }}>{tT.microcopy2}</p>
+              <p style={{ margin: "14px 0 0", color: "rgba(255,255,255,0.45)", fontSize: "0.75rem", fontFamily: "'DM Mono', monospace" }}>{tT.microcopy2}</p>
             </div>
           </main>
         </div>

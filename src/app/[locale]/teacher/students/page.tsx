@@ -63,7 +63,7 @@ export default function LearnersPage() {
 
         {/* Demo banner */}
         <div style={{ marginBottom: 20, padding: "10px 14px", borderRadius: 10, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(245,158,11,0.15)", color: "#f59e0b", fontSize: "0.62rem", fontFamily: "'Syne', sans-serif", fontWeight: 700, flexShrink: 0 }}>{tT.demoLabel}</span>
+          <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(245,158,11,0.15)", color: "#f59e0b", fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 700, flexShrink: 0 }}>{tT.demoLabel}</span>
           <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>{tT.demoLearnersBanner}</span>
         </div>
 
@@ -79,7 +79,7 @@ export default function LearnersPage() {
                 display: "flex", alignItems: "center", gap: 6,
               }}>
                 {tab.label}
-                <span style={{ padding: "1px 6px", borderRadius: 99, background: filter === tab.key ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.08)", fontSize: "0.65rem" }}>{tab.count}</span>
+                <span style={{ padding: "1px 6px", borderRadius: 99, background: filter === tab.key ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.08)", fontSize: "0.75rem" }}>{tab.count}</span>
               </button>
             ))}
           </div>
@@ -109,9 +109,9 @@ export default function LearnersPage() {
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.name}</p>
-                      <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.60)", fontSize: "0.78rem" }}>{s.class}</p>
+                      <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.68)", fontSize: "0.82rem" }}>{s.class}</p>
                     </div>
-                    <span style={{ padding: "3px 10px", borderRadius: 20, background: cfg.bg, border: `1px solid ${cfg.border}`, color: cfg.color, fontSize: "0.6rem", fontFamily: "'Syne', sans-serif", fontWeight: 600, flexShrink: 0 }}>
+                    <span style={{ padding: "3px 10px", borderRadius: 20, background: cfg.bg, border: `1px solid ${cfg.border}`, color: cfg.color, fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 600, flexShrink: 0 }}>
                       {cfg.label(tT)}
                     </span>
                   </div>
@@ -120,15 +120,15 @@ export default function LearnersPage() {
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
                     <div style={{ textAlign: "center", padding: "8px 4px", borderRadius: 8, background: "rgba(255,255,255,0.03)" }}>
                       <p style={{ margin: 0, color: scoreColor(s.avgScore), fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{s.avgScore}/10</p>
-                      <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.58)", fontSize: "0.72rem" }}>score</p>
+                      <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.65)", fontSize: "0.75rem" }}>score</p>
                     </div>
                     <div style={{ textAlign: "center", padding: "8px 4px", borderRadius: 8, background: "rgba(255,255,255,0.03)" }}>
                       <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{s.progress}%</p>
-                      <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.58)", fontSize: "0.72rem" }}>{tT.classProgress}</p>
+                      <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.65)", fontSize: "0.75rem" }}>{tT.classProgress}</p>
                     </div>
                     <div style={{ textAlign: "center", padding: "8px 4px", borderRadius: 8, background: "rgba(255,255,255,0.03)" }}>
                       <p style={{ margin: 0, color: s.streak > 0 ? "#f59e0b" : "rgba(255,255,255,0.25)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{s.streak > 0 ? `🔥 ${s.streak}j` : "—"}</p>
-                      <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.58)", fontSize: "0.72rem" }}>streak</p>
+                      <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.65)", fontSize: "0.75rem" }}>streak</p>
                     </div>
                   </div>
 
@@ -139,8 +139,8 @@ export default function LearnersPage() {
 
                   {/* Footer */}
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <span style={{ color: "rgba(255,255,255,0.60)", fontSize: "0.78rem" }}>{tT.learnerLastActive ?? "Dernière activité"} : il y a {s.lastActive}</span>
-                    <Link href={`/teacher/students/${s.id}`} style={{ padding: "4px 12px", borderRadius: 8, background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.68)", fontSize: "0.80rem", textDecoration: "none", fontFamily: "'Syne', sans-serif" }}>
+                    <span style={{ color: "rgba(255,255,255,0.68)", fontSize: "0.82rem" }}>{tT.learnerLastActive ?? "Dernière activité"} : il y a {s.lastActive}</span>
+                    <Link href={`/teacher/students/${s.id}`} style={{ padding: "4px 12px", borderRadius: 8, background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.78)", fontSize: "0.82rem", textDecoration: "none", fontFamily: "'Syne', sans-serif" }}>
                       {tT.viewStudent}
                     </Link>
                   </div>

@@ -42,14 +42,14 @@ export default function NewClassroomPage() {
           >← Retour</button>
           <div>
             <h1 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.2rem" }}>Créer une classe</h1>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.75rem" }}>Les élèves pourront la rejoindre via un code</p>
+            <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>Les élèves pourront la rejoindre via un code</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Nom */}
           <div>
-            <label style={{ display: "block", color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+            <label style={{ display: "block", color: "rgba(255,255,255,0.72)", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
               Nom de la classe *
             </label>
             <input
@@ -62,12 +62,12 @@ export default function NewClassroomPage() {
                 color: "white", outline: "none", boxSizing: "border-box",
               }}
             />
-            {errors.name && <span style={{ color: "#ef4444", fontSize: 11, marginTop: 4, display: "block" }}>{errors.name}</span>}
+            {errors.name && <span style={{ color: "#ef4444", fontSize: 12, marginTop: 4, display: "block" }}>{errors.name}</span>}
           </div>
 
           {/* Niveau */}
           <div>
-            <label style={{ display: "block", color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+            <label style={{ display: "block", color: "rgba(255,255,255,0.72)", fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
               Niveau CECR *
             </label>
             <div style={{ display: "flex", gap: 8 }}>
@@ -79,7 +79,7 @@ export default function NewClassroomPage() {
                     padding: "8px 16px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer",
                     background: form.level === lvl ? `${LEVEL_COLORS[lvl]}22` : "rgba(255,255,255,0.04)",
                     border: `1.5px solid ${form.level === lvl ? LEVEL_COLORS[lvl] : "rgba(255,255,255,0.1)"}`,
-                    color: form.level === lvl ? LEVEL_COLORS[lvl] : "rgba(255,255,255,0.5)",
+                    color: form.level === lvl ? LEVEL_COLORS[lvl] : "rgba(255,255,255,0.72)",
                     transition: "all 0.15s",
                   }}
                 >{lvl}</button>
@@ -90,7 +90,7 @@ export default function NewClassroomPage() {
           {/* Max students + schedule */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 14 }}>
             <div>
-              <label style={{ display: "block", color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+              <label style={{ display: "block", color: "rgba(255,255,255,0.72)", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
                 Max. élèves *
               </label>
               <input
@@ -103,10 +103,10 @@ export default function NewClassroomPage() {
                   color: "white", outline: "none", boxSizing: "border-box",
                 }}
               />
-              {errors.maxStudents && <span style={{ color: "#ef4444", fontSize: 11, marginTop: 4, display: "block" }}>{errors.maxStudents}</span>}
+              {errors.maxStudents && <span style={{ color: "#ef4444", fontSize: 12, marginTop: 4, display: "block" }}>{errors.maxStudents}</span>}
             </div>
             <div>
-              <label style={{ display: "block", color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+              <label style={{ display: "block", color: "rgba(255,255,255,0.72)", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
                 Horaires *
               </label>
               <input
@@ -119,14 +119,14 @@ export default function NewClassroomPage() {
                   color: "white", outline: "none", boxSizing: "border-box",
                 }}
               />
-              {errors.schedule && <span style={{ color: "#ef4444", fontSize: 11, marginTop: 4, display: "block" }}>{errors.schedule}</span>}
+              {errors.schedule && <span style={{ color: "#ef4444", fontSize: 12, marginTop: 4, display: "block" }}>{errors.schedule}</span>}
             </div>
           </div>
 
           {/* Description */}
           <div>
-            <label style={{ display: "block", color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
-              Description <span style={{ color: "rgba(255,255,255,0.25)", fontWeight: 400 }}>(optionnel)</span>
+            <label style={{ display: "block", color: "rgba(255,255,255,0.72)", fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
+              Description <span style={{ color: "rgba(255,255,255,0.45)", fontWeight: 400 }}>(optionnel)</span>
             </label>
             <textarea
               value={form.description}
@@ -148,12 +148,12 @@ export default function NewClassroomPage() {
               padding: "16px 18px", borderRadius: 14,
               background: `${lc}08`, border: `1px solid ${lc}30`,
             }}>
-              <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, marginBottom: 8 }}>Aperçu</div>
+              <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, marginBottom: 8 }}>Aperçu</div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ background: `${lc}20`, color: lc, border: `1px solid ${lc}40`, borderRadius: 7, padding: "2px 8px", fontSize: 12, fontWeight: 700 }}>{form.level}</span>
                 <span style={{ color: "white", fontWeight: 700, fontSize: 15 }}>{form.name}</span>
               </div>
-              {form.schedule && <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, marginTop: 6 }}>📅 {form.schedule} · {form.maxStudents} élèves max</div>}
+              {form.schedule && <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, marginTop: 6 }}>📅 {form.schedule} · {form.maxStudents} élèves max</div>}
             </div>
           )}
 
@@ -162,7 +162,7 @@ export default function NewClassroomPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              style={{ flex: 1, padding: "13px", borderRadius: 12, fontSize: 14, fontWeight: 600, cursor: "pointer", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
+              style={{ flex: 1, padding: "13px", borderRadius: 12, fontSize: 14, fontWeight: 600, cursor: "pointer", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.65)" }}
             >Annuler</button>
             <button
               type="submit"

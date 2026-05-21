@@ -53,8 +53,8 @@ export default function CorrectionsPage() {
               { step: "4", label: tT.correctionStepSend,    color: "#10b981" },
             ].map((s, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                {i > 0 && <span style={{ color: "rgba(255,255,255,0.15)", fontSize: "0.6rem" }}>→</span>}
-                <span style={{ padding: "2px 8px", borderRadius: 6, background: `${s.color}12`, border: `1px solid ${s.color}28`, color: s.color, fontSize: "0.6rem", fontFamily: "'DM Mono', monospace" }}>
+                {i > 0 && <span style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.75rem" }}>→</span>}
+                <span style={{ padding: "2px 8px", borderRadius: 6, background: `${s.color}12`, border: `1px solid ${s.color}28`, color: s.color, fontSize: "0.75rem", fontFamily: "'DM Mono', monospace" }}>
                   {s.step}. {s.label}
                 </span>
               </div>
@@ -64,7 +64,7 @@ export default function CorrectionsPage() {
 
         {/* Demo banner */}
         <div style={{ marginBottom: 20, padding: "10px 14px", borderRadius: 10, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(245,158,11,0.15)", color: "#f59e0b", fontSize: "0.6rem", fontFamily: "'Syne', sans-serif", fontWeight: 700, flexShrink: 0 }}>{tT.sampleLabel}</span>
+          <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(245,158,11,0.15)", color: "#f59e0b", fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 700, flexShrink: 0 }}>{tT.sampleLabel}</span>
           <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>{tT.aiTrustNote}</span>
         </div>
 
@@ -79,7 +79,7 @@ export default function CorrectionsPage() {
               display: "flex", alignItems: "center", gap: 6,
             }}>
               {tab.label}
-              <span style={{ padding: "1px 6px", borderRadius: 99, background: activeTab === tab.key ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.08)", fontSize: "0.65rem" }}>{tab.count}</span>
+              <span style={{ padding: "1px 6px", borderRadius: 99, background: activeTab === tab.key ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.08)", fontSize: "0.75rem" }}>{tab.count}</span>
             </button>
           ))}
           <span style={{ flex: 1 }} />
@@ -106,30 +106,30 @@ export default function CorrectionsPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
                       <span style={{ color: "rgba(255,255,255,0.9)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem" }}>{a.title}</span>
-                      <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(99,102,241,0.12)", color: "#818cf8", fontSize: "0.6rem" }}>{a.class}</span>
+                      <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(99,102,241,0.12)", color: "#818cf8", fontSize: "0.75rem" }}>{a.class}</span>
                       {a.hasAI && (
-                        <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(16,185,129,0.1)", color: "#10b981", fontSize: "0.6rem", border: "1px solid rgba(16,185,129,0.2)" }}>
+                        <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(16,185,129,0.1)", color: "#10b981", fontSize: "0.75rem", border: "1px solid rgba(16,185,129,0.2)" }}>
                           ✨ {tT.aiSuggestionAvailable}
                         </span>
                       )}
-                      <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(245,158,11,0.1)", color: "rgba(245,158,11,0.7)", fontSize: "0.58rem", border: "1px solid rgba(245,158,11,0.2)" }}>
+                      <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(245,158,11,0.1)", color: "#f59e0b", fontSize: "0.75rem", border: "1px solid rgba(245,158,11,0.2)" }}>
                         {tT.sampleLabel}
                       </span>
                     </div>
-                    <p style={{ margin: "0 0 10px", color: "rgba(255,255,255,0.60)", fontSize: "0.80rem" }}>
+                    <p style={{ margin: "0 0 10px", color: "rgba(255,255,255,0.72)", fontSize: "0.875rem" }}>
                       {tT.deadline} : {a.due} · {tT.maxScoreLabel} : {a.maxScore} pts
                     </p>
                     <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                       <div style={{ flex: 1, maxWidth: 220 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                          <span style={{ color: "rgba(255,255,255,0.62)", fontSize: "0.78rem" }}>{tT.submittedLabel}</span>
-                          <span style={{ color: scoreColor(pct), fontSize: "0.68rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>{a.submitted}/{a.total}</span>
+                          <span style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.82rem" }}>{tT.submittedLabel}</span>
+                          <span style={{ color: scoreColor(pct), fontSize: "0.78rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>{a.submitted}/{a.total}</span>
                         </div>
                         <div style={{ height: 4, borderRadius: 99, background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
                           <div style={{ height: "100%", borderRadius: 99, width: `${pct}%`, background: scoreColor(pct) }} />
                         </div>
                       </div>
-                      <span style={{ color: "rgba(255,255,255,0.58)", fontSize: "0.78rem" }}>{pct}% {tT.submittedPctLabel}</span>
+                      <span style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.82rem" }}>{pct}% {tT.submittedPctLabel}</span>
                     </div>
                   </div>
                   <button style={{
@@ -156,8 +156,8 @@ export default function CorrectionsPage() {
                   { label: tT.fieldDue,   ph: "" },
                 ].map(f => (
                   <div key={f.label}>
-                    <label style={{ color: "rgba(255,255,255,0.68)", fontSize: "0.86rem", display: "block", marginBottom: 6 }}>{f.label}</label>
-                    <input placeholder={f.ph} style={{ width: "100%", padding: "10px 14px", borderRadius: 9, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: "0.82rem", outline: "none", boxSizing: "border-box" }} />
+                    <label style={{ color: "rgba(255,255,255,0.78)", fontSize: "0.875rem", display: "block", marginBottom: 6 }}>{f.label}</label>
+                    <input placeholder={f.ph} style={{ width: "100%", padding: "10px 14px", borderRadius: 9, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: "1rem", outline: "none", boxSizing: "border-box" }} />
                   </div>
                 ))}
                 {/* Teacher review always ON */}
@@ -166,11 +166,11 @@ export default function CorrectionsPage() {
                     <span style={{ color: "#10b981", fontSize: "0.85rem" }}>✓</span>
                     <span style={{ color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.75rem" }}>{tT.activityValidationRequired}</span>
                   </div>
-                  <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: "0.78rem", paddingLeft: 24 }}>{tT.microcopy1}</p>
+                  <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", paddingLeft: 24 }}>{tT.microcopy1}</p>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 22 }}>
-                <button onClick={() => setShowModal(false)} style={{ padding: "8px 18px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: "0.8rem" }}>{tC.cancel}</button>
+                <button onClick={() => setShowModal(false)} style={{ padding: "8px 18px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.65)", cursor: "pointer", fontSize: "0.875rem" }}>{tC.cancel}</button>
                 <button onClick={() => setShowModal(false)} style={{ padding: "8px 18px", borderRadius: 9, border: "none", background: "#10b981", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, cursor: "pointer", fontSize: "0.8rem" }}>{tT.createActivityDraft}</button>
               </div>
             </div>

@@ -241,14 +241,14 @@ export default function StudentProfilePage() {
           <button
             onClick={() => router.push("/teacher")}
             style={{
-              background: "none", border: "none", color: "#64748b", cursor: "pointer",
+              background: "none", border: "none", color: "#94a3b8", cursor: "pointer",
               fontSize: 13, display: "flex", alignItems: "center", gap: 6,
             }}
           >
             ← Tableau de bord
           </button>
-          <span style={{ color: "#2a3441" }}>›</span>
-          <span style={{ color: "#94a3b8", fontSize: 13 }}>Élèves</span>
+          <span style={{ color: "#4a5568" }}>›</span>
+          <span style={{ color: "#cbd5e1", fontSize: 13 }}>Élèves</span>
           <span style={{ color: "#2a3441" }}>›</span>
           <span style={{ color: "#10b981", fontSize: 13, fontWeight: 600 }}>{student.fullName}</span>
         </div>
@@ -269,7 +269,7 @@ export default function StudentProfilePage() {
               <div style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 18, marginBottom: 4 }}>
                 {student.fullName}
               </div>
-              <div style={{ color: "#64748b", fontSize: 13, marginBottom: 12 }}>{student.email}</div>
+              <div style={{ color: "#94a3b8", fontSize: 13, marginBottom: 12 }}>{student.email}</div>
               <span style={{
                 background: `${levelColors[student.level] ?? "#10b981"}22`,
                 color: levelColors[student.level] ?? "#10b981",
@@ -283,7 +283,7 @@ export default function StudentProfilePage() {
 
           {/* Stats */}
           <div style={{ background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 16, padding: 20 }}>
-            <div style={{ color: "#94a3b8", fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 16 }}>
+            <div style={{ color: "#cbd5e1", fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 16 }}>
               Statistiques
             </div>
             {[
@@ -298,7 +298,7 @@ export default function StudentProfilePage() {
                 display: "flex", justifyContent: "space-between", alignItems: "center",
                 padding: "8px 0", borderBottom: "1px solid #1e2d3d",
               }}>
-                <span style={{ color: "#64748b", fontSize: 13 }}>{stat.icon} {stat.label}</span>
+                <span style={{ color: "#94a3b8", fontSize: 13 }}>{stat.icon} {stat.label}</span>
                 <span style={{ color: "#e2e8f0", fontSize: 13, fontWeight: 600 }}>{stat.value}</span>
               </div>
             ))}
@@ -306,7 +306,7 @@ export default function StudentProfilePage() {
 
           {/* Feedback */}
           <div style={{ background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 16, padding: 20 }}>
-            <div style={{ color: "#94a3b8", fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
+            <div style={{ color: "#cbd5e1", fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
               Commentaire enseignant
             </div>
             <textarea
@@ -335,12 +335,12 @@ export default function StudentProfilePage() {
 
           {/* Level modification section */}
           <div style={{ background: "#0d1117", border: "1px solid #1e2d3d", borderRadius: 16, padding: 20 }}>
-            <div style={{ color: "#94a3b8", fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 14 }}>
+            <div style={{ color: "#cbd5e1", fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 14 }}>
               📊 Évaluation en présentiel
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
               <div>
-                <div style={{ color: "#64748b", fontSize: 12, marginBottom: 4 }}>Niveau actuel</div>
+                <div style={{ color: "#94a3b8", fontSize: 12, marginBottom: 4 }}>Niveau actuel</div>
                 <span style={{
                   background: `${levelColors[student.level] ?? "#10b981"}22`,
                   color: levelColors[student.level] ?? "#10b981",
@@ -363,14 +363,14 @@ export default function StudentProfilePage() {
             </div>
 
             {/* History */}
-            <div style={{ color: "#64748b", fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>
+            <div style={{ color: "#94a3b8", fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>
               Historique
             </div>
             {!levelHistoryLoaded && (
-              <div style={{ color: "#64748b", fontSize: 12 }}>Chargement…</div>
+              <div style={{ color: "#94a3b8", fontSize: 12 }}>Chargement…</div>
             )}
             {levelHistoryLoaded && levelHistory.length === 0 && (
-              <div style={{ color: "#2a3441", fontSize: 12 }}>Aucune modification enregistrée.</div>
+              <div style={{ color: "#64748b", fontSize: 12 }}>Aucune modification enregistrée.</div>
             )}
             {levelHistory.map(h => (
               <div key={h.id} style={{
@@ -378,14 +378,14 @@ export default function StudentProfilePage() {
                 padding: "10px 12px", marginBottom: 8,
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                  <span style={{ color: "#94a3b8", fontSize: 13, fontFamily: "monospace" }}>
+                  <span style={{ color: "#cbd5e1", fontSize: 13, fontFamily: "monospace" }}>
                     {h.oldLevel} → {h.newLevel}
                   </span>
-                  <span style={{ color: "#2a3441", fontSize: 11 }}>
+                  <span style={{ color: "#94a3b8", fontSize: 12 }}>
                     {new Date(h.changedAt).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })}
                   </span>
                 </div>
-                <div style={{ color: "#64748b", fontSize: 12, fontStyle: "italic" }}>{h.reason}</div>
+                <div style={{ color: "#94a3b8", fontSize: 12, fontStyle: "italic" }}>{h.reason}</div>
               </div>
             ))}
           </div>
@@ -402,8 +402,8 @@ export default function StudentProfilePage() {
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={SCORE_EVOLUTION}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e2d3d" />
-                <XAxis dataKey="date" stroke="#64748b" tick={{ fontSize: 11 }} tickLine={false} />
-                <YAxis stroke="#64748b" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} domain={[0, 10]} />
+                <XAxis dataKey="date" stroke="#94a3b8" tick={{ fontSize: 12 }} tickLine={false} />
+                <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} domain={[0, 10]} />
                 <Tooltip
                   contentStyle={{ background: "#161b22", border: "1px solid #1e2d3d", borderRadius: 8, color: "#e2e8f0" }}
                   formatter={(v) => [typeof v === "number" ? v.toFixed(1) : String(v ?? ""), "Score"] as [string, string]}
@@ -434,8 +434,8 @@ export default function StudentProfilePage() {
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                        <span style={{ color: "#94a3b8", fontSize: 13 }}>{cp.title}</span>
-                        <span style={{ color: "#64748b", fontSize: 12 }}>
+                        <span style={{ color: "#cbd5e1", fontSize: 13 }}>{cp.title}</span>
+                        <span style={{ color: "#94a3b8", fontSize: 12 }}>
                           {cp.modulesCompleted}/{cp.modulesTotal} modules
                           {cp.avgScore > 0 && (
                             <span style={{ marginLeft: 12, color, fontWeight: 600 }}>
@@ -475,7 +475,7 @@ export default function StudentProfilePage() {
                         <div style={{ color: "#e2e8f0", fontWeight: 600, fontSize: 14, marginBottom: 2 }}>
                           {session.scenario}
                         </div>
-                        <div style={{ color: "#64748b", fontSize: 12 }}>
+                        <div style={{ color: "#94a3b8", fontSize: 12 }}>
                           {formatDateShort(session.date)} · {session.duration} min · Niveau {session.niveau}
                         </div>
                       </div>
@@ -497,7 +497,7 @@ export default function StudentProfilePage() {
                         return (
                           <div key={s.label} style={{ textAlign: "center" }}>
                             <div style={{ color: c, fontSize: 18, fontWeight: 800 }}>{s.value}</div>
-                            <div style={{ color: "#64748b", fontSize: 11 }}>{s.label}</div>
+                            <div style={{ color: "#94a3b8", fontSize: 12 }}>{s.label}</div>
                           </div>
                         );
                       })}
@@ -519,8 +519,8 @@ export default function StudentProfilePage() {
                   <tr style={{ borderBottom: "1px solid #1e2d3d" }}>
                     {["Module", "Date", "Score", "Résultat", "Tentative"].map(h => (
                       <th key={h} style={{
-                        padding: "10px 14px", textAlign: "left", color: "#64748b",
-                        fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em",
+                        padding: "10px 14px", textAlign: "left", color: "#94a3b8",
+                        fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em",
                       }}>
                         {h}
                       </th>
@@ -530,20 +530,20 @@ export default function StudentProfilePage() {
                 <tbody>
                   {MOCK_QUIZ_ATTEMPTS.map((qa, i) => (
                     <tr key={qa.id} style={{ borderBottom: i < MOCK_QUIZ_ATTEMPTS.length - 1 ? "1px solid #1e2d3d" : "none" }}>
-                      <td style={{ padding: "12px 14px", color: "#94a3b8", fontSize: 13 }}>{qa.module}</td>
-                      <td style={{ padding: "12px 14px", color: "#64748b", fontSize: 12 }}>{formatDateShort(qa.date)}</td>
+                      <td style={{ padding: "12px 14px", color: "#cbd5e1", fontSize: 13 }}>{qa.module}</td>
+                      <td style={{ padding: "12px 14px", color: "#94a3b8", fontSize: 13 }}>{formatDateShort(qa.date)}</td>
                       <td style={{ padding: "12px 14px" }}><ScoreBadge score={qa.score} outOf={qa.total} /></td>
                       <td style={{ padding: "12px 14px" }}>
                         <span style={{
                           background: qa.passed ? "#10b98122" : "#ef444422",
                           color: qa.passed ? "#10b981" : "#ef4444",
                           border: `1px solid ${qa.passed ? "#10b98144" : "#ef444444"}`,
-                          borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700,
+                          borderRadius: 6, padding: "2px 8px", fontSize: 12, fontWeight: 700,
                         }}>
                           {qa.passed ? "Réussi" : "Échoué"}
                         </span>
                       </td>
-                      <td style={{ padding: "12px 14px", color: "#64748b", fontSize: 12 }}>
+                      <td style={{ padding: "12px 14px", color: "#94a3b8", fontSize: 13 }}>
                         #{qa.attemptNo}
                       </td>
                     </tr>
@@ -572,7 +572,7 @@ export default function StudentProfilePage() {
 
             {/* Level selector */}
             <div style={{ marginBottom: 20 }}>
-              <div style={{ color: "#64748b", fontSize: 11, fontWeight: 600, textTransform: "uppercase", marginBottom: 10 }}>
+              <div style={{ color: "#94a3b8", fontSize: 12, fontWeight: 600, textTransform: "uppercase", marginBottom: 10 }}>
                 Nouveau niveau
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -581,7 +581,7 @@ export default function StudentProfilePage() {
                     padding: "8px 18px", borderRadius: 8, cursor: "pointer", fontWeight: 800, fontSize: 14,
                     background: modalLevel === l ? `${levelColors[l] ?? "#10b981"}22` : "rgba(255,255,255,0.04)",
                     border: `1px solid ${modalLevel === l ? `${levelColors[l] ?? "#10b981"}55` : "#2a3441"}`,
-                    color: modalLevel === l ? (levelColors[l] ?? "#10b981") : "#64748b",
+                    color: modalLevel === l ? (levelColors[l] ?? "#10b981") : "#94a3b8",
                     transition: "all 0.15s",
                   }}>{l}</button>
                 ))}
@@ -590,7 +590,7 @@ export default function StudentProfilePage() {
 
             {/* Reason */}
             <div style={{ marginBottom: 24 }}>
-              <label style={{ color: "#64748b", fontSize: 11, fontWeight: 600, textTransform: "uppercase", display: "block", marginBottom: 8 }}>
+              <label style={{ color: "#94a3b8", fontSize: 12, fontWeight: 600, textTransform: "uppercase", display: "block", marginBottom: 8 }}>
                 Raison (obligatoire)
               </label>
               <textarea
@@ -611,7 +611,7 @@ export default function StudentProfilePage() {
               <button
                 onClick={() => setShowLevelModal(false)}
                 style={{
-                  flex: 1, background: "rgba(255,255,255,0.04)", color: "#64748b",
+                  flex: 1, background: "rgba(255,255,255,0.04)", color: "#94a3b8",
                   border: "1px solid #2a3441", borderRadius: 8, padding: "11px",
                   fontSize: 13, fontWeight: 600, cursor: "pointer",
                 }}
