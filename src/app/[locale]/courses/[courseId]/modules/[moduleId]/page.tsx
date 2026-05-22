@@ -848,13 +848,15 @@ export default function ModulePage() {
                 </p>
               </div>
 
-              {module.content.dialogs?.map((dialog: { title: string; context_fr: string; lines: { sprecher: string; text: string; translation: string; gender: "male" | "female" | undefined; pause_after_ms?: number }[] }, i: number) => (
+              {module.content.dialogs?.map((dialog: { title: string; context_fr: string; context_en?: string; lines: { sprecher: string; text: string; translation: string; gender: "male" | "female" | undefined; pause_after_ms?: number }[] }, i: number) => (
                 <DialogPlayer
                   key={i}
                   title={dialog.title}
                   context_fr={dialog.context_fr}
+                  context_en={dialog.context_en}
                   lines={dialog.lines}
                   onComplete={() => i === module.content.dialogs.length - 1 && handleComplete(80)}
+                  locale={locale}
                 />
               ))}
 

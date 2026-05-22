@@ -14,19 +14,24 @@ export interface DialogLine {
 interface DialogPlayerProps {
   title: string
   context_fr: string
+  context_en?: string
   lines: DialogLine[]
   onComplete?: () => void
+  locale?: "fr" | "en"
 }
 
 export default function DialogPlayer({
   title,
   context_fr,
+  context_en,
   lines,
   onComplete,
+  locale = "fr",
 }: DialogPlayerProps) {
   const [currentLine, setCurrentLine] = useState<number | null>(null)
   const [showTranslations, setShowTranslations] = useState(false)
   const [completed, setCompleted] = useState(false)
+  const isPlaying = currentLine !== null
 
   const handleLineEnd = (index: number) => {
     if (index < lines.length - 1) {
@@ -40,8 +45,12 @@ export default function DialogPlayer({
   }
 
   const handlePlayAll = () => {
-    setCurrentLine(0)
-    setCompleted(false)
+    if (isPlaying) {
+      setCurrentLine(null)
+    } else {
+      setCurrentLine(0)
+      setCompleted(false)
+    }
   }
 
   return (
@@ -69,7 +78,7 @@ export default function DialogPlayer({
             color: "rgba(255,255,255,0.4)",
             fontSize: 11, margin: 0
           }}>
-            {context_fr}
+            {locale === "en" && context_en ? context_en : context_fr}
           </p>
         </div>
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
@@ -94,11 +103,17 @@ export default function DialogPlayer({
             style={{
               padding: "5px 12px", borderRadius: 8, fontSize: 10,
               fontWeight: 700,
-              background: "linear-gradient(135deg,#10b981,#059669)",
-              border: "none", color: "white", cursor: "pointer"
+              background: isPlaying
+                ? "rgba(239,68,68,0.15)"
+                : "linear-gradient(135deg,#10b981,#059669)",
+              border: isPlaying ? "1px solid rgba(239,68,68,0.3)" : "none",
+              color: "white", cursor: "pointer",
+              transition: "all 0.2s",
             }}
           >
-            ▶ Tout écouter
+            {isPlaying
+              ? (locale === "en" ? "⏹ Stop" : "⏹ Arrêter")
+              : (locale === "en" ? "▶ Listen all" : "▶ Tout écouter")}
           </button>
         </div>
       </div>
@@ -167,7 +182,9 @@ export default function DialogPlayer({
           border: "1px solid rgba(16,185,129,0.2)",
           color: "#10b981", fontSize: 12, textAlign: "center"
         }}>
-          ✅ Dialogue terminé — Vous pouvez réécouter ou passer aux exercices
+          {locale === "en"
+            ? "✅ Dialogue complete — Listen again or continue to exercises"
+            : "✅ Dialogue terminé — Vous pouvez réécouter ou passer aux exercices"}
         </div>
       )}
     </div>

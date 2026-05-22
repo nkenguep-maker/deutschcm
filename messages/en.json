@@ -181,7 +181,9 @@
     "consentMiddle": " and ",
     "consentPrivacy": "Privacy Policy",
     "consentAfter": ". I am at least 16 years old.",
-    "consentRequired": "You must accept the terms to continue."
+    "consentRequired": "You must accept the terms to continue.",
+  "ageConsentLabel": "I confirm that I am at least 16 years old or have permission from a parent or legal guardian.",
+  "ageConsentRequired": "You must confirm this condition to create an account."
   },
   "dashboard": {
     "xpLabel": "XP earned",

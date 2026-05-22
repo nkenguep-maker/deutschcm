@@ -36,6 +36,7 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [consent, setConsent] = useState(false);
+  const [ageConsent, setAgeConsent] = useState(false);
 
   const getRoleLabel = (key: Role) =>
     t(key === "STUDENT" ? "roleStudent" : key === "TEACHER" ? "roleTeacher" : "roleCenter");
@@ -53,6 +54,11 @@ export default function RegisterPage() {
     }
     if (!consent) {
       setError(t("consentRequired"));
+      setLoading(false);
+      return;
+    }
+    if (!ageConsent) {
+      setError(t("ageConsentRequired"));
       setLoading(false);
       return;
     }
@@ -341,18 +347,30 @@ export default function RegisterPage() {
                     </span>
                   </label>
 
+                  <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+                    <input
+                      type="checkbox"
+                      checked={ageConsent}
+                      onChange={e => setAgeConsent(e.target.checked)}
+                      style={{ marginTop: 2, accentColor: "#10b981", flexShrink: 0, width: 15, height: 15 }}
+                    />
+                    <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", lineHeight: 1.6 }}>
+                      {t("ageConsentLabel")}
+                    </span>
+                  </label>
+
                   <button
                     type="submit"
-                    disabled={loading || !consent}
+                    disabled={loading || !consent || !ageConsent}
                     className="w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-200 active:scale-95 mt-2"
                     style={{
-                      background: loading || !consent
+                      background: loading || !consent || !ageConsent
                         ? "rgba(16,185,129,0.4)"
                         : "linear-gradient(135deg, #10b981, #059669)",
                       color: "white",
                       fontFamily: "'Syne', sans-serif",
-                      boxShadow: loading || !consent ? "none" : "0 4px 24px rgba(16,185,129,0.35)",
-                      cursor: loading || !consent ? "not-allowed" : "pointer",
+                      boxShadow: loading || !consent || !ageConsent ? "none" : "0 4px 24px rgba(16,185,129,0.35)",
+                      cursor: loading || !consent || !ageConsent ? "not-allowed" : "pointer",
                     }}
                   >
                     {loading ? tc("loading") : `${t("registerBtn")} →`}

@@ -5,7 +5,12 @@ import { useRouter } from "@/navigation";
 import OnboardingProgress from "@/components/OnboardingProgress";
 import PhoneInput from "@/components/PhoneInput";
 
-const CITIES = ["Yaoundé", "Douala", "Bafoussam", "Bamenda", "Garoua", "Maroua", "Ngaoundéré", "Bertoua", "Ebolowa", "Kribi"];
+const CITIES = [
+  "Yaoundé", "Douala", "Bafoussam", "Bamenda", "Garoua", "Maroua", "Ngaoundéré", "Bertoua", "Ebolowa", "Kribi",
+  "Abidjan", "Dakar", "Libreville", "Brazzaville", "Kinshasa", "Lomé", "Cotonou", "Niamey", "Bamako", "Ouagadougou",
+  "Paris", "Lyon", "Marseille", "Bruxelles", "Genève", "Berlin", "Munich", "Vienne", "Londres", "Montréal",
+  "Autre / Other",
+];
 const GOALS = [
   { value: "Tourisme",   icon: "✈️",  label: "Tourisme",   desc: "Voyager en Allemagne ou en Autriche" },
   { value: "Travail",    icon: "💼",  label: "Travail",    desc: "Opportunités professionnelles" },
@@ -153,7 +158,7 @@ export default function StudentOnboardingPage() {
               fullName: `${form.firstName.trim()} ${form.lastName.trim()}`,
               phone: form.phone,
               city: form.city,
-              country: "Cameroun",
+              country: "",
               dateOfBirth: form.dateOfBirth,
               learningGoal: form.learningGoal,
               availability: form.availability,

@@ -5,7 +5,12 @@ import { useRouter } from "@/navigation";
 import OnboardingProgress from "@/components/OnboardingProgress";
 import PhoneInput from "@/components/PhoneInput";
 
-const CITIES = ["Yaoundé", "Douala", "Bafoussam", "Bamenda", "Garoua", "Maroua", "Ngaoundéré", "Bertoua", "Ebolowa", "Kribi"];
+const CITIES = [
+  "Yaoundé", "Douala", "Bafoussam", "Bamenda", "Garoua", "Maroua", "Ngaoundéré", "Bertoua", "Ebolowa", "Kribi",
+  "Abidjan", "Dakar", "Libreville", "Brazzaville", "Kinshasa", "Lomé", "Cotonou", "Niamey", "Bamako", "Ouagadougou",
+  "Paris", "Lyon", "Marseille", "Bruxelles", "Genève", "Berlin", "Munich", "Vienne", "Londres", "Montréal",
+  "Autre / Other",
+];
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const DIPLOMAS = ["Licence en linguistique", "Master FLE", "DAAD", "Magistère", "PhD Linguistique", "Baccalauréat + expérience", "Autre"];
 const DAYS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];

@@ -181,7 +181,9 @@
     "consentMiddle": " et la ",
     "consentPrivacy": "Politique de confidentialité",
     "consentAfter": ". Je confirme avoir au moins 16 ans.",
-    "consentRequired": "Vous devez accepter les conditions pour continuer."
+    "consentRequired": "Vous devez accepter les conditions pour continuer.",
+  "ageConsentLabel": "Je confirme avoir au moins 16 ans ou disposer de l'autorisation d'un parent ou tuteur légal.",
+  "ageConsentRequired": "Vous devez confirmer cette condition pour créer un compte."
   },
   "dashboard": {
     "xpLabel": "Points XP",

@@ -23,6 +23,7 @@ interface Course {
   modules: number;
   progress: number;
   locked: boolean;
+  comingSoon?: boolean;
   firstModuleId?: string;
 }
 
@@ -47,6 +48,7 @@ const T = {
     statusCompleted: "Terminé",
     statusPct: (n: number) => `${n}% complété`,
     unlockHint: "Terminez les bases A1 pour accéder à la suite.",
+    comingSoonHint: "Bientôt disponible.",
     modulesLabel: "modules",
     levelBadge: "Parcours aligné CECRL",
     disclaimer: "Yema Languages propose une pratique linguistique indépendante alignée sur le CECRL et n'est affiliée à aucun organisme officiel d'examen.",
@@ -76,6 +78,7 @@ const T = {
     statusCompleted: "Completed",
     statusPct: (n: number) => `${n}% completed`,
     unlockHint: "Complete the A1 foundations to access the next steps.",
+    comingSoonHint: "Coming soon.",
     modulesLabel: "modules",
     levelBadge: "CEFR-aligned path",
     disclaimer: "Yema Languages provides independent CEFR-aligned language practice and is not affiliated with any official examination institute.",
@@ -136,25 +139,25 @@ const COURSES: Course[] = [
     locked: false,
     firstModuleId: l.firstModuleId,
   })),
-  // ── B1 ────────────────────────────────────────────────────────────────────
-  { id: "b1-1", titleDE: "Menschen und Begegnungen",     titleFR: "Personnes et rencontres",  titleEN: "People and encounters",      icon: "🤝",    level: "B1", lektionen: "Lektion 1-2",   modules: 5, progress: 0, locked: false },
-  { id: "b1-2", titleDE: "Arbeitswelt",                  titleFR: "Monde du travail",         titleEN: "The working world",          icon: "🏢",    level: "B1", lektionen: "Lektion 3-4",   modules: 5, progress: 0, locked: false },
-  { id: "b1-3", titleDE: "Natur und Umwelt",             titleFR: "Nature et environnement",  titleEN: "Nature and environment",     icon: "🌿",    level: "B1", lektionen: "Lektion 5-6",   modules: 5, progress: 0, locked: false },
-  { id: "b1-4", titleDE: "Kultur und Gesellschaft",      titleFR: "Culture et société",       titleEN: "Culture and society",        icon: "🎭",    level: "B1", lektionen: "Lektion 7-8",   modules: 5, progress: 0, locked: false },
-  { id: "b1-5", titleDE: "Sprache und Kommunikation",    titleFR: "Langue et communication",  titleEN: "Language and communication", icon: "💬",    level: "B1", lektionen: "Lektion 9-10",  modules: 5, progress: 0, locked: false },
-  { id: "b1-6", titleDE: "Zukunft und Träume",           titleFR: "Avenir et rêves",          titleEN: "Future and dreams",          icon: "🌟",    level: "B1", lektionen: "Lektion 11-12", modules: 5, progress: 0, locked: false },
+  // ── B1 — locked ───────────────────────────────────────────────────────────
+  { id: "b1-1", titleDE: "Menschen und Begegnungen",     titleFR: "Personnes et rencontres",  titleEN: "People and encounters",      icon: "🤝",    level: "B1", lektionen: "Lektion 1-2",   modules: 5, progress: 0, locked: true, comingSoon: true },
+  { id: "b1-2", titleDE: "Arbeitswelt",                  titleFR: "Monde du travail",         titleEN: "The working world",          icon: "🏢",    level: "B1", lektionen: "Lektion 3-4",   modules: 5, progress: 0, locked: true, comingSoon: true },
+  { id: "b1-3", titleDE: "Natur und Umwelt",             titleFR: "Nature et environnement",  titleEN: "Nature and environment",     icon: "🌿",    level: "B1", lektionen: "Lektion 5-6",   modules: 5, progress: 0, locked: true, comingSoon: true },
+  { id: "b1-4", titleDE: "Kultur und Gesellschaft",      titleFR: "Culture et société",       titleEN: "Culture and society",        icon: "🎭",    level: "B1", lektionen: "Lektion 7-8",   modules: 5, progress: 0, locked: true, comingSoon: true },
+  { id: "b1-5", titleDE: "Sprache und Kommunikation",    titleFR: "Langue et communication",  titleEN: "Language and communication", icon: "💬",    level: "B1", lektionen: "Lektion 9-10",  modules: 5, progress: 0, locked: true, comingSoon: true },
+  { id: "b1-6", titleDE: "Zukunft und Träume",           titleFR: "Avenir et rêves",          titleEN: "Future and dreams",          icon: "🌟",    level: "B1", lektionen: "Lektion 11-12", modules: 5, progress: 0, locked: true, comingSoon: true },
   // ── B2 — locked ───────────────────────────────────────────────────────────
-  { id: "b2-1", titleDE: "Werte und Normen",             titleFR: "Valeurs et normes",        titleEN: "Values and norms",           icon: "⚖️",   level: "B2", lektionen: "Kapitel 1-2",   modules: 6, progress: 0, locked: true  },
-  { id: "b2-2", titleDE: "Wissenschaft und Technik",     titleFR: "Science et technologie",   titleEN: "Science and technology",     icon: "🔬",    level: "B2", lektionen: "Kapitel 3-4",   modules: 6, progress: 0, locked: true  },
-  { id: "b2-3", titleDE: "Wirtschaft und Finanzen",      titleFR: "Économie et finances",     titleEN: "Economy and finance",        icon: "📊",    level: "B2", lektionen: "Kapitel 5-6",   modules: 6, progress: 0, locked: true  },
-  { id: "b2-4", titleDE: "Geschichte und Politik",       titleFR: "Histoire et politique",    titleEN: "History and politics",       icon: "🏛️",   level: "B2", lektionen: "Kapitel 7-8",   modules: 6, progress: 0, locked: true  },
-  { id: "b2-5", titleDE: "Kunst und Literatur",          titleFR: "Art et littérature",       titleEN: "Art and literature",         icon: "🎨",    level: "B2", lektionen: "Kapitel 9-10",  modules: 6, progress: 0, locked: true  },
+  { id: "b2-1", titleDE: "Werte und Normen",             titleFR: "Valeurs et normes",        titleEN: "Values and norms",           icon: "⚖️",   level: "B2", lektionen: "Kapitel 1-2",   modules: 6, progress: 0, locked: true, comingSoon: true },
+  { id: "b2-2", titleDE: "Wissenschaft und Technik",     titleFR: "Science et technologie",   titleEN: "Science and technology",     icon: "🔬",    level: "B2", lektionen: "Kapitel 3-4",   modules: 6, progress: 0, locked: true, comingSoon: true },
+  { id: "b2-3", titleDE: "Wirtschaft und Finanzen",      titleFR: "Économie et finances",     titleEN: "Economy and finance",        icon: "📊",    level: "B2", lektionen: "Kapitel 5-6",   modules: 6, progress: 0, locked: true, comingSoon: true },
+  { id: "b2-4", titleDE: "Geschichte und Politik",       titleFR: "Histoire et politique",    titleEN: "History and politics",       icon: "🏛️",   level: "B2", lektionen: "Kapitel 7-8",   modules: 6, progress: 0, locked: true, comingSoon: true },
+  { id: "b2-5", titleDE: "Kunst und Literatur",          titleFR: "Art et littérature",       titleEN: "Art and literature",         icon: "🎨",    level: "B2", lektionen: "Kapitel 9-10",  modules: 6, progress: 0, locked: true, comingSoon: true },
   // ── C1 — locked ───────────────────────────────────────────────────────────
-  { id: "c1-1", titleDE: "Sprache und Identität",        titleFR: "Langue et identité",       titleEN: "Language and identity",      icon: "🗣️",   level: "C1", lektionen: "Kapitel 1-2",   modules: 7, progress: 0, locked: true  },
-  { id: "c1-2", titleDE: "Globalisierung",               titleFR: "Mondialisation",           titleEN: "Globalisation",              icon: "🌍",    level: "C1", lektionen: "Kapitel 3-4",   modules: 7, progress: 0, locked: true  },
-  { id: "c1-3", titleDE: "Philosophie und Ethik",        titleFR: "Philosophie et éthique",   titleEN: "Philosophy and ethics",      icon: "🧠",    level: "C1", lektionen: "Kapitel 5-6",   modules: 7, progress: 0, locked: true  },
-  { id: "c1-4", titleDE: "Medien und Gesellschaft",      titleFR: "Médias et société",        titleEN: "Media and society",          icon: "📰",    level: "C1", lektionen: "Kapitel 7-8",   modules: 7, progress: 0, locked: true  },
-  { id: "c1-5", titleDE: "Beruf und Karriere",           titleFR: "Profession et carrière",   titleEN: "Career and professional growth", icon: "🚀", level: "C1", lektionen: "Kapitel 9-10", modules: 7, progress: 0, locked: true  },
+  { id: "c1-1", titleDE: "Sprache und Identität",        titleFR: "Langue et identité",       titleEN: "Language and identity",      icon: "🗣️",   level: "C1", lektionen: "Kapitel 1-2",   modules: 7, progress: 0, locked: true, comingSoon: true },
+  { id: "c1-2", titleDE: "Globalisierung",               titleFR: "Mondialisation",           titleEN: "Globalisation",              icon: "🌍",    level: "C1", lektionen: "Kapitel 3-4",   modules: 7, progress: 0, locked: true, comingSoon: true },
+  { id: "c1-3", titleDE: "Philosophie und Ethik",        titleFR: "Philosophie et éthique",   titleEN: "Philosophy and ethics",      icon: "🧠",    level: "C1", lektionen: "Kapitel 5-6",   modules: 7, progress: 0, locked: true, comingSoon: true },
+  { id: "c1-4", titleDE: "Medien und Gesellschaft",      titleFR: "Médias et société",        titleEN: "Media and society",          icon: "📰",    level: "C1", lektionen: "Kapitel 7-8",   modules: 7, progress: 0, locked: true, comingSoon: true },
+  { id: "c1-5", titleDE: "Beruf und Karriere",           titleFR: "Profession et carrière",   titleEN: "Career and professional growth", icon: "🚀", level: "C1", lektionen: "Kapitel 9-10", modules: 7, progress: 0, locked: true, comingSoon: true },
 ];
 
 const LEVELS: Level[] = ["A1", "A2", "B1", "B2", "C1"];
@@ -247,7 +250,7 @@ function CourseCard({ course, locale, t }: { course: Course; locale: Locale; t: 
         </div>
       ) : (
         <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>
-          {t.unlockHint}
+          {course.comingSoon ? t.comingSoonHint : t.unlockHint}
         </p>
       )}
     </div>

@@ -215,7 +215,7 @@ export default function LandingPage() {
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(16,185,129,0.02)" }}>
         <div style={{ maxWidth: 960, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 28 : 36, fontWeight: 800, marginBottom: 12 }}>
+            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 28 : 36, fontWeight: 800, marginBottom: 12, color: "#f0f4f8" }}>
               {t.visionTitle}
             </h2>
             <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 16, maxWidth: 560, margin: "0 auto" }}>
@@ -231,7 +231,7 @@ export default function LandingPage() {
               <div key={i} style={{ padding: "28px 24px", borderRadius: 18, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(16,185,129,0.12)", position: "relative", overflow: "hidden" }}>
                 <div style={{ position: "absolute", top: 16, right: 20, fontFamily: "'Syne',sans-serif", fontSize: 40, fontWeight: 900, color: "rgba(16,185,129,0.08)" }}>{v.num}</div>
                 <span style={{ fontSize: 12, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, display: "block", marginBottom: 10 }}>{v.label}</span>
-                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800, margin: "0 0 12px" }}>{v.title}</h3>
+                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800, margin: "0 0 12px", color: "#f0f4f8" }}>{v.title}</h3>
                 <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 14, lineHeight: 1.7, margin: 0 }}>{v.desc}</p>
               </div>
             ))}
@@ -242,7 +242,7 @@ export default function LandingPage() {
       {/* ── FEATURES ── */}
       <section id="features" style={{ padding: isMobile ? "60px 16px" : "80px 40px", maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12 }}>
+          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12, color: "#f0f4f8" }}>
             {t.featuresTitle}
           </h2>
           <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 16 }}>
@@ -257,7 +257,7 @@ export default function LandingPage() {
             >
               <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, fontWeight: 700, margin: 0 }}>{f.title}</h3>
+                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, fontWeight: 700, margin: 0, color: "#f0f4f8" }}>{f.title}</h3>
                 {f.badge && <span style={{ fontSize: 8, padding: "2px 6px", borderRadius: 99, background: "rgba(16,185,129,0.12)", color: "#10b981", fontWeight: 700, whiteSpace: "nowrap" }}>{f.badge}</span>}
               </div>
               <p style={{ color: "rgba(255,255,255,0.70)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
@@ -270,7 +270,7 @@ export default function LandingPage() {
       <section id="levels" style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12 }}>
+            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12, color: "#f0f4f8" }}>
               {t.levelsTitle}
             </h2>
             <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 16 }}>
@@ -285,7 +285,7 @@ export default function LandingPage() {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-                    <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 700, margin: 0 }}>{lvl.name}</h3>
+                    <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 700, margin: 0, color: "#f0f4f8" }}>{lvl.name}</h3>
                     {!lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: `${lvl.color}15`, color: lvl.color, fontWeight: 700 }}>{t.available}</span>}
                     {lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>{t.locked}</span>}
                   </div>
@@ -305,7 +305,7 @@ export default function LandingPage() {
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
         <div style={{ maxWidth: 860, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 56, alignItems: "start" }}>
           <div>
-            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 26 : 34, fontWeight: 800, marginBottom: 16, lineHeight: 1.2 }}>
+            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 26 : 34, fontWeight: 800, marginBottom: 16, lineHeight: 1.2, color: "#f0f4f8" }}>
               {t.germanyTitle}
             </h2>
             <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 15, lineHeight: 1.8, margin: 0 }}>
@@ -328,7 +328,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "center" }}>
           <div>
             <span style={{ fontSize: 12, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t.simTitle}</span>
-            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2 }}>
+            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2, color: "#f0f4f8" }}>
               {t.simHeadline}
             </h2>
             <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 15, lineHeight: 1.8, marginBottom: 24 }}>
@@ -387,14 +387,14 @@ export default function LandingPage() {
       {/* ── PROBLEMS ── */}
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 26 : 36, fontWeight: 800, textAlign: "center", marginBottom: 48 }}>
+          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 26 : 36, fontWeight: 800, textAlign: "center", marginBottom: 48, color: "#f0f4f8" }}>
             {t.testimonialsTitle}
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: isMobile ? 12 : 20 }}>
             {problems.map((p, i) => (
               <div key={i} style={{ padding: "28px 24px", borderRadius: 18, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <div style={{ fontSize: 32, marginBottom: 16 }}>{p.icon}</div>
-                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 700, margin: "0 0 10px" }}>{p.title}</h3>
+                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 700, margin: "0 0 10px", color: "#f0f4f8" }}>{p.title}</h3>
                 <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 14, lineHeight: 1.7, margin: 0 }}>{p.desc}</p>
               </div>
             ))}
@@ -407,7 +407,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "center" }}>
           <div>
             <span style={{ fontSize: 12, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t.b2bLabel}</span>
-            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2 }}>
+            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2, color: "#f0f4f8" }}>
               {t.centerTitle}
             </h2>
             <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 15, lineHeight: 1.8, marginBottom: 24 }}>
@@ -475,7 +475,7 @@ export default function LandingPage() {
       {/* ── FAQ ── */}
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
-          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 24 : 36, fontWeight: 800, textAlign: "center", marginBottom: 40 }}>
+          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 24 : 36, fontWeight: 800, textAlign: "center", marginBottom: 40, color: "#f0f4f8" }}>
             {t.faqTitle}
           </h2>
           {faqs.map((faq, i) => (
@@ -509,7 +509,7 @@ export default function LandingPage() {
           </div>
 
           {/* Headline */}
-          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 36 : 56, fontWeight: 900, lineHeight: 1.08, letterSpacing: "-0.02em", marginBottom: 20 }}>
+          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 36 : 56, fontWeight: 900, lineHeight: 1.08, letterSpacing: "-0.02em", marginBottom: 20, color: "#f0f4f8" }}>
             {t.ctaFinalTitle}<br />
             <span style={{ color: "#10b981", textShadow: "0 0 60px rgba(16,185,129,0.35)" }}>{t.ctaFinalSub}</span>
           </h2>
