@@ -154,6 +154,14 @@ const LABELS = {
 
 type Locale = keyof typeof LABELS
 
+// ─── Safe score helper ───────────────────────────────────
+function safeScore(raw: number | undefined): number | null {
+  if (raw === undefined || raw === null) return null
+  const n = Math.round(raw)
+  if (!isFinite(n)) return null
+  return Math.max(0, Math.min(100, n))
+}
+
 // ─── Static quiz renderer (deterministic, no AI) ─────────
 interface StaticQuestion {
   id: string
@@ -181,14 +189,34 @@ function StaticQuizRenderer({
 }) {
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [submitted, setSubmitted] = useState(false)
-  const [result, setResult] = useState<{ correct: number; total: number } | null>(null)
+  const [result, setResult] = useState<{ correct: number; total: number; pct: number } | null>(null)
+
+  if (!questions || questions.length === 0) {
+    return (
+      <div style={{ padding: "32px 24px", borderRadius: 14, background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.18)", textAlign: "center" }}>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: 0 }}>
+          {locale === "en" ? "No questions available for this quiz." : "Aucune question disponible pour ce quiz."}
+        </p>
+      </div>
+    )
+  }
 
   const handleSubmit = () => {
     const correct = questions.filter(q => answers[q.id] === q.correctIndex).length
-    setResult({ correct, total: questions.length })
+    const total = questions.length
+    const pct = total > 0 ? Math.round((correct / total) * 100) : 0
+    setResult({ correct, total, pct })
     setSubmitted(true)
-    onComplete(Math.round((correct / questions.length) * 100))
+    onComplete(pct)
   }
+
+  const handleReset = () => {
+    setAnswers({})
+    setSubmitted(false)
+    setResult(null)
+  }
+
+  const answeredCount = Object.keys(answers).length
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -252,24 +280,37 @@ function StaticQuizRenderer({
       {!submitted ? (
         <button
           onClick={handleSubmit}
-          disabled={Object.keys(answers).length < questions.length}
+          disabled={answeredCount < questions.length}
           style={{
-            padding: "14px", borderRadius: 14, border: "none", cursor: Object.keys(answers).length < questions.length ? "not-allowed" : "pointer",
-            background: Object.keys(answers).length < questions.length ? "rgba(255,255,255,0.06)" : "linear-gradient(135deg,#10b981,#059669)",
-            color: Object.keys(answers).length < questions.length ? "rgba(255,255,255,0.35)" : "white",
+            padding: "14px", borderRadius: 14, border: "none",
+            cursor: answeredCount < questions.length ? "not-allowed" : "pointer",
+            background: answeredCount < questions.length ? "rgba(255,255,255,0.06)" : "linear-gradient(135deg,#10b981,#059669)",
+            color: answeredCount < questions.length ? "rgba(255,255,255,0.35)" : "white",
             fontSize: 14, fontWeight: 700, fontFamily: "'Syne',sans-serif",
           }}
         >
-          {locale === "en" ? `Submit answers (${Object.keys(answers).length}/${questions.length})` : `Valider (${Object.keys(answers).length}/${questions.length})`}
+          {locale === "en" ? `Submit answers (${answeredCount}/${questions.length})` : `Valider (${answeredCount}/${questions.length})`}
         </button>
       ) : result && (
         <div style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", textAlign: "center" }}>
           <p style={{ color: "#10b981", fontSize: 20, fontWeight: 800, fontFamily: "'Syne',sans-serif", margin: "0 0 4px" }}>
             {result.correct}/{result.total}
           </p>
-          <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: 0 }}>
-            {locale === "en" ? `${Math.round((result.correct / result.total) * 100)}% correct` : `${Math.round((result.correct / result.total) * 100)}% de bonnes réponses`}
+          <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: "0 0 14px" }}>
+            {locale === "en" ? `${result.pct}% correct` : `${result.pct}% de bonnes réponses`}
           </p>
+          {result.pct < 80 && (
+            <button
+              onClick={handleReset}
+              style={{
+                padding: "9px 20px", borderRadius: 10, border: "1px solid rgba(245,158,11,0.3)",
+                background: "rgba(245,158,11,0.08)", color: "#f59e0b",
+                fontSize: 12, fontWeight: 700, fontFamily: "'Syne',sans-serif", cursor: "pointer",
+              }}
+            >
+              {locale === "en" ? "↩ Try again" : "↩ Réessayer"}
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -549,6 +590,7 @@ export default function ModulePage() {
   const [xpEarned, setXpEarned] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [quizKey, setQuizKey] = useState(0)
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768)
@@ -582,7 +624,8 @@ export default function ModulePage() {
 
   const handleComplete = (earnedScore?: number) => {
     setCompleted(true)
-    if (earnedScore !== undefined) setScore(earnedScore)
+    const s = safeScore(earnedScore)
+    if (s !== null) setScore(s)
     setXpEarned(module.xpReward)
     // Save XP to DB — fire and forget, silent failure
     if (module.xpReward > 0) {
@@ -958,19 +1001,21 @@ export default function ModulePage() {
               </div>
               {module.content?.staticQuestions ? (
                 <StaticQuizRenderer
+                  key={quizKey}
                   questions={module.content.staticQuestions as StaticQuestion[]}
                   locale={locale}
                   onComplete={handleComplete}
                 />
               ) : (
                 <AdaptiveQuiz
+                  key={quizKey}
                   level={module.level}
                   topic={module.topic}
                   moduleId={module.id}
                   questionCount={8}
                   adaptive={true}
                   onComplete={(result) => handleComplete(result.percentage)}
-                  onClose={() => window.history.back()}
+                  onClose={() => { setCompleted(false); setScore(null); setXpEarned(0); setQuizKey(k => k + 1) }}
                 />
               )}
             </div>
@@ -1078,8 +1123,9 @@ export default function ModulePage() {
                   {step.isFinal ? labels.finalModuleText : labels.completionText}
                 </p>
                 {score !== null && (
-                  <p style={{ color: "rgba(255,255,255,0.62)", fontSize: 13, margin: "0 0 10px" }}>
+                  <p style={{ color: score >= 80 ? "#10b981" : score >= 60 ? "#f59e0b" : "#ef4444", fontSize: 13, fontWeight: 700, margin: "0 0 10px" }}>
                     {labels.scoreLabel} {score}%
+                    {score < 60 && <span style={{ fontWeight: 400, color: "rgba(255,255,255,0.5)", marginLeft: 8 }}>— {locale === "en" ? "Keep practicing!" : "Continuez à pratiquer !"}</span>}
                   </p>
                 )}
                 <p style={{ color: "#f59e0b", fontSize: 14, fontWeight: 700, margin: "0 0 20px" }}>
@@ -1103,6 +1149,17 @@ export default function ModulePage() {
 
                 {/* Secondary actions */}
                 <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginTop: 16 }}>
+                  {module.type === "QUIZ" && (
+                    <>
+                      <button
+                        onClick={() => { setCompleted(false); setScore(null); setXpEarned(0); setQuizKey(k => k + 1) }}
+                        style={{ background: "none", border: "none", color: "rgba(255,255,255,0.58)", fontSize: 13, cursor: "pointer", padding: 0 }}
+                      >
+                        {locale === "en" ? "↩ Retry quiz" : "↩ Réessayer le quiz"}
+                      </button>
+                      <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}>·</span>
+                    </>
+                  )}
                   <a href={`/${locale}/courses`} style={{ color: "rgba(255,255,255,0.58)", fontSize: 13, textDecoration: "none" }}>
                     {labels.backToCourses}
                   </a>
