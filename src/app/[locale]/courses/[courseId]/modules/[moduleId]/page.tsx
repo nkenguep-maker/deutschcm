@@ -6,6 +6,7 @@ import AudioPlayer from "@/components/AudioPlayer"
 import VoiceRecorder from "@/components/VoiceRecorder"
 import SchreibenEditor from "@/components/SchreibenEditor"
 import { A1_BETA_MODULES, COURSE_TO_MODULE_IDS, COURSE_LABELS } from "@/data/a1-beta-modules"
+import { YEMA_MODULES, YEMA_COURSE_TO_MODULE_IDS, YEMA_COURSE_LABELS, YEMA_COURSE_SEQUENCE } from "@/data/courses/index"
 import { checkGermanGrammar, type GrammarError } from "@/lib/grammarGuardrail"
 
 const AdaptiveQuiz = dynamic(() => import("@/components/AdaptiveQuiz"), { ssr: false })
@@ -152,6 +153,128 @@ const LABELS = {
 } as const
 
 type Locale = keyof typeof LABELS
+
+// ─── Static quiz renderer (deterministic, no AI) ─────────
+interface StaticQuestion {
+  id: string
+  qtype?: string
+  question_fr: string
+  question_en: string
+  prompt_de: string
+  options: string[]
+  correctIndex: number
+  correctAnswer: string
+  explanation_fr: string
+  explanation_en: string
+  skill?: string
+  difficulty?: string
+}
+
+function StaticQuizRenderer({
+  questions,
+  locale,
+  onComplete,
+}: {
+  questions: StaticQuestion[]
+  locale: "fr" | "en"
+  onComplete: (score: number) => void
+}) {
+  const [answers, setAnswers] = useState<Record<string, number>>({})
+  const [submitted, setSubmitted] = useState(false)
+  const [result, setResult] = useState<{ correct: number; total: number } | null>(null)
+
+  const handleSubmit = () => {
+    const correct = questions.filter(q => answers[q.id] === q.correctIndex).length
+    setResult({ correct, total: questions.length })
+    setSubmitted(true)
+    onComplete(Math.round((correct / questions.length) * 100))
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {questions.map((q, qi) => {
+        const question = locale === "en" ? q.question_en : q.question_fr
+        const explanation = locale === "en" ? q.explanation_en : q.explanation_fr
+        const chosen = answers[q.id]
+        const isCorrect = submitted && chosen === q.correctIndex
+        const isWrong = submitted && chosen !== undefined && chosen !== q.correctIndex
+
+        return (
+          <div key={q.id} style={{
+            padding: "20px 24px", borderRadius: 14,
+            background: submitted
+              ? (isCorrect ? "rgba(16,185,129,0.07)" : isWrong ? "rgba(239,68,68,0.06)" : "rgba(255,255,255,0.03)")
+              : "rgba(255,255,255,0.03)",
+            border: `1px solid ${submitted ? (isCorrect ? "rgba(16,185,129,0.25)" : isWrong ? "rgba(239,68,68,0.2)" : "rgba(255,255,255,0.07)") : "rgba(255,255,255,0.07)"}`,
+          }}>
+            <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 6px" }}>
+              Q{qi + 1} · {q.skill ?? "grammar"}
+            </p>
+            <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 14, margin: "0 0 6px", lineHeight: 1.6 }}>{question}</p>
+            {q.prompt_de && (
+              <p style={{ color: "#10b981", fontSize: 15, fontWeight: 700, fontFamily: "'DM Mono',monospace", margin: "0 0 14px", padding: "8px 12px", background: "rgba(16,185,129,0.08)", borderRadius: 8 }}>
+                {q.prompt_de}
+              </p>
+            )}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {q.options.map((opt, oi) => {
+                const isChosen = chosen === oi
+                const isRight = submitted && oi === q.correctIndex
+                const isWrongChoice = submitted && isChosen && oi !== q.correctIndex
+                return (
+                  <button
+                    key={oi}
+                    onClick={() => !submitted && setAnswers(prev => ({ ...prev, [q.id]: oi }))}
+                    style={{
+                      padding: "10px 16px", borderRadius: 10, textAlign: "left",
+                      cursor: submitted ? "default" : "pointer",
+                      border: `1px solid ${isRight ? "rgba(16,185,129,0.5)" : isWrongChoice ? "rgba(239,68,68,0.4)" : isChosen ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.1)"}`,
+                      background: isRight ? "rgba(16,185,129,0.12)" : isWrongChoice ? "rgba(239,68,68,0.08)" : isChosen ? "rgba(255,255,255,0.07)" : "transparent",
+                      color: isRight ? "#10b981" : isWrongChoice ? "#ef4444" : isChosen ? "white" : "rgba(255,255,255,0.72)",
+                      fontSize: 13, fontFamily: "'DM Mono',monospace", fontWeight: isChosen || isRight ? 700 : 400,
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    {isRight && "✓ "}{isWrongChoice && "✗ "}{opt}
+                  </button>
+                )
+              })}
+            </div>
+            {submitted && (
+              <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "12px 0 0", lineHeight: 1.6, fontStyle: "italic" }}>
+                {explanation}
+              </p>
+            )}
+          </div>
+        )
+      })}
+
+      {!submitted ? (
+        <button
+          onClick={handleSubmit}
+          disabled={Object.keys(answers).length < questions.length}
+          style={{
+            padding: "14px", borderRadius: 14, border: "none", cursor: Object.keys(answers).length < questions.length ? "not-allowed" : "pointer",
+            background: Object.keys(answers).length < questions.length ? "rgba(255,255,255,0.06)" : "linear-gradient(135deg,#10b981,#059669)",
+            color: Object.keys(answers).length < questions.length ? "rgba(255,255,255,0.35)" : "white",
+            fontSize: 14, fontWeight: 700, fontFamily: "'Syne',sans-serif",
+          }}
+        >
+          {locale === "en" ? `Submit answers (${Object.keys(answers).length}/${questions.length})` : `Valider (${Object.keys(answers).length}/${questions.length})`}
+        </button>
+      ) : result && (
+        <div style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", textAlign: "center" }}>
+          <p style={{ color: "#10b981", fontSize: 20, fontWeight: 800, fontFamily: "'Syne',sans-serif", margin: "0 0 4px" }}>
+            {result.correct}/{result.total}
+          </p>
+          <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: 0 }}>
+            {locale === "en" ? `${Math.round((result.correct / result.total) * 100)}% correct` : `${Math.round((result.correct / result.total) * 100)}% de bonnes réponses`}
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
 
 // ─── Grammar inspector widget ─────────────────────────────
 type AnyLabels = typeof LABELS["en"] | typeof LABELS["fr"]
@@ -343,11 +466,23 @@ const DEMO_MODULES: Record<string, Module> = {
 const ALL_MODULES: Record<string, Module> = {
   ...DEMO_MODULES,
   ...A1_BETA_MODULES as unknown as Record<string, Module>,
+  ...YEMA_MODULES as unknown as Record<string, Module>,
+}
+
+const MERGED_COURSE_TO_MODULE_IDS: Record<string, string[]> = {
+  ...COURSE_TO_MODULE_IDS,
+  ...YEMA_COURSE_TO_MODULE_IDS,
+}
+
+const MERGED_COURSE_LABELS: Record<string, string> = {
+  ...COURSE_LABELS,
+  ...YEMA_COURSE_LABELS,
 }
 
 // ─── Course order for sequential navigation ───────────────
 const COURSE_SEQUENCE = [
   "a1-beta-1", "a1-beta-2", "a1-beta-3", "a1-beta-4", "a1-beta-5",
+  ...YEMA_COURSE_SEQUENCE,
 ]
 
 interface NextStep {
@@ -363,7 +498,7 @@ function getNextLearningStep(
   locale: string,
   labels: AnyLabels
 ): NextStep {
-  const courseModuleIds = COURSE_TO_MODULE_IDS[courseId]
+  const courseModuleIds = MERGED_COURSE_TO_MODULE_IDS[courseId]
   const currentIndex = courseModuleIds?.indexOf(moduleId) ?? -1
 
   // Case 1: there is a next module in the same course
@@ -381,7 +516,7 @@ function getNextLearningStep(
   const seqIndex = COURSE_SEQUENCE.indexOf(courseId)
   if (seqIndex >= 0 && seqIndex < COURSE_SEQUENCE.length - 1) {
     const nextCourseId = COURSE_SEQUENCE[seqIndex + 1]
-    const nextIds = COURSE_TO_MODULE_IDS[nextCourseId]
+    const nextIds = MERGED_COURSE_TO_MODULE_IDS[nextCourseId]
     if (nextIds && nextIds.length > 0) {
       return {
         type: "next_lesson",
@@ -460,18 +595,19 @@ export default function ModulePage() {
   }
 
   const courseModules = ((): Module[] => {
-    const ids = COURSE_TO_MODULE_IDS[params.courseId]
+    const ids = MERGED_COURSE_TO_MODULE_IDS[params.courseId]
     return ids
       ? ids.map(id => ALL_MODULES[id]).filter(Boolean) as Module[]
       : Object.values(ALL_MODULES)
   })()
 
-  const icons: Record<ModuleType, string> = {
+  const icons: Record<string, string> = {
     LESSON: "📖", HOEREN: "🎧", CONVERSATION: "🎙️",
     SCHREIBEN: "✍️", QUIZ: "🎯", VIDEO: "🎬",
   }
+  const getIcon = (type: string) => icons[type] ?? "📄"
 
-  const courseLabel = COURSE_LABELS[params.courseId] ?? params.courseId
+  const courseLabel = MERGED_COURSE_LABELS[params.courseId] ?? params.courseId
 
   // ── Sidebar nav content (shared between desktop + mobile) ──
   const SidebarNav = () => (
@@ -493,7 +629,7 @@ export default function ModulePage() {
               border: isActive ? "1px solid rgba(16,185,129,0.2)" : "1px solid transparent",
               textDecoration: "none", transition: "all 0.15s",
             }}>
-            <span style={{ fontSize: 16 }}>{icons[mod.type]}</span>
+            <span style={{ fontSize: 16 }}>{getIcon(mod.type)}</span>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ color: isActive ? "#10b981" : "rgba(255,255,255,0.75)", fontSize: 12, fontWeight: isActive ? 700 : 400, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {mod.title.split("—")[1]?.trim() ?? mod.title}
@@ -818,15 +954,102 @@ export default function ModulePage() {
                   {labels.quizInstructions}
                 </p>
               </div>
-              <AdaptiveQuiz
-                level={module.level}
-                topic={module.topic}
-                moduleId={module.id}
-                questionCount={8}
-                adaptive={true}
-                onComplete={(result) => handleComplete(result.percentage)}
-                onClose={() => window.history.back()}
-              />
+              {module.content?.staticQuestions ? (
+                <StaticQuizRenderer
+                  questions={module.content.staticQuestions as StaticQuestion[]}
+                  locale={locale}
+                  onComplete={handleComplete}
+                />
+              ) : (
+                <AdaptiveQuiz
+                  level={module.level}
+                  topic={module.topic}
+                  moduleId={module.id}
+                  questionCount={8}
+                  adaptive={true}
+                  onComplete={(result) => handleComplete(result.percentage)}
+                  onClose={() => window.history.back()}
+                />
+              )}
+            </div>
+          )}
+
+          {/* ── VIDEO script placeholder ── */}
+          {module.type === "VIDEO" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              {/* Coming-soon banner */}
+              <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.2)", textAlign: "center" }}>
+                <div style={{ fontSize: 32, marginBottom: 8 }}>🎬</div>
+                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, color: "#a5b4fc", margin: "0 0 4px" }}>
+                  {locale === "en" ? "Cartoon video — coming soon" : "Vidéo cartoon — bientôt disponible"}
+                </h3>
+                <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 13, margin: 0 }}>
+                  {locale === "en" ? "Scene script available for beta below." : "Script de scène disponible en bêta ci-dessous."}
+                </p>
+              </div>
+
+              {/* Video meta */}
+              {module.content?.videoScript && (() => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const vs = module.content.videoScript as any
+                return (
+                  <div style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                    <p style={{ color: "#10b981", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 10px" }}>
+                      {locale === "en" ? vs.title_en ?? "Video script" : vs.title_fr ?? "Script vidéo"}
+                    </p>
+                    <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, margin: "0 0 4px" }}>
+                      ⏱ {vs.durationSeconds}s · {vs.style}
+                    </p>
+                    <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: 0, fontStyle: "italic" }}>
+                      {locale === "en" ? vs.objective_en : vs.objective_fr}
+                    </p>
+                  </div>
+                )
+              })()}
+
+              {/* Scenes */}
+              {(module.content?.videoScript as { scenes?: Array<{
+                sceneNumber: number
+                visualPrompt_fr: string
+                visualPrompt_en: string
+                narration_fr: string
+                narration_en: string
+                dialogue_de: string
+                caption_fr: string
+                caption_en: string
+                keyVocabulary: string[]
+              }> })?.scenes?.map((scene, i) => (
+                <div key={i} style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 10px" }}>
+                    {locale === "en" ? `Scene ${scene.sceneNumber}` : `Scène ${scene.sceneNumber}`}
+                  </p>
+                  <p style={{ color: "rgba(255,255,255,0.70)", fontSize: 13, margin: "0 0 8px", lineHeight: 1.6 }}>
+                    {locale === "en" ? scene.visualPrompt_en : scene.visualPrompt_fr}
+                  </p>
+                  {scene.dialogue_de && (
+                    <p style={{ color: "#10b981", fontSize: 14, fontWeight: 700, fontFamily: "'DM Mono',monospace", margin: "0 0 8px", padding: "6px 10px", background: "rgba(16,185,129,0.08)", borderRadius: 6 }}>
+                      "{scene.dialogue_de}"
+                    </p>
+                  )}
+                  <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 12, margin: "0 0 6px", fontStyle: "italic" }}>
+                    {locale === "en" ? scene.caption_en : scene.caption_fr}
+                  </p>
+                  {scene.keyVocabulary?.length > 0 && (
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
+                      {scene.keyVocabulary.map((w, j) => (
+                        <span key={j} style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(16,185,129,0.1)", color: "#10b981", fontSize: 11, border: "1px solid rgba(16,185,129,0.2)" }}>
+                          {w}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              <button onClick={() => handleComplete(100)}
+                style={{ padding: "14px", borderRadius: 14, background: "linear-gradient(135deg,#6366f1,#4f46e5)", border: "none", color: "white", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
+                {locale === "en" ? `✓ Mark as viewed · +${module.xpReward} XP` : `✓ Marquer comme vu · +${module.xpReward} XP`}
+              </button>
             </div>
           )}
 

@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Link } from "@/navigation";
 import { usePathname } from "next/navigation";
 import Layout from "@/components/Layout";
+import { YEMA_LESSON_META } from "@/data/courses/index";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,7 +52,7 @@ const T = {
     disclaimer: "Yema Languages propose une pratique linguistique indépendante alignée sur le CECRL et n'est affiliée à aucun organisme officiel d'examen.",
     levels: {
       A1: { title: "Yema A1 — Premiers pas",          subtitle: "Se présenter, parler de sa famille, comprendre des phrases simples et gérer des situations de base.",    status: "Disponible en bêta",   recommended: true  },
-      A2: { title: "Yema A2 — Vie quotidienne",       subtitle: "Communiquer dans les situations courantes : achats, rendez-vous, santé, transport et logement.",        status: "En préparation",       recommended: false },
+      A2: { title: "Yema A2 — Vie réelle",             subtitle: "Communiquer dans des situations courantes, expliquer ses besoins et se préparer à la vie quotidienne.", status: "Disponible",            recommended: false },
       B1: { title: "Yema B1 — Autonomie",             subtitle: "Échanger avec plus d'assurance dans la vie personnelle, professionnelle et administrative.",            status: "En préparation",       recommended: false },
       B2: { title: "Yema B2 — Communication avancée", subtitle: "Exprimer des opinions, expliquer des projets et comprendre des contenus plus complexes.",              status: "Bientôt disponible",   recommended: false },
       C1: { title: "Yema C1 — Intégration avancée",   subtitle: "Communiquer avec aisance dans un contexte académique, professionnel ou d'intégration avancée.",       status: "Bientôt disponible",   recommended: false },
@@ -80,7 +81,7 @@ const T = {
     disclaimer: "Yema Languages provides independent CEFR-aligned language practice and is not affiliated with any official examination institute.",
     levels: {
       A1: { title: "Yema A1 — First steps",             subtitle: "Introduce yourself, talk about your family, understand simple sentences and handle basic situations.", status: "Available in beta", recommended: true  },
-      A2: { title: "Yema A2 — Everyday life",           subtitle: "Communicate in common situations: shopping, appointments, health, transport and housing.",            status: "In preparation",   recommended: false },
+      A2: { title: "Yema A2 — Real-life situations",    subtitle: "Communicate in routine situations, explain needs and prepare for everyday life.",                    status: "Available",        recommended: false },
       B1: { title: "Yema B1 — Independence",            subtitle: "Communicate with more confidence in personal, professional and administrative situations.",          status: "In preparation",   recommended: false },
       B2: { title: "Yema B2 — Advanced communication",  subtitle: "Express opinions, explain projects and understand more complex content.",                            status: "Coming soon",      recommended: false },
       C1: { title: "Yema C1 — Advanced integration",    subtitle: "Communicate with ease in academic, professional or advanced integration contexts.",                  status: "Coming soon",      recommended: false },
@@ -107,20 +108,34 @@ const COURSES: Course[] = [
   { id: "a1-beta-3", titleDE: "Mein Alltag",         titleFR: "Routine quotidienne et chiffres",        titleEN: "Daily routine and numbers",           icon: "🕐",    level: "A1", lektionen: "Beta · Leçon 3",  modules: 5, progress: 0, locked: false, firstModuleId: "a1-beta-3-lesen" },
   { id: "a1-beta-4", titleDE: "Einkaufen & Essen",   titleFR: "Achats, nourriture et rendez-vous",      titleEN: "Shopping, food and appointments",     icon: "🛒",    level: "A1", lektionen: "Beta · Leçon 4",  modules: 5, progress: 0, locked: false, firstModuleId: "a1-beta-4-lesen" },
   { id: "a1-beta-5", titleDE: "Deutschland-Reise",   titleFR: "Situations utiles pour l'Allemagne",     titleEN: "Useful situations for Germany",       icon: "✈️",    level: "A1", lektionen: "Beta · Leçon 5",  modules: 5, progress: 0, locked: false, firstModuleId: "a1-beta-5-lesen" },
-  // ── A1 ────────────────────────────────────────────────────────────────────
-  { id: "a1-1", titleDE: "Guten Tag!",              titleFR: "Salutations",           titleEN: "Greetings",               icon: "👋",    level: "A1", lektionen: "Lektion 1-2",   modules: 4, progress: 100, locked: false },
-  { id: "a1-2", titleDE: "Familie und Freunde",     titleFR: "Famille et amis",       titleEN: "Family and friends",      icon: "👨‍👩‍👧", level: "A1", lektionen: "Lektion 3-4",   modules: 4, progress: 75,  locked: false },
-  { id: "a1-3", titleDE: "Essen und Trinken",       titleFR: "Manger et boire",       titleEN: "Food and drinks",         icon: "🍽️",   level: "A1", lektionen: "Lektion 5-6",   modules: 4, progress: 50,  locked: false },
-  { id: "a1-4", titleDE: "Wohnen",                  titleFR: "Habiter",               titleEN: "Housing and living",      icon: "🏠",    level: "A1", lektionen: "Lektion 7-8",   modules: 4, progress: 0,   locked: false },
-  { id: "a1-5", titleDE: "Alltag und Freizeit",     titleFR: "Quotidien et loisirs",  titleEN: "Daily life and leisure",  icon: "⏰",    level: "A1", lektionen: "Lektion 9-10",  modules: 4, progress: 0,   locked: false },
-  { id: "a1-6", titleDE: "Mein Tag",                titleFR: "Ma journée",            titleEN: "My day",                  icon: "📅",    level: "A1", lektionen: "Lektion 11-12", modules: 4, progress: 0,   locked: false },
-  // ── A2 ────────────────────────────────────────────────────────────────────
-  { id: "a2-1", titleDE: "Arbeit und Beruf",             titleFR: "Travail et profession",    titleEN: "Work and profession",        icon: "💼",    level: "A2", lektionen: "Lektion 1-2",   modules: 4, progress: 0, locked: false },
-  { id: "a2-2", titleDE: "Gesundheit",                   titleFR: "Santé",                    titleEN: "Health",                     icon: "🏥",    level: "A2", lektionen: "Lektion 3-4",   modules: 4, progress: 0, locked: false },
-  { id: "a2-3", titleDE: "Reisen und Verkehr",           titleFR: "Voyages et transport",     titleEN: "Travel and transport",       icon: "✈️",    level: "A2", lektionen: "Lektion 5-6",   modules: 4, progress: 0, locked: false },
-  { id: "a2-4", titleDE: "Einkaufen und Mode",           titleFR: "Shopping et mode",         titleEN: "Shopping and fashion",       icon: "🛒",    level: "A2", lektionen: "Lektion 7-8",   modules: 4, progress: 0, locked: false },
-  { id: "a2-5", titleDE: "Medien und Kommunikation",     titleFR: "Médias et communication",  titleEN: "Media and communication",    icon: "📱",    level: "A2", lektionen: "Lektion 9-10",  modules: 4, progress: 0, locked: false },
-  { id: "a2-6", titleDE: "Feste und Feiern",             titleFR: "Fêtes et célébrations",    titleEN: "Celebrations and holidays",  icon: "🎉",    level: "A2", lektionen: "Lektion 11-12", modules: 4, progress: 0, locked: false },
+  // ── A1 — full 12-lesson curriculum (from static seed) ────────────────────
+  ...YEMA_LESSON_META.filter(l => l.level === "A1").map((l, i) => ({
+    id: l.id,
+    titleDE: l.titleDE,
+    titleFR: l.descriptionFR,
+    titleEN: l.descriptionEN,
+    icon: ["👋","👨‍👩‍👧","🕐","🛒","🗺️","📅","🏠","🏥","📚","💼","🎉","🔁"][i] ?? "📖",
+    level: "A1" as Level,
+    lektionen: `A1 · Lektion ${l.order}`,
+    modules: l.moduleCount,
+    progress: 0,
+    locked: false,
+    firstModuleId: l.firstModuleId,
+  })),
+  // ── A2 — full 12-lesson curriculum (from static seed) ────────────────────
+  ...YEMA_LESSON_META.filter(l => l.level === "A2").map((l, i) => ({
+    id: l.id,
+    titleDE: l.titleDE,
+    titleFR: l.descriptionFR,
+    titleEN: l.descriptionEN,
+    icon: ["🔄","📋","💼","🎓","🏥","🏘️","🚇","💳","🤝","🌱","💬","🔁"][i] ?? "📖",
+    level: "A2" as Level,
+    lektionen: `A2 · Lektion ${l.order}`,
+    modules: l.moduleCount,
+    progress: 0,
+    locked: false,
+    firstModuleId: l.firstModuleId,
+  })),
   // ── B1 ────────────────────────────────────────────────────────────────────
   { id: "b1-1", titleDE: "Menschen und Begegnungen",     titleFR: "Personnes et rencontres",  titleEN: "People and encounters",      icon: "🤝",    level: "B1", lektionen: "Lektion 1-2",   modules: 5, progress: 0, locked: false },
   { id: "b1-2", titleDE: "Arbeitswelt",                  titleFR: "Monde du travail",         titleEN: "The working world",          icon: "🏢",    level: "B1", lektionen: "Lektion 3-4",   modules: 5, progress: 0, locked: false },
