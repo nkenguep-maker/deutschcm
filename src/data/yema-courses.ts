@@ -113,53 +113,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Guten Tag",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "Bonjour (formel)",
+                  "en": "Good day (formal)"
                 },
                 {
                   "de": "Hallo",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "Salut / Bonjour",
+                  "en": "Hello / Hi"
                 },
                 {
                   "de": "Ich heiße",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "Je m'appelle",
+                  "en": "My name is"
                 },
                 {
                   "de": "Ich komme aus",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "Je viens de",
+                  "en": "I come from"
                 },
                 {
                   "de": "Kamerun",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "Cameroun",
+                  "en": "Cameroon"
                 },
                 {
                   "de": "Deutschland",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "Allemagne",
+                  "en": "Germany"
                 },
                 {
                   "de": "Deutsch",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "l'allemand",
+                  "en": "German (language)"
                 },
                 {
                   "de": "Freut mich",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "Enchanté(e)",
+                  "en": "Nice to meet you"
                 },
                 {
                   "de": "Wie heißen Sie?",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "Comment vous appelez-vous ?",
+                  "en": "What is your name?"
                 },
                 {
                   "de": "Woher kommen Sie?",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "D'où venez-vous ?",
+                  "en": "Where are you from?"
                 }
               ]
             }
@@ -246,18 +246,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "willkommen-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
-                "prompt_de": "Ich heiße",
+                "question_fr": "Que signifie 'Guten Tag' ?",
+                "question_en": "What does 'Guten Tag' mean?",
+                "prompt_de": "Guten Tag",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "Bonjour (formel)",
+                  "Bonne nuit",
+                  "Au revoir",
+                  "Bonsoir"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "Bonjour (formel)",
+                "explanation_fr": "'Guten Tag' est une salutation formelle utilisée en journée.",
+                "explanation_en": "'Guten Tag' is a formal daytime greeting.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -516,53 +516,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Mutter",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "mère",
+                  "en": "mother"
                 },
                 {
                   "de": "Vater",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "père",
+                  "en": "father"
                 },
                 {
                   "de": "Bruder",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "frère",
+                  "en": "brother"
                 },
                 {
                   "de": "Schwester",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "sœur",
+                  "en": "sister"
                 },
                 {
                   "de": "Familie",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "famille",
+                  "en": "family"
                 },
                 {
                   "de": "Sohn",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "fils",
+                  "en": "son"
                 },
                 {
                   "de": "Tochter",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "fille",
+                  "en": "daughter"
                 },
                 {
                   "de": "Eltern",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "parents",
+                  "en": "parents"
                 },
                 {
                   "de": "Jahre alt",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "ans (âge)",
+                  "en": "years old"
                 },
                 {
                   "de": "verheiratet",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "marié(e)",
+                  "en": "married"
                 }
               ]
             }
@@ -649,18 +649,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "meine-familie-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Mutter' ?",
+                "question_en": "What does 'Mutter' mean?",
                 "prompt_de": "Eltern",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "mère",
+                  "père",
+                  "sœur",
+                  "frère"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "mère",
+                "explanation_fr": "'Mutter' signifie 'mère' en allemand.",
+                "explanation_en": "'Mutter' means 'mother' in German.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -919,53 +919,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "aufstehen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "se lever",
+                  "en": "to get up"
                 },
                 {
                   "de": "arbeiten",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "travailler",
+                  "en": "to work"
                 },
                 {
                   "de": "lernen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "apprendre",
+                  "en": "to learn"
                 },
                 {
                   "de": "essen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "manger",
+                  "en": "to eat"
                 },
                 {
                   "de": "trinken",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "boire",
+                  "en": "to drink"
                 },
                 {
                   "de": "schlafen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "dormir",
+                  "en": "to sleep"
                 },
                 {
                   "de": "Uhr",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "heure",
+                  "en": "o'clock / hour"
                 },
                 {
                   "de": "Morgen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "matin",
+                  "en": "morning"
                 },
                 {
                   "de": "Abend",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "soir",
+                  "en": "evening"
                 },
                 {
                   "de": "Montag",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "lundi",
+                  "en": "Monday"
                 }
               ]
             }
@@ -1052,18 +1052,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "mein-alltag-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'aufstehen' ?",
+                "question_en": "What does 'aufstehen' mean?",
                 "prompt_de": "essen",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "se lever",
+                  "se coucher",
+                  "manger",
+                  "travailler"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "se lever",
+                "explanation_fr": "'aufstehen' signifie 'se lever' — action du matin.",
+                "explanation_en": "'aufstehen' means 'to get up' — a morning action.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -1322,53 +1322,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Brot",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "pain",
+                  "en": "bread"
                 },
                 {
                   "de": "Wasser",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "eau",
+                  "en": "water"
                 },
                 {
                   "de": "Reis",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "riz",
+                  "en": "rice"
                 },
                 {
                   "de": "Obst",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "fruits",
+                  "en": "fruit"
                 },
                 {
                   "de": "Gemüse",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "légumes",
+                  "en": "vegetables"
                 },
                 {
                   "de": "Kaffee",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "café",
+                  "en": "coffee"
                 },
                 {
                   "de": "Preis",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "prix",
+                  "en": "price"
                 },
                 {
                   "de": "Euro",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "euro",
+                  "en": "euro"
                 },
                 {
                   "de": "kaufen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "acheter",
+                  "en": "to buy"
                 },
                 {
                   "de": "kosten",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "coûter",
+                  "en": "to cost"
                 }
               ]
             }
@@ -1455,18 +1455,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "essen-einkaufen-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Brot' ?",
+                "question_en": "What does 'Brot' mean?",
                 "prompt_de": "Gemüse",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "pain",
+                  "eau",
+                  "riz",
+                  "café"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "pain",
+                "explanation_fr": "'Brot' est un aliment de base en Allemagne — le pain.",
+                "explanation_en": "'Brot' means 'bread', a staple in Germany.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -1725,53 +1725,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Bahnhof",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "gare",
+                  "en": "train station"
                 },
                 {
                   "de": "Bus",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "bus",
+                  "en": "bus"
                 },
                 {
                   "de": "Zug",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "train",
+                  "en": "train"
                 },
                 {
                   "de": "Flughafen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "aéroport",
+                  "en": "airport"
                 },
                 {
                   "de": "links",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "à gauche",
+                  "en": "left"
                 },
                 {
                   "de": "rechts",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "à droite",
+                  "en": "right"
                 },
                 {
                   "de": "geradeaus",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "tout droit",
+                  "en": "straight ahead"
                 },
                 {
                   "de": "Ticket",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "billet",
+                  "en": "ticket"
                 },
                 {
                   "de": "Straße",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "rue / chemin",
+                  "en": "street"
                 },
                 {
                   "de": "Hilfe",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "aide / au secours",
+                  "en": "help"
                 }
               ]
             }
@@ -1858,18 +1858,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "unterwegs-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Bahnhof' ?",
+                "question_en": "What does 'Bahnhof' mean?",
                 "prompt_de": "links",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "gare",
+                  "aéroport",
+                  "bus",
+                  "rue"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "gare",
+                "explanation_fr": "'Bahnhof' désigne la gare ferroviaire.",
+                "explanation_en": "'Bahnhof' means 'train station'.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -2128,53 +2128,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Termin",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "rendez-vous",
+                  "en": "appointment"
                 },
                 {
                   "de": "Dokument",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "document",
+                  "en": "document"
                 },
                 {
                   "de": "Pass",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "passeport",
+                  "en": "passport"
                 },
                 {
                   "de": "Bitte",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "s'il vous plaît",
+                  "en": "please"
                 },
                 {
                   "de": "Warten",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "attendre",
+                  "en": "to wait"
                 },
                 {
                   "de": "Name",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "nom",
+                  "en": "name"
                 },
                 {
                   "de": "Adresse",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "adresse",
+                  "en": "address"
                 },
                 {
                   "de": "Formular",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "formulaire",
+                  "en": "form"
                 },
                 {
                   "de": "Unterschrift",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "signature",
+                  "en": "signature"
                 },
                 {
                   "de": "heute",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "aujourd'hui",
+                  "en": "today"
                 }
               ]
             }
@@ -2261,18 +2261,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "ein-termin-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Termin' ?",
+                "question_en": "What does 'Termin' mean?",
                 "prompt_de": "Pass",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "rendez-vous",
+                  "formulaire",
+                  "signature",
+                  "document"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "rendez-vous",
+                "explanation_fr": "'Termin' signifie 'rendez-vous' — mot clé pour l'administration.",
+                "explanation_en": "'Termin' means 'appointment' — key word at official offices.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -2531,53 +2531,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Wohnung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "appartement",
+                  "en": "apartment"
                 },
                 {
                   "de": "Zimmer",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "pièce / chambre",
+                  "en": "room"
                 },
                 {
                   "de": "Küche",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "cuisine",
+                  "en": "kitchen"
                 },
                 {
                   "de": "Bad",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "salle de bain",
+                  "en": "bathroom"
                 },
                 {
                   "de": "Miete",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "loyer",
+                  "en": "rent"
                 },
                 {
                   "de": "Tisch",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "table",
+                  "en": "table"
                 },
                 {
                   "de": "Stuhl",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "chaise",
+                  "en": "chair"
                 },
                 {
                   "de": "Bett",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "lit",
+                  "en": "bed"
                 },
                 {
                   "de": "klein",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "petit(e)",
+                  "en": "small"
                 },
                 {
                   "de": "groß",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "grand(e)",
+                  "en": "large"
                 }
               ]
             }
@@ -2664,18 +2664,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "wohnen-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Wohnung' ?",
+                "question_en": "What does 'Wohnung' mean?",
                 "prompt_de": "Küche",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "appartement",
+                  "cuisine",
+                  "chambre",
+                  "loyer"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "appartement",
+                "explanation_fr": "'Wohnung' désigne l'appartement ou le logement.",
+                "explanation_en": "'Wohnung' means 'apartment' or 'flat'.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -2934,53 +2934,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Kopf",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "tête",
+                  "en": "head"
                 },
                 {
                   "de": "Bauch",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "ventre",
+                  "en": "stomach"
                 },
                 {
                   "de": "Schmerz",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "douleur",
+                  "en": "pain"
                 },
                 {
                   "de": "Arzt",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "médecin",
+                  "en": "doctor"
                 },
                 {
                   "de": "Apotheke",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "pharmacie",
+                  "en": "pharmacy"
                 },
                 {
                   "de": "Medikament",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "médicament",
+                  "en": "medication"
                 },
                 {
                   "de": "krank",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "malade",
+                  "en": "sick"
                 },
                 {
                   "de": "müde",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "fatigué(e)",
+                  "en": "tired"
                 },
                 {
                   "de": "Termin",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "rendez-vous",
+                  "en": "appointment"
                 },
                 {
                   "de": "Hilfe",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "aide",
+                  "en": "help"
                 }
               ]
             }
@@ -3067,18 +3067,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "gesundheit-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Arzt' ?",
+                "question_en": "What does 'Arzt' mean?",
                 "prompt_de": "Bauch",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "médecin",
+                  "pharmacie",
+                  "médicament",
+                  "douleur"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "médecin",
+                "explanation_fr": "'Arzt' désigne le médecin.",
+                "explanation_en": "'Arzt' means 'doctor'.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -3337,53 +3337,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Frage",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "question",
+                  "en": "question"
                 },
                 {
                   "de": "Antwort",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "réponse",
+                  "en": "answer"
                 },
                 {
                   "de": "Übung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "exercice",
+                  "en": "exercise"
                 },
                 {
                   "de": "Buch",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "livre",
+                  "en": "book"
                 },
                 {
                   "de": "Heft",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "cahier",
+                  "en": "notebook"
                 },
                 {
                   "de": "sprechen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "parler",
+                  "en": "to speak"
                 },
                 {
                   "de": "hören",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "écouter",
+                  "en": "to listen"
                 },
                 {
                   "de": "lesen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "lire",
+                  "en": "to read"
                 },
                 {
                   "de": "schreiben",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "écrire",
+                  "en": "to write"
                 },
                 {
                   "de": "verstehen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "comprendre",
+                  "en": "to understand"
                 }
               ]
             }
@@ -3470,18 +3470,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "im-deutschkurs-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Frage' ?",
+                "question_en": "What does 'Frage' mean?",
                 "prompt_de": "Übung",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "question",
+                  "réponse",
+                  "exercice",
+                  "livre"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "question",
+                "explanation_fr": "'Frage' signifie 'question' — mot essentiel en classe.",
+                "explanation_en": "'Frage' means 'question' — essential in the classroom.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -3740,53 +3740,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Arbeit",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "travail",
+                  "en": "work"
                 },
                 {
                   "de": "Beruf",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "métier",
+                  "en": "profession"
                 },
                 {
                   "de": "Lehrer",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "professeur",
+                  "en": "teacher"
                 },
                 {
                   "de": "Krankenschwester",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "infirmière",
+                  "en": "nurse"
                 },
                 {
                   "de": "Ingenieur",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "ingénieur",
+                  "en": "engineer"
                 },
                 {
                   "de": "Computer",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "ordinateur",
+                  "en": "computer"
                 },
                 {
                   "de": "Büro",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "bureau",
+                  "en": "office"
                 },
                 {
                   "de": "helfen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "aider",
+                  "en": "to help"
                 },
                 {
                   "de": "kochen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "cuisiner",
+                  "en": "to cook"
                 },
                 {
                   "de": "fahren",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "conduire",
+                  "en": "to drive"
                 }
               ]
             }
@@ -3873,18 +3873,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "arbeit-beruf-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Beruf' ?",
+                "question_en": "What does 'Beruf' mean?",
                 "prompt_de": "Computer",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "métier",
+                  "travail",
+                  "bureau",
+                  "professeur"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "métier",
+                "explanation_fr": "'Beruf' signifie 'métier' ou 'profession'.",
+                "explanation_en": "'Beruf' means 'profession' or 'occupation'.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -4143,53 +4143,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Freizeit",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "temps libre",
+                  "en": "free time"
                 },
                 {
                   "de": "Freund",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "ami(e)",
+                  "en": "friend"
                 },
                 {
                   "de": "Kino",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "cinéma",
+                  "en": "cinema"
                 },
                 {
                   "de": "Musik",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "musique",
+                  "en": "music"
                 },
                 {
                   "de": "Fußball",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "football",
+                  "en": "football"
                 },
                 {
                   "de": "einladen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "inviter",
+                  "en": "to invite"
                 },
                 {
                   "de": "mitkommen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "venir avec",
+                  "en": "to come along"
                 },
                 {
                   "de": "anrufen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "appeler",
+                  "en": "to call"
                 },
                 {
                   "de": "Wochenende",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "week-end",
+                  "en": "weekend"
                 },
                 {
                   "de": "Zeit",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "temps",
+                  "en": "time"
                 }
               ]
             }
@@ -4276,18 +4276,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "freizeit-freunde-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Freizeit' ?",
+                "question_en": "What does 'Freizeit' mean?",
                 "prompt_de": "Freund",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "temps libre",
+                  "ami",
+                  "week-end",
+                  "cinéma"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "temps libre",
+                "explanation_fr": "'Freizeit' désigne le temps libre — les moments hors travail.",
+                "explanation_en": "'Freizeit' means 'free time' — time outside work.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -4546,53 +4546,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Name",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "nom",
+                  "en": "name"
                 },
                 {
                   "de": "Land",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "pays",
+                  "en": "country"
                 },
                 {
                   "de": "Familie",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "famille",
+                  "en": "family"
                 },
                 {
                   "de": "Termin",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "rendez-vous",
+                  "en": "appointment"
                 },
                 {
                   "de": "Einkaufen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "faire les courses",
+                  "en": "shopping"
                 },
                 {
                   "de": "Wohnen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "habiter / logement",
+                  "en": "living / housing"
                 },
                 {
                   "de": "Gesundheit",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "santé",
+                  "en": "health"
                 },
                 {
                   "de": "Arbeit",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "travail",
+                  "en": "work"
                 },
                 {
                   "de": "Freizeit",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "temps libre",
+                  "en": "free time"
                 },
                 {
                   "de": "Kurs",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "cours",
+                  "en": "course"
                 }
               ]
             }
@@ -4679,18 +4679,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "a1-wiederholung-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Land' ?",
+                "question_en": "What does 'Land' mean?",
                 "prompt_de": "Land",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "pays",
+                  "famille",
+                  "cours",
+                  "travail"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "pays",
+                "explanation_fr": "'Land' signifie 'pays' — mot vu dès la leçon 1.",
+                "explanation_en": "'Land' means 'country' — used from lesson 1.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -4963,53 +4963,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "angekommen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "arrivé(e)",
+                  "en": "arrived"
                 },
                 {
                   "de": "gearbeitet",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "travaillé",
+                  "en": "worked"
                 },
                 {
                   "de": "gelernt",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "appris",
+                  "en": "learned"
                 },
                 {
                   "de": "gereist",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "voyagé",
+                  "en": "travelled"
                 },
                 {
                   "de": "besucht",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "visité",
+                  "en": "visited"
                 },
                 {
                   "de": "gemacht",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "fait",
+                  "en": "done"
                 },
                 {
                   "de": "gestern",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "hier",
+                  "en": "yesterday"
                 },
                 {
                   "de": "letzte Woche",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "la semaine dernière",
+                  "en": "last week"
                 },
                 {
                   "de": "Erfahrung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "expérience",
+                  "en": "experience"
                 },
                 {
                   "de": "neu",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "nouveau / nouvelle",
+                  "en": "new"
                 }
               ]
             }
@@ -5096,18 +5096,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "wieder-ankommen-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'angekommen' ?",
+                "question_en": "What does 'angekommen' mean?",
                 "prompt_de": "Erfahrung",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "arrivé(e)",
+                  "parti(e)",
+                  "appris",
+                  "voyagé"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "arrivé(e)",
+                "explanation_fr": "'angekommen' est le participe passé de 'ankommen' — arriver.",
+                "explanation_en": "'angekommen' is the past participle of 'ankommen' — to arrive.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -5402,53 +5402,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Ausweis",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "carte d'identité",
+                  "en": "ID card"
                 },
                 {
                   "de": "Antrag",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "demande / dossier",
+                  "en": "application"
                 },
                 {
                   "de": "Formular",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "formulaire",
+                  "en": "form"
                 },
                 {
                   "de": "Termin",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "rendez-vous",
+                  "en": "appointment"
                 },
                 {
                   "de": "Behörde",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "administration",
+                  "en": "authority / office"
                 },
                 {
                   "de": "Kopie",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "copie",
+                  "en": "copy"
                 },
                 {
                   "de": "Unterschrift",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "signature",
+                  "en": "signature"
                 },
                 {
                   "de": "Gebühr",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "frais / taxe",
+                  "en": "fee"
                 },
                 {
                   "de": "Bestätigung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "confirmation",
+                  "en": "confirmation"
                 },
                 {
                   "de": "Unterlagen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "documents justificatifs",
+                  "en": "documents"
                 }
               ]
             }
@@ -5535,18 +5535,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "termine-dokumente-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Ausweis' ?",
+                "question_en": "What does 'Ausweis' mean?",
                 "prompt_de": "Antrag",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "carte d'identité",
+                  "formulaire",
+                  "signature",
+                  "demande"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "carte d'identité",
+                "explanation_fr": "'Ausweis' est la carte d'identité — document indispensable.",
+                "explanation_en": "'Ausweis' means 'ID card' — an essential document.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -5841,53 +5841,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Lebenslauf",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "CV",
+                  "en": "CV / résumé"
                 },
                 {
                   "de": "Bewerbung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "candidature",
+                  "en": "application"
                 },
                 {
                   "de": "Stelle",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "poste / emploi",
+                  "en": "position / job"
                 },
                 {
                   "de": "Erfahrung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "expérience",
+                  "en": "experience"
                 },
                 {
                   "de": "Fähigkeit",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "compétence",
+                  "en": "skill"
                 },
                 {
                   "de": "Vorstellungsgespräch",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "entretien d'embauche",
+                  "en": "job interview"
                 },
                 {
                   "de": "Team",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "équipe",
+                  "en": "team"
                 },
                 {
                   "de": "pünktlich",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "ponctuel(le)",
+                  "en": "punctual"
                 },
                 {
                   "de": "zuverlässig",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "fiable / sérieux(se)",
+                  "en": "reliable"
                 },
                 {
                   "de": "suchen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "chercher",
+                  "en": "to look for"
                 }
               ]
             }
@@ -5974,18 +5974,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "arbeit-suchen-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Lebenslauf' ?",
+                "question_en": "What does 'Lebenslauf' mean?",
                 "prompt_de": "suchen",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "CV",
+                  "candidature",
+                  "entretien",
+                  "poste"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "CV",
+                "explanation_fr": "'Lebenslauf' désigne le CV — document clé pour postuler.",
+                "explanation_en": "'Lebenslauf' means 'CV' — the key document for job applications.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -6280,53 +6280,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Ausbildung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "formation professionnelle",
+                  "en": "vocational training"
                 },
                 {
                   "de": "Studium",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "études (universitaires)",
+                  "en": "university studies"
                 },
                 {
                   "de": "Universität",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "université",
+                  "en": "university"
                 },
                 {
                   "de": "Kurs",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "cours",
+                  "en": "course"
                 },
                 {
                   "de": "Prüfung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "examen",
+                  "en": "exam"
                 },
                 {
                   "de": "Abschluss",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "diplôme",
+                  "en": "degree / diploma"
                 },
                 {
                   "de": "Bewerbung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "candidature",
+                  "en": "application"
                 },
                 {
                   "de": "Fach",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "matière / discipline",
+                  "en": "subject"
                 },
                 {
                   "de": "Plan",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "plan / projet",
+                  "en": "plan"
                 },
                 {
                   "de": "Zukunft",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "avenir",
+                  "en": "future"
                 }
               ]
             }
@@ -6413,18 +6413,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "ausbildung-studium-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Prüfung' ?",
+                "question_en": "What does 'Prüfung' mean?",
                 "prompt_de": "Fach",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "examen",
+                  "cours",
+                  "diplôme",
+                  "université"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "examen",
+                "explanation_fr": "'Prüfung' signifie 'examen' — moment de vérification des connaissances.",
+                "explanation_en": "'Prüfung' means 'exam' — a test of knowledge.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -6719,53 +6719,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Versicherung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "assurance",
+                  "en": "insurance"
                 },
                 {
                   "de": "Krankenkasse",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "caisse d'assurance maladie",
+                  "en": "health insurance fund"
                 },
                 {
                   "de": "Chipkarte",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "carte à puce médicale",
+                  "en": "health card"
                 },
                 {
                   "de": "Rezept",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "ordonnance",
+                  "en": "prescription"
                 },
                 {
                   "de": "Praxis",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "cabinet médical",
+                  "en": "medical practice"
                 },
                 {
                   "de": "Symptom",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "symptôme",
+                  "en": "symptom"
                 },
                 {
                   "de": "Rücken",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "dos",
+                  "en": "back"
                 },
                 {
                   "de": "Fieber",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "fièvre",
+                  "en": "fever"
                 },
                 {
                   "de": "Termin",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "rendez-vous",
+                  "en": "appointment"
                 },
                 {
                   "de": "Notfall",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "urgence",
+                  "en": "emergency"
                 }
               ]
             }
@@ -6852,18 +6852,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "gesundheit-versicherung-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Rezept' ?",
+                "question_en": "What does 'Rezept' mean?",
                 "prompt_de": "Notfall",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "ordonnance",
+                  "assurance",
+                  "urgence",
+                  "symptôme"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "ordonnance",
+                "explanation_fr": "'Rezept' signifie 'ordonnance' médicale — document du médecin.",
+                "explanation_en": "'Rezept' means 'prescription' — the document from the doctor.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -7158,53 +7158,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Nachbar",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "voisin(e)",
+                  "en": "neighbour"
                 },
                 {
                   "de": "Lärm",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "bruit",
+                  "en": "noise"
                 },
                 {
                   "de": "Reparatur",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "réparation",
+                  "en": "repair"
                 },
                 {
                   "de": "Heizung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "chauffage",
+                  "en": "heating"
                 },
                 {
                   "de": "Mietvertrag",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "contrat de location",
+                  "en": "rental contract"
                 },
                 {
                   "de": "Vermieter",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "propriétaire / bailleur",
+                  "en": "landlord"
                 },
                 {
                   "de": "Flur",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "couloir",
+                  "en": "hallway"
                 },
                 {
                   "de": "unter",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "en dessous de",
+                  "en": "under / below"
                 },
                 {
                   "de": "neben",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "à côté de",
+                  "en": "next to"
                 },
                 {
                   "de": "zwischen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "entre",
+                  "en": "between"
                 }
               ]
             }
@@ -7291,18 +7291,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "wohnung-nachbarn-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Nachbar' ?",
+                "question_en": "What does 'Nachbar' mean?",
                 "prompt_de": "Flur",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "voisin",
+                  "propriétaire",
+                  "couloir",
+                  "bruit"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "voisin",
+                "explanation_fr": "'Nachbar' désigne le voisin.",
+                "explanation_en": "'Nachbar' means 'neighbour'.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -7597,53 +7597,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Straßenbahn",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "tramway",
+                  "en": "tram"
                 },
                 {
                   "de": "U-Bahn",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "métro",
+                  "en": "metro"
                 },
                 {
                   "de": "Fahrplan",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "horaire (transport)",
+                  "en": "timetable"
                 },
                 {
                   "de": "Haltestelle",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "arrêt (bus/tram)",
+                  "en": "stop"
                 },
                 {
                   "de": "schneller",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "plus rapide",
+                  "en": "faster"
                 },
                 {
                   "de": "billiger",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "moins cher",
+                  "en": "cheaper"
                 },
                 {
                   "de": "näher",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "plus proche",
+                  "en": "closer"
                 },
                 {
                   "de": "umsteigen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "changer de transport",
+                  "en": "to change (transport)"
                 },
                 {
                   "de": "Verspätung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "retard",
+                  "en": "delay"
                 },
                 {
                   "de": "Verbindung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "correspondance",
+                  "en": "connection"
                 }
               ]
             }
@@ -7730,18 +7730,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "mobilitaet-stadt-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Verspätung' ?",
+                "question_en": "What does 'Verspätung' mean?",
                 "prompt_de": "umsteigen",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "retard",
+                  "arrêt",
+                  "horaire",
+                  "métro"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "retard",
+                "explanation_fr": "'Verspätung' signifie 'retard' — fréquent dans les transports.",
+                "explanation_en": "'Verspätung' means 'delay' — frequently heard in public transport.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -8036,53 +8036,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Konto",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "compte bancaire",
+                  "en": "bank account"
                 },
                 {
                   "de": "Rechnung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "facture",
+                  "en": "invoice / bill"
                 },
                 {
                   "de": "Vertrag",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "contrat",
+                  "en": "contract"
                 },
                 {
                   "de": "Gebühr",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "frais / taxe",
+                  "en": "fee"
                 },
                 {
                   "de": "monatlich",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "mensuel(le)",
+                  "en": "monthly"
                 },
                 {
                   "de": "kündigen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "résilier",
+                  "en": "to cancel / terminate"
                 },
                 {
                   "de": "bezahlen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "payer",
+                  "en": "to pay"
                 },
                 {
                   "de": "überweisen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "virer (argent)",
+                  "en": "to transfer (money)"
                 },
                 {
                   "de": "Datum",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "date",
+                  "en": "date"
                 },
                 {
                   "de": "Betrag",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "montant",
+                  "en": "amount"
                 }
               ]
             }
@@ -8169,18 +8169,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "geld-vertraege-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Rechnung' ?",
+                "question_en": "What does 'Rechnung' mean?",
                 "prompt_de": "Vertrag",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "facture",
+                  "contrat",
+                  "montant",
+                  "compte"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "facture",
+                "explanation_fr": "'Rechnung' signifie 'facture' ou 'note'.",
+                "explanation_en": "'Rechnung' means 'invoice' or 'bill'.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -8475,53 +8475,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "pünktlich",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "ponctuel(le)",
+                  "en": "punctual"
                 },
                 {
                   "de": "höflich",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "poli(e)",
+                  "en": "polite"
                 },
                 {
                   "de": "Regel",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "règle",
+                  "en": "rule"
                 },
                 {
                   "de": "Ruhe",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "calme / silence",
+                  "en": "quiet / calm"
                 },
                 {
                   "de": "Respekt",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "respect",
+                  "en": "respect"
                 },
                 {
                   "de": "Nachbarschaft",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "voisinage",
+                  "en": "neighbourhood"
                 },
                 {
                   "de": "Termin",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "rendez-vous",
+                  "en": "appointment"
                 },
                 {
                   "de": "Gewohnheit",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "habitude",
+                  "en": "habit"
                 },
                 {
                   "de": "direkt",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "direct(e)",
+                  "en": "direct"
                 },
                 {
                   "de": "freundlich",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "aimable / sympathique",
+                  "en": "friendly"
                 }
               ]
             }
@@ -8608,18 +8608,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "kultur-zusammenleben-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'höflich' ?",
+                "question_en": "What does 'höflich' mean?",
                 "prompt_de": "höflich",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "poli(e)",
+                  "ponctuel(le)",
+                  "direct(e)",
+                  "aimable"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "poli(e)",
+                "explanation_fr": "'höflich' signifie 'poli' — valeur importante en Allemagne.",
+                "explanation_en": "'höflich' means 'polite' — an important value in Germany.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -8914,53 +8914,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Zukunft",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "avenir",
+                  "en": "future"
                 },
                 {
                   "de": "Plan",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "plan / projet",
+                  "en": "plan"
                 },
                 {
                   "de": "Ziel",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "objectif / but",
+                  "en": "goal"
                 },
                 {
                   "de": "Familie",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "famille",
+                  "en": "family"
                 },
                 {
                   "de": "umziehen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "déménager",
+                  "en": "to move (house)"
                 },
                 {
                   "de": "arbeiten",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "travailler",
+                  "en": "to work"
                 },
                 {
                   "de": "lernen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "apprendre",
+                  "en": "to learn"
                 },
                 {
                   "de": "sparen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "épargner / économiser",
+                  "en": "to save (money)"
                 },
                 {
                   "de": "später",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "plus tard",
+                  "en": "later"
                 },
                 {
                   "de": "nächstes Jahr",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "l'année prochaine",
+                  "en": "next year"
                 }
               ]
             }
@@ -9047,18 +9047,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "familie-zukunft-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Zukunft' ?",
+                "question_en": "What does 'Zukunft' mean?",
                 "prompt_de": "Plan",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "avenir",
+                  "famille",
+                  "objectif",
+                  "projet"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "avenir",
+                "explanation_fr": "'Zukunft' signifie 'avenir'.",
+                "explanation_en": "'Zukunft' means 'future'.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -9353,53 +9353,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Problem",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "problème",
+                  "en": "problem"
                 },
                 {
                   "de": "Entschuldigung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "excuse / pardon",
+                  "en": "excuse me / sorry"
                 },
                 {
                   "de": "Lösung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "solution",
+                  "en": "solution"
                 },
                 {
                   "de": "Beschwerde",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "plainte / réclamation",
+                  "en": "complaint"
                 },
                 {
                   "de": "ruhig",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "calme",
+                  "en": "calm"
                 },
                 {
                   "de": "klären",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "clarifier / résoudre",
+                  "en": "to clarify"
                 },
                 {
                   "de": "helfen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "aider",
+                  "en": "to help"
                 },
                 {
                   "de": "vorschlagen",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "proposer / suggérer",
+                  "en": "to suggest"
                 },
                 {
                   "de": "wäre",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "serait (conditionnel)",
+                  "en": "would be"
                 },
                 {
                   "de": "könnte",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "pourrait (conditionnel)",
+                  "en": "could"
                 }
               ]
             }
@@ -9486,18 +9486,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "probleme-loesen-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Lösung' ?",
+                "question_en": "What does 'Lösung' mean?",
                 "prompt_de": "Beschwerde",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "solution",
+                  "problème",
+                  "plainte",
+                  "excuse"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "solution",
+                "explanation_fr": "'Lösung' signifie 'solution'.",
+                "explanation_en": "'Lösung' means 'solution'.",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
@@ -9792,53 +9792,53 @@ export const yemaStaticGermanCourses = [
               "items": [
                 {
                   "de": "Termin",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "rendez-vous",
+                  "en": "appointment"
                 },
                 {
                   "de": "Arbeit",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "travail",
+                  "en": "work"
                 },
                 {
                   "de": "Studium",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "études",
+                  "en": "studies"
                 },
                 {
                   "de": "Gesundheit",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "santé",
+                  "en": "health"
                 },
                 {
                   "de": "Wohnung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "appartement",
+                  "en": "apartment"
                 },
                 {
                   "de": "Vertrag",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "contrat",
+                  "en": "contract"
                 },
                 {
                   "de": "Kultur",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "culture",
+                  "en": "culture"
                 },
                 {
                   "de": "Problem",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "problème",
+                  "en": "problem"
                 },
                 {
                   "de": "Zukunft",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "avenir",
+                  "en": "future"
                 },
                 {
                   "de": "Erfahrung",
-                  "fr": "à traduire dans l’UI",
-                  "en": "to translate in UI"
+                  "fr": "expérience",
+                  "en": "experience"
                 }
               ]
             }
@@ -9925,18 +9925,18 @@ export const yemaStaticGermanCourses = [
               {
                 "id": "a2-wiederholung-q2",
                 "type": "multiple_choice",
-                "question_fr": "Que signifie cette phrase ?",
-                "question_en": "What does this sentence mean?",
+                "question_fr": "Que signifie 'Gesundheit' ?",
+                "question_en": "What does 'Gesundheit' mean?",
                 "prompt_de": "Arbeit",
                 "options": [
-                  "Réponse liée au thème",
-                  "Une question officielle",
-                  "Un nombre",
-                  "Une couleur"
+                  "santé",
+                  "travail",
+                  "culture",
+                  "avenir"
                 ],
-                "correctAnswer": "Réponse liée au thème",
-                "explanation_fr": "Ce mot fait partie du vocabulaire de la leçon.",
-                "explanation_en": "This word belongs to the lesson vocabulary.",
+                "correctAnswer": "santé",
+                "explanation_fr": "'Gesundheit' signifie 'santé' — aussi dit après un éternuement !",
+                "explanation_en": "'Gesundheit' means 'health' — also said after a sneeze!",
                 "skill": "vocabulary",
                 "difficulty": "easy"
               },
