@@ -772,76 +772,121 @@ export default function ModulePage() {
                   {labels.introduction}
                 </p>
                 <p style={{ color: "rgba(255,255,255,0.8)", fontSize: 14, margin: "0 0 8px", lineHeight: 1.7 }}>
-                  {module.content.introduction}
+                  {locale === "en" && module.content.introduction_en
+                    ? module.content.introduction_en as string
+                    : module.content.introduction as string}
                 </p>
-                {module.content.kulturhinweis && (
+                {(locale === "en" ? module.content.kulturhinweis_en : module.content.kulturhinweis) && (
                   <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: 0, fontStyle: "italic" }}>
-                    {module.content.kulturhinweis}
+                    {locale === "en"
+                      ? module.content.kulturhinweis_en as string
+                      : module.content.kulturhinweis as string}
                   </p>
                 )}
               </div>
 
-              {/* Vocabulary */}
-              <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 17, margin: "0 0 16px" }}>{labels.vocabulary}</h2>
-                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10 }}>
-                  {module.content.wortschatz?.map((word: { de: string; fr: string; example: string }, i: number) => (
-                    <div key={i} style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
-                        <span style={{ color: "#10b981", fontSize: 15, fontWeight: 700 }}>{word.de}</span>
-                        <AudioPlayer text={word.de} gender="female" accent="de" rate="0.8" label={word.de} />
+              {/* Key phrases preview — only for intro modules (wortschatz is null but keyPhrases exist) */}
+              {!module.content.wortschatz && ((module.content.keyPhrases as string[] | undefined)?.length ?? 0) > 0 && (
+                <div style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.15)" }}>
+                  <p style={{ fontSize: 10, color: "#a5b4fc", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 12px", fontWeight: 700 }}>
+                    {locale === "en" ? "Key phrases" : "Phrases clés"}
+                  </p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {(module.content.keyPhrases as string[]).map((phrase, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <AudioPlayer text={phrase} gender="female" accent="de" rate="0.85" label={phrase} />
+                        <span style={{ color: "#10b981", fontSize: 14, fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{phrase}</span>
                       </div>
-                      <p style={{ color: "rgba(255,255,255,0.70)", fontSize: 13, margin: "0 0 6px" }}>{word.fr}</p>
-                      <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 12, margin: 0, fontStyle: "italic" }}>{word.example}</p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Grammar */}
+              {/* Vocabulary — only when wortschatz has items */}
+              {((module.content.wortschatz as unknown[] | null | undefined)?.length ?? 0) > 0 && (
+                <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 17, margin: "0 0 16px" }}>{labels.vocabulary}</h2>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 10 }}>
+                    {(module.content.wortschatz as Array<{ de: string; fr: string; en?: string; example: string }>).map((word, i) => (
+                      <div key={i} style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
+                          <span style={{ color: "#10b981", fontSize: 15, fontWeight: 700 }}>{word.de}</span>
+                          <AudioPlayer text={word.de} gender="female" accent="de" rate="0.8" label={word.de} />
+                        </div>
+                        <p style={{ color: "rgba(255,255,255,0.70)", fontSize: 13, margin: "0 0 6px" }}>
+                          {locale === "en" ? (word.en ?? word.fr) : word.fr}
+                        </p>
+                        {word.example && word.example !== word.de && (
+                          <p style={{ color: "rgba(255,255,255,0.60)", fontSize: 12, margin: 0, fontStyle: "italic" }}>{word.example}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Grammar — only when grammatik exists */}
               {module.content.grammatik && (
                 <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 17, margin: "0 0 6px" }}>{labels.grammar}</h2>
                   <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: "0 0 16px", fontStyle: "italic" }}>
-                    {module.content.grammatik.ruleDE}
+                    {locale === "en"
+                      ? (module.content.grammatik.ruleEN as string ?? module.content.grammatik.ruleDE as string)
+                      : module.content.grammatik.ruleDE as string}
                   </p>
                   <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, margin: "0 0 16px", lineHeight: 1.7 }}>
-                    {module.content.grammatik.explanation}
+                    {locale === "en"
+                      ? (module.content.grammatik.explanation_en as string ?? module.content.grammatik.explanation as string)
+                      : module.content.grammatik.explanation as string}
                   </p>
 
-                  {/* Conjugation table */}
-                  <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 16 }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", background: "rgba(16,185,129,0.08)", borderBottom: "1px solid rgba(16,185,129,0.15)" }}>
-                      {module.content.grammatik.table.headers.map((h: string, i: number) => (
-                        <div key={i} style={{ padding: "10px 16px", color: "#10b981", fontSize: 11, fontWeight: 700, textTransform: "uppercase" }}>{h}</div>
+                  {/* Examples table — dynamic columns */}
+                  {(module.content.grammatik.table.rows as string[][]).length > 0 && (() => {
+                    const headers = module.content.grammatik.table.headers as string[]
+                    const rows = module.content.grammatik.table.rows as string[][]
+                    const colCount = headers.filter((h: string) => h !== "").length || 1
+                    const isMultiCol = colCount >= 3
+                    return (
+                      <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 16 }}>
+                        <div style={{ display: "grid", gridTemplateColumns: `repeat(${colCount},1fr)`, background: "rgba(16,185,129,0.08)", borderBottom: "1px solid rgba(16,185,129,0.15)" }}>
+                          {headers.filter((h: string) => h !== "").map((h: string, i: number) => (
+                            <div key={i} style={{ padding: "10px 16px", color: "#10b981", fontSize: 11, fontWeight: 700, textTransform: "uppercase" }}>{h}</div>
+                          ))}
+                        </div>
+                        {rows.map((row: string[], i: number) => {
+                          const cells = row.filter((c: string) => !(colCount < 3 && c === ""))
+                          return (
+                            <div key={i} style={{ display: "grid", gridTemplateColumns: `repeat(${colCount},1fr)`, borderBottom: i < rows.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
+                              {cells.map((cell: string, j: number) => (
+                                <div key={j} style={{ padding: isMobile ? "8px 10px" : "10px 16px", color: isMultiCol ? (j === 0 ? "#10b981" : j === 1 ? "white" : "rgba(255,255,255,0.5)") : "#10b981", fontSize: isMultiCol && j === 1 ? 15 : 13, fontWeight: isMultiCol && j === 1 ? 700 : (j === 0 ? 700 : 400), fontStyle: isMultiCol && j === 2 ? "italic" : "normal", display: "flex", alignItems: "center", gap: 6, fontFamily: "'DM Mono',monospace" }}>
+                                  {cell}
+                                  {isMultiCol && j === 1 && <AudioPlayer text={cell} gender="female" rate="0.8" />}
+                                  {!isMultiCol && j === 0 && <AudioPlayer text={cell} gender="female" rate="0.8" />}
+                                </div>
+                              ))}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )
+                  })()}
+
+                  {/* Common mistakes — only when non-empty */}
+                  {((module.content.grammatik.commonMistakes as unknown[] | undefined)?.length ?? 0) > 0 && (
+                    <div>
+                      <p style={{ fontSize: 12, color: "rgba(255,255,255,0.58)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
+                        {labels.commonMistakes}
+                      </p>
+                      {(module.content.grammatik.commonMistakes as Array<{ wrong: string; correct: string; explanation: string }>).map((err, i) => (
+                        <div key={i} style={{ padding: "8px 12px", borderRadius: 8, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", marginBottom: 6, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                          <span style={{ color: "#ef4444", fontSize: 13, textDecoration: "line-through" }}>{err.wrong}</span>
+                          <span style={{ color: "rgba(255,255,255,0.65)" }}>→</span>
+                          <span style={{ color: "#10b981", fontSize: 13, fontWeight: 700 }}>{err.correct}</span>
+                          <span style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}>{err.explanation}</span>
+                        </div>
                       ))}
                     </div>
-                    {module.content.grammatik.table.rows.map((row: string[], i: number) => (
-                      <div key={i} style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", borderBottom: i < module.content.grammatik.table.rows.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
-                        {row.map((cell, j) => (
-                          <div key={j} style={{ padding: isMobile ? "8px 10px" : "10px 16px", color: j === 0 ? "#10b981" : j === 1 ? "white" : "rgba(255,255,255,0.5)", fontSize: j === 1 ? 15 : 13, fontWeight: j === 1 ? 700 : 400, fontStyle: j === 2 ? "italic" : "normal", display: "flex", alignItems: "center", gap: 6 }}>
-                            {cell}
-                            {j === 1 && <AudioPlayer text={cell} gender="female" rate="0.8" />}
-                          </div>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Common mistakes */}
-                  <div>
-                    <p style={{ fontSize: 12, color: "rgba(255,255,255,0.58)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
-                      {labels.commonMistakes}
-                    </p>
-                    {module.content.grammatik.commonMistakes?.map((err: { wrong: string; correct: string; explanation: string }, i: number) => (
-                      <div key={i} style={{ padding: "8px 12px", borderRadius: 8, background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", marginBottom: 6, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                        <span style={{ color: "#ef4444", fontSize: 13, textDecoration: "line-through" }}>{err.wrong}</span>
-                        <span style={{ color: "rgba(255,255,255,0.65)" }}>→</span>
-                        <span style={{ color: "#10b981", fontSize: 13, fontWeight: 700 }}>{err.correct}</span>
-                        <span style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}>{err.explanation}</span>
-                      </div>
-                    ))}
-                  </div>
+                  )}
                 </div>
               )}
 
@@ -849,7 +894,7 @@ export default function ModulePage() {
               {module.content.lesetext && (
                 <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
-                    <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 17, margin: 0 }}>📄 {module.content.lesetext.title}</h2>
+                    <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 17, margin: 0 }}>📄 {(module.content.lesetext as { title: string }).title}</h2>
                     <button
                       onClick={() => setShowTranslation(!showTranslation)}
                       style={{ padding: "5px 12px", borderRadius: 99, fontSize: 10, fontWeight: 700, background: showTranslation ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.05)", border: showTranslation ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.1)", color: showTranslation ? "#10b981" : "rgba(255,255,255,0.4)", cursor: "pointer" }}
@@ -858,16 +903,16 @@ export default function ModulePage() {
                     </button>
                   </div>
                   <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: "0 0 12px", fontStyle: "italic" }}>
-                    {module.content.lesetext.context}
+                    {(module.content.lesetext as { context: string }).context}
                   </p>
                   <div style={{ padding: "14px 18px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", marginBottom: 12 }}>
-                    {module.content.lesetext.text.split("\n").map((line: string, i: number) => (
+                    {(module.content.lesetext as { text: string }).text.split("\n").map((line: string, i: number) => (
                       <p key={i} style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, margin: "0 0 6px", lineHeight: 1.7 }}>{line}</p>
                     ))}
                   </div>
                   {showTranslation && (
                     <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.12)" }}>
-                      {module.content.lesetext.translation.split("\n").map((line: string, i: number) => (
+                      {(module.content.lesetext as { translation: string }).translation.split("\n").map((line: string, i: number) => (
                         <p key={i} style={{ color: "rgba(255,255,255,0.68)", fontSize: 13, margin: "0 0 4px", fontStyle: "italic" }}>{line}</p>
                       ))}
                     </div>

@@ -107,6 +107,10 @@ for (const course of yemaStaticGermanCourses as unknown as Array<{
 
     let lessonXp = 0
 
+    // Pre-collect key phrases from speaking module for intro enrichment
+    const speakingMod = lesson.modules.find(m => m.type === "speaking")
+    const keyPhrases = ((speakingMod?.content?.starter_de as string[] | undefined) ?? []).slice(0, 4)
+
     for (const mod of lesson.modules) {
       lessonXp += mod.xp
       const baseType = mapType(mod.type)
@@ -116,11 +120,15 @@ for (const course of yemaStaticGermanCourses as unknown as Array<{
 
       if (mod.type === "lesson") {
         content = {
+          // Locale-aware intro text — renderer picks the right field
           introduction: (mod.content?.objective_fr as string) ?? "",
+          introduction_en: (mod.content?.objective_en as string) ?? "",
           kulturhinweis: (mod.content?.realLifeGoal_fr as string) ?? "",
-          wortschatz: [],
+          kulturhinweis_en: (mod.content?.realLifeGoal_en as string) ?? "",
+          wortschatz: null,   // intro has no vocabulary — guard prevents empty section
           grammatik: null,
           lesetext: null,
+          keyPhrases,         // preview phrases from speaking module
         }
       } else if (mod.type === "dialogue") {
         const lines = ((mod.content?.dialogue ?? []) as Array<{ speaker: string; text_de: string }>).map(d => ({
@@ -134,6 +142,7 @@ for (const course of yemaStaticGermanCourses as unknown as Array<{
           dialogs: [{
             title: lesson.title_de,
             context_fr: (mod.content?.note_fr as string) ?? "",
+            context_en: (mod.content?.note_en as string) ?? "",
             lines,
           }],
         }
@@ -141,14 +150,16 @@ for (const course of yemaStaticGermanCourses as unknown as Array<{
         const items = ((mod.content?.items ?? []) as Array<{ de: string; fr: string; en: string }>).map(item => ({
           de: item.de,
           fr: (item.fr && item.fr !== "à traduire dans l'UI") ? item.fr : item.de,
+          en: (item.en && item.en.trim()) ? item.en : item.de,
           article: null,
           example: item.de,
           audio: true,
         }))
         content = {
           introduction: `Vocabulaire — ${lesson.title_fr}`,
+          introduction_en: `Vocabulary — ${lesson.title_en}`,
           kulturhinweis: null,
-          wortschatz: items,
+          wortschatz: items,   // filled — section renders
           grammatik: null,
           lesetext: null,
         }
@@ -156,15 +167,18 @@ for (const course of yemaStaticGermanCourses as unknown as Array<{
         const examples = (mod.content?.examples_de ?? []) as string[]
         content = {
           introduction: (mod.content?.explanation_fr as string) ?? "",
+          introduction_en: (mod.content?.explanation_en as string) ?? "",
           kulturhinweis: null,
-          wortschatz: [],
+          wortschatz: null,    // grammar has no vocabulary — guard prevents empty section
           grammatik: {
             rule: lesson.grammar.fr,
+            ruleEN: lesson.grammar.en,
             ruleDE: lesson.grammar.en,
             explanation: (mod.content?.explanation_fr as string) ?? "",
+            explanation_en: (mod.content?.explanation_en as string) ?? "",
             table: {
-              headers: ["Exemple", ""],
-              rows: examples.map(ex => [ex, ""]),
+              headers: ["Beispiel"],
+              rows: examples.map(ex => [ex]),
             },
             commonMistakes: [],
           },
