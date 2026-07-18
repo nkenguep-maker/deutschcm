@@ -42,3 +42,6 @@ next-env.d.ts
 # Project copies / temp dirs
 deutschcm2/
 .vercel
+
+# MCP config (contient un PAT Supabase)
+.mcp.json

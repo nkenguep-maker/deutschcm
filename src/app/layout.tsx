@@ -1,16 +1,38 @@
-import { Geist, Geist_Mono } from "next/font/google"
+import { Fraunces, JetBrains_Mono, Manrope } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/contexts/ThemeContext"
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
+// Kaffeehaus — Fraunces (display, contrast serif), Manrope (humanist body),
+// JetBrains Mono (utility, CEFR numerals).
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+})
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+})
+const jetbrains = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600"],
+})
 
 // Always force dark mode — light mode not yet released
 const THEME_SCRIPT = `document.documentElement.dataset.theme='dark';`
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html
+      lang="fr"
+      className={`${fraunces.variable} ${manrope.variable} ${jetbrains.variable} h-full antialiased`}
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

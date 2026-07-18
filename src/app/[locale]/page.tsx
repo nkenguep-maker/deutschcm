@@ -3,23 +3,17 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useLocale } from "next-intl"
 import { useT } from "@/hooks/useT"
-import LanguageSwitcher from "@/components/LanguageSwitcher"
 import { createClient } from "@/lib/supabase/client"
 import BrandLogo from "@/components/BrandLogo"
+import { LandingNav } from "@/components/landing/LandingNav"
+import { LandingHero } from "@/components/landing/LandingHero"
 
 export default function LandingPage() {
   const router = useRouter()
   const locale = useLocale()
   const { landing: t, nav: tNav } = useT()
-  const [scrolled, setScrolled] = useState(false)
   const [faqOpen, setFaqOpen] = useState<number | null>(null)
   const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50)
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768)
@@ -27,13 +21,6 @@ export default function LandingPage() {
     window.addEventListener("resize", check)
     return () => window.removeEventListener("resize", check)
   }, [])
-
-  const stats = [
-    { value: t.stat1Value, label: t.stat1Label },
-    { value: t.stat2Value, label: t.stat2Label },
-    { value: t.stat3Value, label: t.stat3Label },
-    { value: t.stat4Value, label: t.stat4Label },
-  ]
 
   const features = [
     { icon: "🏛️", title: t.feature1Title, desc: t.feature1Desc, badge: t.feature1Badge },
@@ -79,137 +66,42 @@ export default function LandingPage() {
     }
   }
 
-  const navItems = [
-    { label: t.navFeatures, href: "#features" },
-    { label: t.navLevels, href: "#levels" },
-    { label: t.navPricing, href: "#pricing" },
-    { label: t.navCenters, href: "#centres" },
-  ]
-
   return (
-    <div style={{ background: "#080c10", color: "white", fontFamily: "'DM Mono',monospace", overflowX: "hidden" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        ::-webkit-scrollbar { display: none; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes pulse { 0%,100%{opacity:0.15;transform:scale(1)} 50%{opacity:0.25;transform:scale(1.05)} }
-        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        .fade-up { animation: fadeUp 0.6s ease both; }
-        a { color: inherit; text-decoration: none; }
-      `}</style>
+    <div className="landing">
+      <LandingNav
+        locale={locale}
+        isMobile={isMobile}
+        labels={{
+          features: t.navFeatures,
+          levels: t.navLevels,
+          pricing: t.navPricing,
+          centers: t.navCenters,
+          login: tNav.login,
+          register: isMobile ? t.getStarted : tNav.register,
+        }}
+      />
 
-      {/* ── NAVBAR ── */}
-      <nav style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-        padding: isMobile ? "12px 16px" : "16px 40px",
-        background: scrolled ? "rgba(8,12,16,0.95)" : "transparent",
-        backdropFilter: scrolled ? "blur(20px)" : "none",
-        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        transition: "all 0.3s"
-      }}>
-        <BrandLogo variant="nav" />
-        {!isMobile && (
-          <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-            {navItems.map(item => (
-              <a key={item.href} href={item.href}
-                style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", transition: "color 0.2s" }}
-                onMouseOver={e => (e.target as HTMLElement).style.color = "white"}
-                onMouseOut={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.6)"}
-              >
-                {item.label}
-              </a>
-            ))}
-          </div>
-        )}
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <LanguageSwitcher style={{ marginRight: 4 }} />
-          <button onClick={() => router.push(`/${locale}/login`)}
-            style={{ padding: isMobile ? "8px 14px" : "9px 20px", borderRadius: 10, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)", fontSize: 12, cursor: "pointer" }}>
-            {tNav.login}
-          </button>
-          <button onClick={() => router.push(`/${locale}/register`)}
-            style={{ padding: isMobile ? "8px 14px" : "9px 20px", borderRadius: 10, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
-            {isMobile ? t.getStarted : tNav.register}
-          </button>
-        </div>
-      </nav>
-
-      {/* ── HERO ── */}
-      <section style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: isMobile ? "100px 20px 72px" : "120px 40px 96px", position: "relative", textAlign: "center" }}>
-        {/* Glows */}
-        <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)", width: 800, height: 800, borderRadius: "50%", background: "radial-gradient(circle,rgba(16,185,129,0.08),transparent 70%)", pointerEvents: "none", animation: "pulse 4s ease-in-out infinite" }} />
-
-        <div style={{ maxWidth: 860, position: "relative", zIndex: 2 }}>
-          {/* Badge */}
-          <div className="fade-up" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 18px", borderRadius: 99, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.28)", marginBottom: 36 }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block", animation: "pulse 2s infinite" }} />
-            <span style={{ color: "#10b981", fontSize: 12, fontWeight: 600 }}>{t.badge}</span>
-          </div>
-
-          {/* Titre */}
-          <h1 className="fade-up" style={{
-            fontFamily: "'Syne',sans-serif",
-            fontSize: isMobile ? 38 : 66,
-            fontWeight: 900,
-            lineHeight: 1.12,
-            marginBottom: 28,
-            letterSpacing: "-0.025em",
-            color: "#f0f4f8",
-          }}>
-            {t.title}<br />
-            <span style={{ color: "#10b981" }}>{t.titleAccent}</span>
-          </h1>
-
-          {/* Sous-titre */}
-          <p className="fade-up" style={{
-            fontSize: isMobile ? 15 : 18,
-            color: "rgba(255,255,255,0.82)",
-            lineHeight: 1.75,
-            maxWidth: 580,
-            margin: "0 auto 16px",
-            fontWeight: 400,
-          }}>
-            {t.subtitle}
-          </p>
-          <p className="fade-up" style={{
-            fontSize: isMobile ? 13 : 14,
-            color: "rgba(255,255,255,0.58)",
-            lineHeight: 1.65,
-            maxWidth: 480,
-            margin: "0 auto 40px",
-            letterSpacing: "0.01em",
-          }}>
-            {t.subtitle2}
-          </p>
-
-          {/* CTAs */}
-          <div className="fade-up" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 12 }}>
-            <button onClick={() => router.push(`/${locale}/register`)}
-              style={{ padding: isMobile ? "14px 28px" : "16px 34px", borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: isMobile ? 14 : 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 8px 32px rgba(16,185,129,0.32)", display: "flex", alignItems: "center", gap: 8 }}>
-              {t.ctaPrimary}
-            </button>
-            <button onClick={handleTestLevel}
-              style={{ padding: isMobile ? "14px 28px" : "16px 34px", borderRadius: 14, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.9)", fontSize: isMobile ? 14 : 15, fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
-              {t.ctaSecondary}
-            </button>
-          </div>
-          <p className="fade-up" style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, marginTop: 8, marginBottom: 44, letterSpacing: "0.03em" }}>
-            {t.ctaMicro}
-          </p>
-
-          {/* Stats */}
-          <div className="fade-up" style={{ display: "flex", gap: isMobile ? 24 : 40, justifyContent: "center", flexWrap: "wrap", paddingTop: 4 }}>
-            {stats.map((stat, i) => (
-              <div key={i} style={{ textAlign: "center", minWidth: isMobile ? 64 : 80, maxWidth: isMobile ? 120 : 160 }}>
-                <div style={{ fontFamily: "'Syne',sans-serif", fontSize: stat.value.length > 4 ? (isMobile ? 14 : 16) : (isMobile ? 24 : 28), fontWeight: 800, color: "#10b981", lineHeight: 1.2 }}>{stat.value}</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.70)", marginTop: 4, lineHeight: 1.3 }}>{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <LandingHero
+        locale={locale}
+        onSecondaryClick={handleTestLevel}
+        labels={{
+          badge: t.badge,
+          title: t.title,
+          titleAccent: t.titleAccent,
+          subtitle: t.subtitle,
+          ctaPrimary: t.ctaPrimary,
+          ctaSecondary: t.ctaSecondary,
+          ctaMicro: t.ctaMicro,
+          stat1Value: t.stat1Value,
+          stat1Label: t.stat1Label,
+          stat2Value: t.stat2Value,
+          stat2Label: t.stat2Label,
+          stat3Value: t.stat3Value,
+          stat3Label: t.stat3Label,
+          stat4Value: t.stat4Value,
+          stat4Label: t.stat4Label,
+        }}
+      />
 
       {/* ── VISION ── */}
       <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(16,185,129,0.02)" }}>
