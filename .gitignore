@@ -45,3 +45,7 @@ deutschcm2/
 
 # MCP config (contient un PAT Supabase)
 .mcp.json
+
+# Audit local (screenshots §8, tsc-lint touch)
+screenshots/
+.tsc-lint-passed
