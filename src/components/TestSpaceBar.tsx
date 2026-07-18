@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
 import type { SpaceRole } from "@/components/SpaceSwitcher";
 
@@ -29,7 +29,6 @@ const SPACES: Array<{
 export function TestSpaceBar() {
   const [roles, setRoles] = useState<SpaceRole[] | null>(null);
   const [active, setActive] = useState<SpaceRole | null>(null);
-  const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
 
@@ -88,7 +87,11 @@ export function TestSpaceBar() {
         body: JSON.stringify({ role }),
       });
     } catch {}
-    router.push(`/${locale}${route}`);
+    // HARD navigation — évite le layout partagé Next.js qui laisse
+    // le sidebar de l'ancien espace monté pendant que le nouveau se
+    // hydrate. window.location.assign force un teardown complet et
+    // une nouvelle hydratation propre à chaque espace.
+    window.location.assign(`/${locale}${route}`);
   };
 
   return (

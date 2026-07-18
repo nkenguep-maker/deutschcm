@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { frTypo } from "@/components/landing/typo";
 
 export type SpaceRole = "STUDENT" | "TEACHER" | "CENTER" | "ADMIN";
@@ -29,7 +28,6 @@ const DOT_TOKEN: Record<SpaceRole, string> = {
 export function SpaceSwitcher({ roles, activeSpace }: Props) {
   const t = useTranslations("space");
   const locale = useLocale();
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [switching, setSwitching] = useState<SpaceRole | null>(null);
   const ref = useRef<HTMLDivElement>(null);
@@ -71,7 +69,12 @@ export function SpaceSwitcher({ roles, activeSpace }: Props) {
       const data = await res.json().catch(() => ({}));
       // Le serveur choisit l'URL de redirection (onboarding si nécessaire)
       const dest = (data.redirectTo as string | undefined) ?? `/${locale}${ROUTE[role]}`;
-      router.push(dest);
+      // HARD navigation — le layout wrapper (Layout / TeacherLayout /
+      // CenterLayout) diffère selon l'espace. router.push conserve le
+      // layout Next.js partagé et peut laisser l'ancien sidebar monté
+      // pendant l'hydratation du nouveau. window.location.assign force
+      // un teardown complet, chaque espace est repeint proprement.
+      window.location.assign(dest);
     } finally {
       setSwitching(null);
       setOpen(false);
