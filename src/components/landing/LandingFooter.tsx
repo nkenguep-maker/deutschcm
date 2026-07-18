@@ -29,9 +29,7 @@ export function LandingFooter({
           <div className="lfooter-brand">
             <LandingBrand />
             <p className="lfooter-tag">{labels.tagline}</p>
-            <p className="lfooter-tag" style={{ opacity: 0.72 }}>
-              {labels.made}
-            </p>
+            <p className="lfooter-tag lfooter-tag-mute">{labels.made}</p>
             <CefrStrip current="A1" ariaLabel="Parcours Yema — CECRL" />
           </div>
 

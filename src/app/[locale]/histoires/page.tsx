@@ -215,7 +215,7 @@ export default function HistoiresPage() {
             </aside>
 
             <div className="lstory-body">
-              <h3>{s.headline}</h3>
+              <h2>{s.headline}</h2>
               <p className="quote">{s.quote}</p>
               <p>{s.body}</p>
               <div className="lstory-goal">

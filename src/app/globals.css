@@ -12,7 +12,7 @@ html[data-theme="dark"] {
   --espresso-3:    #2E1F16;   /* raised card */
   --creme:         #F4EBDC;   /* ink, warm ivory */
   --creme-soft:    rgba(244, 235, 220, 0.72);
-  --creme-mute:    rgba(244, 235, 220, 0.44);
+  --creme-mute:    rgba(244, 235, 220, 0.62);
   --creme-faint:   rgba(244, 235, 220, 0.22);
   --creme-hair:    rgba(244, 235, 220, 0.09);
   --brass:         #B8873E;   /* accent warm, laiton */
@@ -427,21 +427,32 @@ button, [role="button"] {
   position: relative;
   display: inline-block;
 }
-.cefr-step[role="button"] {
+.cefr-step-btn {
+  all: unset;
   cursor: pointer;
-  outline: none;
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  color: inherit;
   transition: transform var(--dur-fast) var(--ease-spring),
               color var(--dur-fast) ease;
 }
-.cefr-step[role="button"]:hover,
-.cefr-step[role="button"]:focus-visible,
-.cefr-step.hover {
+.cefr-step-btn:hover,
+.cefr-step-btn:focus-visible,
+.cefr-step.hover .cefr-step-btn {
   color: var(--creme);
   transform: translateX(2px);
 }
-.cefr-step[role="button"]:hover > .dot,
-.cefr-step[role="button"]:focus-visible > .dot,
-.cefr-step.hover > .dot {
+.cefr-step-btn:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.cefr-step-btn:hover > .dot,
+.cefr-step-btn:focus-visible > .dot,
+.cefr-step.hover .cefr-step-btn > .dot {
   border-color: var(--brass);
   box-shadow: 0 0 0 4px var(--brass-glow);
 }
@@ -1192,18 +1203,18 @@ button, [role="button"] {
 .lsim-score {
   border: 1px solid var(--brass-edge);
   border-radius: 12px;
-  background: var(--brass-glow);
+  background: var(--espresso);
   padding: 10px 14px;
   margin-top: 10px;
 }
 .lsim-score-lbl {
   font-family: var(--font-jetbrains, monospace);
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--brass);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   margin: 0 0 4px;
-  font-weight: 600;
+  font-weight: 700;
 }
 .lsim-score-vals {
   display: flex;
@@ -1531,11 +1542,12 @@ button, [role="button"] {
   gap: 8px;
 }
 .lfooter-tag {
-  color: var(--creme-mute);
+  color: var(--creme-soft);
   font-size: 13.5px;
   line-height: 1.5;
   max-width: 32ch;
 }
+.lfooter-tag-mute { color: var(--creme-mute); }
 .lfooter-links {
   display: flex;
   flex-direction: column;
@@ -1896,18 +1908,22 @@ button, [role="button"] {
   color: var(--brass);
   flex-shrink: 0;
 }
-.lauth-role-body h4 {
+.lauth-role-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.lauth-role-title {
   font-family: var(--font-fraunces), Georgia, serif;
   font-size: 15px;
   font-weight: 500;
   color: var(--creme);
-  margin: 0 0 3px;
   letter-spacing: -0.005em;
+  line-height: 1.2;
 }
-.lauth-role-body p {
+.lauth-role-desc {
   font-size: 12.5px;
-  color: var(--creme-mute);
-  margin: 0;
+  color: var(--creme-soft);
   line-height: 1.5;
 }
 .lauth-role-arrow {
@@ -2219,7 +2235,7 @@ button, [role="button"] {
   text-transform: uppercase;
   margin: 0;
 }
-.lstory-body h3 {
+.lstory-body h2 {
   font-family: var(--font-fraunces), Georgia, serif;
   font-size: clamp(22px, 2.4vw, 28px);
   font-weight: 500;

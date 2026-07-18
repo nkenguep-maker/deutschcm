@@ -58,27 +58,28 @@ export default function LandingPage() {
         }}
       />
 
-      <LandingHero
-        locale={locale}
-        onSecondaryClick={handleTestLevel}
-        labels={{
-          badge: t.badge,
-          title: t.title,
-          titleAccent: t.titleAccent,
-          subtitle: t.subtitle,
-          ctaPrimary: t.ctaPrimary,
-          ctaSecondary: t.ctaSecondary,
-          ctaMicro: t.ctaMicro,
-          stat1Value: t.stat1Value,
-          stat1Label: t.stat1Label,
-          stat2Value: t.stat2Value,
-          stat2Label: t.stat2Label,
-          stat3Value: t.stat3Value,
-          stat3Label: t.stat3Label,
-          stat4Value: t.stat4Value,
-          stat4Label: t.stat4Label,
-        }}
-      />
+      <main>
+        <LandingHero
+          locale={locale}
+          onSecondaryClick={handleTestLevel}
+          labels={{
+            badge: t.badge,
+            title: t.title,
+            titleAccent: t.titleAccent,
+            subtitle: t.subtitle,
+            ctaPrimary: t.ctaPrimary,
+            ctaSecondary: t.ctaSecondary,
+            ctaMicro: t.ctaMicro,
+            stat1Value: t.stat1Value,
+            stat1Label: t.stat1Label,
+            stat2Value: t.stat2Value,
+            stat2Label: t.stat2Label,
+            stat3Value: t.stat3Value,
+            stat3Label: t.stat3Label,
+            stat4Value: t.stat4Value,
+            stat4Label: t.stat4Label,
+          }}
+        />
 
       <LandingVision
         labels={{
@@ -218,6 +219,7 @@ export default function LandingPage() {
           micro: t.ctaFinalSocial,
         }}
       />
+      </main>
 
       <LandingFooter
         locale={locale}

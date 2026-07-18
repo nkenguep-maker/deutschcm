@@ -144,18 +144,8 @@ export function CefrSpine({
           const status =
             i < currentIdx ? "done" : i === currentIdx ? "on" : "next";
           const meta = LEVEL_META[lvl][langKey];
-          return (
-            <li
-              key={lvl}
-              className={`cefr-step ${status}${hovered === lvl ? " hover" : ""}`}
-              aria-current={status === "on" ? "step" : undefined}
-              onMouseEnter={interactive ? () => setHovered(lvl) : undefined}
-              onFocus={interactive ? () => setHovered(lvl) : undefined}
-              onBlur={interactive ? () => setHovered(null) : undefined}
-              tabIndex={interactive ? 0 : undefined}
-              role={interactive ? "button" : undefined}
-              aria-describedby={interactive ? `cefr-panel-${lvl}` : undefined}
-            >
+          const inner = (
+            <>
               <span className="dot" aria-hidden="true" />
               <span className="lbl">
                 <span className="lvl">{lvl}</span>
@@ -163,6 +153,29 @@ export function CefrSpine({
                   <span className="cefr-step-caption">{meta.headline}</span>
                 ) : null}
               </span>
+            </>
+          );
+          return (
+            <li
+              key={lvl}
+              className={`cefr-step ${status}${hovered === lvl ? " hover" : ""}`}
+              aria-current={status === "on" ? "step" : undefined}
+            >
+              {interactive ? (
+                <button
+                  type="button"
+                  className="cefr-step-btn"
+                  onMouseEnter={() => setHovered(lvl)}
+                  onFocus={() => setHovered(lvl)}
+                  onBlur={() => setHovered(null)}
+                  aria-describedby={`cefr-panel-${lvl}`}
+                  aria-label={`${lvl} — ${meta.headline}`}
+                >
+                  {inner}
+                </button>
+              ) : (
+                inner
+              )}
             </li>
           );
         })}

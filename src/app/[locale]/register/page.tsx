@@ -189,8 +189,8 @@ export default function RegisterPage() {
                         <Icon size={22} />
                       </span>
                       <span className="lauth-role-body">
-                        <h4>{getRoleLabel(role)}</h4>
-                        <p>{getRoleDesc(role)}</p>
+                        <span className="lauth-role-title">{getRoleLabel(role)}</span>
+                        <span className="lauth-role-desc">{getRoleDesc(role)}</span>
                       </span>
                       <span className="lauth-role-arrow" aria-hidden="true">
                         <svg
