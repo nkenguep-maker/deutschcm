@@ -1994,3 +1994,284 @@ button, [role="button"] {
   text-align: center;
 }
 
+/* ═══════════════════════════════════════════════
+   /methode — page éditoriale (design pédagogique §12)
+   ═══════════════════════════════════════════════ */
+
+.lmethode {
+  padding: clamp(120px, 14vw, 160px) 0 clamp(80px, 12vw, 120px);
+  max-width: 780px;
+  margin: 0 auto;
+}
+.lmethode .lsection-eye { margin-bottom: 20px; }
+.lmethode h1 {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(36px, 5.4vw, 68px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.028em;
+  color: var(--creme);
+  margin: 0 0 24px;
+  max-width: 15ch;
+}
+.lmethode h1 em {
+  font-style: italic;
+  color: var(--brass);
+  font-weight: 400;
+}
+.lmethode .lede {
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.6;
+  color: var(--creme-soft);
+  max-width: 60ch;
+  margin: 0 0 72px;
+  border-bottom: 1px solid var(--creme-hair);
+  padding-bottom: 40px;
+}
+.lmethode-principle {
+  margin: 0 0 64px;
+}
+.lmethode-principle-eye {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.lmethode-principle-num {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 40px;
+  font-weight: 400;
+  color: var(--brass);
+  line-height: 1;
+  font-variant-numeric: oldstyle-nums;
+  letter-spacing: -0.02em;
+  min-width: 60px;
+}
+.lmethode-principle-tag {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.lmethode-principle h2 {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(24px, 2.8vw, 32px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--creme);
+  margin: 0 0 18px;
+  padding-left: 76px;
+}
+.lmethode-principle p {
+  color: var(--creme-soft);
+  font-size: 16px;
+  line-height: 1.75;
+  padding-left: 76px;
+  margin: 0 0 18px;
+  max-width: 58ch;
+}
+.lmethode-principle .lm-example {
+  padding-left: 76px;
+  margin-top: 24px;
+}
+.lmethode-principle .lm-example-lbl {
+  display: block;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--creme-mute);
+  margin-bottom: 10px;
+}
+.lmethode-principle .lm-example-block {
+  border-left: 2px solid var(--brass);
+  padding: 6px 0 6px 16px;
+  background: rgba(184, 135, 62, 0.04);
+}
+.lmethode-principle .lm-example-de {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 20px;
+  font-style: italic;
+  color: var(--creme);
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+}
+.lmethode-principle .lm-example-fr {
+  color: var(--creme-mute);
+  font-size: 13px;
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .lmethode-principle-num { font-size: 32px; min-width: 44px; }
+  .lmethode-principle h2,
+  .lmethode-principle p,
+  .lmethode-principle .lm-example { padding-left: 60px; }
+}
+@media (max-width: 520px) {
+  .lmethode-principle h2,
+  .lmethode-principle p,
+  .lmethode-principle .lm-example { padding-left: 0; }
+}
+
+.lmethode-closer {
+  padding: 40px 0;
+  border-top: 1px solid var(--creme-hair);
+  margin-top: 40px;
+}
+.lmethode-closer p {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(20px, 2vw, 24px);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--creme);
+  letter-spacing: -0.01em;
+  max-width: 40ch;
+  margin: 0 0 24px;
+}
+.lmethode-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--brass);
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--brass-edge);
+  transition: gap var(--dur-fast), border-color var(--dur-fast);
+}
+.lmethode-cta:hover { gap: 14px; border-color: var(--brass); }
+
+/* ═══════════════════════════════════════════════
+   /histoires — parcours étudiants nommés (§7 doctrine)
+   ═══════════════════════════════════════════════ */
+
+.lstories {
+  padding: clamp(120px, 14vw, 160px) 0 clamp(80px, 12vw, 120px);
+  max-width: 900px;
+  margin: 0 auto;
+}
+.lstories-head {
+  margin-bottom: 72px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--creme-hair);
+}
+.lstories-head .lede {
+  font-size: clamp(16px, 1.3vw, 18px);
+  line-height: 1.65;
+  color: var(--creme-soft);
+  max-width: 56ch;
+  margin: 0;
+}
+.lstory {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: clamp(24px, 4vw, 56px);
+  padding: 48px 0;
+  border-top: 1px solid var(--creme-hair);
+  align-items: start;
+}
+.lstory:first-of-type { border-top: 0; padding-top: 0; }
+.lstory-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.lstory-mono {
+  width: 92px;
+  height: 92px;
+  border-radius: 14px;
+  border: 1px solid var(--brass-edge);
+  background: var(--brass-glow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 44px;
+  font-weight: 500;
+  color: var(--brass);
+  letter-spacing: -0.02em;
+}
+.lstory-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.lstory-name {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--creme);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.lstory-loc {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11.5px;
+  color: var(--creme-mute);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.lstory-body h3 {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 500;
+  color: var(--creme);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  margin: 0 0 16px;
+  max-width: 26ch;
+}
+.lstory-body .quote {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 17.5px;
+  font-style: italic;
+  color: var(--creme);
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+  padding-left: 20px;
+  border-left: 2px solid var(--brass);
+  margin: 0 0 18px;
+  max-width: 44ch;
+}
+.lstory-body p {
+  color: var(--creme-soft);
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0 0 14px;
+  max-width: 50ch;
+}
+.lstory-goal {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--creme-hair);
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 16px;
+  align-items: baseline;
+}
+.lstory-goal-lbl {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--creme-mute);
+  text-transform: uppercase;
+}
+.lstory-goal-text {
+  color: var(--creme-soft);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+@media (max-width: 720px) {
+  .lstory { grid-template-columns: 1fr; padding: 32px 0; }
+  .lstory-mono { width: 72px; height: 72px; font-size: 34px; }
+}
+

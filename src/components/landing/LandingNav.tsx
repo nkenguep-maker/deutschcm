@@ -12,6 +12,8 @@ type NavLabels = {
   centers: string;
   login: string;
   register: string;
+  methode?: string;
+  histoires?: string;
 };
 
 // LandingNav — mécanique client (scroll → .solid). Le locale-switch
@@ -41,11 +43,25 @@ export function LandingNav({
     ? `/${otherLocale}${pathname.slice(3)}`
     : `/${otherLocale}`;
 
+  // Nav items : anchors sur la landing, pages routes ailleurs.
+  const onLanding = pathname === `/${locale}` || pathname === "/";
   const navItems = [
-    { label: labels.features, href: "#features" },
-    { label: labels.levels, href: "#levels" },
-    { label: labels.pricing, href: "#pricing" },
-    { label: labels.centers, href: "#centres" },
+    {
+      label: labels.methode ?? (locale === "en" ? "Method" : "Méthode"),
+      href: `/${locale}/methode`,
+    },
+    {
+      label: labels.histoires ?? (locale === "en" ? "Journeys" : "Histoires"),
+      href: `/${locale}/histoires`,
+    },
+    {
+      label: labels.levels,
+      href: onLanding ? "#levels" : `/${locale}#levels`,
+    },
+    {
+      label: labels.centers,
+      href: onLanding ? "#centres" : `/${locale}#centres`,
+    },
   ];
 
   return (
