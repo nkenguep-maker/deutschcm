@@ -1,484 +1,463 @@
 "use client";
 
-import { useState } from "react";
-import { Link } from "@/navigation";
-import { useTranslations } from "next-intl";
+// /landing — page B2B centres de langues.
+// Argumentaire douleur → solution → preuve → offre.
+// Structure : Hero → Pains → Solution → How → Proof → Unique → Pricing → Final.
+// Palette Kaffeehaus. Tokens :root. Composants réutilisés : LandingNav,
+// LandingFooter, icons.tsx. next-intl pour toutes les strings.
 
-export default function LandingPage() {
- const t = useTranslations("centerLanding");
- const [contactForm, setContactForm] = useState({ nom: "", email: "", centre: "", ville: "", message: "" });
- const [contactSent, setContactSent] = useState(false);
- const [openFaq, setOpenFaq] = useState<number | null>(null);
+import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { LandingFooter } from "@/components/landing/LandingFooter";
+import { LandingNav } from "@/components/landing/LandingNav";
+import {
+  IconAnalytics,
+  IconArrow,
+  IconCheck,
+  IconContext,
+  IconInstitution,
+  IconLesen,
+  IconSprechen,
+  IconTracker,
+} from "@/components/landing/icons";
 
- const FEATURES = [
- { icon: "", title: t("feat1Title"), desc: t("feat1Desc") },
- { icon: "", title: t("feat2Title"), desc: t("feat2Desc") },
- { icon: "", title: t("feat3Title"), desc: t("feat3Desc") },
- { icon: "", title: t("feat4Title"), desc: t("feat4Desc") },
- { icon: "", title: t("feat5Title"), desc: t("feat5Desc") },
- { icon: "", title: t("feat6Title"), desc: t("feat6Desc") },
- ];
+// Micro-typo FR — espace fine insécable avant : ; ! ? % € °.
+// Appliqué à chaque valeur retournée par useTranslations en FR.
+const NNBSP = " ";
+function frTypo(s: string): string {
+  return s.replace(/ ([:;!?%€°])/g, `${NNBSP}$1`);
+}
+function useTypoT(namespace: string) {
+  const t = useTranslations(namespace);
+  const locale = useLocale();
+  const apply = locale === "fr";
+  return (key: string, values?: Record<string, string | number>): string => {
+    const raw = t(key, values);
+    return apply ? frTypo(raw) : raw;
+  };
+}
 
- const PLANS = [
- {
- name: "Starter",
- price: "25 000",
- icon: "",
- color: "#64748b",
- accentBg: "rgba(100,116,139,0.08)",
- accentBorder: "rgba(100,116,139,0.2)",
- teachersLabel: t("planStarterTeachers"),
- studentsLabel: t("planStarterStudents"),
- features: [t("planStarterF1"), t("planStarterF2"), t("planStarterF3"), t("planStarterF4"), t("planStarterF5")],
- cta: t("planStarterCta"),
- popular: false,
- },
- {
- name: "Pro",
- price: "75 000",
- icon: "⭐",
- color: "var(--brass)",
- accentBg: "rgba(184, 135, 62,0.08)",
- accentBorder: "rgba(184, 135, 62,0.3)",
- teachersLabel: t("planProTeachers"),
- studentsLabel: t("planProStudents"),
- features: [t("planProF1"), t("planProF2"), t("planProF3"), t("planProF4"), t("planProF5"), t("planProF6"), t("planProF7")],
- cta: t("planProCta"),
- popular: true,
- },
- {
- name: "Enterprise",
- price: "150 000",
- icon: "🏆",
- color: "#6366f1",
- accentBg: "rgba(99,102,241,0.08)",
- accentBorder: "rgba(99,102,241,0.2)",
- teachersLabel: t("planEnterpriseTeachers"),
- studentsLabel: t("planEnterpriseStudents"),
- features: [t("planEnterpriseF1"), t("planEnterpriseF2"), t("planEnterpriseF3"), t("planEnterpriseF4"), t("planEnterpriseF5"), t("planEnterpriseF6"), t("planEnterpriseF7")],
- cta: t("planEnterpriseCta"),
- popular: false,
- },
- ];
+export default function B2BLandingPage() {
+  const locale = useLocale();
+  const t = useTypoT("b2b");
+  const [isMobile, setIsMobile] = useState(false);
 
- const TESTIMONIALS = [
- {
- name: "Pr. Henriette Ngo Biyong",
- role: t("testimonial1Role"),
- center: "Deutsch Pro CM",
- city: "Yaoundé",
- flag: "",
- quote: t("testimonial1Quote"),
- avatar: "HN",
- stars: 5,
- },
- {
- name: "M. Emmanuel Tchouala",
- role: t("testimonial2Role"),
- center: "Deutsch-Kamerun Center",
- city: "Douala",
- flag: "",
- quote: t("testimonial2Quote"),
- avatar: "ET",
- stars: 5,
- },
- {
- name: "Mme Rosine Abena",
- role: t("testimonial3Role"),
- center: "Sprache & Kultur Bafoussam",
- city: "Bafoussam",
- flag: "",
- quote: t("testimonial3Quote"),
- avatar: "RA",
- stars: 5,
- },
- ];
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
- const FAQS = [
- { q: t("faq1Q"), a: t("faq1A") },
- { q: t("faq2Q"), a: t("faq2A") },
- { q: t("faq3Q"), a: t("faq3A") },
- { q: t("faq4Q"), a: t("faq4A") },
- ];
+  return (
+    <div className="landing">
+      <LandingNav
+        locale={locale}
+        isMobile={isMobile}
+        labels={{
+          features: locale === "en" ? "Languages" : "Langues",
+          levels: locale === "en" ? "Method" : "Méthode",
+          pricing: locale === "en" ? "Manifesto" : "Manifeste",
+          centers: locale === "en" ? "Centers" : "Centres",
+          login: locale === "en" ? "Log in" : "Se connecter",
+          register: locale === "en" ? "Start" : "Commencer",
+        }}
+      />
 
- const handleContact = (e: React.FormEvent) => {
- e.preventDefault();
- setContactSent(true);
- };
+      <main>
+        <B2BHero />
+        <B2BPains />
+        <B2BSolution />
+        <B2BHow />
+        <B2BProof />
+        <B2BUnique />
+        <B2BPricing />
+        <B2BFinal />
+      </main>
 
- return (
- <div style={{
- background: "var(--espresso)", color: "var(--creme)",
- fontFamily: "var(--font-manrope), sans-serif", minHeight: "100vh",
- }}>
- <style>{`
- .syne { font-family: var(--font-fraunces), Georgia, serif; font-weight: 500; letter-spacing: -0.01em; }
- * { box-sizing: border-box; }
- body { margin: 0; }
- .btn-gold:hover { opacity: 0.9; transform: translateY(-1px); }
- .btn-gold { transition: all 0.2s; }
- .feat-card:hover { border-color: rgba(184, 135, 62,0.3) !important; background: rgba(184, 135, 62,0.03) !important; }
- .feat-card { transition: all 0.2s; }
- @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
- @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
- .hero-float { animation: float 4s ease-in-out infinite; }
- .fade-in { animation: fadeIn 0.6s ease forwards; }
- `}</style>
+      <LandingFooter
+        locale={locale}
+        labels={{
+          tagline:
+            locale === "en"
+              ? "Africa speaks. All its languages — foreign and native, at last one place."
+              : "L’Afrique parle. Toutes ses langues — étrangères et natales, enfin un lieu.",
+          made:
+            locale === "en"
+              ? "Built in Cameroon, for the continent and the world"
+              : "Construit au Cameroun, pour le continent et le monde",
+          legal: locale === "en" ? "Legal" : "Mentions légales",
+          terms: locale === "en" ? "Terms" : "CGU",
+          privacy: locale === "en" ? "Privacy" : "Confidentialité",
+          contact: locale === "en" ? "Contact" : "Contact",
+          disclaimer:
+            locale === "en"
+              ? "YEMA Languages is a pan-African CEFR-aligned platform for foreign languages, and independent for African native languages. Not affiliated with any official examination institute."
+              : "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues étrangères, et indépendante pour les langues natales africaines. N’est affiliée à aucun organisme officiel d’examen.",
+        }}
+      />
+    </div>
+  );
+}
 
- {/* ── NAV ── */}
- <nav style={{
- position: "sticky", top: 0, zIndex: 50, height: 68,
- display: "flex", alignItems: "center", justifyContent: "space-between",
- padding: "0 40px", background: "rgba(8,12,16,0.95)", backdropFilter: "blur(20px)",
- borderBottom: "1px solid rgba(184, 135, 62,0.1)",
- }}>
- <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
- <div style={{
- width: 38, height: 38, borderRadius: 10,
- background: "linear-gradient(135deg, rgba(184, 135, 62,0.2), rgba(138, 96, 39,0.08))",
- border: "1px solid rgba(184, 135, 62,0.3)",
- display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem",
- }}></div>
- <span className="syne" style={{ color: "white", fontWeight: 800, fontSize: "1.1rem" }}>
- Yema
- <span style={{ color: "rgba(244, 235, 220, 0.44)", fontWeight: 400, fontSize: "0.75rem", marginLeft: 8 }}>{t("navForCenters")}</span>
- </span>
- </Link>
- <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
- <a href="#features" style={{ color: "rgba(244, 235, 220, 0.72)", fontSize: 14, textDecoration: "none" }}>{t("navFeatures")}</a>
- <a href="#pricing" style={{ color: "rgba(244, 235, 220, 0.72)", fontSize: 14, textDecoration: "none" }}>{t("navPricing")}</a>
- <a href="#testimonials" style={{ color: "rgba(244, 235, 220, 0.72)", fontSize: 14, textDecoration: "none" }}>{t("navTestimonials")}</a>
- <Link href="/login" style={{ color: "rgba(244, 235, 220, 0.72)", fontSize: 14, textDecoration: "none" }}>{t("navLogin")}</Link>
- <a href="#contact" className="btn-gold" style={{
- background: "linear-gradient(135deg, var(--brass), var(--brass-deep))",
- color: "var(--espresso)", borderRadius: 9, padding: "8px 20px",
- fontSize: 13, fontWeight: 700, textDecoration: "none",
- }}>{t("navDemo")}</a>
- </div>
- </nav>
+/* ═══════════════════════════════════════════════
+   1. HERO
+   ═══════════════════════════════════════════════ */
+function B2BHero() {
+  const t = useTypoT("b2b.hero");
+  const locale = useLocale();
+  return (
+    <section className="lb2b-hero">
+      <div className="container">
+        <div className="lb2b-eye">{t("eye")}</div>
+        <h1 className="lb2b-hero-h">
+          <span className="lb2b-hero-line">{t("title_l1")}</span>
+          <span className="lb2b-hero-line">
+            {t("title_l2")}
+            {" "}
+            <em>{t("title_em")}</em>
+          </span>
+        </h1>
+        <p className="lb2b-hero-sub">{t("sub")}</p>
+        <div className="lb2b-hero-cta">
+          <a
+            href={`/${locale}/landing#final`}
+            className="lb2b-btn-primary"
+          >
+            {t("cta_primary")}
+            <span className="lb2b-btn-arrow" aria-hidden="true">
+              <IconArrow size={16} />
+            </span>
+          </a>
+          <a
+            href={`/${locale}/landing#solution`}
+            className="lb2b-btn-ghost"
+          >
+            {t("cta_ghost")}
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
 
- {/* ── HERO ── */}
- <section style={{
- position: "relative", overflow: "hidden",
- padding: "90px 40px 80px", textAlign: "center",
- background: "linear-gradient(180deg, rgba(184, 135, 62,0.04) 0%, transparent 100%)",
- }}>
- <div style={{ position: "absolute", top: -100, left: "50%", transform: "translateX(-50%)", width: 600, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(184, 135, 62,0.08), transparent)", filter: "blur(60px)", pointerEvents: "none" }} />
+/* ═══════════════════════════════════════════════
+   2. PAINS · 4 cartes
+   ═══════════════════════════════════════════════ */
+function B2BPains() {
+  const t = useTypoT("b2b.pains");
+  const pains: Array<{ Icon: (p: { size?: number }) => ReactNode; key: string }> = [
+    { Icon: IconAnalytics, key: "p1" },
+    { Icon: IconContext, key: "p2" },
+    { Icon: IconLesen, key: "p3" },
+    { Icon: IconTracker, key: "p4" },
+  ];
+  return (
+    <section className="lb2b-section lb2b-section-alt" id="pains">
+      <div className="container">
+        <div className="lsection-head centered">
+          <div className="lb2b-eye">{/* eye omitted for rythm */}</div>
+          <h2 className="lb2b-h">{t("title")}</h2>
+          <p className="lb2b-lede">{t("sub")}</p>
+        </div>
 
- <div style={{ position: "relative", maxWidth: 820, margin: "0 auto" }}>
- <div className="hero-float" style={{ fontSize: 64, marginBottom: 24 }}></div>
- <div style={{
- display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20,
- background: "rgba(184, 135, 62,0.1)", border: "1px solid rgba(184, 135, 62,0.25)",
- borderRadius: 20, padding: "6px 16px",
- }}>
- <span style={{ color: "var(--brass)", fontSize: 12, fontWeight: 700 }}>{t("heroBadge")}</span>
- </div>
- <h1 className="syne" style={{
- fontSize: "clamp(32px, 5vw, 58px)", fontWeight: 800, lineHeight: 1.1,
- color: "#f8fafc", margin: "0 0 20px",
- }}>
- {t("heroTitle1")}<br />
- <span style={{ color: "var(--brass)" }}>{t("heroTitleAccent")}</span><br />
- {t("heroTitle2")}
- </h1>
- <p style={{
- fontSize: 18, color: "rgba(244, 235, 220, 0.72)", maxWidth: 580, margin: "0 auto 36px",
- lineHeight: 1.7,
- }}>
- {t("heroSubtitle")}
- </p>
- <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
- <a href="#contact" className="btn-gold" style={{
- background: "linear-gradient(135deg, var(--brass), var(--brass-deep))",
- color: "var(--espresso)", borderRadius: 12, padding: "14px 28px",
- fontSize: 15, fontWeight: 700, textDecoration: "none",
- }}>
- {t("heroCtaDemo")}
- </a>
- <Link href="/register" style={{
- background: "rgba(244, 235, 220, 0.05)", color: "rgba(244, 235, 220, 0.72)",
- border: "1px solid rgba(244, 235, 220, 0.12)", borderRadius: 12, padding: "14px 28px",
- fontSize: 15, textDecoration: "none",
- }}>
- {t("heroCtaRegister")}
- </Link>
- </div>
- {/* Social proof */}
- <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 24, marginTop: 40 }}>
- {[
- { value: "30+", label: t("stat1Label") },
- { value: "2 800+", label: t("stat2Label") },
- { value: "98%", label: t("stat3Label") },
- ].map(s => (
- <div key={s.label} style={{ textAlign: "center" }}>
- <div className="syne" style={{ color: "var(--brass)", fontWeight: 800, fontSize: 22 }}>{s.value}</div>
- <div style={{ color: "rgba(244, 235, 220, 0.44)", fontSize: 12 }}>{s.label}</div>
- </div>
- ))}
- </div>
- </div>
- </section>
+        <div className="lb2b-pains-grid">
+          {pains.map(({ Icon, key }) => (
+            <article key={key} className="lb2b-pain">
+              <div className="lb2b-pain-icon" aria-hidden="true">
+                <Icon size={22} />
+              </div>
+              <h3>{t(`${key}_title`)}</h3>
+              <p>{t(`${key}_body`)}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
- {/* ── FEATURES ── */}
- <section id="features" style={{ padding: "80px 40px", maxWidth: 1200, margin: "0 auto" }}>
- <div style={{ textAlign: "center", marginBottom: 48 }}>
- <h2 className="syne" style={{ fontSize: 36, fontWeight: 800, color: "#f1f5f9", margin: "0 0 12px" }}>
- {t("featuresTitle")}
- </h2>
- <p style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 16 }}>
- {t("featuresSubtitle")}
- </p>
- </div>
- <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
- {FEATURES.map((f, i) => (
- <div key={i} className="feat-card" style={{
- background: "rgba(13,17,23,0.6)", border: "1px solid rgba(255,255,255,0.07)",
- borderRadius: 16, padding: "24px 20px",
- }}>
- <div style={{ fontSize: 32, marginBottom: 12 }}>{f.icon}</div>
- <div className="syne" style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 16, marginBottom: 10 }}>{f.title}</div>
- <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, lineHeight: 1.65 }}>{f.desc}</div>
- </div>
- ))}
- </div>
- </section>
+/* ═══════════════════════════════════════════════
+   3. SOLUTION · mock + 3 bullets
+   ═══════════════════════════════════════════════ */
+function B2BSolution() {
+  const t = useTypoT("b2b.solution");
+  return (
+    <section className="lb2b-section" id="solution">
+      <div className="container">
+        <div className="lb2b-solution-grid">
+          <div className="lb2b-mock" role="img" aria-label={t("mock_label")}>
+            <span className="lb2b-mock-label">{t("mock_label")}</span>
+          </div>
+          <div>
+            <div className="lb2b-eye">{/* rythm */}</div>
+            <h2 className="lb2b-h">
+              {t("title")} <em>{t("title_em")}</em>
+            </h2>
+            <div className="lb2b-solution-bullets">
+              {["b1", "b2", "b3"].map((k) => (
+                <div key={k} className="lb2b-solution-bullet">
+                  <span
+                    className="lb2b-solution-bullet-check"
+                    aria-hidden="true"
+                  >
+                    <IconCheck size={18} strokeWidth={2} />
+                  </span>
+                  <p>{t(k)}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
- {/* ── PRICING ── */}
- <section id="pricing" style={{ padding: "80px 40px", background: "rgba(184, 135, 62,0.02)", borderTop: "1px solid rgba(184, 135, 62,0.08)", borderBottom: "1px solid rgba(184, 135, 62,0.08)" }}>
- <div style={{ maxWidth: 1100, margin: "0 auto" }}>
- <div style={{ textAlign: "center", marginBottom: 48 }}>
- <h2 className="syne" style={{ fontSize: 36, fontWeight: 800, color: "#f1f5f9", margin: "0 0 12px" }}>
- {t("pricingTitle")}
- </h2>
- <p style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 16 }}>{t("pricingSubtitle")}</p>
- </div>
- <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
- {PLANS.map(plan => (
- <div key={plan.name} style={{
- background: plan.popular ? plan.accentBg : "rgba(13,17,23,0.8)",
- border: `2px solid ${plan.popular ? plan.accentBorder : "rgba(255,255,255,0.07)"}`,
- borderRadius: 18, padding: "28px 24px", display: "flex", flexDirection: "column",
- position: "relative",
- }}>
- {plan.popular && (
- <div style={{
- position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)",
- background: "linear-gradient(135deg, var(--brass), var(--brass-deep))",
- color: "var(--espresso)", borderRadius: 20, padding: "4px 16px",
- fontSize: 11, fontWeight: 800, whiteSpace: "nowrap",
- }}>{t("planPopular")}</div>
- )}
- <div style={{ fontSize: 32, marginBottom: 12 }}>{plan.icon}</div>
- <div className="syne" style={{ color: plan.color, fontWeight: 800, fontSize: 20, marginBottom: 4 }}>{plan.name}</div>
- <div style={{ marginBottom: 8 }}>
- <span className="syne" style={{ color: plan.color, fontWeight: 800, fontSize: 30 }}>{plan.price}</span>
- <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}> {t("planPerMonth")}</span>
- </div>
- <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, marginBottom: 20 }}>
- {plan.teachersLabel} · {plan.studentsLabel}
- </div>
- <ul style={{ margin: "0 0 24px", padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
- {plan.features.map(f => (
- <li key={f} style={{ display: "flex", alignItems: "center", gap: 8, color: "rgba(244, 235, 220, 0.72)", fontSize: 13 }}>
- <span style={{ color: plan.color, fontSize: 14, flexShrink: 0 }}>✓</span> {f}
- </li>
- ))}
- </ul>
- <a href="#contact" className="btn-gold" style={{
- display: "block", textAlign: "center", textDecoration: "none",
- background: plan.popular ? "linear-gradient(135deg, var(--brass), var(--brass-deep))" : `rgba(${plan.color === "#6366f1" ? "99,102,241" : "100,116,139"},0.12)`,
- color: plan.popular ? "var(--espresso)" : plan.color,
- border: `1px solid ${plan.popular ? "transparent" : plan.color + "44"}`,
- borderRadius: 10, padding: "12px 0", fontWeight: 700, fontSize: 14,
- }}>
- {plan.cta}
- </a>
- </div>
- ))}
- </div>
- </div>
- </section>
+/* ═══════════════════════════════════════════════
+   4. HOW · 3 étapes
+   ═══════════════════════════════════════════════ */
+function B2BHow() {
+  const t = useTypoT("b2b.how");
+  return (
+    <section className="lb2b-section lb2b-section-alt" id="how">
+      <div className="container">
+        <div className="lsection-head centered">
+          <h2 className="lb2b-h">{t("title")}</h2>
+        </div>
 
- {/* ── TESTIMONIALS ── */}
- <section id="testimonials" style={{ padding: "80px 40px", maxWidth: 1200, margin: "0 auto" }}>
- <div style={{ textAlign: "center", marginBottom: 48 }}>
- <h2 className="syne" style={{ fontSize: 36, fontWeight: 800, color: "#f1f5f9", margin: "0 0 12px" }}>
- {t("testimonialsTitle")}
- </h2>
- <p style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 16 }}>{t("testimonialsSubtitle")}</p>
- </div>
- <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
- {TESTIMONIALS.map((item, i) => (
- <div key={i} style={{
- background: "rgba(13,17,23,0.8)", border: "1px solid rgba(255,255,255,0.07)",
- borderRadius: 16, padding: 28,
- }}>
- <div style={{ display: "flex", gap: 2, marginBottom: 16 }}>
- {Array.from({ length: item.stars }).map((_, j) => (
- <span key={j} style={{ color: "var(--brass)", fontSize: 16 }}>★</span>
- ))}
- </div>
- <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, lineHeight: 1.7, margin: "0 0 20px", fontStyle: "italic" }}>
- &ldquo;{item.quote}&rdquo;
- </p>
- <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
- <div style={{
- width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
- background: "linear-gradient(135deg, rgba(184, 135, 62,0.25), rgba(138, 96, 39,0.1))",
- border: "1px solid rgba(184, 135, 62,0.3)",
- display: "flex", alignItems: "center", justifyContent: "center",
- color: "var(--brass)", fontWeight: 700, fontSize: 14,
- }}>
- {item.avatar}
- </div>
- <div>
- <div style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 13 }}>{item.name}</div>
- <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{item.role} · {item.center}</div>
- <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 10 }}>{item.flag} {item.city}</div>
- </div>
- </div>
- </div>
- ))}
- </div>
- </section>
+        <div className="lb2b-how-steps">
+          {[1, 2, 3].map((n) => (
+            <div key={n} className="lb2b-step">
+              <span className="lb2b-step-num" aria-hidden="true">
+                {String(n).padStart(2, "0")}
+              </span>
+              <span className="lb2b-step-lbl">
+                {t("step_lbl")} {n}
+              </span>
+              <h3>{t(`s${n}_title`)}</h3>
+              <p>{t(`s${n}_body`)}</p>
+            </div>
+          ))}
+        </div>
 
- {/* ── FAQ ── */}
- <section style={{ padding: "60px 40px", background: "rgba(13,17,23,0.5)", borderTop: "1px solid rgba(244, 235, 220, 0.05)" }}>
- <div style={{ maxWidth: 700, margin: "0 auto" }}>
- <h2 className="syne" style={{ fontSize: 30, fontWeight: 800, color: "#f1f5f9", margin: "0 0 32px", textAlign: "center" }}>
- {t("faqTitle")}
- </h2>
- <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
- {FAQS.map((faq, i) => (
- <div key={i} style={{
- background: "rgba(13,17,23,0.8)", border: `1px solid ${openFaq === i ? "rgba(184, 135, 62,0.25)" : "rgba(255,255,255,0.07)"}`,
- borderRadius: 12, overflow: "hidden", transition: "border 0.2s",
- }}>
- <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{
- width: "100%", background: "none", border: "none", cursor: "pointer",
- padding: "18px 20px", textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center",
- }}>
- <span style={{ color: "#f1f5f9", fontWeight: 600, fontSize: 14 }}>{faq.q}</span>
- <span style={{ color: "var(--brass)", fontSize: 18, transform: openFaq === i ? "rotate(45deg)" : "none", transition: "transform 0.2s", flexShrink: 0 }}>+</span>
- </button>
- {openFaq === i && (
- <div style={{ padding: "0 20px 18px", color: "rgba(244, 235, 220, 0.72)", fontSize: 13, lineHeight: 1.65 }}>
- {faq.a}
- </div>
- )}
- </div>
- ))}
- </div>
- </div>
- </section>
+        <p className="lb2b-how-note">{t("note")}</p>
+      </div>
+    </section>
+  );
+}
 
- {/* ── CONTACT / DEMO FORM ── */}
- <section id="contact" style={{ padding: "80px 40px" }}>
- <div style={{ maxWidth: 600, margin: "0 auto" }}>
- <div style={{ textAlign: "center", marginBottom: 40 }}>
- <h2 className="syne" style={{ fontSize: 34, fontWeight: 800, color: "#f1f5f9", margin: "0 0 12px" }}>
- {t("contactTitle")}
- </h2>
- <p style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 15 }}>
- {t("contactSubtitle")}
- </p>
- </div>
+/* ═══════════════════════════════════════════════
+   5. PROOF · mock + text
+   ═══════════════════════════════════════════════ */
+function B2BProof() {
+  const t = useTypoT("b2b.proof");
+  return (
+    <section className="lb2b-section" id="proof">
+      <div className="container">
+        <div className="lb2b-proof-grid">
+          <div className="lb2b-proof-text">
+            <div className="lb2b-eye">{/* rythm */}</div>
+            <h2 className="lb2b-h">{t("title")}</h2>
+            <p>{t("body")}</p>
+          </div>
+          <div className="lb2b-mock" role="img" aria-label={t("mock_label")}>
+            <span className="lb2b-mock-label">{t("mock_label")}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
- {contactSent ? (
- <div style={{
- background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)",
- borderRadius: 16, padding: "40px 32px", textAlign: "center",
- }}>
- <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
- <div className="syne" style={{ color: "#10b981", fontWeight: 800, fontSize: 22, marginBottom: 8 }}>
- {t("contactSuccessTitle")}
- </div>
- <div style={{ color: "rgba(244, 235, 220, 0.72)", fontSize: 14 }}>
- {t("contactSuccessDesc")}
- </div>
- <Link href="/register" style={{
- display: "inline-block", marginTop: 20,
- background: "linear-gradient(135deg, var(--brass), var(--brass-deep))",
- color: "var(--espresso)", borderRadius: 10, padding: "10px 24px",
- fontSize: 14, fontWeight: 700, textDecoration: "none",
- }}>
- {t("contactSuccessBtn")}
- </Link>
- </div>
- ) : (
- <form onSubmit={handleContact} style={{
- background: "rgba(13,17,23,0.8)", border: "1px solid rgba(184, 135, 62,0.15)",
- borderRadius: 16, padding: 32, display: "flex", flexDirection: "column", gap: 16,
- }}>
- <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
- {[
- { label: t("contactFullName"), key: "nom", placeholder: "Dr. Henriette Ngo Biyong" },
- { label: t("contactEmail"), key: "email", placeholder: "direction@votre-centre.cm" },
- ].map(f => (
- <div key={f.key}>
- <label style={{ color: "rgba(244, 235, 220, 0.72)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>{f.label}</label>
- <input type={f.key === "email" ? "email" : "text"} required
- value={contactForm[f.key as keyof typeof contactForm]}
- onChange={e => setContactForm(c => ({ ...c, [f.key]: e.target.value }))}
- placeholder={f.placeholder}
- style={{ width: "100%", background: "#161b22", border: "1px solid rgba(244, 235, 220, 0.12)", borderRadius: 9, padding: "10px 14px", color: "var(--creme)", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
- </div>
- ))}
- </div>
- <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
- {[
- { label: t("contactCenter"), key: "centre", placeholder: "Centre Allemand de Yaoundé" },
- { label: t("contactCity"), key: "ville", placeholder: "Yaoundé, Douala..." },
- ].map(f => (
- <div key={f.key}>
- <label style={{ color: "rgba(244, 235, 220, 0.72)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>{f.label}</label>
- <input type="text" required
- value={contactForm[f.key as keyof typeof contactForm]}
- onChange={e => setContactForm(c => ({ ...c, [f.key]: e.target.value }))}
- placeholder={f.placeholder}
- style={{ width: "100%", background: "#161b22", border: "1px solid rgba(244, 235, 220, 0.12)", borderRadius: 9, padding: "10px 14px", color: "var(--creme)", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
- </div>
- ))}
- </div>
- <div>
- <label style={{ color: "rgba(244, 235, 220, 0.72)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>{t("contactMessage")}</label>
- <textarea value={contactForm.message} onChange={e => setContactForm(c => ({ ...c, message: e.target.value }))}
- placeholder="We have 8 teachers and 150 students. Interested in the Pro plan..."
- rows={3}
- style={{ width: "100%", background: "#161b22", border: "1px solid rgba(244, 235, 220, 0.12)", borderRadius: 9, padding: "10px 14px", color: "var(--creme)", fontSize: 14, outline: "none", resize: "vertical", boxSizing: "border-box" }} />
- </div>
- <button type="submit" className="btn-gold" style={{
- background: "linear-gradient(135deg, var(--brass), var(--brass-deep))",
- color: "var(--espresso)", border: "none", borderRadius: 10, padding: "13px 0",
- fontSize: 15, fontWeight: 700, cursor: "pointer", width: "100%",
- }}>
- {t("contactSubmit")}
- </button>
- <p style={{ margin: 0, textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: 12 }}>
- {t("contactFree")}
- </p>
- </form>
- )}
- </div>
- </section>
+/* ═══════════════════════════════════════════════
+   6. UNIQUE · 2 blocs
+   ═══════════════════════════════════════════════ */
+function B2BUnique() {
+  const t = useTypoT("b2b.unique");
+  return (
+    <section className="lb2b-section lb2b-section-alt" id="unique">
+      <div className="container">
+        <div className="lsection-head centered">
+          <h2 className="lb2b-h">
+            {t("title")} <em>{t("title_em")}</em>
+          </h2>
+        </div>
 
- {/* ── FOOTER ── */}
- <footer style={{
- borderTop: "1px solid rgba(255,255,255,0.06)", padding: "24px 40px",
- display: "flex", justifyContent: "space-between", alignItems: "center",
- flexWrap: "wrap", gap: 12,
- color: "rgba(255,255,255,0.25)", fontSize: 12,
- }}>
- <div>{t("footerCopyright")}</div>
- <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
- <Link href="/login" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{t("footerLogin")}</Link>
- <Link href="/register" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{t("footerRegister")}</Link>
- <Link href="/center" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{t("footerCenter")}</Link>
- <Link href="/privacy" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{t("footerPrivacy")}</Link>
- <Link href="/terms" style={{ color: "rgba(255,255,255,0.25)", textDecoration: "none" }}>{t("footerTerms")}</Link>
- </div>
- </footer>
- </div>
- );
+        <div className="lb2b-unique-grid">
+          <article className="lb2b-unique-item">
+            <span className="icon" aria-hidden="true">
+              <IconSprechen size={26} />
+            </span>
+            <h3>{t("u1_title")}</h3>
+            <p>{t("u1_body")}</p>
+          </article>
+          <article className="lb2b-unique-item">
+            <span className="icon" aria-hidden="true">
+              <IconInstitution size={26} />
+            </span>
+            <h3>{t("u2_title")}</h3>
+            <p>{t("u2_body")}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   7. PRICING · 3 formules
+   ═══════════════════════════════════════════════ */
+function B2BPricing() {
+  const t = useTypoT("b2b.pricing");
+  const locale = useLocale();
+  const perMonth = locale === "en" ? "XAF / month" : "XAF / mois";
+
+  const plans = ["starter", "pro", "ent"] as const;
+  return (
+    <section className="lb2b-section" id="pricing">
+      <div className="container">
+        <div className="lsection-head centered">
+          <h2 className="lb2b-h">{t("title")}</h2>
+          <p className="lb2b-lede">{t("sub")}</p>
+        </div>
+
+        <div className="lb2b-plans">
+          {plans.map((key) => {
+            const featured = key === "pro";
+            const count = Number.parseInt(t(`${key}_fcount`), 10) || 0;
+            const features = Array.from({ length: count }, (_, i) =>
+              t(`${key}_f${i + 1}`),
+            );
+            return (
+              <article
+                key={key}
+                className={`lb2b-plan${featured ? " lb2b-plan-featured" : ""}`}
+                aria-labelledby={`plan-${key}-name`}
+              >
+                {featured ? (
+                  <span className="lb2b-plan-badge">{t("pro_badge")}</span>
+                ) : null}
+                <h3 id={`plan-${key}-name`} className="lb2b-plan-name">
+                  {t(`${key}_name`)}
+                </h3>
+                <p className="lb2b-plan-line">{t(`${key}_line`)}</p>
+                <div className="lb2b-plan-price">
+                  <span className="lb2b-plan-price-num" data-num>
+                    {t(`${key}_price`)}
+                  </span>
+                  <span className="lb2b-plan-price-unit">{perMonth}</span>
+                </div>
+                <ul className="lb2b-plan-features">
+                  {features.map((f, i) => (
+                    <li key={i}>
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={`/${locale}/landing#final`}
+                  className="lb2b-plan-cta"
+                >
+                  {t(`${key}_cta`)}
+                </a>
+              </article>
+            );
+          })}
+        </div>
+
+        <p className="lb2b-value-line">{t("value_line")}</p>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   8. FINAL CTA · bandeau + formulaire minimal
+   ═══════════════════════════════════════════════ */
+function B2BFinal() {
+  const t = useTypoT("b2b.final");
+  const [sent, setSent] = useState(false);
+  const [center, setCenter] = useState("");
+  const [city, setCity] = useState("");
+  const [wa, setWa] = useState("");
+
+  const onSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    // TODO server action / API. Pour la bêta, on flip juste sent = true.
+    setSent(true);
+  };
+
+  return (
+    <section className="lb2b-final" id="final">
+      <div className="container">
+        <div className="lb2b-final-band">
+          <div>
+            <span className="lb2b-final-eye">{t("eye")}</span>
+            <h2 className="lb2b-final-h">{t("title")}</h2>
+            <p className="lb2b-final-sub">{t("sub")}</p>
+          </div>
+
+          {sent ? (
+            <div className="lb2b-sent">
+              <h3 className="lb2b-sent-h">{t("form_sent_title")}</h3>
+              <p className="lb2b-sent-body">{t("form_sent_body")}</p>
+            </div>
+          ) : (
+            <form onSubmit={onSubmit} className="lb2b-form" noValidate>
+              <div className="lb2b-form-field">
+                <label htmlFor="b2b-center" className="lb2b-form-lbl">
+                  {t("form_center_lbl")}
+                </label>
+                <input
+                  id="b2b-center"
+                  className="lb2b-form-input"
+                  type="text"
+                  required
+                  autoComplete="organization"
+                  value={center}
+                  onChange={(e) => setCenter(e.target.value)}
+                  placeholder={t("form_center_ph")}
+                />
+              </div>
+              <div className="lb2b-form-field">
+                <label htmlFor="b2b-city" className="lb2b-form-lbl">
+                  {t("form_city_lbl")}
+                </label>
+                <input
+                  id="b2b-city"
+                  className="lb2b-form-input"
+                  type="text"
+                  required
+                  autoComplete="address-level2"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder={t("form_city_ph")}
+                />
+              </div>
+              <div className="lb2b-form-field">
+                <label htmlFor="b2b-wa" className="lb2b-form-lbl">
+                  {t("form_wa_lbl")}
+                </label>
+                <input
+                  id="b2b-wa"
+                  className="lb2b-form-input"
+                  type="tel"
+                  required
+                  autoComplete="tel"
+                  inputMode="tel"
+                  value={wa}
+                  onChange={(e) => setWa(e.target.value)}
+                  placeholder={t("form_wa_ph")}
+                />
+              </div>
+              <button type="submit" className="lb2b-form-cta">
+                {t("form_cta")}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    </section>
+  );
 }
