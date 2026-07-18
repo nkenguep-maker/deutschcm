@@ -11,6 +11,7 @@ import { LandingFeatures } from "@/components/landing/LandingFeatures";
 import { LandingFinalCta } from "@/components/landing/LandingFinalCta";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingHero } from "@/components/landing/LandingHero";
+import { LandingLanguages } from "@/components/landing/LandingLanguages";
 import { LandingLevels } from "@/components/landing/LandingLevels";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingProblems } from "@/components/landing/LandingProblems";
@@ -92,6 +93,10 @@ export default function LandingPage() {
           ],
         }}
       />
+
+      <div className="container"><div className="lsep" /></div>
+
+      <LandingLanguages locale={locale} />
 
       <div className="container"><div className="lsep" /></div>
 
