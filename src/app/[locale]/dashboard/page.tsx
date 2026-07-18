@@ -138,6 +138,53 @@ function nextLevel(current: Level | null): Level | "C2" {
   return LEVELS[idx + 1];
 }
 
+// Stub visuel pour les langues natales (échelle YEMA É1→É5).
+// Un vrai <YemaSpine/> composant arrivera dans un prochain cycle
+// avec la même mécanique interactive que CefrSpine.
+function YemaSpineStub({ language, levels }: { language: string; levels: string[] }) {
+  return (
+    <div style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: 8,
+      minWidth: 160,
+      padding: "16px 18px",
+      border: "1px solid var(--brass-edge)",
+      borderRadius: 12,
+      background: "var(--brass-glow)",
+    }}>
+      <p style={{
+        fontFamily: "var(--font-jetbrains, monospace)",
+        fontSize: 10.5,
+        fontWeight: 600,
+        letterSpacing: "0.12em",
+        textTransform: "uppercase",
+        color: "var(--brass)",
+        margin: 0,
+      }}>
+        Échelle YEMA · {language}
+      </p>
+      {levels.map((lvl, i) => (
+        <div key={lvl} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{
+            width: 8, height: 8, borderRadius: "50%",
+            background: i === 0 ? "var(--brass)" : "var(--creme-hair)",
+            flexShrink: 0,
+          }} aria-hidden="true" />
+          <span style={{
+            fontFamily: "var(--font-fraunces), Georgia, serif",
+            fontSize: 14,
+            color: i === 0 ? "var(--creme)" : "var(--creme-mute)",
+            fontStyle: "italic",
+          }}>
+            {lvl}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function StudentDashboard() {
   const locale = useLocale();
   const t = locale === "en" ? EN : FR;
@@ -165,9 +212,20 @@ export default function StudentDashboard() {
   }, []);
 
   const firstName = (data?.fullName ?? "").split(" ")[0] || (locale === "en" ? "you" : "toi");
-  const level = (data?.germanLevel as Level | undefined) ?? null;
-  const hasLevel = !!level && LEVELS.includes(level as Level);
-  const currentSpine = (hasLevel ? level : "A1") as Level;
+
+  // Niveau adapté à la langue active. Pour l'allemand → germanLevel
+  // legacy. Pour les autres langues → premier palier de l'échelle
+  // (en attendant le model UserLanguage). Le hero et le spine
+  // reflètent tous deux la langue active.
+  const isGerman = activeLang.id === "deutsch";
+  const levelsArray = activeLang.levels;
+  const rawLevel = isGerman ? (data?.germanLevel ?? null) : levelsArray[0];
+  const level = rawLevel && levelsArray.includes(rawLevel) ? rawLevel : null;
+  const hasLevel = !!level;
+  // Spine display : garde CECRL A1 par défaut pour les langues foreign,
+  // les langues natales ont leur propre échelle (le CefrSpine composant
+  // gère uniquement CECRL, un YemaSpine arrivera plus tard).
+  const currentSpine = (isGerman && hasLevel ? level : "A1") as Level;
 
   const ctaHref = hasLevel ? "/courses" : "/test-niveau";
   const ctaLabel = hasLevel ? t.ctaContinue : t.ctaTest;
@@ -233,7 +291,11 @@ export default function StudentDashboard() {
             </p>
           </div>
           <div className="dash-hero-side" aria-label={t.spineAria}>
-            <CefrSpine current={currentSpine} locale={locale === "en" ? "en" : "fr"} compact />
+            {activeLang.scale === "cefr" ? (
+              <CefrSpine current={currentSpine} locale={locale === "en" ? "en" : "fr"} compact />
+            ) : (
+              <YemaSpineStub language={activeLang.name} levels={activeLang.levels} />
+            )}
           </div>
         </article>
 
@@ -260,7 +322,11 @@ export default function StudentDashboard() {
               {t.statLevel}
             </p>
             <p className="dash-stat-val">{hasLevel ? level : "—"}</p>
-            <p className="dash-stat-sub">{t.statLevelSub}</p>
+            <p className="dash-stat-sub">
+              {activeLang.scale === "yema"
+                ? "É1 → É5"
+                : `${activeLang.levels[0]} → ${activeLang.levels[activeLang.levels.length - 1]}`}
+            </p>
           </div>
           <div className="dash-stat">
             <p className="dash-stat-lbl">

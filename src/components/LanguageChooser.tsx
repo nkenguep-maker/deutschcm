@@ -16,7 +16,7 @@ import { frTypo } from "@/components/landing/typo";
 //     territoire, copy) proprement.
 
 export function LanguageChooser() {
-  const { language, loading, setActiveLanguage } = useActiveLanguage();
+  const { language, loading, setActiveLanguage, supportedIds } = useActiveLanguage();
   const locale = useLocale();
   const t = useTranslations("space");
   const [open, setOpen] = useState(false);
@@ -51,8 +51,12 @@ export function LanguageChooser() {
       setOpen(false);
       return;
     }
-    if (l.status !== "live") {
-      // pas d'action si non dispo — retour visuel simple
+    // Une langue est cliquable si :
+    //   1. elle est "live" (dispo pour tou·te·s), ou
+    //   2. elle est dans les supportedLanguages du compte (accès test
+    //      ou beta accordé — ex: Jacob a plusieurs langues pour tester).
+    const canPick = l.status === "live" || supportedIds.includes(l.id);
+    if (!canPick) {
       setOpen(false);
       return;
     }
@@ -101,7 +105,7 @@ export function LanguageChooser() {
               <LangItem key={l.id} lang={l} active={l.id === language.id}
                         label={applyTypo(label(l))}
                         status={statusLabel[l.status]}
-                        disabled={l.status !== "live"}
+                        disabled={l.status !== "live" && !supportedIds.includes(l.id)}
                         onPick={() => pick(l)} />
             ))}
           </div>
@@ -113,7 +117,7 @@ export function LanguageChooser() {
               <LangItem key={l.id} lang={l} active={l.id === language.id}
                         label={applyTypo(label(l))}
                         status={statusLabel[l.status]}
-                        disabled={l.status !== "live"}
+                        disabled={l.status !== "live" && !supportedIds.includes(l.id)}
                         onPick={() => pick(l)} />
             ))}
           </div>
