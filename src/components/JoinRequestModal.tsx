@@ -77,12 +77,12 @@ export default function JoinRequestModal({
         }),
       });
       const d = await res.json();
-      if (!res.ok) { setError(d.error ?? "Erreur"); return; }
+      if (!res.ok) { setError(d.error ?? "Ça n'a pas abouti. Réessayez."); return; }
       setSent(true);
       setStep(3);
       onSuccess?.();
     } catch {
-      setError("Erreur réseau");
+      setError("Le réseau a lâché. Réessayez.");
     } finally {
       setSending(false);
     }

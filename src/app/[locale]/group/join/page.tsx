@@ -31,7 +31,7 @@ export default function GroupJoinPage() {
           setCodeError("");
         } else { setPreview(null); setCodeError("Groupe introuvable"); }
       } else { setPreview(null); setCodeError("Code invalide"); }
-    } catch { setCodeError("Erreur réseau"); }
+    } catch { setCodeError("Le réseau a lâché. Réessayez."); }
     finally { setChecking(false); }
   };
 
@@ -52,7 +52,7 @@ export default function GroupJoinPage() {
       });
       const d = await r.json();
       if (r.ok) { setDone(true); setTimeout(() => router.push("/group"), 2000); }
-      else setCodeError(d.error ?? "Erreur inconnue");
+      else setCodeError(d.error ?? "Ça coince de notre côté. Réessayez.");
     } finally { setJoining(false); }
   };
 

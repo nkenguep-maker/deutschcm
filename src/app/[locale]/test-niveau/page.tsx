@@ -42,7 +42,7 @@ const T = {
     typeLabels: { qcm: "QCM", fill: "Compléter", translate: "Traduction", error: "Erreur", article: "Article" } as Record<string, string>,
     loading1: "Génération des questions CEFR...",
     loading2: "Notre IA prépare votre test de 30 questions A1→C1",
-    loadError: "Erreur de chargement — Rechargez la page",
+    loadError: "Le chargement n'a pas abouti — rafraîchissez la page.",
     header: "Test de niveau CEFR",
     headerSub: "30 questions A1→C1",
     timerLabel: "souple",

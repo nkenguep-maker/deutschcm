@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
+import { StateBlock } from "@/components/StateBlock";
 
 interface Notif {
   id: string;
@@ -151,13 +152,18 @@ export default function NotificationsPage() {
               <div key={i} style={{ height: 72, background: "rgba(255,255,255,0.02)", borderRadius: 14, border: "1px solid rgba(255,255,255,0.05)", animation: "pulse 2s infinite" }} />
             ))
           ) : filtered.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "60px 16px", color: "rgba(255,255,255,0.3)" }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>🔔</div>
-              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>
-                {filter === "unread" ? "Tout est lu !" : filter === "action" ? "Aucune action requise" : "Aucune notification"}
-              </div>
-              <div style={{ fontSize: 12 }}>Revenez plus tard</div>
-            </div>
+            <StateBlock
+              kind="empty"
+              centered
+              soul={
+                filter === "unread"
+                  ? "Tout est lu. *La maison est calme.*"
+                  : filter === "action"
+                  ? "Rien à décider pour l'instant. *Bel espace.*"
+                  : "Rien dans la boîte. *Revenez plus tard.*"
+              }
+              body="Yema vous notifie seulement quand une action humaine attend, jamais pour vous distraire."
+            />
           ) : (
             filtered.map(n => {
               const isActionable = ACTION_TYPES.includes(n.type);

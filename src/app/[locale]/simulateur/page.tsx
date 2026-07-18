@@ -2,9 +2,11 @@
 
 import { useState, useRef, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams, usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Layout from "@/components/Layout";
 import VoiceRecorder from "@/components/VoiceRecorder";
 import AudioPlayer from "@/components/AudioPlayer";
+import { StateBlock } from "@/components/StateBlock";
 import { useAmbassade } from "@/hooks/useAmbassade";
 import { SCENARIOS, NIVEAUX } from "@/types/ambassade";
 import type { ConversationMessage, CorrectionDE, EvaluationScore, NiveauType, ScenarioType } from "@/types/ambassade";
@@ -328,6 +330,7 @@ function SimulateurPage() {
   const pathname = usePathname();
   const locale: Locale = pathname.startsWith("/en") ? "en" : "fr";
   const t = T[locale] as TT;
+  const tStates = useTranslations("states");
 
   const {
     messages, isLoading, error, concluded, sessionResult,
@@ -612,11 +615,18 @@ function SimulateurPage() {
             {/* Typing indicator */}
             {isLoading && <div className="msg-in"><TypingIndicator /></div>}
 
-            {/* Error */}
+            {/* Error — StateBlock kind="error" */}
             {error && (
-              <div style={{ padding: "10px 16px", borderRadius: 12, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171", fontSize: "0.78rem", fontFamily: "'DM Mono', monospace" }}>
-                ⚠️ {error.message}
-              </div>
+              <StateBlock
+                kind="error"
+                compact
+                soul={tStates("offline.soul")}
+                body={tStates("offline.body")}
+                action={{
+                  label: tStates("offline.action"),
+                  onClick: () => window.location.reload(),
+                }}
+              />
             )}
 
             {/* Concluded state */}

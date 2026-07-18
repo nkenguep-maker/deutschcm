@@ -49,7 +49,7 @@ export default function GroupCreatePage() {
       });
       const d = await r.json();
       if (r.ok) { setGroup(d.group); setPayStep("done"); }
-      else setError(d.error ?? "Erreur de paiement");
+      else setError(d.error ?? "Le paiement n'a pas abouti. Réessayez.");
     } finally { setLoading(false); }
   };
 

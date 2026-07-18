@@ -1,8 +1,10 @@
 "use client";
 
 import { Link } from "@/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "@/navigation";
 import TeacherLayout from "@/components/TeacherLayout";
+import { StateBlock } from "@/components/StateBlock";
 
 interface Klass {
   id: string;
@@ -59,7 +61,10 @@ const EN: Copy = {
 export default function TeacherClassroomsPage() {
   const locale = useLocale();
   const t = locale === "en" ? EN : FR;
+  const tStates = useTranslations("states");
+  const router = useRouter();
   const totalLearners = CLASSES.reduce((s, c) => s + c.students, 0);
+  const hasClasses = CLASSES.length > 0;
 
   return (
     <TeacherLayout title={t.title}>
@@ -70,15 +75,30 @@ export default function TeacherClassroomsPage() {
             <h2 className="subpage-h">{t.h}</h2>
             <p className="subpage-sub">{t.sub(CLASSES.length, totalLearners)}</p>
           </div>
-          <Link href="/teacher/classroom/new" className="subpage-cta">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
-              <path d="M7 3v8M3 7h8" />
-            </svg>
-            {t.newBtn}
-          </Link>
+          {hasClasses && (
+            <Link href="/teacher/classroom/new" className="subpage-cta">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+                <path d="M7 3v8M3 7h8" />
+              </svg>
+              {t.newBtn}
+            </Link>
+          )}
         </header>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {!hasClasses && (
+          <StateBlock
+            kind="empty"
+            centered
+            soul={tStates("teacher_no_class.soul")}
+            body={tStates("teacher_no_class.body")}
+            action={{
+              label: tStates("teacher_no_class.action"),
+              onClick: () => router.push("/teacher/classroom/new"),
+            }}
+          />
+        )}
+
+        <div style={{ display: hasClasses ? "flex" : "none", flexDirection: "column", gap: 12 }}>
           {CLASSES.map((cls) => {
             const scoreClass = cls.avgScore >= 8 ? "high" : cls.avgScore >= 6 ? "mid" : "low";
             return (

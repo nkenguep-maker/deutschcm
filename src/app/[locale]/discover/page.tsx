@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Link } from "@/navigation";
 import Layout from "@/components/Layout";
+import { StateBlock } from "@/components/StateBlock";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -462,8 +464,8 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
         </div>
 
         {codeResult === "notfound" && (
-          <div style={{ marginTop: 10, color: "#ef4444", fontSize: 12, display: "flex", gap: 6, alignItems: "center" }}>
-            ❌ {t.codeNotFound}
+          <div style={{ marginTop: 10, color: "var(--oxblood)", fontSize: 12, display: "flex", gap: 6, alignItems: "center" }} role="alert">
+            {t.codeNotFound}
           </div>
         )}
 
@@ -1009,6 +1011,7 @@ export default function DiscoverPage() {
   const pathname = usePathname();
   const locale: Locale = pathname.startsWith("/en") ? "en" : "fr";
   const t = T[locale] as TT;
+  const tStates = useTranslations("states");
 
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<TabKey>("all");
@@ -1337,23 +1340,22 @@ export default function DiscoverPage() {
               </div>
             )}
 
-            {/* Empty state */}
+            {/* Empty state — StateBlock kind="empty" */}
             {isEmpty && (
-              <div style={{ textAlign: "center", padding: "52px 20px", background: "rgba(13,17,23,0.6)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 18 }}>
-                <div style={{ fontSize: 44, marginBottom: 14 }}>🔍</div>
-                <div className="syne" style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 18, marginBottom: 8 }}>{t.emptyTitle}</div>
-                <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 1.6, marginBottom: 24, maxWidth: 380, margin: "0 auto 24px" }}>
-                  {t.emptyText}
-                </div>
-                <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-                  <Link href="/courses" style={{ padding: "10px 22px", borderRadius: 10, background: "#10b981", color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-                    {t.emptyCta1}
-                  </Link>
-                  <button onClick={() => { setSearch(""); setFilters(DEFAULT_FILTERS); setTab("all"); }} style={{ padding: "10px 22px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)", fontSize: 13, cursor: "pointer" }}>
-                    {t.emptyCta2}
-                  </button>
-                </div>
-              </div>
+              <StateBlock
+                kind="empty"
+                centered
+                soul={tStates("search_none.soul")}
+                body={tStates("search_none.body")}
+                action={{
+                  label: t.emptyCta1,
+                  href: "/courses",
+                }}
+                secondary={{
+                  label: t.emptyCta2,
+                  onClick: () => { setSearch(""); setFilters(DEFAULT_FILTERS); setTab("all"); },
+                }}
+              />
             )}
 
             {/* Community coming soon */}

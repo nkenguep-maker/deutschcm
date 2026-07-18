@@ -636,5 +636,103 @@
       "CENTER": "Centre",
       "ADMIN": "Admin"
     }
+  },
+  "states": {
+    "offline": {
+      "soul": "Le réseau a lâché. *Pas votre travail.*",
+      "body": "Votre réponse est gardée au chaud. Dès que la connexion revient, on reprend où vous étiez.",
+      "action": "Réessayer"
+    },
+    "server": {
+      "soul": "Ça coince de notre côté. *Pas du vôtre.*",
+      "body": "Nos artisans sont dessus. Réessayez dans un instant.",
+      "action": "Réessayer"
+    },
+    "notfound": {
+      "soul": "Cette page n'existe pas. *Rentrons à la maison.*",
+      "body": "Le lien que vous suivez pointe vers un endroit qui n'a jamais existé, ou plus.",
+      "action": "Retour à l'accueil"
+    },
+    "ai_busy": {
+      "soul": "Le correcteur reprend son souffle. *Un instant.*",
+      "body": "Beaucoup de textes à relire en ce moment. Votre tour arrive.",
+      "action": "Réessayer"
+    },
+    "form": {
+      "soul": "Il manque un détail. *On y est presque.*",
+      "body": "Vérifiez le champ marqué — tout le reste est bon.",
+      "action": "Reprendre"
+    },
+    "student_no_course": {
+      "soul": "Tout commence ici. *Choisissez votre langue.*",
+      "body": "Aligné CECRL pour l'allemand, l'anglais, le français. Échelle YEMA pour les langues natales.",
+      "action": "Voir les langues"
+    },
+    "student_no_class": {
+      "soul": "Apprendre ensemble, c'est mieux. *Vous avez un code ?*",
+      "body": "Votre enseignant·e ou votre centre vous donnera un code d'invitation pour rejoindre une classe.",
+      "action": "Entrer un code",
+      "secondary": "Continuer seul·e"
+    },
+    "teacher_no_class": {
+      "soul": "Votre salle est prête. *Il manque les élèves.*",
+      "body": "Créez votre première classe — le code se partage en un geste.",
+      "action": "Créer une classe"
+    },
+    "teacher_all_clear": {
+      "soul": "Tout est en ordre. *Vos élèves avancent.*",
+      "body": "Aucun rendu en attente. Profitez-en pour préparer une activité.",
+      "action": "Préparer une activité"
+    },
+    "center_no_teacher": {
+      "soul": "Un centre, c'est d'abord une équipe. *Invitez votre premier enseignant.*",
+      "body": "Partagez le code d'invitation ou envoyez un email direct. L'onboarding se fait en trois minutes.",
+      "action": "Inviter"
+    },
+    "search_none": {
+      "soul": "Rien à ce nom. *Essayez le code ?*",
+      "body": "Un code d'invitation trouve toujours son destinataire, même sans nom exact."
+    },
+    "correcting": {
+      "soul": "On relit votre texte *ligne à ligne.*",
+      "body": "L'IA propose une piste, votre enseignant·e valide. Quelques secondes."
+    },
+    "quiz_gen": {
+      "soul": "On prépare des questions *à votre niveau.*",
+      "body": "Vocabulaire, grammaire, compréhension — dosés d'après votre parcours."
+    },
+    "report": {
+      "soul": "On assemble votre rapport, *chiffre par chiffre.*",
+      "body": "Progression, rétention, score moyen — bientôt à l'écran."
+    },
+    "generic_loading": {
+      "soul": "Un instant — *ça arrive.*"
+    },
+    "lesson_done": {
+      "soul": "{lektion}, terminée. *Ça s'entend déjà.*",
+      "body": "La suite vous attend quand vous voulez — la régularité bat l'intensité.",
+      "action": "Continuer"
+    },
+    "class_created": {
+      "soul": "{name} existe. *Partagez le code.*",
+      "body": "Le code s'affiche sur la carte de la classe. Vos apprenant·e·s peuvent rejoindre.",
+      "action": "Voir la classe"
+    },
+    "request_sent": {
+      "soul": "Demande envoyée. *L'enseignant·e décide.*",
+      "body": "Vous serez notifié·e dès que la réponse arrive. Rien à faire en attendant.",
+      "action": "Retour"
+    },
+    "role_granted": {
+      "soul": "Votre espace enseignant est ouvert. *Bienvenue de ce côté.*",
+      "body": "Un sélecteur d'espace apparaît en haut à droite pour basculer entre vos rôles.",
+      "action": "Ouvrir l'espace"
+    },
+    "delete_class": {
+      "soul": "Fermer {name} ?",
+      "body": "Les élèves gardent leur progression. La classe, elle, disparaît.",
+      "action": "Fermer la classe",
+      "secondary": "Annuler"
+    }
   }
 }

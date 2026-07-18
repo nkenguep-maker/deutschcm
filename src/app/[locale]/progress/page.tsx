@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import Layout from "@/components/Layout"
+import { StateBlock } from "@/components/StateBlock"
 import {
   LineChart, Line, BarChart, Bar, RadarChart, Radar,
   PolarGrid, PolarAngleAxis, XAxis, YAxis, CartesianGrid,
@@ -131,12 +132,12 @@ interface ProgressData {
 
 const scoreColor = (s: number) => s >= 80 ? "#10b981" : s >= 60 ? "#f59e0b" : "#ef4444"
 
+// EmptyState local — délègue à StateBlock (empty, compact, centered).
+// Le titre devient la ligne d'âme, on n'a pas de fragment brass
+// donc on met un point final simple. Le texte reste en body.
 function EmptyState({ title, text }: { title: string; text: string }) {
   return (
-    <div style={{ padding: "32px 24px", textAlign: "center", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-      <p style={{ color: "rgba(255,255,255,0.5)", fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "1rem", margin: "0 0 8px" }}>{title}</p>
-      <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", margin: 0 }}>{text}</p>
-    </div>
+    <StateBlock kind="empty" compact centered soul={title} body={text} />
   );
 }
 

@@ -49,9 +49,9 @@ export default function AdminRolesPage() {
       const r = await fetch(`/api/roles/list?q=${encodeURIComponent(query)}`);
       const d = await r.json();
       if (r.ok) setRows(d.users ?? []);
-      else setMsg({ kind: "err", text: d.error ?? "Erreur" });
+      else setMsg({ kind: "err", text: d.error ?? "Ça n'a pas abouti. Réessayez." });
     } catch {
-      setMsg({ kind: "err", text: "Erreur réseau" });
+      setMsg({ kind: "err", text: "Le réseau a lâché. Réessayez." });
     } finally {
       setLoading(false);
     }
@@ -76,7 +76,7 @@ export default function AdminRolesPage() {
         setMsg({ kind: "ok", text: `Rôle ${L[role]} accordé.` });
         await load(q);
       } else {
-        setMsg({ kind: "err", text: d.error ?? "Erreur" });
+        setMsg({ kind: "err", text: d.error ?? "Ça n'a pas abouti. Réessayez." });
       }
     } finally {
       setBusy(null);
@@ -98,7 +98,7 @@ export default function AdminRolesPage() {
         setMsg({ kind: "ok", text: `Rôle ${L[role]} retiré.` });
         await load(q);
       } else {
-        setMsg({ kind: "err", text: d.error ?? "Erreur" });
+        setMsg({ kind: "err", text: d.error ?? "Ça n'a pas abouti. Réessayez." });
       }
     } finally {
       setBusy(null);

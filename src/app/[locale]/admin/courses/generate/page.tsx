@@ -168,7 +168,7 @@ export default function AdminGenerateCourse() {
       setProgress(100);
       setStatusMsg("✅ Cours généré avec succès !");
     } catch {
-      setStatusMsg("❌ Erreur lors de la génération. Réessayez.");
+      setStatusMsg("La génération a échoué. Réessayez dans un instant.");
     } finally {
       setLoading(false);
     }
@@ -176,7 +176,7 @@ export default function AdminGenerateCourse() {
 
   const handleSave = async () => {
     if (!generatedData) {
-      setStatusMsg("⚠️ Générez d'abord un cours avant de sauvegarder.");
+      setStatusMsg("Générez d'abord un cours avant de sauvegarder.");
       return;
     }
     setStatusMsg("💾 Sauvegarde en base de données...");
@@ -214,7 +214,7 @@ export default function AdminGenerateCourse() {
         ? "🌐 Cours publié ! Les élèves peuvent y accéder depuis /courses."
         : "✅ Sauvegardé en brouillon. Cliquez sur Publier pour le rendre visible.");
     } catch (e) {
-      setStatusMsg("❌ " + (e instanceof Error ? e.message : "Erreur de connexion"));
+      setStatusMsg("" + (e instanceof Error ? e.message : "Le réseau a lâché. Réessayez."));
     }
   };
 
@@ -229,7 +229,7 @@ export default function AdminGenerateCourse() {
       setSavedCourses(prev => prev.map((c, i) => i === idx ? { ...c, status: "publié" } : c));
       setStatusMsg("🌐 Cours publié ! Les élèves peuvent y accéder depuis /courses.");
     } catch {
-      setStatusMsg("❌ Erreur lors de la publication.");
+      setStatusMsg("La publication a échoué. Réessayez.");
     }
   };
 
@@ -307,7 +307,7 @@ export default function AdminGenerateCourse() {
 
   const handleVideoUpload = async (file: File) => {
     if (!file || !file.type.startsWith("video/")) {
-      setStatusMsg("❌ Veuillez sélectionner un fichier vidéo (MP4).");
+      setStatusMsg("Un fichier vidéo (MP4) est attendu ici.");
       return;
     }
     setUploading(true);
@@ -333,7 +333,7 @@ export default function AdminGenerateCourse() {
           if (e.lengthComputable) setUploadProgress(Math.round((e.loaded / e.total) * 100));
         };
         xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`HTTP ${xhr.status}`)));
-        xhr.onerror = () => reject(new Error("Erreur réseau"));
+        xhr.onerror = () => reject(new Error("Le réseau a lâché. Réessayez."));
         xhr.send(file);
       });
 
@@ -341,7 +341,7 @@ export default function AdminGenerateCourse() {
       setUploadDone(true);
       setStatusMsg("🎬 Vidéo NotebookLM uploadée ! Cliquez sur Sauvegarder.");
     } catch (e) {
-      setStatusMsg("❌ " + (e instanceof Error ? e.message : "Erreur upload"));
+      setStatusMsg("" + (e instanceof Error ? e.message : "Erreur upload"));
     } finally {
       setUploading(false);
     }

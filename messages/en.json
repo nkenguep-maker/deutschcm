@@ -636,5 +636,103 @@
       "CENTER": "Center",
       "ADMIN": "Admin"
     }
+  },
+  "states": {
+    "offline": {
+      "soul": "The network dropped. *Not your work.*",
+      "body": "Your answer is safe. When the connection comes back, we pick up right where you were.",
+      "action": "Try again"
+    },
+    "server": {
+      "soul": "Something's off on our end. *Not yours.*",
+      "body": "Our craftspeople are on it. Try again in a moment.",
+      "action": "Try again"
+    },
+    "notfound": {
+      "soul": "This page doesn't exist. *Let's head home.*",
+      "body": "The link you followed points to somewhere that never existed, or no longer does.",
+      "action": "Back to home"
+    },
+    "ai_busy": {
+      "soul": "The reviewer is catching its breath. *One moment.*",
+      "body": "Lots of texts to look over right now. Your turn is coming.",
+      "action": "Try again"
+    },
+    "form": {
+      "soul": "One detail is missing. *We're almost there.*",
+      "body": "Check the flagged field — everything else looks right.",
+      "action": "Go back"
+    },
+    "student_no_course": {
+      "soul": "It all starts here. *Pick your language.*",
+      "body": "CEFR-aligned for German, English, French. YEMA scale for African native languages.",
+      "action": "See languages"
+    },
+    "student_no_class": {
+      "soul": "Learning together is better. *Have a code?*",
+      "body": "Your teacher or center will give you an invitation code to join a class.",
+      "action": "Enter a code",
+      "secondary": "Continue solo"
+    },
+    "teacher_no_class": {
+      "soul": "Your room is ready. *The learners are missing.*",
+      "body": "Create your first class — the code shares in one gesture.",
+      "action": "Create a class"
+    },
+    "teacher_all_clear": {
+      "soul": "All is quiet. *Your learners are moving forward.*",
+      "body": "Nothing pending. Use the time to plan an activity.",
+      "action": "Plan an activity"
+    },
+    "center_no_teacher": {
+      "soul": "A center is first a team. *Invite your first teacher.*",
+      "body": "Share the invitation code or send a direct email. Onboarding takes three minutes.",
+      "action": "Invite"
+    },
+    "search_none": {
+      "soul": "Nothing by that name. *Try the code?*",
+      "body": "An invitation code always finds its match, even without an exact name."
+    },
+    "correcting": {
+      "soul": "Reading your text *line by line.*",
+      "body": "AI drafts a path, your teacher validates. A few seconds."
+    },
+    "quiz_gen": {
+      "soul": "Preparing questions *at your level.*",
+      "body": "Vocabulary, grammar, comprehension — tuned to your path."
+    },
+    "report": {
+      "soul": "Assembling your report, *number by number.*",
+      "body": "Progress, retention, average score — coming right up."
+    },
+    "generic_loading": {
+      "soul": "One moment — *coming up.*"
+    },
+    "lesson_done": {
+      "soul": "{lektion}, done. *You can hear it already.*",
+      "body": "The next step is here whenever you want — regularity beats intensity.",
+      "action": "Continue"
+    },
+    "class_created": {
+      "soul": "{name} exists. *Share the code.*",
+      "body": "The code appears on the class card. Your learners can now join.",
+      "action": "See class"
+    },
+    "request_sent": {
+      "soul": "Request sent. *The teacher decides.*",
+      "body": "You'll be notified as soon as the answer arrives. Nothing to do in the meantime.",
+      "action": "Back"
+    },
+    "role_granted": {
+      "soul": "Your teacher space is open. *Welcome to this side.*",
+      "body": "A space switcher appears top-right so you can toggle between your roles.",
+      "action": "Open the space"
+    },
+    "delete_class": {
+      "soul": "Close {name}?",
+      "body": "Learners keep their progress. The class itself goes away.",
+      "action": "Close the class",
+      "secondary": "Cancel"
+    }
   }
 }

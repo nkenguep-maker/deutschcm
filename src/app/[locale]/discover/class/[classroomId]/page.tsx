@@ -87,11 +87,11 @@ export default function ClassDetailPage() {
         body: JSON.stringify({ action: "request-join-class", classroomId, message }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error ?? "Erreur"); return; }
+      if (!res.ok) { setError(data.error ?? "Quelque chose a échoué. Réessayez."); return; }
       setSent(true);
       setShowModal(false);
     } catch {
-      setError("Erreur réseau");
+      setError("Le réseau a lâché. Réessayez.");
     } finally {
       setSending(false);
     }
