@@ -4,24 +4,25 @@ import { ThemeProvider } from "@/contexts/ThemeContext"
 
 // Kaffeehaus — Fraunces (display, contrast serif), Manrope (humanist body),
 // JetBrains Mono (utility, CEFR numerals).
+// Trimmed weights → tient sous la limite Vercel Edge (1 MB).
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500"],
   style: ["normal", "italic"],
 })
 const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin"],
   display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
 })
 const jetbrains = JetBrains_Mono({
   variable: "--font-jetbrains",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500", "600"],
+  weight: ["500"],
 })
 
 // Always force dark mode — light mode not yet released

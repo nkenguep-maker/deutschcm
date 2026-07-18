@@ -1,61 +1,244 @@
 import { ImageResponse } from "next/og"
 
-export const runtime = "edge"
-export const alt = "Yema — Apprenez l'allemand au Cameroun"
+// Node.js runtime — l'Edge runtime plafonne à 1 MB, @vercel/og + fonts
+// next/font gonflent au-delà. Node runtime a 50 MB de marge.
+export const runtime = "nodejs"
+export const alt = "Yema Languages — L'allemand, pas l'accent."
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
+
+// OG image Kaffeehaus — palette espresso/crème/laiton, tagline éditoriale,
+// CEFR spine A1→C1 en signature à droite. Aucune police externe (sans-serif
+// système) pour tenir sous 1 MB en Edge.
+
+const LEVELS = ["A1", "A2", "B1", "B2", "C1"] as const
 
 export default async function Image() {
   return new ImageResponse(
     (
-      <div style={{
-        width: "100%", height: "100%",
-        background: "linear-gradient(135deg, #080c10 0%, #0f1a14 100%)",
-        display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center",
-        fontFamily: "sans-serif", position: "relative"
-      }}>
-        {/* Background glow */}
-        <div style={{
-          position: "absolute", width: 600, height: 600,
-          borderRadius: "50%", top: "50%", left: "50%",
-          transform: "translate(-50%,-50%)",
-          background: "radial-gradient(circle, rgba(16,185,129,0.15), transparent 70%)",
-        }} />
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          background: "#1B120A",
+          display: "flex",
+          fontFamily: "sans-serif",
+          position: "relative",
+          padding: "72px 80px",
+        }}
+      >
+        {/* Warm radial light — coin haut gauche, pas centré générique */}
+        <div
+          style={{
+            position: "absolute",
+            top: -220,
+            left: -180,
+            width: 720,
+            height: 720,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(184,135,62,0.22) 0%, transparent 65%)",
+          }}
+        />
 
-        {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32 }}>
-          <div style={{ fontSize: 64 }}></div>
-          <div style={{ fontWeight: 900, fontSize: 56, color: "white" }}>
-            Yema
+        {/* Colonne gauche — mark + tagline + eye */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            flex: 1,
+            zIndex: 2,
+            paddingRight: 48,
+          }}
+        >
+          {/* Mark : Y sérif dans un carré laiton */}
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 10,
+                border: "1.5px solid rgba(184,135,62,0.55)",
+                background: "rgba(184,135,62,0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "serif",
+                  fontSize: 34,
+                  fontStyle: "italic",
+                  color: "#B8873E",
+                  fontWeight: 500,
+                }}
+              >
+                Y
+              </div>
+            </div>
+            <div
+              style={{
+                fontFamily: "serif",
+                fontSize: 36,
+                fontStyle: "italic",
+                color: "#F4EBDC",
+                letterSpacing: "-0.015em",
+                fontWeight: 500,
+              }}
+            >
+              Yema
+            </div>
+          </div>
+
+          {/* Tagline centrale */}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {/* Eye */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+                color: "#B8873E",
+                fontSize: 18,
+                fontWeight: 600,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                marginBottom: 32,
+              }}
+            >
+              <div
+                style={{
+                  width: 32,
+                  height: 1.5,
+                  background: "#B8873E",
+                }}
+              />
+              Bêta ouverte · CEFR A1 → C1
+            </div>
+
+            {/* Titre editorial */}
+            <div
+              style={{
+                fontFamily: "serif",
+                fontSize: 108,
+                fontWeight: 400,
+                color: "#F4EBDC",
+                lineHeight: 1.02,
+                letterSpacing: "-0.028em",
+                marginBottom: 8,
+              }}
+            >
+              L&apos;allemand,
+            </div>
+            <div
+              style={{
+                fontFamily: "serif",
+                fontSize: 108,
+                fontWeight: 400,
+                fontStyle: "italic",
+                color: "#B8873E",
+                lineHeight: 1.02,
+                letterSpacing: "-0.028em",
+              }}
+            >
+              pas l&apos;accent.
+            </div>
+          </div>
+
+          {/* Bottom line */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              color: "rgba(244,235,220,0.55)",
+              fontSize: 18,
+              letterSpacing: "0.03em",
+            }}
+          >
+            <span>yema.app</span>
+            <span style={{ color: "rgba(244,235,220,0.25)" }}>·</span>
+            <span>Conçu au Cameroun</span>
           </div>
         </div>
 
-        {/* Tagline */}
-        <div style={{ fontSize: 28, color: "rgba(255,255,255,0.7)", marginBottom: 24, textAlign: "center", maxWidth: 800 }}>
-          Apprenez l&apos;allemand avec l&apos;IA · A1 → C1
-        </div>
+        {/* Colonne droite — CEFR spine signature */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            justifyContent: "center",
+            width: 200,
+            zIndex: 2,
+            position: "relative",
+          }}
+        >
+          {/* La colonne verticale — laiton du haut jusqu'à A1, filet ensuite */}
+          <div
+            style={{
+              position: "absolute",
+              left: 15,
+              top: 0,
+              bottom: 0,
+              width: 1.5,
+              background:
+                "linear-gradient(to bottom, #B8873E 0%, #B8873E 20%, rgba(244,235,220,0.14) 20%, rgba(244,235,220,0.14) 100%)",
+            }}
+          />
 
-        {/* Badges */}
-        <div style={{ display: "flex", gap: 16 }}>
-          {["🏛️ Simulateur IA", "🎧 Audio natif", "🎯 Quiz adaptatif", "📊 CEFR A1-C1"].map(badge => (
-            <div key={badge} style={{
-              padding: "8px 20px", borderRadius: 99,
-              background: "rgba(16,185,129,0.15)",
-              border: "1px solid rgba(16,185,129,0.3)",
-              color: "#10b981", fontSize: 18, fontWeight: 600
-            }}>
-              {badge}
-            </div>
-          ))}
-        </div>
-
-        {/* Bottom */}
-        <div style={{ position: "absolute", bottom: 32, color: "rgba(255,255,255,0.3)", fontSize: 16 }}>
-          deutschcm.vercel.app · 🇨🇲 Conçu pour le Cameroun
+          {LEVELS.map((lvl, i) => {
+            const isCurrent = i === 0 // A1 active
+            const isDone = i < 0
+            return (
+              <div
+                key={lvl}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 20,
+                  height: 96,
+                  color: isCurrent
+                    ? "#F4EBDC"
+                    : isDone
+                      ? "rgba(244,235,220,0.72)"
+                      : "rgba(244,235,220,0.44)",
+                }}
+              >
+                <div
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 999,
+                    background: isCurrent || isDone ? "#B8873E" : "#1B120A",
+                    border: "1.5px solid",
+                    borderColor:
+                      isCurrent || isDone
+                        ? "#B8873E"
+                        : "rgba(244,235,220,0.18)",
+                    boxShadow: isCurrent
+                      ? "0 0 0 8px rgba(184,135,62,0.18)"
+                      : "none",
+                  }}
+                />
+                <div
+                  style={{
+                    fontFamily: "serif",
+                    fontSize: 22,
+                    fontWeight: 500,
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  {lvl}
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
     ),
-    { ...size }
+    { ...size },
   )
 }
