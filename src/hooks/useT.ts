@@ -825,17 +825,19 @@ const layout = {
 }
 
 // ─── All text ──────────────────────────────────────────────────────────────────
+// FR bundle : micro-typo passée en profondeur sur tout l'arbre.
+// EN bundle : tel quel (règles typographiques anglaises différentes).
 export const TEXT = {
   fr: {
     landing: deepTypo(landing.fr),
-    nav: nav.fr,
-    dashboard: dashboard.fr,
-    teacher: teacher.fr,
-    center: center.fr,
-    admin: admin.fr,
-    common: common.fr,
-    auth: auth.fr,
-    layout: layout.fr,
+    nav: deepTypo(nav.fr),
+    dashboard: deepTypo(dashboard.fr),
+    teacher: deepTypo(teacher.fr),
+    center: deepTypo(center.fr),
+    admin: deepTypo(admin.fr),
+    common: deepTypo(common.fr),
+    auth: deepTypo(auth.fr),
+    layout: deepTypo(layout.fr),
   },
   en: { landing: landing.en, nav: nav.en, dashboard: dashboard.en, teacher: teacher.en, center: center.en, admin: admin.en, common: common.en, auth: auth.en, layout: layout.en },
 }
