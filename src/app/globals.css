@@ -5653,6 +5653,78 @@ button, [role="button"] {
   border-color: var(--brass-edge);
 }
 
+/* ─── TestSpaceBar · barre de test multi-espaces ────────────────
+   Self-gated : n'apparaît QUE si l'user a les 4 rôles actifs.
+   Barre fixe en haut du viewport, au-dessus de tout. */
+
+.test-space-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 14px;
+  background: var(--espresso);
+  border-bottom: 1px solid var(--brass-edge);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  color: var(--creme-mute);
+  letter-spacing: 0.06em;
+}
+.test-space-bar-eye {
+  color: var(--brass);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.test-space-bar-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.test-space-bar-tabs::-webkit-scrollbar { display: none; }
+.test-space-bar-tab {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid var(--creme-hair);
+  color: var(--creme-soft);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--dur-touch) var(--ease-enter),
+              border-color var(--dur-touch) var(--ease-enter),
+              background var(--dur-touch) var(--ease-enter);
+}
+.test-space-bar-tab:hover { color: var(--creme); border-color: var(--brass-edge); }
+.test-space-bar-tab.on {
+  background: var(--brass-glow);
+  color: var(--creme);
+  border-color: var(--brass);
+}
+.test-space-bar-tab:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+/* Quand la barre est visible, décale le contenu de la hauteur ~34px.
+   Utilise :has() pour reconnaître la présence de la barre côté layout.
+   Fallback : padding-top ignoré si :has() non supporté. */
+body:has(.test-space-bar) { padding-top: 34px; }
+
+@media (max-width: 480px) {
+  .test-space-bar { padding: 5px 10px; gap: 8px; }
+  .test-space-bar-eye { display: none; }
+}
+
 /* ─── Portrait · pipeline duotone YEMA en CSS ─────────────────────
    Couches empilées (ordre exact) :
      1. .portrait-img · grayscale + contrast + brightness

@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { NextIntlClientProvider } from "next-intl"
 import { notFound } from "next/navigation"
 import { routing } from "@/i18n/routing"
+import { TestSpaceBar } from "@/components/TestSpaceBar"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://deutschcm.vercel.app"),
@@ -66,6 +67,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
+      <TestSpaceBar />
       {children}
     </NextIntlClientProvider>
   )
