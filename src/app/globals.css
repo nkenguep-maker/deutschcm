@@ -2291,3 +2291,85 @@ button, [role="button"] {
   .lstory-mono { width: 72px; height: 72px; font-size: 34px; }
 }
 
+/* ═══════════════════════════════════════════════
+   /manifeste — déclaration éditoriale (§14 doctrine)
+   ═══════════════════════════════════════════════ */
+
+.lmanifest {
+  padding: clamp(120px, 14vw, 160px) 0 clamp(80px, 12vw, 120px);
+  max-width: 720px;
+  margin: 0 auto;
+}
+.lmanifest-h {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(38px, 5.4vw, 68px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.028em;
+  color: var(--creme);
+  margin: 0 0 60px;
+  max-width: 16ch;
+}
+.lmanifest-h em {
+  font-style: italic;
+  color: var(--brass);
+  font-weight: 400;
+}
+.lmanifest-body {
+  border-top: 1px solid var(--creme-hair);
+}
+.lmanifest-clause {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 24px;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--creme-hair);
+  align-items: baseline;
+}
+.lmanifest-mark {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass);
+  line-height: 1;
+  padding-top: 5px;
+}
+.lmanifest-clause p {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: clamp(16px, 1.35vw, 18px);
+  line-height: 1.7;
+  color: var(--creme-soft);
+  margin: 0;
+  max-width: 54ch;
+}
+.lmanifest-clause p strong {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 500;
+  color: var(--creme);
+  font-size: 1.06em;
+  letter-spacing: -0.005em;
+  margin-right: 4px;
+}
+.lmanifest-sig {
+  margin-top: 48px;
+  padding-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: flex-start;
+}
+.lmanifest-sig-line {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--creme-soft);
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .lmanifest-clause { grid-template-columns: 1fr; gap: 10px; padding: 28px 0; }
+  .lmanifest-mark { padding-top: 0; }
+}
+
