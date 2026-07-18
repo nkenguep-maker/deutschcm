@@ -216,16 +216,16 @@ export function LandingLanguages({ locale }: { locale: string }) {
       <div className="container">
         <div className="lsection-head centered">
           <div className="lsection-eye">{labels.eye}</div>
-          <h2 className="lsection-h">
+          <h1 className="lsection-h">
             {labels.title} <em>{labels.titleAccent}</em>
-          </h2>
+          </h1>
           <p className="lsection-lede">{labels.body}</p>
         </div>
 
         <div className="llang-family">
           <div className="llang-family-head">
             <div className="llang-family-eye">{labels.familyForeignEye}</div>
-            <h3>{labels.familyForeignTitle}</h3>
+            <h2>{labels.familyForeignTitle}</h2>
             <p className="llang-family-scale">{labels.scaleLegendCefr}</p>
           </div>
           <div className="llang-grid">
@@ -238,7 +238,7 @@ export function LandingLanguages({ locale }: { locale: string }) {
         <div className="llang-family">
           <div className="llang-family-head">
             <div className="llang-family-eye">{labels.familyNativeEye}</div>
-            <h3>{labels.familyNativeTitle}</h3>
+            <h2>{labels.familyNativeTitle}</h2>
             <p className="llang-family-scale">{labels.scaleLegendYema}</p>
           </div>
           <div className="llang-grid">

@@ -11,11 +11,12 @@ const OUT = resolve("screenshots");
 
 const PAGES = [
   { name: "landing-fr",    path: "/fr" },
+  { name: "langues-fr",    path: "/fr/langues" },
   { name: "login-fr",      path: "/fr/login" },
   { name: "register-fr",   path: "/fr/register" },
   { name: "methode-fr",    path: "/fr/methode" },
   { name: "histoires-fr",  path: "/fr/histoires" },
-  { name: "notfound-fr",   path: "/fr/does-not-exist" },
+  { name: "manifeste-fr",  path: "/fr/manifeste" },
 ];
 
 await mkdir(OUT, { recursive: true });

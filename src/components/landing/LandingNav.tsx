@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { LandingBrand } from "./LandingBrand";
 
 type NavLabels = {
-  features: string;
-  levels: string;
-  pricing: string;
+  features: string;    // "Langues" — nom du hub multi-langues
+  levels: string;      // "Méthode"
+  pricing: string;     // "Manifeste"
   centers: string;
   login: string;
   register: string;
@@ -43,11 +43,15 @@ export function LandingNav({
     ? `/${otherLocale}${pathname.slice(3)}`
     : `/${otherLocale}`;
 
-  // Nav items : anchors sur la landing, pages routes ailleurs.
-  const onLanding = pathname === `/${locale}` || pathname === "/";
+  // Nav items : ordre = Langues · Méthode · Histoires · Manifeste.
+  // Toutes pointent vers des pages dédiées (pas d'ancre landing).
   const navItems = [
     {
-      label: labels.methode ?? (locale === "en" ? "Method" : "Méthode"),
+      label: labels.features, // "Langues"
+      href: `/${locale}/langues`,
+    },
+    {
+      label: labels.methode ?? labels.levels, // "Méthode"
       href: `/${locale}/methode`,
     },
     {
@@ -55,12 +59,8 @@ export function LandingNav({
       href: `/${locale}/histoires`,
     },
     {
-      label: labels.levels,
-      href: onLanding ? "#levels" : `/${locale}#levels`,
-    },
-    {
-      label: labels.centers,
-      href: onLanding ? "#centres" : `/${locale}#centres`,
+      label: labels.pricing, // "Manifeste"
+      href: `/${locale}/manifeste`,
     },
   ];
 

@@ -161,9 +161,9 @@ export default function HistoiresPage() {
         locale={locale}
         isMobile={isMobile}
         labels={{
-          features: locale === "en" ? "Features" : "Fonctionnalités",
-          levels: locale === "en" ? "Levels" : "Niveaux",
-          pricing: locale === "en" ? "Method" : "Méthode",
+          features: locale === "en" ? "Languages" : "Langues",
+          levels: locale === "en" ? "Method" : "Méthode",
+          pricing: locale === "en" ? "Manifesto" : "Manifeste",
           centers: locale === "en" ? "Centers" : "Centres",
           login: locale === "en" ? "Log in" : "Se connecter",
           register: locale === "en" ? "Start" : "Commencer",

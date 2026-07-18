@@ -11,7 +11,6 @@ import { LandingFeatures } from "@/components/landing/LandingFeatures";
 import { LandingFinalCta } from "@/components/landing/LandingFinalCta";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingHero } from "@/components/landing/LandingHero";
-import { LandingLanguages } from "@/components/landing/LandingLanguages";
 import { LandingLevels } from "@/components/landing/LandingLevels";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { LandingProblems } from "@/components/landing/LandingProblems";
@@ -93,10 +92,6 @@ export default function LandingPage() {
           ],
         }}
       />
-
-      <div className="container"><div className="lsep" /></div>
-
-      <LandingLanguages locale={locale} />
 
       <div className="container"><div className="lsep" /></div>
 
@@ -216,9 +211,9 @@ export default function LandingPage() {
       <LandingFinalCta
         locale={locale}
         labels={{
-          live: "Bêta ouverte · A1 gratuit",
-          titleLine1: locale === "en" ? "Learn German." : "Apprends l'allemand.",
-          titleAccent: locale === "en" ? "Without the fuss." : "Sans détour.",
+          live: locale === "en" ? "Open beta · Free A1" : "Bêta ouverte · A1 gratuit",
+          titleLine1: locale === "en" ? "Open your first" : "Ouvre ton premier",
+          titleAccent: locale === "en" ? "chapter." : "chapitre.",
           body: t.ctaFinalDesc,
           cta: t.ctaFinalBtn,
           micro: t.ctaFinalSocial,
@@ -230,8 +225,8 @@ export default function LandingPage() {
         locale={locale}
         labels={{
           tagline: locale === "en"
-            ? "German, without the fuss. From A1 to C1, independent, CEFR-aligned."
-            : "L'allemand, pas l'accent. De A1 à C1, indépendant, aligné CECRL.",
+            ? "Africa speaks. All its languages — foreign and native, at last one place."
+            : "L'Afrique parle. Toutes ses langues — étrangères et natales, enfin un lieu.",
           made: t.footerMade,
           legal: t.footerLegal,
           terms: t.footerTerms,
