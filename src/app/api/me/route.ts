@@ -76,10 +76,19 @@ export async function GET() {
   const activeSpace = (user.user_metadata?.active_space as SpaceRole | undefined)
     ?? (roles[0] ?? "STUDENT");
 
+  // Langue active (multi-langues). Fallback deutsch pour la migration
+  // douce. supportedLanguages sera géré côté data model plus tard.
+  const activeLanguage = (user.user_metadata?.activeLanguage as string | undefined) ?? "deutsch";
+  const supportedLanguages = Array.isArray(user.user_metadata?.supportedLanguages)
+    ? (user.user_metadata.supportedLanguages as string[])
+    : [activeLanguage];
+
   return NextResponse.json({
     role: dbUser?.role ?? "STUDENT",
     roles,
     activeSpace,
+    activeLanguage,
+    supportedLanguages,
     fullName: dbUser?.fullName,
     email: dbUser?.email,
     onboardingDone: dbUser?.onboardingDone ?? false,

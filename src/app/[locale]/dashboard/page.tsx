@@ -5,6 +5,7 @@ import { Link } from "@/navigation";
 import { useLocale } from "next-intl";
 import Layout from "@/components/Layout";
 import { CefrSpine } from "@/components/landing/CefrSpine";
+import { useActiveLanguage } from "@/hooks/useActiveLanguage";
 import {
   IconMic,
   IconBook,
@@ -140,6 +141,7 @@ function nextLevel(current: Level | null): Level | "C2" {
 export default function StudentDashboard() {
   const locale = useLocale();
   const t = locale === "en" ? EN : FR;
+  const { language: activeLang } = useActiveLanguage();
   const [data, setData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -173,8 +175,34 @@ export default function StudentDashboard() {
   return (
     <Layout title={t.eye}>
       <section className="dash" aria-labelledby="dash-h1">
-        <header>
-          <p className="dash-eye">{t.greet(firstName)}</p>
+        <header style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+          <p className="dash-eye" style={{ margin: 0 }}>{t.greet(firstName)}</p>
+          <span style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "4px 10px 4px 4px",
+            borderRadius: 999,
+            border: "1px solid var(--brass-edge)",
+            background: "var(--brass-glow)",
+            fontFamily: "var(--font-jetbrains, monospace)",
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: "0.08em",
+            color: "var(--brass)",
+          }}>
+            <span style={{
+              width: 20, height: 20,
+              borderRadius: 5,
+              background: "var(--brass)",
+              color: "var(--espresso)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 9.5, fontWeight: 700, letterSpacing: 0,
+            }} aria-hidden="true">{activeLang.code}</span>
+            <span style={{ textTransform: "uppercase" }}>
+              {locale === "en" ? activeLang.nameEn : activeLang.name} · {activeLang.scale === "yema" ? "YEMA" : "CECRL"}
+            </span>
+          </span>
         </header>
 
         <article className="dash-hero">

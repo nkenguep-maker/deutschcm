@@ -8,6 +8,8 @@ import { createClient } from "@/lib/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { SpaceSwitcher, type SpaceRole } from "@/components/SpaceSwitcher";
+import { LanguageChooser } from "@/components/LanguageChooser";
+import { useActiveLanguage } from "@/hooks/useActiveLanguage";
 import { useT } from "@/hooks/useT";
 import {
   IconHome,
@@ -42,6 +44,7 @@ export default function CenterLayout({ children, title, centerName, centerCity }
   const pathname = usePathname();
   const router = useRouter();
   const locale = useLocale();
+  const { language: activeLang } = useActiveLanguage();
   const { nav: tNav } = useT();
 
   // Nav centre groupée par intention.
@@ -102,7 +105,7 @@ export default function CenterLayout({ children, title, centerName, centerCity }
     : "Espace centre";
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell territory-${activeLang.territory}`}>
       <aside className={`app-sidebar ${sidebarOpen ? "open" : ""}`}>
         <Link href="/center" className="app-sidebar-brand">
           <span aria-hidden="true" style={{
@@ -177,6 +180,7 @@ export default function CenterLayout({ children, title, centerName, centerCity }
           </button>
           <h1 className="app-header-title">{title}</h1>
           <div className="app-header-actions">
+            <LanguageChooser />
             <SpaceSwitcher roles={userRoles} activeSpace={activeSpace} />
             <LanguageSwitcher />
             <NotificationBell accentColor="var(--brass)" />

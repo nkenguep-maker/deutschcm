@@ -8,6 +8,8 @@ import { createClient } from "@/lib/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { SpaceSwitcher, type SpaceRole } from "@/components/SpaceSwitcher";
+import { LanguageChooser } from "@/components/LanguageChooser";
+import { useActiveLanguage } from "@/hooks/useActiveLanguage";
 import { useT } from "@/hooks/useT";
 import {
   IconHome,
@@ -40,6 +42,7 @@ export default function TeacherLayout({ children, title }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const locale = useLocale();
+  const { language: activeLang } = useActiveLanguage();
   const { nav: tNav, layout: tl } = useT();
 
   // Nav enseignant·e groupée par intention.
@@ -98,7 +101,7 @@ export default function TeacherLayout({ children, title }: Props) {
   const initials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "E";
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell territory-${activeLang.territory}`}>
       <aside className={`app-sidebar ${sidebarOpen ? "open" : ""}`}>
         <Link href="/teacher" className="app-sidebar-brand">
           <span aria-hidden="true" style={{
@@ -173,6 +176,7 @@ export default function TeacherLayout({ children, title }: Props) {
           </button>
           {title ? <h1 className="app-header-title">{title}</h1> : <div style={{ flex: 1 }} />}
           <div className="app-header-actions">
+            <LanguageChooser />
             <SpaceSwitcher roles={userRoles} activeSpace={activeSpace} />
             <LanguageSwitcher />
             <NotificationBell accentColor="var(--brass)" />

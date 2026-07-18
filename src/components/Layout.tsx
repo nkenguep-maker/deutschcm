@@ -8,6 +8,8 @@ import { createClient } from "@/lib/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { SpaceSwitcher, type SpaceRole } from "@/components/SpaceSwitcher";
+import { LanguageChooser } from "@/components/LanguageChooser";
+import { useActiveLanguage } from "@/hooks/useActiveLanguage";
 import { useT } from "@/hooks/useT";
 import {
   IconHome,
@@ -49,6 +51,7 @@ export default function Layout({ children, title }: LayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const locale = useLocale();
+  const { language: activeLang } = useActiveLanguage();
   const { nav: tn, layout: tl } = useT();
 
   // Chaque profil a sa nav groupée par intention. Les section-labels
@@ -213,7 +216,7 @@ export default function Layout({ children, title }: LayoutProps) {
   };
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell territory-${activeLang.territory}`}>
       <aside className={`app-sidebar ${sidebarOpen ? "open" : ""}`}>
         <Link href="/dashboard" className="app-sidebar-brand">
           <span
@@ -337,6 +340,7 @@ export default function Layout({ children, title }: LayoutProps) {
           </button>
           <h1 className="app-header-title">{title}</h1>
           <div className="app-header-actions">
+            <LanguageChooser />
             <SpaceSwitcher roles={userRoles} activeSpace={activeSpace} />
             <LanguageSwitcher />
             <NotificationBell accentColor="var(--brass)" />
