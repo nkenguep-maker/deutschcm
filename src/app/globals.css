@@ -5653,132 +5653,199 @@ button, [role="button"] {
   border-color: var(--brass-edge);
 }
 
-/* ─── PortraitDuotone · traitement brass/creme sur portraits ─────
-   Le portrait est livré sans retouche couleur ; le site applique
-   le duotone selon le territoire (world → espresso/brass/creme,
-   sources → terre/brass/creme). Composition :
-     1. Image en grayscale + léger contrast (luminance pure)
-     2. Overlay linéaire noir chaud → brass → creme
-        en mix-blend-mode "screen" pour recolorer selon les valeurs
-     3. Grain léger éventuel via ::after (option future)
-   Aucune correction visible sur le visage — c'est de la teinte
-   pure, comme une trichromie ancienne. */
+/* ─── Portrait · pipeline duotone YEMA en CSS ─────────────────────
+   Couches empilées (ordre exact) :
+     1. .portrait-img · grayscale + contrast + brightness
+     2. .portrait-duo · linear-gradient 215° en multiply
+     3. .portrait-screen · brass 12% en screen (hautes lumières)
+     4. .portrait-grain · /grain.svg overlay opacity 0.06
+     5. .portrait-pattern (option) · BridgePattern dans les ombres
+        via mask-image gradient
+   Le fallback (pas de src) affiche un monogramme Fraunces brass dans
+   le même cadre, avec le même anneau — cohérence système. */
 
-.portrait-duotone {
+.portrait {
   position: relative;
-  width: 100%;
-  border-radius: 16px;
   overflow: hidden;
+  border-radius: 14px;
   background: var(--espresso);
   isolation: isolate;
   margin: 0;
+  display: block;
 }
-.portrait-duotone.territory-sources { background: var(--terre); }
+.portrait-sources { background: var(--terre); }
 
-.portrait-duotone-img {
+.portrait-img {
   object-fit: cover;
-  filter: grayscale(1) contrast(1.08) brightness(0.92);
+  filter: grayscale(1) contrast(1.08) brightness(0.96);
   z-index: 1;
 }
 
-/* L'overlay duotone — deux dégradés stackés. Le premier remplace les
-   ombres par --espresso (ou --terre), les mi-tons par --brass, les
-   hautes lumières par --creme. Blend "screen" additionne la couleur
-   à l'image grayscale : les zones sombres restent sombres (--espresso
-   proche du noir), les zones claires reçoivent --creme. */
-.portrait-duotone-overlay {
+/* Couche 2 · duotone gradient · multiply */
+.portrait-duo {
   position: absolute;
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background:
-    linear-gradient(180deg,
-      rgba(184, 135, 62, 0.24) 0%,
-      rgba(184, 135, 62, 0.08) 40%,
-      rgba(184, 135, 62, 0.32) 100%);
   mix-blend-mode: multiply;
 }
-.portrait-duotone::after {
-  content: "";
+.portrait-world .portrait-duo {
+  background: linear-gradient(215deg, #E3B96B 0%, #B8873E 38%, #1B120A 100%);
+}
+.portrait-sources .portrait-duo {
+  background: linear-gradient(215deg, #EBC07A 0%, #C9843F 38%, #2A0F14 100%);
+}
+
+/* Couche 3 · contre-calque laiton 12% en screen — remet les hautes lumières */
+.portrait-screen {
   position: absolute;
   inset: 0;
   z-index: 3;
   pointer-events: none;
-  background:
-    linear-gradient(180deg,
-      rgba(27, 18, 10, 0.10) 0%,
-      transparent 30%,
-      transparent 70%,
-      rgba(27, 18, 10, 0.55) 100%);
-  mix-blend-mode: multiply;
-}
-.portrait-duotone.territory-sources::after {
-  background:
-    linear-gradient(180deg,
-      rgba(42, 15, 20, 0.10) 0%,
-      transparent 30%,
-      transparent 70%,
-      rgba(42, 15, 20, 0.55) 100%);
+  background: rgba(184, 135, 62, 0.12);
+  mix-blend-mode: screen;
 }
 
-/* Caption + bouton audio, en bas de l'image */
-.portrait-duotone-cap {
+/* Couche 4 · grain partagé, opacity 0.06 */
+.portrait-grain {
   position: absolute;
-  left: 0; right: 0; bottom: 0;
+  inset: 0;
   z-index: 4;
-  padding: 14px 18px;
+  pointer-events: none;
+  background-image: url("/grain.svg");
+  background-size: 300px 300px;
+  background-repeat: repeat;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+}
+
+/* Couche 5 · pattern dans les ombres uniquement (option) */
+.portrait-pattern {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.05;
+  /* Masquer sur les hautes lumières : gradient qui laisse voir le
+     pattern uniquement dans le tiers bas-gauche (ombres du 215°). */
+  mask-image: linear-gradient(215deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.5) 70%,
+    rgba(0, 0, 0, 1) 100%);
+  -webkit-mask-image: linear-gradient(215deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.5) 70%,
+    rgba(0, 0, 0, 1) 100%);
+}
+
+/* Fallback monogramme · même cadre, brass, Fraunces italic */
+.portrait-mono {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  color: var(--creme);
-}
-.portrait-duotone-meta {
-  font-family: var(--font-jetbrains, monospace);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-  color: var(--creme-soft);
-}
-.portrait-duotone-audio {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(27, 18, 10, 0.55);
-  border: 1px solid var(--brass-edge);
+  justify-content: center;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(48px, 20%, 96px);
   color: var(--brass);
-  font-family: var(--font-jetbrains, monospace);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  transition: background var(--dur-touch) var(--ease-enter),
-              color var(--dur-touch) var(--ease-enter);
-  backdrop-filter: blur(6px);
+  background: var(--brass-glow);
+  border: 1px solid var(--brass-edge);
+  border-radius: inherit;
 }
-.portrait-duotone-audio:hover {
-  background: var(--brass);
-  color: var(--espresso);
-}
-.portrait-duotone-audio.on {
-  background: var(--brass);
-  color: var(--espresso);
-}
-.portrait-duotone-audio:focus-visible {
-  outline: 2px solid var(--brass);
-  outline-offset: 2px;
+.portrait-sources .portrait-mono {
+  background: rgba(184, 135, 62, 0.10);
 }
 
-/* Espace négatif côté regard — utilisé par les layouts parents pour
-   savoir où placer le texte. Le portrait lui-même est agnostique.
-   Le parent utilise data-gaze="left" ou "right" pour placer le texte. */
-.portrait-duotone[data-gaze="left"] .portrait-duotone-img {
-  object-position: 70% center;
+/* ─── PortraitSpeaking · le portrait qui parle ─────────────────────
+   Cercle avec anneau laiton dessiné en SVG. Le stroke-dashoffset
+   s'anime en dur-moment / ease-enter pendant la lecture de audioSrc.
+   prefers-reduced-motion : anneau statique plein. */
+
+.portrait-speaking {
+  position: relative;
+  display: inline-block;
+  border-radius: 50%;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  isolation: isolate;
 }
-.portrait-duotone[data-gaze="right"] .portrait-duotone-img {
-  object-position: 30% center;
+.portrait-speaking:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 4px;
+  border-radius: 50%;
 }
+
+.portrait-speaking .portrait {
+  border-radius: 50%;
+}
+.portrait-speaking .portrait-mono {
+  border-radius: inherit;
+}
+
+/* Le ring SVG — position absolue par-dessus */
+.portrait-speaking-ring {
+  position: absolute;
+  inset: -6px;
+  z-index: 6;
+  pointer-events: none;
+  transform: rotate(-90deg);
+}
+.portrait-speaking-ring circle {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--dur-moment) var(--ease-enter);
+}
+.portrait-speaking-ring .ring-track {
+  stroke: var(--creme-hair);
+  stroke-width: 1.5;
+}
+/* Quand data-playing → offset 0 (ring plein) ; sinon full offset (invisible) */
+.portrait-speaking .ring-fg {
+  stroke-dasharray: var(--ring-circ, 660);
+  stroke-dashoffset: var(--ring-circ, 660);
+}
+.portrait-speaking[data-playing="true"] .ring-fg {
+  stroke-dashoffset: 0;
+}
+
+/* Icône play/pause en overlay bas */
+.portrait-speaking-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  z-index: 7;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--brass);
+  color: var(--espresso);
+  border: 3px solid var(--espresso);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--dur-touch) var(--ease-enter);
+}
+.portrait-sources ~ .portrait-speaking-badge,
+.portrait-speaking .portrait-sources + .portrait-speaking-ring + .portrait-speaking-badge {
+  border-color: var(--terre);
+}
+.portrait-speaking:hover .portrait-speaking-badge {
+  transform: scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portrait-speaking .ring-fg {
+    transition: none;
+    stroke-dashoffset: 0;  /* ring plein statique */
+  }
+  .portrait-speaking-badge { transition: none; }
+}
+
 

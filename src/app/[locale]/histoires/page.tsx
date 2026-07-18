@@ -4,7 +4,8 @@ import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingNav } from "@/components/landing/LandingNav";
-import { PortraitDuotone } from "@/components/PortraitDuotone";
+import { Portrait } from "@/components/Portrait";
+import { PortraitSpeaking } from "@/components/PortraitSpeaking";
 
 // /histoires — parcours étudiants réels. Chaque histoire a un nom, une
 // ville, une date, un objectif concret. §7 doctrine v2 : "témoignages
@@ -257,21 +258,30 @@ export default function HistoiresPage() {
         {stories.map((s) => (
           <article key={s.name} className="lstory">
             <aside className="lstory-side">
-              {s.portraitUrl ? (
-                <PortraitDuotone
+              {/* Le pipeline duotone s'applique dès que portraitUrl arrive.
+                  Sans photo : Portrait affiche le monogramme dans le même
+                  cadre. Avec audioSrc : bascule sur PortraitSpeaking (cercle
+                  + anneau brass qui se peint pendant la lecture). */}
+              {s.audioUrl ? (
+                <PortraitSpeaking
                   src={s.portraitUrl}
                   name={s.name}
-                  meta={`${s.city} · ${s.year}`}
-                  territory={s.territory ?? "world"}
-                  ratio="vertical"
-                  gaze={s.gaze}
-                  audioUrl={s.audioUrl}
-                  audioLabel={locale === "en" ? "Listen" : "Écouter"}
+                  variant={s.territory ?? "world"}
+                  size="lg"
+                  lang={s.level.split("·")[1]?.trim() ?? s.level}
+                  audioSrc={s.audioUrl}
+                  mono={s.mono}
+                  listenLabel={locale === "en" ? "Listen to" : "Écouter"}
                 />
               ) : (
-                <div className="lstory-mono" aria-hidden="true">
-                  {s.mono}
-                </div>
+                <Portrait
+                  src={s.portraitUrl}
+                  name={s.name}
+                  variant={s.territory ?? "world"}
+                  size="lg"
+                  ratio="4:5"
+                  mono={s.mono}
+                />
               )}
               <div className="lstory-meta">
                 <p className="lstory-name">{s.name}</p>
