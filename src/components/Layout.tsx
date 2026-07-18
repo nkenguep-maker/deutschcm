@@ -3,6 +3,7 @@
 import { useState, useEffect, type ReactElement } from "react";
 import { Link } from "@/navigation";
 import { usePathname, useRouter } from "@/navigation";
+import { useLocale } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -30,6 +31,13 @@ interface NavItem {
   href: string;
 }
 
+interface NavSection {
+  /** Label optionnel — quand présent, s'affiche en JetBrains Mono muted
+   * au-dessus des items du groupe. Absent = section silencieuse. */
+  label?: string;
+  items: NavItem[];
+}
+
 interface LayoutProps {
   children: React.ReactNode;
   title: string;
@@ -40,44 +48,96 @@ interface LayoutProps {
 export default function Layout({ children, title }: LayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const locale = useLocale();
   const { nav: tn, layout: tl } = useT();
 
-  const STUDENT_NAV: NavItem[] = [
-    { Icon: IconHome,     label: tn.home,       href: "/dashboard"  },
-    { Icon: IconBook,     label: tn.courses,    href: "/courses"    },
-    { Icon: IconClasse,   label: tn.myClasses,  href: "/classroom"  },
-    { Icon: IconContext,  label: tn.discover,   href: "/discover"   },
-    { Icon: IconMic,      label: tn.simulator,  href: "/simulateur" },
-    { Icon: IconChart,    label: tn.progress,   href: "/progress"   },
-    { Icon: IconSettings, label: tn.settings,   href: "/settings"   },
+  // Chaque profil a sa nav groupée par intention. Les section-labels
+  // sont silencieux pour student (parcours linéaire simple) mais
+  // explicites pour teacher/center/admin (contextes plus riches).
+
+  const STUDENT_NAV: NavSection[] = [
+    { items: [
+        { Icon: IconHome,   label: tn.home,          href: "/dashboard"  },
+        { Icon: IconBook,   label: tn.path,          href: "/courses"    },
+    ]},
+    { label: locale === "en" ? "Practice" : "Pratiquer",
+      items: [
+        { Icon: IconMic,    label: tn.practice,      href: "/simulateur" },
+        { Icon: IconClasse, label: tn.myClass,       href: "/classroom"  },
+    ]},
+    { label: locale === "en" ? "Belong" : "Se relier",
+      items: [
+        { Icon: IconContext,label: tn.community,     href: "/discover"   },
+        { Icon: IconChart,  label: tn.journey,       href: "/progress"   },
+    ]},
+    { items: [
+        { Icon: IconSettings, label: tn.settings,    href: "/settings"   },
+    ]},
   ];
-  const TEACHER_NAV: NavItem[] = [
-    { Icon: IconHome,       label: tn.overview,       href: "/teacher"                 },
-    { Icon: IconClasse,     label: tn.myClasses,      href: "/teacher/classrooms"      },
-    { Icon: IconGroup,      label: tn.students,       href: "/teacher/students"        },
-    { Icon: IconContext,    label: tn.discover,       href: "/discover"                },
-    { Icon: IconBook,       label: tn.assignments,    href: "/teacher/assignments"     },
-    { Icon: IconSpark,      label: tn.generateCourse, href: "/admin/courses/generate"  },
-    { Icon: IconChart,      label: tn.stats,          href: "/teacher/stats"           },
-    { Icon: IconSettings,   label: tn.settings,       href: "/settings"                },
+
+  const TEACHER_NAV: NavSection[] = [
+    { items: [
+        { Icon: IconHome,     label: tn.today,       href: "/teacher"             },
+    ]},
+    { label: locale === "en" ? "Classes" : "Classes",
+      items: [
+        { Icon: IconClasse,   label: tn.teacherClasses, href: "/teacher/classrooms" },
+        { Icon: IconGroup,    label: tn.learners,       href: "/teacher/students"   },
+        { Icon: IconBook,     label: tn.corrections,    href: "/teacher/assignments" },
+    ]},
+    { label: locale === "en" ? "Create" : "Créer",
+      items: [
+        { Icon: IconSpark,    label: tn.studio,      href: "/teacher/studio"      },
+        { Icon: IconChart,    label: tn.tracking,    href: "/teacher/stats"       },
+        { Icon: IconBook,     label: tn.resources,   href: "/teacher/resources"   },
+    ]},
+    { items: [
+        { Icon: IconSettings, label: tn.settings,    href: "/settings"            },
+    ]},
   ];
-  const CENTER_NAV: NavItem[] = [
-    { Icon: IconHome,        label: tn.overview,       href: "/center"                  },
-    { Icon: IconTeacher,     label: tn.teachers,       href: "/center/teachers"         },
-    { Icon: IconGroup,       label: tn.students,       href: "/center/students"         },
-    { Icon: IconClasse,      label: tn.myClasses,      href: "/center/classes"          },
-    { Icon: IconSpark,       label: tn.generateCourse, href: "/admin/courses/generate"  },
-    { Icon: IconChart,       label: tn.stats,          href: "/center/stats"            },
-    { Icon: IconMoney,       label: tn.billing,        href: "/center/billing"          },
+
+  const CENTER_NAV: NavSection[] = [
+    { items: [
+        { Icon: IconHome,     label: tn.centerOverview, href: "/center"          },
+    ]},
+    { label: locale === "en" ? "Team" : "Équipe",
+      items: [
+        { Icon: IconTeacher,  label: tn.teachers,       href: "/center/teachers" },
+        { Icon: IconGroup,    label: tn.centerLearners, href: "/center/students" },
+        { Icon: IconClasse,   label: tn.centerClasses,  href: "/center/classes"  },
+    ]},
+    { label: locale === "en" ? "Steer" : "Piloter",
+      items: [
+        { Icon: IconChart,    label: tn.centerTracking, href: "/center/stats"    },
+        { Icon: IconMoney,    label: tn.billing,        href: "/center/billing"  },
+    ]},
+    { items: [
+        { Icon: IconSettings, label: tn.settings,       href: "/settings"        },
+    ]},
   ];
-  const ADMIN_NAV: NavItem[] = [
-    { Icon: IconHome,        label: tn.overview,       href: "/admin"                   },
-    { Icon: IconSpark,       label: tn.generateCourse, href: "/admin/courses/generate"  },
-    { Icon: IconGroup,       label: tn.users,          href: "/teacher/students"        },
-    { Icon: IconInstitution, label: tn.centers,        href: "/center"                  },
-    { Icon: IconChart,       label: tn.stats,          href: "/center/stats"            },
+
+  const ADMIN_NAV: NavSection[] = [
+    { items: [
+        { Icon: IconHome,        label: tn.adminOverview, href: "/admin"                  },
+    ]},
+    { label: locale === "en" ? "Accounts" : "Comptes",
+      items: [
+        { Icon: IconGroup,       label: tn.adminUsers,    href: "/admin/users"            },
+        { Icon: IconInstitution, label: tn.adminRoles,    href: "/admin/roles"            },
+        { Icon: IconInstitution, label: tn.adminCenters,  href: "/admin/centers"          },
+    ]},
+    { label: locale === "en" ? "Content" : "Contenu",
+      items: [
+        { Icon: IconBook,        label: tn.adminCourses,  href: "/admin/courses"          },
+        { Icon: IconSpark,       label: tn.studio,        href: "/admin/courses/generate" },
+    ]},
+    { items: [
+        { Icon: IconChart,       label: tn.tracking,      href: "/admin/system"           },
+        { Icon: IconSettings,    label: tn.settings,      href: "/settings"               },
+    ]},
   ];
-  const NAV_BY_ROLE: Record<string, NavItem[]> = {
+
+  const NAV_BY_ROLE: Record<string, NavSection[]> = {
     STUDENT: STUDENT_NAV,
     TEACHER: TEACHER_NAV,
     CENTER:  CENTER_NAV,
@@ -208,22 +268,36 @@ export default function Layout({ children, title }: LayoutProps) {
         </div>
 
         <nav className="app-nav" aria-label="Navigation principale">
-          {activeNav.map((item) => {
-            const exact = item.href === "/teacher" || item.href === "/center" || item.href === "/dashboard" || item.href === "/admin";
-            const active = exact ? pathname === item.href : (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href)));
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`app-nav-link ${active ? "active" : ""}`}
-                onClick={() => setSidebarOpen(false)}
-                aria-current={active ? "page" : undefined}
-              >
-                <span className="app-nav-icon" aria-hidden="true"><item.Icon size={18} /></span>
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+          {activeNav.map((section, si) => (
+            <div key={si} className="app-nav-section">
+              {section.label && (
+                <p className="app-nav-section-label">{section.label}</p>
+              )}
+              {section.items.map((item) => {
+                const exact =
+                  item.href === "/teacher" ||
+                  item.href === "/center" ||
+                  item.href === "/dashboard" ||
+                  item.href === "/admin";
+                const active = exact
+                  ? pathname === item.href
+                  : pathname === item.href ||
+                    (item.href !== "/" && pathname.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`app-nav-link ${active ? "active" : ""}`}
+                    onClick={() => setSidebarOpen(false)}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    <span className="app-nav-icon" aria-hidden="true"><item.Icon size={18} /></span>
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         <div className="app-sidebar-user">

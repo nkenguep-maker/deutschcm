@@ -4245,6 +4245,31 @@ button, [role="button"] {
   margin: 8px 4px;
 }
 
+/* Sections nav · groupes silencieux ou labellés
+   Un espace vertical modeste entre groupes (12px), un label
+   optionnel en JetBrains Mono muted qui décrit l'intention du
+   groupe (Pratiquer, Créer, Piloter, etc.). */
+.app-nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 6px;
+}
+.app-nav-section + .app-nav-section {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--creme-hair);
+}
+.app-nav-section-label {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--creme-mute);
+  margin: 6px 12px 6px;
+}
+
 /* User card at bottom */
 .app-sidebar-user {
   padding: 14px 16px;

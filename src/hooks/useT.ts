@@ -209,28 +209,119 @@ const landing = {
 }
 
 // ─── Navigation ────────────────────────────────────────────────────────────────
+// Doctrine premium : verbes précis, pas de jargon. "Cours" → "Parcours"
+// (personnel, éditorial), "Découvrir" → "Communauté" (le vrai objet),
+// "Simulateur IA" → "Pratique orale" (le résultat, pas l'outil),
+// "Statistiques" → "Suivi" (incarné). "Apprenant·e·s" partout, jamais "Élèves".
 const nav = {
   fr: {
-    home: "Accueil", courses: "Cours", myClasses: "Mes Classes", discover: "Découvrir",
-    simulator: "Simulateur IA", progress: "Progression", settings: "Paramètres",
-    overview: "Vue d'ensemble", students: "Élèves", assignments: "Devoirs",
-    generateCourse: "Générer cours", stats: "Statistiques", teachers: "Enseignants",
-    billing: "Facturation", users: "Utilisateurs", centers: "Centres",
-    login: "Se connecter", register: "Commencer gratuitement", logout: "Se déconnecter", logoutHint: "À bientôt",
-    // Teacher-centered nav labels
-    today: "Aujourd'hui", learners: "Apprenants", corrections: "Corrections",
-    tracking: "Suivi", resources: "Ressources", activities: "Activités",
+    // Communs
+    home: "Accueil",
+    settings: "Paramètres",
+    login: "Se connecter",
+    register: "Commencer gratuitement",
+    logout: "Se déconnecter",
+    logoutHint: "À bientôt",
+
+    // Student
+    path: "Mon parcours",
+    myClass: "Ma classe",
+    community: "Communauté",
+    practice: "Pratique orale",
+    journey: "Mon chemin",
+    notifications: "Notifications",
+
+    // Teacher
+    today: "Aujourd'hui",
+    teacherClasses: "Mes classes",
+    learners: "Apprenant·e·s",
+    corrections: "Corrections",
+    studio: "Studio · IA",
+    tracking: "Suivi",
+    resources: "Ressources",
+
+    // Center
+    centerOverview: "Vue du centre",
+    teachers: "Équipe pédagogique",
+    centerLearners: "Apprenant·e·s",
+    centerClasses: "Classes",
+    centerTracking: "Suivi",
+    billing: "Facturation",
+
+    // Admin
+    adminOverview: "Vue d'ensemble",
+    adminUsers: "Comptes",
+    adminRoles: "Rôles",
+    adminCourses: "Bibliothèque",
+    adminCenters: "Centres",
+    adminSystem: "Système",
+
+    // Legacy (préservés le temps de la migration) —
+    // à supprimer une fois tous les usages nettoyés.
+    courses: "Mon parcours",
+    myClasses: "Ma classe",
+    discover: "Communauté",
+    simulator: "Pratique orale",
+    progress: "Mon chemin",
+    overview: "Vue d'ensemble",
+    students: "Apprenant·e·s",
+    assignments: "Corrections",
+    generateCourse: "Studio · IA",
+    stats: "Suivi",
+    users: "Comptes",
+    centers: "Centres",
+    activities: "Activités",
   },
   en: {
-    home: "Home", courses: "Courses", myClasses: "My Classes", discover: "Explore",
-    simulator: "Simulator", progress: "My Progress", settings: "Settings",
-    overview: "Overview", students: "Students", assignments: "Assignments",
-    generateCourse: "Generate Course", stats: "Statistics", teachers: "Teachers",
-    billing: "Billing", users: "Users", centers: "Centers",
-    login: "Log in", register: "Get started free", logout: "Log out", logoutHint: "See you soon",
-    // Teacher-centered nav labels
-    today: "Today", learners: "Learners", corrections: "Corrections",
-    tracking: "Tracking", resources: "Resources", activities: "Activities",
+    home: "Home",
+    settings: "Settings",
+    login: "Log in",
+    register: "Get started free",
+    logout: "Log out",
+    logoutHint: "See you soon",
+
+    path: "My path",
+    myClass: "My class",
+    community: "Community",
+    practice: "Speaking practice",
+    journey: "My journey",
+    notifications: "Notifications",
+
+    today: "Today",
+    teacherClasses: "My classes",
+    learners: "Learners",
+    corrections: "Corrections",
+    studio: "Studio · AI",
+    tracking: "Tracking",
+    resources: "Resources",
+
+    centerOverview: "Center overview",
+    teachers: "Teaching team",
+    centerLearners: "Learners",
+    centerClasses: "Classes",
+    centerTracking: "Tracking",
+    billing: "Billing",
+
+    adminOverview: "Overview",
+    adminUsers: "Accounts",
+    adminRoles: "Roles",
+    adminCourses: "Library",
+    adminCenters: "Centers",
+    adminSystem: "System",
+
+    courses: "My path",
+    myClasses: "My class",
+    discover: "Community",
+    simulator: "Speaking practice",
+    progress: "My journey",
+    overview: "Overview",
+    students: "Learners",
+    assignments: "Corrections",
+    generateCourse: "Studio · AI",
+    stats: "Tracking",
+    users: "Accounts",
+    centers: "Centers",
+    activities: "Activities",
   },
 }
 

@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactElement } from "react";
 import { Link } from "@/navigation";
 import { usePathname, useRouter } from "@/navigation";
+import { useLocale } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -13,16 +14,21 @@ import {
   IconTeacher,
   IconGroup,
   IconClasse,
-  IconSpark,
   IconChart,
   IconMoney,
   IconLogout,
+  IconSettings,
 } from "@/components/landing/icons";
 
 interface Item {
   Icon: (p: { size?: number }) => ReactElement;
   label: string;
   href: string;
+}
+
+interface Section {
+  label?: string;
+  items: Item[];
 }
 
 interface Props {
@@ -35,16 +41,31 @@ interface Props {
 export default function CenterLayout({ children, title, centerName, centerCity }: Props) {
   const pathname = usePathname();
   const router = useRouter();
+  const locale = useLocale();
   const { nav: tNav } = useT();
 
-  const NAV: Item[] = [
-    { Icon: IconHome,        label: tNav.overview,       href: "/center"                   },
-    { Icon: IconTeacher,     label: tNav.teachers,       href: "/center/teachers"          },
-    { Icon: IconGroup,       label: tNav.students,       href: "/center/students"          },
-    { Icon: IconClasse,      label: tNav.myClasses,      href: "/center/classes"           },
-    { Icon: IconSpark,       label: tNav.generateCourse, href: "/admin/courses/generate"   },
-    { Icon: IconChart,       label: tNav.stats,          href: "/center/stats"             },
-    { Icon: IconMoney,       label: tNav.billing,        href: "/center/billing"           },
+  // Nav centre groupée par intention.
+  //   Vue          → point d'entrée
+  //   Équipe       → enseignant·e·s + apprenant·e·s + classes
+  //   Piloter      → suivi + facturation
+  const NAV: Section[] = [
+    { items: [
+        { Icon: IconHome,     label: tNav.centerOverview, href: "/center"          },
+    ]},
+    { label: locale === "en" ? "Team" : "Équipe",
+      items: [
+        { Icon: IconTeacher,  label: tNav.teachers,       href: "/center/teachers" },
+        { Icon: IconGroup,    label: tNav.centerLearners, href: "/center/students" },
+        { Icon: IconClasse,   label: tNav.centerClasses,  href: "/center/classes"  },
+    ]},
+    { label: locale === "en" ? "Steer" : "Piloter",
+      items: [
+        { Icon: IconChart,    label: tNav.centerTracking, href: "/center/stats"    },
+        { Icon: IconMoney,    label: tNav.billing,        href: "/center/billing"  },
+    ]},
+    { items: [
+        { Icon: IconSettings, label: tNav.settings,       href: "/settings"        },
+    ]},
   ];
 
   const [userName, setUserName] = useState("Directeur");
@@ -106,19 +127,28 @@ export default function CenterLayout({ children, title, centerName, centerCity }
         </div>
 
         <nav className="app-nav" aria-label="Navigation centre">
-          {NAV.map(item => {
-            const exact = item.href === "/center";
-            const active = exact ? pathname === item.href : (pathname === item.href || pathname.startsWith(item.href + "/"));
-            return (
-              <Link key={item.href} href={item.href}
-                    className={`app-nav-link ${active ? "active" : ""}`}
-                    onClick={() => setSidebarOpen(false)}
-                    aria-current={active ? "page" : undefined}>
-                <span className="app-nav-icon" aria-hidden="true"><item.Icon size={18} /></span>
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+          {NAV.map((section, si) => (
+            <div key={si} className="app-nav-section">
+              {section.label && (
+                <p className="app-nav-section-label">{section.label}</p>
+              )}
+              {section.items.map((item) => {
+                const exact = item.href === "/center";
+                const active = exact
+                  ? pathname === item.href
+                  : pathname === item.href || pathname.startsWith(item.href + "/");
+                return (
+                  <Link key={item.href} href={item.href}
+                        className={`app-nav-link ${active ? "active" : ""}`}
+                        onClick={() => setSidebarOpen(false)}
+                        aria-current={active ? "page" : undefined}>
+                    <span className="app-nav-icon" aria-hidden="true"><item.Icon size={18} /></span>
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         <div className="app-sidebar-user">

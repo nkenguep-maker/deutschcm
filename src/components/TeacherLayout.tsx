@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactElement } from "react";
 import { Link } from "@/navigation";
 import { usePathname, useRouter } from "@/navigation";
+import { useLocale } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -12,7 +13,6 @@ import {
   IconHome,
   IconBook,
   IconClasse,
-  IconContext,
   IconChart,
   IconSettings,
   IconGroup,
@@ -26,6 +26,11 @@ interface Item {
   href: string;
 }
 
+interface Section {
+  label?: string;
+  items: Item[];
+}
+
 interface Props {
   children: React.ReactNode;
   title?: string;
@@ -34,17 +39,32 @@ interface Props {
 export default function TeacherLayout({ children, title }: Props) {
   const pathname = usePathname();
   const router = useRouter();
+  const locale = useLocale();
   const { nav: tNav, layout: tl } = useT();
 
-  const NAV: Item[] = [
-    { Icon: IconHome,       label: tNav.today ?? tNav.overview, href: "/teacher"             },
-    { Icon: IconClasse,     label: tNav.myClasses,               href: "/teacher/classrooms"  },
-    { Icon: IconGroup,      label: tNav.learners ?? tNav.students, href: "/teacher/students"   },
-    { Icon: IconContext,    label: tNav.discover,                href: "/discover"            },
-    { Icon: IconBook,       label: tNav.assignments ?? tNav.corrections, href: "/teacher/assignments" },
-    { Icon: IconSpark,      label: tNav.generateCourse,          href: "/admin/courses/generate" },
-    { Icon: IconChart,      label: tNav.stats ?? tNav.tracking,  href: "/teacher/stats"       },
-    { Icon: IconSettings,   label: tNav.settings,                href: "/settings"            },
+  // Nav enseignant·e groupée par intention.
+  //   Aujourd'hui  → point d'entrée quotidien
+  //   Classes      → gestion des groupes et corrections
+  //   Créer        → Studio IA + suivi + ressources
+  const NAV: Section[] = [
+    { items: [
+        { Icon: IconHome,     label: tNav.today,          href: "/teacher"             },
+    ]},
+    { label: locale === "en" ? "Classes" : "Classes",
+      items: [
+        { Icon: IconClasse,   label: tNav.teacherClasses, href: "/teacher/classrooms"  },
+        { Icon: IconGroup,    label: tNav.learners,       href: "/teacher/students"    },
+        { Icon: IconBook,     label: tNav.corrections,    href: "/teacher/assignments" },
+    ]},
+    { label: locale === "en" ? "Create" : "Créer",
+      items: [
+        { Icon: IconSpark,    label: tNav.studio,         href: "/teacher/studio"      },
+        { Icon: IconChart,    label: tNav.tracking,       href: "/teacher/stats"       },
+        { Icon: IconBook,     label: tNav.resources,      href: "/teacher/resources"   },
+    ]},
+    { items: [
+        { Icon: IconSettings, label: tNav.settings,       href: "/settings"            },
+    ]},
   ];
 
   const [userName, setUserName] = useState(tl.userFallback ?? "Enseignant·e");
@@ -103,19 +123,28 @@ export default function TeacherLayout({ children, title }: Props) {
         </div>
 
         <nav className="app-nav" aria-label="Navigation enseignant">
-          {NAV.map(item => {
-            const exact = item.href === "/teacher";
-            const active = exact ? pathname === item.href : (pathname === item.href || pathname.startsWith(item.href + "/"));
-            return (
-              <Link key={item.href} href={item.href}
-                    className={`app-nav-link ${active ? "active" : ""}`}
-                    onClick={() => setSidebarOpen(false)}
-                    aria-current={active ? "page" : undefined}>
-                <span className="app-nav-icon" aria-hidden="true"><item.Icon size={18} /></span>
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+          {NAV.map((section, si) => (
+            <div key={si} className="app-nav-section">
+              {section.label && (
+                <p className="app-nav-section-label">{section.label}</p>
+              )}
+              {section.items.map((item) => {
+                const exact = item.href === "/teacher";
+                const active = exact
+                  ? pathname === item.href
+                  : pathname === item.href || pathname.startsWith(item.href + "/");
+                return (
+                  <Link key={item.href} href={item.href}
+                        className={`app-nav-link ${active ? "active" : ""}`}
+                        onClick={() => setSidebarOpen(false)}
+                        aria-current={active ? "page" : undefined}>
+                    <span className="app-nav-icon" aria-hidden="true"><item.Icon size={18} /></span>
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         <div className="app-sidebar-user">
