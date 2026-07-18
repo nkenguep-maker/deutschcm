@@ -1,6 +1,25 @@
 "use client"
 import { usePathname } from "next/navigation"
 
+// Micro-typo FR (§1.11 doctrine v2) : espace fine insécable avant : ; ! ? %.
+// Appliqué en profondeur au sous-arbre landing.fr uniquement (le reste
+// touche l'app connectée et n'a pas besoin de sweep landing).
+const NNBSP = " ";
+function frTypo(s: string): string {
+  return s.replace(/ ([:;!?%€°])/g, `${NNBSP}$1`);
+}
+type Deep<T> = { [K in keyof T]: T[K] extends string ? string : Deep<T[K]> };
+function deepTypo<T extends Record<string, unknown>>(obj: T): Deep<T> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (typeof v === "string") out[k] = frTypo(v);
+    else if (Array.isArray(v)) out[k] = v.map((x) => (typeof x === "string" ? frTypo(x) : x));
+    else if (v && typeof v === "object") out[k] = deepTypo(v as Record<string, unknown>);
+    else out[k] = v;
+  }
+  return out as Deep<T>;
+}
+
 // ─── Landing page ─────────────────────────────────────────────────────────────
 const landing = {
   fr: {
@@ -807,7 +826,17 @@ const layout = {
 
 // ─── All text ──────────────────────────────────────────────────────────────────
 export const TEXT = {
-  fr: { landing: landing.fr, nav: nav.fr, dashboard: dashboard.fr, teacher: teacher.fr, center: center.fr, admin: admin.fr, common: common.fr, auth: auth.fr, layout: layout.fr },
+  fr: {
+    landing: deepTypo(landing.fr),
+    nav: nav.fr,
+    dashboard: dashboard.fr,
+    teacher: teacher.fr,
+    center: center.fr,
+    admin: admin.fr,
+    common: common.fr,
+    auth: auth.fr,
+    layout: layout.fr,
+  },
   en: { landing: landing.en, nav: nav.en, dashboard: dashboard.en, teacher: teacher.en, center: center.en, admin: admin.en, common: common.en, auth: auth.en, layout: layout.en },
 }
 

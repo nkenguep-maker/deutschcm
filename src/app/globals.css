@@ -422,6 +422,109 @@ button, [role="button"] {
   text-transform: none;
   min-width: 26px;
 }
+
+.cefr-spine-wrap {
+  position: relative;
+  display: inline-block;
+}
+.cefr-step[role="button"] {
+  cursor: pointer;
+  outline: none;
+  transition: transform var(--dur-fast) var(--ease-spring),
+              color var(--dur-fast) ease;
+}
+.cefr-step[role="button"]:hover,
+.cefr-step[role="button"]:focus-visible,
+.cefr-step.hover {
+  color: var(--creme);
+  transform: translateX(2px);
+}
+.cefr-step[role="button"]:hover > .dot,
+.cefr-step[role="button"]:focus-visible > .dot,
+.cefr-step.hover > .dot {
+  border-color: var(--brass);
+  box-shadow: 0 0 0 4px var(--brass-glow);
+}
+
+.cefr-panel {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 24px);
+  width: 288px;
+  padding: 18px 20px 16px;
+  background: var(--espresso-2);
+  border: 1px solid var(--brass-edge);
+  border-radius: var(--r-card);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+  animation: cefr-panel-in 0.18s var(--ease-out-expo);
+  z-index: 20;
+  pointer-events: none;
+}
+@keyframes cefr-panel-in {
+  from { opacity: 0; transform: translateY(4px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.cefr-panel-code {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 44px;
+  font-weight: 400;
+  color: var(--brass-glow);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.cefr-panel-head {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--creme);
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  max-width: 200px;
+}
+.cefr-panel-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cefr-panel-list li {
+  padding-left: 12px;
+  position: relative;
+  color: var(--creme-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.cefr-panel-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 6px;
+  height: 1px;
+  background: var(--brass);
+}
+.cefr-panel-fine {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--creme-hair);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--creme-mute);
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .cefr-panel {
+    display: none;
+  }
+}
 .cefr-step-caption {
   font-family: var(--font-manrope), sans-serif;
   font-size: 11.5px;
@@ -1369,6 +1472,45 @@ button, [role="button"] {
   font-size: 12px;
   letter-spacing: 0.06em;
   color: var(--creme-mute);
+}
+
+/* ── CefrStrip · variante horizontale (footer signature) ── */
+.cefr-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 4px 6px;
+  border-top: 1px solid var(--creme-hair);
+  margin-top: 12px;
+}
+.cefr-strip-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--creme-mute);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.cefr-strip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px solid var(--creme-hair);
+  background: transparent;
+}
+.cefr-strip-step.done,
+.cefr-strip-step.on {
+  color: var(--brass);
+}
+.cefr-strip-step.done .cefr-strip-dot,
+.cefr-strip-step.on .cefr-strip-dot {
+  background: var(--brass);
+  border-color: var(--brass);
+}
+.cefr-strip-step.on .cefr-strip-dot {
+  box-shadow: 0 0 0 3px var(--brass-glow);
 }
 
 /* ── Footer · warm minimal ── */

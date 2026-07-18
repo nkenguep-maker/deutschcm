@@ -1,7 +1,8 @@
 // LandingFooter — warm minimal. Brand, tagline, deux colonnes de liens,
-// social en pills laiton. Signature CEFR spine minifiée à droite du brand
+// social en pills laiton. Signature CEFR strip horizontale sous le tag
 // (5e apparition de la signature).
 
+import { CefrStrip } from "./CefrStrip";
 import { LandingBrand } from "./LandingBrand";
 
 type Labels = {
@@ -31,6 +32,7 @@ export function LandingFooter({
             <p className="lfooter-tag" style={{ opacity: 0.72 }}>
               {labels.made}
             </p>
+            <CefrStrip current="A1" ariaLabel="Parcours Yema — CECRL" />
           </div>
 
           <nav className="lfooter-links" aria-label="Légal">
