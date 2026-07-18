@@ -5,30 +5,31 @@ import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { useEffect, useState } from "react";
 
-// /methode — page éditoriale qui explique la façon Yema d'enseigner
-// l'allemand. Cinq principes numérotés, chacun avec un exemple allemand
-// concret (§12 doctrine v2 : le design enseigne).
+// /methode — cinq principes YEMA. Agnostiques de langue : ils tiennent pour
+// l'allemand (chapitre en cours), le wolof (à venir), l'anglais, le bassa.
+// Chaque principe est illustré par un exemple concret allemand pour le
+// prouver — l'exemple change quand chaque chapitre s'ouvre.
 
 const PRINCIPLES_FR = [
   {
     tag: "Principe 01 · Contexte",
     title: "Un mot vit dans une scène, pas dans une liste.",
     body:
-      "On n'apprend jamais « der Bäcker » comme un mot isolé. On l'apprend en franchissant la porte d'une boulangerie de Berlin à 7 h du matin. Chaque module part d'une scène qui a du sens — administrative, professionnelle, amicale — et le vocabulaire vient s'y accrocher.",
+      "On n’apprend pas « der Bäcker » comme un mot isolé — on l’apprend en poussant la porte d’une boulangerie de Berlin à 7 h du matin. Ce principe tient pour toutes les langues : le wolof s’apprend à Sandaga, le bassa se transmet à Édéa, le swahili se déploie sur les côtes de l’Océan indien. Chaque module part d’une scène qui a du sens.",
     example: {
-      lbl: "Exemple · A1",
-      de: '„Zwei Brötchen, bitte.”',
-      fr: "« Deux petits pains, s'il vous plaît. »",
+      lbl: "Exemple · A1 allemand",
+      de: "„Zwei Brötchen, bitte.”",
+      fr: "« Deux petits pains, s’il vous plaît. »",
     },
   },
   {
-    tag: "Principe 02 · Grammaire",
+    tag: "Principe 02 · Structure",
     title: "Comprendre pourquoi, avant de mémoriser comment.",
     body:
-      "L'allemand a des règles claires. On les explique en français avec le vocabulaire du quotidien, jamais avec du jargon linguistique. Une seule règle par leçon, appliquée trois fois dans trois contextes différents. Retention par répétition espacée, pas par bourrage.",
+      "Toutes les langues ont des règles claires. Sans jargon linguistique. Une seule règle par leçon, appliquée trois fois dans trois contextes différents. Retention par répétition espacée, pas par bourrage. En wolof, cela se traduit par la classe nominale ; en bassa, par les tons ; en allemand, par les cas. Toujours la même méthode : rendre la règle utile avant qu’elle soit belle.",
     example: {
-      lbl: "Exemple · A2",
-      de: '„Ich bin nach Berlin gefahren.”',
+      lbl: "Exemple · A2 allemand",
+      de: "„Ich bin nach Berlin gefahren.”",
       fr: "Auxiliaire « sein » quand on change de lieu — pas « haben ».",
     },
   },
@@ -36,32 +37,32 @@ const PRINCIPLES_FR = [
     tag: "Principe 03 · Oral",
     title: "Parler tôt, se tromper vite, se corriger précis.",
     body:
-      "Attendre B1 pour parler est un piège. Dès A1, ton coach IA t'entraîne dans des scénarios réalistes — commander un café, prendre un rendez-vous, répondre au téléphone. Correction immédiate sur trois axes : grammaire, vocabulaire, pertinence culturelle.",
+      "Attendre B1 (ou É3 chez YEMA) pour parler est un piège. Dès la première leçon, ton coach IA t’entraîne dans des scénarios réalistes — commander un café en allemand, saluer une aînée en bassa, prendre un rendez-vous en anglais. Correction immédiate sur trois axes : grammaire, vocabulaire, pertinence culturelle.",
     example: {
       lbl: "Exemple · Coach IA",
-      de: '„Guten Tag, ich hätte gern einen Termin.”',
+      de: "„Guten Tag, ich hätte gern einen Termin.”",
       fr: "« Bonjour, je souhaiterais un rendez-vous. » — formule à connaître.",
     },
   },
   {
     tag: "Principe 04 · Écrit",
-    title: "Écrire, c'est structurer sa pensée en allemand.",
+    title: "Écrire, c’est structurer sa pensée dans la langue.",
     body:
-      "L'écriture n'est pas un supplément d'oral. C'est une compétence à part qui organise la langue. Modules Schreiben du A2 au C1 : tu rédiges un email, une lettre formelle, un texte argumenté. Gemini corrige avec explications, pas juste un score.",
+      "L’écriture n’est pas un supplément d’oral. C’est une compétence à part qui organise la langue. Modules Schreiben (allemand) du A2 au C1 — bientôt Sabaru (Récit-écriture wolof) et Kalati (grammaire bassa écrite). Gemini corrige avec explications, pas juste un score.",
     example: {
-      lbl: "Exemple · B1",
-      de: '„Sehr geehrte Frau Schmidt,”',
-      fr: "Formule d'ouverture de lettre formelle — à ne jamais confondre avec « Hallo ».",
+      lbl: "Exemple · B1 allemand",
+      de: "„Sehr geehrte Frau Schmidt,”",
+      fr: "Formule d’ouverture de lettre formelle — à ne jamais confondre avec « Hallo ».",
     },
   },
   {
     tag: "Principe 05 · Culture",
-    title: "La langue vit dans une culture. On l'enseigne aussi.",
+    title: "La langue vit dans une culture. On l’enseigne aussi.",
     body:
-      "Comprendre le mot « Feierabend » (fin de journée sacrée), savoir que le tutoiement se demande, connaître le prix d'un ticket de U-Bahn — ce sont ces détails qui font la différence entre parler allemand et parler comme un Allemand. Chaque module accueille une note culturelle courte.",
+      "Comprendre le mot « Feierabend » (fin de journée sacrée en Allemagne), savoir que le tutoiement se demande, connaître ce qu’est un « teranga » wolof ou un « ubuntu » en Afrique australe — ce sont ces détails qui font la différence entre parler une langue et parler comme un locuteur. Chaque module accueille une note culturelle courte, ancrée dans le pays d’origine.",
     example: {
       lbl: "Exemple · Culture",
-      de: '„Schönen Feierabend!”',
+      de: "„Schönen Feierabend!”",
       fr: "Salutation entre collègues quand on se sépare le soir. Sacré.",
     },
   },
@@ -91,9 +92,9 @@ export default function MethodePage() {
         locale={locale}
         isMobile={isMobile}
         labels={{
-          features: locale === "en" ? "Features" : "Fonctionnalités",
-          levels: locale === "en" ? "Levels" : "Niveaux",
-          pricing: locale === "en" ? "Method" : "Méthode",
+          features: locale === "en" ? "Languages" : "Langues",
+          levels: locale === "en" ? "Method" : "Méthode",
+          pricing: locale === "en" ? "Manifesto" : "Manifeste",
           centers: locale === "en" ? "Centers" : "Centres",
           login: locale === "en" ? "Log in" : "Se connecter",
           register: locale === "en" ? "Start" : "Commencer",
@@ -105,13 +106,13 @@ export default function MethodePage() {
           {locale === "en" ? "The method" : "La méthode"}
         </div>
         <h1>
-          {locale === "en" ? "German, " : "L'allemand, "}
-          <em>{locale === "en" ? "the honest way." : "sans détour."}</em>
+          {locale === "en" ? "Five principles, " : "Cinq principes, "}
+          <em>{locale === "en" ? "any language." : "toutes les langues."}</em>
         </h1>
         <p className="lede">
           {locale === "en"
-            ? "Five principles that guide every module Yema publishes. Each one is a design choice — not a marketing line."
-            : "Cinq principes qui guident chaque module publié par Yema. Chacun est une décision de design pédagogique — pas une phrase marketing."}
+            ? "The same five principles guide every module YEMA publishes — whether the language is European or African, foreign or native. Below, illustrated with concrete German examples (the first chapter live)."
+            : "Les mêmes cinq principes guident chaque module publié par YEMA — que la langue soit européenne ou africaine, étrangère ou natale. Ci-dessous, illustrés par des exemples allemands concrets (premier chapitre en cours)."}
         </p>
 
         {principles.map((p, i) => (
@@ -137,13 +138,10 @@ export default function MethodePage() {
         <section className="lmethode-closer">
           <p>
             {locale === "en"
-              ? '„Übung macht den Meister” — practice makes the master. But only the right kind of practice.'
-              : "« Übung macht den Meister » — c'est en s'exerçant qu'on devient maître. Encore faut-il s'exercer sur ce qui compte."}
+              ? "„Übung macht den Meister” — practice makes the master. In Wolof: „Ndaje mi la ko am” — practice earns it. Same idea, three languages away."
+              : "« Übung macht den Meister » — c’est en s’exerçant qu’on devient maître. En wolof : « Ndaje mi la ko am » — c’est l’exercice qui le donne. Même idée, à trois langues d’écart."}
           </p>
-          <a
-            href={`/${locale}/register`}
-            className="lmethode-cta"
-          >
+          <a href={`/${locale}/register`} className="lmethode-cta">
             {locale === "en" ? "Start a lesson" : "Ouvrir une leçon"}
             <span aria-hidden="true">→</span>
           </a>
@@ -155,20 +153,20 @@ export default function MethodePage() {
         labels={{
           tagline:
             locale === "en"
-              ? "German, without the fuss. From A1 to C1, independent, CEFR-aligned."
-              : "L'allemand, pas l'accent. De A1 à C1, indépendant, aligné CECRL.",
+              ? "Africa speaks. All its languages — foreign and native, at last one place."
+              : "L’Afrique parle. Toutes ses langues — étrangères et natales, enfin un lieu.",
           made:
             locale === "en"
-              ? "Built in Cameroon, for learners worldwide"
-              : "Construit au Cameroun, pour les apprenants du monde",
+              ? "Built in Cameroon, for the continent and the world"
+              : "Construit au Cameroun, pour le continent et le monde",
           legal: locale === "en" ? "Legal" : "Mentions légales",
           terms: locale === "en" ? "Terms" : "CGU",
           privacy: locale === "en" ? "Privacy" : "Confidentialité",
           contact: locale === "en" ? "Contact" : "Contact",
           disclaimer:
             locale === "en"
-              ? "Yema Languages provides independent CEFR-aligned practice and is not affiliated with any official examination institute."
-              : "Yema Languages propose une pratique linguistique indépendante alignée sur le CECRL et n'est affiliée à aucun organisme officiel d'examen.",
+              ? "YEMA Languages is a pan-African CEFR-aligned platform for foreign languages, and independent for African native languages. Not affiliated with any official examination institute."
+              : "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues étrangères, et indépendante pour les langues natales africaines. N’est affiliée à aucun organisme officiel d’examen.",
         }}
       />
     </div>

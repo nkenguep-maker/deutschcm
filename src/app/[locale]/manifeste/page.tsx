@@ -1,8 +1,8 @@
 "use client";
 
-// /manifeste — page éditoriale simple, une déclaration signée. §14 doctrine :
-// un site 25 k€ apporte au moins UNE information vraie que l'utilisateur
-// retient. Ici : la position de Yema sur ce qu'est apprendre une langue.
+// /manifeste — la position de YEMA. Six clauses tranchées : ce qu'on
+// défend (langues natales à même dignité), ce qu'on refuse (score,
+// gamification, IA-remplaçante), et à qui on parle.
 
 import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
@@ -11,71 +11,81 @@ import { LandingNav } from "@/components/landing/LandingNav";
 
 const COPY_FR = {
   eye: "Le manifeste",
-  h1_line1: "On apprend une langue",
-  h1_line2: "pour parler à quelqu'un.",
+  h1_line1: "Le continent qui apprend.",
+  h1_line2: "Le monde qui écoute.",
   clauses: [
     {
-      strong: "Pas pour un score.",
+      strong: "Nos langues valent les leurs.",
       body:
-        "Un score B1 n'a jamais fait rire personne dans une boulangerie berlinoise. Yema ne se paie pas ta réussite à un examen. Elle se paie ta capacité à commander un café, à demander l'heure, à raconter d'où tu viens. Le reste vient avec.",
+        "Le wolof n’est pas moins précis que le français. Le bassa n’est pas plus difficile que l’allemand. Le swahili traverse plus de pays que l’espagnol. YEMA place les langues du continent sur le même plan éditorial que les langues étrangères — même méthode, même exigence, même dignité.",
     },
     {
-      strong: "Pas pour une gamification.",
+      strong: "L’allemand est notre premier chapitre.",
       body:
-        "Les points, les badges, les séries de trente jours — c'est un langage de jeu, pas une pédagogie. Une session Yema dure ce qu'elle doit durer : dix minutes, quarante, une heure. On arrête quand on a compris, pas quand on a gagné un cœur.",
+        "On commence quelque part. Nous commençons par l’allemand parce qu’il ouvre une porte concrète à des milliers d’Africain·e·s qui préparent études, travail, famille en Europe. C’est le premier chapitre — pas le dernier. Anglais, wolof, bassa, swahili, lingala : chaque prochain chapitre s’annonce déjà.",
     },
     {
-      strong: "Pas contre un mur de règles.",
+      strong: "L’IA est un outil, pas un remplaçant.",
       body:
-        "L'allemand est une langue de règles claires. Les règles sont belles, elles rassurent — mais on ne les apprend pas dans le vide. À chaque règle, une phrase. À chaque phrase, un contexte. À chaque contexte, une utilité.",
+        "Nos coachs IA guident, corrigent, encouragent — mais ils ne remplacent ni la voix d’un aîné qui te dit un proverbe en bassa, ni la patience d’un enseignant qui te réexplique la Deklination trois fois. YEMA outille les êtres humains, jamais l’inverse.",
     },
     {
-      strong: "Depuis un continent qui parle beaucoup.",
+      strong: "Pas de score. Pas de gamification. Pas de badges.",
       body:
-        "Yema est née au Cameroun, dans un pays qui traduit tous les jours entre le français, l'anglais, le pidgin, le bassa, le douala, le fulfulde. On sait que l'allemand n'est pas plus dur qu'une autre langue. Il demande juste la même chose : du temps, un contexte, quelqu'un à qui parler.",
+        "Un B1 n’a jamais fait rire personne dans une boulangerie berlinoise, et une série de trente jours n’a jamais appris le lingala à personne. YEMA se paie ta capacité à comprendre, à parler, à revenir chez toi dans une langue. Le reste — points, badges, streaks — appartient au jeu, pas à la pédagogie.",
     },
     {
-      strong: "Pour tout ceux qui prennent le chemin.",
+      strong: "Depuis le Cameroun, vers le monde.",
       body:
-        "Aïcha à Yaoundé qui prépare son master. Kevin à Douala qui vise un poste tech. Fatima à Bafoussam qui enseigne. Jean à Édéa qui rejoint sa fille à soixante-deux ans. Yema est faite pour eux — et pour la personne qui, après avoir lu cette phrase, ouvrira sa première leçon.",
+        "YEMA naît dans un pays qui traduit tous les jours entre le français, l’anglais, le pidgin, le bassa, le douala, le fulfulde. Cette expérience quotidienne du plurilinguisme est notre acte de naissance. Elle nous a appris qu’une langue s’apprend en la mettant à côté d’autres, pas en la coupant du reste.",
+    },
+    {
+      strong: "Pour celle qui hésite encore.",
+      body:
+        "Aïcha à Yaoundé qui prépare son master. Kevin à Douala qui vise Berlin. Fatima à Bafoussam qui enseigne. Jean à Édéa qui rejoint sa fille. Et surtout : la personne qui, en ce moment, se demande si elle a le temps, l’âge, ou le droit d’apprendre. YEMA est faite pour elle. La première leçon dure dix minutes.",
     },
   ],
-  signature_line: "Yema, édition bêta 2026.",
+  signature_line: "YEMA, édition bêta 2026.",
   cta: "Ouvrir une leçon",
 };
 
 const COPY_EN = {
   eye: "The manifesto",
-  h1_line1: "You learn a language",
-  h1_line2: "to speak to someone.",
+  h1_line1: "The continent that learns.",
+  h1_line2: "The world that listens.",
   clauses: [
     {
-      strong: "Not for a score.",
+      strong: "Our languages are worth theirs.",
       body:
-        "A B1 score has never made anyone laugh in a Berlin bakery. Yema doesn't get paid for your exam success. It gets paid for your ability to order a coffee, ask the time, tell people where you're from. The rest follows.",
+        "Wolof is no less precise than French. Bassa is no harder than German. Swahili crosses more countries than Spanish. YEMA places continent languages on the same editorial plane as foreign ones — same method, same rigor, same dignity.",
     },
     {
-      strong: "Not for gamification.",
+      strong: "German is our first chapter.",
       body:
-        "Points, badges, thirty-day streaks — that's game vocabulary, not pedagogy. A Yema session lasts what it needs to last: ten minutes, forty, an hour. You stop when you've understood, not when you've earned a heart.",
+        "You start somewhere. We start with German because it opens a concrete door for thousands of Africans preparing studies, work or family reunification in Europe. It’s the first chapter — not the last. English, Wolof, Bassa, Swahili, Lingala: every next chapter is already announced.",
     },
     {
-      strong: "Not against a wall of rules.",
+      strong: "AI is a tool, not a replacement.",
       body:
-        "German is a language of clear rules. Rules are beautiful, they reassure — but you don't learn them in a vacuum. Every rule, a sentence. Every sentence, a context. Every context, a use.",
+        "Our AI coaches guide, correct, encourage — but they replace neither the voice of an elder telling you a proverb in Bassa, nor the patience of a teacher who explains Deklination for the third time. YEMA equips human beings, never the reverse.",
     },
     {
-      strong: "From a continent that speaks a lot.",
+      strong: "No score. No gamification. No badges.",
       body:
-        "Yema was born in Cameroon, in a country that translates every day between French, English, Pidgin, Bassa, Douala, Fulfulde. We know German is no harder than any other language. It just asks the same thing: time, context, someone to speak with.",
+        "A B1 has never made anyone laugh in a Berlin bakery, and a thirty-day streak has never taught anyone Lingala. YEMA gets paid for your ability to understand, to speak, to come home in a language. The rest — points, badges, streaks — belongs to games, not pedagogy.",
     },
     {
-      strong: "For everyone who takes the road.",
+      strong: "From Cameroon, to the world.",
       body:
-        "Aïcha in Yaoundé preparing her master's. Kevin in Douala aiming for a tech job. Fatima in Bafoussam who teaches. Jean in Édéa joining his daughter at sixty-two. Yema is built for them — and for the person who, after reading this sentence, will open their first lesson.",
+        "YEMA is born in a country that translates every day between French, English, Pidgin, Bassa, Douala, Fulfulde. This daily experience of plurilingualism is our birth certificate. It taught us that a language is learned by placing it next to others — not by cutting it off from the rest.",
+    },
+    {
+      strong: "For the person still hesitating.",
+      body:
+        "Aïcha in Yaoundé preparing her master's. Kevin in Douala aiming for Berlin. Fatima in Bafoussam who teaches. Jean in Édéa joining his daughter. And above all: the person who, right now, wonders if they have the time, the age, or the right to learn. YEMA is built for them. The first lesson takes ten minutes.",
     },
   ],
-  signature_line: "Yema, beta edition 2026.",
+  signature_line: "YEMA, beta edition 2026.",
   cta: "Open a lesson",
 };
 
@@ -98,9 +108,9 @@ export default function ManifestePage() {
         locale={locale}
         isMobile={isMobile}
         labels={{
-          features: locale === "en" ? "Features" : "Fonctionnalités",
-          levels: locale === "en" ? "Levels" : "Niveaux",
-          pricing: locale === "en" ? "Method" : "Méthode",
+          features: locale === "en" ? "Languages" : "Langues",
+          levels: locale === "en" ? "Method" : "Méthode",
+          pricing: locale === "en" ? "Manifesto" : "Manifeste",
           centers: locale === "en" ? "Centers" : "Centres",
           login: locale === "en" ? "Log in" : "Se connecter",
           register: locale === "en" ? "Start" : "Commencer",
@@ -142,20 +152,20 @@ export default function ManifestePage() {
         labels={{
           tagline:
             locale === "en"
-              ? "German, without the fuss. From A1 to C1, independent, CEFR-aligned."
-              : "L'allemand, pas l'accent. De A1 à C1, indépendant, aligné CECRL.",
+              ? "Africa speaks. All its languages — foreign and native, at last one place."
+              : "L’Afrique parle. Toutes ses langues — étrangères et natales, enfin un lieu.",
           made:
             locale === "en"
-              ? "Built in Cameroon, for learners worldwide"
-              : "Construit au Cameroun, pour les apprenants du monde",
+              ? "Built in Cameroon, for the continent and the world"
+              : "Construit au Cameroun, pour le continent et le monde",
           legal: locale === "en" ? "Legal" : "Mentions légales",
           terms: locale === "en" ? "Terms" : "CGU",
           privacy: locale === "en" ? "Privacy" : "Confidentialité",
           contact: locale === "en" ? "Contact" : "Contact",
           disclaimer:
             locale === "en"
-              ? "Yema Languages provides independent CEFR-aligned practice and is not affiliated with any official examination institute."
-              : "Yema Languages propose une pratique linguistique indépendante alignée sur le CECRL et n'est affiliée à aucun organisme officiel d'examen.",
+              ? "YEMA Languages is a pan-African CEFR-aligned platform for foreign languages, and independent for African native languages. Not affiliated with any official examination institute."
+              : "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues étrangères, et indépendante pour les langues natales africaines. N’est affiliée à aucun organisme officiel d’examen.",
         }}
       />
     </div>
