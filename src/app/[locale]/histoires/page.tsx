@@ -4,6 +4,7 @@ import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingNav } from "@/components/landing/LandingNav";
+import { PortraitDuotone } from "@/components/PortraitDuotone";
 
 // /histoires — parcours étudiants réels. Chaque histoire a un nom, une
 // ville, une date, un objectif concret. §7 doctrine v2 : "témoignages
@@ -22,6 +23,14 @@ type Story = {
   body: string;
   goalLbl: string;
   goal: string;
+  // Champs optionnels · s'activent quand les portraits arrivent.
+  // Tant que portraitUrl est absent, on affiche le monogramme.
+  portraitUrl?: string;
+  audioUrl?: string;
+  /** Territoire du portrait (world = étrangères, sources = natales) */
+  territory?: "world" | "sources";
+  /** Côté du regard — dicte le placement du texte */
+  gaze?: "left" | "right";
 };
 
 const STORIES_FR: readonly Story[] = [
@@ -38,6 +47,8 @@ const STORIES_FR: readonly Story[] = [
       "Bintou est née en France de parents sénégalais. Le wolof, elle l’entend depuis toujours mais ne l’a jamais parlé. Elle a rejoint la liste d’attente wolof (chapitre suivant YEMA) et commence par les modules d’écoute — l’étape É1 sur l’échelle YEMA. L’objectif n’est pas de « maîtriser » : c’est de participer à la conversation familiale.",
     goalLbl: "Objectif 2026",
     goal: "Rendre visite à sa grand-mère à Louga en tenant une conversation en wolof.",
+    territory: "sources",
+    gaze: "left",
   },
   {
     mono: "A",
@@ -52,6 +63,8 @@ const STORIES_FR: readonly Story[] = [
       "Aïcha prépare son Master en génie civil à Fribourg. Elle a commencé Yema avec le vocabulaire administratif d'un dossier universitaire, puis a basculé sur la conversation avec Klaus, le coach IA. Trois soirs par semaine, quarante minutes chaque fois.",
     goalLbl: "Objectif 2026",
     goal: "Atteindre B2 avant l'entretien du semestre d'automne.",
+    territory: "world",
+    gaze: "right",
   },
   {
     mono: "K",
@@ -66,6 +79,8 @@ const STORIES_FR: readonly Story[] = [
       "Kevin est développeur, il vise un poste chez une entreprise berlinoise. Il a commencé avec les cinquante mots les plus utiles du quotidien professionnel, puis a construit son vocabulaire technique. La signature Yema qu'il utilise chaque jour : le simulateur de scénarios avec Klaus.",
     goalLbl: "Objectif 2026",
     goal: "Passer un premier entretien technique en allemand d'ici décembre.",
+    territory: "world",
+    gaze: "left",
   },
   {
     mono: "F",
@@ -80,6 +95,8 @@ const STORIES_FR: readonly Story[] = [
       "Fatima enseigne l'allemand au lycée depuis six ans. Elle utilise Yema pour rafraîchir ses propres compétences et pour donner à ses élèves un accès continu entre deux cours. Elle apprécie la correction Schreiben — plus rigoureuse que celle qu'elle peut donner à trente copies.",
     goalLbl: "Objectif 2026",
     goal: "Amener sa classe de première à un vrai A2 dans l'année.",
+    territory: "world",
+    gaze: "right",
   },
   {
     mono: "J",
@@ -94,6 +111,8 @@ const STORIES_FR: readonly Story[] = [
       "Jean prend l'allemand pour un regroupement familial. Il a commencé A1 il y a huit semaines, une leçon par jour, jamais plus. Il aime particulièrement les modules audio (Hören) : voix claires, débit adapté, sous-titres qu'il peut activer.",
     goalLbl: "Objectif 2026",
     goal: "Passer l'entretien A1 exigé pour son visa avant l'été.",
+    territory: "world",
+    gaze: "left",
   },
 ];
 
@@ -111,6 +130,8 @@ const STORIES_EN: readonly Story[] = [
       "Bintou was born in France to Senegalese parents. She has always heard Wolof but never spoken it. She joined the Wolof waitlist (YEMA next chapter) and started with listening modules — level É1 on the YEMA scale. The goal isn't to \"master\" it: it's to join the family conversation.",
     goalLbl: "2026 goal",
     goal: "Visit her grandmother in Louga and hold a conversation in Wolof.",
+    territory: "sources",
+    gaze: "left",
   },
   {
     mono: "A",
@@ -125,6 +146,8 @@ const STORIES_EN: readonly Story[] = [
       "Aïcha is preparing a Master's in civil engineering in Freiburg. She started with administrative vocabulary from her university file, then moved to conversation with Klaus, the AI coach. Three evenings a week, forty minutes each.",
     goalLbl: "2026 goal",
     goal: "Reach B2 before the autumn semester interview.",
+    territory: "world",
+    gaze: "right",
   },
   {
     mono: "K",
@@ -139,6 +162,8 @@ const STORIES_EN: readonly Story[] = [
       "Kevin is a developer aiming for a job in Berlin. He started with the fifty most useful words of professional daily life, then built up his technical vocabulary. His favorite Yema feature: the scenario simulator with Klaus.",
     goalLbl: "2026 goal",
     goal: "Pass a first technical interview in German by December.",
+    territory: "world",
+    gaze: "left",
   },
   {
     mono: "F",
@@ -153,6 +178,8 @@ const STORIES_EN: readonly Story[] = [
       "Fatima has taught German at high school for six years. She uses Yema to refresh her own skills and give her students continuous access between two lessons. She particularly values the Schreiben correction — more rigorous than what she can give to thirty essays.",
     goalLbl: "2026 goal",
     goal: "Bring her first-year class to a real A2 within the year.",
+    territory: "world",
+    gaze: "right",
   },
   {
     mono: "J",
@@ -167,6 +194,8 @@ const STORIES_EN: readonly Story[] = [
       "Jean is learning German for family reunification. He started A1 eight weeks ago, one lesson a day, never more. He particularly likes the audio modules (Hören): clear voices, adapted pace, subtitles he can turn on.",
     goalLbl: "2026 goal",
     goal: "Pass the A1 interview required for his visa before summer.",
+    territory: "world",
+    gaze: "left",
   },
 ];
 
@@ -228,9 +257,22 @@ export default function HistoiresPage() {
         {stories.map((s) => (
           <article key={s.name} className="lstory">
             <aside className="lstory-side">
-              <div className="lstory-mono" aria-hidden="true">
-                {s.mono}
-              </div>
+              {s.portraitUrl ? (
+                <PortraitDuotone
+                  src={s.portraitUrl}
+                  name={s.name}
+                  meta={`${s.city} · ${s.year}`}
+                  territory={s.territory ?? "world"}
+                  ratio="vertical"
+                  gaze={s.gaze}
+                  audioUrl={s.audioUrl}
+                  audioLabel={locale === "en" ? "Listen" : "Écouter"}
+                />
+              ) : (
+                <div className="lstory-mono" aria-hidden="true">
+                  {s.mono}
+                </div>
+              )}
               <div className="lstory-meta">
                 <p className="lstory-name">{s.name}</p>
                 <p className="lstory-loc">
