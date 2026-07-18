@@ -710,7 +710,16 @@
     },
     "lesson_done": {
       "soul": "{lektion}, terminée. *Ça s'entend déjà.*",
+      "motto": "La régularité bat l'intensité.",
       "body": "La suite vous attend quand vous voulez — la régularité bat l'intensité.",
+      "action": "Continuer",
+      "later": "Plus tard",
+      "xpLbl": "XP gagnés",
+      "levelCaption": "Niveau {level} · {pct}%"
+    },
+    "level_up": {
+      "soul": "Vous parlez au niveau {level}. *Le chemin continue.*",
+      "soulNative": "É{level} — {name}. *La langue vous reconnaît.*",
       "action": "Continuer"
     },
     "class_created": {

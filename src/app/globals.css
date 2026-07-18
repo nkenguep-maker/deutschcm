@@ -50,6 +50,12 @@ html[data-theme="dark"] {
   --dur-moment:     480ms;
   --ease-enter:     cubic-bezier(0.22, 1, 0.36, 1);
   --ease-glide:     cubic-bezier(0.65, 0, 0.35, 1);
+  /* --dur-ceremony · SEULE exception autorisée à dur-moment.
+     Réservé aux cérémonies rares (franchissement de niveau A1→A2,
+     É1→É2, arrivé environ 4-5 fois dans une vie d'apprenant·e).
+     Ne JAMAIS utiliser pour du hover, une modale ou une transition
+     de page ordinaire. */
+  --dur-ceremony:   960ms;
 
   /* Aliases pour l'existant — mêmes valeurs, nouveaux noms.
      À supprimer une fois la migration finie. */
@@ -5113,100 +5119,126 @@ button, [role="button"] {
   margin-inline: auto;
 }
 
-/* ─── Signature moment #3 · LessonComplete ─────────────────────────
-   Séquence totale ≤ 1.2s. Trois éléments en cascade 120ms :
-     1. .lesson-complete-mark (checkmark) apparaît (t=0)
-     2. .lesson-complete-xp (count-up) démarre à t=120ms
-     3. .lesson-complete-progress-fill se peint à t=240ms
-   Sobre. Aucun confetti, aucun bounce, aucun overshoot. */
-.lesson-complete {
-  max-width: 420px;
-  margin: 0 auto;
-  padding: 40px 32px;
-  background: var(--espresso-2);
-  border: 1px solid var(--creme-hair);
-  border-radius: 20px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-.lesson-complete-eye {
-  font-family: var(--font-jetbrains, monospace);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--brass);
-  margin: 0;
-}
-.lesson-complete-mark {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: var(--brass-glow);
-  border: 1.5px solid var(--brass-edge);
+/* ─── Cérémonie · fin de leçon (LessonComplete plein écran) ─────────
+   Territoire de la langue active (world ou sources). Partition exacte :
+     t=0     ligne d'âme (Fraunces italic, fragment brass)
+     t=120   devise creme-mute
+     t=240   scores par compétence, cascade 50ms (5 max)
+     t=360   XP count-up (via useCountUp, 480ms)
+     t=480   spine — portion GAGNÉE peinte (scaleX left, 480ms)
+     t=720   boutons Continuer + Plus tard
+   Durée totale ≤ 1.2s. Aucun confetti, aucun bounce, aucun overshoot.
+   prefers-reduced-motion : tout affiché instantanément. */
+
+.ceremony {
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--brass);
-  opacity: 0;
-  transform: scale(0.98);
-  animation: lc-mark-in var(--dur-move) var(--ease-enter) forwards;
+  padding: 48px 24px;
 }
-.lesson-complete-check { display: flex; }
-@keyframes lc-mark-in {
-  to { opacity: 1; transform: scale(1); }
+.ceremony-inner {
+  max-width: 640px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 28px;
 }
-.lesson-complete-h {
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-style: italic;
-  font-size: clamp(20px, 3vw, 26px);
-  font-weight: 400;
-  letter-spacing: -0.018em;
-  color: var(--creme);
-  margin: 0;
-  line-height: 1.25;
-  max-width: 26ch;
-  opacity: 0;
-  transform: translateY(12px);
-  animation: lc-fade-up var(--dur-move) var(--ease-enter) forwards;
-  animation-delay: 120ms;
-}
-.lesson-complete-sub {
-  font-family: var(--font-manrope), sans-serif;
-  font-size: 13.5px;
-  color: var(--creme-soft);
-  line-height: 1.55;
-  margin: -4px 0 6px;
-  max-width: 44ch;
-  opacity: 0;
-  transform: translateY(12px);
-  animation: lc-fade-up var(--dur-move) var(--ease-enter) forwards;
-  animation-delay: 240ms;
-}
-@keyframes lc-fade-up {
+
+/* Chaque étape a le même keyframe. Seul l'animation-delay change. */
+@keyframes ceremony-in {
   to { opacity: 1; transform: translateY(0); }
 }
-.lesson-complete-xp {
+.ceremony-item {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: ceremony-in var(--dur-move) var(--ease-enter) forwards;
+}
+
+.ceremony-soul {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(26px, 4vw, 34px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--creme);
+  margin: 0;
+  max-width: 22ch;
+  animation-delay: 0ms;
+}
+.ceremony-devise {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 13.5px;
+  color: var(--creme-mute);
+  letter-spacing: 0.02em;
+  margin: 0;
+  font-style: italic;
+  animation-delay: 120ms;
+}
+
+/* Cartes compétences · cascade 50ms, 5 max */
+.ceremony-skills {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  width: 100%;
+  max-width: 540px;
+}
+.ceremony-skill {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(244, 235, 220, 0.03);
+  border: 1px solid var(--creme-hair);
+  opacity: 0;
+  transform: translateY(12px);
+  animation: ceremony-in var(--dur-move) var(--ease-enter) forwards;
+}
+.ceremony-skill[data-i="0"] { animation-delay: 240ms; }
+.ceremony-skill[data-i="1"] { animation-delay: 290ms; }
+.ceremony-skill[data-i="2"] { animation-delay: 340ms; }
+.ceremony-skill[data-i="3"] { animation-delay: 390ms; }
+.ceremony-skill[data-i="4"] { animation-delay: 440ms; }
+.ceremony-skill-name {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--creme-mute);
+  margin: 0 0 6px;
+}
+.ceremony-skill-score {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 22px;
+  color: var(--creme);
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.ceremony-skill-score .out {
+  font-size: 13px;
+  color: var(--creme-mute);
+}
+
+/* XP count-up */
+.ceremony-xp {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  opacity: 0;
-  transform: translateY(12px);
-  animation: lc-fade-up var(--dur-move) var(--ease-enter) forwards;
-  animation-delay: 120ms;
+  animation-delay: 360ms;
 }
-.lesson-complete-xp-value {
+.ceremony-xp-value {
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 42px;
+  font-size: clamp(44px, 6vw, 56px);
   color: var(--brass);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
-.lesson-complete-xp-lbl {
+.ceremony-xp-lbl {
   font-family: var(--font-jetbrains, monospace);
   font-size: 11px;
   font-weight: 600;
@@ -5214,67 +5246,267 @@ button, [role="button"] {
   text-transform: uppercase;
   color: var(--creme-mute);
 }
-.lesson-complete-progress {
+
+/* Spine — portion peinte (scaleX origin left) */
+.ceremony-spine {
   width: 100%;
-  opacity: 0;
-  transform: translateY(12px);
-  animation: lc-fade-up var(--dur-move) var(--ease-enter) forwards;
-  animation-delay: 240ms;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation-delay: 480ms;
 }
-.lesson-complete-progress-lbl {
+.ceremony-spine-caption {
   font-family: var(--font-jetbrains, monospace);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: var(--creme-soft);
-  margin: 0 0 8px;
+  color: var(--creme-mute);
+  margin: 0;
 }
-.lesson-complete-progress-bar {
+.ceremony-spine-track {
+  position: relative;
   height: 6px;
   background: var(--creme-hair);
   border-radius: 999px;
   overflow: hidden;
 }
-.lesson-complete-progress-fill {
-  height: 100%;
+.ceremony-spine-prev {
+  position: absolute;
+  inset: 0;
+  background: rgba(184, 135, 62, 0.35);
+  border-radius: inherit;
+  transform-origin: left center;
+  transform: scaleX(var(--prev-pct, 0));
+}
+.ceremony-spine-won {
+  position: absolute;
+  inset: 0;
   background: var(--brass);
   border-radius: inherit;
-  width: 100%;
   transform-origin: left center;
   transform: scaleX(0);
-  animation: lc-paint var(--dur-moment) var(--ease-enter) forwards;
-  animation-delay: 360ms;
+  animation: ceremony-paint var(--dur-moment) var(--ease-enter) forwards;
+  animation-delay: 480ms;
 }
-@keyframes lc-paint {
-  to { transform: scaleX(calc(var(--fill, 0%) / 100%)); }
+@keyframes ceremony-paint {
+  to { transform: scaleX(var(--new-pct, 0)); }
 }
-.lesson-complete-cta {
+
+/* Boutons — brass + ghost */
+.ceremony-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation-delay: 720ms;
+}
+.ceremony-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px 28px;
+  border-radius: 10px;
   background: var(--brass);
   color: var(--espresso);
-  border: none;
-  border-radius: 10px;
+  border: 1px solid transparent;
   font-family: var(--font-manrope), sans-serif;
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
+  text-decoration: none;
   transition: opacity var(--dur-touch) var(--ease-enter);
-  opacity: 0;
-  animation: lc-cta-in var(--dur-move) var(--ease-enter) forwards;
-  animation-delay: 480ms;
 }
-.lesson-complete-cta:hover { opacity: 0.9; }
-.lesson-complete-cta:focus-visible { outline: 2px solid var(--creme); outline-offset: 3px; }
-@keyframes lc-cta-in { to { opacity: 1; } }
+.ceremony-cta:hover:not(:disabled) { opacity: 0.9; }
+.ceremony-cta:focus-visible { outline: 2px solid var(--creme); outline-offset: 3px; }
+.ceremony-cta.ghost {
+  background: transparent;
+  color: var(--creme-soft);
+  border-color: var(--creme-hair);
+}
+.ceremony-cta.ghost:hover {
+  color: var(--creme);
+  border-color: var(--brass-edge);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .lesson-complete-mark,
-  .lesson-complete-h,
-  .lesson-complete-sub,
-  .lesson-complete-xp,
-  .lesson-complete-progress,
-  .lesson-complete-cta { opacity: 1; transform: none; animation: none; }
-  .lesson-complete-progress-fill { animation: none; transform: scaleX(calc(var(--fill, 0%) / 100%)); }
+  .ceremony-item,
+  .ceremony-skill,
+  .ceremony-spine-won { opacity: 1; transform: none; animation: none; }
+  .ceremony-spine-won { transform: scaleX(var(--new-pct, 0)); }
+}
+
+/* ─── LevelUp · cérémonie rare (franchissement de niveau) ─────────
+   Utilise --dur-ceremony (960ms) — seule exception à dur-moment.
+   Halo brass qui s'élève, spine ENTIER repeint segment par segment.
+   Le nouveau niveau apparaît à la dernière position, brass éclatant. */
+
+.level-up {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg,
+    var(--espresso) 0%,
+    var(--espresso-2) 100%);
+}
+.level-up.territory-sources {
+  background: linear-gradient(180deg,
+    var(--terre) 0%,
+    var(--terre-2) 100%);
+}
+
+/* Le halo qui s'élève — fondu du bas vers le centre puis fade */
+.levelup-halo {
+  position: absolute;
+  left: 50%;
+  bottom: -30vh;
+  width: 90vh;
+  height: 90vh;
+  max-width: 900px;
+  max-height: 900px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(184, 135, 62, 0.28) 0%,
+    rgba(184, 135, 62, 0.10) 40%,
+    transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%, 0);
+  opacity: 0;
+  animation: levelup-halo-rise var(--dur-ceremony) var(--ease-enter) forwards;
+}
+@keyframes levelup-halo-rise {
+  0%   { opacity: 0; transform: translate(-50%, 40vh); }
+  60%  { opacity: 1; }
+  100% { opacity: 0.85; transform: translate(-50%, -10vh); }
+}
+
+/* Le spine — ol vertical, chaque segment cascade 120ms */
+.levelup-spine {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: relative;
+}
+/* La colonne verticale entre les dots — filet créme-hair, peint en brass
+   au fur et à mesure que les segments s'activent. */
+.levelup-spine::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 12px;
+  bottom: 12px;
+  width: 1.5px;
+  background: linear-gradient(to bottom,
+    var(--brass) 0%,
+    var(--brass) 100%);
+  transform-origin: top center;
+  transform: scaleY(0);
+  animation: levelup-spine-line var(--dur-ceremony) var(--ease-enter) forwards;
+}
+@keyframes levelup-spine-line {
+  to { transform: scaleY(1); }
+}
+
+.levelup-segment {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  align-items: center;
+  gap: 16px;
+  color: var(--creme-mute);
+  opacity: 0;
+  transform: translateX(-8px);
+  animation: levelup-seg-in var(--dur-move) var(--ease-enter) forwards;
+  position: relative;
+  z-index: 1;
+}
+.levelup-segment[data-i="0"] { animation-delay: 0ms; }
+.levelup-segment[data-i="1"] { animation-delay: 160ms; }
+.levelup-segment[data-i="2"] { animation-delay: 320ms; }
+.levelup-segment[data-i="3"] { animation-delay: 480ms; }
+.levelup-segment[data-i="4"] { animation-delay: 640ms; }
+.levelup-segment[data-i="5"] { animation-delay: 800ms; }
+@keyframes levelup-seg-in {
+  to { opacity: 1; transform: translateX(0); }
+}
+.levelup-segment[aria-current="step"] {
+  color: var(--creme);
+}
+.levelup-segment[aria-current="step"] .levelup-segment-key {
+  color: var(--brass);
+}
+
+.levelup-segment-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--brass);
+  border: 1.5px solid var(--brass);
+  box-shadow: 0 0 0 4px rgba(184, 135, 62, 0.14);
+  justify-self: center;
+}
+.levelup-segment[aria-current="step"] .levelup-segment-dot {
+  background: var(--brass);
+  box-shadow: 0 0 0 6px rgba(184, 135, 62, 0.28);
+}
+
+.levelup-segment-lbl {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.levelup-segment-key {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 18px;
+  color: inherit;
+  letter-spacing: -0.01em;
+}
+.levelup-segment-caption {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  color: var(--creme-mute);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+
+/* La ligne d'âme apparaît après la fin de la cascade des segments */
+.levelup-soul {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(28px, 4.5vw, 40px);
+  font-weight: 400;
+  letter-spacing: -0.024em;
+  line-height: 1.12;
+  color: var(--creme);
+  margin: 0;
+  max-width: 22ch;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: ceremony-in var(--dur-move) var(--ease-enter) forwards;
+  animation-delay: 960ms;
+}
+
+.levelup-action {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: ceremony-in var(--dur-move) var(--ease-enter) forwards;
+  animation-delay: 1120ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .levelup-halo,
+  .levelup-spine::before,
+  .levelup-segment,
+  .levelup-soul,
+  .levelup-action { opacity: 1; transform: none; animation: none; }
+  .levelup-halo { opacity: 0.6; }
+  .levelup-spine::before { transform: scaleY(1); }
+}
+@media (max-width: 640px) {
+  .levelup-spine { margin-bottom: 24px; gap: 14px; }
+  .levelup-segment-key { font-size: 16px; }
 }
 
 /* ─── StateBlock · l'unique façon d'afficher un état ────────────

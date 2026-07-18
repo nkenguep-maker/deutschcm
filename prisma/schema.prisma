@@ -526,13 +526,14 @@ model StudentGroupMember {
 }
 
 model LevelHistory {
-  id        String   @id @default(uuid())
-  userId    String
-  oldLevel  String
-  newLevel  String
-  reason    String
-  changedBy String
-  changedAt DateTime @default(now())
+  id            String   @id @default(uuid())
+  userId        String
+  oldLevel      String
+  newLevel      String
+  reason        String
+  changedBy     String
+  changedAt     DateTime @default(now())
+  ceremonySeen  Boolean  @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
