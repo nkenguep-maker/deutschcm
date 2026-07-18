@@ -139,7 +139,11 @@ export default function Layout({ children, title }: LayoutProps) {
     router.push("/goodbye");
   };
 
-  const activeNav = NAV_BY_ROLE[userRole] ?? STUDENT_NAV;
+  // Multi-rôles : la sidebar suit activeSpace (le choix explicite de
+  // l'user via SpaceSwitcher/TestSpaceBar), pas User.role legacy.
+  // Fallback sur userRole si activeSpace pas encore chargé.
+  const navRole = activeSpace ?? userRole;
+  const activeNav = NAV_BY_ROLE[navRole] ?? STUDENT_NAV;
   const initials = userName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) || "Y";
   const spaceLabel: Record<SpaceRole, string> = {
     STUDENT: tl.studentRole ?? "Espace apprenant",
