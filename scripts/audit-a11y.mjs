@@ -17,6 +17,10 @@ const PAGES = [
   { name: "methode-fr",    path: "/fr/methode" },
   { name: "histoires-fr",  path: "/fr/histoires" },
   { name: "manifeste-fr",  path: "/fr/manifeste" },
+  { name: "setup-role-fr", path: "/fr/setup-role" },
+  { name: "onboard-stu-fr", path: "/fr/onboarding/student" },
+  { name: "onboard-tea-fr", path: "/fr/onboarding/teacher" },
+  { name: "onboard-cen-fr", path: "/fr/onboarding/center" },
 ];
 
 await mkdir(OUT, { recursive: true });

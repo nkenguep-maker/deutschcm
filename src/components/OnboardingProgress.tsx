@@ -1,8 +1,10 @@
 "use client";
 
+// OnboardingProgress — Kaffeehaus. Filet horizontal avec pastilles laiton.
+// Pastille active au brass, précédentes cochées, suivantes en attente.
+
 interface Step {
   label: string;
-  icon?: string;
 }
 
 interface Props {
@@ -12,46 +14,40 @@ interface Props {
 
 export default function OnboardingProgress({ steps, current }: Props) {
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0, marginBottom: 36 }}>
+    <ol
+      className="lonboard-progress"
+      aria-label="Progression de l'onboarding"
+    >
       {steps.map((step, i) => {
-        const done = i < current;
-        const active = i === current;
+        const state = i < current ? "done" : i === current ? "on" : "next";
         return (
-          <div key={i} style={{ display: "flex", alignItems: "center" }}>
-            {/* Step circle */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-              <div style={{
-                width: 38, height: 38, borderRadius: "50%",
-                background: done ? "#10b981" : active ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)",
-                border: `2px solid ${done ? "#10b981" : active ? "#10b981" : "rgba(255,255,255,0.1)"}`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: done ? "#fff" : active ? "#10b981" : "rgba(255,255,255,0.2)",
-                fontWeight: 700, fontSize: done ? 16 : 14,
-                transition: "all 0.3s ease",
-                boxShadow: active ? "0 0 16px rgba(16,185,129,0.3)" : "none",
-              }}>
-                {done ? "✓" : (step.icon ?? String(i + 1))}
-              </div>
-              <span style={{
-                fontSize: 10, fontWeight: active ? 700 : 400,
-                color: done ? "#10b981" : active ? "#10b981" : "rgba(255,255,255,0.25)",
-                whiteSpace: "nowrap", maxWidth: 70, textAlign: "center", lineHeight: 1.2,
-              }}>
-                {step.label}
-              </span>
-            </div>
-
-            {/* Connector */}
-            {i < steps.length - 1 && (
-              <div style={{
-                width: 48, height: 2, margin: "0 4px", marginBottom: 22,
-                background: done ? "#10b981" : "rgba(255,255,255,0.06)",
-                transition: "background 0.3s ease",
-              }} />
-            )}
-          </div>
+          <li
+            key={i}
+            className={`lonboard-progress-step ${state}`}
+            aria-current={state === "on" ? "step" : undefined}
+          >
+            <span className="lonboard-progress-dot" aria-hidden="true">
+              {state === "done" ? (
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M2 6.5 5 9.5 10 3.5" />
+                </svg>
+              ) : (
+                <span>{i + 1}</span>
+              )}
+            </span>
+            <span className="lonboard-progress-lbl">{step.label}</span>
+          </li>
         );
       })}
-    </div>
+    </ol>
   );
 }
