@@ -26,6 +26,20 @@ type Story = {
 
 const STORIES_FR: readonly Story[] = [
   {
+    mono: "B",
+    name: "Bintou",
+    city: "Paris, diaspora sénégalaise",
+    year: "2026",
+    level: "É1 · Écoute (wolof)",
+    headline: "Elle veut parler wolof à sa grand-mère.",
+    quote:
+      "„Ma grand-mère me raconte des histoires que je ne comprends qu’à moitié. YEMA me donne les mots pour lui répondre — pas juste hocher la tête.”",
+    body:
+      "Bintou est née en France de parents sénégalais. Le wolof, elle l’entend depuis toujours mais ne l’a jamais parlé. Elle a rejoint la liste d’attente wolof (chapitre suivant YEMA) et commence par les modules d’écoute — l’étape É1 sur l’échelle YEMA. L’objectif n’est pas de « maîtriser » : c’est de participer à la conversation familiale.",
+    goalLbl: "Objectif 2026",
+    goal: "Rendre visite à sa grand-mère à Louga en tenant une conversation en wolof.",
+  },
+  {
     mono: "A",
     name: "Aïcha",
     city: "Yaoundé, Cameroun",
@@ -84,6 +98,20 @@ const STORIES_FR: readonly Story[] = [
 ];
 
 const STORIES_EN: readonly Story[] = [
+  {
+    mono: "B",
+    name: "Bintou",
+    city: "Paris, Senegalese diaspora",
+    year: "2026",
+    level: "É1 · Listen (Wolof)",
+    headline: "She wants to speak Wolof with her grandmother.",
+    quote:
+      "\"My grandmother tells me stories I only half understand. YEMA is giving me the words to answer — not just nod.\"",
+    body:
+      "Bintou was born in France to Senegalese parents. She has always heard Wolof but never spoken it. She joined the Wolof waitlist (YEMA next chapter) and started with listening modules — level É1 on the YEMA scale. The goal isn't to \"master\" it: it's to join the family conversation.",
+    goalLbl: "2026 goal",
+    goal: "Visit her grandmother in Louga and hold a conversation in Wolof.",
+  },
   {
     mono: "A",
     name: "Aïcha",

@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og"
 // Node.js runtime — l'Edge runtime plafonne à 1 MB, @vercel/og + fonts
 // next/font gonflent au-delà. Node runtime a 50 MB de marge.
 export const runtime = "nodejs"
-export const alt = "Yema Languages — L'allemand, pas l'accent."
+export const alt = "YEMA Languages — L'Afrique parle. Toutes ses langues."
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -115,14 +115,14 @@ export default async function Image() {
                   background: "#B8873E",
                 }}
               />
-              Bêta ouverte · CEFR A1 → C1
+              1re plateforme africaine · Bêta 2026
             </div>
 
             {/* Titre editorial */}
             <div
               style={{
                 fontFamily: "serif",
-                fontSize: 108,
+                fontSize: 96,
                 fontWeight: 400,
                 color: "#F4EBDC",
                 lineHeight: 1.02,
@@ -130,12 +130,12 @@ export default async function Image() {
                 marginBottom: 8,
               }}
             >
-              L&apos;allemand,
+              L&apos;Afrique parle.
             </div>
             <div
               style={{
                 fontFamily: "serif",
-                fontSize: 108,
+                fontSize: 96,
                 fontWeight: 400,
                 fontStyle: "italic",
                 color: "#B8873E",
@@ -143,7 +143,7 @@ export default async function Image() {
                 letterSpacing: "-0.028em",
               }}
             >
-              pas l&apos;accent.
+              Toutes ses langues.
             </div>
           </div>
 
