@@ -305,15 +305,15 @@ type Locale = "fr" | "en";
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const LEVEL_COLORS: Record<string, string> = {
-  A1: "#10b981", A2: "#34d399", B1: "#3b82f6", B2: "#8b5cf6", C1: "#f59e0b", C2: "#ef4444",
+  A1: "var(--brass)", A2: "#34d399", B1: "#3b82f6", B2: "#8b5cf6", C1: "#f59e0b", C2: "var(--oxblood)",
 };
 const PLAN_LABEL: Record<string, { label: string; color: string }> = {
   starter: { label: "Starter", color: "#64748b" },
-  pro: { label: "Pro", color: "#6366f1" },
+  pro: { label: "Pro", color: "var(--brass)" },
   enterprise: { label: "Enterprise", color: "#f59e0b" },
 };
 
-function Av({ initials, size = 38, color = "#10b981" }: { initials: string; size?: number; color?: string }) {
+function Av({ initials, size = 38, color = "var(--brass)" }: { initials: string; size?: number; color?: string }) {
   return (
     <div style={{ width: size, height: size, borderRadius: "50%", flexShrink: 0, background: `linear-gradient(135deg, ${color}, ${color}88)`, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: size * 0.36 }}>
       {initials}
@@ -331,21 +331,21 @@ function Stars({ rating }: { rating: number }) {
     <span style={{ color: "#fbbf24", fontSize: 13 }}>
       {"★".repeat(Math.floor(rating))}
       {rating % 1 >= 0.5 ? "½" : ""}
-      <span style={{ color: "rgba(255,255,255,0.2)" }}>{"★".repeat(5 - Math.ceil(rating))}</span>
+      <span style={{ color: "var(--creme-hair)" }}>{"★".repeat(5 - Math.ceil(rating))}</span>
     </span>
   );
 }
 
 function SpotsBar({ current, max, t }: { current: number; max: number; t: TT }) {
   const pct = (current / max) * 100;
-  const color = pct >= 90 ? "#ef4444" : pct >= 70 ? "#f59e0b" : "#10b981";
+  const color = pct >= 90 ? "var(--oxblood)" : pct >= 70 ? "#f59e0b" : "var(--brass)";
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 13, color: "rgba(255,255,255,0.65)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 13, color: "var(--creme-soft)" }}>
         <span>{t.cardSpotsLabel(current, max)}</span>
-        <span style={{ color: pct >= 90 ? "#ef4444" : "#10b981", fontWeight: 600 }}>{t.cardSpotsRemaining(max - current)}</span>
+        <span style={{ color: pct >= 90 ? "var(--oxblood)" : "var(--brass)", fontWeight: 600 }}>{t.cardSpotsRemaining(max - current)}</span>
       </div>
-      <div style={{ height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 2 }}>
+      <div style={{ height: 4, background: "var(--creme-hair)", borderRadius: 2 }}>
         <div style={{ width: `${pct}%`, height: "100%", background: color, borderRadius: 2, transition: "width var(--dur-moment)" }} />
       </div>
     </div>
@@ -369,28 +369,28 @@ function CameroonMap({ onCityClick, t }: { onCityClick: (city: string) => void; 
   const mapCities = [...MAP_CITIES_BASE, { name: onlineKey, x: 110, y: 240, classes: 1 }];
 
   return (
-    <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 16, display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, marginBottom: 12 }}>{t.mapTitle}</div>
+    <div style={{ background: "rgba(244, 235, 220, 0.02)", border: "1px solid var(--creme-hair)", borderRadius: 18, padding: 16, display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div style={{ color: "var(--creme-soft)", fontSize: 13, marginBottom: 12 }}>{t.mapTitle}</div>
       <svg viewBox="0 0 200 300" width={200} height={300} style={{ overflow: "visible" }}>
         <path d="M 30,275 C 40,280 65,285 85,282 L 130,278 C 155,265 175,240 185,210 L 190,175 L 185,145 C 182,120 175,100 165,78 L 152,50 C 140,28 122,10 100,3 L 72,0 C 48,5 25,22 14,50 L 3,82 C 0,108 8,132 12,158 L 16,192 L 22,228 Z"
-          fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.25)" strokeWidth="1.5" />
+          fill="var(--brass-glow)" stroke="var(--brass-edge)" strokeWidth="1.5" />
         {mapCities.map(city => (
           <g key={city.name} onClick={() => onCityClick(city.name)} style={{ cursor: "pointer" }}
             onMouseEnter={() => setHovered(city.name)} onMouseLeave={() => setHovered(null)}>
             <circle cx={city.x} cy={city.y} r={city.classes > 0 ? 7 : 4}
-              fill={city.classes > 0 ? "#10b981" : "rgba(255,255,255,0.2)"}
-              stroke={hovered === city.name ? "white" : city.classes > 0 ? "rgba(16,185,129,0.4)" : "rgba(255,255,255,0.1)"}
+              fill={city.classes > 0 ? "var(--brass)" : "var(--creme-hair)"}
+              stroke={hovered === city.name ? "white" : city.classes > 0 ? "rgba(16,185,129,0.4)" : "var(--creme-hair)"}
               strokeWidth={hovered === city.name ? 2 : 1} opacity={hovered === city.name ? 1 : 0.85} />
             {city.classes > 0 && (
               <text x={city.x} y={city.y + 0.5} textAnchor="middle" dominantBaseline="middle" fill="white" fontSize={7} fontWeight="bold">{city.classes}</text>
             )}
-            <text x={city.x + 10} y={city.y} dominantBaseline="middle" fill={hovered === city.name ? "white" : "rgba(255,255,255,0.6)"} fontSize={9}>{city.name}</text>
+            <text x={city.x + 10} y={city.y} dominantBaseline="middle" fill={hovered === city.name ? "white" : "var(--creme-soft)"} fontSize={9}>{city.name}</text>
           </g>
         ))}
       </svg>
-      <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 13, color: "rgba(255,255,255,0.72)" }}>
-        <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", display: "inline-block" }} /> {t.mapLegendClass}</span>
-        <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "inline-block" }} /> {t.mapLegendCity}</span>
+      <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 13, color: "var(--creme-soft)" }}>
+        <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--brass)", display: "inline-block" }} /> {t.mapLegendClass}</span>
+        <span style={{ display: "flex", gap: 4, alignItems: "center" }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--creme-hair)", display: "inline-block" }} /> {t.mapLegendCity}</span>
       </div>
     </div>
   );
@@ -407,7 +407,7 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
   const [nameQuery, setNameQuery] = useState("");
   const [nameFilter, setNameFilter] = useState<NameFilter>("all");
 
-  const ac = "#10b981";
+  const ac = "var(--brass)";
 
   const handleCodeSearch = () => {
     const trimmed = code.trim().toUpperCase();
@@ -441,14 +441,14 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
     <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 24 }}>
 
       {/* Code section */}
-      <div style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.08), rgba(5,150,105,0.03))", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 18, padding: "16px 20px" }}>
+      <div style={{ background: "linear-gradient(135deg, var(--brass-glow), rgba(5,150,105,0.03))", border: "1px solid var(--brass-edge)", borderRadius: 18, padding: "16px 20px" }}>
         <div style={{ marginBottom: 4 }}>
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 3 }}>
             <span style={{ fontSize: 14 }}>🔑</span>
             <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>{t.joinByCodeTitle}</span>
-            <span style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>{t.codeSubtitle}</span>
+            <span style={{ color: "var(--creme-soft)", fontSize: 13 }}>{t.codeSubtitle}</span>
           </div>
-          <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 13, marginBottom: 12 }}>{t.joinByCodeDesc}</div>
+          <div style={{ color: "var(--creme-soft)", fontSize: 13, marginBottom: 12 }}>{t.joinByCodeDesc}</div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <input
@@ -456,9 +456,9 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
             onChange={e => { setCode(e.target.value.toUpperCase()); setCodeResult(null); }}
             onKeyDown={e => e.key === "Enter" && code.trim().length >= 4 && handleCodeSearch()}
             placeholder={t.joinByCodePlaceholder}
-            style={{ flex: 1, padding: "10px 12px", borderRadius: 11, background: "rgba(255,255,255,0.06)", border: `1px solid ${codeResult === "notfound" ? "rgba(239,68,68,0.5)" : codeResult ? "rgba(16,185,129,0.5)" : "rgba(255,255,255,0.12)"}`, color: "white", fontSize: 16, outline: "none", fontFamily: "monospace", letterSpacing: "0.04em", boxSizing: "border-box" as const }}
+            style={{ flex: 1, padding: "10px 12px", borderRadius: 11, background: "var(--creme-hair)", border: `1px solid ${codeResult === "notfound" ? "rgba(239,68,68,0.5)" : codeResult ? "rgba(16,185,129,0.5)" : "var(--creme-hair)"}`, color: "white", fontSize: 16, outline: "none", fontFamily: "monospace", letterSpacing: "0.04em", boxSizing: "border-box" as const }}
           />
-          <button onClick={handleCodeSearch} disabled={code.trim().length < 4} style={{ padding: "10px 18px", borderRadius: 11, fontSize: 13, fontWeight: 700, cursor: code.trim().length >= 4 ? "pointer" : "not-allowed", background: code.trim().length >= 4 ? `linear-gradient(135deg,${ac},#059669)` : "rgba(255,255,255,0.05)", color: code.trim().length >= 4 ? "white" : "rgba(255,255,255,0.3)", border: "none", whiteSpace: "nowrap" as const }}>
+          <button onClick={handleCodeSearch} disabled={code.trim().length < 4} style={{ padding: "10px 18px", borderRadius: 11, fontSize: 13, fontWeight: 700, cursor: code.trim().length >= 4 ? "pointer" : "not-allowed", background: code.trim().length >= 4 ? `linear-gradient(135deg,${ac},var(--brass-deep))` : "var(--creme-hair)", color: code.trim().length >= 4 ? "white" : "var(--creme-mute)", border: "none", whiteSpace: "nowrap" as const }}>
             {t.joinByCodeBtn} →
           </button>
         </div>
@@ -476,17 +476,17 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
             const sent = codeSent.has(cls.id);
             const lc = LEVEL_COLORS[cls.level] ?? ac;
             return (
-              <div style={{ marginTop: 12, padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: `1px solid ${lc}30`, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" as const }}>
+              <div style={{ marginTop: 12, padding: "14px 16px", borderRadius: 14, background: "rgba(244, 235, 220, 0.04)", border: `1px solid ${lc}30`, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" as const }}>
                 <Av initials={cls.teacherAvatar} size={42} color={lc} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" as const, marginBottom: 3 }}>
                     <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{cls.teacherName}</span>
                     <LvlBadge level={cls.level} />
-                    <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 13, fontWeight: 700 }}>{t.teacherBadge}</span>
+                    <span style={{ background: "rgba(99,102,241,0.12)", color: "var(--brass)", borderRadius: 5, padding: "1px 6px", fontSize: 13, fontWeight: 700 }}>{t.teacherBadge}</span>
                   </div>
-                  <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>📍 {cls.city} · 📅 {cls.schedule} · {spots > 0 ? t.spotsAvail(spots) : t.spotsFull}</div>
+                  <div style={{ color: "var(--creme-soft)", fontSize: 13 }}>📍 {cls.city} · 📅 {cls.schedule} · {spots > 0 ? t.spotsAvail(spots) : t.spotsFull}</div>
                 </div>
-                <button onClick={() => { if (!sent && spots > 0) { setCodeSent(s => new Set([...s, cls.id])); onJoin(cls.id, `${cls.teacherName} — ${cls.level}`, "class", cls.teacherName); } }} disabled={sent || spots <= 0} style={{ padding: "9px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: (!sent && spots > 0) ? "pointer" : "not-allowed", background: sent ? `${ac}15` : `linear-gradient(135deg,${ac},#059669)`, border: sent ? `1px solid ${ac}40` : "none", color: sent ? ac : "white", whiteSpace: "nowrap" as const }}>
+                <button onClick={() => { if (!sent && spots > 0) { setCodeSent(s => new Set([...s, cls.id])); onJoin(cls.id, `${cls.teacherName} — ${cls.level}`, "class", cls.teacherName); } }} disabled={sent || spots <= 0} style={{ padding: "9px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: (!sent && spots > 0) ? "pointer" : "not-allowed", background: sent ? `${ac}15` : `linear-gradient(135deg,${ac},var(--brass-deep))`, border: sent ? `1px solid ${ac}40` : "none", color: sent ? ac : "white", whiteSpace: "nowrap" as const }}>
                   {sent ? t.spotsSent : spots <= 0 ? t.spotsFull : t.joinBtn}
                 </button>
               </div>
@@ -496,7 +496,7 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
             const ctr = codeResult.data;
             const sent = codeSent.has(ctr.id);
             return (
-              <div style={{ marginTop: 12, padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(234,179,8,0.3)", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" as const }}>
+              <div style={{ marginTop: 12, padding: "14px 16px", borderRadius: 14, background: "rgba(244, 235, 220, 0.04)", border: "1px solid rgba(234,179,8,0.3)", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" as const }}>
                 <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(234,179,8,0.15)", border: "1px solid rgba(234,179,8,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fbbf24", fontWeight: 800, fontSize: 15, flexShrink: 0 }}>{ctr.avatar}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" as const, marginBottom: 3 }}>
@@ -504,7 +504,7 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
                     {ctr.verified && <span>✅</span>}
                     <span style={{ background: "rgba(234,179,8,0.12)", color: "#fbbf24", borderRadius: 5, padding: "1px 6px", fontSize: 13, fontWeight: 700 }}>{t.centerBadge}</span>
                   </div>
-                  <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>📍 {ctr.city} · {ctr.classes} {t.cardClassesLabel}</div>
+                  <div style={{ color: "var(--creme-soft)", fontSize: 13 }}>📍 {ctr.city} · {ctr.classes} {t.cardClassesLabel}</div>
                 </div>
                 <button onClick={() => { if (!sent) { setCodeSent(s => new Set([...s, ctr.id])); onJoin(ctr.id, ctr.name, "center"); } }} disabled={sent} style={{ padding: "9px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: sent ? "not-allowed" : "pointer", background: sent ? "rgba(234,179,8,0.1)" : "linear-gradient(135deg,#eab308,#ca8a04)", border: sent ? "1px solid rgba(234,179,8,0.3)" : "none", color: sent ? "#fbbf24" : "white", whiteSpace: "nowrap" as const }}>
                   {sent ? t.spotsSent : t.joinBtn}
@@ -516,17 +516,17 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
           const isFull = grp.members >= grp.max;
           const sent = codeSent.has(grp.id);
           return (
-            <div style={{ marginTop: 12, padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(99,102,241,0.25)", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" as const }}>
-              <Av initials={grp.creatorAvatar} size={42} color="#6366f1" />
+            <div style={{ marginTop: 12, padding: "14px 16px", borderRadius: 14, background: "rgba(244, 235, 220, 0.04)", border: "1px solid rgba(99,102,241,0.25)", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" as const }}>
+              <Av initials={grp.creatorAvatar} size={42} color="var(--brass)" />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" as const, marginBottom: 3 }}>
                   <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{grp.name}</span>
                   <LvlBadge level={grp.level} />
-                  <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 13, fontWeight: 700 }}>{t.groupBadge}</span>
+                  <span style={{ background: "rgba(99,102,241,0.12)", color: "var(--brass)", borderRadius: 5, padding: "1px 6px", fontSize: 13, fontWeight: 700 }}>{t.groupBadge}</span>
                 </div>
-                <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>📍 {grp.city} · {t.cardMembers(grp.members, grp.max)} · {grp.schedule}</div>
+                <div style={{ color: "var(--creme-soft)", fontSize: 13 }}>📍 {grp.city} · {t.cardMembers(grp.members, grp.max)} · {grp.schedule}</div>
               </div>
-              <button onClick={() => { if (!isFull && !sent) { setCodeSent(s => new Set([...s, grp.id])); onJoin(grp.id, grp.name, "group"); } }} disabled={sent || isFull} style={{ padding: "9px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: (sent || isFull) ? "not-allowed" : "pointer", background: sent ? "rgba(99,102,241,0.1)" : isFull ? "rgba(255,255,255,0.04)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: sent ? "1px solid rgba(99,102,241,0.3)" : isFull ? "1px solid rgba(255,255,255,0.07)" : "none", color: sent ? "#818cf8" : isFull ? "rgba(255,255,255,0.3)" : "white", whiteSpace: "nowrap" as const }}>
+              <button onClick={() => { if (!isFull && !sent) { setCodeSent(s => new Set([...s, grp.id])); onJoin(grp.id, grp.name, "group"); } }} disabled={sent || isFull} style={{ padding: "9px 18px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: (sent || isFull) ? "not-allowed" : "pointer", background: sent ? "rgba(99,102,241,0.1)" : isFull ? "rgba(244, 235, 220, 0.04)" : "linear-gradient(135deg,var(--brass),#4f46e5)", border: sent ? "1px solid rgba(99,102,241,0.3)" : isFull ? "1px solid var(--creme-hair)" : "none", color: sent ? "var(--brass)" : isFull ? "var(--creme-mute)" : "white", whiteSpace: "nowrap" as const }}>
                 {sent ? t.spotsSent : isFull ? t.fullBtn : t.joinBtn}
               </button>
             </div>
@@ -535,29 +535,29 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
       </div>
 
       {/* Name search */}
-      <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: "16px 20px" }}>
+      <div style={{ background: "rgba(244, 235, 220, 0.02)", border: "1px solid var(--creme-hair)", borderRadius: 18, padding: "16px 20px" }}>
         <div style={{ marginBottom: 10 }}>
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 3 }}>
             <span style={{ fontSize: 14 }}>🔍</span>
             <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>{t.searchByNameTitle}</span>
           </div>
-          <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 13 }}>{t.searchByNameDesc}</div>
+          <div style={{ color: "var(--creme-soft)", fontSize: 13 }}>{t.searchByNameDesc}</div>
         </div>
         <div style={{ position: "relative" as const, marginBottom: 10 }}>
           <input
             value={nameQuery}
             onChange={e => setNameQuery(e.target.value)}
             placeholder={t.searchByNamePlaceholder}
-            style={{ width: "100%", padding: "10px 36px 10px 36px", borderRadius: 11, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 16, outline: "none", boxSizing: "border-box" as const }}
-            onFocus={e => (e.target.style.borderColor = "rgba(255,255,255,0.3)")}
-            onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
+            style={{ width: "100%", padding: "10px 36px 10px 36px", borderRadius: 11, background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "white", fontSize: 16, outline: "none", boxSizing: "border-box" as const }}
+            onFocus={e => (e.target.style.borderColor = "var(--creme-mute)")}
+            onBlur={e => (e.target.style.borderColor = "var(--creme-hair)")}
           />
           <span style={{ position: "absolute" as const, left: 11, top: "50%", transform: "translateY(-50%)", fontSize: 14, opacity: 0.4 }}>🔍</span>
-          {nameQuery && <button onClick={() => setNameQuery("")} style={{ position: "absolute" as const, right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 16, cursor: "pointer" }}>×</button>}
+          {nameQuery && <button onClick={() => setNameQuery("")} style={{ position: "absolute" as const, right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--creme-mute)", fontSize: 16, cursor: "pointer" }}>×</button>}
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" as const }}>
           {(["all", "teachers", "centers", "classes", "groups"] as NameFilter[]).map(f => (
-            <button key={f} onClick={() => setNameFilter(f)} style={{ padding: "4px 11px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", background: nameFilter === f ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.04)", border: nameFilter === f ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.07)", color: nameFilter === f ? "white" : "rgba(255,255,255,0.65)" }}>
+            <button key={f} onClick={() => setNameFilter(f)} style={{ padding: "4px 11px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", background: nameFilter === f ? "var(--creme-hair)" : "rgba(244, 235, 220, 0.04)", border: nameFilter === f ? "1px solid var(--creme-mute)" : "1px solid var(--creme-hair)", color: nameFilter === f ? "white" : "var(--creme-soft)" }}>
               {nameFilterLabels[f]}
             </button>
           ))}
@@ -565,11 +565,11 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
 
         {nameQuery.length >= 3 && (
           <div style={{ marginTop: 12 }}>
-            <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, marginBottom: 8 }}>
+            <div style={{ color: "var(--creme-soft)", fontSize: 13, marginBottom: 8 }}>
               {t.nameResultsLabel(nameResults.length, nameQuery)}
             </div>
             {nameResults.length === 0 ? (
-              <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 13, textAlign: "center" as const, padding: "10px 0" }}>
+              <div style={{ color: "var(--creme-soft)", fontSize: 13, textAlign: "center" as const, padding: "10px 0" }}>
                 {t.nameNoResults(nameQuery)}
               </div>
             ) : (
@@ -579,31 +579,31 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
                     const cls = r.data as ClassItem;
                     const lc = LEVEL_COLORS[cls.level] ?? ac;
                     return (
-                      <div key={`c${i}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                      <div key={`c${i}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)" }}>
                         <Av initials={cls.teacherAvatar} size={32} color={lc} />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: "flex", gap: 5, alignItems: "center", flexWrap: "wrap" as const }}>
                             <span style={{ color: "white", fontSize: 13, fontWeight: 700 }}>{cls.teacherName}</span>
                             <LvlBadge level={cls.level} />
-                            <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 5px", fontSize: 13, fontWeight: 700 }}>{t.teacherBadge}</span>
+                            <span style={{ background: "rgba(99,102,241,0.12)", color: "var(--brass)", borderRadius: 5, padding: "1px 5px", fontSize: 13, fontWeight: 700 }}>{t.teacherBadge}</span>
                           </div>
-                          <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>📍 {cls.city} · {t.cardSpotsRemaining(cls.max - cls.students)}</div>
+                          <div style={{ color: "var(--creme-soft)", fontSize: 13 }}>📍 {cls.city} · {t.cardSpotsRemaining(cls.max - cls.students)}</div>
                         </div>
-                        <button onClick={() => onJoin(cls.id, `${cls.teacherName} — ${cls.level}`, "class", cls.teacherName)} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", background: `linear-gradient(135deg,${ac},#059669)`, color: "white", border: "none", whiteSpace: "nowrap" as const }}>{t.seeBtn}</button>
+                        <button onClick={() => onJoin(cls.id, `${cls.teacherName} — ${cls.level}`, "class", cls.teacherName)} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", background: `linear-gradient(135deg,${ac},var(--brass-deep))`, color: "white", border: "none", whiteSpace: "nowrap" as const }}>{t.seeBtn}</button>
                       </div>
                     );
                   }
                   if (r.type === "center") {
                     const ctr = r.data as CenterItem;
                     return (
-                      <div key={`t${i}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                      <div key={`t${i}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)" }}>
                         <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(234,179,8,0.15)", border: "1px solid rgba(234,179,8,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fbbf24", fontWeight: 800, fontSize: 12, flexShrink: 0 }}>{ctr.avatar}</div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
                             <span style={{ color: "white", fontSize: 13, fontWeight: 700 }}>{ctr.name}</span>
                             <span style={{ background: "rgba(234,179,8,0.12)", color: "#fbbf24", borderRadius: 5, padding: "1px 5px", fontSize: 13, fontWeight: 700 }}>{t.centerBadge}</span>
                           </div>
-                          <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>📍 {ctr.city} · {ctr.classes} {t.cardClassesLabel}</div>
+                          <div style={{ color: "var(--creme-soft)", fontSize: 13 }}>📍 {ctr.city} · {ctr.classes} {t.cardClassesLabel}</div>
                         </div>
                         <button onClick={() => onJoin(ctr.id, ctr.name, "center")} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg,#eab308,#ca8a04)", color: "white", border: "none", whiteSpace: "nowrap" as const }}>{t.seeBtn}</button>
                       </div>
@@ -612,17 +612,17 @@ function DualSearch({ onJoin, t }: { onJoin: (id: string, name: string, type: "c
                   const grp = r.data as GroupItem;
                   const lc = LEVEL_COLORS[grp.level] ?? ac;
                   return (
-                    <div key={`g${i}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                      <Av initials={grp.creatorAvatar} size={32} color="#6366f1" />
+                    <div key={`g${i}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)" }}>
+                      <Av initials={grp.creatorAvatar} size={32} color="var(--brass)" />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: "flex", gap: 5, alignItems: "center", flexWrap: "wrap" as const }}>
                           <span style={{ color: "white", fontSize: 13, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, maxWidth: 120 }}>{grp.name}</span>
                           <LvlBadge level={grp.level} />
-                          <span style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 5, padding: "1px 5px", fontSize: 13, fontWeight: 700 }}>{t.groupBadge}</span>
+                          <span style={{ background: "rgba(99,102,241,0.12)", color: "var(--brass)", borderRadius: 5, padding: "1px 5px", fontSize: 13, fontWeight: 700 }}>{t.groupBadge}</span>
                         </div>
-                        <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13 }}>📍 {grp.city} · {t.cardMembers(grp.members, grp.max)}</div>
+                        <div style={{ color: "var(--creme-soft)", fontSize: 13 }}>📍 {grp.city} · {t.cardMembers(grp.members, grp.max)}</div>
                       </div>
-                      <button onClick={() => onJoin(grp.id, grp.name, "group")} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "white", border: "none", whiteSpace: "nowrap" as const }}>{t.seeBtn}</button>
+                      <button onClick={() => onJoin(grp.id, grp.name, "group")} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg,var(--brass),#4f46e5)", color: "white", border: "none", whiteSpace: "nowrap" as const }}>{t.seeBtn}</button>
                     </div>
                   );
                 })}
@@ -647,21 +647,21 @@ function OnboardingOverlay({ onClose, t }: { onClose: () => void; t: TT }) {
   const current = steps[step];
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 1500, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div style={{ background: "#0d1117", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 24, padding: "32px 28px", maxWidth: 400, width: "100%", textAlign: "center" }}>
+      <div style={{ background: "var(--espresso-2)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 24, padding: "32px 28px", maxWidth: 400, width: "100%", textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>{current.icon}</div>
         <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 20 }}>
-          {steps.map((_, i) => <div key={i} style={{ width: i === step ? 20 : 6, height: 6, borderRadius: 3, background: i === step ? "#10b981" : "rgba(255,255,255,0.15)", transition: "width var(--dur-move)" }} />)}
+          {steps.map((_, i) => <div key={i} style={{ width: i === step ? 20 : 6, height: 6, borderRadius: 3, background: i === step ? "var(--brass)" : "var(--creme-hair)", transition: "width var(--dur-move)" }} />)}
         </div>
         <h3 style={{ color: "white", fontSize: 18, fontWeight: 800, margin: "0 0 10px" }}>{current.title}</h3>
-        <p style={{ color: "rgba(255,255,255,0.78)", fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>{current.desc}</p>
+        <p style={{ color: "var(--creme-soft)", fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>{current.desc}</p>
         <div style={{ display: "flex", gap: 10 }}>
           {step < steps.length - 1 ? (
             <>
-              <button onClick={onClose} style={{ flex: 1, padding: "11px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.72)", fontSize: 13, cursor: "pointer" }}>{t.onboardSkip}</button>
-              <button onClick={() => setStep(s => s + 1)} style={{ flex: 2, padding: "11px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", color: "white", border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{t.onboardNext}</button>
+              <button onClick={onClose} style={{ flex: 1, padding: "11px", borderRadius: 12, background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "var(--creme-soft)", fontSize: 13, cursor: "pointer" }}>{t.onboardSkip}</button>
+              <button onClick={() => setStep(s => s + 1)} style={{ flex: 2, padding: "11px", borderRadius: 12, background: "linear-gradient(135deg,var(--brass),var(--brass-deep))", color: "white", border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>{t.onboardNext}</button>
             </>
           ) : (
-            <button onClick={onClose} style={{ width: "100%", padding: "12px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", color: "white", border: "none", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{t.onboardDone}</button>
+            <button onClick={onClose} style={{ width: "100%", padding: "12px", borderRadius: 12, background: "linear-gradient(135deg,var(--brass),var(--brass-deep))", color: "white", border: "none", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>{t.onboardDone}</button>
           )}
         </div>
       </div>
@@ -680,18 +680,18 @@ function FilterSidebar({ filters, onChange, onReset, count, t }: { filters: Filt
   };
 
   const Chip = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
-    <button onClick={onClick} style={{ padding: "5px 10px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", background: active ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)", border: active ? "1px solid rgba(16,185,129,0.4)" : "1px solid rgba(255,255,255,0.07)", color: active ? "#10b981" : "rgba(255,255,255,0.65)", transition: "all var(--dur-touch)" }}>
+    <button onClick={onClick} style={{ padding: "5px 10px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", background: active ? "var(--brass-glow)" : "rgba(244, 235, 220, 0.04)", border: active ? "1px solid rgba(16,185,129,0.4)" : "1px solid var(--creme-hair)", color: active ? "var(--brass)" : "var(--creme-soft)", transition: "all var(--dur-touch)" }}>
       {label}
     </button>
   );
 
   return (
-    <div style={{ width: "100%", maxWidth: 220, flexShrink: 0, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 16, height: "fit-content", position: "sticky", top: 140 }}>
+    <div style={{ width: "100%", maxWidth: 220, flexShrink: 0, background: "rgba(244, 235, 220, 0.02)", border: "1px solid var(--creme-hair)", borderRadius: 16, padding: 16, height: "fit-content", position: "sticky", top: 140 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <span style={{ color: "white", fontWeight: 700, fontSize: 13 }}>{t.filterSidebarLabel}</span>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <span style={{ background: "rgba(16,185,129,0.15)", color: "#10b981", borderRadius: 8, padding: "2px 8px", fontSize: 13, fontWeight: 700 }}>{t.filterResultsLabel(count)}</span>
-          <button onClick={onReset} style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, background: "none", border: "none", cursor: "pointer" }}>{t.filterReset}</button>
+          <span style={{ background: "var(--brass-glow)", color: "var(--brass)", borderRadius: 8, padding: "2px 8px", fontSize: 13, fontWeight: 700 }}>{t.filterResultsLabel(count)}</span>
+          <button onClick={onReset} style={{ color: "var(--creme-soft)", fontSize: 13, background: "none", border: "none", cursor: "pointer" }}>{t.filterReset}</button>
         </div>
       </div>
 
@@ -701,7 +701,7 @@ function FilterSidebar({ filters, onChange, onReset, count, t }: { filters: Filt
         { label: t.filterAvailability, key: "availability" as const, items: t.availList },
       ].map(section => (
         <div key={section.key} style={{ marginBottom: 16 }}>
-          <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{section.label}</div>
+          <div style={{ color: "var(--creme-soft)", fontSize: 13, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{section.label}</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
             {section.items.map(item => (
               <Chip key={item} label={item} active={filters[section.key].includes(item)} onClick={() => toggle(section.key, item)} />
@@ -710,16 +710,16 @@ function FilterSidebar({ filters, onChange, onReset, count, t }: { filters: Filt
         </div>
       ))}
 
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 12, display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ borderTop: "1px solid var(--creme-hair)", paddingTop: 12, display: "flex", flexDirection: "column", gap: 8 }}>
         {[
           { key: "spotsOnly", label: t.filterSpotsOnly },
           { key: "verifiedOnly", label: t.filterVerifiedOnly },
         ].map(opt => (
           <label key={opt.key} style={{ display: "flex", gap: 8, alignItems: "center", cursor: "pointer" }}>
-            <div onClick={() => onChange({ ...filters, [opt.key]: !filters[opt.key as keyof Filters] })} style={{ width: 16, height: 16, borderRadius: 4, border: "1px solid rgba(255,255,255,0.2)", background: filters[opt.key as keyof Filters] ? "#10b981" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+            <div onClick={() => onChange({ ...filters, [opt.key]: !filters[opt.key as keyof Filters] })} style={{ width: 16, height: 16, borderRadius: 4, border: "1px solid var(--creme-hair)", background: filters[opt.key as keyof Filters] ? "var(--brass)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
               {filters[opt.key as keyof Filters] && <span style={{ color: "white", fontSize: 10 }}>✓</span>}
             </div>
-            <span style={{ color: "rgba(255,255,255,0.72)", fontSize: 13 }}>{opt.label}</span>
+            <span style={{ color: "var(--creme-soft)", fontSize: 13 }}>{opt.label}</span>
           </label>
         ))}
       </div>
@@ -733,7 +733,7 @@ function ClassCard({ cls, recommended, onJoin, faved, onFav, sent, t }: { cls: C
   const [hovered, setHovered] = useState(false);
   const [waitlisted, setWaitlisted] = useState(false);
   const isFull = cls.students >= cls.max;
-  const lc = LEVEL_COLORS[cls.level] ?? "#10b981";
+  const lc = LEVEL_COLORS[cls.level] ?? "var(--brass)";
 
   const share = () => {
     const url = `${window.location.origin}/discover/class/${cls.id}`;
@@ -744,7 +744,7 @@ function ClassCard({ cls, recommended, onJoin, faved, onFav, sent, t }: { cls: C
 
   return (
     <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{
-      background: "rgba(255,255,255,0.03)", border: `1px solid ${hovered ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.08)"}`,
+      background: "rgba(244, 235, 220, 0.03)", border: `1px solid ${hovered ? "rgba(16,185,129,0.3)" : "var(--creme-hair)"}`,
       borderRadius: 18, padding: 18, display: "flex", flexDirection: "column", gap: 12,
       transform: hovered ? "translateY(-3px)" : "translateY(0)",
       boxShadow: hovered ? "0 12px 40px rgba(0,0,0,0.3)" : "none",
@@ -753,16 +753,16 @@ function ClassCard({ cls, recommended, onJoin, faved, onFav, sent, t }: { cls: C
       {recommended && <div style={{ position: "absolute", top: -8, left: 16, background: "#f59e0b", color: "#000", fontSize: 12, fontWeight: 800, padding: "2px 10px", borderRadius: 99, letterSpacing: "0.05em" }}>{t.cardRecommended}</div>}
 
       <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-        <Av initials={cls.teacherAvatar} size={44} color="#6366f1" />
+        <Av initials={cls.teacherAvatar} size={44} color="var(--brass)" />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", marginBottom: 2 }}>
             <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{cls.teacherName}</span>
             {cls.verified && <span title="✅" style={{ fontSize: 12 }}>✅</span>}
-            {cls.isOnline && <span style={{ background: "rgba(99,102,241,0.15)", color: "#818cf8", borderRadius: 5, padding: "1px 6px", fontSize: 13 }}>{t.cardOnline}</span>}
+            {cls.isOnline && <span style={{ background: "rgba(99,102,241,0.15)", color: "var(--brass)", borderRadius: 5, padding: "1px 6px", fontSize: 13 }}>{t.cardOnline}</span>}
           </div>
-          <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13 }}>🏛️ {cls.center} · 📍 {cls.city}</div>
+          <div style={{ color: "var(--creme-soft)", fontSize: 13 }}>🏛️ {cls.center} · 📍 {cls.city}</div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
-            <code style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", letterSpacing: "0.03em" }}>{cls.code}</code>
+            <code style={{ fontSize: 11, color: "var(--creme-mute)", letterSpacing: "0.03em" }}>{cls.code}</code>
             <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(cls.code).catch(() => {}); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 9, opacity: 0.4, lineHeight: 1 }} title={t.cardProgram}>📋</button>
           </div>
         </div>
@@ -774,39 +774,39 @@ function ClassCard({ cls, recommended, onJoin, faved, onFav, sent, t }: { cls: C
         </div>
       </div>
 
-      <p style={{ margin: 0, color: "rgba(255,255,255,0.75)", fontSize: 13, lineHeight: 1.6 }}>{cls.description}</p>
+      <p style={{ margin: 0, color: "var(--creme)", fontSize: 13, lineHeight: 1.6 }}>{cls.description}</p>
 
       <SpotsBar current={cls.students} max={cls.max} t={t} />
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 13, color: "rgba(255,255,255,0.65)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 13, color: "var(--creme-soft)" }}>
         <div>📅 {cls.schedule}</div>
-        <div style={{ color: "#10b981" }}>⏭ {cls.nextSession}</div>
+        <div style={{ color: "var(--brass)" }}>⏭ {cls.nextSession}</div>
         <div style={{ display: "flex", gap: 4, alignItems: "center" }}><Stars rating={cls.rating} /> <span>{cls.rating} ({cls.reviews})</span></div>
-        <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 13 }}>🕐 {cls.lastActive}</div>
+        <div style={{ color: "var(--creme-mute)", fontSize: 13 }}>🕐 {cls.lastActive}</div>
       </div>
 
       <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-        {cls.tags.map(tag => <span key={tag} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 5, padding: "1px 7px", fontSize: 13, color: "rgba(255,255,255,0.65)" }}>#{tag}</span>)}
+        {cls.tags.map(tag => <span key={tag} style={{ background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", borderRadius: 5, padding: "1px 7px", fontSize: 13, color: "var(--creme-soft)" }}>#{tag}</span>)}
       </div>
 
       <div style={{ display: "flex", gap: 8 }}>
-        <Link href={`/discover/class/${cls.id}`} style={{ flex: 1, textAlign: "center", padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 600, textDecoration: "none", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.7)" }}>
+        <Link href={`/discover/class/${cls.id}`} style={{ flex: 1, textAlign: "center", padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 600, textDecoration: "none", background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "var(--creme-soft)" }}>
           {t.cardProgram}
         </Link>
         {isFull ? (
-          <button onClick={() => setWaitlisted(true)} style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 11, fontWeight: 700, cursor: waitlisted ? "default" : "pointer", background: waitlisted ? "rgba(239,68,68,0.08)" : "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", color: waitlisted ? "rgba(255,255,255,0.4)" : "#f87171" }}>
+          <button onClick={() => setWaitlisted(true)} style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 11, fontWeight: 700, cursor: waitlisted ? "default" : "pointer", background: waitlisted ? "rgba(239,68,68,0.08)" : "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", color: waitlisted ? "var(--creme-mute)" : "#f87171" }}>
             {waitlisted ? t.cardWaitlisted : t.cardWaitlist}
           </button>
         ) : sent ? (
-          <button disabled style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 11, fontWeight: 700, cursor: "not-allowed", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.3)" }}>
+          <button disabled style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 11, fontWeight: 700, cursor: "not-allowed", background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "var(--creme-mute)" }}>
             {t.cardRequestSent}
           </button>
         ) : (
-          <button onClick={() => onJoin(cls.id, cls.teacherName + " — " + cls.level, cls.teacherName)} style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg, #10b981, #059669)", color: "white", border: "none", boxShadow: hovered ? "0 4px 14px rgba(16,185,129,0.5)" : "0 4px 14px rgba(16,185,129,0.3)" }}>
+          <button onClick={() => onJoin(cls.id, cls.teacherName + " — " + cls.level, cls.teacherName)} style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg, var(--brass), var(--brass-deep))", color: "white", border: "none", boxShadow: hovered ? "0 4px 14px rgba(16,185,129,0.5)" : "0 4px 14px rgba(16,185,129,0.3)" }}>
             {t.cardJoinClass}
           </button>
         )}
-        <button onClick={share} style={{ padding: "9px 10px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)", fontSize: 14, cursor: "pointer" }}>↗</button>
+        <button onClick={share} style={{ padding: "9px 10px", borderRadius: 10, background: "rgba(244, 235, 220, 0.04)", border: "1px solid var(--creme-hair)", color: "var(--creme-mute)", fontSize: 14, cursor: "pointer" }}>↗</button>
       </div>
     </div>
   );
@@ -820,7 +820,7 @@ function CenterCard({ center, onJoin, faved, onFav, sent, t }: { center: CenterI
 
   return (
     <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{
-      background: "rgba(255,255,255,0.03)", border: `1px solid ${hovered ? "rgba(234,179,8,0.3)" : "rgba(255,255,255,0.08)"}`,
+      background: "rgba(244, 235, 220, 0.03)", border: `1px solid ${hovered ? "rgba(234,179,8,0.3)" : "var(--creme-hair)"}`,
       borderRadius: 18, padding: 18, display: "flex", flexDirection: "column", gap: 12,
       transform: hovered ? "translateY(-3px)" : "translateY(0)",
       boxShadow: hovered ? "0 12px 40px rgba(0,0,0,0.3)" : "none",
@@ -835,9 +835,9 @@ function CenterCard({ center, onJoin, faved, onFav, sent, t }: { center: CenterI
             <span style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{center.name}</span>
             {center.verified && <span title="Vérifié" style={{ fontSize: 12 }}>✅</span>}
           </div>
-          <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13 }}>📍 {center.city}, {center.region} · {center.yearsActive} ans</div>
+          <div style={{ color: "var(--creme-soft)", fontSize: 13 }}>📍 {center.city}, {center.region} · {center.yearsActive} ans</div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
-            <code style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", letterSpacing: "0.03em" }}>{center.code}</code>
+            <code style={{ fontSize: 11, color: "var(--creme-mute)", letterSpacing: "0.03em" }}>{center.code}</code>
             <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(center.code).catch(() => {}); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 9, opacity: 0.4, lineHeight: 1 }}>📋</button>
           </div>
         </div>
@@ -851,9 +851,9 @@ function CenterCard({ center, onJoin, faved, onFav, sent, t }: { center: CenterI
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
         {[{ v: center.teachers, l: t.cardTeachersLabel }, { v: center.students, l: t.cardStudentsLabel }, { v: center.classes, l: t.cardClassesLabel }].map(s => (
-          <div key={s.l} style={{ textAlign: "center", background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: "8px 4px" }}>
+          <div key={s.l} style={{ textAlign: "center", background: "rgba(244, 235, 220, 0.03)", borderRadius: 10, padding: "8px 4px" }}>
             <div style={{ color: "#fbbf24", fontWeight: 800, fontSize: 16 }}>{s.v}</div>
-            <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13 }}>{s.l}</div>
+            <div style={{ color: "var(--creme-soft)", fontSize: 13 }}>{s.l}</div>
           </div>
         ))}
       </div>
@@ -861,17 +861,17 @@ function CenterCard({ center, onJoin, faved, onFav, sent, t }: { center: CenterI
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", gap: 4 }}>{center.languages.map(l => <span key={l} style={{ fontSize: 18 }}>{l}</span>)}</div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 11 }}>{t.cardSuccessRate}</div>
-          <div style={{ background: "rgba(16,185,129,0.15)", color: "#10b981", borderRadius: 6, padding: "2px 8px", fontSize: 12, fontWeight: 700 }}>{center.successRate}%</div>
+          <div style={{ color: "var(--creme-soft)", fontSize: 11 }}>{t.cardSuccessRate}</div>
+          <div style={{ background: "var(--brass-glow)", color: "var(--brass)", borderRadius: 6, padding: "2px 8px", fontSize: 12, fontWeight: 700 }}>{center.successRate}%</div>
         </div>
       </div>
 
       <div style={{ display: "flex", gap: 8 }}>
-        <Link href={`/discover/center/${center.id}`} style={{ flex: 1, textAlign: "center", padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 600, textDecoration: "none", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.7)" }}>
+        <Link href={`/discover/center/${center.id}`} style={{ flex: 1, textAlign: "center", padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 600, textDecoration: "none", background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "var(--creme-soft)" }}>
           {t.cardViewClasses}
         </Link>
         {sent ? (
-          <button disabled style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 11, fontWeight: 700, cursor: "not-allowed", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.3)" }}>
+          <button disabled style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 11, fontWeight: 700, cursor: "not-allowed", background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "var(--creme-mute)" }}>
             {t.cardRequestSent}
           </button>
         ) : (
@@ -889,22 +889,22 @@ function CenterCard({ center, onJoin, faved, onFav, sent, t }: { center: CenterI
 function GroupCard({ group, onJoin, faved, onFav, sent, t }: { group: GroupItem; onJoin: (id: string, name: string) => void; faved: boolean; onFav: (id: string) => void; sent?: boolean; t: TT }) {
   const [hovered, setHovered] = useState(false);
   const isFull = group.members >= group.max;
-  const lc = LEVEL_COLORS[group.level] ?? "#10b981";
+  const lc = LEVEL_COLORS[group.level] ?? "var(--brass)";
   const isActive = group.lastActive.includes("min") || group.lastActive.includes("1h") || group.lastActive.includes("2h") || group.lastActive.includes("3h");
 
   return (
     <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{
-      background: "rgba(255,255,255,0.03)", border: `1px solid ${hovered ? "rgba(99,102,241,0.3)" : "rgba(255,255,255,0.08)"}`,
+      background: "rgba(244, 235, 220, 0.03)", border: `1px solid ${hovered ? "rgba(99,102,241,0.3)" : "var(--creme-hair)"}`,
       borderRadius: 18, padding: 18, display: "flex", flexDirection: "column", gap: 12,
       transform: hovered ? "translateY(-3px)" : "translateY(0)", transition: "all var(--dur-move) var(--ease-enter)",
     }}>
       <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-        <Av initials={group.creatorAvatar} size={40} color="#6366f1" />
+        <Av initials={group.creatorAvatar} size={40} color="var(--brass)" />
         <div style={{ flex: 1 }}>
           <div style={{ color: "white", fontWeight: 700, fontSize: 14, marginBottom: 2 }}>{group.name}</div>
-          <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13 }}>{t.cardGroupBy} {group.creatorName} · 📍 {group.city}</div>
+          <div style={{ color: "var(--creme-soft)", fontSize: 13 }}>{t.cardGroupBy} {group.creatorName} · 📍 {group.city}</div>
           <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
-            <code style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", letterSpacing: "0.03em" }}>{group.code}</code>
+            <code style={{ fontSize: 11, color: "var(--creme-mute)", letterSpacing: "0.03em" }}>{group.code}</code>
             <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(group.code).catch(() => {}); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: 9, opacity: 0.4, lineHeight: 1 }}>📋</button>
           </div>
         </div>
@@ -917,36 +917,36 @@ function GroupCard({ group, onJoin, faved, onFav, sent, t }: { group: GroupItem;
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <div style={{ display: "flex" }}>
           {group.memberAvatars.slice(0, 5).map((av, i) => (
-            <div key={i} style={{ width: 26, height: 26, borderRadius: "50%", background: `hsl(${i * 60}, 60%, 50%)`, border: "2px solid #0d1117", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 9, fontWeight: 700, marginLeft: i > 0 ? -8 : 0, zIndex: 5 - i, position: "relative" }}>
+            <div key={i} style={{ width: 26, height: 26, borderRadius: "50%", background: `hsl(${i * 60}, 60%, 50%)`, border: "2px solid var(--espresso-2)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 9, fontWeight: 700, marginLeft: i > 0 ? -8 : 0, zIndex: 5 - i, position: "relative" }}>
               {av}
             </div>
           ))}
-          {group.members > 5 && <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "2px solid #0d1117", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.5)", fontSize: 9, marginLeft: -8, zIndex: 0 }}>+{group.members - 5}</div>}
+          {group.members > 5 && <div style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--creme-hair)", border: "2px solid var(--espresso-2)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--creme-mute)", fontSize: 9, marginLeft: -8, zIndex: 0 }}>+{group.members - 5}</div>}
         </div>
-        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)" }}>{t.cardMembers(group.members, group.max)}</div>
+        <div style={{ fontSize: 13, color: "var(--creme-soft)" }}>{t.cardMembers(group.members, group.max)}</div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4, fontSize: 11 }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: isActive ? "#10b981" : "rgba(255,255,255,0.2)", display: "inline-block", flexShrink: 0 }} />
-          <span style={{ color: "rgba(255,255,255,0.72)" }}>{group.lastActive}</span>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: isActive ? "var(--brass)" : "var(--creme-hair)", display: "inline-block", flexShrink: 0 }} />
+          <span style={{ color: "var(--creme-soft)" }}>{group.lastActive}</span>
         </div>
       </div>
 
       <SpotsBar current={group.members} max={group.max} t={t} />
 
-      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)" }}>
-        <div style={{ marginBottom: 4 }}>🎯 <strong style={{ color: "rgba(255,255,255,0.85)" }}>{group.goal}</strong></div>
+      <div style={{ fontSize: 13, color: "var(--creme-soft)" }}>
+        <div style={{ marginBottom: 4 }}>🎯 <strong style={{ color: "var(--creme)" }}>{group.goal}</strong></div>
         <div>📅 {group.schedule}</div>
       </div>
 
       <div style={{ display: "flex", gap: 8 }}>
-        <Link href={`/discover/group/${group.id}`} style={{ flex: 1, textAlign: "center", padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 600, textDecoration: "none", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.7)" }}>
+        <Link href={`/discover/group/${group.id}`} style={{ flex: 1, textAlign: "center", padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 600, textDecoration: "none", background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "var(--creme-soft)" }}>
           {t.cardGroupActivity}
         </Link>
         {sent ? (
-          <button disabled style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 11, fontWeight: 700, cursor: "not-allowed", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.3)" }}>
+          <button disabled style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 11, fontWeight: 700, cursor: "not-allowed", background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "var(--creme-mute)" }}>
             {t.cardRequestSent}
           </button>
         ) : (
-          <button onClick={() => !isFull && onJoin(group.id, group.name)} disabled={isFull} style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: isFull ? "default" : "pointer", background: isFull ? "rgba(255,255,255,0.04)" : "linear-gradient(135deg,#6366f1,#4f46e5)", border: isFull ? "1px solid rgba(255,255,255,0.07)" : "none", color: isFull ? "rgba(255,255,255,0.25)" : "white", boxShadow: (!isFull && hovered) ? "0 4px 14px rgba(99,102,241,0.4)" : "none" }}>
+          <button onClick={() => !isFull && onJoin(group.id, group.name)} disabled={isFull} style={{ flex: 1, padding: "9px", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: isFull ? "default" : "pointer", background: isFull ? "rgba(244, 235, 220, 0.04)" : "linear-gradient(135deg,var(--brass),#4f46e5)", border: isFull ? "1px solid var(--creme-hair)" : "none", color: isFull ? "var(--creme-mute)" : "white", boxShadow: (!isFull && hovered) ? "0 4px 14px rgba(99,102,241,0.4)" : "none" }}>
             {isFull ? t.cardGroupFull : t.cardGroupJoin}
           </button>
         )}
@@ -959,11 +959,11 @@ function GroupCard({ group, onJoin, faved, onFav, sent, t }: { group: GroupItem;
 
 function SoloCard({ student, onInvite, invited, t }: { student: SoloItem; onInvite: (id: string, name: string) => void; invited: boolean; t: TT }) {
   const [hovered, setHovered] = useState(false);
-  const lc = LEVEL_COLORS[student.level] ?? "#10b981";
+  const lc = LEVEL_COLORS[student.level] ?? "var(--brass)";
 
   return (
     <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{
-      background: "rgba(255,255,255,0.03)", border: `1px solid ${hovered ? "rgba(245,158,11,0.3)" : "rgba(255,255,255,0.08)"}`,
+      background: "rgba(244, 235, 220, 0.03)", border: `1px solid ${hovered ? "rgba(245,158,11,0.3)" : "var(--creme-hair)"}`,
       borderRadius: 18, padding: 18, display: "flex", flexDirection: "column", gap: 12,
       transform: hovered ? "translateY(-3px)" : "translateY(0)", transition: "all var(--dur-move) var(--ease-enter)",
     }}>
@@ -971,18 +971,18 @@ function SoloCard({ student, onInvite, invited, t }: { student: SoloItem; onInvi
         <Av initials={student.avatar} size={44} color="#f59e0b" />
         <div style={{ flex: 1 }}>
           <div style={{ color: "white", fontWeight: 700, fontSize: 14 }}>{student.name}</div>
-          <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 13 }}>📍 {student.city}</div>
+          <div style={{ color: "var(--creme-soft)", fontSize: 13 }}>📍 {student.city}</div>
         </div>
         <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
           <LvlBadge level={student.level} />
-          <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>→</span>
+          <span style={{ color: "var(--creme-mute)", fontSize: 11 }}>→</span>
           <LvlBadge level={student.targetLevel} />
         </div>
       </div>
 
-      <p style={{ margin: 0, color: "rgba(255,255,255,0.75)", fontSize: 13, lineHeight: 1.6, fontStyle: "italic" }}>&ldquo;{student.desc}&rdquo;</p>
+      <p style={{ margin: 0, color: "var(--creme)", fontSize: 13, lineHeight: 1.6, fontStyle: "italic" }}>&ldquo;{student.desc}&rdquo;</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 13, color: "rgba(255,255,255,0.65)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 13, color: "var(--creme-soft)" }}>
         <div>🎯 {student.goal}</div>
         <div>⏰ {student.availability}</div>
       </div>
@@ -1158,7 +1158,7 @@ export default function DiscoverPage() {
     setModalOpen(true);
   };
 
-  const accentColor = "#10b981";
+  const accentColor = "var(--brass)";
   const showClasses = tab === "all" || tab === "classes";
   const showCenters = tab === "all" || tab === "centers";
   const showGroups = tab === "all" || tab === "groups";
@@ -1175,28 +1175,28 @@ export default function DiscoverPage() {
       <style>{`
         @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
-        .syne { font-family: 'Syne', sans-serif; }
+        .syne { font-family: var(--font-fraunces), Georgia, serif; }
       `}</style>
 
       {showOnboarding && <OnboardingOverlay onClose={() => setShowOnboarding(false)} t={t} />}
 
       {/* Sticky header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(8,12,16,0.95)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)", margin: "-24px -24px 24px", padding: "16px 24px" }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(8,12,16,0.95)", backdropFilter: "blur(20px)", borderBottom: "1px solid var(--creme-hair)", margin: "-24px -24px 24px", padding: "16px 24px" }}>
         {/* Title + actions */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
           <div>
             <h1 className="syne" style={{ margin: 0, color: "white", fontWeight: 800, fontSize: 20 }}>
               {t.pageTitle}
             </h1>
-            <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.60)", fontSize: 13 }}>
+            <p style={{ margin: "2px 0 0", color: "var(--creme-soft)", fontSize: 13 }}>
               {t.pageSubtitle}
             </p>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={() => setShowFilters(f => !f)} style={{ padding: "7px 14px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", background: showFilters ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.05)", border: showFilters ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.08)", color: showFilters ? accentColor : "rgba(255,255,255,0.72)" }}>
+            <button onClick={() => setShowFilters(f => !f)} style={{ padding: "7px 14px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", background: showFilters ? "var(--brass-glow)" : "var(--creme-hair)", border: showFilters ? "1px solid rgba(16,185,129,0.3)" : "1px solid var(--creme-hair)", color: showFilters ? accentColor : "var(--creme-soft)" }}>
               {t.filtersBtn}
             </button>
-            <button onClick={() => setViewMode(v => v === "list" ? "map" : "list")} style={{ padding: "7px 14px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.72)" }}>
+            <button onClick={() => setViewMode(v => v === "list" ? "map" : "list")} style={{ padding: "7px 14px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "var(--creme-soft)" }}>
               {viewMode === "list" ? t.mapBtnList : t.mapBtnGrid}
             </button>
           </div>
@@ -1208,29 +1208,29 @@ export default function DiscoverPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder={t.searchPlaceholder}
-            style={{ width: "100%", padding: "11px 14px 11px 38px", borderRadius: 12, boxSizing: "border-box", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 16, outline: "none", transition: "border-color var(--dur-move)" }}
+            style={{ width: "100%", padding: "11px 14px 11px 38px", borderRadius: 12, boxSizing: "border-box", background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "white", fontSize: 16, outline: "none", transition: "border-color var(--dur-move)" }}
             onFocus={e => e.target.style.borderColor = "rgba(16,185,129,0.5)"}
-            onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
+            onBlur={e => e.target.style.borderColor = "var(--creme-hair)"}
           />
           <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 15, opacity: 0.4 }}>🔍</span>
-          {search && <button onClick={() => setSearch("")} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 16, cursor: "pointer" }}>×</button>}
+          {search && <button onClick={() => setSearch("")} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--creme-mute)", fontSize: 16, cursor: "pointer" }}>×</button>}
         </div>
 
         {/* Tabs + sort */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
             {tabs.map(tb => (
-              <button key={tb.key} onClick={() => setTab(tb.key)} style={{ padding: "6px 12px", borderRadius: 99, fontSize: 13, fontWeight: 600, cursor: "pointer", background: tab === tb.key ? `${accentColor}18` : "rgba(255,255,255,0.04)", border: tab === tb.key ? `1px solid ${accentColor}40` : "1px solid rgba(255,255,255,0.07)", color: tab === tb.key ? accentColor : "rgba(255,255,255,0.72)" }}>
+              <button key={tb.key} onClick={() => setTab(tb.key)} style={{ padding: "6px 12px", borderRadius: 99, fontSize: 13, fontWeight: 600, cursor: "pointer", background: tab === tb.key ? `${accentColor}18` : "rgba(244, 235, 220, 0.04)", border: tab === tb.key ? `1px solid ${accentColor}40` : "1px solid var(--creme-hair)", color: tab === tb.key ? accentColor : "var(--creme-soft)" }}>
                 {tb.label} <span style={{ opacity: 0.7, fontSize: 13 }}>({tb.count})</span>
               </button>
             ))}
             {/* Learning partners — coming soon (non-interactive) */}
-            <span style={{ padding: "6px 12px", borderRadius: 99, fontSize: 12, fontWeight: 600, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.25)", display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ padding: "6px 12px", borderRadius: 99, fontSize: 12, fontWeight: 600, background: "rgba(244, 235, 220, 0.02)", border: "1px solid var(--creme-hair)", color: "var(--creme-mute)", display: "flex", alignItems: "center", gap: 6 }}>
               {t.tabPartners}
-              <span style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.3)", borderRadius: 8, padding: "1px 6px", fontSize: 9, fontWeight: 700 }}>{t.tabPartnersSoon}</span>
+              <span style={{ background: "var(--creme-hair)", color: "var(--creme-mute)", borderRadius: 8, padding: "1px 6px", fontSize: 9, fontWeight: 700 }}>{t.tabPartnersSoon}</span>
             </span>
           </div>
-          <select value={sort} onChange={e => setSort(e.target.value as SortKey)} style={{ padding: "6px 10px", borderRadius: 8, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", fontSize: 12, outline: "none", cursor: "pointer" }}>
+          <select value={sort} onChange={e => setSort(e.target.value as SortKey)} style={{ padding: "6px 10px", borderRadius: 8, background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "var(--creme-soft)", fontSize: 12, outline: "none", cursor: "pointer" }}>
             <option value="relevance">{t.sortRelevance}</option>
             <option value="active">{t.sortActive}</option>
             <option value="rating">{t.sortRating}</option>
@@ -1243,14 +1243,14 @@ export default function DiscoverPage() {
       <DualSearch onJoin={openJoin} t={t} />
 
       {/* Results count line */}
-      <div style={{ marginBottom: 20, color: "rgba(255,255,255,0.60)", fontSize: 13 }}>
+      <div style={{ marginBottom: 20, color: "var(--creme-soft)", fontSize: 13 }}>
         {t.resultsLabel(totalCount, userLevel, userCity)}
       </div>
 
       {viewMode === "map" ? (
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "220px 1fr", gap: 20 }}>
           <CameroonMap onCityClick={(city) => { setFilters(f => ({ ...f, cities: [city] })); setViewMode("list"); }} t={t} />
-          <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
+          <div style={{ color: "var(--creme-soft)", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
             {t.mapClickNote}
           </div>
         </div>
@@ -1263,11 +1263,11 @@ export default function DiscoverPage() {
           <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 32 }}>
 
             {/* Positioning intro */}
-            <div style={{ background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.1)", borderRadius: 14, padding: "16px 20px", display: "flex", gap: 14, alignItems: "flex-start" }}>
+            <div style={{ background: "rgba(16,185,129,0.04)", border: "1px solid var(--brass-glow)", borderRadius: 14, padding: "16px 20px", display: "flex", gap: 14, alignItems: "flex-start" }}>
               <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>🌍</span>
               <div>
-                <div className="syne" style={{ color: "#10b981", fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{t.positionTitle}</div>
-                <div style={{ color: "rgba(255,255,255,0.68)", fontSize: 13, lineHeight: 1.6 }}>{t.positionDesc}</div>
+                <div className="syne" style={{ color: "var(--brass)", fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{t.positionTitle}</div>
+                <div style={{ color: "var(--creme-soft)", fontSize: 13, lineHeight: 1.6 }}>{t.positionDesc}</div>
               </div>
             </div>
 
@@ -1277,7 +1277,7 @@ export default function DiscoverPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                   <span style={{ color: "#f59e0b", fontSize: 16 }}>⭐</span>
                   <h2 className="syne" style={{ margin: 0, color: "white", fontWeight: 700, fontSize: 16 }}>{t.sectionRecommended}</h2>
-                  {userLevel && <span style={{ color: "rgba(255,255,255,0.56)", fontSize: 13 }}>{t.sectionRecommendedSub(userLevel)}</span>}
+                  {userLevel && <span style={{ color: "var(--creme-mute)", fontSize: 13 }}>{t.sectionRecommendedSub(userLevel)}</span>}
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
                   {filteredClasses.filter(c => recommendedIds.has(c.id)).map(cls => (
@@ -1293,7 +1293,7 @@ export default function DiscoverPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                   <span style={{ fontSize: 16 }}>👨‍🏫</span>
                   <h2 className="syne" style={{ margin: 0, color: "white", fontWeight: 700, fontSize: 16 }}>{t.sectionClasses}</h2>
-                  <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", borderRadius: 8, padding: "2px 8px", fontSize: 12 }}>{filteredClasses.length}</span>
+                  <span style={{ background: "var(--creme-hair)", color: "var(--creme-mute)", borderRadius: 8, padding: "2px 8px", fontSize: 12 }}>{filteredClasses.length}</span>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
                   {filteredClasses.map(cls => (
@@ -1309,7 +1309,7 @@ export default function DiscoverPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                   <span style={{ fontSize: 16 }}>🏫</span>
                   <h2 className="syne" style={{ margin: 0, color: "white", fontWeight: 700, fontSize: 16 }}>{t.sectionCenters}</h2>
-                  <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", borderRadius: 8, padding: "2px 8px", fontSize: 12 }}>{filteredCenters.length}</span>
+                  <span style={{ background: "var(--creme-hair)", color: "var(--creme-mute)", borderRadius: 8, padding: "2px 8px", fontSize: 12 }}>{filteredCenters.length}</span>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
                   {filteredCenters.map(center => (
@@ -1326,9 +1326,9 @@ export default function DiscoverPage() {
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                     <span style={{ fontSize: 16 }}>👥</span>
                     <h2 className="syne" style={{ margin: 0, color: "white", fontWeight: 700, fontSize: 16 }}>{t.sectionGroups}</h2>
-                    <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", borderRadius: 8, padding: "2px 8px", fontSize: 12 }}>{filteredGroups.length}</span>
+                    <span style={{ background: "var(--creme-hair)", color: "var(--creme-mute)", borderRadius: 8, padding: "2px 8px", fontSize: 12 }}>{filteredGroups.length}</span>
                   </div>
-                  <Link href="/group/create" style={{ padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 700, textDecoration: "none", background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.25)", color: "#818cf8" }}>
+                  <Link href="/group/create" style={{ padding: "7px 14px", borderRadius: 10, fontSize: 12, fontWeight: 700, textDecoration: "none", background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.25)", color: "var(--brass)" }}>
                     {t.createGroupBtn}
                   </Link>
                 </div>
@@ -1363,7 +1363,7 @@ export default function DiscoverPage() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <div className="syne" style={{ color: "#a5b4fc", fontWeight: 700, fontSize: 14, marginBottom: 6 }}>{t.communityTitle}</div>
-                  <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, lineHeight: 1.6 }}>{t.communityText}</div>
+                  <div style={{ color: "var(--creme-soft)", fontSize: 13, lineHeight: 1.6 }}>{t.communityText}</div>
                 </div>
                 <span style={{ background: "rgba(99,102,241,0.12)", color: "#a5b4fc", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 20, padding: "5px 14px", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", flexShrink: 0 }}>
                   {t.tabPartnersSoon}
@@ -1378,13 +1378,13 @@ export default function DiscoverPage() {
       {/* Join modal */}
       {modalOpen && selectedItem && (
         <div onClick={() => setModalOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, background: "linear-gradient(160deg,#0f1a14,#080c10)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 24, padding: 32 }}>
-            <div style={{ width: 36, height: 4, borderRadius: 99, background: "rgba(255,255,255,0.15)", margin: "0 auto 24px" }} />
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 480, background: "linear-gradient(160deg,#0f1a14,var(--espresso))", border: "1px solid var(--brass-edge)", borderRadius: 24, padding: 32 }}>
+            <div style={{ width: 36, height: 4, borderRadius: 99, background: "var(--creme-hair)", margin: "0 auto 24px" }} />
             <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 800, margin: "0 0 6px" }}>
               {selectedItem.type === "group" ? t.modalJoinGroup : selectedItem.type === "center" ? t.modalJoinCenter : t.modalJoinClass}
             </h2>
-            <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: "0 0 20px" }}>{selectedItem.name}</p>
-            <label style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, textTransform: "uppercase", letterSpacing: "0.1em", display: "block", marginBottom: 8 }}>
+            <p style={{ color: "var(--creme-soft)", fontSize: 13, margin: "0 0 20px" }}>{selectedItem.name}</p>
+            <label style={{ color: "var(--creme-soft)", fontSize: 13, textTransform: "uppercase", letterSpacing: "0.1em", display: "block", marginBottom: 8 }}>
               {t.modalMsgLabel}
             </label>
             <textarea
@@ -1392,7 +1392,7 @@ export default function DiscoverPage() {
               onChange={e => setMessageText(e.target.value)}
               placeholder={t.modalMsgPlaceholder}
               rows={4}
-              style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: 12, color: "white", fontSize: 16, resize: "none", outline: "none", marginBottom: 20, boxSizing: "border-box" }}
+              style={{ width: "100%", background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", borderRadius: 12, padding: 12, color: "white", fontSize: 16, resize: "none", outline: "none", marginBottom: 20, boxSizing: "border-box" }}
             />
             <div style={{ display: "flex", gap: 12 }}>
               <button
@@ -1414,10 +1414,10 @@ export default function DiscoverPage() {
                   setSending(false);
                 }}
                 disabled={sending}
-                style={{ flex: 1, padding: "14px", borderRadius: 14, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", opacity: sending ? 0.7 : 1 }}>
+                style={{ flex: 1, padding: "14px", borderRadius: 14, background: "linear-gradient(135deg,var(--brass),var(--brass-deep))", border: "none", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer", opacity: sending ? 0.7 : 1 }}>
                 {sending ? t.modalSending : t.modalSend}
               </button>
-              <button onClick={() => setModalOpen(false)} style={{ padding: "14px 20px", borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.72)", cursor: "pointer", fontSize: 14 }}>
+              <button onClick={() => setModalOpen(false)} style={{ padding: "14px 20px", borderRadius: 14, background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "var(--creme-soft)", cursor: "pointer", fontSize: 14 }}>
                 {t.modalCancel}
               </button>
             </div>

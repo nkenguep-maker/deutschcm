@@ -10,7 +10,7 @@ interface AdminStats {
 }
 
 const LEVEL_DISTRIBUTION = [
-  { name: "A1", value: 0, color: "#10b981" },
+  { name: "A1", value: 0, color: "var(--brass)" },
   { name: "A2", value: 0, color: "#34d399" },
   { name: "B1", value: 0, color: "#60a5fa" },
   { name: "B2", value: 0, color: "#a78bfa" },
@@ -20,8 +20,8 @@ const LEVEL_DISTRIBUTION = [
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload?.length) {
     return (
-      <div style={{ background: "#0f1a14", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "8px 12px" }}>
-        <p style={{ color: "#10b981", fontSize: 11, margin: "0 0 4px", fontWeight: 700 }}>{label}</p>
+      <div style={{ background: "#0f1a14", border: "1px solid var(--brass-edge)", borderRadius: 8, padding: "8px 12px" }}>
+        <p style={{ color: "var(--brass)", fontSize: 11, margin: "0 0 4px", fontWeight: 700 }}>{label}</p>
         {payload.map((p: any, i: number) => (
           <p key={i} style={{ color: p.color, fontSize: 11, margin: 0 }}>{p.name}: {p.value}</p>
         ))}
@@ -60,8 +60,8 @@ export default function AdminDashboard() {
   }, [])
 
   const roleColor: Record<string, string> = {
-    STUDENT: "#10b981", TEACHER: "#60a5fa",
-    CENTER: "#f59e0b", ADMIN: "#ef4444"
+    STUDENT: "var(--brass)", TEACHER: "#60a5fa",
+    CENTER: "#f59e0b", ADMIN: "var(--oxblood)"
   }
 
   const roleLabel: Record<string, string> = {
@@ -81,8 +81,8 @@ export default function AdminDashboard() {
 
   return (
     <div style={{
-      minHeight: "100vh", background: "#080c10",
-      fontFamily: "'DM Mono',monospace", color: "white"
+      minHeight: "100vh", background: "var(--espresso)",
+      fontFamily: "var(--font-jetbrains, monospace),monospace", color: "white"
     }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono&display=swap');
@@ -94,16 +94,16 @@ export default function AdminDashboard() {
         {/* ── Sidebar ── */}
         <div style={{
           width: 240, flexShrink: 0,
-          borderRight: "1px solid rgba(255,255,255,0.06)",
-          background: "rgba(255,255,255,0.02)",
+          borderRight: "1px solid var(--creme-hair)",
+          background: "rgba(244, 235, 220, 0.02)",
           padding: "24px 16px", overflowY: "auto"
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28 }}>
             <span style={{ fontSize: 20 }}></span>
-            <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800 }}>
+            <span style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 16, fontWeight: 800 }}>
               Yema
             </span>
-            <span style={{ fontSize: 8, padding: "2px 6px", borderRadius: 99, background: "rgba(239,68,68,0.15)", color: "#ef4444", fontWeight: 700, marginLeft: 4 }}>ADMIN</span>
+            <span style={{ fontSize: 8, padding: "2px 6px", borderRadius: 99, background: "rgba(239,68,68,0.15)", color: "var(--oxblood)", fontWeight: 700, marginLeft: 4 }}>ADMIN</span>
           </div>
 
           {navItems.map(item => (
@@ -111,25 +111,25 @@ export default function AdminDashboard() {
               style={{
                 width: "100%", display: "flex", alignItems: "center", gap: 10,
                 padding: "10px 12px", borderRadius: 10, marginBottom: 4, border: "none",
-                background: activeTab === item.key ? "rgba(16,185,129,0.12)" : "transparent",
-                color: activeTab === item.key ? "#10b981" : "rgba(255,255,255,0.5)",
+                background: activeTab === item.key ? "var(--brass-glow)" : "transparent",
+                color: activeTab === item.key ? "var(--brass)" : "var(--creme-mute)",
                 cursor: "pointer", textAlign: "left", fontSize: 13,
-                outline: activeTab === item.key ? "1px solid rgba(16,185,129,0.2)" : "none"
+                outline: activeTab === item.key ? "1px solid var(--brass-edge)" : "none"
               }}>
               <span>{item.icon}</span>
-              <span style={{ flex: 1, fontFamily: "'Syne',sans-serif", fontWeight: activeTab === item.key ? 700 : 400 }}>
+              <span style={{ flex: 1, fontFamily: "var(--font-fraunces),sans-serif", fontWeight: activeTab === item.key ? 700 : 400 }}>
                 {item.label}
               </span>
               {item.badge ? (
-                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 99, background: "rgba(239,68,68,0.15)", color: "#ef4444", fontWeight: 700 }}>
+                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 99, background: "rgba(239,68,68,0.15)", color: "var(--oxblood)", fontWeight: 700 }}>
                   {item.badge}
                 </span>
               ) : null}
             </button>
           ))}
 
-          <div style={{ paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: 24 }}>
-            <a href="/" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 10, color: "rgba(255,255,255,0.4)", fontSize: 12, textDecoration: "none" }}>
+          <div style={{ paddingTop: 20, borderTop: "1px solid var(--creme-hair)", marginTop: 24 }}>
+            <a href="/" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 10, color: "var(--creme-mute)", fontSize: 12, textDecoration: "none" }}>
               {tA.backToSite}
             </a>
           </div>
@@ -142,10 +142,10 @@ export default function AdminDashboard() {
           {activeTab === "overview" && (
             <div>
               <div style={{ marginBottom: 28 }}>
-                <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>
+                <h1 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>
                   {tA.greeting}
                 </h1>
-                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: 0 }}>
+                <p style={{ color: "var(--creme-mute)", fontSize: 12, margin: 0 }}>
                   Yema · {new Date().toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
                 </p>
               </div>
@@ -153,16 +153,16 @@ export default function AdminDashboard() {
               {/* KPIs */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 24 }}>
                 {[
-                  { label: tA.kpiTotal, value: stats.users.total.toLocaleString(), icon: "👥", color: "#10b981", sub: tA.kpiTotalSub },
+                  { label: tA.kpiTotal, value: stats.users.total.toLocaleString(), icon: "👥", color: "var(--brass)", sub: tA.kpiTotalSub },
                   { label: tA.kpiStudents, value: stats.users.students.toLocaleString(), icon: "🎓", color: "#34d399", sub: tA.kpiStudentsSub },
                   { label: tA.kpiTeachers, value: stats.users.teachers.toLocaleString(), icon: "👨‍🏫", color: "#60a5fa", sub: tA.kpiTeachersSub },
                   { label: tA.kpiCenters, value: stats.users.centers.toLocaleString(), icon: "🏫", color: "#f59e0b", sub: tA.kpiCentersSub },
                   { label: tA.kpiSessions, value: stats.sessions.today.toLocaleString(), icon: "⚡", color: "#a78bfa", sub: tA.kpiSessionsSub },
                 ].map((kpi, i) => (
-                  <div key={i} style={{ padding: "16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  <div key={i} style={{ padding: "16px", borderRadius: 14, background: "rgba(244, 235, 220, 0.04)", border: "1px solid var(--creme-hair)" }}>
                     <div style={{ fontSize: 22, marginBottom: 8 }}>{kpi.icon}</div>
-                    <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 24, fontWeight: 800, color: kpi.color, marginBottom: 2 }}>{kpi.value}</div>
-                    <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginBottom: 2 }}>{kpi.label}</div>
+                    <div style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 24, fontWeight: 800, color: kpi.color, marginBottom: 2 }}>{kpi.value}</div>
+                    <div style={{ fontSize: 10, color: "var(--creme-mute)", marginBottom: 2 }}>{kpi.label}</div>
                     <div style={{ fontSize: 9, color: kpi.color }}>{kpi.sub}</div>
                   </div>
                 ))}
@@ -171,27 +171,27 @@ export default function AdminDashboard() {
               {/* Charts */}
               <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16, marginBottom: 20 }}>
 
-                <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 20px" }}>{tA.chartMonthly}</h3>
+                <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)" }}>
+                  <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 14, margin: "0 0 20px" }}>{tA.chartMonthly}</h3>
                   <ResponsiveContainer width="100%" height={180}>
                     <AreaChart data={[]}>
                       <defs>
                         <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                          <stop offset="5%" stopColor="var(--brass)" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="var(--brass)" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                      <XAxis dataKey="month" stroke="rgba(255,255,255,0.3)" fontSize={10} />
-                      <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--creme-hair)" />
+                      <XAxis dataKey="month" stroke="var(--creme-mute)" fontSize={10} />
+                      <YAxis stroke="var(--creme-mute)" fontSize={10} />
                       <Tooltip content={<CustomTooltip />} />
-                      <Area type="monotone" dataKey="users" stroke="#10b981" fill="url(#colorUsers)" strokeWidth={2} name={tA.chartSeriesUsers} />
+                      <Area type="monotone" dataKey="users" stroke="var(--brass)" fill="url(#colorUsers)" strokeWidth={2} name={tA.chartSeriesUsers} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
 
-                <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.chartLevels}</h3>
+                <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)" }}>
+                  <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.chartLevels}</h3>
                   <ResponsiveContainer width="100%" height={140}>
                     <PieChart>
                       <Pie data={LEVEL_DISTRIBUTION} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value">
@@ -206,23 +206,23 @@ export default function AdminDashboard() {
                     {LEVEL_DISTRIBUTION.map((l, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", gap: 4 }}>
                         <div style={{ width: 6, height: 6, borderRadius: "50%", background: l.color }} />
-                        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.5)" }}>{l.name}: {l.value}</span>
+                        <span style={{ fontSize: 9, color: "var(--creme-mute)" }}>{l.name}: {l.value}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
-                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 20px" }}>{tA.chartWeekly}</h3>
+              <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)", marginBottom: 20 }}>
+                <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 14, margin: "0 0 20px" }}>{tA.chartWeekly}</h3>
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={[]}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="day" stroke="rgba(255,255,255,0.3)" fontSize={10} />
-                    <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--creme-hair)" />
+                    <XAxis dataKey="day" stroke="var(--creme-mute)" fontSize={10} />
+                    <YAxis stroke="var(--creme-mute)" fontSize={10} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend wrapperStyle={{ fontSize: 10, color: "rgba(255,255,255,0.5)" }} />
-                    <Bar dataKey="students" fill="#10b981" radius={[4,4,0,0]} name={tA.chartSeriesStudents} />
+                    <Legend wrapperStyle={{ fontSize: 10, color: "var(--creme-mute)" }} />
+                    <Bar dataKey="students" fill="var(--brass)" radius={[4,4,0,0]} name={tA.chartSeriesStudents} />
                     <Bar dataKey="teachers" fill="#60a5fa" radius={[4,4,0,0]} name={tA.chartSeriesTeachers} />
                     <Bar dataKey="centers" fill="#f59e0b" radius={[4,4,0,0]} name={tA.chartSeriesCenters} />
                   </BarChart>
@@ -230,18 +230,18 @@ export default function AdminDashboard() {
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.recentActivity}</h3>
+                <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)" }}>
+                  <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.recentActivity}</h3>
                   <div style={{ textAlign: "center", padding: "20px 0" }}>
-                    <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: 0 }}>
+                    <p style={{ color: "var(--creme-mute)", fontSize: 11, margin: 0 }}>
                       {tA.recentActivityEmpty}
                     </p>
                   </div>
                 </div>
 
-                <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.topCities}</h3>
-                  <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, margin: 0, textAlign: "center", padding: "20px 0" }}>
+                <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)" }}>
+                  <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.topCities}</h3>
+                  <p style={{ color: "var(--creme-mute)", fontSize: 11, margin: 0, textAlign: "center", padding: "20px 0" }}>
                     {tA.topCitiesEmpty}
                   </p>
                 </div>
@@ -253,16 +253,16 @@ export default function AdminDashboard() {
           {activeTab === "users" && (
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-                <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, margin: 0 }}>{tA.usersTitle}</h1>
+                <h1 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 22, fontWeight: 800, margin: 0 }}>{tA.usersTitle}</h1>
                 <div style={{ display: "flex", gap: 8 }}>
                   <input
                     value={searchUser}
                     onChange={e => setSearchUser(e.target.value)}
                     placeholder={tA.searchPlaceholder}
-                    style={{ padding: "8px 14px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 12, outline: "none", width: 220 }}
+                    style={{ padding: "8px 14px", borderRadius: 10, background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "white", fontSize: 12, outline: "none", width: 220 }}
                   />
                   <select value={filterRole} onChange={e => setFilterRole(e.target.value)}
-                    style={{ padding: "8px 12px", borderRadius: 10, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 12, outline: "none" }}>
+                    style={{ padding: "8px 12px", borderRadius: 10, background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "white", fontSize: 12, outline: "none" }}>
                     <option value="ALL">{tA.filterAll}</option>
                     <option value="STUDENT">{tA.filterStudents}</option>
                     <option value="TEACHER">{tA.filterTeachers}</option>
@@ -273,24 +273,24 @@ export default function AdminDashboard() {
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 20 }}>
                 {[
-                  { label: tA.filterStudents, value: stats.users.students, color: "#10b981" },
+                  { label: tA.filterStudents, value: stats.users.students, color: "var(--brass)" },
                   { label: tA.filterTeachers, value: stats.users.teachers, color: "#60a5fa" },
                   { label: tA.filterCenters, value: stats.users.centers, color: "#f59e0b" },
                   { label: tA.quickStatNew, value: 12, color: "#a78bfa" },
                 ].map((s, i) => (
-                  <div key={i} style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", textAlign: "center" }}>
-                    <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
-                    <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{s.label}</div>
+                  <div key={i} style={{ padding: "12px 16px", borderRadius: 12, background: "rgba(244, 235, 220, 0.04)", border: "1px solid var(--creme-hair)", textAlign: "center" }}>
+                    <div style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
+                    <div style={{ fontSize: 10, color: "var(--creme-mute)" }}>{s.label}</div>
                   </div>
                 ))}
               </div>
 
-              <div style={{ borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)" }}>
+              <div style={{ borderRadius: 14, overflow: "hidden", border: "1px solid var(--creme-hair)" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                   <thead>
-                    <tr style={{ background: "rgba(255,255,255,0.04)" }}>
+                    <tr style={{ background: "rgba(244, 235, 220, 0.04)" }}>
                       {[tA.tableUser, tA.tableRole, tA.tableLevel, tA.tableCity, tA.tableDate, tA.tableStatus, tA.tableActions].map(h => (
-                        <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                        <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "var(--creme-mute)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid var(--creme-hair)" }}>
                           {h}
                         </th>
                       ))}
@@ -301,7 +301,7 @@ export default function AdminDashboard() {
                       .filter(u => filterRole === "ALL" || u.role === filterRole)
                       .filter(u => !searchUser || u.name.toLowerCase().includes(searchUser.toLowerCase()) || u.email.toLowerCase().includes(searchUser.toLowerCase()))
                       .map((u, i) => (
-                        <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)", background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)" }}>
+                        <tr key={i} style={{ borderBottom: "1px solid rgba(244, 235, 220, 0.04)", background: i % 2 === 0 ? "transparent" : "rgba(244, 235, 220, 0.02)" }}>
                           <td style={{ padding: "12px 16px" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                               <div style={{ width: 32, height: 32, borderRadius: "50%", background: `${roleColor[u.role]}20`, border: `1px solid ${roleColor[u.role]}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: roleColor[u.role] }}>
@@ -309,7 +309,7 @@ export default function AdminDashboard() {
                               </div>
                               <div>
                                 <p style={{ color: "white", fontSize: 12, fontWeight: 600, margin: 0 }}>{u.name}</p>
-                                <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, margin: 0 }}>{u.email}</p>
+                                <p style={{ color: "var(--creme-mute)", fontSize: 10, margin: 0 }}>{u.email}</p>
                               </div>
                             </div>
                           </td>
@@ -318,19 +318,19 @@ export default function AdminDashboard() {
                               {roleLabel[u.role]}
                             </span>
                           </td>
-                          <td style={{ padding: "12px 16px", color: "#10b981", fontSize: 12, fontWeight: 700 }}>{u.level}</td>
-                          <td style={{ padding: "12px 16px", color: "rgba(255,255,255,0.5)", fontSize: 11 }}>{u.city}</td>
-                          <td style={{ padding: "12px 16px", color: "rgba(255,255,255,0.35)", fontSize: 10 }}>{u.date}</td>
+                          <td style={{ padding: "12px 16px", color: "var(--brass)", fontSize: 12, fontWeight: 700 }}>{u.level}</td>
+                          <td style={{ padding: "12px 16px", color: "var(--creme-mute)", fontSize: 11 }}>{u.city}</td>
+                          <td style={{ padding: "12px 16px", color: "var(--creme-mute)", fontSize: 10 }}>{u.date}</td>
                           <td style={{ padding: "12px 16px" }}>
-                            <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: u.status === "active" ? "rgba(16,185,129,0.12)" : "rgba(245,158,11,0.12)", color: u.status === "active" ? "#10b981" : "#f59e0b", fontWeight: 700 }}>
+                            <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: u.status === "active" ? "var(--brass-glow)" : "rgba(245,158,11,0.12)", color: u.status === "active" ? "var(--brass)" : "#f59e0b", fontWeight: 700 }}>
                               {u.status === "active" ? tA.statusActive : tA.statusPending}
                             </span>
                           </td>
                           <td style={{ padding: "12px 16px" }}>
                             <div style={{ display: "flex", gap: 8 }}>
-                              <button style={{ fontSize: 10, color: "#10b981", background: "none", border: "none", cursor: "pointer", padding: 0 }}>{tA.actionView}</button>
+                              <button style={{ fontSize: 10, color: "var(--brass)", background: "none", border: "none", cursor: "pointer", padding: 0 }}>{tA.actionView}</button>
                               <button style={{ fontSize: 10, color: "#60a5fa", background: "none", border: "none", cursor: "pointer", padding: 0 }}>{tA.actionEdit}</button>
-                              <button style={{ fontSize: 10, color: "#ef4444", background: "none", border: "none", cursor: "pointer", padding: 0 }}>{tA.actionBlock}</button>
+                              <button style={{ fontSize: 10, color: "var(--oxblood)", background: "none", border: "none", cursor: "pointer", padding: 0 }}>{tA.actionBlock}</button>
                             </div>
                           </td>
                         </tr>
@@ -345,10 +345,10 @@ export default function AdminDashboard() {
           {activeTab === "courses" && (
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-                <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, margin: 0 }}>{tA.coursesTitle}</h1>
+                <h1 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 22, fontWeight: 800, margin: 0 }}>{tA.coursesTitle}</h1>
                 <div style={{ display: "flex", gap: 8 }}>
                   <a href="/admin/courses/generate"
-                    style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,#10b981,#059669)", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
+                    style={{ padding: "9px 18px", borderRadius: 10, background: "linear-gradient(135deg,var(--brass),var(--brass-deep))", color: "white", fontSize: 12, fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
                     {tA.generateBtn}
                   </a>
                 </div>
@@ -356,35 +356,35 @@ export default function AdminDashboard() {
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 24 }}>
                 {[
-                  { label: tA.kpiCoursesTotal, value: stats.courses.total, color: "#10b981", icon: "📚" },
+                  { label: tA.kpiCoursesTotal, value: stats.courses.total, color: "var(--brass)", icon: "📚" },
                   { label: tA.kpiPublished, value: stats.courses.published, color: "#34d399", icon: "✅" },
                   { label: tA.kpiDraft, value: stats.courses.draft, color: "#f59e0b", icon: "📝" },
                   { label: tA.kpiModules, value: stats.courses.modules, color: "#60a5fa", icon: "🧩" },
                 ].map((s, i) => (
-                  <div key={i} style={{ padding: "16px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", textAlign: "center" }}>
+                  <div key={i} style={{ padding: "16px", borderRadius: 12, background: "rgba(244, 235, 220, 0.04)", border: "1px solid var(--creme-hair)", textAlign: "center" }}>
                     <div style={{ fontSize: 20, marginBottom: 6 }}>{s.icon}</div>
-                    <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
-                    <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{s.label}</div>
+                    <div style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 22, fontWeight: 800, color: s.color }}>{s.value}</div>
+                    <div style={{ fontSize: 10, color: "var(--creme-mute)" }}>{s.label}</div>
                   </div>
                 ))}
               </div>
 
               {["A1","A2","B1","B2","C1"].map(level => {
-                const colors: Record<string, string> = { A1:"#10b981", A2:"#34d399", B1:"#60a5fa", B2:"#a78bfa", C1:"#f59e0b" }
+                const colors: Record<string, string> = { A1:"var(--brass)", A2:"#34d399", B1:"#60a5fa", B2:"#a78bfa", C1:"#f59e0b" }
                 const isA1 = level === "A1"
                 const total = level === "B2" || level === "C1" ? 10 : 12
                 const generated = isA1 ? 6 : 0
                 return (
-                  <div key={level} style={{ marginBottom: 16, padding: "16px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: `1px solid ${colors[level]}20` }}>
+                  <div key={level} style={{ marginBottom: 16, padding: "16px 20px", borderRadius: 14, background: "rgba(244, 235, 220, 0.03)", border: `1px solid ${colors[level]}20` }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800, color: colors[level] }}>{level}</span>
-                        <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>
+                        <span style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 16, fontWeight: 800, color: colors[level] }}>{level}</span>
+                        <span style={{ color: "var(--creme-mute)", fontSize: 12 }}>
                           {level === "A1" ? "Netzwerk neu A1 · 12 Lektionen" : level === "A2" ? "Netzwerk neu A2 · 12 Lektionen" : level === "B1" ? "Netzwerk neu B1 · 12 Lektionen" : level === "B2" ? "Aspekte neu B2 · 10 Lektionen" : "Aspekte neu C1 · 10 Lektionen"}
                         </span>
                       </div>
                       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>
+                        <span style={{ fontSize: 10, color: "var(--creme-mute)" }}>
                           {tA.levelGenerated}
                         </span>
                         <a href="/admin/courses/generate"
@@ -393,7 +393,7 @@ export default function AdminDashboard() {
                         </a>
                       </div>
                     </div>
-                    <div style={{ height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 99, marginTop: 12, overflow: "hidden" }}>
+                    <div style={{ height: 4, background: "var(--creme-hair)", borderRadius: 99, marginTop: 12, overflow: "hidden" }}>
                       <div style={{ height: "100%", width: isA1 ? "50%" : "0%", background: `linear-gradient(90deg,${colors[level]}88,${colors[level]})`, borderRadius: 99 }} />
                     </div>
                   </div>
@@ -405,24 +405,24 @@ export default function AdminDashboard() {
           {/* ════ VALIDATIONS ════ */}
           {activeTab === "validations" && (
             <div>
-              <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 24 }}>
+              <h1 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 24 }}>
                 {tA.validationsTitle}
               </h1>
 
               {pendingValidations.length === 0 ? (
-                <div style={{ textAlign: "center", padding: 60, color: "rgba(255,255,255,0.4)", fontSize: 13 }}>
+                <div style={{ textAlign: "center", padding: 60, color: "var(--creme-mute)", fontSize: 13 }}>
                   {tA.noValidations}
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {pendingValidations.map((item, i) => (
-                    <div key={i} style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", alignItems: "center", gap: 16 }}>
+                    <div key={i} style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(244, 235, 220, 0.03)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", alignItems: "center", gap: 16 }}>
                       <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
                         {item.type === "center" ? "🏫" : "👨‍🏫"}
                       </div>
                       <div style={{ flex: 1 }}>
-                        <p style={{ color: "white", fontSize: 14, fontWeight: 700, margin: "0 0 3px", fontFamily: "'Syne',sans-serif" }}>{item.name}</p>
-                        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, margin: 0 }}>
+                        <p style={{ color: "white", fontSize: 14, fontWeight: 700, margin: "0 0 3px", fontFamily: "var(--font-fraunces),sans-serif" }}>{item.name}</p>
+                        <p style={{ color: "var(--creme-mute)", fontSize: 11, margin: 0 }}>
                           {item.city} · {item.email} · {item.date}
                         </p>
                       </div>
@@ -430,10 +430,10 @@ export default function AdminDashboard() {
                         {item.type === "center" ? tA.validTypeCenter : tA.validTypeTeacher}
                       </span>
                       <div style={{ display: "flex", gap: 8 }}>
-                        <button style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#10b981", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                        <button style={{ padding: "8px 16px", borderRadius: 8, background: "var(--brass-glow)", border: "1px solid rgba(16,185,129,0.3)", color: "var(--brass)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                           {tA.validateBtn}
                         </button>
-                        <button style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", color: "#ef4444", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                        <button style={{ padding: "8px 16px", borderRadius: 8, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)", color: "var(--oxblood)", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                           {tA.rejectBtn}
                         </button>
                       </div>
@@ -447,12 +447,12 @@ export default function AdminDashboard() {
           {/* ════ SYSTEM ════ */}
           {activeTab === "system" && (
             <div>
-              <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 24 }}>{tA.systemTitle}</h1>
+              <h1 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 24 }}>{tA.systemTitle}</h1>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
 
-                <div style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.apisTitle}</h3>
+                <div style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)" }}>
+                  <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.apisTitle}</h3>
                   {[
                     { name: "notre IA", status: "active", usage: "Quiz + Correction + Simulateur" },
                     { name: "voix natives", status: "active", usage: "Dialogues Hören" },
@@ -461,21 +461,21 @@ export default function AdminDashboard() {
                     { name: "Prisma + PostgreSQL", status: "active", usage: "Base de données" },
                     { name: "CinetPay", status: "pending", usage: "Paiements Mobile Money" },
                   ].map((api, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, padding: "8px 12px", borderRadius: 8, background: "rgba(255,255,255,0.03)" }}>
-                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: api.status === "active" ? "#10b981" : "#f59e0b", flexShrink: 0 }} />
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, padding: "8px 12px", borderRadius: 8, background: "rgba(244, 235, 220, 0.03)" }}>
+                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: api.status === "active" ? "var(--brass)" : "#f59e0b", flexShrink: 0 }} />
                       <div style={{ flex: 1 }}>
                         <p style={{ color: "white", fontSize: 12, fontWeight: 600, margin: 0 }}>{api.name}</p>
-                        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, margin: 0 }}>{api.usage}</p>
+                        <p style={{ color: "var(--creme-mute)", fontSize: 10, margin: 0 }}>{api.usage}</p>
                       </div>
-                      <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 99, background: api.status === "active" ? "rgba(16,185,129,0.12)" : "rgba(245,158,11,0.12)", color: api.status === "active" ? "#10b981" : "#f59e0b" }}>
+                      <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 99, background: api.status === "active" ? "var(--brass-glow)" : "rgba(245,158,11,0.12)", color: api.status === "active" ? "var(--brass)" : "#f59e0b" }}>
                         {api.status === "active" ? tA.apiStatusActive : tA.apiStatusPending}
                       </span>
                     </div>
                   ))}
                 </div>
 
-                <div style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.pagesTitle}</h3>
+                <div style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)" }}>
+                  <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.pagesTitle}</h3>
                   {[
                     { path: "/", name: "Landing page", status: "ok" },
                     { path: "/dashboard", name: tA.pageDashboardStudent, status: "ok" },
@@ -492,18 +492,18 @@ export default function AdminDashboard() {
                     { path: "/pricing", name: tA.pagePricing, status: "ok" },
                   ].map((page, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: page.status === "ok" ? "#10b981" : "#ef4444", flexShrink: 0 }} />
+                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: page.status === "ok" ? "var(--brass)" : "var(--oxblood)", flexShrink: 0 }} />
                       <a href={page.path} target="_blank" rel="noreferrer"
-                        style={{ flex: 1, color: "rgba(255,255,255,0.6)", fontSize: 11, textDecoration: "none" }}>
+                        style={{ flex: 1, color: "var(--creme-soft)", fontSize: 11, textDecoration: "none" }}>
                         {page.name}
                       </a>
-                      <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 9 }}>{page.path}</span>
+                      <span style={{ color: "var(--creme-hair)", fontSize: 9 }}>{page.path}</span>
                     </div>
                   ))}
                 </div>
 
-                <div style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", gridColumn: "1/-1" }}>
-                  <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.envTitle}</h3>
+                <div style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)", gridColumn: "1/-1" }}>
+                  <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.envTitle}</h3>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
                     {[
                       { key: "GEMINI_API_KEY", status: true },
@@ -518,9 +518,9 @@ export default function AdminDashboard() {
                       { key: "CINETPAY_SITE_ID", status: false },
                       { key: "NEXT_PUBLIC_APP_URL", status: false },
                     ].map((env, i) => (
-                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", borderRadius: 6, background: "rgba(255,255,255,0.03)" }}>
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", borderRadius: 6, background: "rgba(244, 235, 220, 0.03)" }}>
                         <span style={{ fontSize: 8 }}>{env.status ? "✅" : "⚠️"}</span>
-                        <span style={{ fontSize: 9, color: env.status ? "rgba(255,255,255,0.6)" : "#f59e0b", fontFamily: "monospace" }}>{env.key}</span>
+                        <span style={{ fontSize: 9, color: env.status ? "var(--creme-soft)" : "#f59e0b", fontFamily: "monospace" }}>{env.key}</span>
                       </div>
                     ))}
                   </div>

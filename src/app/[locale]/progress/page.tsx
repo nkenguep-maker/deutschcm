@@ -130,7 +130,7 @@ interface ProgressData {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const scoreColor = (s: number) => s >= 80 ? "#10b981" : s >= 60 ? "#f59e0b" : "#ef4444"
+const scoreColor = (s: number) => s >= 80 ? "var(--brass)" : s >= 60 ? "#f59e0b" : "var(--oxblood)"
 
 // EmptyState local — délègue à StateBlock (empty, compact, centered).
 // Le titre devient la ligne d'âme, on n'a pas de fragment brass
@@ -145,10 +145,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload?.length) {
     return (
       <div style={{
-        background: "#0f1a14", border: "1px solid rgba(16,185,129,0.2)",
+        background: "#0f1a14", border: "1px solid var(--brass-edge)",
         borderRadius: 8, padding: "8px 12px"
       }}>
-        <p style={{ color: "#10b981", fontSize: 11, margin: "0 0 4px", fontWeight: 700 }}>{label}</p>
+        <p style={{ color: "var(--brass)", fontSize: 11, margin: "0 0 4px", fontWeight: 700 }}>{label}</p>
         {payload.map((p: any, i: number) => (
           <p key={i} style={{ color: p.color, fontSize: 11, margin: 0 }}>
             {p.name}: {p.value}
@@ -207,7 +207,7 @@ export default function ProgressPage() {
     return (
       <Layout title={t.title}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 300 }}>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "'Syne',sans-serif" }}>{t.loading}</p>
+          <p style={{ color: "var(--creme-mute)", fontFamily: "var(--font-fraunces),sans-serif" }}>{t.loading}</p>
         </div>
       </Layout>
     )
@@ -218,14 +218,14 @@ export default function ProgressPage() {
     return (
       <Layout title={t.title}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px" }}>
-          <a href={`/${locale}/dashboard`} style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, textDecoration: "none", display: "inline-block", marginBottom: 20 }}>{t.backToDashboard}</a>
-          <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 28, fontWeight: 800, margin: "0 0 32px" }}>📊 {t.title}</h1>
+          <a href={`/${locale}/dashboard`} style={{ color: "var(--creme-mute)", fontSize: 12, textDecoration: "none", display: "inline-block", marginBottom: 20 }}>{t.backToDashboard}</a>
+          <h1 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 28, fontWeight: 800, margin: "0 0 32px" }}>📊 {t.title}</h1>
           <EmptyState title={t.noDataTitle} text={t.encourage} />
           <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
-            <a href={`/${locale}/test-niveau`} style={{ padding: "10px 18px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", color: "white", fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "0.82rem", textDecoration: "none" }}>
+            <a href={`/${locale}/test-niveau`} style={{ padding: "10px 18px", borderRadius: 12, background: "linear-gradient(135deg,var(--brass),var(--brass-deep))", color: "white", fontFamily: "var(--font-fraunces),sans-serif", fontWeight: 700, fontSize: "0.82rem", textDecoration: "none" }}>
               {t.testLevel}
             </a>
-            <a href={`/${locale}/courses`} style={{ padding: "10px 18px", borderRadius: 12, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", color: "#10b981", fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: "0.82rem", textDecoration: "none" }}>
+            <a href={`/${locale}/courses`} style={{ padding: "10px 18px", borderRadius: 12, background: "var(--brass-glow)", border: "1px solid var(--brass-edge)", color: "var(--brass)", fontFamily: "var(--font-fraunces),sans-serif", fontWeight: 700, fontSize: "0.82rem", textDecoration: "none" }}>
               {t.startA1}
             </a>
           </div>
@@ -270,16 +270,16 @@ export default function ProgressPage() {
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
 
         {/* Back link */}
-        <a href={`/${locale}/dashboard`} style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, textDecoration: "none", display: "inline-block", marginBottom: 20 }}>
+        <a href={`/${locale}/dashboard`} style={{ color: "var(--creme-mute)", fontSize: 12, textDecoration: "none", display: "inline-block", marginBottom: 20 }}>
           {t.backToDashboard}
         </a>
 
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 28, fontWeight: 800, margin: "0 0 6px" }}>
+          <h1 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 28, fontWeight: 800, margin: "0 0 6px" }}>
             📊 {t.title}
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: 0 }}>
+          <p style={{ color: "var(--creme-mute)", fontSize: 13, margin: 0 }}>
             {`${t.levelLabel}: ${overview.level ?? t.levelUnknown} · ${overview.streakDays} ${t.streakLabel} 🔥 · ${overview.xpTotal} XP`}
           </p>
         </div>
@@ -287,7 +287,7 @@ export default function ProgressPage() {
         {/* Stats globales */}
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(3, 1fr)" : "repeat(6, 1fr)", gap: 12, marginBottom: 28 }}>
           {[
-            { label: t.xpLabel,      value: overview.xpTotal.toLocaleString(), icon: "⚡", color: "#10b981" },
+            { label: t.xpLabel,      value: overview.xpTotal.toLocaleString(), icon: "⚡", color: "var(--brass)" },
             { label: t.streakLabel,  value: `${overview.streakDays}j`,         icon: "🔥", color: "#f59e0b" },
             { label: t.modulesLabel, value: `${overview.completedModules}/${overview.totalModules}`, icon: "✅", color: "#60a5fa" },
             { label: t.quizLabel,    value: `${overview.avgQuizScore}%`,        icon: "🎯", color: "#a78bfa" },
@@ -296,13 +296,13 @@ export default function ProgressPage() {
           ].map((stat, i) => (
             <div key={i} style={{
               padding: "16px 20px", borderRadius: 16, textAlign: "center",
-              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)"
+              background: "rgba(244, 235, 220, 0.04)", border: "1px solid var(--creme-hair)"
             }}>
               <div style={{ fontSize: 22, marginBottom: 6 }}>{stat.icon}</div>
-              <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'Syne',sans-serif", color: stat.color, marginBottom: 2 }}>
+              <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "var(--font-fraunces),sans-serif", color: stat.color, marginBottom: 2 }}>
                 {stat.value}
               </div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{stat.label}</div>
+              <div style={{ fontSize: 10, color: "var(--creme-mute)" }}>{stat.label}</div>
             </div>
           ))}
         </div>
@@ -310,33 +310,33 @@ export default function ProgressPage() {
         {/* Barre progression niveau */}
         <div style={{
           padding: "20px 24px", borderRadius: 16, marginBottom: 28,
-          background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)"
+          background: "rgba(244, 235, 220, 0.04)", border: "1px solid var(--creme-hair)"
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
             <div>
-              <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>{t.progressTo} </span>
-              <span style={{ color: "#10b981", fontWeight: 700 }}>{nextLevel}</span>
+              <span style={{ color: "var(--creme-mute)", fontSize: 11 }}>{t.progressTo} </span>
+              <span style={{ color: "var(--brass)", fontWeight: 700 }}>{nextLevel}</span>
             </div>
-            <span style={{ color: "#10b981", fontWeight: 700 }}>{overview.completionRate}%</span>
+            <span style={{ color: "var(--brass)", fontWeight: 700 }}>{overview.completionRate}%</span>
           </div>
-          <div style={{ height: 8, background: "rgba(255,255,255,0.06)", borderRadius: 99, overflow: "hidden" }}>
+          <div style={{ height: 8, background: "var(--creme-hair)", borderRadius: 99, overflow: "hidden" }}>
             <div style={{
               height: "100%", width: `${overview.completionRate}%`,
-              background: "linear-gradient(90deg,#059669,#10b981,#34d399)",
+              background: "linear-gradient(90deg,var(--brass-deep),var(--brass),#34d399)",
               boxShadow: "0 0 10px rgba(16,185,129,0.5)",
               borderRadius: 99, transition: "width var(--dur-moment) var(--ease-enter)"
             }} />
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-            <span style={{ fontSize: 9, color: "rgba(255,255,255,0.2)" }}>0 XP</span>
-            <span style={{ fontSize: 9, color: "rgba(255,255,255,0.2)" }}>1000 XP</span>
+            <span style={{ fontSize: 9, color: "var(--creme-hair)" }}>0 XP</span>
+            <span style={{ fontSize: 9, color: "var(--creme-hair)" }}>1000 XP</span>
           </div>
         </div>
 
         {/* Onglets */}
         <div style={{
           display: "flex", gap: 4, padding: 4,
-          background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)",
+          background: "rgba(244, 235, 220, 0.04)", border: "1px solid var(--creme-hair)",
           borderRadius: 14, marginBottom: 24
         }}>
           {tabs.map(tab => (
@@ -345,11 +345,11 @@ export default function ProgressPage() {
                 flex: 1, padding: "9px 8px", borderRadius: 10,
                 fontSize: 11, fontWeight: 600, border: "none", cursor: "pointer",
                 background: activeTab === tab.key
-                  ? "linear-gradient(135deg,rgba(16,185,129,0.2),rgba(5,150,105,0.1))"
+                  ? "linear-gradient(135deg,var(--brass-edge),rgba(5,150,105,0.1))"
                   : "transparent",
-                color: activeTab === tab.key ? "#10b981" : "rgba(255,255,255,0.4)",
-                outline: activeTab === tab.key ? "1px solid rgba(16,185,129,0.2)" : "none",
-                fontFamily: "'Syne',sans-serif"
+                color: activeTab === tab.key ? "var(--brass)" : "var(--creme-mute)",
+                outline: activeTab === tab.key ? "1px solid var(--brass-edge)" : "none",
+                fontFamily: "var(--font-fraunces),sans-serif"
               }}
             >
               {tab.label}
@@ -364,18 +364,18 @@ export default function ProgressPage() {
             {hasActivity ? (
               <div style={{
                 padding: "20px 24px", borderRadius: 16,
-                background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)"
+                background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)"
               }}>
-                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, margin: "0 0 20px" }}>
+                <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 15, margin: "0 0 20px" }}>
                   📈 {t.weeklyTitle}
                 </h3>
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart data={d.weeklyProgress}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="week" stroke="rgba(255,255,255,0.3)" fontSize={11} />
-                    <YAxis stroke="rgba(255,255,255,0.3)" fontSize={11} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--creme-hair)" />
+                    <XAxis dataKey="week" stroke="var(--creme-mute)" fontSize={11} />
+                    <YAxis stroke="var(--creme-mute)" fontSize={11} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Line type="monotone" dataKey="score" stroke="#10b981" strokeWidth={2} dot={{ fill: "#10b981", r: 4 }} name="Score" />
+                    <Line type="monotone" dataKey="score" stroke="var(--brass)" strokeWidth={2} dot={{ fill: "var(--brass)", r: 4 }} name="Score" />
                     <Line type="monotone" dataKey="modules" stroke="#60a5fa" strokeWidth={2} dot={{ fill: "#60a5fa", r: 4 }} name="Modules" />
                   </LineChart>
                 </ResponsiveContainer>
@@ -387,18 +387,18 @@ export default function ProgressPage() {
             {hasActivity ? (
               <div style={{
                 padding: "20px 24px", borderRadius: 16,
-                background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)"
+                background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)"
               }}>
-                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, margin: "0 0 20px" }}>
+                <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 15, margin: "0 0 20px" }}>
                   ⚡ {t.xpWeeklyTitle}
                 </h3>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={d.weeklyProgress}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="week" stroke="rgba(255,255,255,0.3)" fontSize={11} />
-                    <YAxis stroke="rgba(255,255,255,0.3)" fontSize={11} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--creme-hair)" />
+                    <XAxis dataKey="week" stroke="var(--creme-mute)" fontSize={11} />
+                    <YAxis stroke="var(--creme-mute)" fontSize={11} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Bar dataKey="xp" fill="#10b981" radius={[4, 4, 0, 0]} name="XP" />
+                    <Bar dataKey="xp" fill="var(--brass)" radius={[4, 4, 0, 0]} name="XP" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -407,9 +407,9 @@ export default function ProgressPage() {
             <div style={{
               gridColumn: "1 / -1",
               padding: "20px 24px", borderRadius: 16,
-              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)"
+              background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)"
             }}>
-              <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, margin: "0 0 16px" }}>
+              <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 15, margin: "0 0 16px" }}>
                 🕐 {t.activityTitle}
               </h3>
               {hasActivity2 ? (
@@ -418,15 +418,15 @@ export default function ProgressPage() {
                     <div key={i} style={{
                       display: "flex", alignItems: "center", gap: 12,
                       padding: "10px 14px", borderRadius: 10,
-                      background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)"
+                      background: "rgba(244, 235, 220, 0.02)", border: "1px solid var(--creme-hair)"
                     }}>
                       <div style={{
                         width: 8, height: 8, borderRadius: "50%",
-                        background: item.status === "COMPLETED" ? "#10b981" : "#f59e0b", flexShrink: 0
+                        background: item.status === "COMPLETED" ? "var(--brass)" : "#f59e0b", flexShrink: 0
                       }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p style={{ color: "white", fontSize: 13, margin: 0, fontWeight: 600 }}>{item.title}</p>
-                        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, margin: 0 }}>{item.course}</p>
+                        <p style={{ color: "var(--creme-mute)", fontSize: 10, margin: 0 }}>{item.course}</p>
                       </div>
                       {item.score !== null && (
                         <span style={{ fontSize: 12, fontWeight: 700, color: scoreColor(item.score) }}>
@@ -435,8 +435,8 @@ export default function ProgressPage() {
                       )}
                       <span style={{
                         fontSize: 9, padding: "2px 8px", borderRadius: 99,
-                        background: item.status === "COMPLETED" ? "rgba(16,185,129,0.12)" : "rgba(245,158,11,0.12)",
-                        color: item.status === "COMPLETED" ? "#10b981" : "#f59e0b"
+                        background: item.status === "COMPLETED" ? "var(--brass-glow)" : "rgba(245,158,11,0.12)",
+                        color: item.status === "COMPLETED" ? "var(--brass)" : "#f59e0b"
                       }}>
                         {item.status === "COMPLETED" ? t.statusDone : t.statusProgress}
                       </span>
@@ -456,26 +456,26 @@ export default function ProgressPage() {
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
               <div style={{
                 padding: "20px 24px", borderRadius: 16,
-                background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)"
+                background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)"
               }}>
-                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, margin: "0 0 20px" }}>
+                <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 15, margin: "0 0 20px" }}>
                   🎯 {t.skillsTitle}
                 </h3>
                 <ResponsiveContainer width="100%" height={280}>
                   <RadarChart data={skillRadarData}>
-                    <PolarGrid stroke="rgba(255,255,255,0.1)" />
-                    <PolarAngleAxis dataKey="skill" stroke="rgba(255,255,255,0.5)" fontSize={12} />
-                    <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="rgba(255,255,255,0.2)" fontSize={9} />
-                    <Radar name="Score" dataKey="score" stroke="#10b981" fill="#10b981" fillOpacity={0.15} strokeWidth={2} />
+                    <PolarGrid stroke="var(--creme-hair)" />
+                    <PolarAngleAxis dataKey="skill" stroke="var(--creme-mute)" fontSize={12} />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="var(--creme-hair)" fontSize={9} />
+                    <Radar name="Score" dataKey="score" stroke="var(--brass)" fill="var(--brass)" fillOpacity={0.15} strokeWidth={2} />
                   </RadarChart>
                 </ResponsiveContainer>
               </div>
 
               <div style={{
                 padding: "20px 24px", borderRadius: 16,
-                background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)"
+                background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)"
               }}>
-                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, margin: "0 0 20px" }}>
+                <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 15, margin: "0 0 20px" }}>
                   📊 {t.skillsDetailTitle}
                 </h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -490,17 +490,17 @@ export default function ProgressPage() {
                     return (
                       <div key={skill.key}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.7)" }}>
+                          <span style={{ fontSize: 12, color: "var(--creme-soft)" }}>
                             {skill.icon} {skill.label}
                           </span>
                           <span style={{ fontSize: 12, fontWeight: 700, color: scoreColor(score) }}>{score}%</span>
                         </div>
-                        <div style={{ height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 99, overflow: "hidden" }}>
+                        <div style={{ height: 6, background: "var(--creme-hair)", borderRadius: 99, overflow: "hidden" }}>
                           <div style={{
                             height: "100%", width: `${score}%`,
-                            background: score >= 80 ? "linear-gradient(90deg,#059669,#10b981)"
+                            background: score >= 80 ? "linear-gradient(90deg,var(--brass-deep),var(--brass))"
                               : score >= 60 ? "linear-gradient(90deg,#d97706,#f59e0b)"
-                              : "linear-gradient(90deg,#dc2626,#ef4444)",
+                              : "linear-gradient(90deg,#dc2626,var(--oxblood))",
                             borderRadius: 99, transition: "width var(--dur-moment) var(--ease-enter)"
                           }} />
                         </div>
@@ -520,9 +520,9 @@ export default function ProgressPage() {
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
             <div style={{
               padding: "20px 24px", borderRadius: 16,
-              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)"
+              background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)"
             }}>
-              <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, margin: "0 0 16px" }}>
+              <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 15, margin: "0 0 16px" }}>
                 🎯 {t.quizHistoryTitle}
               </h3>
               {hasQuiz ? (
@@ -531,11 +531,11 @@ export default function ProgressPage() {
                     <div key={i} style={{
                       display: "flex", alignItems: "center", justifyContent: "space-between",
                       padding: "10px 14px", borderRadius: 10,
-                      background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)"
+                      background: "rgba(244, 235, 220, 0.02)", border: "1px solid var(--creme-hair)"
                     }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <span style={{ fontSize: 16 }}>{q.isPassed ? "✅" : "❌"}</span>
-                        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.6)" }}>
+                        <span style={{ fontSize: 12, color: "var(--creme-soft)" }}>
                           Quiz #{d.quizHistory.length - i}
                         </span>
                       </div>
@@ -552,9 +552,9 @@ export default function ProgressPage() {
 
             <div style={{
               padding: "20px 24px", borderRadius: 16,
-              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)"
+              background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)"
             }}>
-              <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, margin: "0 0 16px" }}>
+              <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 15, margin: "0 0 16px" }}>
                 🤖 {t.sessionHistoryTitle}
               </h3>
               {hasConv ? (
@@ -562,7 +562,7 @@ export default function ProgressPage() {
                   {d.conversationHistory.map((s, i) => (
                     <div key={i} style={{
                       padding: "12px 14px", borderRadius: 10,
-                      background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)"
+                      background: "rgba(244, 235, 220, 0.02)", border: "1px solid var(--creme-hair)"
                     }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                         <span style={{ fontSize: 12, color: "white", fontWeight: 600 }}>{s.scenario}</span>
@@ -574,8 +574,8 @@ export default function ProgressPage() {
                       </div>
                       {s.scoreGrammaire !== null && s.scoreFluence !== null && (
                         <div style={{ display: "flex", gap: 12 }}>
-                          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{t.gramLabel}: {s.scoreGrammaire}/10</span>
-                          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{t.fluLabel}: {s.scoreFluence}/10</span>
+                          <span style={{ fontSize: 10, color: "var(--creme-mute)" }}>{t.gramLabel}: {s.scoreGrammaire}/10</span>
+                          <span style={{ fontSize: 10, color: "var(--creme-mute)" }}>{t.fluLabel}: {s.scoreFluence}/10</span>
                         </div>
                       )}
                     </div>
@@ -590,16 +590,16 @@ export default function ProgressPage() {
               <div style={{
                 gridColumn: "1 / -1",
                 padding: "20px 24px", borderRadius: 16,
-                background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)"
+                background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)"
               }}>
-                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, margin: "0 0 20px" }}>
+                <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 15, margin: "0 0 20px" }}>
                   📈 {t.scoreTrend}
                 </h3>
                 <ResponsiveContainer width="100%" height={180}>
                   <LineChart data={d.quizHistory.map((q, i) => ({ index: `#${i + 1}`, score: q.score }))}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="index" stroke="rgba(255,255,255,0.3)" fontSize={11} />
-                    <YAxis stroke="rgba(255,255,255,0.3)" fontSize={11} domain={[0, 100]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--creme-hair)" />
+                    <XAxis dataKey="index" stroke="var(--creme-mute)" fontSize={11} />
+                    <YAxis stroke="var(--creme-mute)" fontSize={11} domain={[0, 100]} />
                     <Tooltip content={<CustomTooltip />} />
                     <Line type="monotone" dataKey="score" stroke="#a78bfa" strokeWidth={2} dot={{ fill: "#a78bfa", r: 4 }} name="Score" />
                   </LineChart>
@@ -612,7 +612,7 @@ export default function ProgressPage() {
         {/* ── Onglet Badges ── */}
         {activeTab === "badges" && (
           <div>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, marginBottom: 20 }}>
+            <p style={{ color: "var(--creme-mute)", fontSize: 12, marginBottom: 20 }}>
               {overview.totalBadges} {t.badgesObtained}
             </p>
             {overview.earnedBadges.length === 0 ? (
@@ -622,8 +622,8 @@ export default function ProgressPage() {
                 {overview.earnedBadges.map((badge, i) => (
                   <div key={i} style={{
                     padding: "20px 16px", borderRadius: 16, textAlign: "center",
-                    background: "rgba(16,185,129,0.06)",
-                    border: "1px solid rgba(16,185,129,0.2)",
+                    background: "var(--brass-glow)",
+                    border: "1px solid var(--brass-edge)",
                   }}>
                     <div style={{ fontSize: 36, marginBottom: 10 }}>
                       {badge.iconUrl ? (
@@ -631,16 +631,16 @@ export default function ProgressPage() {
                       ) : "🏆"}
                     </div>
                     <p style={{
-                      fontFamily: "'Syne',sans-serif", fontSize: 13, fontWeight: 700, margin: "0 0 4px",
+                      fontFamily: "var(--font-fraunces),sans-serif", fontSize: 13, fontWeight: 700, margin: "0 0 4px",
                       color: "white"
                     }}>
                       {badge.name}
                     </p>
-                    <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", margin: 0 }}>{badge.description}</p>
+                    <p style={{ fontSize: 10, color: "var(--creme-mute)", margin: 0 }}>{badge.description}</p>
                     <div style={{
                       marginTop: 10, display: "inline-block",
                       padding: "2px 10px", borderRadius: 99,
-                      background: "rgba(16,185,129,0.15)", color: "#10b981", fontSize: 9, fontWeight: 700
+                      background: "var(--brass-glow)", color: "var(--brass)", fontSize: 9, fontWeight: 700
                     }}>
                       ✓
                     </div>

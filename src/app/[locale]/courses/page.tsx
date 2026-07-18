@@ -95,7 +95,7 @@ const T = {
 // ─── Level style config ───────────────────────────────────────────────────────
 
 const LEVEL_CONFIG: Record<Level, { color: string; bg: string; border: string; glow: string }> = {
-  A1: { color: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.2)", glow: "rgba(16,185,129,0.06)" },
+  A1: { color: "var(--brass)", bg: "var(--brass-glow)", border: "var(--brass-edge)", glow: "var(--brass-glow)" },
   A2: { color: "#14b8a6", bg: "rgba(20,184,166,0.08)", border: "rgba(20,184,166,0.2)", glow: "rgba(20,184,166,0.06)" },
   B1: { color: "#3b82f6", bg: "rgba(59,130,246,0.08)", border: "rgba(59,130,246,0.2)", glow: "rgba(59,130,246,0.06)" },
   B2: { color: "#8b5cf6", bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.2)", glow: "rgba(139,92,246,0.06)" },
@@ -178,9 +178,9 @@ function CourseCard({ course, locale, t }: { course: Course; locale: Locale; t: 
     <div style={{
       borderRadius: 16, padding: "16px",
       background: course.locked
-        ? "rgba(255,255,255,0.02)"
-        : `linear-gradient(135deg, ${cfg.glow}, rgba(255,255,255,0.02))`,
-      border: `1px solid ${course.locked ? "rgba(255,255,255,0.06)" : cfg.border}`,
+        ? "rgba(244, 235, 220, 0.02)"
+        : `linear-gradient(135deg, ${cfg.glow}, rgba(244, 235, 220, 0.02))`,
+      border: `1px solid ${course.locked ? "var(--creme-hair)" : cfg.border}`,
       opacity: course.locked ? 0.55 : 1,
       display: "flex", flexDirection: "column", gap: 12,
       transition: "all var(--dur-touch) var(--ease-enter)",
@@ -189,21 +189,21 @@ function CourseCard({ course, locale, t }: { course: Course; locale: Locale; t: 
         <div style={{
           width: 44, height: 44, borderRadius: 12, flexShrink: 0,
           display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem",
-          background: course.locked ? "rgba(255,255,255,0.04)" : cfg.bg,
-          border: `1px solid ${course.locked ? "rgba(255,255,255,0.07)" : cfg.border}`,
+          background: course.locked ? "rgba(244, 235, 220, 0.04)" : cfg.bg,
+          border: `1px solid ${course.locked ? "var(--creme-hair)" : cfg.border}`,
         }}>
           {course.locked ? "🔒" : course.icon}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{
-            margin: 0, color: "white", fontFamily: "'Syne', sans-serif",
+            margin: 0, color: "white", fontFamily: "var(--font-fraunces), Georgia, serif",
             fontWeight: 700, fontSize: "0.85rem",
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
           }}>
             {course.titleDE}
-            {course.progress === 100 && <span style={{ color: "#10b981", marginLeft: 6 }}>✓</span>}
+            {course.progress === 100 && <span style={{ color: "var(--brass)", marginLeft: 6 }}>✓</span>}
           </p>
-          <p style={{ margin: "3px 0 0", color: "rgba(255,255,255,0.72)", fontSize: "0.85rem" }}>
+          <p style={{ margin: "3px 0 0", color: "var(--creme-soft)", fontSize: "0.85rem" }}>
             {description}
           </p>
         </div>
@@ -218,13 +218,13 @@ function CourseCard({ course, locale, t }: { course: Course; locale: Locale; t: 
         </span>
         <span style={{
           fontSize: "0.75rem", padding: "2px 8px", borderRadius: 6,
-          background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.65)",
+          background: "var(--creme-hair)", color: "var(--creme-soft)",
         }}>
           {tag}
         </span>
         <span style={{
           fontSize: "0.75rem", padding: "2px 8px", borderRadius: 6,
-          background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.65)",
+          background: "var(--creme-hair)", color: "var(--creme-soft)",
         }}>
           {course.modules} {t.modulesLabel}
         </span>
@@ -232,7 +232,7 @@ function CourseCard({ course, locale, t }: { course: Course; locale: Locale; t: 
 
       {!course.locked ? (
         <div>
-          <div style={{ height: 5, borderRadius: 99, overflow: "hidden", background: "rgba(255,255,255,0.06)" }}>
+          <div style={{ height: 5, borderRadius: 99, overflow: "hidden", background: "var(--creme-hair)" }}>
             <div style={{
               height: "100%", borderRadius: 99,
               width: `${course.progress}%`,
@@ -240,7 +240,7 @@ function CourseCard({ course, locale, t }: { course: Course; locale: Locale; t: 
               boxShadow: course.progress > 0 ? `0 0 8px ${cfg.color}55` : "none",
             }} />
           </div>
-          <p style={{ margin: "5px 0 0", color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>
+          <p style={{ margin: "5px 0 0", color: "var(--creme-soft)", fontSize: "0.82rem" }}>
             {course.progress === 0
               ? t.statusNotStarted
               : course.progress === 100
@@ -249,7 +249,7 @@ function CourseCard({ course, locale, t }: { course: Course; locale: Locale; t: 
           </p>
         </div>
       ) : (
-        <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>
+        <p style={{ margin: 0, color: "var(--creme-soft)", fontSize: "0.82rem" }}>
           {course.comingSoon ? t.comingSoonHint : t.unlockHint}
         </p>
       )}
@@ -270,44 +270,44 @@ function LevelSection({ level, courses, isMobile, locale, t }: {
   return (
     <div style={{ marginBottom: 44 }}>
       {/* Section header */}
-      <div style={{ marginBottom: 14, padding: "18px 20px", borderRadius: 16, background: isLocked ? "rgba(255,255,255,0.02)" : `${cfg.glow}`, border: `1px solid ${isLocked ? "rgba(255,255,255,0.06)" : cfg.border}` }}>
+      <div style={{ marginBottom: 14, padding: "18px 20px", borderRadius: 16, background: isLocked ? "rgba(244, 235, 220, 0.02)" : `${cfg.glow}`, border: `1px solid ${isLocked ? "var(--creme-hair)" : cfg.border}` }}>
         <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
           <div style={{
             width: 38, height: 38, borderRadius: 11, flexShrink: 0,
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "0.9rem",
-            color: isLocked ? "rgba(255,255,255,0.2)" : cfg.color,
-            background: isLocked ? "rgba(255,255,255,0.04)" : cfg.bg,
-            border: `1px solid ${isLocked ? "rgba(255,255,255,0.07)" : cfg.border}`,
+            fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 800, fontSize: "0.9rem",
+            color: isLocked ? "var(--creme-hair)" : cfg.color,
+            background: isLocked ? "rgba(244, 235, 220, 0.04)" : cfg.bg,
+            border: `1px solid ${isLocked ? "var(--creme-hair)" : cfg.border}`,
           }}>
             {isLocked ? "🔒" : level}
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
-              <p style={{ margin: 0, color: isLocked ? "rgba(255,255,255,0.3)" : "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
+              <p style={{ margin: 0, color: isLocked ? "var(--creme-mute)" : "white", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, fontSize: "1rem" }}>
                 {meta.title}
               </p>
               {meta.recommended && (
-                <span style={{ fontSize: "0.75rem", padding: "2px 10px", borderRadius: 99, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#10b981", fontWeight: 700, letterSpacing: "0.06em" }}>
+                <span style={{ fontSize: "0.75rem", padding: "2px 10px", borderRadius: 99, background: "var(--brass-glow)", border: "1px solid rgba(16,185,129,0.3)", color: "var(--brass)", fontWeight: 700, letterSpacing: "0.06em" }}>
                   ✦ Beta
                 </span>
               )}
             </div>
-            <p style={{ margin: "0 0 8px", color: "rgba(255,255,255,0.78)", fontSize: "0.86rem", lineHeight: 1.5 }}>
+            <p style={{ margin: "0 0 8px", color: "var(--creme-soft)", fontSize: "0.86rem", lineHeight: 1.5 }}>
               {meta.subtitle}
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
               <span style={{
                 fontSize: "0.75rem", padding: "2px 10px", borderRadius: 6,
-                background: isLocked ? "rgba(255,255,255,0.04)" : cfg.bg,
-                color: isLocked ? "rgba(255,255,255,0.25)" : cfg.color,
-                border: `1px solid ${isLocked ? "rgba(255,255,255,0.07)" : cfg.border}`,
+                background: isLocked ? "rgba(244, 235, 220, 0.04)" : cfg.bg,
+                color: isLocked ? "var(--creme-mute)" : cfg.color,
+                border: `1px solid ${isLocked ? "var(--creme-hair)" : cfg.border}`,
                 fontWeight: 600,
               }}>
                 {meta.status}
               </span>
               {!isLocked && (
-                <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>
+                <span style={{ color: "var(--creme-soft)", fontSize: "0.82rem" }}>
                   {done}/{courses.length} · {t.levelBadge}
                 </span>
               )}
@@ -336,19 +336,19 @@ function LevelSection({ level, courses, isMobile, locale, t }: {
 
 function JourneyBlock({ t }: { t: typeof T["fr"] }) {
   const pillars = [
-    { text: t.pillar1, color: "#10b981" },
-    { text: t.pillar2, color: "#6366f1" },
+    { text: t.pillar1, color: "var(--brass)" },
+    { text: t.pillar2, color: "var(--brass)" },
     { text: t.pillar3, color: "#f59e0b" },
   ];
   return (
     <div className="fade-up card-delay-1" style={{
       marginBottom: 32, padding: "20px 24px", borderRadius: 16,
-      background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
+      background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)",
     }}>
-      <p style={{ margin: "0 0 6px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>
+      <p style={{ margin: "0 0 6px", color: "white", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, fontSize: "0.95rem" }}>
         {t.journeyTitle}
       </p>
-      <p style={{ margin: "0 0 14px", color: "rgba(255,255,255,0.78)", fontSize: "0.88rem", lineHeight: 1.6 }}>
+      <p style={{ margin: "0 0 14px", color: "var(--creme-soft)", fontSize: "0.88rem", lineHeight: 1.6 }}>
         {t.journeyText}
       </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -356,7 +356,7 @@ function JourneyBlock({ t }: { t: typeof T["fr"] }) {
           <span key={i} style={{
             fontSize: "0.78rem", padding: "4px 12px", borderRadius: 8,
             background: `${p.color}08`, border: `1px solid ${p.color}20`,
-            color: "rgba(255,255,255,0.72)",
+            color: "var(--creme-soft)",
           }}>
             <span style={{ color: p.color, fontWeight: 700, marginRight: 4 }}>✦</span>
             {p.text}
@@ -451,15 +451,15 @@ export default function CoursesPage() {
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 8,
               padding: "4px 12px", borderRadius: 8, marginBottom: 10,
-              background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
+              background: "var(--brass-glow)", border: "1px solid var(--brass-edge)",
               color: "#34d399", fontSize: "0.82rem",
             }}>
               🎓 {t.pageBadge}
             </div>
-            <h2 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.7rem" }}>
+            <h2 style={{ margin: 0, color: "white", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 800, fontSize: "1.7rem" }}>
               {t.pageTitle}
             </h2>
-            <p style={{ margin: "6px 0 0", color: "rgba(255,255,255,0.72)", fontSize: "0.88rem" }}>
+            <p style={{ margin: "6px 0 0", color: "var(--creme-soft)", fontSize: "0.88rem" }}>
               {t.coursesDone(done, totalUnlocked)}
             </p>
           </div>
@@ -477,8 +477,8 @@ export default function CoursesPage() {
                     background: cfg.bg, border: `1px solid ${cfg.border}`,
                     opacity: allCourses.filter(c => c.level === l && !c.locked).length === 0 ? 0.4 : 1,
                   }}>
-                    <p style={{ margin: 0, color: cfg.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1rem" }}>{l}</p>
-                    <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.65)", fontSize: "0.75rem" }}>{lvlDone}/{lvlTotal}</p>
+                    <p style={{ margin: 0, color: cfg.color, fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 800, fontSize: "1rem" }}>{l}</p>
+                    <p style={{ margin: "2px 0 0", color: "var(--creme-soft)", fontSize: "0.75rem" }}>{lvlDone}/{lvlTotal}</p>
                   </div>
                 );
               })}
@@ -501,10 +501,10 @@ export default function CoursesPage() {
               onClick={() => setFilter(key)}
               style={{
                 padding: "8px 18px", borderRadius: 10, cursor: "pointer",
-                fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.8rem",
-                background: active ? (cfg ? cfg.bg : "rgba(255,255,255,0.1)") : "rgba(255,255,255,0.04)",
-                color: active ? (cfg ? cfg.color : "white") : "rgba(255,255,255,0.65)",
-                border: active ? `1px solid ${cfg ? cfg.border : "rgba(255,255,255,0.2)"}` : "1px solid rgba(255,255,255,0.06)",
+                fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 600, fontSize: "0.8rem",
+                background: active ? (cfg ? cfg.bg : "var(--creme-hair)") : "rgba(244, 235, 220, 0.04)",
+                color: active ? (cfg ? cfg.color : "white") : "var(--creme-soft)",
+                border: active ? `1px solid ${cfg ? cfg.border : "var(--creme-hair)"}` : "1px solid var(--creme-hair)",
                 transition: "all var(--dur-touch) var(--ease-enter)",
               }}
             >
@@ -518,10 +518,10 @@ export default function CoursesPage() {
       {filtered.length === 0 ? (
         <div style={{ textAlign: "center", padding: "60px 20px" }}>
           <p style={{ fontSize: "2.5rem", marginBottom: 12 }}>🔍</p>
-          <p style={{ color: "rgba(255,255,255,0.78)", fontFamily: "'Syne', sans-serif", fontSize: "0.95rem", margin: "0 0 6px" }}>
+          <p style={{ color: "var(--creme-soft)", fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "0.95rem", margin: "0 0 6px" }}>
             {t.noResults}
           </p>
-          <p style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.86rem", margin: 0 }}>
+          <p style={{ color: "var(--creme-soft)", fontSize: "0.86rem", margin: 0 }}>
             {t.noResultsSub}
           </p>
         </div>
@@ -539,8 +539,8 @@ export default function CoursesPage() {
       )}
 
       {/* ── Disclaimer ── */}
-      <div style={{ marginTop: 48, padding: "14px 20px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", textAlign: "center" }}>
-        <p style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", margin: 0, lineHeight: 1.6 }}>
+      <div style={{ marginTop: 48, padding: "14px 20px", borderRadius: 12, background: "rgba(244, 235, 220, 0.02)", border: "1px solid var(--creme-hair)", textAlign: "center" }}>
+        <p style={{ color: "var(--creme-soft)", fontSize: "0.82rem", margin: 0, lineHeight: 1.6 }}>
           {t.disclaimer}
         </p>
       </div>

@@ -115,13 +115,13 @@ type TT = typeof T.fr;
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function scoreColor(n: number): string {
-  if (n >= 8) return "#10b981";
+  if (n >= 8) return "var(--brass)";
   if (n >= 5) return "#f59e0b";
-  return "#ef4444";
+  return "var(--oxblood)";
 }
 
 function scoreBg(n: number): string {
-  if (n >= 8) return "rgba(16,185,129,0.12)";
+  if (n >= 8) return "var(--brass-glow)";
   if (n >= 5) return "rgba(245,158,11,0.12)";
   return "rgba(239,68,68,0.12)";
 }
@@ -138,7 +138,7 @@ function ScoreBadge({ label, value }: { label: string; value: number }) {
         padding: "2px 8px",
         borderRadius: 20,
         fontSize: "0.75rem",
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-fraunces), Georgia, serif",
         fontWeight: 600,
         background: scoreBg(value),
         color: scoreColor(value),
@@ -157,8 +157,8 @@ function TypingIndicator() {
         style={{
           width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
           display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.85rem",
-          background: "linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.08))",
-          border: "1px solid rgba(16,185,129,0.25)",
+          background: "linear-gradient(135deg, var(--brass-glow), rgba(5,150,105,0.08))",
+          border: "1px solid var(--brass-edge)",
         }}
       >
         🤖
@@ -166,7 +166,7 @@ function TypingIndicator() {
       <div
         style={{
           padding: "10px 16px", borderRadius: "18px 18px 18px 4px",
-          background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+          background: "rgba(244, 235, 220, 0.04)", border: "1px solid var(--creme-hair)",
           display: "flex", alignItems: "center", gap: 5,
         }}
       >
@@ -175,7 +175,7 @@ function TypingIndicator() {
             0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
             30% { transform: translateY(-5px); opacity: 1; }
           }
-          .dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; animation: bounce 1.2s infinite; }
+          .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brass); animation: bounce 1.2s infinite; }
           .dot:nth-child(2) { animation-delay: 0.2s; }
           .dot:nth-child(3) { animation-delay: 0.4s; }
         `}</style>
@@ -202,38 +202,38 @@ function AgentBubble({
         style={{
           width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
           display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.85rem",
-          background: "linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.08))",
-          border: "1px solid rgba(16,185,129,0.25)",
+          background: "linear-gradient(135deg, var(--brass-glow), rgba(5,150,105,0.08))",
+          border: "1px solid var(--brass-edge)",
         }}
       >
         🤖
       </div>
       <div style={{ maxWidth: "72%", display: "flex", flexDirection: "column", gap: 6 }}>
-        <p style={{ margin: 0, fontSize: "0.82rem", color: "rgba(255,255,255,0.65)", fontFamily: "'DM Mono', monospace" }}>
+        <p style={{ margin: 0, fontSize: "0.82rem", color: "var(--creme-soft)", fontFamily: "var(--font-jetbrains, monospace)" }}>
           {t.coachName} •{" "}
           {msg.timestamp.toLocaleTimeString(t.dateLocale, { hour: "2-digit", minute: "2-digit" })}
         </p>
         <div
           style={{
             padding: "12px 16px", borderRadius: "18px 18px 18px 4px",
-            background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+            background: "rgba(244, 235, 220, 0.04)", border: "1px solid var(--creme-hair)",
           }}
         >
-          <p style={{ margin: 0, color: "rgba(255,255,255,0.9)", fontSize: "0.85rem", lineHeight: 1.6, fontFamily: "'DM Mono', monospace" }}>
+          <p style={{ margin: 0, color: "var(--creme)", fontSize: "0.85rem", lineHeight: 1.6, fontFamily: "var(--font-jetbrains, monospace)" }}>
             {msg.textDE}
           </p>
           <div style={{ marginTop: 8 }}>
             <AudioPlayer text={msg.textDE} gender="male" accent="de" rate="0.85" autoPlay={isLast} label={t.coachName} />
           </div>
           {showTranslation && (
-            <p style={{ margin: "8px 0 0", color: "rgba(16,185,129,0.85)", fontSize: "0.82rem", lineHeight: 1.5, fontFamily: "'DM Mono', monospace", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 8 }}>
+            <p style={{ margin: "8px 0 0", color: "rgba(16,185,129,0.85)", fontSize: "0.82rem", lineHeight: 1.5, fontFamily: "var(--font-jetbrains, monospace)", borderTop: "1px solid var(--creme-hair)", paddingTop: 8 }}>
               {msg.translation}
             </p>
           )}
         </div>
         <button
           onClick={onToggle}
-          style={{ alignSelf: "flex-start", background: "none", border: "none", color: "rgba(16,185,129,0.8)", fontSize: "0.75rem", cursor: "pointer", fontFamily: "'DM Mono', monospace", padding: "2px 0" }}
+          style={{ alignSelf: "flex-start", background: "none", border: "none", color: "rgba(16,185,129,0.8)", fontSize: "0.75rem", cursor: "pointer", fontFamily: "var(--font-jetbrains, monospace)", padding: "2px 0" }}
         >
           {showTranslation ? t.hideTranslation : t.showTranslation}
         </button>
@@ -248,34 +248,34 @@ function UserBubble({ msg, t }: { msg: ConversationMessage; t: TT }) {
   const showCorrection = correction && !correction.wasCorrect;
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
-      <p style={{ margin: 0, fontSize: "0.75rem", color: "rgba(255,255,255,0.55)", fontFamily: "'DM Mono', monospace" }}>
+      <p style={{ margin: 0, fontSize: "0.75rem", color: "var(--creme-mute)", fontFamily: "var(--font-jetbrains, monospace)" }}>
         {t.userLabel} •{" "}
         {msg.timestamp.toLocaleTimeString(t.dateLocale, { hour: "2-digit", minute: "2-digit" })}
       </p>
       <div
         style={{
           maxWidth: "72%", padding: "12px 16px", borderRadius: "18px 18px 4px 18px",
-          background: "linear-gradient(135deg, rgba(16,185,129,0.12), rgba(5,150,105,0.06))",
-          border: "1px solid rgba(16,185,129,0.2)",
+          background: "linear-gradient(135deg, var(--brass-glow), rgba(5,150,105,0.06))",
+          border: "1px solid var(--brass-edge)",
         }}
       >
-        <p style={{ margin: 0, color: "rgba(255,255,255,0.9)", fontSize: "0.85rem", lineHeight: 1.6, fontFamily: "'DM Mono', monospace" }}>
+        <p style={{ margin: 0, color: "var(--creme)", fontSize: "0.85rem", lineHeight: 1.6, fontFamily: "var(--font-jetbrains, monospace)" }}>
           {msg.textDE}
         </p>
       </div>
       {showCorrection && (
         <div style={{ maxWidth: "72%", padding: "10px 14px", borderRadius: 12, background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", flexDirection: "column", gap: 4 }}>
-          <p style={{ margin: 0, fontSize: "0.75rem", color: "rgba(245,158,11,0.9)", fontFamily: "'Syne', sans-serif", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+          <p style={{ margin: 0, fontSize: "0.75rem", color: "rgba(245,158,11,0.9)", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
             {t.correctionLabel}
           </p>
-          <p style={{ margin: 0, fontSize: "0.82rem", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.55)", textDecoration: "line-through" }}>
+          <p style={{ margin: 0, fontSize: "0.82rem", fontFamily: "var(--font-jetbrains, monospace)", color: "var(--creme-mute)", textDecoration: "line-through" }}>
             {correction.original}
           </p>
-          <p style={{ margin: 0, fontSize: "0.78rem", fontFamily: "'DM Mono', monospace", color: "#10b981" }}>
+          <p style={{ margin: 0, fontSize: "0.78rem", fontFamily: "var(--font-jetbrains, monospace)", color: "var(--brass)" }}>
             {correction.corrected}
           </p>
           {correction.grammarNote && (
-            <p style={{ margin: "2px 0 0", fontSize: "0.78rem", fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.65)", lineHeight: 1.5 }}>
+            <p style={{ margin: "2px 0 0", fontSize: "0.78rem", fontFamily: "var(--font-jetbrains, monospace)", color: "var(--creme-soft)", lineHeight: 1.5 }}>
               {correction.grammarNote}
             </p>
           )}
@@ -299,16 +299,16 @@ function GlobalScoreRing({ score }: { score: number }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
       <svg width={76} height={76} style={{ transform: "rotate(-90deg)" }}>
-        <circle cx={38} cy={38} r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={6} />
+        <circle cx={38} cy={38} r={r} fill="none" stroke="var(--creme-hair)" strokeWidth={6} />
         <circle cx={38} cy={38} r={r} fill="none" stroke={scoreColor(score)} strokeWidth={6}
           strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
           style={{ transition: "stroke-dasharray var(--dur-moment) var(--ease-enter)" }} />
       </svg>
       <div style={{ position: "absolute", display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <span style={{ color: scoreColor(score), fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1.2rem" }}>
+        <span style={{ color: scoreColor(score), fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, fontSize: "1.2rem" }}>
           {score.toFixed(1)}
         </span>
-        <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.72rem" }}>/10</span>
+        <span style={{ color: "var(--creme-soft)", fontSize: "0.72rem" }}>/10</span>
       </div>
     </div>
   );
@@ -424,11 +424,11 @@ function SimulateurPage() {
     <Layout title={t.layoutTitle}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
-        .sim-textarea::placeholder { color: rgba(255,255,255,0.2); }
+        .sim-textarea::placeholder { color: var(--creme-hair); }
         .sim-textarea:focus { border-color: rgba(16,185,129,0.4) !important; }
         .sim-scroll::-webkit-scrollbar { width: 4px; }
         .sim-scroll::-webkit-scrollbar-track { background: transparent; }
-        .sim-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); border-radius: 4px; }
+        .sim-scroll::-webkit-scrollbar-thumb { background: var(--creme-hair); border-radius: 4px; }
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .msg-in { animation: fadeSlideIn 0.3s ease forwards; }
         @keyframes pulseRing { 0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); } 50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); } }
@@ -440,8 +440,8 @@ function SimulateurPage() {
         <div style={{
           margin: "-16px -14px 0",
           padding: "10px 14px 12px",
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
-          background: "#080c10",
+          borderBottom: "1px solid var(--creme-hair)",
+          background: "var(--espresso)",
         }}>
           {/* Level row */}
           <div style={{ display: "flex", gap: 5, marginBottom: 10 }}>
@@ -451,10 +451,10 @@ function SimulateurPage() {
                 onClick={() => handleNiveauChange(n)}
                 style={{
                   flex: 1, padding: "7px 0", borderRadius: 8, cursor: "pointer",
-                  border: niveau === n ? "1px solid rgba(16,185,129,0.45)" : "1px solid rgba(255,255,255,0.08)",
-                  background: niveau === n ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.03)",
-                  color: niveau === n ? "#10b981" : "rgba(255,255,255,0.72)",
-                  fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.78rem",
+                  border: niveau === n ? "1px solid rgba(16,185,129,0.45)" : "1px solid var(--creme-hair)",
+                  background: niveau === n ? "var(--brass-glow)" : "rgba(244, 235, 220, 0.03)",
+                  color: niveau === n ? "var(--brass)" : "var(--creme-soft)",
+                  fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, fontSize: "0.78rem",
                 }}
               >{n}</button>
             ))}
@@ -469,10 +469,10 @@ function SimulateurPage() {
                   onClick={() => handleScenarioChange(s.id)}
                   style={{
                     flexShrink: 0, padding: "5px 10px", borderRadius: 8, cursor: "pointer",
-                    border: active ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.07)",
-                    background: active ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.02)",
-                    color: active ? "#10b981" : "rgba(255,255,255,0.72)",
-                    fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem",
+                    border: active ? "1px solid rgba(16,185,129,0.3)" : "1px solid var(--creme-hair)",
+                    background: active ? "var(--brass-glow)" : "rgba(244, 235, 220, 0.02)",
+                    color: active ? "var(--brass)" : "var(--creme-soft)",
+                    fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 600, fontSize: "0.78rem",
                     display: "flex", alignItems: "center", gap: 5, whiteSpace: "nowrap",
                   }}
                 >
@@ -490,17 +490,17 @@ function SimulateurPage() {
         height: isMobile ? "auto" : "calc(100vh - 64px)",
         display: "flex",
         overflow: isMobile ? "visible" : "hidden",
-        background: "#080c10",
+        background: "var(--espresso)",
       }}>
 
         {/* ════ LEFT PANEL — Scenarios (desktop only) ════ */}
         <aside
           className="sim-scroll"
-          style={{ width: 230, borderRight: "1px solid rgba(255,255,255,0.07)", display: isMobile ? "none" : "flex", flexDirection: "column", overflowY: "auto", padding: "16px 10px", gap: 8, flexShrink: 0 }}
+          style={{ width: 230, borderRight: "1px solid var(--creme-hair)", display: isMobile ? "none" : "flex", flexDirection: "column", overflowY: "auto", padding: "16px 10px", gap: 8, flexShrink: 0 }}
         >
           {/* Level selector */}
           <div style={{ marginBottom: 4 }}>
-            <p style={{ margin: "0 0 6px 4px", fontSize: "0.72rem", color: "rgba(255,255,255,0.65)", fontFamily: "'Syne', sans-serif", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            <p style={{ margin: "0 0 6px 4px", fontSize: "0.72rem", color: "var(--creme-soft)", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>
               {t.levelLabel}
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5 }}>
@@ -510,25 +510,25 @@ function SimulateurPage() {
                   onClick={() => handleNiveauChange(n)}
                   style={{
                     padding: "6px 0", borderRadius: 8,
-                    border: niveau === n ? "1px solid rgba(16,185,129,0.5)" : "1px solid rgba(255,255,255,0.08)",
-                    background: niveau === n ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.03)",
-                    color: niveau === n ? "#10b981" : "rgba(255,255,255,0.4)",
-                    fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.75rem", cursor: "pointer", transition: "all var(--dur-touch)",
+                    border: niveau === n ? "1px solid rgba(16,185,129,0.5)" : "1px solid var(--creme-hair)",
+                    background: niveau === n ? "var(--brass-glow)" : "rgba(244, 235, 220, 0.03)",
+                    color: niveau === n ? "var(--brass)" : "var(--creme-mute)",
+                    fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, fontSize: "0.75rem", cursor: "pointer", transition: "all var(--dur-touch)",
                   }}
                 >
                   {n}
                 </button>
               ))}
             </div>
-            <p style={{ margin: "8px 4px 0", fontSize: "0.75rem", color: "rgba(255,255,255,0.65)", fontFamily: "'DM Mono', monospace", lineHeight: 1.5 }}>
+            <p style={{ margin: "8px 4px 0", fontSize: "0.75rem", color: "var(--creme-soft)", fontFamily: "var(--font-jetbrains, monospace)", lineHeight: 1.5 }}>
               {t.levelHint}
             </p>
           </div>
 
-          <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "4px 0" }} />
+          <div style={{ height: 1, background: "var(--creme-hair)", margin: "4px 0" }} />
 
           {/* Scenario cards */}
-          <p style={{ margin: "0 0 4px 4px", fontSize: "0.72rem", color: "rgba(255,255,255,0.65)", fontFamily: "'Syne', sans-serif", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+          <p style={{ margin: "0 0 4px 4px", fontSize: "0.72rem", color: "var(--creme-soft)", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>
             {t.scenarioLabel}
           </p>
           {SCENARIOS.map(s => {
@@ -539,17 +539,17 @@ function SimulateurPage() {
                 onClick={() => handleScenarioChange(s.id)}
                 style={{
                   width: "100%", textAlign: "left", padding: "10px 12px", borderRadius: 12,
-                  border: active ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.06)",
-                  background: active ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.02)",
+                  border: active ? "1px solid rgba(16,185,129,0.3)" : "1px solid var(--creme-hair)",
+                  background: active ? "var(--brass-glow)" : "rgba(244, 235, 220, 0.02)",
                   cursor: "pointer", transition: "all var(--dur-touch)", display: "flex", alignItems: "flex-start", gap: 10,
                 }}
               >
                 <span style={{ fontSize: "1.2rem", flexShrink: 0, marginTop: 1 }}>{s.icon}</span>
                 <div style={{ minWidth: 0 }}>
-                  <p style={{ margin: 0, color: active ? "#10b981" : "rgba(255,255,255,0.75)", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.75rem", lineHeight: 1.3 }}>
+                  <p style={{ margin: 0, color: active ? "var(--brass)" : "var(--creme)", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 600, fontSize: "0.75rem", lineHeight: 1.3 }}>
                     {t.scenarioLabels[s.id] ?? s.label}
                   </p>
-                  <p style={{ margin: "3px 0 0", color: "rgba(255,255,255,0.65)", fontSize: "0.75rem", fontFamily: "'DM Mono', monospace", lineHeight: 1.4 }}>
+                  <p style={{ margin: "3px 0 0", color: "var(--creme-soft)", fontSize: "0.75rem", fontFamily: "var(--font-jetbrains, monospace)", lineHeight: 1.4 }}>
                     {s.defaultLevel}
                   </p>
                 </div>
@@ -563,7 +563,7 @@ function SimulateurPage() {
           {messages.length > 0 && (
             <button
               onClick={() => resetSession()}
-              style={{ padding: "8px 12px", borderRadius: 10, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.05)", color: "rgba(239,68,68,0.7)", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.7rem", cursor: "pointer", width: "100%" }}
+              style={{ padding: "8px 12px", borderRadius: 10, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.05)", color: "rgba(239,68,68,0.7)", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 600, fontSize: "0.7rem", cursor: "pointer", width: "100%" }}
             >
               {t.newSession}
             </button>
@@ -578,22 +578,22 @@ function SimulateurPage() {
             {/* Empty state */}
             {messages.length === 0 && !isLoading && (
               <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, opacity: 0.7 }}>
-                <div style={{ width: 72, height: 72, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.15)" }}>
+                <div style={{ width: 72, height: 72, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem", background: "var(--brass-glow)", border: "1px solid var(--brass-glow)" }}>
                   {scenarioObj.icon}
                 </div>
                 <div style={{ textAlign: "center", maxWidth: 360 }}>
-                  <p style={{ margin: "0 0 6px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
+                  <p style={{ margin: "0 0 6px", color: "white", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, fontSize: "1rem" }}>
                     {t.emptyTitle}
                   </p>
-                  <p style={{ margin: "0 0 6px", color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.85rem" }}>
+                  <p style={{ margin: "0 0 6px", color: "var(--brass)", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 600, fontSize: "0.85rem" }}>
                     {scenarioLabel}
                   </p>
-                  <p style={{ margin: "0 0 20px", color: "rgba(255,255,255,0.72)", fontSize: "0.88rem", fontFamily: "'DM Mono', monospace", lineHeight: 1.6 }}>
+                  <p style={{ margin: "0 0 20px", color: "var(--creme-soft)", fontSize: "0.88rem", fontFamily: "var(--font-jetbrains, monospace)", lineHeight: 1.6 }}>
                     {t.emptyText}
                   </p>
                   <button
                     onClick={startInterview}
-                    style={{ padding: "12px 28px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #10b981, #059669)", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 4px 20px rgba(16,185,129,0.3)" }}
+                    style={{ padding: "12px 28px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, var(--brass), var(--brass-deep))", color: "white", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 4px 20px rgba(16,185,129,0.3)" }}
                   >
                     {t.startBtn}
                   </button>
@@ -635,17 +635,17 @@ function SimulateurPage() {
                 className="msg-in"
                 style={{
                   textAlign: "center", padding: "24px", borderRadius: 16,
-                  background: sessionResult === "strong" ? "rgba(16,185,129,0.08)" : "rgba(245,158,11,0.08)",
-                  border: `1px solid ${sessionResult === "strong" ? "rgba(16,185,129,0.25)" : "rgba(245,158,11,0.25)"}`,
+                  background: sessionResult === "strong" ? "var(--brass-glow)" : "rgba(245,158,11,0.08)",
+                  border: `1px solid ${sessionResult === "strong" ? "var(--brass-edge)" : "rgba(245,158,11,0.25)"}`,
                 }}
               >
                 <p style={{ margin: "0 0 6px", fontSize: "2rem" }}>
                   {sessionResult === "strong" ? "✅" : "💪"}
                 </p>
-                <p style={{ margin: "0 0 4px", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem", color: "white" }}>
+                <p style={{ margin: "0 0 4px", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, fontSize: "1rem", color: "white" }}>
                   {sessionResult === "strong" ? t.conclusionSuccessTitle : t.conclusionEndTitle}
                 </p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.72)", fontSize: "0.85rem", fontFamily: "'DM Mono', monospace" }}>
+                <p style={{ margin: 0, color: "var(--creme-soft)", fontSize: "0.85rem", fontFamily: "var(--font-jetbrains, monospace)" }}>
                   {sessionResult === "strong" ? t.conclusionSuccessText : t.conclusionEndText}
                 </p>
               </div>
@@ -655,12 +655,12 @@ function SimulateurPage() {
           </div>
 
           {/* Input area */}
-          <div style={{ padding: isMobile ? "10px 14px 14px" : "12px 20px 16px", borderTop: "1px solid rgba(255,255,255,0.07)", background: "rgba(8,12,16,0.98)" }}>
+          <div style={{ padding: isMobile ? "10px 14px 14px" : "12px 20px 16px", borderTop: "1px solid var(--creme-hair)", background: "rgba(8,12,16,0.98)" }}>
             {concluded ? (
               <div style={{ textAlign: "center" }}>
                 <button
                   onClick={() => resetSession()}
-                  style={{ padding: "10px 24px", borderRadius: 10, border: "1px solid rgba(16,185,129,0.3)", background: "rgba(16,185,129,0.1)", color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.8rem", cursor: "pointer" }}
+                  style={{ padding: "10px 24px", borderRadius: 10, border: "1px solid rgba(16,185,129,0.3)", background: "var(--brass-glow)", color: "var(--brass)", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 600, fontSize: "0.8rem", cursor: "pointer" }}
                 >
                   {t.restartSession}
                 </button>
@@ -685,20 +685,20 @@ function SimulateurPage() {
                     rows={2}
                     disabled={isLoading}
                     className="sim-textarea"
-                    style={{ flex: 1, resize: "none", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, color: "white", padding: "12px 16px", fontSize: "1rem", fontFamily: "'DM Mono', monospace", outline: "none", lineHeight: 1.5, transition: "border-color var(--dur-touch)" }}
+                    style={{ flex: 1, resize: "none", background: "rgba(244, 235, 220, 0.04)", border: "1px solid var(--creme-hair)", borderRadius: 14, color: "white", padding: "12px 16px", fontSize: "1rem", fontFamily: "var(--font-jetbrains, monospace)", outline: "none", lineHeight: 1.5, transition: "border-color var(--dur-touch)" }}
                   />
                   <button
                     onClick={handleMic}
                     title={t.micTitle}
                     className={isListening ? "mic-active" : ""}
-                    style={{ width: 44, height: 44, borderRadius: 12, border: isListening ? "1px solid rgba(239,68,68,0.5)" : "1px solid rgba(255,255,255,0.1)", background: isListening ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.04)", color: isListening ? "#ef4444" : "rgba(255,255,255,0.4)", fontSize: "1.1rem", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all var(--dur-touch)" }}
+                    style={{ width: 44, height: 44, borderRadius: 12, border: isListening ? "1px solid rgba(239,68,68,0.5)" : "1px solid var(--creme-hair)", background: isListening ? "rgba(239,68,68,0.12)" : "rgba(244, 235, 220, 0.04)", color: isListening ? "var(--oxblood)" : "var(--creme-mute)", fontSize: "1.1rem", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all var(--dur-touch)" }}
                   >
                     🎙️
                   </button>
                   <button
                     onClick={handleSend}
                     disabled={!input.trim() || isLoading}
-                    style={{ width: 44, height: 44, borderRadius: 12, border: "none", background: !input.trim() || isLoading ? "rgba(255,255,255,0.05)" : "linear-gradient(135deg, #10b981, #059669)", color: !input.trim() || isLoading ? "rgba(255,255,255,0.2)" : "white", fontSize: "1rem", cursor: !input.trim() || isLoading ? "not-allowed" : "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all var(--dur-move)", boxShadow: !input.trim() || isLoading ? "none" : "0 4px 16px rgba(16,185,129,0.3)" }}
+                    style={{ width: 44, height: 44, borderRadius: 12, border: "none", background: !input.trim() || isLoading ? "var(--creme-hair)" : "linear-gradient(135deg, var(--brass), var(--brass-deep))", color: !input.trim() || isLoading ? "var(--creme-hair)" : "white", fontSize: "1rem", cursor: !input.trim() || isLoading ? "not-allowed" : "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all var(--dur-move)", boxShadow: !input.trim() || isLoading ? "none" : "0 4px 16px rgba(16,185,129,0.3)" }}
                   >
                     ➤
                   </button>
@@ -711,11 +711,11 @@ function SimulateurPage() {
         {/* ════ RIGHT PANEL — Scores & Tips (desktop only) ════ */}
         <aside
           className="sim-scroll"
-          style={{ width: 280, borderLeft: "1px solid rgba(255,255,255,0.07)", display: isMobile ? "none" : "flex", flexDirection: "column", padding: "20px 16px", gap: 16, overflowY: "auto", flexShrink: 0 }}
+          style={{ width: 280, borderLeft: "1px solid var(--creme-hair)", display: isMobile ? "none" : "flex", flexDirection: "column", padding: "20px 16px", gap: 16, overflowY: "auto", flexShrink: 0 }}
         >
           {/* Session score */}
-          <div style={{ borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", padding: "16px", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-            <p style={{ margin: 0, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.75rem", color: "rgba(255,255,255,0.65)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+          <div style={{ borderRadius: 16, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)", padding: "16px", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+            <p style={{ margin: 0, fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, fontSize: "0.75rem", color: "var(--creme-soft)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
               {t.sessionScore}
             </p>
             {globalScore !== null ? (
@@ -723,7 +723,7 @@ function SimulateurPage() {
                 <GlobalScoreRing score={globalScore} />
               </div>
             ) : (
-              <div style={{ width: 76, height: 76, borderRadius: "50%", border: "6px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.15)", fontSize: "0.7rem", fontFamily: "'DM Mono', monospace" }}>
+              <div style={{ width: 76, height: 76, borderRadius: "50%", border: "6px solid var(--creme-hair)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--creme-hair)", fontSize: "0.7rem", fontFamily: "var(--font-jetbrains, monospace)" }}>
                 —
               </div>
             )}
@@ -734,10 +734,10 @@ function SimulateurPage() {
                 const avg = evaluated.reduce((s, m) => s + m.evaluation![key], 0) / evaluated.length;
                 return (
                   <div key={key} style={{ padding: "8px 10px", borderRadius: 10, background: scoreBg(avg), border: `1px solid ${scoreColor(avg)}22`, display: "flex", flexDirection: "column", gap: 2 }}>
-                    <span style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.75rem", fontFamily: "'DM Mono', monospace" }}>
+                    <span style={{ color: "var(--creme-soft)", fontSize: "0.75rem", fontFamily: "var(--font-jetbrains, monospace)" }}>
                       {t.scoreLabels[key]}
                     </span>
-                    <span style={{ color: scoreColor(avg), fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
+                    <span style={{ color: scoreColor(avg), fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, fontSize: "1rem" }}>
                       {avg.toFixed(1)}
                     </span>
                   </div>
@@ -747,18 +747,18 @@ function SimulateurPage() {
           </div>
 
           {/* Pedagogical tip */}
-          <div style={{ borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", padding: "14px 16px" }}>
-            <p style={{ margin: "0 0 8px", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.75rem", color: "rgba(255,255,255,0.65)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+          <div style={{ borderRadius: 16, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)", padding: "14px 16px" }}>
+            <p style={{ margin: "0 0 8px", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, fontSize: "0.75rem", color: "var(--creme-soft)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
               {t.tipLabel}
             </p>
-            <p style={{ margin: 0, color: lastTip ? "rgba(255,255,255,0.78)" : "rgba(255,255,255,0.35)", fontSize: "0.82rem", lineHeight: 1.6, fontFamily: "'DM Mono', monospace" }}>
+            <p style={{ margin: 0, color: lastTip ? "var(--creme-soft)" : "var(--creme-mute)", fontSize: "0.82rem", lineHeight: 1.6, fontFamily: "var(--font-jetbrains, monospace)" }}>
               {lastTip ?? t.tipEmpty}
             </p>
           </div>
 
           {/* Progress */}
-          <div style={{ borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", padding: "14px 16px" }}>
-            <p style={{ margin: "0 0 12px", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.75rem", color: "rgba(255,255,255,0.65)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+          <div style={{ borderRadius: 16, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)", padding: "14px 16px" }}>
+            <p style={{ margin: "0 0 12px", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, fontSize: "0.75rem", color: "var(--creme-soft)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
               {t.progressLabel}
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -769,10 +769,10 @@ function SimulateurPage() {
                 { label: t.progressStatus,    value: progressStatusValue,     icon: "📌" },
               ].map(row => (
                 <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.75rem", fontFamily: "'DM Mono', monospace" }}>
+                  <span style={{ color: "var(--creme-soft)", fontSize: "0.75rem", fontFamily: "var(--font-jetbrains, monospace)" }}>
                     {row.icon} {row.label}
                   </span>
-                  <span style={{ color: "rgba(255,255,255,0.75)", fontSize: "0.7rem", fontFamily: "'Syne', sans-serif", fontWeight: 600, textAlign: "right", maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <span style={{ color: "var(--creme)", fontSize: "0.7rem", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 600, textAlign: "right", maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {row.value}
                   </span>
                 </div>
@@ -785,15 +785,15 @@ function SimulateurPage() {
             <button
               onClick={() => sendMessage("Ich habe alle Fragen beantwortet. Können Sie bitte eine Entscheidung treffen?")}
               disabled={isLoading}
-              style={{ padding: "10px 16px", borderRadius: 12, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.06)", color: "rgba(239,68,68,0.8)", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.75rem", cursor: isLoading ? "not-allowed" : "pointer", width: "100%" }}
+              style={{ padding: "10px 16px", borderRadius: 12, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.06)", color: "rgba(239,68,68,0.8)", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 600, fontSize: "0.75rem", cursor: isLoading ? "not-allowed" : "pointer", width: "100%" }}
             >
               {t.endSession}
             </button>
           )}
 
           {/* Compliance disclaimer */}
-          <div style={{ marginTop: "auto", padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
-            <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: "0.72rem", lineHeight: 1.5, fontFamily: "'DM Mono', monospace" }}>
+          <div style={{ marginTop: "auto", padding: "10px 12px", borderRadius: 10, background: "rgba(244, 235, 220, 0.02)", border: "1px solid var(--creme-hair)" }}>
+            <p style={{ margin: 0, color: "var(--creme-mute)", fontSize: "0.72rem", lineHeight: 1.5, fontFamily: "var(--font-jetbrains, monospace)" }}>
               {t.disclaimer}
             </p>
           </div>

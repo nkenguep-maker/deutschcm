@@ -113,7 +113,7 @@ function getMockClassrooms(locale: Locale): Classroom[] {
         code: "DEUTSCH-A1-2024",
         students: 24,
         progress: 68,
-        color: "#10b981",
+        color: "var(--brass)",
         isDemo: true,
         nextAssignments: [
           { id: "a1", title: "Vocabulary: Introducing yourself", dueDate: "2025-05-15", submitted: false },
@@ -128,7 +128,7 @@ function getMockClassrooms(locale: Locale): Classroom[] {
         code: "DEUTSCH-A2-TELC",
         students: 18,
         progress: 45,
-        color: "#6366f1",
+        color: "var(--brass)",
         isDemo: true,
         nextAssignments: [
           { id: "a3", title: "Reading exercises", dueDate: "2025-05-18", submitted: false },
@@ -145,7 +145,7 @@ function getMockClassrooms(locale: Locale): Classroom[] {
       code: "DEUTSCH-A1-2024",
       students: 24,
       progress: 68,
-      color: "#10b981",
+      color: "var(--brass)",
       isDemo: true,
       nextAssignments: [
         { id: "a1", title: "Vocabulaire : se présenter", dueDate: "2025-05-15", submitted: false },
@@ -160,7 +160,7 @@ function getMockClassrooms(locale: Locale): Classroom[] {
       code: "DEUTSCH-A2-TELC",
       students: 18,
       progress: 45,
-      color: "#6366f1",
+      color: "var(--brass)",
       isDemo: true,
       nextAssignments: [
         { id: "a3", title: "Exercices de lecture", dueDate: "2025-05-18", submitted: false },
@@ -170,19 +170,19 @@ function getMockClassrooms(locale: Locale): Classroom[] {
 }
 
 const LEVEL_COLORS: Record<string, string> = {
-  A1: "#10b981", A2: "#34d399", B1: "#6366f1", B2: "#8b5cf6", C1: "#f59e0b",
+  A1: "var(--brass)", A2: "#34d399", B1: "var(--brass)", B2: "#8b5cf6", C1: "#f59e0b",
 };
 
 // ─── ClassCard ────────────────────────────────────────────────────────────────
 
 function ClassCard({ cls, t }: { cls: Classroom; t: TT }) {
   const pendingCount = cls.nextAssignments.filter(a => !a.submitted).length;
-  const levelColor = LEVEL_COLORS[cls.level] ?? "#10b981";
+  const levelColor = LEVEL_COLORS[cls.level] ?? "var(--brass)";
 
   return (
     <div style={{
       background: "rgba(13,17,23,0.8)",
-      border: "1px solid rgba(255,255,255,0.07)",
+      border: "1px solid var(--creme-hair)",
       borderTop: `3px solid ${levelColor}`,
       borderRadius: 16, padding: 22,
       display: "flex", flexDirection: "column", gap: 14,
@@ -199,23 +199,23 @@ function ClassCard({ cls, t }: { cls: Classroom; t: TT }) {
             }}>{cls.level}</span>
             {cls.isDemo && (
               <span style={{
-                background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.3)",
-                border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20,
+                background: "var(--creme-hair)", color: "var(--creme-mute)",
+                border: "1px solid var(--creme-hair)", borderRadius: 20,
                 padding: "2px 8px", fontSize: 10, fontWeight: 600,
               }}>{t.demoLabel}</span>
             )}
             {pendingCount > 0 && (
               <span style={{
-                background: "rgba(239,68,68,0.15)", color: "#ef4444",
+                background: "rgba(239,68,68,0.15)", color: "var(--oxblood)",
                 border: "1px solid rgba(239,68,68,0.3)", borderRadius: 20,
                 padding: "2px 8px", fontSize: 10, fontWeight: 700,
               }}>{t.cardDueLabel(pendingCount)}</span>
             )}
           </div>
-          <h3 style={{ margin: 0, color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 15 }}>
+          <h3 style={{ margin: 0, color: "var(--creme)", fontFamily: "var(--font-fraunces), Georgia, serif", fontWeight: 700, fontSize: 15 }}>
             {cls.name}
           </h3>
-          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, marginTop: 3 }}>
+          <div style={{ color: "var(--creme-mute)", fontSize: 12, marginTop: 3 }}>
             👨‍🏫 {cls.teacher} · 👥 {cls.students} {t.cardLearnersLabel}
           </div>
         </div>
@@ -231,35 +231,35 @@ function ClassCard({ cls, t }: { cls: Classroom; t: TT }) {
       {/* Progress */}
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-          <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{t.cardProgressLabel}</span>
+          <span style={{ color: "var(--creme-mute)", fontSize: 11 }}>{t.cardProgressLabel}</span>
           <span style={{ color: levelColor, fontSize: 11, fontWeight: 700 }}>{cls.progress}%</span>
         </div>
-        <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 4, height: 5, overflow: "hidden" }}>
+        <div style={{ background: "var(--creme-hair)", borderRadius: 4, height: 5, overflow: "hidden" }}>
           <div style={{ width: `${cls.progress}%`, height: "100%", background: levelColor, borderRadius: 4, transition: "width var(--dur-moment) var(--ease-enter)" }} />
         </div>
       </div>
 
       {/* Assignments */}
       <div>
-        <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>
+        <div style={{ color: "var(--creme-mute)", fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>
           {t.cardAssignmentsLabel}
         </div>
         {cls.nextAssignments.length === 0 ? (
-          <div style={{ color: "rgba(255,255,255,0.2)", fontSize: 12 }}>{t.cardNoAssignments}</div>
+          <div style={{ color: "var(--creme-hair)", fontSize: 12 }}>{t.cardNoAssignments}</div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {cls.nextAssignments.map(a => (
               <div key={a.id} style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 padding: "7px 10px", borderRadius: 8,
-                background: a.submitted ? "rgba(16,185,129,0.06)" : "rgba(239,68,68,0.06)",
-                border: `1px solid ${a.submitted ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)"}`,
+                background: a.submitted ? "var(--brass-glow)" : "rgba(239,68,68,0.06)",
+                border: `1px solid ${a.submitted ? "var(--brass-glow)" : "rgba(239,68,68,0.15)"}`,
               }}>
-                <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <span style={{ color: "var(--creme-soft)", fontSize: 12, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {a.submitted ? "✓" : "○"} {a.title}
                 </span>
                 {a.dueDate && (
-                  <span style={{ color: a.submitted ? "#10b981" : "#ef4444", fontSize: 11, flexShrink: 0, marginLeft: 8 }}>
+                  <span style={{ color: a.submitted ? "var(--brass)" : "var(--oxblood)", fontSize: 11, flexShrink: 0, marginLeft: 8 }}>
                     {a.submitted
                       ? t.cardSubmittedLabel
                       : new Date(a.dueDate).toLocaleDateString(t.dateLocale, { day: "2-digit", month: "short" })}
@@ -273,7 +273,7 @@ function ClassCard({ cls, t }: { cls: Classroom; t: TT }) {
 
       {/* Footer */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <code style={{ color: "rgba(255,255,255,0.2)", fontSize: 10, fontFamily: "monospace" }}>{cls.code}</code>
+        <code style={{ color: "var(--creme-hair)", fontSize: 10, fontFamily: "monospace" }}>{cls.code}</code>
         <Link href={`/classroom/${cls.id}`} style={{
           background: `${levelColor}22`, color: levelColor,
           border: `1px solid ${levelColor}44`, borderRadius: 8,
@@ -329,21 +329,21 @@ export default function ClassroomListPage() {
     <Layout title={t.layoutTitle}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
-        .syne { font-family: 'Syne', sans-serif; }
+        .syne { font-family: var(--font-fraunces), Georgia, serif; }
       `}</style>
 
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <div>
-          <h2 className="syne" style={{ margin: 0, color: "#f1f5f9", fontWeight: 800, fontSize: 24 }}>
+          <h2 className="syne" style={{ margin: 0, color: "var(--creme)", fontWeight: 800, fontSize: 24 }}>
             {t.pageTitle}
           </h2>
-          <p style={{ margin: "4px 0 0", color: "rgba(255,255,255,0.35)", fontSize: 13 }}>
+          <p style={{ margin: "4px 0 0", color: "var(--creme-mute)", fontSize: 13 }}>
             {t.pageSubtitle}
           </p>
         </div>
         <button onClick={() => setShowJoinModal(true)} style={{
-          background: "rgba(16,185,129,0.12)", color: "#10b981",
+          background: "var(--brass-glow)", color: "var(--brass)",
           border: "1px solid rgba(16,185,129,0.3)", borderRadius: 10,
           padding: "10px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer",
         }}>
@@ -353,16 +353,16 @@ export default function ClassroomListPage() {
 
       {/* Positioning block */}
       <div style={{
-        background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.12)",
+        background: "rgba(16,185,129,0.05)", border: "1px solid var(--brass-glow)",
         borderRadius: 12, padding: "14px 18px", marginBottom: 24,
         display: "flex", gap: 12, alignItems: "center",
       }}>
         <span style={{ fontSize: 22, flexShrink: 0 }}>🎓</span>
         <div>
-          <div className="syne" style={{ color: "#10b981", fontWeight: 700, fontSize: 13, marginBottom: 2 }}>
+          <div className="syne" style={{ color: "var(--brass)", fontWeight: 700, fontSize: 13, marginBottom: 2 }}>
             {t.positionTitle}
           </div>
-          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>{t.positionDesc}</div>
+          <div style={{ color: "var(--creme-mute)", fontSize: 12 }}>{t.positionDesc}</div>
         </div>
       </div>
 
@@ -374,18 +374,18 @@ export default function ClassroomListPage() {
         {classrooms.length === 0 && (
           <div style={{
             gridColumn: "1/-1", textAlign: "center", padding: "60px 20px",
-            background: "rgba(13,17,23,0.6)", border: "1px solid rgba(255,255,255,0.06)",
+            background: "rgba(13,17,23,0.6)", border: "1px solid var(--creme-hair)",
             borderRadius: 16,
           }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>🏫</div>
-            <div className="syne" style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 18, marginBottom: 8 }}>
+            <div className="syne" style={{ color: "var(--creme)", fontWeight: 700, fontSize: 18, marginBottom: 8 }}>
               {t.emptyTitle}
             </div>
-            <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, marginBottom: 20 }}>
+            <div style={{ color: "var(--creme-mute)", fontSize: 14, marginBottom: 20 }}>
               {t.emptyDesc}
             </div>
             <button onClick={() => setShowJoinModal(true)} style={{
-              background: "#10b981", color: "#fff", border: "none", borderRadius: 10,
+              background: "var(--brass)", color: "#fff", border: "none", borderRadius: 10,
               padding: "10px 24px", fontSize: 14, fontWeight: 700, cursor: "pointer",
             }}>
               {t.emptyBtn}
@@ -404,7 +404,7 @@ export default function ClassroomListPage() {
           <div className="syne" style={{ color: "#a5b4fc", fontWeight: 700, fontSize: 13 }}>
             {t.communityTitle}
           </div>
-          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, marginTop: 3 }}>
+          <div style={{ color: "var(--creme-mute)", fontSize: 12, marginTop: 3 }}>
             {t.communityDesc}
           </div>
         </div>
@@ -425,22 +425,22 @@ export default function ClassroomListPage() {
           onClick={e => e.target === e.currentTarget && setShowJoinModal(false)}
         >
           <div style={{
-            background: "#0d1117", border: "1px solid rgba(16,185,129,0.2)",
+            background: "var(--espresso-2)", border: "1px solid var(--brass-edge)",
             borderRadius: 16, padding: 32, width: 420, maxWidth: "90vw",
           }}>
             {joinSuccess ? (
               <div style={{ textAlign: "center" }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
-                <div className="syne" style={{ color: "#10b981", fontWeight: 800, fontSize: 20 }}>
+                <div className="syne" style={{ color: "var(--brass)", fontWeight: 800, fontSize: 20 }}>
                   {t.modalSuccessTitle}
                 </div>
               </div>
             ) : (
               <>
-                <div className="syne" style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 18, marginBottom: 6 }}>
+                <div className="syne" style={{ color: "var(--creme)", fontWeight: 700, fontSize: 18, marginBottom: 6 }}>
                   {t.modalTitle}
                 </div>
-                <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, marginBottom: 24 }}>
+                <div style={{ color: "var(--creme-mute)", fontSize: 13, marginBottom: 24 }}>
                   {t.modalSubtitle}
                 </div>
                 <input
@@ -451,24 +451,24 @@ export default function ClassroomListPage() {
                   placeholder="DEUTSCH-A1-2024"
                   autoFocus
                   style={{
-                    width: "100%", background: "#161b22",
-                    border: `1px solid ${joinError ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.1)"}`,
-                    borderRadius: 10, padding: "12px 16px", color: "#10b981",
+                    width: "100%", background: "var(--espresso-2)",
+                    border: `1px solid ${joinError ? "rgba(239,68,68,0.4)" : "var(--creme-hair)"}`,
+                    borderRadius: 10, padding: "12px 16px", color: "var(--brass)",
                     fontSize: 16, fontFamily: "monospace", letterSpacing: "0.05em",
                     outline: "none", boxSizing: "border-box", marginBottom: 8,
                   }}
                 />
                 {joinError && (
-                  <div style={{ color: "#ef4444", fontSize: 12, marginBottom: 12 }}>{joinError}</div>
+                  <div style={{ color: "var(--oxblood)", fontSize: 12, marginBottom: 12 }}>{joinError}</div>
                 )}
                 <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 16 }}>
                   <button onClick={() => setShowJoinModal(false)} style={{
-                    background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)",
-                    border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8,
+                    background: "var(--creme-hair)", color: "var(--creme-mute)",
+                    border: "1px solid var(--creme-hair)", borderRadius: 8,
                     padding: "8px 20px", cursor: "pointer",
                   }}>{t.modalCancel}</button>
                   <button onClick={handleJoin} disabled={joining || !code.trim()} style={{
-                    background: joining ? "rgba(16,185,129,0.5)" : "#10b981",
+                    background: joining ? "rgba(16,185,129,0.5)" : "var(--brass)",
                     color: "#fff", border: "none", borderRadius: 8,
                     padding: "8px 24px", cursor: "pointer", fontWeight: 700, fontSize: 14,
                   }}>
