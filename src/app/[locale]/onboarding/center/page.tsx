@@ -47,7 +47,11 @@ interface Form {
   payStep: "form" | "confirm" | "done";
 }
 
-const LANGS = ["Allemand", "Anglais", "Français", "Espagnol", "Chinois", "Arabe", "Portugais"];
+// Langues enseignées — deux clusters : étrangères CECRL alignées + natales africaines
+// (échelle YEMA É1→É5). Cohérent avec la page /langues.
+const LANGS_FOREIGN = ["Allemand", "Anglais", "Français", "Espagnol", "Chinois", "Arabe", "Portugais"];
+const LANGS_NATIVE = ["Bassa", "Wolof", "Swahili", "Lingala", "Douala", "Ewondo", "Fulfulde", "Yoruba"];
+const LANGS = [...LANGS_FOREIGN, ...LANGS_NATIVE];
 
 function inp(style?: React.CSSProperties): React.CSSProperties {
   return {
@@ -289,20 +293,49 @@ export default function CenterOnboardingPage() {
                 </div>
               </div>
               <div>
-                <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 8 }}>LANGUES ENSEIGNÉES</label>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {LANGS.map(l => {
-                    const active = form.languages.includes(l);
-                    return (
-                      <button key={l} onClick={() => toggleLang(l)} style={{
-                        padding: "7px 14px", borderRadius: 8, cursor: "pointer",
-                        background: active ? "rgba(184, 135, 62, 0.12)" : "rgba(244, 235, 220, 0.03)",
-                        border: `1px solid ${active ? "rgba(184, 135, 62, 0.35)" : "rgba(244, 235, 220, 0.09)"}`,
-                        color: active ? "var(--brass)" : "rgba(244, 235, 220, 0.72)", fontWeight: 600, fontSize: 13,
-                        transition: "all 0.15s",
-                      }}>{l}</button>
-                    );
-                  })}
+                <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 4 }}>LANGUES ENSEIGNÉES</label>
+                <p style={{ color: "var(--creme-mute)", fontSize: 11, margin: "0 0 10px" }}>
+                  Cochez toutes les langues proposées par votre centre. Deux familles disponibles — étrangères (CECRL) et natales africaines (échelle YEMA).
+                </p>
+
+                <div style={{ marginTop: 6 }}>
+                  <p style={{ fontFamily: "var(--font-jetbrains, monospace)", color: "var(--brass)", fontSize: 10, fontWeight: 600, letterSpacing: "0.10em", textTransform: "uppercase", margin: "0 0 8px" }}>
+                    Étrangères · A1 → C1
+                  </p>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {LANGS_FOREIGN.map(l => {
+                      const active = form.languages.includes(l);
+                      return (
+                        <button key={l} type="button" aria-pressed={active} onClick={() => toggleLang(l)} style={{
+                          padding: "7px 14px", borderRadius: 8, cursor: "pointer",
+                          background: active ? "rgba(184, 135, 62, 0.12)" : "rgba(244, 235, 220, 0.03)",
+                          border: `1px solid ${active ? "rgba(184, 135, 62, 0.35)" : "rgba(244, 235, 220, 0.09)"}`,
+                          color: active ? "var(--brass)" : "var(--creme-soft)", fontWeight: 600, fontSize: 13,
+                          transition: "all 0.15s",
+                        }}>{l}</button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div style={{ marginTop: 14 }}>
+                  <p style={{ fontFamily: "var(--font-jetbrains, monospace)", color: "var(--brass)", fontSize: 10, fontWeight: 600, letterSpacing: "0.10em", textTransform: "uppercase", margin: "0 0 8px" }}>
+                    Natales africaines · É1 → É5
+                  </p>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {LANGS_NATIVE.map(l => {
+                      const active = form.languages.includes(l);
+                      return (
+                        <button key={l} type="button" aria-pressed={active} onClick={() => toggleLang(l)} style={{
+                          padding: "7px 14px", borderRadius: 8, cursor: "pointer",
+                          background: active ? "rgba(184, 135, 62, 0.12)" : "rgba(244, 235, 220, 0.03)",
+                          border: `1px solid ${active ? "rgba(184, 135, 62, 0.35)" : "rgba(244, 235, 220, 0.09)"}`,
+                          color: active ? "var(--brass)" : "var(--creme-soft)", fontWeight: 600, fontSize: 13,
+                          transition: "all 0.15s",
+                        }}>{l}</button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
               <div>
