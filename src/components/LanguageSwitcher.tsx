@@ -45,7 +45,7 @@ export default function LanguageSwitcher({ style }: Props) {
               ? "linear-gradient(135deg,#10b981,#059669)"
               : "transparent",
             color: locale === l.code ? "white" : "rgba(255,255,255,0.5)",
-            transition: "all 0.2s",
+            transition: "all var(--dur-move)",
             fontFamily: "'DM Mono',monospace"
           }}
         >

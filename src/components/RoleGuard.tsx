@@ -31,16 +31,19 @@ export default function RoleGuard({
   if (loading) {
     return (
       <div style={{
-        minHeight: "100vh", background: "#080c10",
+        minHeight: "100vh", background: "var(--espresso)",
         display: "flex", alignItems: "center", justifyContent: "center"
       }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 32, marginBottom: 12, animation: "spin 1s linear infinite" }}>⚙️</div>
-          <p style={{ color: "#10b981", fontSize: 13, fontFamily: "'DM Mono',monospace" }}>
-            Vérification des permissions...
+          <div style={{
+            width: 10, height: 10, borderRadius: "50%",
+            background: "var(--brass)", margin: "0 auto 14px",
+            animation: "motion-pulse 960ms var(--ease-enter) infinite",
+          }} aria-hidden="true" />
+          <p style={{ color: "var(--creme-mute)", fontSize: 12, fontFamily: "var(--font-jetbrains, monospace)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+            Vérification…
           </p>
         </div>
-        <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
       </div>
     )
   }

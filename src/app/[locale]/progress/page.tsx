@@ -323,7 +323,7 @@ export default function ProgressPage() {
               height: "100%", width: `${overview.completionRate}%`,
               background: "linear-gradient(90deg,#059669,#10b981,#34d399)",
               boxShadow: "0 0 10px rgba(16,185,129,0.5)",
-              borderRadius: 99, transition: "width 1s ease"
+              borderRadius: 99, transition: "width var(--dur-moment) var(--ease-enter)"
             }} />
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
@@ -500,7 +500,7 @@ export default function ProgressPage() {
                             background: score >= 80 ? "linear-gradient(90deg,#059669,#10b981)"
                               : score >= 60 ? "linear-gradient(90deg,#d97706,#f59e0b)"
                               : "linear-gradient(90deg,#dc2626,#ef4444)",
-                            borderRadius: 99, transition: "width 0.8s ease"
+                            borderRadius: 99, transition: "width var(--dur-moment) var(--ease-enter)"
                           }} />
                         </div>
                       </div>

@@ -344,7 +344,7 @@ function SpotsBar({ current, max, t }: { current: number; max: number; t: TT }) 
         <span style={{ color: pct >= 90 ? "#ef4444" : "#10b981", fontWeight: 600 }}>{t.cardSpotsRemaining(max - current)}</span>
       </div>
       <div style={{ height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 2 }}>
-        <div style={{ width: `${pct}%`, height: "100%", background: color, borderRadius: 2, transition: "width 0.4s" }} />
+        <div style={{ width: `${pct}%`, height: "100%", background: color, borderRadius: 2, transition: "width var(--dur-moment)" }} />
       </div>
     </div>
   );
@@ -648,7 +648,7 @@ function OnboardingOverlay({ onClose, t }: { onClose: () => void; t: TT }) {
       <div style={{ background: "#0d1117", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 24, padding: "32px 28px", maxWidth: 400, width: "100%", textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>{current.icon}</div>
         <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 20 }}>
-          {steps.map((_, i) => <div key={i} style={{ width: i === step ? 20 : 6, height: 6, borderRadius: 3, background: i === step ? "#10b981" : "rgba(255,255,255,0.15)", transition: "width 0.3s" }} />)}
+          {steps.map((_, i) => <div key={i} style={{ width: i === step ? 20 : 6, height: 6, borderRadius: 3, background: i === step ? "#10b981" : "rgba(255,255,255,0.15)", transition: "width var(--dur-move)" }} />)}
         </div>
         <h3 style={{ color: "white", fontSize: 18, fontWeight: 800, margin: "0 0 10px" }}>{current.title}</h3>
         <p style={{ color: "rgba(255,255,255,0.78)", fontSize: 14, lineHeight: 1.6, margin: "0 0 24px" }}>{current.desc}</p>
@@ -678,7 +678,7 @@ function FilterSidebar({ filters, onChange, onReset, count, t }: { filters: Filt
   };
 
   const Chip = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
-    <button onClick={onClick} style={{ padding: "5px 10px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", background: active ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)", border: active ? "1px solid rgba(16,185,129,0.4)" : "1px solid rgba(255,255,255,0.07)", color: active ? "#10b981" : "rgba(255,255,255,0.65)", transition: "all 0.15s" }}>
+    <button onClick={onClick} style={{ padding: "5px 10px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", background: active ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)", border: active ? "1px solid rgba(16,185,129,0.4)" : "1px solid rgba(255,255,255,0.07)", color: active ? "#10b981" : "rgba(255,255,255,0.65)", transition: "all var(--dur-touch)" }}>
       {label}
     </button>
   );
@@ -746,7 +746,7 @@ function ClassCard({ cls, recommended, onJoin, faved, onFav, sent, t }: { cls: C
       borderRadius: 18, padding: 18, display: "flex", flexDirection: "column", gap: 12,
       transform: hovered ? "translateY(-3px)" : "translateY(0)",
       boxShadow: hovered ? "0 12px 40px rgba(0,0,0,0.3)" : "none",
-      transition: "all 0.25s ease", position: "relative",
+      transition: "all var(--dur-move) var(--ease-enter)", position: "relative",
     }}>
       {recommended && <div style={{ position: "absolute", top: -8, left: 16, background: "#f59e0b", color: "#000", fontSize: 12, fontWeight: 800, padding: "2px 10px", borderRadius: 99, letterSpacing: "0.05em" }}>{t.cardRecommended}</div>}
 
@@ -766,7 +766,7 @@ function ClassCard({ cls, recommended, onJoin, faved, onFav, sent, t }: { cls: C
         </div>
         <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
           <LvlBadge level={cls.level} />
-          <button onClick={() => onFav(cls.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, lineHeight: 1, opacity: faved ? 1 : 0.3, transition: "opacity 0.2s" }}>
+          <button onClick={() => onFav(cls.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, lineHeight: 1, opacity: faved ? 1 : 0.3, transition: "opacity var(--dur-move)" }}>
             {faved ? "❤️" : "🤍"}
           </button>
         </div>
@@ -822,7 +822,7 @@ function CenterCard({ center, onJoin, faved, onFav, sent, t }: { center: CenterI
       borderRadius: 18, padding: 18, display: "flex", flexDirection: "column", gap: 12,
       transform: hovered ? "translateY(-3px)" : "translateY(0)",
       boxShadow: hovered ? "0 12px 40px rgba(0,0,0,0.3)" : "none",
-      transition: "all 0.25s ease",
+      transition: "all var(--dur-move) var(--ease-enter)",
     }}>
       <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
         <div style={{ width: 48, height: 48, borderRadius: 14, background: "linear-gradient(135deg, rgba(234,179,8,0.2), rgba(234,179,8,0.05))", border: "1px solid rgba(234,179,8,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fbbf24", fontWeight: 800, fontSize: 16, flexShrink: 0 }}>
@@ -894,7 +894,7 @@ function GroupCard({ group, onJoin, faved, onFav, sent, t }: { group: GroupItem;
     <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{
       background: "rgba(255,255,255,0.03)", border: `1px solid ${hovered ? "rgba(99,102,241,0.3)" : "rgba(255,255,255,0.08)"}`,
       borderRadius: 18, padding: 18, display: "flex", flexDirection: "column", gap: 12,
-      transform: hovered ? "translateY(-3px)" : "translateY(0)", transition: "all 0.25s ease",
+      transform: hovered ? "translateY(-3px)" : "translateY(0)", transition: "all var(--dur-move) var(--ease-enter)",
     }}>
       <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
         <Av initials={group.creatorAvatar} size={40} color="#6366f1" />
@@ -963,7 +963,7 @@ function SoloCard({ student, onInvite, invited, t }: { student: SoloItem; onInvi
     <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{
       background: "rgba(255,255,255,0.03)", border: `1px solid ${hovered ? "rgba(245,158,11,0.3)" : "rgba(255,255,255,0.08)"}`,
       borderRadius: 18, padding: 18, display: "flex", flexDirection: "column", gap: 12,
-      transform: hovered ? "translateY(-3px)" : "translateY(0)", transition: "all 0.25s ease",
+      transform: hovered ? "translateY(-3px)" : "translateY(0)", transition: "all var(--dur-move) var(--ease-enter)",
     }}>
       <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
         <Av initials={student.avatar} size={44} color="#f59e0b" />
@@ -1205,7 +1205,7 @@ export default function DiscoverPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder={t.searchPlaceholder}
-            style={{ width: "100%", padding: "11px 14px 11px 38px", borderRadius: 12, boxSizing: "border-box", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 16, outline: "none", transition: "border-color 0.2s" }}
+            style={{ width: "100%", padding: "11px 14px 11px 38px", borderRadius: 12, boxSizing: "border-box", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: 16, outline: "none", transition: "border-color var(--dur-move)" }}
             onFocus={e => e.target.style.borderColor = "rgba(16,185,129,0.5)"}
             onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
           />

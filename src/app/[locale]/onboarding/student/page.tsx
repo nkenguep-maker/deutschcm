@@ -54,7 +54,7 @@ function inp(style?: React.CSSProperties): React.CSSProperties {
     width: "100%", background: "rgba(244, 235, 220, 0.04)", border: "1px solid rgba(244, 235, 220, 0.12)",
     borderRadius: 10, padding: "12px 14px", color: "var(--creme)", fontSize: 14,
     outline: "none", boxSizing: "border-box", fontFamily: "inherit",
-    transition: "border-color 0.2s",
+    transition: "border-color var(--dur-move)",
     ...style,
   };
 }
@@ -192,9 +192,9 @@ export default function StudentOnboardingPage() {
       <style>{`
         input::placeholder, textarea::placeholder { color: var(--creme-mute); }
         input:focus, select:focus, textarea:focus { border-color: var(--brass) !important; }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-        .fadeUp { animation: fadeUp 0.4s ease forwards; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)} to { opacity:1; transform:translateY(0); } }
+        .fadeUp { animation: fadeUp var(--dur-moment) var(--ease-enter) forwards; }
+        /* spin removed — see motion-pulse in globals.css */ }
         select option { background: var(--espresso-2); color: var(--creme); }
       `}</style>
 
@@ -279,7 +279,7 @@ export default function StudentOnboardingPage() {
                       display: "flex", alignItems: "center", gap: 14, textAlign: "left",
                       background: active ? "rgba(184, 135, 62, 0.08)" : "rgba(244, 235, 220, 0.03)",
                       border: `1px solid ${active ? "rgba(184, 135, 62, 0.4)" : "rgba(244, 235, 220, 0.09)"}`,
-                      borderRadius: 12, padding: "14px 16px", cursor: "pointer", transition: "all 0.15s",
+                      borderRadius: 12, padding: "14px 16px", cursor: "pointer", transition: "all var(--dur-touch)",
                     }}>
                       <span style={{ fontSize: 24, flexShrink: 0 }}>{g.icon}</span>
                       <div style={{ flex: 1 }}>
@@ -312,7 +312,7 @@ export default function StudentOnboardingPage() {
                       <button key={a.value} onClick={() => set("availability")(a.value)} style={{
                         background: active ? "rgba(184, 135, 62, 0.08)" : "rgba(244, 235, 220, 0.03)",
                         border: `1px solid ${active ? "rgba(184, 135, 62, 0.4)" : "rgba(244, 235, 220, 0.09)"}`,
-                        borderRadius: 12, padding: "14px", cursor: "pointer", textAlign: "center", transition: "all 0.15s",
+                        borderRadius: 12, padding: "14px", cursor: "pointer", textAlign: "center", transition: "all var(--dur-touch)",
                       }}>
                         <div style={{ color: active ? "var(--brass)" : "var(--creme)", fontWeight: 700, fontSize: 15 }}>{a.label}</div>
                         <div style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, marginTop: 3 }}>{a.desc}</div>
@@ -332,7 +332,7 @@ export default function StudentOnboardingPage() {
                       <button key={s.value} onClick={() => set("preferredSchedule")(s.value)} style={{
                         background: active ? "rgba(184, 135, 62, 0.08)" : "rgba(244, 235, 220, 0.03)",
                         border: `1px solid ${active ? "rgba(184, 135, 62, 0.4)" : "rgba(244, 235, 220, 0.09)"}`,
-                        borderRadius: 12, padding: "12px", cursor: "pointer", textAlign: "center", transition: "all 0.15s",
+                        borderRadius: 12, padding: "12px", cursor: "pointer", textAlign: "center", transition: "all var(--dur-touch)",
                       }}>
                         <div style={{ color: active ? "var(--brass)" : "var(--creme)", fontWeight: 600, fontSize: 13 }}>{s.label}</div>
                         <div style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, marginTop: 2 }}>{s.desc}</div>
@@ -360,7 +360,7 @@ export default function StudentOnboardingPage() {
                         display: "flex", alignItems: "center", gap: 14, textAlign: "left",
                         background: active ? "rgba(184, 135, 62, 0.08)" : "rgba(244, 235, 220, 0.03)",
                         border: `1px solid ${active ? "rgba(184, 135, 62, 0.4)" : "rgba(244, 235, 220, 0.09)"}`,
-                        borderRadius: 12, padding: "14px 16px", cursor: "pointer", transition: "all 0.15s",
+                        borderRadius: 12, padding: "14px 16px", cursor: "pointer", transition: "all var(--dur-touch)",
                       }}>
                         <span style={{ fontSize: 24, flexShrink: 0 }}>{opt.icon}</span>
                         <div style={{ flex: 1 }}>
@@ -386,7 +386,7 @@ export default function StudentOnboardingPage() {
                         placeholder="YAO-XXXX"
                         style={{ ...inp(), fontFamily: "monospace", letterSpacing: "0.08em", color: centerPreview ? "#eab308" : "var(--creme)", borderColor: centerPreview ? "rgba(234,179,8,0.4)" : centerCodeError ? "rgba(239,68,68,0.4)" : "rgba(244, 235, 220, 0.12)", paddingRight: 40 }}
                       />
-                      {centerChecking && <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, border: "2px solid rgba(244, 235, 220, 0.12)", borderTopColor: "#eab308", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />}
+                      {centerChecking && <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", width: 8, height: 8, background: "var(--brass)", borderRadius: "50%", animation: "motion-pulse 960ms var(--ease-enter) infinite" }} />}
                       {centerPreview && !centerChecking && <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", color: "#eab308" }}>✓</div>}
                     </div>
                     {centerCodeError && <div style={{ color: "#E5B4B7", fontSize: 11, marginTop: 4 }}>⚠ {centerCodeError}</div>}
@@ -413,7 +413,7 @@ export default function StudentOnboardingPage() {
                         placeholder="DEUTSCH-A1-XXXX"
                         style={{ ...inp(), fontFamily: "monospace", letterSpacing: "0.05em", color: codePreview ? "var(--brass)" : "var(--creme)", borderColor: codePreview ? "rgba(184, 135, 62, 0.4)" : codeError ? "rgba(239,68,68,0.4)" : "rgba(244, 235, 220, 0.12)", paddingRight: 40 }}
                       />
-                      {codeChecking && <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, border: "2px solid rgba(244, 235, 220, 0.12)", borderTopColor: "var(--brass)", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />}
+                      {codeChecking && <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", width: 8, height: 8, background: "var(--brass)", borderRadius: "50%", animation: "motion-pulse 960ms var(--ease-enter) infinite" }} />}
                       {codePreview && !codeChecking && <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", color: "var(--brass)" }}>✓</div>}
                     </div>
                     {codeError && <div style={{ color: "#E5B4B7", fontSize: 11, marginTop: 4 }}>⚠ {codeError}</div>}

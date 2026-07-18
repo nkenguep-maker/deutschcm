@@ -82,7 +82,7 @@ function inp(style?: React.CSSProperties): React.CSSProperties {
     width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
     borderRadius: 10, padding: "13px 16px", color: "#f1f5f9", fontSize: 16,
     outline: "none", boxSizing: "border-box", fontFamily: "monospace",
-    letterSpacing: "0.06em", transition: "border-color 0.2s",
+    letterSpacing: "0.06em", transition: "border-color var(--dur-move)",
     ...style,
   };
 }
@@ -159,9 +159,9 @@ function ClassroomJoinContent() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
         input:focus { border-color: rgba(16,185,129,0.5) !important; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
-        .fadeUp { animation: fadeUp 0.4s ease forwards; }
-        @keyframes spin { to{transform:rotate(360deg);} }
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0);} }
+        .fadeUp { animation: fadeUp var(--dur-moment) var(--ease-enter) forwards; }
+        /* spin removed — see motion-pulse in globals.css */ }
       `}</style>
 
       <div style={{ width: "100%", maxWidth: 500 }} className="fadeUp">
@@ -216,7 +216,7 @@ function ClassroomJoinContent() {
                   autoFocus
                 />
                 {checking && (
-                  <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", width: 16, height: 16, border: "2px solid rgba(255,255,255,0.1)", borderTopColor: "#10b981", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+                  <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", width: 8, height: 8, background: "var(--brass)", borderRadius: "50%", animation: "motion-pulse 960ms var(--ease-enter) infinite" }} />
                 )}
                 {preview && !checking && (
                   <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", color: "#10b981", fontSize: 18 }}>✓</div>
@@ -267,7 +267,7 @@ function ClassroomJoinContent() {
                 color: preview && !joining ? "#fff" : "rgba(255,255,255,0.45)",
                 border: "none", borderRadius: 12, padding: "14px",
                 fontWeight: 700, fontSize: 15, cursor: preview && !joining ? "pointer" : "default",
-                transition: "all 0.2s",
+                transition: "all var(--dur-move)",
               }}
             >
               {joining

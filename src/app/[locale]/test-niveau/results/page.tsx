@@ -186,11 +186,10 @@ export default function TestResultsPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#080c10", padding: "48px 20px 80px" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono&display=swap');
-        @keyframes fadeUp { from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);} }
-        @keyframes scaleIn { from{opacity:0;transform:scale(0.78);}to{opacity:1;transform:scale(1);} }
-        .fade-up { animation: fadeUp 0.5s ease forwards; }
-        .scale-in { animation: scaleIn 0.55s cubic-bezier(.34,1.56,.64,1) forwards; }
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0);} }
+        @keyframes scaleIn { from{opacity:0;transform:scale(0.98);}to{opacity:1;transform:scale(1);} }
+        .fade-up { animation: fadeUp var(--dur-moment) var(--ease-enter) forwards; }
+        .scale-in { animation: scaleIn var(--dur-moment) var(--ease-enter) forwards; }
       `}</style>
 
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
@@ -252,12 +251,16 @@ export default function TestResultsPage() {
             <div style={{ color: "rgba(255,255,255,0.60)", fontSize: 13, marginTop: 8 }}>
               {t.correctAnswers(result.totalCorrect ?? 0, result.total ?? 30)}
             </div>
-            {/* Score bar */}
+            {/* Score bar — anime transform (scaleX) au lieu de width */}
             <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 4, height: 4, marginTop: 12, overflow: "hidden" }}>
               <div style={{
-                width: animated ? `${result.score}%` : "0%",
-                height: "100%", background: `linear-gradient(90deg, ${levelColor}99, ${levelColor})`,
-                borderRadius: 4, transition: "width 1.3s cubic-bezier(.4,0,.2,1)",
+                width: "100%",
+                height: "100%",
+                background: `linear-gradient(90deg, ${levelColor}99, ${levelColor})`,
+                borderRadius: 4,
+                transformOrigin: "left center",
+                transform: `scaleX(${animated ? result.score / 100 : 0})`,
+                transition: "transform var(--dur-moment) var(--ease-enter)",
               }} />
             </div>
           </div>
@@ -346,7 +349,7 @@ export default function TestResultsPage() {
                     </span>
                   </div>
                   <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 4, height: 5, overflow: "hidden" }}>
-                    <div style={{ width: animated ? `${pct}%` : "0%", height: "100%", background: lc, borderRadius: 4, transition: "width 1s ease" }} />
+                    <div style={{ width: animated ? `${pct}%` : "0%", height: "100%", background: lc, borderRadius: 4, transition: "width var(--dur-moment) var(--ease-enter)" }} />
                   </div>
                 </div>
               );
@@ -379,7 +382,7 @@ export default function TestResultsPage() {
                         </span>
                       </div>
                       <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 4, height: 5, overflow: "hidden" }}>
-                        <div style={{ width: animated ? `${pct}%` : "0%", height: "100%", background: sc, borderRadius: 4, transition: "width 1.1s ease 0.2s" }} />
+                        <div style={{ width: animated ? `${pct}%` : "0%", height: "100%", background: sc, borderRadius: 4, transition: "width var(--dur-moment) var(--ease-enter) var(--dur-move)" }} />
                       </div>
                     </div>
                   );
@@ -439,7 +442,7 @@ export default function TestResultsPage() {
               cursor: accepting ? "default" : "pointer",
               boxShadow: accepting ? "none" : `0 8px 28px ${levelColor}28`,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-              transition: "all 0.2s",
+              transition: "all var(--dur-move)",
             }}>
             {accepting ? t.redirecting : `${t.startBtn} →`}
           </button>

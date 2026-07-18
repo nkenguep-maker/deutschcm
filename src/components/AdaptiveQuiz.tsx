@@ -293,7 +293,7 @@ export default function AdaptiveQuiz({
           <div style={{
             height: "100%", width: `${progress}%`,
             background: "linear-gradient(90deg,#059669,#10b981)",
-            borderRadius: 99, transition: "width 0.3s ease"
+            borderRadius: 99, transition: "width var(--dur-move) var(--ease-enter)"
           }} />
         </div>
       </div>
@@ -352,7 +352,7 @@ export default function AdaptiveQuiz({
                   background: bg, border, color,
                   cursor: showResult ? "not-allowed" : "pointer",
                   fontSize: 13, display: "flex", alignItems: "center", gap: 10,
-                  transition: "all 0.15s"
+                  transition: "all var(--dur-touch)"
                 }}>
                 <span style={{
                   width: 28, height: 28, borderRadius: "50%", flexShrink: 0,

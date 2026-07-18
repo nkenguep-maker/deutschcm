@@ -59,7 +59,7 @@ export default function LessonViewer({ content, level = "A1", title = "Lektion",
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-        .playing { animation: pulse 0.5s ease infinite; }
+        .playing { animation: pulse var(--dur-moment) var(--ease-enter) infinite; }
         .vocab-row:hover { background: rgba(255,255,255,0.04) !important; }
         .sentence-card:hover { border-color: rgba(16,185,129,0.25) !important; }
       `}</style>
@@ -205,7 +205,7 @@ export default function LessonViewer({ content, level = "A1", title = "Lektion",
                 padding: "11px 14px",
                 borderBottom: i < content.vocabulary.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none",
                 background: "transparent",
-                transition: "background 0.1s",
+                transition: "background var(--dur-touch)",
               }}
             >
               <span style={{ fontFamily: "'DM Mono', monospace", fontWeight: 600, color: "#10b981", fontSize: "0.85rem" }}>
@@ -237,7 +237,7 @@ export default function LessonViewer({ content, level = "A1", title = "Lektion",
                 display: "flex",
                 alignItems: "center",
                 gap: 14,
-                transition: "border-color 0.15s",
+                transition: "border-color var(--dur-touch)",
               }}
             >
               <button
@@ -256,7 +256,7 @@ export default function LessonViewer({ content, level = "A1", title = "Lektion",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  transition: "all 0.15s",
+                  transition: "all var(--dur-touch)",
                 }}
               >
                 <span className={playingIdx === i ? "playing" : ""}>

@@ -72,7 +72,7 @@ export default function Leaderboard({ classroomId, initialEntries, currentUserId
             return (
               <div key={entry.userId} style={{
                 display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-                transition: "transform 0.5s ease",
+                transition: "transform var(--dur-moment) var(--ease-enter)",
                 transform: animated ? "translateY(0)" : "translateY(20px)",
                 transitionDelay: `${i * 0.1}s`,
               }}>

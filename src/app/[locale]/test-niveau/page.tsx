@@ -211,11 +211,11 @@ export default function TestNiveauPage() {
     <div style={{ minHeight: "100vh", background: "#080c10" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
-        @keyframes fadeUp { from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);} }
-        .fadeUp { animation: fadeUp 0.3s ease forwards; }
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0);} }
+        .fadeUp { animation: fadeUp var(--dur-move) var(--ease-enter) forwards; }
         @keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.5;} }
         @keyframes slideIn { from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);} }
-        .slideIn { animation: slideIn 0.3s ease forwards; }
+        .slideIn { animation: slideIn var(--dur-move) var(--ease-enter) forwards; }
       `}</style>
 
       {/* ── Sticky header ── */}
@@ -265,7 +265,7 @@ export default function TestNiveauPage() {
                   <div key={`${lvl}-${i}`} style={{
                     flex: 1, height: 5, borderRadius: 2,
                     background: done ? lc : active ? `${lc}80` : "rgba(255,255,255,0.06)",
-                    transition: "background 0.3s",
+                    transition: "background var(--dur-move)",
                   }} />
                 );
               });
@@ -279,7 +279,7 @@ export default function TestNiveauPage() {
                 <span key={lvl} style={{
                   fontSize: 10, fontWeight: 700,
                   color: q.level === lvl ? LEVEL_COLORS[lvl] : "rgba(255,255,255,0.40)",
-                  transition: "color 0.3s",
+                  transition: "color var(--dur-move)",
                 }}>{lvl}</span>
               ))}
             </div>
@@ -341,7 +341,7 @@ export default function TestNiveauPage() {
                   display: "flex", alignItems: "center", gap: 14, textAlign: "left",
                   background: bg, border: `1px solid ${border}`, borderRadius: 12,
                   padding: "13px 18px", cursor: confirmed ? "default" : "pointer",
-                  transition: "all 0.15s",
+                  transition: "all var(--dur-touch)",
                 }}>
                   <div style={{
                     width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
@@ -387,7 +387,7 @@ export default function TestNiveauPage() {
                 color: selected !== null ? "#fff" : "rgba(255,255,255,0.2)",
                 border: "none", borderRadius: 12, padding: "14px",
                 fontWeight: 700, fontSize: 15, cursor: selected !== null ? "pointer" : "default",
-                transition: "all 0.2s",
+                transition: "all var(--dur-move)",
               }}>
                 {t.confirm}
               </button>

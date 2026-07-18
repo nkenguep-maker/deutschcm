@@ -260,7 +260,7 @@ function StaticQuizRenderer({
                       background: isRight ? "rgba(16,185,129,0.12)" : isWrongChoice ? "rgba(239,68,68,0.08)" : isChosen ? "rgba(255,255,255,0.07)" : "transparent",
                       color: isRight ? "#10b981" : isWrongChoice ? "#ef4444" : isChosen ? "white" : "rgba(255,255,255,0.72)",
                       fontSize: 13, fontFamily: "'DM Mono',monospace", fontWeight: isChosen || isRight ? 700 : 400,
-                      transition: "all 0.15s",
+                      transition: "all var(--dur-touch)",
                     }}
                   >
                     {isRight && "✓ "}{isWrongChoice && "✗ "}{opt}
@@ -670,7 +670,7 @@ export default function ModulePage() {
               padding: "10px 12px", borderRadius: 10, marginBottom: 6,
               background: isActive ? "rgba(16,185,129,0.12)" : "transparent",
               border: isActive ? "1px solid rgba(16,185,129,0.2)" : "1px solid transparent",
-              textDecoration: "none", transition: "all 0.15s",
+              textDecoration: "none", transition: "all var(--dur-touch)",
             }}>
             <span style={{ fontSize: 16 }}>{getIcon(mod.type)}</span>
             <div style={{ flex: 1, minWidth: 0 }}>

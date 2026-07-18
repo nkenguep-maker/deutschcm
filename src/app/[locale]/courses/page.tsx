@@ -183,7 +183,7 @@ function CourseCard({ course, locale, t }: { course: Course; locale: Locale; t: 
       border: `1px solid ${course.locked ? "rgba(255,255,255,0.06)" : cfg.border}`,
       opacity: course.locked ? 0.55 : 1,
       display: "flex", flexDirection: "column", gap: 12,
-      transition: "all 0.15s ease",
+      transition: "all var(--dur-touch) var(--ease-enter)",
     }}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
         <div style={{
@@ -505,7 +505,7 @@ export default function CoursesPage() {
                 background: active ? (cfg ? cfg.bg : "rgba(255,255,255,0.1)") : "rgba(255,255,255,0.04)",
                 color: active ? (cfg ? cfg.color : "white") : "rgba(255,255,255,0.65)",
                 border: active ? `1px solid ${cfg ? cfg.border : "rgba(255,255,255,0.2)"}` : "1px solid rgba(255,255,255,0.06)",
-                transition: "all 0.15s ease",
+                transition: "all var(--dur-touch) var(--ease-enter)",
               }}
             >
               {label}

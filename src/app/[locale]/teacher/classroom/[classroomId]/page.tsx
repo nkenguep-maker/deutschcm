@@ -123,7 +123,7 @@ function ProgressBar({ value, max = 100 }: { value: number; max?: number }) {
   const color = pct >= 70 ? "#10b981" : pct >= 40 ? "#f59e0b" : "#ef4444";
   return (
     <div style={{ background: "#1e2530", borderRadius: 4, height: 6, width: "100%", overflow: "hidden" }}>
-      <div style={{ width: `${pct}%`, height: "100%", background: color, borderRadius: 4, transition: "width 0.4s" }} />
+      <div style={{ width: `${pct}%`, height: "100%", background: color, borderRadius: 4, transition: "width var(--dur-moment)" }} />
     </div>
   );
 }
@@ -243,7 +243,7 @@ function ElevesTab({ classroomId }: { classroomId: string }) {
               padding: "6px 16px", borderRadius: 8, border: "none", cursor: "pointer",
               background: filter === f.key ? "#10b981" : "#1e2530",
               color: filter === f.key ? "#fff" : "#94a3b8",
-              fontSize: 13, fontWeight: 600, transition: "all 0.2s",
+              fontSize: 13, fontWeight: 600, transition: "all var(--dur-move)",
             }}
           >
             {f.label}
@@ -683,13 +683,13 @@ function ParametresTab({ classroom }: { classroom: Classroom }) {
               style={{
                 width: 44, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
                 background: isActive ? "#10b981" : "#2a3441",
-                position: "relative", transition: "background 0.2s",
+                position: "relative", transition: "background var(--dur-move)",
               }}
             >
               <div style={{
                 width: 18, height: 18, borderRadius: "50%", background: "#fff",
                 position: "absolute", top: 3, left: isActive ? 23 : 3,
-                transition: "left 0.2s",
+                transition: "left var(--dur-move)",
               }} />
             </button>
           </div>
@@ -880,7 +880,7 @@ export default function ClassroomPage() {
                 padding: "12px 20px", fontSize: 14, fontWeight: 600,
                 color: activeTab === tab.key ? "#10b981" : "#94a3b8",
                 borderBottom: activeTab === tab.key ? "2px solid #10b981" : "2px solid transparent",
-                marginBottom: -1, transition: "all 0.2s",
+                marginBottom: -1, transition: "all var(--dur-move)",
                 display: "flex", alignItems: "center", gap: 6,
               }}
             >

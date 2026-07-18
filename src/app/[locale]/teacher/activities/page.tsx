@@ -154,7 +154,7 @@ export default function TeacherActivitiesPage() {
                       cursor: "pointer",
                       textAlign: "left",
                       color: "inherit",
-                      transition: "border-color var(--dur-fast) var(--ease-out-expo)",
+                      transition: "border-color var(--dur-touch) var(--ease-enter)",
                     }}
                     onFocus={(e) => (e.currentTarget.style.borderColor = "var(--brass)")}
                     onBlur={(e) => (e.currentTarget.style.borderColor = "var(--creme-hair)")}

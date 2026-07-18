@@ -239,7 +239,7 @@ export default function ClassroomChat({ classroomId, currentUserId, currentUserN
               background: input.trim() ? "#10b981" : "rgba(255,255,255,0.06)",
               color: input.trim() ? "#fff" : "rgba(255,255,255,0.2)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 14, flexShrink: 0, transition: "all 0.2s",
+              fontSize: 14, flexShrink: 0, transition: "all var(--dur-move)",
             }}
           >
             ↑

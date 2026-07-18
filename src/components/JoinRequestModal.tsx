@@ -105,7 +105,7 @@ export default function JoinRequestModal({
 
         {/* Progress bar */}
         <div style={{ height: 3, background: "rgba(255,255,255,0.05)" }}>
-          <div style={{ height: "100%", background: accentColor, width: `${(step / 3) * 100}%`, transition: "width 0.4s ease" }} />
+          <div style={{ height: "100%", background: accentColor, width: `${(step / 3) * 100}%`, transition: "width var(--dur-moment) var(--ease-enter)" }} />
         </div>
 
         {/* Header */}

@@ -300,7 +300,7 @@ function GlobalScoreRing({ score }: { score: number }) {
         <circle cx={38} cy={38} r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={6} />
         <circle cx={38} cy={38} r={r} fill="none" stroke={scoreColor(score)} strokeWidth={6}
           strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
-          style={{ transition: "stroke-dasharray 0.6s ease" }} />
+          style={{ transition: "stroke-dasharray var(--dur-moment) var(--ease-enter)" }} />
       </svg>
       <div style={{ position: "absolute", display: "flex", flexDirection: "column", alignItems: "center" }}>
         <span style={{ color: scoreColor(score), fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1.2rem" }}>
@@ -510,7 +510,7 @@ function SimulateurPage() {
                     border: niveau === n ? "1px solid rgba(16,185,129,0.5)" : "1px solid rgba(255,255,255,0.08)",
                     background: niveau === n ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.03)",
                     color: niveau === n ? "#10b981" : "rgba(255,255,255,0.4)",
-                    fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.75rem", cursor: "pointer", transition: "all 0.15s",
+                    fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.75rem", cursor: "pointer", transition: "all var(--dur-touch)",
                   }}
                 >
                   {n}
@@ -538,7 +538,7 @@ function SimulateurPage() {
                   width: "100%", textAlign: "left", padding: "10px 12px", borderRadius: 12,
                   border: active ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.06)",
                   background: active ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.02)",
-                  cursor: "pointer", transition: "all 0.15s", display: "flex", alignItems: "flex-start", gap: 10,
+                  cursor: "pointer", transition: "all var(--dur-touch)", display: "flex", alignItems: "flex-start", gap: 10,
                 }}
               >
                 <span style={{ fontSize: "1.2rem", flexShrink: 0, marginTop: 1 }}>{s.icon}</span>
@@ -675,20 +675,20 @@ function SimulateurPage() {
                     rows={2}
                     disabled={isLoading}
                     className="sim-textarea"
-                    style={{ flex: 1, resize: "none", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, color: "white", padding: "12px 16px", fontSize: "1rem", fontFamily: "'DM Mono', monospace", outline: "none", lineHeight: 1.5, transition: "border-color 0.15s" }}
+                    style={{ flex: 1, resize: "none", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, color: "white", padding: "12px 16px", fontSize: "1rem", fontFamily: "'DM Mono', monospace", outline: "none", lineHeight: 1.5, transition: "border-color var(--dur-touch)" }}
                   />
                   <button
                     onClick={handleMic}
                     title={t.micTitle}
                     className={isListening ? "mic-active" : ""}
-                    style={{ width: 44, height: 44, borderRadius: 12, border: isListening ? "1px solid rgba(239,68,68,0.5)" : "1px solid rgba(255,255,255,0.1)", background: isListening ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.04)", color: isListening ? "#ef4444" : "rgba(255,255,255,0.4)", fontSize: "1.1rem", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}
+                    style={{ width: 44, height: 44, borderRadius: 12, border: isListening ? "1px solid rgba(239,68,68,0.5)" : "1px solid rgba(255,255,255,0.1)", background: isListening ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.04)", color: isListening ? "#ef4444" : "rgba(255,255,255,0.4)", fontSize: "1.1rem", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all var(--dur-touch)" }}
                   >
                     🎙️
                   </button>
                   <button
                     onClick={handleSend}
                     disabled={!input.trim() || isLoading}
-                    style={{ width: 44, height: 44, borderRadius: 12, border: "none", background: !input.trim() || isLoading ? "rgba(255,255,255,0.05)" : "linear-gradient(135deg, #10b981, #059669)", color: !input.trim() || isLoading ? "rgba(255,255,255,0.2)" : "white", fontSize: "1rem", cursor: !input.trim() || isLoading ? "not-allowed" : "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", boxShadow: !input.trim() || isLoading ? "none" : "0 4px 16px rgba(16,185,129,0.3)" }}
+                    style={{ width: 44, height: 44, borderRadius: 12, border: "none", background: !input.trim() || isLoading ? "rgba(255,255,255,0.05)" : "linear-gradient(135deg, #10b981, #059669)", color: !input.trim() || isLoading ? "rgba(255,255,255,0.2)" : "white", fontSize: "1rem", cursor: !input.trim() || isLoading ? "not-allowed" : "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all var(--dur-move)", boxShadow: !input.trim() || isLoading ? "none" : "0 4px 16px rgba(16,185,129,0.3)" }}
                   >
                     ➤
                   </button>

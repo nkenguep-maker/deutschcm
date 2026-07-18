@@ -98,7 +98,7 @@ export default function GroupPage() {
                 <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, marginBottom: 4 }}>Code du groupe</div>
                 <div style={{ color: "#10b981", fontFamily: "monospace", fontWeight: 700, fontSize: 14, letterSpacing: "0.05em" }}>{group.code}</div>
               </div>
-              <button onClick={copyCode} style={{ background: copied ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)", color: copied ? "#10b981" : "rgba(255,255,255,0.4)", border: `1px solid ${copied ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, padding: "7px 14px", fontSize: 12, cursor: "pointer", fontWeight: 600, transition: "all 0.2s" }}>
+              <button onClick={copyCode} style={{ background: copied ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)", color: copied ? "#10b981" : "rgba(255,255,255,0.4)", border: `1px solid ${copied ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, padding: "7px 14px", fontSize: 12, cursor: "pointer", fontWeight: 600, transition: "all var(--dur-move)" }}>
                 {copied ? "✓ Copié" : "📋 Copier le code"}
               </button>
             </div>
@@ -111,7 +111,7 @@ export default function GroupPage() {
         {(["members", "leaderboard", "activity"] as const).map(t => {
           const labels = { members: "👥 Membres", leaderboard: "🏆 Classement", activity: "⚡ Activité" };
           return (
-            <button key={t} onClick={() => setTab(t)} style={{ flex: 1, padding: "9px 16px", borderRadius: 9, border: "none", cursor: "pointer", fontWeight: tab === t ? 700 : 400, fontSize: 13, background: tab === t ? "rgba(16,185,129,0.12)" : "transparent", color: tab === t ? "#10b981" : "rgba(255,255,255,0.4)", transition: "all 0.15s" }}>
+            <button key={t} onClick={() => setTab(t)} style={{ flex: 1, padding: "9px 16px", borderRadius: 9, border: "none", cursor: "pointer", fontWeight: tab === t ? 700 : 400, fontSize: 13, background: tab === t ? "rgba(16,185,129,0.12)" : "transparent", color: tab === t ? "#10b981" : "rgba(255,255,255,0.4)", transition: "all var(--dur-touch)" }}>
               {labels[t]}
             </button>
           );

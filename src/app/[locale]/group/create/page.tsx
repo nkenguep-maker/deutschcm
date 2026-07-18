@@ -10,7 +10,7 @@ function inp(style?: React.CSSProperties): React.CSSProperties {
   return {
     width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
     borderRadius: 10, padding: "12px 14px", color: "#f1f5f9", fontSize: 14,
-    outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "border-color 0.2s",
+    outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "border-color var(--dur-move)",
     ...style,
   };
 }
@@ -65,8 +65,8 @@ export default function GroupCreatePage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
         input:focus, select:focus { border-color: rgba(16,185,129,0.5) !important; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
-        .fadeUp { animation: fadeUp 0.4s ease forwards; }
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0);} }
+        .fadeUp { animation: fadeUp var(--dur-moment) var(--ease-enter) forwards; }
         select option { background: #0d1117; color: #f1f5f9; }
       `}</style>
 
@@ -93,7 +93,7 @@ export default function GroupCreatePage() {
                 <div style={{ color: "#10b981", fontFamily: "monospace", fontWeight: 800, fontSize: 22, letterSpacing: "0.08em" }}>{group.code}</div>
                 <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, marginTop: 6 }}>Nom : {group.name}</div>
               </div>
-              <button onClick={copyCode} style={{ width: "100%", background: copied ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.06)", color: copied ? "#10b981" : "rgba(255,255,255,0.6)", border: `1px solid ${copied ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.1)"}`, borderRadius: 10, padding: "12px", fontWeight: 600, fontSize: 13, cursor: "pointer", marginBottom: 12, transition: "all 0.2s" }}>
+              <button onClick={copyCode} style={{ width: "100%", background: copied ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.06)", color: copied ? "#10b981" : "rgba(255,255,255,0.6)", border: `1px solid ${copied ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.1)"}`, borderRadius: 10, padding: "12px", fontWeight: 600, fontSize: 13, cursor: "pointer", marginBottom: 12, transition: "all var(--dur-move)" }}>
                 {copied ? "✓ Copié !" : "📋 Copier le code"}
               </button>
               <button onClick={() => router.push(`/group`)} style={{ width: "100%", background: "#10b981", color: "#fff", border: "none", borderRadius: 10, padding: "12px", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>

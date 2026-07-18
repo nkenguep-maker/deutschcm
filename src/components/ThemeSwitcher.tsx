@@ -51,7 +51,7 @@ export function ThemeSwitcher() {
               display: "flex",
               alignItems: "center",
               gap: 7,
-              transition: "all 0.15s ease",
+              transition: "all var(--dur-touch) var(--ease-enter)",
               minHeight: 40,
             }}
           >

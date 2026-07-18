@@ -57,7 +57,7 @@ function inp(style?: React.CSSProperties): React.CSSProperties {
   return {
     width: "100%", background: "rgba(244, 235, 220, 0.04)", border: "1px solid rgba(244, 235, 220, 0.12)",
     borderRadius: 10, padding: "12px 14px", color: "var(--creme)", fontSize: 14,
-    outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "border-color 0.2s",
+    outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "border-color var(--dur-move)",
     ...style,
   };
 }
@@ -167,8 +167,8 @@ export default function CenterOnboardingPage() {
     <main style={{ minHeight: "100vh", background: "var(--espresso)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <style>{`
         input:focus, select:focus, textarea:focus { border-color: var(--brass) !important; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
-        .fadeUp { animation: fadeUp 0.4s ease forwards; }
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0);} }
+        .fadeUp { animation: fadeUp var(--dur-moment) var(--ease-enter) forwards; }
         select option { background: var(--espresso-2); color: var(--creme); }
       `}</style>
 
@@ -311,7 +311,7 @@ export default function CenterOnboardingPage() {
                           background: active ? "rgba(184, 135, 62, 0.12)" : "rgba(244, 235, 220, 0.03)",
                           border: `1px solid ${active ? "rgba(184, 135, 62, 0.35)" : "rgba(244, 235, 220, 0.09)"}`,
                           color: active ? "var(--brass)" : "var(--creme-soft)", fontWeight: 600, fontSize: 13,
-                          transition: "all 0.15s",
+                          transition: "all var(--dur-touch)",
                         }}>{l}</button>
                       );
                     })}
@@ -331,7 +331,7 @@ export default function CenterOnboardingPage() {
                           background: active ? "rgba(184, 135, 62, 0.12)" : "rgba(244, 235, 220, 0.03)",
                           border: `1px solid ${active ? "rgba(184, 135, 62, 0.35)" : "rgba(244, 235, 220, 0.09)"}`,
                           color: active ? "var(--brass)" : "var(--creme-soft)", fontWeight: 600, fontSize: 13,
-                          transition: "all 0.15s",
+                          transition: "all var(--dur-touch)",
                         }}>{l}</button>
                       );
                     })}
@@ -432,7 +432,7 @@ export default function CenterOnboardingPage() {
                           display: "flex", alignItems: "center", gap: 14, textAlign: "left",
                           background: active ? "rgba(184, 135, 62, 0.08)" : "rgba(244, 235, 220, 0.03)",
                           border: `1px solid ${active ? "rgba(184, 135, 62, 0.4)" : p.highlight ? "rgba(245,158,11,0.3)" : "rgba(244, 235, 220, 0.09)"}`,
-                          borderRadius: 12, padding: "14px 16px", cursor: "pointer", transition: "all 0.15s",
+                          borderRadius: 12, padding: "14px 16px", cursor: "pointer", transition: "all var(--dur-touch)",
                           position: "relative",
                         }}>
                           {p.highlight && <span style={{ position: "absolute", top: -10, right: 12, background: "#f59e0b", color: "#000", borderRadius: 20, padding: "2px 10px", fontSize: 10, fontWeight: 800 }}>POPULAIRE</span>}

@@ -117,7 +117,7 @@ export default function AudioPlayer({
           cursor: loading ? "not-allowed" : "pointer",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 14, flexShrink: 0,
-          transition: "all 0.2s",
+          transition: "all var(--dur-move)",
         }}
       >
         {loading ? "⏳" : playing ? "⏹" : "▶"}

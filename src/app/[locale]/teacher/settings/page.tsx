@@ -245,7 +245,7 @@ function NotifToggle({ label, defaultOn, last }: { label: string; defaultOn: boo
           background: on ? "var(--brass-glow)" : "transparent",
           position: "relative",
           cursor: "pointer",
-          transition: "all var(--dur-fast) var(--ease-out-expo)",
+          transition: "all var(--dur-touch) var(--ease-enter)",
           flexShrink: 0,
         }}
       >
@@ -257,7 +257,7 @@ function NotifToggle({ label, defaultOn, last }: { label: string; defaultOn: boo
           height: 16,
           borderRadius: "50%",
           background: on ? "var(--brass)" : "var(--creme-mute)",
-          transition: "left var(--dur-fast) var(--ease-out-expo), background var(--dur-fast)",
+          transition: "left var(--dur-touch) var(--ease-enter), background var(--dur-touch)",
         }} />
       </button>
     </div>

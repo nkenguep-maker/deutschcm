@@ -45,7 +45,7 @@ function inp(style?: React.CSSProperties): React.CSSProperties {
   return {
     width: "100%", background: "rgba(244, 235, 220, 0.04)", border: "1px solid rgba(244, 235, 220, 0.12)",
     borderRadius: 10, padding: "12px 14px", color: "var(--creme)", fontSize: 14,
-    outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "border-color 0.2s",
+    outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "border-color var(--dur-move)",
     ...style,
   };
 }
@@ -154,8 +154,8 @@ export default function TeacherOnboardingPage() {
     <main style={{ minHeight: "100vh", background: "var(--espresso)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <style>{`
         input:focus, select:focus, textarea:focus { border-color: var(--brass) !important; }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-        .fadeUp { animation: fadeUp 0.4s ease forwards; }
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)} to { opacity:1; transform:translateY(0); } }
+        .fadeUp { animation: fadeUp var(--dur-moment) var(--ease-enter) forwards; }
         select option { background: var(--espresso-2); color: var(--creme); }
       `}</style>
 
@@ -239,7 +239,7 @@ export default function TeacherOnboardingPage() {
                         background: active ? "rgba(184, 135, 62, 0.15)" : "rgba(244, 235, 220, 0.04)",
                         border: `1px solid ${active ? "rgba(184, 135, 62, 0.4)" : "rgba(244, 235, 220, 0.09)"}`,
                         color: active ? "var(--brass)" : "rgba(244, 235, 220, 0.72)", fontWeight: 700, fontSize: 13,
-                        transition: "all 0.15s",
+                        transition: "all var(--dur-touch)",
                       }}>{l}</button>
                     );
                   })}
@@ -294,7 +294,7 @@ export default function TeacherOnboardingPage() {
                                 background: on ? "rgba(184, 135, 62, 0.2)" : "rgba(244, 235, 220, 0.04)",
                                 border: `1px solid ${on ? "rgba(184, 135, 62, 0.4)" : "rgba(244, 235, 220, 0.09)"}`,
                                 color: on ? "var(--brass)" : "var(--creme-mute)", fontSize: 12,
-                                transition: "all 0.15s",
+                                transition: "all var(--dur-touch)",
                               }}>{on ? "✓" : "—"}</button>
                             </td>
                           );

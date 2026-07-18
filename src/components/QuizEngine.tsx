@@ -115,8 +115,8 @@ export default function QuizEngine({ questions, xp, onComplete }: QuizEngineProp
         }}
       >
         <style>{`
-          @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-          .pop-in { animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+          @keyframes popIn { from { transform: scale(0.98); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+          .pop-in { animation: popIn var(--dur-move) var(--ease-enter) forwards; }
         `}</style>
 
         {/* Score ring */}
@@ -233,7 +233,7 @@ export default function QuizEngine({ questions, xp, onComplete }: QuizEngineProp
           <span style={{
             fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.78rem",
             color: timerColor,
-            transition: "color 0.3s",
+            transition: "color var(--dur-move)",
           }}>
             ⏱ {timeLeft}s
           </span>
@@ -245,7 +245,7 @@ export default function QuizEngine({ questions, xp, onComplete }: QuizEngineProp
             height: "100%", borderRadius: 99,
             width: `${progress}%`,
             background: "linear-gradient(90deg, #10b981, #059669)",
-            transition: "width 0.4s ease",
+            transition: "width var(--dur-moment) var(--ease-enter)",
           }} />
         </div>
 
@@ -255,7 +255,7 @@ export default function QuizEngine({ questions, xp, onComplete }: QuizEngineProp
             height: "100%", borderRadius: 99,
             width: `${(timeLeft / TIMER_SECONDS) * 100}%`,
             background: timerColor,
-            transition: "width 1s linear, background 0.3s",
+            transition: "width var(--dur-moment) linear, background var(--dur-move)",
           }} />
         </div>
       </div>
@@ -318,7 +318,7 @@ export default function QuizEngine({ questions, xp, onComplete }: QuizEngineProp
                 display: "flex",
                 alignItems: "center",
                 gap: 12,
-                transition: "all 0.15s ease",
+                transition: "all var(--dur-touch) var(--ease-enter)",
               }}
             >
               <span style={{

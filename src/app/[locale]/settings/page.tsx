@@ -106,7 +106,7 @@ export default function StudentSettingsPage() {
               color: saved ? "#10b981" : "white",
               fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem",
               boxShadow: saved ? "none" : "0 4px 16px rgba(16,185,129,0.3)",
-              transition: "all 0.2s",
+              transition: "all var(--dur-move)",
             }}
           >
             {saved ? "✓ Sauvegardé" : "Enregistrer les modifications"}
@@ -208,9 +208,9 @@ function NotifToggle({ label, defaultOn }: { label: string; defaultOn: boolean }
       <span style={{ color: "rgba(255,255,255,0.75)", fontSize: "0.88rem" }}>{label}</span>
       <button onClick={() => setOn(!on)} style={{
         width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
-        background: on ? "#10b981" : "rgba(255,255,255,0.1)", position: "relative", transition: "background 0.2s",
+        background: on ? "#10b981" : "rgba(255,255,255,0.1)", position: "relative", transition: "background var(--dur-move)",
       }}>
-        <div style={{ width: 16, height: 16, borderRadius: "50%", background: "white", position: "absolute", top: 3, left: on ? 21 : 3, transition: "left 0.2s" }} />
+        <div style={{ width: 16, height: 16, borderRadius: "50%", background: "white", position: "absolute", top: 3, left: on ? 21 : 3, transition: "left var(--dur-move)" }} />
       </button>
     </div>
   );

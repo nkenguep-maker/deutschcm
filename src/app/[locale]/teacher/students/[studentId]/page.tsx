@@ -148,7 +148,7 @@ function ProgressBar({ value, max = 100, color }: { value: number; max?: number;
   const c = color ?? (pct >= 70 ? "#10b981" : pct >= 40 ? "#f59e0b" : "#ef4444");
   return (
     <div style={{ background: "#1e2530", borderRadius: 4, height: 8, width: "100%", overflow: "hidden" }}>
-      <div style={{ width: `${pct}%`, height: "100%", background: c, borderRadius: 4, transition: "width 0.5s" }} />
+      <div style={{ width: `${pct}%`, height: "100%", background: c, borderRadius: 4, transition: "width var(--dur-moment)" }} />
     </div>
   );
 }
@@ -326,7 +326,7 @@ export default function StudentProfilePage() {
                 width: "100%", background: feedbackSent ? "#059669" : "#10b981",
                 color: "#fff", border: "none", borderRadius: 8,
                 padding: "8px 0", fontSize: 13, fontWeight: 600, cursor: "pointer",
-                transition: "background 0.2s",
+                transition: "background var(--dur-move)",
               }}
             >
               {feedbackSent ? "✓ Envoyé !" : "Envoyer le commentaire"}
@@ -582,7 +582,7 @@ export default function StudentProfilePage() {
                     background: modalLevel === l ? `${levelColors[l] ?? "#10b981"}22` : "rgba(255,255,255,0.04)",
                     border: `1px solid ${modalLevel === l ? `${levelColors[l] ?? "#10b981"}55` : "#2a3441"}`,
                     color: modalLevel === l ? (levelColors[l] ?? "#10b981") : "#94a3b8",
-                    transition: "all 0.15s",
+                    transition: "all var(--dur-touch)",
                   }}>{l}</button>
                 ))}
               </div>

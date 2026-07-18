@@ -67,11 +67,10 @@ export default function GoodbyePage() {
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(18px); }
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}
           to   { opacity: 1; transform: translateY(0); }
         }
-        .fade-up { animation: fadeUp 0.55s ease forwards; }
+        .fade-up { animation: fadeUp var(--dur-moment) var(--ease-enter) forwards; }
         .d1 { animation-delay: 0s; opacity: 0; }
         .d2 { animation-delay: 0.1s; opacity: 0; }
         .d3 { animation-delay: 0.2s; opacity: 0; }
@@ -151,7 +150,7 @@ export default function GoodbyePage() {
               fontFamily: "'Syne', sans-serif",
               fontWeight: 700,
               fontSize: "0.88rem",
-              transition: "background 0.15s ease",
+              transition: "background var(--dur-touch) var(--ease-enter)",
             }}
           >
             {t.ctaLogin}
@@ -166,7 +165,7 @@ export default function GoodbyePage() {
               color: "rgba(255,255,255,0.55)",
               fontFamily: "'DM Mono', monospace",
               fontSize: "0.84rem",
-              transition: "background 0.15s ease",
+              transition: "background var(--dur-touch) var(--ease-enter)",
             }}
           >
             {t.ctaHome}
@@ -199,7 +198,7 @@ export default function GoodbyePage() {
                   borderRadius: 14,
                   background: "rgba(255,255,255,0.025)",
                   border: "1px solid rgba(255,255,255,0.07)",
-                  transition: "background 0.15s ease, border-color 0.15s ease",
+                  transition: "background var(--dur-touch) var(--ease-enter), border-color var(--dur-touch) var(--ease-enter)",
                 }}
               >
                 <span style={{ fontSize: "1.4rem", display: "block", marginBottom: 10 }}>{f.icon}</span>

@@ -363,7 +363,7 @@ export default function VirtualClassroomPage() {
                 padding: "14px 16px", fontSize: 13, fontWeight: 600,
                 color: activeView === tab.key ? "#10b981" : "rgba(255,255,255,0.35)",
                 borderBottom: activeView === tab.key ? "2px solid #10b981" : "2px solid transparent",
-                marginBottom: -1, transition: "all 0.15s",
+                marginBottom: -1, transition: "all var(--dur-touch)",
               }}>{tab.label}</button>
             ))}
           </div>

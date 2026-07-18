@@ -37,12 +37,27 @@ html[data-theme="dark"] {
   --r-panel: 20px;
   --r-pill: 999px;
 
-  /* ── Motion tokens ── */
-  --ease-out-expo:  cubic-bezier(.16, 1, .3, 1);
-  --ease-spring:    cubic-bezier(.2, .7, .3, 1);
-  --dur-fast: 160ms;
-  --dur-med:  240ms;
-  --dur-slow: 400ms;
+  /* ── Motion · doctrine YEMA ─────────────────────────────
+     Trois temps, deux courbes. Rien d'autre.
+       --dur-touch  : hover, press, focus — le toucher
+       --dur-move   : cartes, menus, entrées — le déplacement
+       --dur-moment : spine, couture, fin de leçon — le moment
+       --ease-enter : tout ce qui apparaît (opacity + translateY)
+       --ease-glide : tout ce qui se déplace (menus, drawers)
+     Interdits absolus : bounce, overshoot, élastique, spin. */
+  --dur-touch:      120ms;
+  --dur-move:       240ms;
+  --dur-moment:     480ms;
+  --ease-enter:     cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-glide:     cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Aliases pour l'existant — mêmes valeurs, nouveaux noms.
+     À supprimer une fois la migration finie. */
+  --dur-fast:       var(--dur-touch);
+  --dur-med:        var(--dur-move);
+  --dur-slow:       var(--dur-moment);
+  --ease-out-expo:  var(--ease-enter);
+  --ease-spring:    var(--ease-glide);
 
   /* ── Legacy aliases — pour ne pas casser l'app existante ── */
   --bg:            var(--espresso);
@@ -106,7 +121,7 @@ html {
   font-size: 16px;
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
-  transition: background var(--dur-med) ease;
+  transition: background var(--dur-move) ease;
 }
 
 body {
@@ -117,7 +132,7 @@ body {
   font-size: 1rem;
   line-height: 1.65;
   font-feature-settings: "ss01", "cv01";
-  transition: background var(--dur-med) ease, color var(--dur-fast) ease;
+  transition: background var(--dur-move) ease, color var(--dur-touch) ease;
 }
 
 /* Headings — Fraunces display, tight tracking */
@@ -251,8 +266,8 @@ button, [role="button"] {
   display: flex;
   align-items: center;
   gap: 24px;
-  transition: background var(--dur-med) var(--ease-out-expo),
-              border-color var(--dur-med) var(--ease-out-expo);
+  transition: background var(--dur-move) var(--ease-enter),
+              border-color var(--dur-move) var(--ease-enter);
   border-bottom: 1px solid transparent;
 }
 .lnav.solid {
@@ -292,7 +307,7 @@ button, [role="button"] {
   color: var(--creme-soft);
   font-size: 13px;
   letter-spacing: 0.01em;
-  transition: color var(--dur-fast) ease;
+  transition: color var(--dur-touch) ease;
 }
 .lnav-links a:hover { color: var(--creme); }
 .lnav-right {
@@ -314,7 +329,7 @@ button, [role="button"] {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-decoration: none;
-  transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+  transition: color var(--dur-touch), border-color var(--dur-touch), background var(--dur-touch);
 }
 .lnav-locale:hover {
   color: var(--brass);
@@ -329,7 +344,7 @@ button, [role="button"] {
   color: var(--creme-soft);
   font-size: 13px;
   font-weight: 500;
-  transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+  transition: color var(--dur-touch), border-color var(--dur-touch), background var(--dur-touch);
 }
 .lnav-btn-ghost:hover {
   color: var(--creme);
@@ -346,7 +361,7 @@ button, [role="button"] {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.005em;
-  transition: background var(--dur-fast) ease, transform var(--dur-fast) var(--ease-spring);
+  transition: background var(--dur-touch) ease, transform var(--dur-touch) var(--ease-glide);
 }
 .lnav-btn-primary:hover { background: #C99A55; }
 .lnav-btn-primary:active { transform: translateY(1px); }
@@ -368,6 +383,24 @@ button, [role="button"] {
   position: relative;
   font-family: var(--font-jetbrains, monospace);
 }
+/* Signature moment #1 — Le spine qui se peint.
+   Au chargement, la colonne laiton se remplit de 0% à --current-pct
+   en var(--dur-moment) var(--ease-enter). Une seule fois. Aucun
+   overshoot, aucun bounce — juste la respiration de la marque.
+   Utilise @property pour interpoler un custom prop en %. */
+@property --spine-paint {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+.cefr-spine {
+  --spine-paint: var(--current-pct, 25%);
+  animation: spine-paint var(--dur-moment) var(--ease-enter) both;
+}
+@keyframes spine-paint {
+  from { --spine-paint: 0%; }
+  to   { --spine-paint: var(--current-pct, 25%); }
+}
 .cefr-spine::before {
   /* la colonne verticale continue */
   content: "";
@@ -379,10 +412,13 @@ button, [role="button"] {
   background: linear-gradient(
     to bottom,
     var(--brass) 0%,
-    var(--brass) calc(var(--current-pct, 25%)),
-    var(--creme-hair) calc(var(--current-pct, 25%)),
+    var(--brass) var(--spine-paint),
+    var(--creme-hair) var(--spine-paint),
     var(--creme-hair) 100%
   );
+}
+@media (prefers-reduced-motion: reduce) {
+  .cefr-spine { animation: none; --spine-paint: var(--current-pct, 25%); }
 }
 .cefr-step {
   display: grid;
@@ -401,7 +437,7 @@ button, [role="button"] {
   border-radius: 50%;
   background: var(--espresso);
   border: 1px solid var(--creme-hair);
-  transition: all var(--dur-med) var(--ease-out-expo);
+  transition: all var(--dur-move) var(--ease-enter);
 }
 .cefr-step.on { color: var(--creme); }
 .cefr-step.on > .dot {
@@ -444,8 +480,8 @@ button, [role="button"] {
   gap: 14px;
   width: 100%;
   color: inherit;
-  transition: transform var(--dur-fast) var(--ease-spring),
-              color var(--dur-fast) ease;
+  transition: transform var(--dur-touch) var(--ease-glide),
+              color var(--dur-touch) ease;
 }
 .cefr-step-btn:hover,
 .cefr-step-btn:focus-visible,
@@ -475,7 +511,7 @@ button, [role="button"] {
   border: 1px solid var(--brass-edge);
   border-radius: var(--r-card);
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
-  animation: cefr-panel-in 0.18s var(--ease-out-expo);
+  animation: cefr-panel-in 0.18s var(--ease-enter);
   z-index: 20;
   pointer-events: none;
 }
@@ -641,8 +677,8 @@ button, [role="button"] {
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.005em;
-  transition: background var(--dur-fast), transform var(--dur-fast) var(--ease-spring),
-              box-shadow var(--dur-fast);
+  transition: background var(--dur-touch), transform var(--dur-touch) var(--ease-glide),
+              box-shadow var(--dur-touch);
   box-shadow: 0 8px 24px rgba(184, 135, 62, 0.22);
 }
 .lhero-btn-primary:hover {
@@ -653,7 +689,7 @@ button, [role="button"] {
 .lhero-btn-primary:active { transform: translateY(0); }
 .lhero-btn-arrow {
   display: inline-block;
-  transition: transform var(--dur-fast) var(--ease-out-expo);
+  transition: transform var(--dur-touch) var(--ease-enter);
 }
 .lhero-btn-primary:hover .lhero-btn-arrow { transform: translateX(3px); }
 .lhero-btn-ghost {
@@ -667,7 +703,7 @@ button, [role="button"] {
   color: var(--creme-soft);
   font-size: 14px;
   font-weight: 500;
-  transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+  transition: color var(--dur-touch), border-color var(--dur-touch), background var(--dur-touch);
 }
 .lhero-btn-ghost:hover {
   color: var(--creme);
@@ -726,7 +762,7 @@ button, [role="button"] {
   to { opacity: 1; transform: translateY(0); }
 }
 .lhero .rise {
-  animation: lhero-rise 0.9s var(--ease-out-expo) both;
+  animation: lhero-rise 0.9s var(--ease-enter) both;
 }
 .lhero .rise-1 { animation-delay: 80ms; }
 .lhero .rise-2 { animation-delay: 180ms; }
@@ -737,6 +773,22 @@ button, [role="button"] {
 
 @media (prefers-reduced-motion: reduce) {
   .lhero .rise { animation: none; }
+}
+
+/* ═══════════════════════════════════════════════
+   MOTION · règle globale prefers-reduced-motion
+   Neutralise toutes les animations et transitions à 0.01ms.
+   Les count-up React lisent aussi cette préférence et affichent
+   la valeur finale directement.
+   ═══════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -891,7 +943,7 @@ button, [role="button"] {
   display: flex;
   flex-direction: column;
   min-height: 200px;
-  transition: background var(--dur-fast) ease;
+  transition: background var(--dur-touch) ease;
 }
 .lfeature:hover {
   background: var(--espresso-2);
@@ -900,7 +952,7 @@ button, [role="button"] {
   color: var(--brass);
   margin-bottom: 18px;
   display: inline-flex;
-  transition: color var(--dur-fast) ease;
+  transition: color var(--dur-touch) ease;
 }
 .lfeature:hover .lfeature-icon { color: #C99A55; }
 .lfeature-head {
@@ -1384,12 +1436,12 @@ button, [role="button"] {
   font-size: 16.5px;
   font-weight: 500;
   letter-spacing: -0.005em;
-  transition: color var(--dur-fast);
+  transition: color var(--dur-touch);
 }
 .lfaq-btn:hover { color: var(--brass); }
 .lfaq-toggle {
   color: var(--brass);
-  transition: transform var(--dur-med) var(--ease-out-expo);
+  transition: transform var(--dur-move) var(--ease-enter);
   flex-shrink: 0;
 }
 .lfaq-btn[aria-expanded="true"] .lfaq-toggle { transform: rotate(45deg); }
@@ -1476,8 +1528,8 @@ button, [role="button"] {
   font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.005em;
-  transition: background var(--dur-fast), transform var(--dur-fast) var(--ease-spring),
-              box-shadow var(--dur-fast);
+  transition: background var(--dur-touch), transform var(--dur-touch) var(--ease-glide),
+              box-shadow var(--dur-touch);
   box-shadow: 0 10px 28px rgba(184, 135, 62, 0.24);
 }
 .lfinal-cta:hover {
@@ -1565,7 +1617,7 @@ button, [role="button"] {
   color: var(--creme-soft);
   font-size: 13px;
   text-decoration: none;
-  transition: color var(--dur-fast);
+  transition: color var(--dur-touch);
 }
 .lfooter-links a:hover { color: var(--brass); }
 .lfooter-social {
@@ -1583,7 +1635,7 @@ button, [role="button"] {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+  transition: color var(--dur-touch), border-color var(--dur-touch), background var(--dur-touch);
 }
 .lfooter-social a:hover {
   color: var(--brass);
@@ -1668,8 +1720,8 @@ button, [role="button"] {
   text-decoration: none;
   padding-bottom: 3px;
   border-bottom: 1px solid var(--brass-edge);
-  transition: gap var(--dur-fast) var(--ease-out-expo),
-              border-color var(--dur-fast);
+  transition: gap var(--dur-touch) var(--ease-enter),
+              border-color var(--dur-touch);
 }
 .l404-cta:hover {
   gap: 14px;
@@ -1786,7 +1838,7 @@ button, [role="button"] {
   color: var(--creme);
   font-family: var(--font-manrope, sans-serif);
   font-size: 15px;
-  transition: border-color var(--dur-fast), background var(--dur-fast);
+  transition: border-color var(--dur-touch), background var(--dur-touch);
   min-width: 0;
 }
 .lauth-input:focus {
@@ -1843,8 +1895,8 @@ button, [role="button"] {
   font-weight: 600;
   letter-spacing: -0.005em;
   cursor: pointer;
-  transition: background var(--dur-fast), transform var(--dur-fast) var(--ease-spring),
-              box-shadow var(--dur-fast);
+  transition: background var(--dur-touch), transform var(--dur-touch) var(--ease-glide),
+              box-shadow var(--dur-touch);
   box-shadow: 0 8px 22px rgba(184, 135, 62, 0.22);
   margin-top: 10px;
 }
@@ -1870,7 +1922,7 @@ button, [role="button"] {
   text-decoration: none;
   border-bottom: 1px solid var(--brass-edge);
   padding-bottom: 1px;
-  transition: border-color var(--dur-fast);
+  transition: border-color var(--dur-touch);
 }
 .lauth-alt a:hover,
 .lauth-alt-link:hover {
@@ -1895,8 +1947,8 @@ button, [role="button"] {
   color: var(--creme);
   cursor: pointer;
   text-align: left;
-  transition: border-color var(--dur-fast), background var(--dur-fast),
-              transform var(--dur-fast) var(--ease-spring);
+  transition: border-color var(--dur-touch), background var(--dur-touch),
+              transform var(--dur-touch) var(--ease-glide);
 }
 .lauth-role:hover,
 .lauth-role:focus-visible {
@@ -1936,7 +1988,7 @@ button, [role="button"] {
 }
 .lauth-role-arrow {
   color: var(--creme-mute);
-  transition: color var(--dur-fast), transform var(--dur-fast);
+  transition: color var(--dur-touch), transform var(--dur-touch);
 }
 .lauth-role:hover .lauth-role-arrow {
   color: var(--brass);
@@ -1966,7 +2018,7 @@ button, [role="button"] {
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
-  transition: color var(--dur-fast);
+  transition: color var(--dur-touch);
 }
 .lauth-role-change:hover { color: var(--brass); }
 .lauth-role-head {
@@ -2146,7 +2198,7 @@ button, [role="button"] {
   font-size: 11px;
   font-weight: 600;
   color: var(--creme-mute);
-  transition: all var(--dur-fast) var(--ease-out-expo);
+  transition: all var(--dur-touch) var(--ease-enter);
 }
 .lonboard-progress-lbl {
   font-family: var(--font-jetbrains, monospace);
@@ -2189,8 +2241,8 @@ button, [role="button"] {
   cursor: pointer;
   text-align: left;
   font-family: inherit;
-  transition: border-color var(--dur-fast), background var(--dur-fast),
-              transform var(--dur-fast) var(--ease-spring);
+  transition: border-color var(--dur-touch), background var(--dur-touch),
+              transform var(--dur-touch) var(--ease-glide);
   width: 100%;
 }
 .lonboard-choice:hover,
@@ -2235,7 +2287,7 @@ button, [role="button"] {
 }
 .lonboard-choice-arrow {
   color: var(--creme-mute);
-  transition: color var(--dur-fast), transform var(--dur-fast);
+  transition: color var(--dur-touch), transform var(--dur-touch);
 }
 .lonboard-choice:hover .lonboard-choice-arrow {
   color: var(--brass);
@@ -2264,7 +2316,7 @@ button, [role="button"] {
   color: var(--creme);
   cursor: pointer;
   text-align: left;
-  transition: border-color var(--dur-fast), background var(--dur-fast);
+  transition: border-color var(--dur-touch), background var(--dur-touch);
   font-family: inherit;
 }
 .lonboard-choice-compact:hover { border-color: var(--brass-edge); background: rgba(184, 135, 62, 0.04); }
@@ -2317,7 +2369,7 @@ button, [role="button"] {
   color: var(--creme);
   font-family: var(--font-manrope), sans-serif;
   font-size: 15px;
-  transition: border-color var(--dur-fast), background var(--dur-fast);
+  transition: border-color var(--dur-touch), background var(--dur-touch);
   min-width: 0;
   box-sizing: border-box;
 }
@@ -2358,7 +2410,7 @@ button, [role="button"] {
   gap: 6px;
   padding: 8px 12px;
   border-radius: 8px;
-  transition: color var(--dur-fast), background var(--dur-fast);
+  transition: color var(--dur-touch), background var(--dur-touch);
 }
 .lonboard-btn-back:hover {
   color: var(--creme);
@@ -2375,8 +2427,8 @@ button, [role="button"] {
   font-weight: 600;
   letter-spacing: -0.005em;
   cursor: pointer;
-  transition: background var(--dur-fast), transform var(--dur-fast) var(--ease-spring),
-              box-shadow var(--dur-fast);
+  transition: background var(--dur-touch), transform var(--dur-touch) var(--ease-glide),
+              box-shadow var(--dur-touch);
   box-shadow: 0 6px 18px rgba(184, 135, 62, 0.22);
 }
 .lonboard-btn-next:hover:not(:disabled) {
@@ -2667,7 +2719,7 @@ button, [role="button"] {
   text-decoration: none;
   padding-bottom: 3px;
   border-bottom: 1px solid var(--brass-edge);
-  transition: gap var(--dur-fast), border-color var(--dur-fast);
+  transition: gap var(--dur-touch), border-color var(--dur-touch);
 }
 .lmethode-cta:hover { gap: 14px; border-color: var(--brass); }
 
@@ -2906,8 +2958,8 @@ button, [role="button"] {
   font-weight: 600;
   letter-spacing: -0.005em;
   text-decoration: none;
-  transition: background var(--dur-fast), transform var(--dur-fast) var(--ease-spring),
-              box-shadow var(--dur-fast);
+  transition: background var(--dur-touch), transform var(--dur-touch) var(--ease-glide),
+              box-shadow var(--dur-touch);
   box-shadow: 0 8px 24px rgba(184, 135, 62, 0.22);
   cursor: pointer;
 }
@@ -2928,7 +2980,7 @@ button, [role="button"] {
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
-  transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+  transition: color var(--dur-touch), border-color var(--dur-touch), background var(--dur-touch);
   cursor: pointer;
 }
 .lb2b-btn-ghost:hover {
@@ -2938,7 +2990,7 @@ button, [role="button"] {
 }
 .lb2b-btn-arrow {
   display: inline-block;
-  transition: transform var(--dur-fast) var(--ease-out-expo);
+  transition: transform var(--dur-touch) var(--ease-enter);
 }
 .lb2b-btn-primary:hover .lb2b-btn-arrow { transform: translateX(3px); }
 
@@ -2957,7 +3009,7 @@ button, [role="button"] {
   padding: 28px 24px;
   display: flex;
   flex-direction: column;
-  transition: background var(--dur-fast) ease;
+  transition: background var(--dur-touch) ease;
 }
 .lb2b-pain:hover { background: var(--espresso-2); }
 .lb2b-pain-icon {
@@ -3194,7 +3246,7 @@ button, [role="button"] {
   display: flex;
   flex-direction: column;
   position: relative;
-  transition: border-color var(--dur-fast) ease;
+  transition: border-color var(--dur-touch) ease;
 }
 .lb2b-plan:hover { border-color: var(--brass-edge); }
 .lb2b-plan-featured {
@@ -3298,7 +3350,7 @@ button, [role="button"] {
   border: 1px solid var(--creme-hair);
   color: var(--creme);
   background: transparent;
-  transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+  transition: color var(--dur-touch), border-color var(--dur-touch), background var(--dur-touch);
   cursor: pointer;
 }
 .lb2b-plan-cta:hover {
@@ -3413,7 +3465,7 @@ button, [role="button"] {
   color: var(--creme);
   font-family: var(--font-manrope), sans-serif;
   font-size: 15px;
-  transition: border-color var(--dur-fast), background var(--dur-fast);
+  transition: border-color var(--dur-touch), background var(--dur-touch);
   min-width: 0;
 }
 .lb2b-form-input:focus {
@@ -3436,8 +3488,8 @@ button, [role="button"] {
   font-weight: 600;
   letter-spacing: -0.005em;
   cursor: pointer;
-  transition: background var(--dur-fast), transform var(--dur-fast) var(--ease-spring),
-              box-shadow var(--dur-fast);
+  transition: background var(--dur-touch), transform var(--dur-touch) var(--ease-glide),
+              box-shadow var(--dur-touch);
   box-shadow: 0 8px 22px rgba(184, 135, 62, 0.22);
 }
 .lb2b-form-cta:hover {
@@ -3620,7 +3672,7 @@ button, [role="button"] {
   grid-template-columns: 48px 1fr auto;
   gap: 16px;
   align-items: center;
-  transition: background var(--dur-fast) ease;
+  transition: background var(--dur-touch) ease;
 }
 .llang:hover { background: var(--espresso-2); }
 .llang-mono {
@@ -3751,8 +3803,8 @@ button, [role="button"] {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: border-color var(--dur-fast) var(--ease-out-expo),
-    background var(--dur-fast) var(--ease-out-expo);
+  transition: border-color var(--dur-touch) var(--ease-enter),
+    background var(--dur-touch) var(--ease-enter);
 }
 .space-switcher-trigger:hover { border-color: var(--brass-edge); }
 .space-switcher-trigger:focus-visible {
@@ -3799,7 +3851,7 @@ button, [role="button"] {
   font-weight: 500;
   cursor: pointer;
   text-align: left;
-  transition: background var(--dur-fast), color var(--dur-fast);
+  transition: background var(--dur-touch), color var(--dur-touch);
 }
 .space-switcher-item:hover:not(:disabled) {
   background: var(--brass-glow);
@@ -3818,16 +3870,18 @@ button, [role="button"] {
 .space-switcher-check { color: var(--brass); flex-shrink: 0; }
 
 .space-switcher-spin {
-  width: 12px;
-  height: 12px;
-  border: 1.5px solid var(--creme-hair);
-  border-top-color: var(--brass);
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  animation: space-switcher-spin 0.7s linear infinite;
+  background: var(--brass);
+  animation: motion-pulse 960ms var(--ease-enter) infinite;
   flex-shrink: 0;
 }
-@keyframes space-switcher-spin {
-  to { transform: rotate(360deg); }
+/* Pulse générique de chargement — remplace tout spinner rotatif.
+   Rythme respiratoire, opacity uniquement, respecte la doctrine. */
+@keyframes motion-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
 }
 
 /* ─── Admin · gestion des rôles ────────────────────────────────────── */
@@ -3898,7 +3952,7 @@ button, [role="button"] {
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
-  transition: opacity var(--dur-fast) var(--ease-out-expo);
+  transition: opacity var(--dur-touch) var(--ease-enter);
 }
 .admin-roles-btn:hover:not(:disabled) { opacity: 0.9; }
 .admin-roles-btn:disabled { cursor: default; opacity: 0.5; }
@@ -3969,7 +4023,7 @@ button, [role="button"] {
   font-size: 11px; font-weight: 600;
   letter-spacing: 0.06em; text-transform: uppercase;
   cursor: pointer;
-  transition: all var(--dur-fast) var(--ease-out-expo);
+  transition: all var(--dur-touch) var(--ease-enter);
 }
 .admin-roles-chip:hover:not(:disabled) { border-color: var(--brass-edge); color: var(--creme); }
 .admin-roles-chip.on {
@@ -4027,6 +4081,15 @@ button, [role="button"] {
   border-radius: 50%;
   background: radial-gradient(circle, var(--brass-glow) 0%, rgba(184, 135, 62, 0.06) 40%, transparent 70%);
   pointer-events: none;
+  /* Signature moment #2 — halo apparaît en fondu au scroll (via IO
+     dans <Seam/>). Départ à opacité 0, on ne peint que quand le
+     seam entre dans le viewport à 40% (threshold IO). */
+  opacity: 0;
+  transition: opacity var(--dur-moment) var(--ease-enter);
+}
+.seam-visible .seam-halo { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .seam-halo { opacity: 1; transition: none; }
 }
 .seam-key {
   position: relative;
@@ -4154,7 +4217,7 @@ button, [role="button"] {
   font-size: 13.5px;
   font-weight: 500;
   text-decoration: none;
-  transition: background var(--dur-fast), color var(--dur-fast);
+  transition: background var(--dur-touch), color var(--dur-touch);
 }
 .app-nav-link:hover { background: var(--brass-glow); color: var(--creme); }
 .app-nav-link.active {
@@ -4167,7 +4230,7 @@ button, [role="button"] {
 .app-nav-icon {
   flex-shrink: 0;
   color: var(--creme-mute);
-  transition: color var(--dur-fast);
+  transition: color var(--dur-touch);
 }
 .app-nav-link:hover .app-nav-icon { color: var(--brass); }
 .app-nav-divider {
@@ -4220,7 +4283,7 @@ button, [role="button"] {
   color: var(--creme-mute);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: color var(--dur-fast), border-color var(--dur-fast);
+  transition: color var(--dur-touch), border-color var(--dur-touch);
 }
 .app-sidebar-logout:hover { color: var(--oxblood); border-color: var(--oxblood); }
 .app-sidebar-logout:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
@@ -4294,13 +4357,13 @@ button, [role="button"] {
   z-index: 39;
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--dur-fast) var(--ease-out-expo);
+  transition: opacity var(--dur-touch) var(--ease-enter);
 }
 
 @media (max-width: 900px) {
   .app-sidebar {
     transform: translateX(-100%);
-    transition: transform 240ms var(--ease-out-expo);
+    transition: transform 240ms var(--ease-enter);
     box-shadow: 8px 0 40px rgba(0, 0, 0, 0.5);
   }
   .app-sidebar.open { transform: translateX(0); }
@@ -4381,7 +4444,7 @@ button, [role="button"] {
   font-size: 14px;
   text-decoration: none;
   cursor: pointer;
-  transition: transform var(--dur-fast) var(--ease-out-expo), opacity var(--dur-fast);
+  transition: transform var(--dur-touch) var(--ease-enter), opacity var(--dur-touch);
 }
 .dash-hero-cta:hover { opacity: 0.92; }
 .dash-hero-cta:focus-visible { outline: 2px solid var(--creme); outline-offset: 3px; }
@@ -4453,7 +4516,7 @@ button, [role="button"] {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: border-color var(--dur-fast), transform var(--dur-fast);
+  transition: border-color var(--dur-touch), transform var(--dur-touch);
   cursor: pointer;
 }
 .dash-action:hover { border-color: var(--brass-edge); }
@@ -4606,7 +4669,7 @@ button, [role="button"] {
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
-  transition: opacity var(--dur-fast);
+  transition: opacity var(--dur-touch);
 }
 .dash-center-code-copy:hover { opacity: 0.9; }
 .dash-center-code-copy:focus-visible { outline: 2px solid var(--creme); outline-offset: 2px; }
@@ -4705,7 +4768,7 @@ button, [role="button"] {
   font-size: 13px;
   cursor: pointer;
   text-decoration: none;
-  transition: opacity var(--dur-fast) var(--ease-out-expo);
+  transition: opacity var(--dur-touch) var(--ease-enter);
   flex-shrink: 0;
 }
 .subpage-cta:hover:not(:disabled) { opacity: 0.9; }
@@ -4735,7 +4798,7 @@ button, [role="button"] {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+  transition: color var(--dur-touch), border-color var(--dur-touch), background var(--dur-touch);
 }
 .subpage-filter:hover { color: var(--creme); border-color: var(--brass-edge); }
 .subpage-filter.on {
@@ -4881,7 +4944,7 @@ button, [role="button"] {
   font-size: 12px;
   cursor: pointer;
   text-decoration: none;
-  transition: color var(--dur-fast), border-color var(--dur-fast);
+  transition: color var(--dur-touch), border-color var(--dur-touch);
   white-space: nowrap;
 }
 .row-btn:hover { color: var(--creme); border-color: var(--brass-edge); }
@@ -5026,7 +5089,7 @@ button, [role="button"] {
   height: 100%;
   background: var(--brass);
   border-radius: inherit;
-  transition: width 300ms var(--ease-out-expo);
+  transition: width 300ms var(--ease-enter);
 }
 
 .empty-state {
@@ -5048,5 +5111,154 @@ button, [role="button"] {
   margin: 0 0 20px;
   max-width: 46ch;
   margin-inline: auto;
+}
+
+/* ─── Signature moment #3 · LessonComplete ─────────────────────────
+   Séquence totale ≤ 1.2s. Trois éléments en cascade 120ms :
+     1. .lesson-complete-mark (checkmark) apparaît (t=0)
+     2. .lesson-complete-xp (count-up) démarre à t=120ms
+     3. .lesson-complete-progress-fill se peint à t=240ms
+   Sobre. Aucun confetti, aucun bounce, aucun overshoot. */
+.lesson-complete {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 40px 32px;
+  background: var(--espresso-2);
+  border: 1px solid var(--creme-hair);
+  border-radius: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.lesson-complete-eye {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin: 0;
+}
+.lesson-complete-mark {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--brass-glow);
+  border: 1.5px solid var(--brass-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brass);
+  opacity: 0;
+  transform: scale(0.98);
+  animation: lc-mark-in var(--dur-move) var(--ease-enter) forwards;
+}
+.lesson-complete-check { display: flex; }
+@keyframes lc-mark-in {
+  to { opacity: 1; transform: scale(1); }
+}
+.lesson-complete-h {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 400;
+  letter-spacing: -0.018em;
+  color: var(--creme);
+  margin: 0;
+  line-height: 1.2;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: lc-fade-up var(--dur-move) var(--ease-enter) forwards;
+  animation-delay: 120ms;
+}
+@keyframes lc-fade-up {
+  to { opacity: 1; transform: translateY(0); }
+}
+.lesson-complete-xp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: lc-fade-up var(--dur-move) var(--ease-enter) forwards;
+  animation-delay: 120ms;
+}
+.lesson-complete-xp-value {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 42px;
+  color: var(--brass);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.lesson-complete-xp-lbl {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--creme-mute);
+}
+.lesson-complete-progress {
+  width: 100%;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: lc-fade-up var(--dur-move) var(--ease-enter) forwards;
+  animation-delay: 240ms;
+}
+.lesson-complete-progress-lbl {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--creme-soft);
+  margin: 0 0 8px;
+}
+.lesson-complete-progress-bar {
+  height: 6px;
+  background: var(--creme-hair);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.lesson-complete-progress-fill {
+  height: 100%;
+  background: var(--brass);
+  border-radius: inherit;
+  width: 100%;
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation: lc-paint var(--dur-moment) var(--ease-enter) forwards;
+  animation-delay: 360ms;
+}
+@keyframes lc-paint {
+  to { transform: scaleX(calc(var(--fill, 0%) / 100%)); }
+}
+.lesson-complete-cta {
+  padding: 12px 28px;
+  background: var(--brass);
+  color: var(--espresso);
+  border: none;
+  border-radius: 10px;
+  font-family: var(--font-manrope), sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity var(--dur-touch) var(--ease-enter);
+  opacity: 0;
+  animation: lc-cta-in var(--dur-move) var(--ease-enter) forwards;
+  animation-delay: 480ms;
+}
+.lesson-complete-cta:hover { opacity: 0.9; }
+.lesson-complete-cta:focus-visible { outline: 2px solid var(--creme); outline-offset: 3px; }
+@keyframes lc-cta-in { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .lesson-complete-mark,
+  .lesson-complete-h,
+  .lesson-complete-xp,
+  .lesson-complete-progress,
+  .lesson-complete-cta { opacity: 1; transform: none; animation: none; }
+  .lesson-complete-progress-fill { animation: none; transform: scaleX(calc(var(--fill, 0%) / 100%)); }
 }
 

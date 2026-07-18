@@ -144,7 +144,7 @@ function Bar({ pct, color, height = 6 }: { pct: number; color: string; height?: 
   useEffect(() => { const t = setTimeout(() => setW(pct), 200); return () => clearTimeout(t) }, [pct])
   return (
     <div style={{ height, borderRadius: 99, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
-      <div style={{ height: "100%", width: `${w}%`, background: color, borderRadius: 99, transition: "width 0.9s ease-out", boxShadow: `0 0 8px ${color}66` }} />
+      <div style={{ height: "100%", width: `${w}%`, background: color, borderRadius: 99, transition: "width var(--dur-moment) var(--ease-enter)", boxShadow: `0 0 8px ${color}66` }} />
     </div>
   )
 }
@@ -207,7 +207,7 @@ function DashboardScreen({ isMobile }: { isMobile: boolean }) {
             const isToday = i === 4
             return (
               <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                <div style={{ width: "100%", height: h, borderRadius: "6px 6px 0 0", background: isToday ? "#10b981" : "rgba(16,185,129,0.25)", boxShadow: isToday ? "0 0 12px rgba(16,185,129,0.4)" : "none", transition: "height 0.8s ease-out" }} />
+                <div style={{ width: "100%", height: h, borderRadius: "6px 6px 0 0", background: isToday ? "#10b981" : "rgba(16,185,129,0.25)", boxShadow: isToday ? "0 0 12px rgba(16,185,129,0.4)" : "none", transition: "height var(--dur-moment) var(--ease-enter)" }} />
                 <span style={{ color: isToday ? "#10b981" : "rgba(255,255,255,0.3)", fontSize: "0.55rem", fontWeight: isToday ? 700 : 400 }}>{d.day}</span>
               </div>
             )
@@ -297,7 +297,7 @@ function SimulatorScreen() {
           <div style={{ display: "flex", alignItems: "flex-end", gap: 8 }}>
             <div style={{ width: 30, height: 30, borderRadius: "50%", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem" }}>🧑‍💼</div>
             <div style={{ padding: "10px 16px", borderRadius: "18px 18px 18px 4px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", gap: 5, alignItems: "center" }}>
-              <style>{`@keyframes db{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}.db{width:5px;height:5px;border-radius:50%;background:#10b981;animation:db 1.2s infinite}.db:nth-child(2){animation-delay:.2s}.db:nth-child(3){animation-delay:.4s}`}</style>
+              <style>{`@keyframes db{0%,100%{opacity:0.35}50%{opacity:1}}.db{width:5px;height:5px;border-radius:50%;background:var(--brass);animation:db 960ms var(--ease-enter) infinite}.db:nth-child(2){animation-delay:120ms}.db:nth-child(3){animation-delay:240ms}`}</style>
               <div className="db" /><div className="db" /><div className="db" />
             </div>
           </div>
@@ -536,13 +536,13 @@ function OnboardingScreen({ lang }: { lang: "fr" | "en" }) {
       {/* Steps */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {DEMO_ONBOARDING_STEPS.map((step, i) => (
-          <div key={i} style={{ padding: "13px 16px", borderRadius: 14, background: revealed ? "rgba(16,185,129,0.05)" : "rgba(255,255,255,0.03)", border: `1px solid ${revealed ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.07)"}`, display: "flex", alignItems: "center", gap: 14, transition: "all 0.4s ease", transitionDelay: `${i * 80}ms` }}>
+          <div key={i} style={{ padding: "13px 16px", borderRadius: 14, background: revealed ? "rgba(16,185,129,0.05)" : "rgba(255,255,255,0.03)", border: `1px solid ${revealed ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.07)"}`, display: "flex", alignItems: "center", gap: 14, transition: "all var(--dur-moment) var(--ease-enter)", transitionDelay: `${i * 80}ms` }}>
             <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>{step.icon}</span>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ margin: 0, color: "rgba(255,255,255,0.55)", fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.07em" }}>{lang === "fr" ? step.label : step.labelEN}</p>
               <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,0.85)", fontSize: "0.8rem", fontWeight: 600 }}>{step.value}</p>
             </div>
-            <div style={{ width: 24, height: 24, borderRadius: "50%", background: revealed ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${revealed ? "#10b981" : "rgba(255,255,255,0.1)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem", flexShrink: 0, transition: "all 0.4s ease", transitionDelay: `${i * 80}ms` }}>
+            <div style={{ width: 24, height: 24, borderRadius: "50%", background: revealed ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${revealed ? "#10b981" : "rgba(255,255,255,0.1)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem", flexShrink: 0, transition: "all var(--dur-moment) var(--ease-enter)", transitionDelay: `${i * 80}ms` }}>
               {revealed ? "✓" : ""}
             </div>
           </div>
@@ -745,7 +745,7 @@ export default function DemoPage() {
       <div style={{ padding: isMobile ? "0 8px" : "0 32px", maxWidth: 680 + 64, margin: "0 auto", overflowX: "auto" }}>
         <div style={{ display: "flex", gap: 4, padding: "0 0 2px", borderBottom: "1px solid rgba(255,255,255,0.06)", minWidth: "max-content" }}>
           {TABS.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)} style={{ padding: isMobile ? "9px 12px" : "10px 18px", borderRadius: "8px 8px 0 0", border: "none", cursor: "pointer", background: tab === t.id ? "rgba(16,185,129,0.1)" : "transparent", borderBottom: tab === t.id ? "2px solid #10b981" : "2px solid transparent", color: tab === t.id ? "#10b981" : "rgba(255,255,255,0.35)", fontSize: "0.72rem", fontFamily: "'Syne',sans-serif", fontWeight: tab === t.id ? 700 : 400, display: "flex", alignItems: "center", gap: 6, transition: "all 0.15s", whiteSpace: "nowrap" }}>
+            <button key={t.id} onClick={() => setTab(t.id)} style={{ padding: isMobile ? "9px 12px" : "10px 18px", borderRadius: "8px 8px 0 0", border: "none", cursor: "pointer", background: tab === t.id ? "rgba(16,185,129,0.1)" : "transparent", borderBottom: tab === t.id ? "2px solid #10b981" : "2px solid transparent", color: tab === t.id ? "#10b981" : "rgba(255,255,255,0.35)", fontSize: "0.72rem", fontFamily: "'Syne',sans-serif", fontWeight: tab === t.id ? 700 : 400, display: "flex", alignItems: "center", gap: 6, transition: "all var(--dur-touch)", whiteSpace: "nowrap" }}>
               <span>{t.icon}</span>
               <span>{lang === "fr" ? t.label : t.labelEN}</span>
             </button>

@@ -381,7 +381,7 @@ export default function TeacherCoursesPage() {
                         cursor: alreadyAssigned ? "default" : "pointer",
                         textAlign: "left",
                         fontFamily: "inherit",
-                        transition: "border-color var(--dur-fast)",
+                        transition: "border-color var(--dur-touch)",
                       }}
                     >
                       <span style={{

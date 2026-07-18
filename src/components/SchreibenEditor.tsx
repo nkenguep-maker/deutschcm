@@ -121,7 +121,7 @@ export default function SchreibenEditor({
             borderRadius: 14, padding: "14px 16px",
             color: "white", fontSize: 14,
             resize: "vertical", outline: "none",
-            lineHeight: 1.7, transition: "border-color 0.2s",
+            lineHeight: 1.7, transition: "border-color var(--dur-move)",
             fontFamily: "inherit"
           }}
         />

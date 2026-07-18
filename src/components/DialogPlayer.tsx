@@ -108,7 +108,7 @@ export default function DialogPlayer({
                 : "linear-gradient(135deg,#10b981,#059669)",
               border: isPlaying ? "1px solid rgba(239,68,68,0.3)" : "none",
               color: "white", cursor: "pointer",
-              transition: "all 0.2s",
+              transition: "all var(--dur-move)",
             }}
           >
             {isPlaying
@@ -129,7 +129,7 @@ export default function DialogPlayer({
             border: currentLine === i
               ? "1px solid rgba(16,185,129,0.2)"
               : "1px solid transparent",
-            transition: "all 0.2s"
+            transition: "all var(--dur-move)"
           }}>
             <AudioPlayer
               text={line.text}

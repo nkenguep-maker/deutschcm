@@ -185,7 +185,7 @@ export default function CenterDetailPage() {
                           <span style={{ color: barColor, fontSize: 11, fontWeight: 700 }}>{cls.students}/{cls.max}</span>
                         </div>
                         <div style={{ height: 4, background: "rgba(255,255,255,0.07)", borderRadius: 4 }}>
-                          <div style={{ height: "100%", width: `${pct}%`, background: barColor, borderRadius: 4, transition: "width 0.3s" }} />
+                          <div style={{ height: "100%", width: `${pct}%`, background: barColor, borderRadius: 4, transition: "width var(--dur-move)" }} />
                         </div>
                       </div>
                       <Link href={`/discover/class/${cls.id}`} style={{

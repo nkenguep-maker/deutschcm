@@ -167,7 +167,7 @@ export default function NotificationsPage() {
                   padding: "16px 18px", background: n.isRead ? "rgba(255,255,255,0.02)" : `${accentColor}08`,
                   border: `1px solid ${n.isRead ? "rgba(255,255,255,0.06)" : `${accentColor}20`}`,
                   borderRadius: 14, display: "flex", gap: 14, alignItems: "flex-start",
-                  transition: "background 0.2s",
+                  transition: "background var(--dur-move)",
                 }}>
                   <div style={{
                     width: 40, height: 40, borderRadius: 12, flexShrink: 0,

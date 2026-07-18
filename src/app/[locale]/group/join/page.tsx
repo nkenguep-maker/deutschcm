@@ -61,9 +61,9 @@ export default function GroupJoinPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
         input:focus { border-color: rgba(16,185,129,0.5) !important; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
-        .fadeUp { animation: fadeUp 0.4s ease forwards; }
-        @keyframes spin { to{transform:rotate(360deg);} }
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0);} }
+        .fadeUp { animation: fadeUp var(--dur-moment) var(--ease-enter) forwards; }
+        /* spin removed — see motion-pulse in globals.css */ }
       `}</style>
 
       <div style={{ width: "100%", maxWidth: 460 }} className="fadeUp">
@@ -90,7 +90,7 @@ export default function GroupJoinPage() {
                   style={{ width: "100%", background: "rgba(255,255,255,0.04)", border: `1px solid ${preview ? "rgba(16,185,129,0.4)" : codeError ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.1)"}`, borderRadius: 10, padding: "13px 16px", color: preview ? "#10b981" : "#f1f5f9", fontSize: 16, outline: "none", fontFamily: "monospace", letterSpacing: "0.05em", boxSizing: "border-box", paddingRight: 40 }}
                   autoFocus
                 />
-                {checking && <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, border: "2px solid rgba(255,255,255,0.1)", borderTopColor: "#10b981", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />}
+                {checking && <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", width: 8, height: 8, background: "var(--brass)", borderRadius: "50%", animation: "motion-pulse 960ms var(--ease-enter) infinite" }} />}
                 {preview && !checking && <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", color: "#10b981", fontSize: 16 }}>✓</div>}
               </div>
               {codeError && <div style={{ color: "#ef4444", fontSize: 12, marginTop: 6 }}>⚠ {codeError}</div>}

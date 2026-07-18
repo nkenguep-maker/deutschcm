@@ -203,7 +203,7 @@ function QuizMode({ assignment, onComplete }: { assignment: Assignment; onComple
           <span style={{ color: "#f59e0b", fontSize: 12, fontWeight: 700 }}>{Math.round(((current) / totalQ) * 100)}%</span>
         </div>
         <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 4, height: 4 }}>
-          <div style={{ width: `${((current) / totalQ) * 100}%`, height: "100%", background: "#f59e0b", borderRadius: 4, transition: "width 0.4s ease" }} />
+          <div style={{ width: `${((current) / totalQ) * 100}%`, height: "100%", background: "#f59e0b", borderRadius: 4, transition: "width var(--dur-moment) var(--ease-enter)" }} />
         </div>
       </div>
 
@@ -231,7 +231,7 @@ function QuizMode({ assignment, onComplete }: { assignment: Assignment; onComple
               display: "flex", alignItems: "center", gap: 12, textAlign: "left",
               background: bg, border: `1px solid ${border}`, borderRadius: 10,
               padding: "13px 16px", cursor: confirmed ? "default" : "pointer",
-              transition: "all 0.15s",
+              transition: "all var(--dur-touch)",
             }}>
               <div style={{
                 width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
@@ -255,7 +255,7 @@ function QuizMode({ assignment, onComplete }: { assignment: Assignment; onComple
           color: selected !== null ? "#000" : "rgba(255,255,255,0.2)",
           border: "none", borderRadius: 10, padding: "13px 24px",
           fontWeight: 700, fontSize: 14, cursor: selected !== null ? "pointer" : "default",
-          transition: "all 0.2s",
+          transition: "all var(--dur-move)",
         }}>
           Valider la réponse
         </button>
@@ -390,7 +390,7 @@ function SimulatorMode({ assignment, onComplete }: { assignment: Assignment; onC
           </span>
         </div>
         <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 4, height: 5 }}>
-          <div style={{ width: `${Math.min((elapsed / 120) * 100, 100)}%`, height: "100%", background: minTarget ? "#10b981" : "#f59e0b", borderRadius: 4, transition: "width 1s linear" }} />
+          <div style={{ width: `${Math.min((elapsed / 120) * 100, 100)}%`, height: "100%", background: minTarget ? "#10b981" : "#f59e0b", borderRadius: 4, transition: "width var(--dur-moment) linear" }} />
         </div>
       </div>
 
@@ -398,7 +398,7 @@ function SimulatorMode({ assignment, onComplete }: { assignment: Assignment; onC
         background: minTarget ? "#10b981" : "rgba(255,255,255,0.06)",
         color: minTarget ? "#fff" : "rgba(255,255,255,0.3)",
         border: "none", borderRadius: 10, padding: "13px 24px",
-        fontWeight: 700, fontSize: 14, cursor: "pointer", transition: "all 0.3s",
+        fontWeight: 700, fontSize: 14, cursor: "pointer", transition: "all var(--dur-move)",
       }}>
         {minTarget ? "Terminer la simulation →" : `Continuer... (${Math.max(0, 120 - elapsed)}s restantes)`}
       </button>
@@ -431,7 +431,7 @@ function ScoreResult({ score, type, onBack }: { score: number; type: AssignmentT
           <circle cx="60" cy="60" r="52" fill="none" stroke={gradeColor} strokeWidth="8"
             strokeDasharray={`${2 * Math.PI * 52}`}
             strokeDashoffset={`${2 * Math.PI * 52 * (1 - score / 100)}`}
-            style={{ transition: "stroke-dashoffset 1.5s ease" }}
+            style={{ transition: "stroke-dashoffset var(--dur-moment) var(--ease-enter)" }}
             strokeLinecap="round"
           />
         </svg>
@@ -634,7 +634,7 @@ export default function AssignmentDetailPage() {
                   flex: 1, background: meta.color, color: "#fff", border: "none", borderRadius: 12,
                   padding: "16px 24px", fontWeight: 700, fontSize: 16, cursor: "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                  transition: "opacity 0.2s",
+                  transition: "opacity var(--dur-move)",
                 }}>
                   <span style={{ fontSize: 20 }}>{meta.icon}</span>
                   {assignment.type === "MODULE" && "Commencer le module →"}

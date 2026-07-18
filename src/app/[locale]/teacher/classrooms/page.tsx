@@ -94,7 +94,7 @@ export default function TeacherClassroomsPage() {
                   display: "flex",
                   flexDirection: "column",
                   gap: 16,
-                  transition: "border-color var(--dur-fast) var(--ease-out-expo)",
+                  transition: "border-color var(--dur-touch) var(--ease-enter)",
                 }}
                 className="teacher-classroom-card"
               >

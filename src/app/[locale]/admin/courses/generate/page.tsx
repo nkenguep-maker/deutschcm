@@ -445,7 +445,7 @@ export default function AdminGenerateCourse() {
                     background: val ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.05)",
                     border: val ? "1px solid rgba(16,185,129,0.35)" : "1px solid rgba(255,255,255,0.08)",
                     color: val ? "#10b981" : "rgba(255,255,255,0.4)",
-                    cursor: "pointer", transition: "all 0.2s"
+                    cursor: "pointer", transition: "all var(--dur-move)"
                   }}
                 >
                   {val && <Check size={12} />}
@@ -471,7 +471,7 @@ export default function AdminGenerateCourse() {
               />
             </div>
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", padding: "12px 14px", borderRadius: 12, background: publishNow ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.04)", border: publishNow ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.08)", transition: "all 0.2s" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", padding: "12px 14px", borderRadius: 12, background: publishNow ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.04)", border: publishNow ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.08)", transition: "all var(--dur-move)" }}>
                 <input
                   type="checkbox"
                   checked={publishNow}
@@ -492,7 +492,7 @@ export default function AdminGenerateCourse() {
           {loading && (
             <div className="mb-5">
               <div style={{ height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 99, overflow: "hidden", marginBottom: 8 }}>
-                <div style={{ height: "100%", width: progress + "%", background: "linear-gradient(90deg,#059669,#10b981)", borderRadius: 99, transition: "width 0.5s ease", boxShadow: "0 0 10px rgba(16,185,129,0.5)" }} />
+                <div style={{ height: "100%", width: progress + "%", background: "linear-gradient(90deg,#059669,#10b981)", borderRadius: 99, transition: "width var(--dur-moment) var(--ease-enter)", boxShadow: "0 0 10px rgba(16,185,129,0.5)" }} />
               </div>
               <p style={{ color: "#10b981", fontSize: 12 }} className="animate-pulse">{statusMsg}</p>
             </div>
@@ -701,7 +701,7 @@ export default function AdminGenerateCourse() {
                   border: "2px dashed rgba(66,133,244,0.3)", borderRadius: 14, padding: "28px 20px",
                   textAlign: "center", cursor: uploading ? "default" : "pointer",
                   background: uploading ? "rgba(66,133,244,0.04)" : "rgba(0,0,0,0.2)",
-                  transition: "all 0.2s",
+                  transition: "all var(--dur-move)",
                 }}
               >
                 {uploading ? (
@@ -710,7 +710,7 @@ export default function AdminGenerateCourse() {
                       ⬆️ Upload en cours... {uploadProgress}%
                     </div>
                     <div style={{ height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 99, overflow: "hidden", maxWidth: 300, margin: "0 auto" }}>
-                      <div style={{ height: "100%", width: uploadProgress + "%", background: "linear-gradient(90deg,#3b82f6,#60a5fa)", borderRadius: 99, transition: "width 0.3s ease" }} />
+                      <div style={{ height: "100%", width: uploadProgress + "%", background: "linear-gradient(90deg,#3b82f6,#60a5fa)", borderRadius: 99, transition: "width var(--dur-move) var(--ease-enter)" }} />
                     </div>
                   </div>
                 ) : (

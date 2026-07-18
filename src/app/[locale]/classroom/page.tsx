@@ -186,7 +186,7 @@ function ClassCard({ cls, t }: { cls: Classroom; t: TT }) {
       borderTop: `3px solid ${levelColor}`,
       borderRadius: 16, padding: 22,
       display: "flex", flexDirection: "column", gap: 14,
-      transition: "border-color 0.2s, transform 0.2s",
+      transition: "border-color var(--dur-move), transform var(--dur-move)",
     }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -235,7 +235,7 @@ function ClassCard({ cls, t }: { cls: Classroom; t: TT }) {
           <span style={{ color: levelColor, fontSize: 11, fontWeight: 700 }}>{cls.progress}%</span>
         </div>
         <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 4, height: 5, overflow: "hidden" }}>
-          <div style={{ width: `${cls.progress}%`, height: "100%", background: levelColor, borderRadius: 4, transition: "width 0.6s ease" }} />
+          <div style={{ width: `${cls.progress}%`, height: "100%", background: levelColor, borderRadius: 4, transition: "width var(--dur-moment) var(--ease-enter)" }} />
         </div>
       </div>
 
