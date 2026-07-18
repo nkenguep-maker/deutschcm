@@ -1,286 +1,274 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "@/navigation";
-import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Link } from "@/navigation";
+import { useLocale } from "next-intl";
 import Layout from "@/components/Layout";
-import { useT } from "@/hooks/useT";
+import { CefrSpine } from "@/components/landing/CefrSpine";
+import {
+  IconMic,
+  IconBook,
+  IconContext,
+  IconFlame,
+  IconSpark,
+  IconChart,
+  IconCheck,
+} from "@/components/landing/icons";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// Dashboard étudiant · Kaffeehaus. Focus continuité d'apprentissage.
+// Hero "Ta prochaine étape" · streak/XP bande secondaire · 3 quick actions.
 
-interface Analytics {
-  xpTotal: number; streakDays: number; completedModules: number;
-  avgQuizScore: number; totalBadges: number; level?: string | null;
+interface UserData {
+  fullName?: string;
+  germanLevel?: string | null;
+  xpTotal: number;
+  streakDays: number;
+  isValidated?: boolean;
+  studentType?: string | null;
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+const LEVELS = ["A1", "A2", "B1", "B2", "C1"] as const;
+type Level = (typeof LEVELS)[number];
 
-function PillarCard({ label, desc, color, badge }: {
-  label: string; desc: string; color: string; badge: string | null;
-}) {
-  return (
-    <div style={{
-      flex: 1, padding: "18px 16px", borderRadius: 16,
-      background: badge ? "rgba(255,255,255,0.02)" : `${color}08`,
-      border: `1px solid ${badge ? "rgba(255,255,255,0.07)" : color + "25"}`,
-      opacity: badge ? 0.75 : 1,
-    }}>
-      <p style={{ margin: "0 0 8px", color: badge ? "rgba(255,255,255,0.45)" : color, fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>
-        {label}
-      </p>
-      <p style={{ margin: 0, color: "rgba(255,255,255,0.72)", fontSize: "0.85rem", lineHeight: 1.55 }}>
-        {desc}
-      </p>
-      {badge && (
-        <span style={{ display: "inline-block", marginTop: 10, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.55)", fontSize: "0.75rem", padding: "2px 8px", borderRadius: 6, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.06em" }}>
-          {badge}
-        </span>
-      )}
-    </div>
-  );
+interface Copy {
+  eye: string;
+  greet: (name: string) => string;
+  h1a: string;
+  h1b: string;
+  subNoLevel: string;
+  subLevel: (level: string) => string;
+  ctaTest: string;
+  ctaContinue: string;
+  hint: string;
+  statStreak: string;
+  statStreakSub: (n: number) => string;
+  statXp: string;
+  statXpSub: string;
+  statLevel: string;
+  statLevelSub: string;
+  statNext: string;
+  statNextSub: string;
+  exploreEye: string;
+  exploreH: string;
+  simTitle: string;
+  simDesc: string;
+  simCta: string;
+  discTitle: string;
+  discDesc: string;
+  discCta: string;
+  courseTitle: string;
+  courseDesc: string;
+  courseCta: string;
+  spineAria: string;
 }
 
-function ActionCard({ title, text, cta, href, accent }: {
-  title: string; text: string; cta: string; href: string; accent: string;
-}) {
-  const router = useRouter();
-  return (
-    <div
-      onClick={() => router.push(href)}
-      style={{
-        flex: 1, padding: "20px 18px", borderRadius: 18, cursor: "pointer",
-        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
-        display: "flex", flexDirection: "column", gap: 10,
-        transition: "border-color 0.15s",
-      }}
-      onMouseEnter={e => (e.currentTarget.style.borderColor = `${accent}33`)}
-      onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}
-    >
-      <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>
-        {title}
-      </p>
-      <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: "0.86rem", lineHeight: 1.55, flex: 1 }}>
-        {text}
-      </p>
-      <span style={{ color: accent, fontSize: "0.78rem", fontWeight: 600 }}>
-        {cta} →
-      </span>
-    </div>
-  );
-}
+const FR: Copy = {
+  eye: "Tableau de bord",
+  greet: (name) => `Bonjour, ${name}.`,
+  h1a: "Ta prochaine ",
+  h1b: "étape.",
+  subNoLevel:
+    "Commence par un test de niveau — dix minutes qui décident du chapitre à ouvrir.",
+  subLevel: (level) =>
+    `Tu es au niveau ${level}. Reprends là où tu t'es arrêté·e, même quelques minutes.`,
+  ctaTest: "Tester mon niveau",
+  ctaContinue: "Continuer ma leçon",
+  hint: "Cinq minutes par jour valent mieux qu'une heure une fois par semaine.",
+  statStreak: "Série",
+  statStreakSub: (n) => (n === 0 ? "Commence aujourd'hui" : n === 1 ? "1 jour d'affilée" : `${n} jours d'affilée`),
+  statXp: "XP cumulés",
+  statXpSub: "Progression totale",
+  statLevel: "Niveau",
+  statLevelSub: "CECRL A1 → C1",
+  statNext: "Prochain palier",
+  statNextSub: "Continuité",
+  exploreEye: "Explorer",
+  exploreH: "Trois portes ouvertes.",
+  simTitle: "Simulateur",
+  simDesc: "Une conversation avec Klaus, ton coach IA. Scénarios réels, correction en direct.",
+  simCta: "Ouvrir",
+  discTitle: "Découvrir",
+  discDesc: "Trouve d'autres apprenant·e·s, partage ton parcours, entraîne-toi ensemble.",
+  discCta: "Explorer",
+  courseTitle: "Cours",
+  courseDesc: "Le catalogue complet des leçons alignées CECRL, du A1 au C1. Rythme libre.",
+  courseCta: "Voir",
+  spineAria: "Ton parcours CECRL",
+};
 
-// ─── Main page ────────────────────────────────────────────────────────────────
+const EN: Copy = {
+  eye: "Dashboard",
+  greet: (name) => `Hello, ${name}.`,
+  h1a: "Your next ",
+  h1b: "step.",
+  subNoLevel:
+    "Start with a level test — ten minutes that decide which chapter to open.",
+  subLevel: (level) =>
+    `You're at level ${level}. Pick up where you left off, even for a few minutes.`,
+  ctaTest: "Take the level test",
+  ctaContinue: "Resume my lesson",
+  hint: "Five minutes a day beats one hour once a week.",
+  statStreak: "Streak",
+  statStreakSub: (n) => (n === 0 ? "Start today" : n === 1 ? "1 day" : `${n} days in a row`),
+  statXp: "XP earned",
+  statXpSub: "Total progress",
+  statLevel: "Level",
+  statLevelSub: "CEFR A1 → C1",
+  statNext: "Next step",
+  statNextSub: "Continuity",
+  exploreEye: "Explore",
+  exploreH: "Three open doors.",
+  simTitle: "Simulator",
+  simDesc: "A conversation with Klaus, your AI coach. Real scenarios, instant correction.",
+  simCta: "Open",
+  discTitle: "Discover",
+  discDesc: "Find fellow learners, share your journey, practice together.",
+  discCta: "Explore",
+  courseTitle: "Courses",
+  courseDesc: "The full CEFR-aligned catalog, from A1 to C1. Free pacing.",
+  courseCta: "Browse",
+  spineAria: "Your CEFR journey",
+};
+
+function nextLevel(current: Level | null): Level | "C2" {
+  if (!current) return "A1";
+  const idx = LEVELS.indexOf(current);
+  if (idx === -1 || idx === LEVELS.length - 1) return "C2";
+  return LEVELS[idx + 1];
+}
 
 export default function StudentDashboard() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const locale = pathname.startsWith("/en") ? "en" as const : "fr" as const;
-  const { dashboard: t, nav: tn } = useT();
-
-  const [userData, setUserData] = useState<{
-    fullName?: string; germanLevel?: string | null; xpTotal?: number; streakDays?: number;
-    city?: string | null; studentType?: string; isValidated?: boolean;
-  } | null>(null);
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const locale = useLocale();
+  const t = locale === "en" ? EN : FR;
+  const [data, setData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
+    fetch("/api/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d) {
+          setData({
+            fullName: d.fullName,
+            germanLevel: d.germanLevel,
+            xpTotal: d.xpTotal ?? 0,
+            streakDays: d.streakDays ?? 0,
+            isValidated: d.isValidated,
+            studentType: d.studentType,
+          });
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    fetch("/api/me").then(r => r.ok ? r.json() : null).then(d => {
-      if (d) setUserData(d);
-    }).catch(() => {});
+  const firstName = (data?.fullName ?? "").split(" ")[0] || (locale === "en" ? "you" : "toi");
+  const level = (data?.germanLevel as Level | undefined) ?? null;
+  const hasLevel = !!level && LEVELS.includes(level as Level);
+  const currentSpine = (hasLevel ? level : "A1") as Level;
 
-    fetch("/api/analytics?type=student")
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d?.success && d.data?.overview) setAnalytics(d.data.overview); })
-      .catch(() => {});
-  }, []);
-
-  const firstName = userData?.fullName?.split(" ")[0] ?? "";
-  const level = analytics?.level ?? userData?.germanLevel ?? null;
-  const xp = analytics?.xpTotal ?? userData?.xpTotal ?? 0;
-  const streak = analytics?.streakDays ?? userData?.streakDays ?? 0;
-
-  // Smart CTA logic
-  const hasLevel = !!level;
-  const hasLessons = analytics ? analytics.completedModules > 0 : false;
-  const nextStepTitle = !hasLevel ? t.nextStep1Title : !hasLessons ? t.nextStep2Title : t.nextStep3Title;
-  const nextStepText = !hasLevel ? t.nextStep1Text : !hasLessons ? t.nextStep2Text : t.nextStep3Text;
-  const nextStepCTA = !hasLevel ? t.nextStep1CTA : !hasLessons ? t.nextStep2CTA : t.nextStep3CTA;
-  const nextStepHref = !hasLevel ? "/test-niveau" : "/courses";
-
-  const pillars = [
-    { label: t.pillar1Label, desc: t.pillar1Desc, color: "#10b981", badge: null },
-    { label: t.pillar2Label, desc: t.pillar2Desc, color: "#6366f1", badge: null },
-    { label: t.pillar3Label, desc: t.pillar3Desc, color: "rgba(255,255,255,0.2)", badge: t.pillar3Badge },
-  ];
-
-  const headerTitle = firstName ? `${t.greetReturn} ${firstName}` : t.greetReturn;
+  const ctaHref = hasLevel ? "/courses" : "/test-niveau";
+  const ctaLabel = hasLevel ? t.ctaContinue : t.ctaTest;
 
   return (
-    <Layout title={tn.home}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-up { animation: fadeUp 0.4s ease forwards; }
-      `}</style>
+    <Layout title={t.eye}>
+      <section className="dash" aria-labelledby="dash-h1">
+        <header>
+          <p className="dash-eye">{t.greet(firstName)}</p>
+        </header>
 
-      {/* ── 1. Human welcome ── */}
-      <div className="fade-up" style={{ marginBottom: 24 }}>
-        <div style={{
-          padding: isMobile ? "22px 18px" : "28px 32px", borderRadius: 20,
-          background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
-        }}>
-          <h2 style={{ margin: "0 0 6px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: isMobile ? "1.5rem" : "1.8rem", lineHeight: 1.15 }}>
-            {headerTitle}
-          </h2>
-          <p style={{ margin: "0 0 10px", color: "rgba(255,255,255,0.75)", fontSize: "0.9rem", lineHeight: 1.6 }}>
-            {t.greetSubtitleReturn}
-          </p>
-          <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.65)", fontSize: "0.85rem", lineHeight: 1.55 }}>
-            {t.greetEmotional}
-          </p>
-          <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 8 }}>
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 6,
-              padding: "5px 12px", borderRadius: 20,
-              background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
+        <article className="dash-hero">
+          <div>
+            <h1 id="dash-h1" className="dash-hero-h">
+              {t.h1a}
+              <em>{t.h1b}</em>
+            </h1>
+            <p className="dash-hero-sub">
+              {hasLevel ? t.subLevel(level as string) : t.subNoLevel}
+            </p>
+            <Link href={ctaHref} className="dash-hero-cta">
+              {ctaLabel}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                   stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"
+                   strokeLinejoin="round" aria-hidden="true">
+                <path d="M3 8h10M9 4l4 4-4 4" />
+              </svg>
+            </Link>
+            <p style={{
+              marginTop: 18,
+              color: "var(--creme-mute)",
+              fontSize: 12.5,
+              fontFamily: "var(--font-jetbrains, monospace)",
+              letterSpacing: "0.04em",
             }}>
-              <span style={{ fontSize: "0.75rem" }}>✦</span>
-              <span style={{ color: "#34d399", fontSize: "0.78rem", fontWeight: 600 }}>{t.encouragementPill}</span>
-            </div>
-            {streak > 0 && (
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                padding: "5px 12px", borderRadius: 20,
-                background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)",
-              }}>
-                <span style={{ fontSize: "0.75rem" }}>🔥</span>
-                <span style={{ color: "#f59e0b", fontSize: "0.78rem" }}>{streak} {t.streakActive}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* ── 2. Next step card (dominant) ── */}
-      <div className="fade-up" style={{ marginBottom: 28 }}>
-        <div style={{
-          padding: isMobile ? "22px 18px" : "28px 32px", borderRadius: 20,
-          background: "linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(16,185,129,0.03) 100%)",
-          border: "1px solid rgba(16,185,129,0.22)",
-        }}>
-          <p style={{ margin: "0 0 8px", color: "rgba(255,255,255,0.65)", fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase" as const }}>
-            {t.nextStepCardTitle}
-          </p>
-          <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? 18 : 28, justifyContent: "space-between" }}>
-            <div style={{ flex: 1 }}>
-              <h3 style={{ margin: "0 0 8px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: isMobile ? "1.1rem" : "1.25rem" }}>
-                {nextStepTitle}
-              </h3>
-              <p style={{ margin: 0, color: "rgba(255,255,255,0.68)", fontSize: "0.85rem", lineHeight: 1.6 }}>
-                {nextStepText}
-              </p>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: isMobile ? "stretch" : "flex-end", gap: 10, flexShrink: 0, width: isMobile ? "100%" : "auto" }}>
-              <button
-                onClick={() => router.push(nextStepHref)}
-                style={{
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                  padding: "13px 24px", borderRadius: 14, cursor: "pointer",
-                  background: "linear-gradient(135deg, #10b981, #059669)",
-                  border: "none", color: "white",
-                  fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem",
-                  boxShadow: "0 4px 20px rgba(16,185,129,0.3)",
-                }}
-              >
-                {nextStepCTA} →
-              </button>
-              <a
-                href={`/${locale}/progress`}
-                style={{
-                  textAlign: "center", color: "rgba(255,255,255,0.60)", fontSize: "0.86rem",
-                  textDecoration: "none", fontFamily: "'DM Mono', monospace",
-                }}
-              >
-                {t.progressViewProgress}
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 3. Three Yema pillars ── */}
-      <div className="fade-up" style={{ marginBottom: 28 }}>
-        <div style={{ borderRadius: 20, overflow: "hidden", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-          <div style={{ padding: "18px 24px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-            <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
-              {t.journeyTitle}
+              {t.hint}
             </p>
           </div>
-          <div style={{ padding: "16px", display: "flex", flexDirection: isMobile ? "column" : "row", gap: 10 }}>
-            {pillars.map(p => (
-              <PillarCard key={p.label} label={p.label} desc={p.desc} color={p.color} badge={p.badge} />
-            ))}
+          <div className="dash-hero-side" aria-label={t.spineAria}>
+            <CefrSpine current={currentSpine} locale={locale === "en" ? "en" : "fr"} compact />
           </div>
-        </div>
-      </div>
+        </article>
 
-      {/* ── 4. Three action cards ── */}
-      <div className="fade-up" style={{ marginBottom: 28 }}>
-        <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", gap: 14 }}>
-          <ActionCard
-            title={t.actionLearnTitle}
-            text={t.actionLearnText}
-            cta={t.actionLearnCTA}
-            href="/courses"
-            accent="#10b981"
-          />
-          <ActionCard
-            title={t.actionPracticeTitle}
-            text={t.actionPracticeText}
-            cta={t.actionPracticeCTA}
-            href="/simulateur"
-            accent="#6366f1"
-          />
-          <ActionCard
-            title={t.actionSupportTitle}
-            text={t.actionSupportText}
-            cta={t.actionSupportCTA}
-            href="/classroom"
-            accent="#f59e0b"
-          />
-        </div>
-      </div>
-
-      {/* ── 5. Community coming soon (soft note) ── */}
-      <div className="fade-up" style={{ marginBottom: 8 }}>
-        <div style={{
-          padding: "20px 24px", borderRadius: 18,
-          background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)",
-          opacity: 0.75,
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-            <span style={{ fontSize: "1.2rem" }}>🌍</span>
-            <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.88rem" }}>
-              {t.communityTitle}
+        <section aria-label={t.exploreEye} className="dash-stats">
+          <div className="dash-stat">
+            <p className="dash-stat-lbl">
+              <span className="dash-stat-icon" aria-hidden="true"><IconFlame size={13} /></span>
+              {t.statStreak}
             </p>
+            <p className="dash-stat-val">{loading ? "—" : data?.streakDays ?? 0}</p>
+            <p className="dash-stat-sub">{t.statStreakSub(data?.streakDays ?? 0)}</p>
           </div>
-          <p style={{ margin: "0 0 10px", color: "rgba(255,255,255,0.60)", fontSize: "0.82rem", lineHeight: 1.55 }}>
-            {t.communityText}
-          </p>
-          <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.60)", fontSize: "0.78rem", padding: "3px 10px", borderRadius: 6, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.07em" }}>
-            {t.pillar3Badge}
-          </span>
-        </div>
-      </div>
+          <div className="dash-stat">
+            <p className="dash-stat-lbl">
+              <span className="dash-stat-icon" aria-hidden="true"><IconSpark size={13} /></span>
+              {t.statXp}
+            </p>
+            <p className="dash-stat-val">{loading ? "—" : (data?.xpTotal ?? 0).toLocaleString()}</p>
+            <p className="dash-stat-sub">{t.statXpSub}</p>
+          </div>
+          <div className="dash-stat">
+            <p className="dash-stat-lbl">
+              <span className="dash-stat-icon" aria-hidden="true"><IconCheck size={13} /></span>
+              {t.statLevel}
+            </p>
+            <p className="dash-stat-val">{hasLevel ? level : "—"}</p>
+            <p className="dash-stat-sub">{t.statLevelSub}</p>
+          </div>
+          <div className="dash-stat">
+            <p className="dash-stat-lbl">
+              <span className="dash-stat-icon" aria-hidden="true"><IconChart size={13} /></span>
+              {t.statNext}
+            </p>
+            <p className="dash-stat-val">{nextLevel(hasLevel ? (level as Level) : null)}</p>
+            <p className="dash-stat-sub">{t.statNextSub}</p>
+          </div>
+        </section>
 
+        <section aria-labelledby="dash-explore-h">
+          <p className="dash-eye">{t.exploreEye}</p>
+          <h2 id="dash-explore-h" className="dash-block-h">{t.exploreH}</h2>
+          <div className="dash-actions">
+            <Link href="/simulateur" className="dash-action">
+              <span className="dash-action-icon" aria-hidden="true"><IconMic size={18} /></span>
+              <h3 className="dash-action-title">{t.simTitle}</h3>
+              <p className="dash-action-desc">{t.simDesc}</p>
+              <p className="dash-action-cta">{t.simCta} →</p>
+            </Link>
+            <Link href="/discover" className="dash-action">
+              <span className="dash-action-icon" aria-hidden="true"><IconContext size={18} /></span>
+              <h3 className="dash-action-title">{t.discTitle}</h3>
+              <p className="dash-action-desc">{t.discDesc}</p>
+              <p className="dash-action-cta">{t.discCta} →</p>
+            </Link>
+            <Link href="/courses" className="dash-action">
+              <span className="dash-action-icon" aria-hidden="true"><IconBook size={18} /></span>
+              <h3 className="dash-action-title">{t.courseTitle}</h3>
+              <p className="dash-action-desc">{t.courseDesc}</p>
+              <p className="dash-action-cta">{t.courseCta} →</p>
+            </Link>
+          </div>
+        </section>
+      </section>
     </Layout>
   );
 }

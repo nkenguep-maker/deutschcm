@@ -809,18 +809,22 @@ const auth = {
 // ─── Layout (sidebar) ──────────────────────────────────────────────────────────
 const layout = {
   fr: {
-    searchPlaceholder: "Rechercher un cours, un scénario...", goethe: "CEFR · A1 → C1",
-    userFallback: "Utilisateur", studentBadge: "✅ Élève inscrit",
-    pendingBadge: "⏳ Validation en cours", groupLeader: "👥 Chef de groupe",
+    searchPlaceholder: "Rechercher un cours, un scénario...", goethe: "CECRL · A1 → C1",
+    userFallback: "Utilisateur", studentBadge: "Élève inscrit",
+    pendingBadge: "Validation en cours", groupLeader: "Chef de groupe",
     solo: "Solo", levelPrefix: "Niveau",
-    teacherRole: "👨‍🏫 Enseignant", centerRole: "⭐ Centre", adminRole: "🛡️ Admin",
+    studentRole: "Espace apprenant·e",
+    teacherRole: "Espace enseignant·e", centerRole: "Espace centre", adminRole: "Espace admin",
+    logout: "Se déconnecter",
   },
   en: {
     searchPlaceholder: "Search...", goethe: "CEFR · A1 → C1",
-    userFallback: "User", studentBadge: "✅ Enrolled learner",
-    pendingBadge: "⏳ Pending validation", groupLeader: "👥 Group leader",
+    userFallback: "User", studentBadge: "Enrolled learner",
+    pendingBadge: "Pending validation", groupLeader: "Group leader",
     solo: "Solo", levelPrefix: "Level",
-    teacherRole: "👨‍🏫 Teacher", centerRole: "⭐ Center", adminRole: "🛡️ Admin",
+    studentRole: "Learner space",
+    teacherRole: "Teacher space", centerRole: "Center space", adminRole: "Admin space",
+    logout: "Log out",
   },
 }
 

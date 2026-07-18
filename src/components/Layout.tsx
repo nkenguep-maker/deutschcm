@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactElement } from "react";
 import { Link } from "@/navigation";
 import { usePathname, useRouter } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -8,16 +8,27 @@ import NotificationBell from "@/components/NotificationBell";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { SpaceSwitcher, type SpaceRole } from "@/components/SpaceSwitcher";
 import { useT } from "@/hooks/useT";
-import BrandLogo from "@/components/BrandLogo";
+import {
+  IconHome,
+  IconBook,
+  IconClasse,
+  IconContext,
+  IconMic,
+  IconChart,
+  IconSettings,
+  IconGroup,
+  IconLogout,
+  IconTeacher,
+  IconInstitution,
+  IconSpark,
+  IconMoney,
+} from "@/components/landing/icons";
 
-const ACCENT_BY_ROLE: Record<string, string> = {
-  STUDENT: "#10b981",
-  TEACHER: "#6366f1",
-  CENTER: "#eab308",
-  ADMIN: "#ef4444",
-};
-
-// ─── Props ────────────────────────────────────────────────────────────────────
+interface NavItem {
+  Icon: (p: { size?: number }) => ReactElement;
+  label: string;
+  href: string;
+}
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -26,50 +37,51 @@ interface LayoutProps {
   onSearchChange?: (value: string) => void;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
-export default function Layout({ children, title, searchQuery = "", onSearchChange }: LayoutProps) {
+export default function Layout({ children, title }: LayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { nav: tn, layout: tl } = useT();
 
-  const STUDENT_NAV = [
-    { icon: "🏠", label: tn.home,           href: "/dashboard"  },
-    { icon: "📚", label: tn.courses,         href: "/courses"    },
-    { icon: "🏫", label: tn.myClasses,       href: "/classroom"  },
-    { icon: "🔍", label: tn.discover,        href: "/discover"   },
-    { icon: "🎙️", label: tn.simulator,      href: "/simulateur" },
-    { icon: "📊", label: tn.progress,        href: "/progress"   },
-    { icon: "⚙️", label: tn.settings,       href: "/settings"   },
+  const STUDENT_NAV: NavItem[] = [
+    { Icon: IconHome,     label: tn.home,       href: "/dashboard"  },
+    { Icon: IconBook,     label: tn.courses,    href: "/courses"    },
+    { Icon: IconClasse,   label: tn.myClasses,  href: "/classroom"  },
+    { Icon: IconContext,  label: tn.discover,   href: "/discover"   },
+    { Icon: IconMic,      label: tn.simulator,  href: "/simulateur" },
+    { Icon: IconChart,    label: tn.progress,   href: "/progress"   },
+    { Icon: IconSettings, label: tn.settings,   href: "/settings"   },
   ];
-  const TEACHER_NAV = [
-    { icon: "🏠", label: tn.overview,        href: "/teacher"                },
-    { icon: "🏫", label: tn.myClasses,        href: "/teacher/classrooms"    },
-    { icon: "👥", label: tn.students,         href: "/teacher/students"      },
-    { icon: "🔍", label: tn.discover,         href: "/discover"              },
-    { icon: "📝", label: tn.assignments,      href: "/teacher/assignments"   },
-    { icon: "✨", label: tn.generateCourse,   href: "/admin/courses/generate"},
-    { icon: "📊", label: tn.stats,            href: "/teacher/stats"         },
-    { icon: "⚙️", label: tn.settings,        href: "/settings"              },
+  const TEACHER_NAV: NavItem[] = [
+    { Icon: IconHome,       label: tn.overview,       href: "/teacher"                 },
+    { Icon: IconClasse,     label: tn.myClasses,      href: "/teacher/classrooms"      },
+    { Icon: IconGroup,      label: tn.students,       href: "/teacher/students"        },
+    { Icon: IconContext,    label: tn.discover,       href: "/discover"                },
+    { Icon: IconBook,       label: tn.assignments,    href: "/teacher/assignments"     },
+    { Icon: IconSpark,      label: tn.generateCourse, href: "/admin/courses/generate"  },
+    { Icon: IconChart,      label: tn.stats,          href: "/teacher/stats"           },
+    { Icon: IconSettings,   label: tn.settings,       href: "/settings"                },
   ];
-  const CENTER_NAV = [
-    { icon: "🏠", label: tn.overview,        href: "/center"                },
-    { icon: "👨‍🏫", label: tn.teachers,      href: "/center/teachers"       },
-    { icon: "👥", label: tn.students,         href: "/center/students"       },
-    { icon: "🏫", label: tn.myClasses,        href: "/center/classes"        },
-    { icon: "✨", label: tn.generateCourse,   href: "/admin/courses/generate"},
-    { icon: "📊", label: tn.stats,            href: "/center/stats"          },
-    { icon: "💳", label: tn.billing,          href: "/center/billing"        },
+  const CENTER_NAV: NavItem[] = [
+    { Icon: IconHome,        label: tn.overview,       href: "/center"                  },
+    { Icon: IconTeacher,     label: tn.teachers,       href: "/center/teachers"         },
+    { Icon: IconGroup,       label: tn.students,       href: "/center/students"         },
+    { Icon: IconClasse,      label: tn.myClasses,      href: "/center/classes"          },
+    { Icon: IconSpark,       label: tn.generateCourse, href: "/admin/courses/generate"  },
+    { Icon: IconChart,       label: tn.stats,          href: "/center/stats"            },
+    { Icon: IconMoney,       label: tn.billing,        href: "/center/billing"          },
   ];
-  const ADMIN_NAV = [
-    { icon: "🏠", label: tn.overview,          href: "/admin"                 },
-    { icon: "✨", label: tn.generateCourse,   href: "/admin/courses/generate"},
-    { icon: "👥", label: tn.users,            href: "/teacher/students"      },
-    { icon: "🏫", label: tn.centers,          href: "/center"               },
-    { icon: "📊", label: tn.stats,            href: "/center/stats"         },
+  const ADMIN_NAV: NavItem[] = [
+    { Icon: IconHome,        label: tn.overview,       href: "/admin"                   },
+    { Icon: IconSpark,       label: tn.generateCourse, href: "/admin/courses/generate"  },
+    { Icon: IconGroup,       label: tn.users,          href: "/teacher/students"        },
+    { Icon: IconInstitution, label: tn.centers,        href: "/center"                  },
+    { Icon: IconChart,       label: tn.stats,          href: "/center/stats"            },
   ];
-  const NAV_BY_ROLE: Record<string, typeof STUDENT_NAV> = {
-    STUDENT: STUDENT_NAV, TEACHER: TEACHER_NAV, CENTER: CENTER_NAV, ADMIN: ADMIN_NAV,
+  const NAV_BY_ROLE: Record<string, NavItem[]> = {
+    STUDENT: STUDENT_NAV,
+    TEACHER: TEACHER_NAV,
+    CENTER:  CENTER_NAV,
+    ADMIN:   ADMIN_NAV,
   };
 
   const [userName, setUserName] = useState(tl.userFallback);
@@ -77,18 +89,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
   const [userRole, setUserRole] = useState<string>("STUDENT");
   const [userRoles, setUserRoles] = useState<SpaceRole[]>([]);
   const [activeSpace, setActiveSpace] = useState<SpaceRole>("STUDENT");
-  const [userLevel, setUserLevel] = useState<string | null>(null);
-  const [studentType, setStudentType] = useState<string | null>(null);
-  const [isValidated, setIsValidated] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
 
   useEffect(() => {
     const supabase = createClient();
@@ -103,16 +104,11 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
       }
     });
     fetch("/api/me").then(r => r.ok ? r.json() : null).then(d => {
-      // No data or network error — don't redirect, just leave user where they are
       if (!d || typeof d.onboardingDone === "undefined") return;
       if (d.role) setUserRole(d.role);
       if (Array.isArray(d.roles)) setUserRoles(d.roles as SpaceRole[]);
       if (d.activeSpace) setActiveSpace(d.activeSpace as SpaceRole);
       if (d.fullName) setUserName(d.fullName);
-      if (d.germanLevel) setUserLevel(d.germanLevel);
-      if (d.studentType) setStudentType(d.studentType);
-      if (d.isValidated !== undefined) setIsValidated(d.isValidated);
-      // Onboarding redirect — skip on onboarding/test pages and on admin/teacher/center routes
       const skipOnboarding =
         pathname.startsWith("/onboarding") ||
         pathname.startsWith("/test-niveau") ||
@@ -122,7 +118,6 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
         pathname.startsWith("/discover") ||
         pathname.startsWith("/notifications");
       if (!skipOnboarding) {
-        // Already has a level → fully set up, never redirect back
         if (d.germanLevel) return;
         if (d.onboardingDone === false) {
           const dest = d.role === "TEACHER" ? "/onboarding/teacher"
@@ -136,7 +131,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
         }
       }
     }).catch(() => {});
-  }, [pathname, router]);
+  }, [pathname, router, tl.userFallback]);
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -144,273 +139,133 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
     router.push("/goodbye");
   };
 
-  const initials = userName.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
   const activeNav = NAV_BY_ROLE[userRole] ?? STUDENT_NAV;
-  const accentColor = ACCENT_BY_ROLE[userRole] ?? "#10b981";
+  const initials = userName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) || "Y";
+  const spaceLabel: Record<SpaceRole, string> = {
+    STUDENT: tl.studentRole ?? "Espace apprenant",
+    TEACHER: tl.teacherRole ?? "Espace enseignant",
+    CENTER:  tl.centerRole ?? "Espace centre",
+    ADMIN:   tl.adminRole ?? "Espace admin",
+  };
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
-        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
-        input::placeholder { color: rgba(255,255,255,0.25); }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(14px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideIn {
-          from { transform: translateX(-100%); }
-          to   { transform: translateX(0); }
-        }
-        .fade-up { animation: fadeUp 0.45s ease forwards; }
-        .card-delay-1 { animation-delay: 0.05s; opacity: 0; }
-        .card-delay-2 { animation-delay: 0.10s; opacity: 0; }
-        .card-delay-3 { animation-delay: 0.15s; opacity: 0; }
-        .card-delay-4 { animation-delay: 0.20s; opacity: 0; }
-        .card-delay-5 { animation-delay: 0.25s; opacity: 0; }
-        .nav-link:hover { background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.8) !important; }
-        .sidebar-drawer { animation: slideIn 0.25s ease forwards; }
-      `}</style>
+    <div className="app-shell">
+      <aside className={`app-sidebar ${sidebarOpen ? "open" : ""}`}>
+        <Link href="/dashboard" className="app-sidebar-brand">
+          <span
+            aria-hidden="true"
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: 10,
+              border: "1.5px solid var(--brass-edge)",
+              background: "var(--brass-glow)",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: "var(--font-fraunces), Georgia, serif",
+              fontSize: 18,
+              fontStyle: "italic",
+              color: "var(--brass)",
+              flexShrink: 0,
+            }}
+          >
+            Y
+          </span>
+          <span
+            style={{
+              fontFamily: "var(--font-fraunces), Georgia, serif",
+              fontStyle: "italic",
+              fontSize: 20,
+              color: "var(--creme)",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            Yema
+          </span>
+        </Link>
 
-      {/* Mobile overlay backdrop */}
-      {isMobile && sidebarOpen && (
-        <div
-          onClick={() => setSidebarOpen(false)}
-          style={{
-            position: "fixed", inset: 0, zIndex: 39,
-            background: "rgba(0,0,0,0.6)", backdropFilter: "blur(2px)",
-          }}
-        />
-      )}
-
-      <div style={{ display: "flex", minHeight: "100vh", background: "#080c10", fontFamily: "'DM Mono', monospace" }}>
-
-        {/* ════════════════ SIDEBAR ════════════════ */}
-        <aside
-          className={isMobile ? "sidebar-drawer" : ""}
-          style={{
-            position: "fixed", top: 0, left: 0, bottom: 0, width: 260, zIndex: 40,
-            display: isMobile && !sidebarOpen ? "none" : "flex",
-            flexDirection: "column",
-            background: "rgba(8,12,16,0.98)",
-            borderRight: "1px solid rgba(255,255,255,0.07)",
-            backdropFilter: "blur(24px)",
-          }}
-        >
-          {/* Ambient glow */}
-          <div style={{
-            position: "absolute", top: -40, left: -40, width: 200, height: 200,
-            borderRadius: "50%", opacity: 0.06,
-            background: `radial-gradient(circle, ${accentColor}, transparent)`,
-            filter: "blur(40px)", pointerEvents: "none",
-          }} />
-
-          {/* ── Logo ── */}
-          <div style={{ padding: "26px 20px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <Link href="/dashboard" style={{ textDecoration: "none" }}>
-              <BrandLogo variant="sidebar" subtitle={tl.goethe} />
-            </Link>
-            {isMobile && (
-              <button
-                onClick={() => setSidebarOpen(false)}
-                style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: "1.2rem", cursor: "pointer", padding: 4, lineHeight: 1 }}
-              >✕</button>
-            )}
-          </div>
-
-          {/* ── Divider ── */}
-          <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "0 16px 8px" }} />
-
-          {/* ── Nav items ── */}
-          <nav style={{ flex: 1, padding: "8px 10px", display: "flex", flexDirection: "column", gap: 2, overflow: "auto" }}>
-            {/* Role badge */}
-            {userRole !== "STUDENT" && (
-              <div style={{ margin: "0 4px 8px", padding: "6px 12px", borderRadius: 8, background: `${accentColor}10`, border: `1px solid ${accentColor}25`, textAlign: "center" }}>
-                <span style={{ color: accentColor, fontSize: 13, fontWeight: 700, letterSpacing: "0.06em" }}>
-                  {userRole === "TEACHER" ? tl.teacherRole : userRole === "CENTER" ? tl.centerRole : tl.adminRole}
-                </span>
-              </div>
-            )}
-            {activeNav.map(item => {
-              const exact = item.href === "/teacher" || item.href === "/center";
-              const active = exact ? pathname === item.href : (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href)));
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="nav-link"
-                  onClick={() => isMobile && setSidebarOpen(false)}
-                  style={{
-                    display: "flex", alignItems: "center", gap: 11,
-                    padding: "10px 13px", borderRadius: 11, textDecoration: "none",
-                    background: active ? `${accentColor}15` : "transparent",
-                    border: active ? `1px solid ${accentColor}30` : "1px solid transparent",
-                    color: active ? accentColor : "rgba(255,255,255,0.72)",
-                    fontFamily: active ? "'Syne', sans-serif" : "'DM Mono', monospace",
-                    fontWeight: active ? 600 : 400,
-                    fontSize: "0.82rem",
-                    transition: "all 0.15s ease",
-                  }}
-                >
-                  <span style={{ width: 22, textAlign: "center", flexShrink: 0, fontSize: "1rem" }}>{item.icon}</span>
-                  <span style={{ flex: 1 }}>{item.label}</span>
-                  {active && <span style={{ width: 6, height: 6, borderRadius: "50%", background: accentColor, flexShrink: 0 }} />}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* ── Divider ── */}
-          <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "8px 16px 0" }} />
-
-          {/* ── User ── */}
-          <div style={{ padding: "12px 14px 20px" }}>
-            <div style={{
-              display: "flex", alignItems: "center", gap: 10,
-              padding: "10px 12px", borderRadius: 12,
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.07)",
-            }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem",
-                color: "white",
-                background: "linear-gradient(135deg, rgba(16,185,129,0.25), rgba(5,150,105,0.1))",
-                border: "1px solid rgba(16,185,129,0.28)",
-              }}>
-                {initials}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {userName}
-                </p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {userLevel ? `${tl.levelPrefix} ${userLevel}` : userEmail || ""}
-                </p>
-              </div>
-            </div>
-            {/* Student type badge */}
-            {userRole === "STUDENT" && studentType && (() => {
-              if (studentType === "classroom" && isValidated)
-                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "4px 0", color: "#10b981", fontSize: "0.78rem", fontWeight: 700 }}>{tl.studentBadge}</div>;
-              if (studentType === "classroom" && !isValidated)
-                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, padding: "4px 0", color: "#f59e0b", fontSize: "0.78rem", fontWeight: 700 }}>{tl.pendingBadge}</div>;
-              if (studentType === "group_creator")
-                return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 8, padding: "4px 0", color: "#a5b4fc", fontSize: "0.78rem", fontWeight: 700 }}>{tl.groupLeader}</div>;
-              return <div style={{ marginTop: 8, textAlign: "center", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "4px 0", color: "rgba(255,255,255,0.65)", fontSize: "0.78rem", fontWeight: 700 }}>Solo</div>;
-            })()}
-            <button
-              onClick={handleLogout}
-              style={{
-                width: "100%", padding: "7px", borderRadius: 9, marginTop: 8,
-                border: "1px solid rgba(239,68,68,0.15)", background: "transparent",
-                color: "rgba(239,68,68,0.65)", fontFamily: "'DM Mono', monospace",
-                fontSize: "0.80rem", cursor: "pointer",
-              }}
-            >
-              {tn.logout}
-            </button>
-          </div>
-        </aside>
-
-        {/* ════════════════ RIGHT SIDE ════════════════ */}
-        <div style={{ marginLeft: isMobile ? 0 : 260, flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
-
-          {/* ── Header ── */}
-          <header style={{
-            position: "sticky", top: 0, zIndex: 30, height: 56,
-            display: "flex", alignItems: "center", gap: isMobile ? 10 : 20,
-            padding: isMobile ? "0 14px" : "0 28px",
-            background: "rgba(8,12,16,0.92)",
-            borderBottom: "1px solid rgba(255,255,255,0.06)",
-            backdropFilter: "blur(20px)",
-          }}>
-            {/* Hamburger (mobile only) */}
-            {isMobile && (
-              <button
-                onClick={() => setSidebarOpen(true)}
-                style={{
-                  flexShrink: 0, background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
-                  color: "white", fontSize: "1rem", cursor: "pointer",
-                  width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center",
-                }}
-              >☰</button>
-            )}
-
-            {/* Page title */}
-            <h1 style={{
-              margin: 0, color: "white", fontFamily: "'Syne', sans-serif",
-              fontWeight: 700, fontSize: isMobile ? "0.9rem" : "1.05rem",
-              flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-              maxWidth: isMobile ? 140 : "none",
-            }}>
-              {title}
-            </h1>
-
-            {/* Search — hidden on mobile when no handler provided */}
-            {(!isMobile || onSearchChange) && (
-              <div style={{
-                flex: 1, maxWidth: isMobile ? "none" : 500,
-                display: "flex", alignItems: "center", gap: 8,
-                padding: isMobile ? "6px 10px" : "8px 14px", borderRadius: 10,
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.08)",
-              }}>
-                <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.82rem", flexShrink: 0 }}>🔍</span>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={e => onSearchChange?.(e.target.value)}
-                  placeholder={tl.searchPlaceholder}
-                  style={{
-                    flex: 1, background: "transparent", border: "none", outline: "none",
-                    color: "white", fontSize: "1rem", fontFamily: "'DM Mono', monospace",
-                    minWidth: 0,
-                  }}
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => onSearchChange?.("")}
-                    style={{ color: "rgba(255,255,255,0.60)", background: "none", border: "none", cursor: "pointer", fontSize: "0.82rem", flexShrink: 0 }}
-                  >✕</button>
-                )}
-              </div>
-            )}
-
-            {/* Right actions */}
-            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-              <SpaceSwitcher roles={userRoles} activeSpace={activeSpace} />
-              <LanguageSwitcher />
-              <NotificationBell accentColor={accentColor} />
-
-              {/* Avatar */}
-              <div style={{
-                width: 34, height: 34, borderRadius: 10, flexShrink: 0,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem",
-                color: "white", cursor: "pointer",
-                background: "linear-gradient(135deg, rgba(16,185,129,0.22), rgba(5,150,105,0.1))",
-                border: "1px solid rgba(16,185,129,0.3)",
-              }}>
-                {initials}
-              </div>
-            </div>
-          </header>
-
-          {/* ── Main content ── */}
-          <main style={{ flex: 1, padding: isMobile ? "16px 14px 32px" : "32px 28px 48px" }}>
-            <div style={{ maxWidth: 1400, margin: "0 auto" }}>
-              {children}
-            </div>
-          </main>
+        <div className="app-sidebar-space">
+          <p className="app-sidebar-space-lbl">{spaceLabel[activeSpace]}</p>
+          <svg
+            className="app-sidebar-space-check"
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 7l3 3 5-6" />
+          </svg>
         </div>
+
+        <nav className="app-nav" aria-label="Navigation principale">
+          {activeNav.map((item) => {
+            const exact = item.href === "/teacher" || item.href === "/center" || item.href === "/dashboard" || item.href === "/admin";
+            const active = exact ? pathname === item.href : (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href)));
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`app-nav-link ${active ? "active" : ""}`}
+                onClick={() => setSidebarOpen(false)}
+                aria-current={active ? "page" : undefined}
+              >
+                <span className="app-nav-icon" aria-hidden="true"><item.Icon size={18} /></span>
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="app-sidebar-user">
+          <div className="app-sidebar-avatar" aria-hidden="true">{initials}</div>
+          <div className="app-sidebar-user-info">
+            <p className="app-sidebar-user-name">{userName}</p>
+            <p className="app-sidebar-user-mail">{userEmail}</p>
+          </div>
+          <button
+            type="button"
+            className="app-sidebar-logout"
+            onClick={handleLogout}
+            aria-label={tl.logout ?? "Se déconnecter"}
+          >
+            <IconLogout size={16} />
+          </button>
+        </div>
+      </aside>
+
+      <div
+        className={`app-scrim ${sidebarOpen ? "open" : ""}`}
+        onClick={() => setSidebarOpen(false)}
+        aria-hidden="true"
+      />
+
+      <div className="app-main">
+        <header className="app-header">
+          <button
+            type="button"
+            className="app-hamburger"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Ouvrir le menu"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+              <path d="M3 5h12M3 9h12M3 13h12" />
+            </svg>
+          </button>
+          <h1 className="app-header-title">{title}</h1>
+          <div className="app-header-actions">
+            <SpaceSwitcher roles={userRoles} activeSpace={activeSpace} />
+            <LanguageSwitcher />
+            <NotificationBell accentColor="var(--brass)" />
+          </div>
+        </header>
+        <main className="app-content">{children}</main>
       </div>
-    </>
+    </div>
   );
 }

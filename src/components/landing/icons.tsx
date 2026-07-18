@@ -230,3 +230,112 @@ export function IconPlay({ size = 16, className, strokeWidth = 1.5 }: IconProps)
     </svg>
   );
 }
+
+/* ── Nav (app-shell) ─────────────────────────────────────────── */
+
+export function IconHome({ size = 20, className, strokeWidth }: IconProps) {
+  return (
+    <svg {...base(size, strokeWidth)} className={className}>
+      <path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-8.5Z" />
+    </svg>
+  );
+}
+
+export function IconBook({ size = 20, className, strokeWidth }: IconProps) {
+  return (
+    <svg {...base(size, strokeWidth)} className={className}>
+      <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5Z" />
+      <path d="M4 19a2 2 0 0 1 2-2h13" />
+    </svg>
+  );
+}
+
+export function IconCalendar({ size = 20, className, strokeWidth }: IconProps) {
+  return (
+    <svg {...base(size, strokeWidth)} className={className}>
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path d="M3 10h18M8 3v4M16 3v4" />
+    </svg>
+  );
+}
+
+export function IconChart({ size = 20, className, strokeWidth }: IconProps) {
+  return (
+    <svg {...base(size, strokeWidth)} className={className}>
+      <path d="M4 20V10M10 20V4M16 20v-8M22 20H2" />
+    </svg>
+  );
+}
+
+export function IconGroup({ size = 20, className, strokeWidth }: IconProps) {
+  return (
+    <svg {...base(size, strokeWidth)} className={className}>
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" />
+      <path d="M17 8.5a3 3 0 1 0 0-5.9" />
+      <path d="M17 14c2.8 0 5 2.2 5 5" />
+    </svg>
+  );
+}
+
+export function IconSettings({ size = 20, className, strokeWidth }: IconProps) {
+  return (
+    <svg {...base(size, strokeWidth)} className={className}>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.02a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.02a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+    </svg>
+  );
+}
+
+export function IconBell({ size = 20, className, strokeWidth }: IconProps) {
+  return (
+    <svg {...base(size, strokeWidth)} className={className}>
+      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+      <path d="M10.3 21a2 2 0 0 0 3.4 0" />
+    </svg>
+  );
+}
+
+export function IconLogout({ size = 20, className, strokeWidth }: IconProps) {
+  return (
+    <svg {...base(size, strokeWidth)} className={className}>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="M16 17l5-5-5-5M21 12H9" />
+    </svg>
+  );
+}
+
+export function IconFlame({ size = 18, className, strokeWidth }: IconProps) {
+  return (
+    <svg {...base(size, strokeWidth)} className={className}>
+      <path d="M8.5 14.5c0-3 3.5-3.5 3.5-6.5 0 0 6 2.5 6 8.5a6 6 0 0 1-12 0c0-1 .5-2 1.5-3l1 1Z" />
+    </svg>
+  );
+}
+
+export function IconSpark({ size = 18, className, strokeWidth }: IconProps) {
+  return (
+    <svg {...base(size, strokeWidth)} className={className}>
+      <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" />
+    </svg>
+  );
+}
+
+export function IconMoney({ size = 20, className, strokeWidth }: IconProps) {
+  return (
+    <svg {...base(size, strokeWidth)} className={className}>
+      <rect x="3" y="6" width="18" height="12" rx="2" />
+      <circle cx="12" cy="12" r="2.5" />
+      <path d="M6 10v.01M18 14v.01" />
+    </svg>
+  );
+}
+
+export function IconMic({ size = 20, className, strokeWidth }: IconProps) {
+  return (
+    <svg {...base(size, strokeWidth)} className={className}>
+      <rect x="9" y="3" width="6" height="12" rx="3" />
+      <path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6" />
+    </svg>
+  );
+}

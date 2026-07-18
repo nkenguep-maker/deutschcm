@@ -1,61 +1,72 @@
 "use client";
 
+import { useEffect, useState, type ReactElement } from "react";
 import { Link } from "@/navigation";
 import { usePathname, useRouter } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { useState, useEffect } from "react";
-import { useT } from "@/hooks/useT";
-import BrandLogo from "@/components/BrandLogo";
+import NotificationBell from "@/components/NotificationBell";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { SpaceSwitcher, type SpaceRole } from "@/components/SpaceSwitcher";
+import { useT } from "@/hooks/useT";
+import {
+  IconHome,
+  IconTeacher,
+  IconGroup,
+  IconClasse,
+  IconSpark,
+  IconChart,
+  IconMoney,
+  IconLogout,
+} from "@/components/landing/icons";
 
-interface CenterLayoutProps {
+interface Item {
+  Icon: (p: { size?: number }) => ReactElement;
+  label: string;
+  href: string;
+}
+
+interface Props {
   children: React.ReactNode;
   title: string;
   centerName?: string;
   centerCity?: string;
 }
 
-export default function CenterLayout({ children, title, centerName = "Centre de langues", centerCity = "Yaoundé" }: CenterLayoutProps) {
+export default function CenterLayout({ children, title, centerName, centerCity }: Props) {
   const pathname = usePathname();
   const router = useRouter();
-  const { nav: tNav, center: tC } = useT();
+  const { nav: tNav } = useT();
+
+  const NAV: Item[] = [
+    { Icon: IconHome,        label: tNav.overview,       href: "/center"                   },
+    { Icon: IconTeacher,     label: tNav.teachers,       href: "/center/teachers"          },
+    { Icon: IconGroup,       label: tNav.students,       href: "/center/students"          },
+    { Icon: IconClasse,      label: tNav.myClasses,      href: "/center/classes"           },
+    { Icon: IconSpark,       label: tNav.generateCourse, href: "/admin/courses/generate"   },
+    { Icon: IconChart,       label: tNav.stats,          href: "/center/stats"             },
+    { Icon: IconMoney,       label: tNav.billing,        href: "/center/billing"           },
+  ];
+
   const [userName, setUserName] = useState("Directeur");
+  const [userEmail, setUserEmail] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userRoles, setUserRoles] = useState<SpaceRole[]>([]);
   const [activeSpace, setActiveSpace] = useState<SpaceRole>("CENTER");
 
   useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) return;
+      setUserEmail(data.user.email ?? "");
+      setUserName(data.user.user_metadata?.full_name ?? data.user.email?.split("@")[0] ?? userName);
+    });
     fetch("/api/me").then(r => r.ok ? r.json() : null).then(d => {
       if (!d) return;
+      if (d.fullName) setUserName(d.fullName);
       if (Array.isArray(d.roles)) setUserRoles(d.roles as SpaceRole[]);
       if (d.activeSpace) setActiveSpace(d.activeSpace as SpaceRole);
     }).catch(() => {});
-  }, []);
-
-  const CENTER_NAV = [
-    { icon: "🏛️", label: tNav.overview,       href: "/center"                   },
-    { icon: "👨‍🏫", label: tNav.teachers,      href: "/center/teachers"          },
-    { icon: "🏫", label: "Classes",             href: "/center/classes"           },
-    { icon: "👥", label: tNav.students,         href: "/center/students"          },
-    { icon: "✨", label: tNav.generateCourse,   href: "/admin/courses/generate"   },
-    { icon: "💳", label: tNav.billing,          href: "/center/billing"           },
-    { icon: "📊", label: tNav.stats,            href: "/center/stats"             },
-    { icon: "⚙️", label: tNav.settings,        href: "/center/settings"          },
-  ];
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) return;
-      const name = data.user.user_metadata?.full_name ?? data.user.email?.split("@")[0] ?? "Directeur";
-      setUserName(name);
-      if (!data.user.user_metadata?.role || data.user.user_metadata.role === "STUDENT") {
-        await fetch("/api/fix-role", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ role: "CENTER" }),
-        });
-      }
-    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLogout = async () => {
@@ -64,176 +75,85 @@ export default function CenterLayout({ children, title, centerName = "Centre de 
     router.push("/goodbye");
   };
 
-  const initials = userName.slice(0, 2).toUpperCase();
+  const initials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "C";
+  const spaceLbl = centerName
+    ? centerCity ? `${centerName} · ${centerCity}` : centerName
+    : "Espace centre";
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
-        *, *::before, *::after { box-sizing: border-box; }
-        body { margin: 0; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
-        .cnav-link:hover { background: rgba(234,179,8,0.08) !important; color: rgba(234,179,8,0.8) !important; }
-      `}</style>
+    <div className="app-shell">
+      <aside className={`app-sidebar ${sidebarOpen ? "open" : ""}`}>
+        <Link href="/center" className="app-sidebar-brand">
+          <span aria-hidden="true" style={{
+            width: 34, height: 34, borderRadius: 10,
+            border: "1.5px solid var(--brass-edge)",
+            background: "var(--brass-glow)",
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: 18, fontStyle: "italic",
+            color: "var(--brass)", flexShrink: 0,
+          }}>Y</span>
+          <span style={{
+            fontFamily: "var(--font-fraunces), Georgia, serif", fontStyle: "italic",
+            fontSize: 20, color: "var(--creme)", letterSpacing: "-0.01em",
+          }}>Yema</span>
+        </Link>
 
-      <div style={{ display: "flex", minHeight: "100vh", background: "#080c10", fontFamily: "'DM Mono', monospace" }}>
-
-        {/* ════ SIDEBAR ════ */}
-        <aside style={{
-          position: "fixed", top: 0, left: 0, bottom: 0, width: 260, zIndex: 40,
-          display: "flex", flexDirection: "column",
-          background: "rgba(8,12,16,0.97)",
-          borderRight: "1px solid rgba(234,179,8,0.12)",
-        }}>
-          {/* Gold ambient glow */}
-          <div style={{
-            position: "absolute", top: -40, left: -40, width: 200, height: 200,
-            borderRadius: "50%", opacity: 0.05,
-            background: "radial-gradient(circle, #eab308, transparent)",
-            filter: "blur(40px)", pointerEvents: "none",
-          }} />
-
-          {/* ── Logo + centre name ── */}
-          <div style={{ padding: "24px 20px 16px" }}>
-            <Link href="/center" style={{ textDecoration: "none", display: "block", marginBottom: 14 }}>
-              <BrandLogo variant="sidebar" subtitle={tC.portal} />
-            </Link>
-
-            {/* Centre card */}
-            <div style={{
-              background: "rgba(234,179,8,0.06)", border: "1px solid rgba(234,179,8,0.18)",
-              borderRadius: 10, padding: "10px 12px",
-            }}>
-              <div style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 13, fontFamily: "'Syne', sans-serif", marginBottom: 2 }}>
-                {centerName}
-              </div>
-              <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>📍 {centerCity}</div>
-              {/* Gold badge */}
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: 4, marginTop: 8,
-                background: "linear-gradient(135deg, rgba(234,179,8,0.2), rgba(161,120,0,0.1))",
-                border: "1px solid rgba(234,179,8,0.35)", borderRadius: 20,
-                padding: "3px 10px", fontSize: 10, color: "#eab308", fontWeight: 700,
-              }}>
-                {tC.partnerBadge}
-              </div>
-            </div>
-          </div>
-
-          <div style={{ height: 1, background: "rgba(234,179,8,0.1)", margin: "0 16px 8px" }} />
-
-          {/* ── Nav ── */}
-          <nav style={{ flex: 1, padding: "6px 10px", display: "flex", flexDirection: "column", gap: 2, overflow: "auto" }}>
-            {CENTER_NAV.map(item => {
-              const active = item.href === "/center"
-                ? pathname === "/center"
-                : pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={`${item.href}-${item.label}`}
-                  href={item.href}
-                  className="cnav-link"
-                  style={{
-                    display: "flex", alignItems: "center", gap: 11,
-                    padding: "10px 13px", borderRadius: 11, textDecoration: "none",
-                    background: active ? "rgba(234,179,8,0.1)" : "transparent",
-                    border: active ? "1px solid rgba(234,179,8,0.25)" : "1px solid transparent",
-                    color: active ? "#eab308" : "rgba(255,255,255,0.4)",
-                    fontFamily: active ? "'Syne', sans-serif" : "'DM Mono', monospace",
-                    fontWeight: active ? 600 : 400,
-                    fontSize: "0.82rem",
-                    transition: "all 0.15s ease",
-                  }}
-                >
-                  <span style={{ width: 22, textAlign: "center", flexShrink: 0, fontSize: "1rem" }}>{item.icon}</span>
-                  <span style={{ flex: 1 }}>{item.label}</span>
-                  {active && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#eab308", flexShrink: 0 }} />}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div style={{ height: 1, background: "rgba(234,179,8,0.08)", margin: "8px 16px 0" }} />
-
-          {/* ── User ── */}
-          <div style={{ padding: "12px 14px 20px" }}>
-            <Link href="/dashboard" style={{
-              display: "flex", alignItems: "center", gap: 10,
-              padding: "10px 12px", borderRadius: 12, textDecoration: "none",
-              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
-              marginBottom: 8,
-            }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "#080c10",
-                background: "linear-gradient(135deg, #eab308, #ca8a04)",
-              }}>
-                {initials}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {userName}
-                </p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.3)", fontSize: "0.6rem" }}>{tC.directorRole}</p>
-              </div>
-            </Link>
-            <button
-              onClick={handleLogout}
-              style={{
-                width: "100%", padding: "7px", borderRadius: 9,
-                border: "1px solid rgba(239,68,68,0.15)", background: "transparent",
-                color: "rgba(239,68,68,0.5)", fontFamily: "'DM Mono', monospace",
-                fontSize: "0.68rem", cursor: "pointer",
-              }}
-            >
-              {tNav.logout}
-            </button>
-          </div>
-        </aside>
-
-        {/* ════ MAIN ════ */}
-        <div style={{ marginLeft: 260, flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
-          {/* Header */}
-          <header style={{
-            position: "sticky", top: 0, zIndex: 30, height: 64,
-            display: "flex", alignItems: "center", gap: 20, padding: "0 32px",
-            background: "rgba(8,12,16,0.94)", backdropFilter: "blur(20px)",
-            borderBottom: "1px solid rgba(234,179,8,0.1)",
-          }}>
-            <h1 style={{
-              margin: 0, color: "white", fontFamily: "'Syne', sans-serif",
-              fontWeight: 700, fontSize: "1.05rem",
-            }}>
-              {title}
-            </h1>
-            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
-              <SpaceSwitcher roles={userRoles} activeSpace={activeSpace} />
-              <Link href="/dashboard" style={{
-                background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
-                color: "rgba(255,255,255,0.5)", borderRadius: 8, padding: "6px 14px",
-                fontSize: 12, textDecoration: "none",
-              }}>
-                {tC.studentPortal}
-              </Link>
-              <div style={{
-                width: 36, height: 36, borderRadius: 10,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem",
-                color: "#080c10", background: "linear-gradient(135deg, #eab308, #ca8a04)",
-                border: "1px solid rgba(234,179,8,0.4)",
-              }}>
-                {initials}
-              </div>
-            </div>
-          </header>
-
-          <main style={{ flex: 1, padding: "32px", overflowX: "hidden" }}>
-            {children}
-          </main>
+        <div className="app-sidebar-space">
+          <p className="app-sidebar-space-lbl" title={spaceLbl}>{spaceLbl}</p>
+          <svg className="app-sidebar-space-check" width="14" height="14" viewBox="0 0 14 14"
+               fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"
+               aria-hidden="true"><path d="M3 7l3 3 5-6" /></svg>
         </div>
+
+        <nav className="app-nav" aria-label="Navigation centre">
+          {NAV.map(item => {
+            const exact = item.href === "/center";
+            const active = exact ? pathname === item.href : (pathname === item.href || pathname.startsWith(item.href + "/"));
+            return (
+              <Link key={item.href} href={item.href}
+                    className={`app-nav-link ${active ? "active" : ""}`}
+                    onClick={() => setSidebarOpen(false)}
+                    aria-current={active ? "page" : undefined}>
+                <span className="app-nav-icon" aria-hidden="true"><item.Icon size={18} /></span>
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="app-sidebar-user">
+          <div className="app-sidebar-avatar" aria-hidden="true">{initials}</div>
+          <div className="app-sidebar-user-info">
+            <p className="app-sidebar-user-name">{userName}</p>
+            <p className="app-sidebar-user-mail">{userEmail}</p>
+          </div>
+          <button type="button" className="app-sidebar-logout" onClick={handleLogout} aria-label="Se déconnecter">
+            <IconLogout size={16} />
+          </button>
+        </div>
+      </aside>
+
+      <div className={`app-scrim ${sidebarOpen ? "open" : ""}`}
+           onClick={() => setSidebarOpen(false)} aria-hidden="true" />
+
+      <div className="app-main">
+        <header className="app-header">
+          <button type="button" className="app-hamburger"
+                  onClick={() => setSidebarOpen(true)} aria-label="Ouvrir le menu">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+                 stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+              <path d="M3 5h12M3 9h12M3 13h12" />
+            </svg>
+          </button>
+          <h1 className="app-header-title">{title}</h1>
+          <div className="app-header-actions">
+            <SpaceSwitcher roles={userRoles} activeSpace={activeSpace} />
+            <LanguageSwitcher />
+            <NotificationBell accentColor="var(--brass)" />
+          </div>
+        </header>
+        <main className="app-content">{children}</main>
       </div>
-    </>
+    </div>
   );
 }
