@@ -3,23 +3,29 @@
 import { useState } from "react";
 import { useRouter } from "@/navigation";
 import { Link } from "@/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import BrandLogo from "@/components/BrandLogo";
+import { createClient } from "@/lib/supabase/client";
+import { CefrStrip } from "@/components/landing/CefrStrip";
+import {
+  IconClasse,
+  IconInstitution,
+  IconTeacher,
+} from "@/components/landing/icons";
+import { LandingBrand } from "@/components/landing/LandingBrand";
 
 type Role = "STUDENT" | "TEACHER" | "CENTER_MANAGER";
-
-const ROLES: { key: Role; emoji: string; color: string }[] = [
-  { key: "STUDENT",        emoji: "🎓", color: "#10b981" },
-  { key: "TEACHER",        emoji: "👨‍🏫", color: "#6366f1" },
-  { key: "CENTER_MANAGER", emoji: "🏫", color: "#eab308" },
-];
 
 const ONBOARDING_DEST: Record<Role, string> = {
   STUDENT: "/onboarding/student",
   TEACHER: "/onboarding/teacher",
   CENTER_MANAGER: "/onboarding/center",
+};
+
+const ROLE_ICONS: Record<Role, React.ComponentType<{ size?: number }>> = {
+  STUDENT: IconClasse,
+  TEACHER: IconTeacher,
+  CENTER_MANAGER: IconInstitution,
 };
 
 export default function RegisterPage() {
@@ -28,6 +34,7 @@ export default function RegisterPage() {
   const next = searchParams.get("next");
   const t = useTranslations("auth");
   const tc = useTranslations("common");
+  const locale = useLocale();
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -39,7 +46,22 @@ export default function RegisterPage() {
   const [ageConsent, setAgeConsent] = useState(false);
 
   const getRoleLabel = (key: Role) =>
-    t(key === "STUDENT" ? "roleStudent" : key === "TEACHER" ? "roleTeacher" : "roleCenter");
+    t(
+      key === "STUDENT"
+        ? "roleStudent"
+        : key === "TEACHER"
+          ? "roleTeacher"
+          : "roleCenter",
+    );
+
+  const getRoleDesc = (key: Role) =>
+    t(
+      key === "STUDENT"
+        ? "roleStudentDesc"
+        : key === "TEACHER"
+          ? "roleTeacherDesc"
+          : "roleCenterDesc",
+    );
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
@@ -93,303 +115,228 @@ export default function RegisterPage() {
     setLoading(false);
   }
 
-  const activeRole = selectedRole ? ROLES.find(r => r.key === selectedRole) : null;
+  const roles: readonly Role[] = ["STUDENT", "TEACHER", "CENTER_MANAGER"];
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
-        * { -webkit-tap-highlight-color: transparent; }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateY(12px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .fade-up { animation: fadeUp 0.5s ease forwards; }
-        .slide-in { animation: slideIn 0.35s ease forwards; }
-        input:-webkit-autofill {
-          -webkit-box-shadow: 0 0 0 1000px #0d1a12 inset !important;
-          -webkit-text-fill-color: white !important;
-        }
-      `}</style>
+    <div className="lauth landing">
+      <header className="lauth-header">
+        <Link href="/" className="lnav-brand">
+          <LandingBrand />
+        </Link>
+        <Link href="/login" className="lauth-alt-link">
+          {t("signIn")}
+        </Link>
+      </header>
 
-      <div
-        className="relative min-h-screen w-full flex items-center justify-center px-5 py-10"
-        style={{ background: "#080c10", fontFamily: "'DM Mono', monospace" }}
-      >
-        <div className="fixed inset-0 pointer-events-none">
-          <div
-            className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full opacity-10"
-            style={{ background: "radial-gradient(circle, #10b981, transparent)", filter: "blur(80px)" }}
-          />
-          <div
-            className="absolute bottom-0 left-0 w-64 h-64 rounded-full opacity-8"
-            style={{ background: "radial-gradient(circle, #059669, transparent)", filter: "blur(60px)" }}
-          />
-        </div>
-
-        <div className="relative z-10 w-full fade-up" style={{ maxWidth: 420 }}>
-          <div className="flex justify-center mb-8">
-            <BrandLogo tagline={t("tagline")} />
-          </div>
-
-          <div
-            className="rounded-3xl p-6"
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              backdropFilter: "blur(20px)",
-              boxShadow: "0 8px 40px rgba(0,0,0,0.4)",
-            }}
-          >
-            {success ? (
-              <div className="text-center py-4">
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-4"
-                  style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)" }}
+      <main className="lauth-body">
+        <div className="lauth-card">
+          {success ? (
+            <div className="lauth-success">
+              <div className="lauth-success-icon" aria-hidden="true">
+                <svg
+                  width="26"
+                  height="26"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  ✉️
-                </div>
-                <h2
-                  className="text-lg font-bold mb-2"
-                  style={{ color: "white", fontFamily: "'Syne', sans-serif" }}
-                >
-                  {t("confirmTitle")}
-                </h2>
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.72)" }}>
-                  {t("confirmSent")}{" "}
-                  <span style={{ color: "#10b981" }}>{email}</span>.
-                  <br /><br />
-                  {t("confirmClick")}{" "}
-                  <span style={{ color: "#10b981" }}>
-                    {activeRole ? getRoleLabel(activeRole.key) : ""}
-                  </span>.
-                </p>
-                <Link
-                  href="/login"
-                  className="inline-block mt-6 px-6 py-3 rounded-xl text-xs font-bold transition-all active:scale-95"
-                  style={{
-                    background: "linear-gradient(135deg, #10b981, #059669)",
-                    color: "white",
-                    fontFamily: "'Syne', sans-serif",
-                    textDecoration: "none",
-                    boxShadow: "0 4px 20px rgba(16,185,129,0.3)",
-                  }}
-                >
-                  {t("backToLogin")}
-                </Link>
+                  <path d="M3 7l9 6 9-6" />
+                  <rect x="3" y="6" width="18" height="13" rx="2" />
+                </svg>
               </div>
+              <h2 className="h">{t("confirmTitle")}</h2>
+              <p>
+                {t("confirmSent")} <b>{email}</b>.
+              </p>
+              <p>
+                {t("confirmClick")}{" "}
+                <b>
+                  {selectedRole ? getRoleLabel(selectedRole) : ""}
+                </b>
+                .
+              </p>
+              <Link
+                href="/login"
+                className="lauth-submit"
+                style={{ display: "inline-block", marginTop: 22, textDecoration: "none" }}
+              >
+                {t("backToLogin")}
+              </Link>
+            </div>
+          ) : selectedRole === null ? (
+            <>
+              <div className="lauth-eye">{t("createAccount")}</div>
+              <h1 className="lauth-h">
+                {locale === "en" ? "Choose your " : "Choisis ton "}
+                <em>{locale === "en" ? "role." : "rôle."}</em>
+              </h1>
+              <p className="lauth-sub">{t("chooseRoleHint")}</p>
 
-            ) : selectedRole === null ? (
-              <div className="slide-in">
-                <h2
-                  className="text-lg font-bold mb-1"
-                  style={{ color: "white", fontFamily: "'Syne', sans-serif" }}
-                >
-                  {t("createAccount")}
-                </h2>
-                <p className="text-xs mb-6" style={{ color: "rgba(255,255,255,0.60)" }}>
-                  {t("chooseRoleHint")}
-                </p>
-
-                <div className="flex flex-col gap-3">
-                  {ROLES.map(({ key, emoji, color }) => (
+              <div className="lauth-roles">
+                {roles.map((role) => {
+                  const Icon = ROLE_ICONS[role];
+                  return (
                     <button
-                      key={key}
+                      key={role}
                       type="button"
-                      onClick={() => setSelectedRole(key)}
-                      className="flex items-center gap-4 px-5 py-4 rounded-2xl text-left transition-all active:scale-[0.98]"
-                      style={{
-                        background: `${color}08`,
-                        border: `1px solid ${color}25`,
-                        cursor: "pointer",
-                      }}
-                      onMouseEnter={e => (e.currentTarget.style.background = `${color}15`)}
-                      onMouseLeave={e => (e.currentTarget.style.background = `${color}08`)}
+                      className="lauth-role"
+                      onClick={() => setSelectedRole(role)}
                     >
-                      <div
-                        className="text-2xl flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
-                        style={{ background: `${color}15`, border: `1px solid ${color}30` }}
-                      >
-                        {emoji}
-                      </div>
-                      <div className="flex-1">
-                        <div
-                          className="text-sm font-bold mb-0.5"
-                          style={{ color: "rgba(255,255,255,0.9)", fontFamily: "'Syne', sans-serif" }}
+                      <span className="lauth-role-icon" aria-hidden="true">
+                        <Icon size={22} />
+                      </span>
+                      <span className="lauth-role-body">
+                        <h4>{getRoleLabel(role)}</h4>
+                        <p>{getRoleDesc(role)}</p>
+                      </span>
+                      <span className="lauth-role-arrow" aria-hidden="true">
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
                         >
-                          {t(key === "STUDENT" ? "roleStudent" : key === "TEACHER" ? "roleTeacher" : "roleCenter")}
-                        </div>
-                        <div className="text-xs" style={{ color: "rgba(255,255,255,0.60)" }}>
-                          {t(key === "STUDENT" ? "roleStudentDesc" : key === "TEACHER" ? "roleTeacherDesc" : "roleCenterDesc")}
-                        </div>
-                      </div>
-                      <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 18 }}>›</span>
+                          <path d="M4 3l4 4-4 4" />
+                        </svg>
+                      </span>
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="lauth-role-head">
+                <span className="lauth-role-tag">
+                  {getRoleLabel(selectedRole)}
+                </span>
+                <button
+                  type="button"
+                  className="lauth-role-change"
+                  onClick={() => setSelectedRole(null)}
+                >
+                  {t("changeRole")}
+                </button>
               </div>
 
-            ) : (
-              <div className="slide-in">
-                <div className="flex items-center justify-between mb-5">
-                  <span
-                    className="px-3 py-1 rounded-full text-xs font-bold"
-                    style={{
-                      background: `${activeRole!.color}15`,
-                      border: `1px solid ${activeRole!.color}30`,
-                      color: activeRole!.color,
-                      fontFamily: "'Syne', sans-serif",
-                    }}
-                  >
-                    {activeRole!.emoji} {getRoleLabel(activeRole!.key)}
+              <h1 className="lauth-h">
+                {locale === "en" ? "One " : "Un "}
+                <em>{locale === "en" ? "account." : "compte."}</em>
+              </h1>
+              <p className="lauth-sub">{t("chooseRoleHint")}</p>
+
+              {error && <div className="lauth-error">{error}</div>}
+
+              <form onSubmit={handleRegister} noValidate>
+                <div className="lauth-field">
+                  <label htmlFor="reg-name" className="lauth-lbl">
+                    {t("fullName")}
+                  </label>
+                  <input
+                    id="reg-name"
+                    className="lauth-input"
+                    type="text"
+                    autoComplete="name"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder={t("fullNamePlaceholder")}
+                  />
+                </div>
+
+                <div className="lauth-field">
+                  <label htmlFor="reg-email" className="lauth-lbl">
+                    {t("email")}
+                  </label>
+                  <input
+                    id="reg-email"
+                    className="lauth-input"
+                    type="email"
+                    autoComplete="email"
+                    inputMode="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={t("emailPlaceholder")}
+                  />
+                </div>
+
+                <div className="lauth-field">
+                  <label htmlFor="reg-password" className="lauth-lbl">
+                    {t("password")}
+                  </label>
+                  <input
+                    id="reg-password"
+                    className="lauth-input"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={t("passwordMin")}
+                  />
+                </div>
+
+                <label className="lauth-consent">
+                  <input
+                    type="checkbox"
+                    checked={consent}
+                    onChange={(e) => setConsent(e.target.checked)}
+                  />
+                  <span>
+                    {t("consentBefore")}
+                    <a href="/terms" target="_blank" rel="noopener noreferrer">
+                      {t("consentTerms")}
+                    </a>
+                    {t("consentMiddle")}
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                      {t("consentPrivacy")}
+                    </a>
+                    {t("consentAfter")}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedRole(null)}
-                    className="text-xs transition-all"
-                    style={{ color: "rgba(255,255,255,0.56)", background: "none", border: "none", cursor: "pointer" }}
-                  >
-                    {t("changeRole")}
-                  </button>
-                </div>
+                </label>
 
-                {error && (
-                  <div
-                    className="mb-4 px-4 py-3 rounded-xl text-xs"
-                    style={{
-                      background: "rgba(239,68,68,0.1)",
-                      border: "1px solid rgba(239,68,68,0.25)",
-                      color: "#f87171",
-                    }}
-                  >
-                    {error}
-                  </div>
-                )}
+                <label className="lauth-consent">
+                  <input
+                    type="checkbox"
+                    checked={ageConsent}
+                    onChange={(e) => setAgeConsent(e.target.checked)}
+                  />
+                  <span>{t("ageConsentLabel")}</span>
+                </label>
 
-                <form onSubmit={handleRegister} className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>{t("fullName")}</label>
-                    <input
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder={t("fullNamePlaceholder")}
-                      required
-                      className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
-                      style={{
-                        background: "rgba(255,255,255,0.06)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        color: "white",
-                        fontFamily: "'DM Mono', monospace",
-                      }}
-                      onFocus={(e) => (e.target.style.borderColor = "rgba(16,185,129,0.5)")}
-                      onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>{t("email")}</label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder={t("emailPlaceholder")}
-                      required
-                      className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
-                      style={{
-                        background: "rgba(255,255,255,0.06)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        color: "white",
-                        fontFamily: "'DM Mono', monospace",
-                      }}
-                      onFocus={(e) => (e.target.style.borderColor = "rgba(16,185,129,0.5)")}
-                      onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>{t("password")}</label>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder={t("passwordMin")}
-                      required
-                      className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
-                      style={{
-                        background: "rgba(255,255,255,0.06)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        color: "white",
-                        fontFamily: "'DM Mono', monospace",
-                      }}
-                      onFocus={(e) => (e.target.style.borderColor = "rgba(16,185,129,0.5)")}
-                      onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
-                    />
-                  </div>
-
-                  <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
-                    <input
-                      type="checkbox"
-                      checked={consent}
-                      onChange={e => setConsent(e.target.checked)}
-                      style={{ marginTop: 2, accentColor: "#10b981", flexShrink: 0, width: 15, height: 15 }}
-                    />
-                    <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", lineHeight: 1.6 }}>
-                      {t("consentBefore")}
-                      <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "#10b981", textDecoration: "none" }}>{t("consentTerms")}</a>
-                      {t("consentMiddle")}
-                      <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#10b981", textDecoration: "none" }}>{t("consentPrivacy")}</a>
-                      {t("consentAfter")}
-                    </span>
-                  </label>
-
-                  <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
-                    <input
-                      type="checkbox"
-                      checked={ageConsent}
-                      onChange={e => setAgeConsent(e.target.checked)}
-                      style={{ marginTop: 2, accentColor: "#10b981", flexShrink: 0, width: 15, height: 15 }}
-                    />
-                    <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", lineHeight: 1.6 }}>
-                      {t("ageConsentLabel")}
-                    </span>
-                  </label>
-
-                  <button
-                    type="submit"
-                    disabled={loading || !consent || !ageConsent}
-                    className="w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-200 active:scale-95 mt-2"
-                    style={{
-                      background: loading || !consent || !ageConsent
-                        ? "rgba(16,185,129,0.4)"
-                        : "linear-gradient(135deg, #10b981, #059669)",
-                      color: "white",
-                      fontFamily: "'Syne', sans-serif",
-                      boxShadow: loading || !consent || !ageConsent ? "none" : "0 4px 24px rgba(16,185,129,0.35)",
-                      cursor: loading || !consent || !ageConsent ? "not-allowed" : "pointer",
-                    }}
-                  >
-                    {loading ? tc("loading") : `${t("registerBtn")} →`}
-                  </button>
-                </form>
-              </div>
-            )}
-          </div>
+                <button
+                  type="submit"
+                  className="lauth-submit"
+                  disabled={loading || !consent || !ageConsent}
+                >
+                  {loading ? tc("loading") : `${t("registerBtn")} →`}
+                </button>
+              </form>
+            </>
+          )}
 
           {!success && (
-            <p className="text-center text-xs mt-6" style={{ color: "rgba(255,255,255,0.56)" }}>
+            <p className="lauth-alt">
               {t("hasAccount")}{" "}
-              <Link href="/login" style={{ color: "#10b981", textDecoration: "none" }}>
+              <Link href="/login" className="lauth-alt-link">
                 {t("signIn")}
               </Link>
             </p>
           )}
         </div>
-      </div>
-    </>
+      </main>
+
+      <footer className="lauth-foot">
+        <CefrStrip current="A1" ariaLabel="Parcours Yema — CECRL" />
+      </footer>
+    </div>
   );
 }
