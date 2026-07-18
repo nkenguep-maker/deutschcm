@@ -208,50 +208,67 @@ function LangCard({
   );
 }
 
-export function LandingLanguages({ locale }: { locale: string }) {
+interface LandingLanguagesProps {
+  locale: string;
+  /** Rendre seulement une famille (utile pour composer avec le
+   * système Territoire). Par défaut, tout le bloc historique. */
+  family?: "foreign" | "native" | "both";
+  /** Cacher le head éditorial (utile quand la page a déjà son h1). */
+  hideHead?: boolean;
+}
+
+export function LandingLanguages({ locale, family = "both", hideHead = false }: LandingLanguagesProps) {
   const labels = locale === "en" ? LABELS_EN : LABELS_FR;
+  const showForeign = family === "both" || family === "foreign";
+  const showNative = family === "both" || family === "native";
 
   return (
     <section className="lsection llanguages" id="languages">
       <div className="container">
-        <div className="lsection-head centered">
-          <div className="lsection-eye">{labels.eye}</div>
-          <h1 className="lsection-h">
-            {labels.title} <em>{labels.titleAccent}</em>
-          </h1>
-          <p className="lsection-lede">{labels.body}</p>
-        </div>
+        {!hideHead && (
+          <div className="lsection-head centered">
+            <div className="lsection-eye">{labels.eye}</div>
+            <h1 className="lsection-h">
+              {labels.title} <em>{labels.titleAccent}</em>
+            </h1>
+            <p className="lsection-lede">{labels.body}</p>
+          </div>
+        )}
 
-        <div className="llang-family">
-          <div className="llang-family-head">
-            <div className="llang-family-eye">{labels.familyForeignEye}</div>
-            <h2>{labels.familyForeignTitle}</h2>
-            <p className="llang-family-scale">{labels.scaleLegendCefr}</p>
+        {showForeign && (
+          <div className="llang-family">
+            <div className="llang-family-head">
+              <div className="llang-family-eye">{labels.familyForeignEye}</div>
+              <h2>{labels.familyForeignTitle}</h2>
+              <p className="llang-family-scale">{labels.scaleLegendCefr}</p>
+            </div>
+            <div className="llang-grid">
+              {FOREIGN_LANGS.map((l) => (
+                <LangCard key={l.name} lang={l} locale={locale} labels={labels} />
+              ))}
+            </div>
           </div>
-          <div className="llang-grid">
-            {FOREIGN_LANGS.map((l) => (
-              <LangCard key={l.name} lang={l} locale={locale} labels={labels} />
-            ))}
-          </div>
-        </div>
+        )}
 
-        <div className="llang-family llang-family-native">
-          <div className="llang-family-head">
-            <div className="llang-family-eye">{labels.familyNativeEye}</div>
-            <h2>{labels.familyNativeTitle}</h2>
-            <p className="llang-family-scale">{labels.scaleLegendYema}</p>
+        {showNative && (
+          <div className="llang-family llang-family-native">
+            <div className="llang-family-head">
+              <div className="llang-family-eye">{labels.familyNativeEye}</div>
+              <h2>{labels.familyNativeTitle}</h2>
+              <p className="llang-family-scale">{labels.scaleLegendYema}</p>
+            </div>
+            <div className="llang-grid llang-grid-2">
+              {NATIVE_LANGS.map((l) => (
+                <LangCard key={l.name} lang={l} locale={locale} labels={labels} />
+              ))}
+            </div>
+            <p className="llang-more">
+              {locale === "en"
+                ? "More native chapters to come — Douala, Fulfulde, Yoruba, Amharic and beyond, prioritized by the diaspora YEMA hears from."
+                : "D'autres chapitres natals à venir — douala, fulfulde, yorùbá, amharique et au-delà, priorisés par la diaspora qui nous écrit."}
+            </p>
           </div>
-          <div className="llang-grid llang-grid-2">
-            {NATIVE_LANGS.map((l) => (
-              <LangCard key={l.name} lang={l} locale={locale} labels={labels} />
-            ))}
-          </div>
-          <p className="llang-more">
-            {locale === "en"
-              ? "More native chapters to come — Douala, Fulfulde, Yoruba, Amharic and beyond, prioritized by the diaspora YEMA hears from."
-              : "D'autres chapitres natals à venir — douala, fulfulde, yorùbá, amharique et au-delà, priorisés par la diaspora qui nous écrit."}
-          </p>
-        </div>
+        )}
       </div>
     </section>
   );

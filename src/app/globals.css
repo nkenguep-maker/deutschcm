@@ -23,6 +23,14 @@ html[data-theme="dark"] {
   --ink:           #2A1D10;   /* deep ink for surfaces */
   --oxblood:       #7A2830;   /* pour accent secondaire, badges attention */
 
+  /* ── Territoire SOURCES — terre-latérite ── */
+  /* Deuxième monde : langues natales africaines. Le laiton, Fraunces,
+     JetBrains Mono et le crème restent communs — seul le fond change.
+     WCAG AA vérifié : creme (15.09:1) et brass (5.59:1) passent sur --terre. */
+  --terre:         #2A0F14;
+  --terre-2:       #3A1A16;
+  --terre-hair:    rgba(244, 235, 220, 0.09);
+
   /* ── Radius scale — par rôle ── */
   --r-input: 8px;
   --r-card: 14px;
@@ -3973,6 +3981,112 @@ button, [role="button"] {
 .admin-roles-chip:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 @media (max-width: 640px) {
   .admin-roles-row { grid-template-columns: 1fr; }
+}
+
+/* ─── Territoires · deux mondes YEMA ─────────────────────────────
+   Le pont : mêmes typographies, mêmes chips laiton, mêmes cartes.
+   Seul le fond change — espresso pour le monde CECRL (world),
+   terre-latérite pour les langues natales (sources). Les classes
+   ne redéfinissent QUE la couleur de fond, tout le reste hérite. */
+.territory-world {
+  background: var(--espresso);
+}
+.territory-sources {
+  background: var(--terre);
+}
+/* Surfaces élevées à l'intérieur de chaque territoire — utilisées
+   par les cartes internes qui héritent de la classe parente. */
+.territory-sources .territory-surface,
+.territory-sources .card,
+.territory-sources .dash-hero,
+.territory-sources .empty-state {
+  background: var(--terre-2);
+  border-color: var(--terre-hair);
+}
+
+/* ─── Seam · couture entre les deux territoires ────────────────
+   Composant visuel autonome : 120 px, dégradé espresso→terre +
+   halo laiton radial centré + monogramme Y au centre. */
+.seam {
+  position: relative;
+  height: 120px;
+  width: 100%;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--espresso) 0%, var(--espresso) 20%, var(--terre) 80%, var(--terre) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.seam-halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--brass-glow) 0%, rgba(184, 135, 62, 0.06) 40%, transparent 70%);
+  pointer-events: none;
+}
+.seam-key {
+  position: relative;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--espresso-2);
+  border: 1.5px solid var(--brass-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 22px;
+  color: var(--brass);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+.seam-line {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--brass-edge), transparent);
+}
+.seam-line-top {
+  top: 0;
+  height: calc(50% - 30px);
+}
+.seam-line-bottom {
+  bottom: 0;
+  height: calc(50% - 30px);
+}
+@media (max-width: 560px) {
+  .seam { height: 100px; }
+  .seam-key { width: 40px; height: 40px; font-size: 20px; }
+  .seam-halo { width: 260px; height: 260px; }
+}
+
+/* ─── BridgePattern · grille SVG laiton discrète ───────────────
+   Le SVG lui-même est fourni via le composant React. Cette classe
+   règle uniquement le comportement de la surcouche. */
+.bridge-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.14;
+  z-index: 0;
+  overflow: hidden;
+}
+.bridge-pattern > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* Le pattern doit aussi couper à sa boîte */
+.territory-world,
+.territory-sources {
+  overflow: hidden;
+  position: relative;
 }
 
 /* ─── App shell · dashboards ETUDIANT / ENSEIGNANT / CENTRE ─────── */
