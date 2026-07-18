@@ -17,6 +17,7 @@ export default function OnboardingProgress({ steps, current }: Props) {
     <ol
       className="lonboard-progress"
       aria-label="Progression de l'onboarding"
+      tabIndex={0}
     >
       {steps.map((step, i) => {
         const state = i < current ? "done" : i === current ? "on" : "next";

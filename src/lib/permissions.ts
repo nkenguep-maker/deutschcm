@@ -1,6 +1,6 @@
 // ─── Rôles et permissions Yema ───────────────────────
 
-export type UserRole = "STUDENT" | "TEACHER" | "CENTER_MANAGER" | "ADMIN"
+export type UserRole = "STUDENT" | "TEACHER" | "CENTER" | "ADMIN"
 
 export type Permission =
   // Cours
@@ -77,7 +77,7 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "notifications:read",
     "notifications:send",
   ],
-  CENTER_MANAGER: [
+  CENTER: [
     "courses:read",
     "modules:read",
     "simulateur:use",
@@ -174,15 +174,15 @@ export const PROTECTED_ROUTES: Record<string, UserRole[]> = {
   "/teacher": ["TEACHER", "ADMIN"],
   "/teacher/classroom": ["TEACHER", "ADMIN"],
   "/teacher/students": ["TEACHER", "ADMIN"],
-  "/center": ["CENTER_MANAGER", "ADMIN"],
-  "/center/teachers": ["CENTER_MANAGER", "ADMIN"],
-  "/center/students": ["CENTER_MANAGER", "ADMIN"],
-  "/center/billing": ["CENTER_MANAGER", "ADMIN"],
-  "/dashboard": ["STUDENT", "TEACHER", "CENTER_MANAGER", "ADMIN"],
-  "/courses": ["STUDENT", "TEACHER", "CENTER_MANAGER", "ADMIN"],
-  "/simulateur": ["STUDENT", "TEACHER", "CENTER_MANAGER", "ADMIN"],
-  "/progress": ["STUDENT", "TEACHER", "CENTER_MANAGER", "ADMIN"],
-  "/discover": ["STUDENT", "TEACHER", "CENTER_MANAGER", "ADMIN"],
+  "/center": ["CENTER", "ADMIN"],
+  "/center/teachers": ["CENTER", "ADMIN"],
+  "/center/students": ["CENTER", "ADMIN"],
+  "/center/billing": ["CENTER", "ADMIN"],
+  "/dashboard": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
+  "/courses": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
+  "/simulateur": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
+  "/progress": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
+  "/discover": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
 }
 
 export function hasPermission(role: UserRole, permission: Permission): boolean {
@@ -203,7 +203,7 @@ export function getDefaultRedirect(role: UserRole): string {
   switch (role) {
     case "ADMIN": return "/admin"
     case "TEACHER": return "/teacher"
-    case "CENTER_MANAGER": return "/center"
+    case "CENTER": return "/center"
     default: return "/dashboard"
   }
 }
@@ -211,7 +211,7 @@ export function getDefaultRedirect(role: UserRole): string {
 export function getOnboardingRoute(role: UserRole): string {
   switch (role) {
     case "TEACHER": return "/onboarding/teacher"
-    case "CENTER_MANAGER": return "/onboarding/center"
+    case "CENTER": return "/onboarding/center"
     default: return "/onboarding/student"
   }
 }

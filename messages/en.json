@@ -626,5 +626,15 @@
       "form_sent_title": "Received.",
       "form_sent_body": "A YEMA team member will reach out within 24 working hours to schedule the demo. Zero pushy sales, promised."
     }
+  },
+  "space": {
+    "switchAria": "Switch space",
+    "menuAria": "Available spaces",
+    "role": {
+      "STUDENT": "Learner",
+      "TEACHER": "Teacher",
+      "CENTER": "Center",
+      "ADMIN": "Admin"
+    }
   }
 }

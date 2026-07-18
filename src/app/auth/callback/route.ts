@@ -3,11 +3,12 @@ import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
+import { grantRole, syncUserMetadata, type SpaceRole } from "@/lib/roles";
 
 const ROLE_MAP: Record<string, Role> = {
   STUDENT: Role.STUDENT,
   TEACHER: Role.TEACHER,
-  CENTER_MANAGER: Role.CENTER_MANAGER,
+  CENTER: Role.CENTER,
   ADMIN: Role.ADMIN,
 };
 
@@ -65,6 +66,12 @@ export async function GET(request: NextRequest) {
         }
       }
 
+      // Multi-rôles : s'assurer que UserRole existe pour le rôle de base
+      if (dbUser) {
+        await grantRole({ userId: dbUser.id, role: dbRole as SpaceRole });
+        await syncUserMetadata({ supabaseId: user.id, activeSpace: dbRole as SpaceRole });
+      }
+
       const onboardingDone = dbUser?.onboardingDone ?? false;
       const cookieRole = metaRole || "STUDENT";
 
@@ -76,13 +83,13 @@ export async function GET(request: NextRequest) {
         } else {
           redirectUrl = dbRole === Role.ADMIN ? "/admin"
             : dbRole === Role.TEACHER ? "/teacher"
-            : dbRole === Role.CENTER_MANAGER ? "/center"
+            : dbRole === Role.CENTER ? "/center"
             : "/dashboard";
         }
       } else {
         redirectUrl = dbRole === Role.ADMIN ? "/admin"
           : dbRole === Role.TEACHER ? "/onboarding/teacher"
-          : dbRole === Role.CENTER_MANAGER ? "/onboarding/center"
+          : dbRole === Role.CENTER ? "/onboarding/center"
           : "/onboarding/student";
       }
 

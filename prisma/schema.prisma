@@ -10,7 +10,12 @@ enum Role {
   STUDENT
   TEACHER
   ADMIN
-  CENTER_MANAGER
+  CENTER
+}
+
+enum RoleStatus {
+  ACTIVE
+  PENDING
 }
 
 enum SubscriptionStatus {
@@ -125,10 +130,26 @@ model User {
   receivedInvites       StudyGroupInvite[]   @relation("inviteReceived")
   connections           UserConnection[]     @relation("connections")
   connectedBy           UserConnection[]     @relation("connectedBy")
+  userRoles             UserRole[]
 
   @@index([email])
   @@index([supabaseId])
   @@map("users")
+}
+
+model UserRole {
+  id         String     @id @default(cuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role       Role
+  status     RoleStatus @default(ACTIVE)
+  onboarded  Boolean    @default(false)
+  grantedBy  String?
+  createdAt  DateTime   @default(now())
+
+  @@unique([userId, role])
+  @@index([userId])
+  @@map("user_roles")
 }
 
 model Course {

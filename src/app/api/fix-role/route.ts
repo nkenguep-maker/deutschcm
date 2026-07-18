@@ -2,18 +2,16 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
-import { Role } from "@prisma/client";
+import { grantRole, syncUserMetadata, type SpaceRole } from "@/lib/roles";
 
-const ROLE_MAP: Record<string, Role> = {
-  TEACHER: Role.TEACHER,
-  CENTER_MANAGER: Role.CENTER_MANAGER,
-  STUDENT: Role.STUDENT,
-  ADMIN: Role.ADMIN,
-};
+// Rôle de base au register : crée le User + une ligne UserRole ACTIVE
+// (onboarded=false — l'onboarding se déclenche à l'entrée dans l'espace).
+
+const VALID: SpaceRole[] = ["STUDENT", "TEACHER", "CENTER", "ADMIN"];
 
 export async function POST(request: Request) {
-  const { role } = await request.json() as { role?: string };
-  if (!role || !ROLE_MAP[role]) {
+  const { role } = (await request.json()) as { role?: string };
+  if (!role || !VALID.includes(role as SpaceRole)) {
     return NextResponse.json({ error: "Invalid role" }, { status: 400 });
   }
 
@@ -24,30 +22,38 @@ export async function POST(request: Request) {
     {
       cookies: {
         getAll: () => cookieStore.getAll(),
-        setAll: (list) => list.forEach(({ name, value, options }) => cookieStore.set(name, value, options)),
+        setAll: (list) =>
+          list.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options),
+          ),
       },
-    }
+    },
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
 
-  await Promise.all([
-    supabase.auth.updateUser({
-      data: { role, onboarding_done: true },
-    }),
-    prisma.user.upsert({
-      where: { supabaseId: user.id },
-      create: {
-        supabaseId: user.id,
-        email: user.email!,
-        fullName: user.user_metadata?.full_name ?? user.email?.split("@")[0] ?? "Utilisateur",
-        role: ROLE_MAP[role],
-        onboardingDone: true,
-      },
-      update: { role: ROLE_MAP[role], onboardingDone: true },
-    }),
-  ]);
+  const dbUser = await prisma.user.upsert({
+    where: { supabaseId: user.id },
+    create: {
+      supabaseId: user.id,
+      email: user.email!,
+      fullName:
+        user.user_metadata?.full_name ??
+        user.email?.split("@")[0] ??
+        "Utilisateur",
+      role: role as SpaceRole,
+    },
+    update: {},
+    select: { id: true },
+  });
+
+  await grantRole({ userId: dbUser.id, role: role as SpaceRole });
+  await syncUserMetadata({ supabaseId: user.id, activeSpace: role as SpaceRole });
 
   return NextResponse.json({ ok: true });
 }

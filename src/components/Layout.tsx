@@ -6,13 +6,14 @@ import { usePathname, useRouter } from "@/navigation";
 import { createClient } from "@/lib/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { SpaceSwitcher, type SpaceRole } from "@/components/SpaceSwitcher";
 import { useT } from "@/hooks/useT";
 import BrandLogo from "@/components/BrandLogo";
 
 const ACCENT_BY_ROLE: Record<string, string> = {
   STUDENT: "#10b981",
   TEACHER: "#6366f1",
-  CENTER_MANAGER: "#eab308",
+  CENTER: "#eab308",
   ADMIN: "#ef4444",
 };
 
@@ -68,12 +69,14 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
     { icon: "📊", label: tn.stats,            href: "/center/stats"         },
   ];
   const NAV_BY_ROLE: Record<string, typeof STUDENT_NAV> = {
-    STUDENT: STUDENT_NAV, TEACHER: TEACHER_NAV, CENTER_MANAGER: CENTER_NAV, ADMIN: ADMIN_NAV,
+    STUDENT: STUDENT_NAV, TEACHER: TEACHER_NAV, CENTER: CENTER_NAV, ADMIN: ADMIN_NAV,
   };
 
   const [userName, setUserName] = useState(tl.userFallback);
   const [userEmail, setUserEmail] = useState("");
   const [userRole, setUserRole] = useState<string>("STUDENT");
+  const [userRoles, setUserRoles] = useState<SpaceRole[]>([]);
+  const [activeSpace, setActiveSpace] = useState<SpaceRole>("STUDENT");
   const [userLevel, setUserLevel] = useState<string | null>(null);
   const [studentType, setStudentType] = useState<string | null>(null);
   const [isValidated, setIsValidated] = useState(false);
@@ -103,6 +106,8 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
       // No data or network error — don't redirect, just leave user where they are
       if (!d || typeof d.onboardingDone === "undefined") return;
       if (d.role) setUserRole(d.role);
+      if (Array.isArray(d.roles)) setUserRoles(d.roles as SpaceRole[]);
+      if (d.activeSpace) setActiveSpace(d.activeSpace as SpaceRole);
       if (d.fullName) setUserName(d.fullName);
       if (d.germanLevel) setUserLevel(d.germanLevel);
       if (d.studentType) setStudentType(d.studentType);
@@ -121,7 +126,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
         if (d.germanLevel) return;
         if (d.onboardingDone === false) {
           const dest = d.role === "TEACHER" ? "/onboarding/teacher"
-            : d.role === "CENTER_MANAGER" ? "/onboarding/center"
+            : d.role === "CENTER" ? "/onboarding/center"
             : "/onboarding/student";
           router.replace(dest);
           return;
@@ -226,7 +231,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
             {userRole !== "STUDENT" && (
               <div style={{ margin: "0 4px 8px", padding: "6px 12px", borderRadius: 8, background: `${accentColor}10`, border: `1px solid ${accentColor}25`, textAlign: "center" }}>
                 <span style={{ color: accentColor, fontSize: 13, fontWeight: 700, letterSpacing: "0.06em" }}>
-                  {userRole === "TEACHER" ? tl.teacherRole : userRole === "CENTER_MANAGER" ? tl.centerRole : tl.adminRole}
+                  {userRole === "TEACHER" ? tl.teacherRole : userRole === "CENTER" ? tl.centerRole : tl.adminRole}
                 </span>
               </div>
             )}
@@ -380,6 +385,7 @@ export default function Layout({ children, title, searchQuery = "", onSearchChan
 
             {/* Right actions */}
             <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <SpaceSwitcher roles={userRoles} activeSpace={activeSpace} />
               <LanguageSwitcher />
               <NotificationBell accentColor={accentColor} />
 

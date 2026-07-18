@@ -14,18 +14,18 @@ import {
 } from "@/components/landing/icons";
 import { LandingBrand } from "@/components/landing/LandingBrand";
 
-type Role = "STUDENT" | "TEACHER" | "CENTER_MANAGER";
+type Role = "STUDENT" | "TEACHER" | "CENTER";
 
 const ONBOARDING_DEST: Record<Role, string> = {
   STUDENT: "/onboarding/student",
   TEACHER: "/onboarding/teacher",
-  CENTER_MANAGER: "/onboarding/center",
+  CENTER: "/onboarding/center",
 };
 
 const ROLE_ICONS: Record<Role, React.ComponentType<{ size?: number }>> = {
   STUDENT: IconClasse,
   TEACHER: IconTeacher,
-  CENTER_MANAGER: IconInstitution,
+  CENTER: IconInstitution,
 };
 
 export default function RegisterPage() {
@@ -104,8 +104,15 @@ export default function RegisterPage() {
     }
 
     if (data.session) {
+      // Créer User + UserRole côté DB (rôle de base, onboarded=false)
+      // et synchroniser user_metadata.roles pour le middleware.
+      await fetch("/api/fix-role", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ role: selectedRole }),
+      }).catch(() => {});
       document.cookie = `user_role=${selectedRole};path=/;max-age=2592000`;
-      document.cookie = `onboarding_done=false;path=/;max-age=2592000`;
+      document.cookie = `active_space=${selectedRole};path=/;max-age=2592000`;
       router.push(ONBOARDING_DEST[selectedRole]);
       router.refresh();
       return;
@@ -115,7 +122,7 @@ export default function RegisterPage() {
     setLoading(false);
   }
 
-  const roles: readonly Role[] = ["STUDENT", "TEACHER", "CENTER_MANAGER"];
+  const roles: readonly Role[] = ["STUDENT", "TEACHER", "CENTER"];
 
   return (
     <div className="lauth landing">

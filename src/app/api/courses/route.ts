@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
 // ── POST: save generatedData to DB without re-running Gemini ─────────────────
 export async function POST(request: NextRequest) {
   const user = await getAuthUser();
-  const allowed = ["ADMIN", "TEACHER", "CENTER_MANAGER"];
+  const allowed = ["ADMIN", "TEACHER", "CENTER"];
   if (!user || !allowed.includes(user.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

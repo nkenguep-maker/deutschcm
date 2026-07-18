@@ -29,7 +29,7 @@ async function getAdminUser() {
     where: { supabaseId: user.id },
     select: { id: true, role: true },
   });
-  const allowed = ["ADMIN", "TEACHER", "CENTER_MANAGER"];
+  const allowed = ["ADMIN", "TEACHER", "CENTER"];
   if (!dbUser || !allowed.includes(dbUser.role)) return null;
   return dbUser;
 }

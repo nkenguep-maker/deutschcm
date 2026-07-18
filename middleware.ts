@@ -4,7 +4,11 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 
-type UserRole = "STUDENT" | "TEACHER" | "CENTER_MANAGER" | "ADMIN"
+// Multi-rôles YEMA — le middleware lit user_metadata.roles (miroir DB).
+// Source de vérité = table user_roles (Prisma). Le middleware n'interroge
+// pas la DB pour rester rapide sur les routes protégées.
+
+type SpaceRole = "STUDENT" | "TEACHER" | "CENTER" | "ADMIN"
 
 const PUBLIC_ROUTES = [
   "/", "/login", "/register", "/pricing",
@@ -13,39 +17,62 @@ const PUBLIC_ROUTES = [
   "/quiz/demo", "/video/preview",
   "/privacy", "/terms", "/landing", "/demo",
   "/goodbye", "/teacher/goodbye",
+  "/methode", "/histoires", "/manifeste", "/langues", "/setup-role",
 ]
 
-const PROTECTED_ROUTES: Record<string, UserRole[]> = {
+// Routes protégées → rôle requis pour l'espace parent.
+const PROTECTED_ROUTES: Record<string, SpaceRole[]> = {
   "/admin": ["ADMIN"],
   "/admin/courses/generate": ["ADMIN"],
+  "/admin/roles": ["ADMIN"],
   "/teacher": ["TEACHER", "ADMIN"],
   "/teacher/classroom": ["TEACHER", "ADMIN"],
   "/teacher/students": ["TEACHER", "ADMIN"],
-  "/center": ["CENTER_MANAGER", "ADMIN"],
-  "/center/teachers": ["CENTER_MANAGER", "ADMIN"],
-  "/center/students": ["CENTER_MANAGER", "ADMIN"],
-  "/center/billing": ["CENTER_MANAGER", "ADMIN"],
-  "/dashboard": ["STUDENT", "TEACHER", "CENTER_MANAGER", "ADMIN"],
-  "/courses": ["STUDENT", "TEACHER", "CENTER_MANAGER", "ADMIN"],
-  "/simulateur": ["STUDENT", "TEACHER", "CENTER_MANAGER", "ADMIN"],
-  "/progress": ["STUDENT", "TEACHER", "CENTER_MANAGER", "ADMIN"],
+  "/center": ["CENTER", "ADMIN"],
+  "/center/teachers": ["CENTER", "ADMIN"],
+  "/center/students": ["CENTER", "ADMIN"],
+  "/center/billing": ["CENTER", "ADMIN"],
+  "/dashboard": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
+  "/courses": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
+  "/simulateur": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
+  "/progress": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
 }
 
-function canAccessRoute(role: UserRole, pathname: string): boolean {
-  const allowed = PROTECTED_ROUTES[pathname]
-  return !allowed || allowed.includes(role)
+// À quel espace appartient un pathname donné ? (pour déterminer le rôle
+// dont dépend l'onboarding requis)
+function spaceForPath(pathname: string): SpaceRole | null {
+  if (pathname.startsWith("/admin")) return "ADMIN"
+  if (pathname.startsWith("/teacher")) return "TEACHER"
+  if (pathname.startsWith("/center")) return "CENTER"
+  if (
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/courses") ||
+    pathname.startsWith("/simulateur") ||
+    pathname.startsWith("/progress")
+  ) return "STUDENT"
+  return null
 }
 
-function getDefaultRedirect(role: UserRole, locale: string): string {
-  if (role === "ADMIN") return `/${locale}/admin`
-  if (role === "TEACHER") return `/${locale}/teacher`
-  if (role === "CENTER_MANAGER") return `/${locale}/center`
+function canAccessRoute(roles: SpaceRole[], pathname: string): boolean {
+  const key = Object.keys(PROTECTED_ROUTES).find(
+    k => pathname === k || pathname.startsWith(k + "/"),
+  )
+  if (!key) return true
+  const allowed = PROTECTED_ROUTES[key]
+  return roles.some(r => allowed.includes(r))
+}
+
+function getDefaultRedirect(roles: SpaceRole[], activeSpace: SpaceRole | undefined, locale: string): string {
+  const primary = activeSpace && roles.includes(activeSpace) ? activeSpace : roles[0]
+  if (primary === "ADMIN") return `/${locale}/admin`
+  if (primary === "TEACHER") return `/${locale}/teacher`
+  if (primary === "CENTER") return `/${locale}/center`
   return `/${locale}/dashboard`
 }
 
-function getOnboardingRoute(role: UserRole, locale: string): string {
+function getOnboardingRoute(role: SpaceRole, locale: string): string {
   if (role === "TEACHER") return `/${locale}/onboarding/teacher`
-  if (role === "CENTER_MANAGER") return `/${locale}/onboarding/center`
+  if (role === "CENTER") return `/${locale}/onboarding/center`
   return `/${locale}/onboarding/student`
 }
 
@@ -64,26 +91,21 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Strip the locale prefix to get the canonical path
   const localePrefix = routing.locales.find(l => pathname === `/${l}` || pathname.startsWith(`/${l}/`))
   const canonicalPath = localePrefix
     ? pathname === `/${localePrefix}` ? "/" : pathname.slice(`/${localePrefix}`.length)
     : pathname
   const locale = localePrefix ?? routing.defaultLocale
 
-  // Public routes: run intl middleware and return
   if (PUBLIC_ROUTES.some(r => canonicalPath === r || canonicalPath.startsWith(r + "/"))) {
     return intlMiddleware(request)
   }
 
-  // Protected routes: auth check first, then intl
   const intlResponse = await intlMiddleware(request)
   if (intlResponse.status !== 200) return intlResponse
 
-  let response = intlResponse
+  const response = intlResponse
 
-  // Fast cookie check: Supabase stores the session in a cookie named
-  // "sb-<project-ref>-auth-token". If absent the user is definitely not logged in.
   const hasSession = request.cookies.getAll().some(c => c.name.startsWith("sb-") && c.name.endsWith("-auth-token"))
   if (!hasSession) {
     if (canonicalPath === "/test-niveau") {
@@ -92,8 +114,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
   }
 
-  // Full Supabase session validation (verify token is not expired/revoked)
-  let user = null
+  let user: { user_metadata?: Record<string, unknown> } | null = null
   try {
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -119,16 +140,37 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
   }
 
-  const userRole = (request.cookies.get("user_role")?.value ||
-    user.user_metadata?.role || "STUDENT") as UserRole
-  const onboardingDone = request.cookies.get("onboarding_done")?.value === "true"
+  // Extract multi-rôles depuis user_metadata (miroir DB synchronisé par /api/*).
+  const meta = user.user_metadata ?? {}
+  const metaRoles = Array.isArray(meta.roles) ? (meta.roles as string[]) : []
+  let roles = metaRoles.filter(r => ["STUDENT", "TEACHER", "CENTER", "ADMIN"].includes(r)) as SpaceRole[]
 
-  if (!onboardingDone && !canonicalPath.startsWith("/onboarding") && !canonicalPath.startsWith("/api")) {
-    return NextResponse.redirect(new URL(getOnboardingRoute(userRole, locale), request.url))
+  // Fallback : legacy cookie ou single role si user_metadata.roles pas encore sync
+  if (roles.length === 0) {
+    const legacyRole = (request.cookies.get("user_role")?.value || meta.role) as SpaceRole | undefined
+    if (legacyRole) roles = [legacyRole]
   }
 
-  if (!canAccessRoute(userRole, canonicalPath)) {
-    return NextResponse.redirect(new URL(getDefaultRedirect(userRole, locale), request.url))
+  // Aucun rôle → forcer setup
+  if (roles.length === 0) {
+    if (canonicalPath === "/setup-role") return response
+    return NextResponse.redirect(new URL(`/${locale}/setup-role`, request.url))
+  }
+
+  const activeSpace = (typeof meta.active_space === "string" ? meta.active_space : undefined) as SpaceRole | undefined
+  const onboardedMap = (meta.onboarded_map ?? {}) as Record<string, boolean>
+
+  // Onboarding par rôle : si on entre dans un espace dont le rôle
+  // n'a pas encore été onboardé, rediriger vers son onboarding.
+  const targetSpace = spaceForPath(canonicalPath)
+  if (targetSpace && roles.includes(targetSpace) && !canonicalPath.startsWith("/onboarding")) {
+    if (onboardedMap[targetSpace] === false) {
+      return NextResponse.redirect(new URL(getOnboardingRoute(targetSpace, locale), request.url))
+    }
+  }
+
+  if (!canAccessRoute(roles, canonicalPath)) {
+    return NextResponse.redirect(new URL(getDefaultRedirect(roles, activeSpace, locale), request.url))
   }
 
   return response

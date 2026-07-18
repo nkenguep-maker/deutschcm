@@ -28,7 +28,7 @@ export async function sendEmail(params: EmailParams) {
 
 export function emailWelcome(name: string, role: string): string {
   const roleLabel: Record<string, string> = {
-    STUDENT: "apprenant", TEACHER: "enseignant", CENTER_MANAGER: "responsable de centre"
+    STUDENT: "apprenant", TEACHER: "enseignant", CENTER: "responsable de centre"
   }
   return `
 <!DOCTYPE html>
@@ -225,4 +225,44 @@ export function emailBadgeEarned(name: string, badgeName: string, badgeIcon: str
   </div>
 </body>
 </html>`
+}
+
+// ─── Rôle accordé par un admin (multi-rôles) ─────────────────
+export function emailRoleGranted(name: string, role: string): string {
+  const spaceLabel: Record<string, { fr: string; url: string }> = {
+    TEACHER: { fr: "espace enseignant", url: "/teacher" },
+    CENTER: { fr: "espace centre de langues", url: "/center" },
+    STUDENT: { fr: "espace apprenant", url: "/dashboard" },
+    ADMIN: { fr: "espace administrateur", url: "/admin" },
+  };
+  const info = spaceLabel[role] ?? spaceLabel.STUDENT;
+  return `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
+<body style="margin:0;padding:0;background:#1B120A;font-family:'Helvetica Neue',Arial,sans-serif">
+  <div style="max-width:600px;margin:0 auto;padding:40px 20px">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="font-size:28px;color:#F4EBDC;font-family:Georgia,serif;font-style:italic">Yema</div>
+    </div>
+    <div style="background:#241812;border:1px solid rgba(244,235,220,0.09);border-radius:16px;padding:32px">
+      <p style="color:#B8873E;font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;margin:0 0 12px">Un nouvel accès</p>
+      <h1 style="color:#F4EBDC;font-family:Georgia,serif;font-size:26px;font-weight:400;line-height:1.2;margin:0 0 14px">
+        ${name}, votre ${info.fr} est ouvert.
+      </h1>
+      <p style="color:rgba(244,235,220,0.72);font-size:15px;line-height:1.65;margin:0 0 22px">
+        Un administrateur YEMA vient de vous accorder l&rsquo;accès. À votre prochaine connexion,
+        un sélecteur d&rsquo;espace apparaîtra pour basculer entre vos rôles.
+      </p>
+      <a href="https://deutschcm.vercel.app${info.url}"
+         style="display:inline-block;padding:12px 24px;background:#B8873E;color:#1B120A;text-decoration:none;border-radius:10px;font-weight:700;font-size:14px">
+        Ouvrir mon espace
+      </a>
+    </div>
+    <p style="text-align:center;color:rgba(244,235,220,0.28);font-size:11px;margin-top:20px">
+      Yema Languages · <a href="https://deutschcm.vercel.app" style="color:#B8873E">yema.app</a>
+    </p>
+  </div>
+</body>
+</html>`;
 }

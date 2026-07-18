@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
 import { useT } from "@/hooks/useT";
 import BrandLogo from "@/components/BrandLogo";
+import { SpaceSwitcher, type SpaceRole } from "@/components/SpaceSwitcher";
 
 interface CenterLayoutProps {
   children: React.ReactNode;
@@ -19,6 +20,16 @@ export default function CenterLayout({ children, title, centerName = "Centre de 
   const router = useRouter();
   const { nav: tNav, center: tC } = useT();
   const [userName, setUserName] = useState("Directeur");
+  const [userRoles, setUserRoles] = useState<SpaceRole[]>([]);
+  const [activeSpace, setActiveSpace] = useState<SpaceRole>("CENTER");
+
+  useEffect(() => {
+    fetch("/api/me").then(r => r.ok ? r.json() : null).then(d => {
+      if (!d) return;
+      if (Array.isArray(d.roles)) setUserRoles(d.roles as SpaceRole[]);
+      if (d.activeSpace) setActiveSpace(d.activeSpace as SpaceRole);
+    }).catch(() => {});
+  }, []);
 
   const CENTER_NAV = [
     { icon: "🏛️", label: tNav.overview,       href: "/center"                   },
@@ -41,7 +52,7 @@ export default function CenterLayout({ children, title, centerName = "Centre de 
         await fetch("/api/fix-role", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ role: "CENTER_MANAGER" }),
+          body: JSON.stringify({ role: "CENTER" }),
         });
       }
     });
@@ -198,6 +209,7 @@ export default function CenterLayout({ children, title, centerName = "Centre de 
               {title}
             </h1>
             <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
+              <SpaceSwitcher roles={userRoles} activeSpace={activeSpace} />
               <Link href="/dashboard" style={{
                 background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
                 color: "rgba(255,255,255,0.5)", borderRadius: 8, padding: "6px 14px",

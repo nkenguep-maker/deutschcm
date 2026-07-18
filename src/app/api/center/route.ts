@@ -35,7 +35,7 @@ async function getCenterUser(supabaseId: string) {
 }
 
 function isCenterManager(role: string) {
-  return role === "CENTER_MANAGER" || role === "ADMIN";
+  return role === "CENTER" || role === "ADMIN";
 }
 
 // GET /api/center — stats, students list, etc.

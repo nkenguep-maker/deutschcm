@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import { prisma } from "@/lib/prisma"
+import { grantRole, markRoleOnboarded, syncUserMetadata, type SpaceRole } from "@/lib/roles"
+
+// Fin d'onboarding — marque UserRole.onboarded=true pour CE rôle uniquement,
+// sans toucher aux autres rôles. Sync user_metadata pour que le middleware
+// arrête de rediriger vers l'onboarding.
+
+const VALID: SpaceRole[] = ["STUDENT", "TEACHER", "CENTER", "ADMIN"]
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,21 +27,29 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 })
 
-    let role: string | undefined
+    let role: SpaceRole | undefined
     let profileData: Record<string, string | null | undefined> = {}
 
     try {
       const body = await req.json()
-      role = body.role
+      const bodyRole = body.role as string | undefined
+      if (bodyRole && VALID.includes(bodyRole as SpaceRole)) role = bodyRole as SpaceRole
       profileData = body.profileData ?? {}
     } catch {
-      // called without body (legacy) — just mark done
+      // pas de body — on tombera sur le fallback ci-dessous
     }
+
+    // Fallback rôle : legacy cookie, user_metadata.role, ou STUDENT.
+    const effectiveRole: SpaceRole =
+      role ||
+      (cookieStore.get("user_role")?.value as SpaceRole | undefined) ||
+      (user.user_metadata?.role as SpaceRole | undefined) ||
+      "STUDENT"
 
     const updated = await prisma.user.upsert({
       where: { supabaseId: user.id },
       update: {
-        onboardingDone: true,
+        onboardingDone: true, // legacy flag conservé pour compat
         ...(profileData.fullName ? { fullName: profileData.fullName } : {}),
         phone: profileData.phone ?? undefined,
         city: profileData.city ?? undefined,
@@ -55,7 +70,7 @@ export async function POST(req: NextRequest) {
       create: {
         supabaseId: user.id,
         email: user.email!,
-        role: (role || user.user_metadata?.role || "STUDENT") as "STUDENT" | "TEACHER" | "CENTER_MANAGER" | "ADMIN",
+        role: effectiveRole,
         onboardingDone: true,
         fullName: profileData.fullName || user.user_metadata?.full_name || "",
         phone: profileData.phone ?? null,
@@ -75,12 +90,16 @@ export async function POST(req: NextRequest) {
       }
     })
 
-    await supabase.auth.updateUser({ data: { onboarding_done: true } })
+    // Multi-rôles : s'assurer que UserRole existe (idempotent), puis marquer onboarded=true.
+    await grantRole({ userId: updated.id, role: effectiveRole })
+    await markRoleOnboarded(updated.id, effectiveRole)
 
-    const effectiveRole = role || updated.role
+    // Sync user_metadata pour le middleware
+    await syncUserMetadata({ supabaseId: user.id, activeSpace: effectiveRole })
+
     const redirectTo = effectiveRole === "TEACHER"
       ? "/teacher"
-      : effectiveRole === "CENTER_MANAGER"
+      : effectiveRole === "CENTER"
       ? "/center"
       : "/test-niveau"
 
@@ -89,7 +108,9 @@ export async function POST(req: NextRequest) {
       userId: updated.id,
       redirectTo,
     })
+    // Cookie legacy conservé pour compat
     response.cookies.set("onboarding_done", "true", { path: "/", maxAge: 2592000 })
+    response.cookies.set("active_space", effectiveRole, { path: "/", maxAge: 2592000 })
     return response
 
   } catch (err) {

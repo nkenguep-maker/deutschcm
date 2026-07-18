@@ -49,7 +49,7 @@ export default function LoginPage() {
       document.cookie = `onboarding_done=${onboardingDone};path=/;max-age=2592000`;
 
       if (!onboardingDone) {
-        if (role === "CENTER_MANAGER") {
+        if (role === "CENTER") {
           router.push("/onboarding/center");
           return;
         }
@@ -67,7 +67,7 @@ export default function LoginPage() {
           router.push(next);
           return;
         }
-        if (role === "CENTER_MANAGER") {
+        if (role === "CENTER") {
           router.push("/center");
           return;
         }

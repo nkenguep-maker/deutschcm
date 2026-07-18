@@ -647,7 +647,7 @@ const center = {
     registrationsChart: "Évolution des inscriptions", registrationsEmpty: "Les statistiques d'inscription apparaîtront ici au fur et à mesure.",
     alerts: "Alertes & Notifications", noAlerts: "Aucune alerte pour le moment",
     teachersList: "Enseignants du centre", noTeachers: "Aucun enseignant associé au centre pour l'instant.",
-    viewAll: "Voir tout →", studentPortal: "← Portail élève", directorRole: "Directeur · CENTER_MANAGER",
+    viewAll: "Voir tout →", studentPortal: "← Portail élève", directorRole: "Directeur · CENTER",
     tableTeacher: "Enseignant", tableSpecialty: "Spécialité", tableClasses: "Classes",
     tableStudents: "Élèves", tableAvgScore: "Score moy.", tableStatus: "Statut",
     overview: "Vue d'ensemble", loading: "Chargement...",

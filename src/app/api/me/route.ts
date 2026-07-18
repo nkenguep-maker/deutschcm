@@ -3,11 +3,12 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
+import { grantRole, syncUserMetadata, type SpaceRole } from "@/lib/roles";
 
 const ROLE_MAP: Record<string, Role> = {
   STUDENT: Role.STUDENT,
   TEACHER: Role.TEACHER,
-  CENTER_MANAGER: Role.CENTER_MANAGER,
+  CENTER: Role.CENTER,
   ADMIN: Role.ADMIN,
 };
 
@@ -42,9 +43,14 @@ export async function GET() {
     },
     update: {},
     select: {
-      role: true, fullName: true, email: true, onboardingDone: true,
+      id: true, role: true, fullName: true, email: true, onboardingDone: true,
       germanLevel: true, city: true, xpTotal: true, streakDays: true,
       studentType: true, isValidated: true, testAttempts: true,
+      userRoles: {
+        where: { status: "ACTIVE" },
+        select: { role: true, onboarded: true },
+        orderBy: { createdAt: "asc" },
+      },
       groupMemberships: {
         where: { isActive: true },
         select: { groupId: true },
@@ -53,6 +59,12 @@ export async function GET() {
     },
   });
 
+  // Backfill : si aucun UserRole (compte legacy), en créer un basé sur User.role
+  if (dbUser && dbUser.userRoles.length === 0) {
+    await grantRole({ userId: dbUser.id, role: dbUser.role as SpaceRole });
+    await syncUserMetadata({ supabaseId: user.id, activeSpace: dbUser.role as SpaceRole });
+  }
+
   // Backfill user_metadata.role from DB if it's missing (old accounts)
   if (!metaRole && dbUser?.role && dbUser.role !== "STUDENT") {
     await supabase.auth.updateUser({
@@ -60,8 +72,14 @@ export async function GET() {
     });
   }
 
+  const roles = (dbUser?.userRoles ?? []).map(r => r.role);
+  const activeSpace = (user.user_metadata?.active_space as SpaceRole | undefined)
+    ?? (roles[0] ?? "STUDENT");
+
   return NextResponse.json({
     role: dbUser?.role ?? "STUDENT",
+    roles,
+    activeSpace,
     fullName: dbUser?.fullName,
     email: dbUser?.email,
     onboardingDone: dbUser?.onboardingDone ?? false,

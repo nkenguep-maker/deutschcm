@@ -12,7 +12,7 @@ import {
 } from "@/components/landing/icons";
 import { LandingBrand } from "@/components/landing/LandingBrand";
 
-type Role = "STUDENT" | "TEACHER" | "CENTER_MANAGER";
+type Role = "STUDENT" | "TEACHER" | "CENTER";
 
 type RoleDef = {
   key: Role;
@@ -44,7 +44,7 @@ const ROLES: readonly RoleDef[] = [
     dest: "/teacher",
   },
   {
-    key: "CENTER_MANAGER",
+    key: "CENTER",
     Icon: IconInstitution,
     labelFR: "Centre de langues",
     labelEN: "Language center",

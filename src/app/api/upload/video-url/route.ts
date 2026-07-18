@@ -25,7 +25,7 @@ async function getAuthUser() {
 
 export async function POST(request: NextRequest) {
   const dbUser = await getAuthUser();
-  const allowed = ["ADMIN", "TEACHER", "CENTER_MANAGER"];
+  const allowed = ["ADMIN", "TEACHER", "CENTER"];
   if (!dbUser || !allowed.includes(dbUser.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

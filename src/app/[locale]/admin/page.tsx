@@ -61,13 +61,13 @@ export default function AdminDashboard() {
 
   const roleColor: Record<string, string> = {
     STUDENT: "#10b981", TEACHER: "#60a5fa",
-    CENTER_MANAGER: "#f59e0b", ADMIN: "#ef4444"
+    CENTER: "#f59e0b", ADMIN: "#ef4444"
   }
 
   const roleLabel: Record<string, string> = {
     STUDENT: tA.roleLabelStudent,
     TEACHER: tA.roleLabelTeacher,
-    CENTER_MANAGER: tA.roleLabelCenter,
+    CENTER: tA.roleLabelCenter,
     ADMIN: tA.roleLabelAdmin,
   }
 
@@ -266,7 +266,7 @@ export default function AdminDashboard() {
                     <option value="ALL">{tA.filterAll}</option>
                     <option value="STUDENT">{tA.filterStudents}</option>
                     <option value="TEACHER">{tA.filterTeachers}</option>
-                    <option value="CENTER_MANAGER">{tA.filterCenters}</option>
+                    <option value="CENTER">{tA.filterCenters}</option>
                   </select>
                 </div>
               </div>

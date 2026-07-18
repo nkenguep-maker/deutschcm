@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
     });
     await prisma.user.update({
       where: { id: dbUser.id },
-      data: { role: Role.CENTER_MANAGER, onboardingDone: true },
+      data: { role: Role.CENTER, onboardingDone: true },
     });
     return NextResponse.json({ center });
   }
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
     if (!center) return NextResponse.json({ error: "Centre introuvable" }, { status: 404 });
 
     const currentAdmins = await prisma.user.count({
-      where: { role: { in: ["ADMIN", "CENTER_MANAGER"] } },
+      where: { role: { in: ["ADMIN", "CENTER"] } },
     });
     if (currentAdmins + emails.length > center.maxAdmins) {
       return NextResponse.json({ error: `Limite de ${center.maxAdmins} admins atteinte` }, { status: 400 });

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
 import { useT } from "@/hooks/useT";
 import BrandLogo from "@/components/BrandLogo";
+import { SpaceSwitcher, type SpaceRole } from "@/components/SpaceSwitcher";
 
 interface TeacherLayoutProps {
   children: React.ReactNode;
@@ -19,6 +20,16 @@ export default function TeacherLayout({ children, title }: TeacherLayoutProps) {
   const [teacherName, setTeacherName] = useState("Prof. Tchamba");
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userRoles, setUserRoles] = useState<SpaceRole[]>([]);
+  const [activeSpace, setActiveSpace] = useState<SpaceRole>("TEACHER");
+
+  useEffect(() => {
+    fetch("/api/me").then(r => r.ok ? r.json() : null).then(d => {
+      if (!d) return;
+      if (Array.isArray(d.roles)) setUserRoles(d.roles as SpaceRole[]);
+      if (d.activeSpace) setActiveSpace(d.activeSpace as SpaceRole);
+    }).catch(() => {});
+  }, []);
 
   const TEACHER_NAV = [
     { icon: "🗓️", label: tNav.today,        href: "/teacher"              },
@@ -173,6 +184,9 @@ export default function TeacherLayout({ children, title }: TeacherLayoutProps) {
               <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontSize: "1.3rem", cursor: "pointer", padding: "4px 6px", flexShrink: 0 }}>☰</button>
             )}
             {title && <h1 style={{ margin: 0, color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: isMobile ? "0.95rem" : "1.05rem", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</h1>}
+            <div style={{ marginLeft: title ? 0 : "auto", flexShrink: 0 }}>
+              <SpaceSwitcher roles={userRoles} activeSpace={activeSpace} />
+            </div>
           </header>
           <main style={{ flex: 1, padding: isMobile ? "20px 16px 40px" : "28px 32px 48px", overflowY: "auto", overflowX: "hidden" }}>
             {children}

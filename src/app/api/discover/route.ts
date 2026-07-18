@@ -50,7 +50,7 @@ export async function GET() {
 
     const centers = await prisma.user.findMany({
       where: {
-        role: "CENTER_MANAGER",
+        role: "CENTER",
         onboardingDone: true
       },
       select: {

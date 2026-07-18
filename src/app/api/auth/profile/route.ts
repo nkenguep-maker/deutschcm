@@ -7,7 +7,7 @@ import { Role } from "@prisma/client";
 const ROLE_MAP: Record<string, Role> = {
   STUDENT: Role.STUDENT,
   TEACHER: Role.TEACHER,
-  CENTER_MANAGER: Role.CENTER_MANAGER,
+  CENTER: Role.CENTER,
   ADMIN: Role.ADMIN,
 };
 
@@ -63,8 +63,8 @@ export async function GET() {
 
   // Determine effective role using reliable signals:
   // - ADMIN: trust DB (never corrupted by old bugs)
-  // - CENTER_MANAGER: trust DB if DB says CENTER_MANAGER; otherwise trust metadata
-  //   (old fix-role bug only targeted TEACHER, never CENTER_MANAGER)
+  // - CENTER: trust DB if DB says CENTER; otherwise trust metadata
+  //   (old fix-role bug only targeted TEACHER, never CENTER)
   // - TEACHER: require DB.role=TEACHER + Teacher record exists (ground truth)
   //   Exception: new teacher who just registered has no record yet but onboardingDone=false
   // - STUDENT: everything else (safe default)
@@ -72,17 +72,17 @@ export async function GET() {
 
   if (dbRole === "ADMIN") {
     effectiveRole = "ADMIN";
-  } else if (dbRole === "CENTER_MANAGER") {
-    effectiveRole = "CENTER_MANAGER";
+  } else if (dbRole === "CENTER") {
+    effectiveRole = "CENTER";
   } else if (dbRole === "TEACHER" && hasTeacherRecord) {
     // Real teacher with onboarding done
     effectiveRole = "TEACHER";
   } else if (dbRole === "TEACHER" && !hasTeacherRecord && !profile?.onboardingDone) {
     // New teacher who registered but hasn't completed onboarding yet (no Teacher record created yet)
     effectiveRole = "TEACHER";
-  } else if ((!dbRole || dbRole === "STUDENT") && metaRole === "CENTER_MANAGER") {
-    // DB was incorrectly set to STUDENT but user registered as CENTER_MANAGER
-    effectiveRole = "CENTER_MANAGER";
+  } else if ((!dbRole || dbRole === "STUDENT") && metaRole === "CENTER") {
+    // DB was incorrectly set to STUDENT but user registered as CENTER
+    effectiveRole = "CENTER";
   } else {
     // DB=TEACHER + no Teacher record + onboardingDone=true → corrupted student account
     // DB=STUDENT → student
@@ -97,10 +97,10 @@ export async function GET() {
     }).catch(() => {});
   }
 
-  // onboardingDone: for CENTER_MANAGER/TEACHER with existing DB row, force true
+  // onboardingDone: for CENTER/TEACHER with existing DB row, force true
   // to avoid re-onboarding old accounts where the flag was never flipped
   let onboardingDone = profile?.onboardingDone ?? false;
-  if (!onboardingDone && profile && (effectiveRole === "CENTER_MANAGER")) {
+  if (!onboardingDone && profile && (effectiveRole === "CENTER")) {
     onboardingDone = true;
     prisma.user.update({
       where: { supabaseId: user.id },

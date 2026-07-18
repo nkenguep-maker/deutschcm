@@ -626,5 +626,15 @@
       "form_sent_title": "Reçu.",
       "form_sent_body": "Un membre de l'équipe YEMA vous écrit sous 24 h ouvrées pour caler la démo. Zéro commercial pressant, promis."
     }
+  },
+  "space": {
+    "switchAria": "Changer d'espace",
+    "menuAria": "Espaces disponibles",
+    "role": {
+      "STUDENT": "Apprenant·e",
+      "TEACHER": "Enseignant·e",
+      "CENTER": "Centre",
+      "ADMIN": "Admin"
+    }
   }
 }

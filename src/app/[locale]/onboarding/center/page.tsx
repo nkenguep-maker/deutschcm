@@ -119,7 +119,7 @@ export default function CenterOnboardingPage() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              role: "CENTER_MANAGER",
+              role: "CENTER",
               profileData: {
                 fullName: form.name,
                 phone: form.phone,
@@ -443,7 +443,7 @@ export default function CenterOnboardingPage() {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
-                        role: "CENTER_MANAGER",
+                        role: "CENTER",
                         profileData: {
                           fullName: form.name,
                           phone: form.phone,

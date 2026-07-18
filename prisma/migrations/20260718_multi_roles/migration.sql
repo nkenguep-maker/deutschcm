@@ -1,0 +1,40 @@
+-- Multi-rôles par compte
+--
+-- Note : le schéma YEMA n'ayant jamais été appliqué à cette base
+-- (héritée de Japap, migré vers yep-market), la migration a été
+-- appliquée via `prisma db push` sur un schéma complet incluant
+-- déjà UserRole + RoleStatus + Role.CENTER (renommé de CENTER_MANAGER).
+--
+-- Pour un environnement fresh, le schéma Prisma dans prisma/schema.prisma
+-- suffit. Cette migration reste conservée pour documenter l'intention
+-- multi-rôles.
+
+-- ─── Enums ─────────────────────────────────────────────────
+-- Rôle : STUDENT | TEACHER | CENTER | ADMIN
+-- (CENTER a remplacé l'ancien CENTER_MANAGER)
+-- RoleStatus : ACTIVE | PENDING (PENDING sera utilisé plus tard
+--              pour la validation des rôles accordés par un admin)
+
+-- ─── Table user_roles ─────────────────────────────────────
+-- Un compte YEMA peut porter N rôles ACTIFS. Chaque rôle a son
+-- propre statut d'onboarding (onboarded booléen). L'onboarding
+-- se déclenche à la première entrée dans l'espace du rôle, pas
+-- à l'inscription — voir src/lib/roles.ts requireRoleOnboarding.
+--
+-- CREATE TABLE user_roles (
+--   id         TEXT PRIMARY KEY,
+--   userId     TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+--   role       Role NOT NULL,
+--   status     RoleStatus NOT NULL DEFAULT 'ACTIVE',
+--   onboarded  BOOLEAN NOT NULL DEFAULT false,
+--   grantedBy  TEXT,
+--   createdAt  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--   UNIQUE(userId, role)
+-- );
+
+-- ─── Backfill (aucune donnée existante ici) ─────────────
+-- Sur un environnement avec des Users pré-existants :
+-- INSERT INTO user_roles (id, userId, role, status, onboarded, createdAt)
+-- SELECT gen_random_uuid()::text, id, role, 'ACTIVE',
+--        COALESCE("onboardingDone", false), "createdAt"
+-- FROM users;
