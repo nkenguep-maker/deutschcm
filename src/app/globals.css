@@ -597,6 +597,34 @@ button, [role="button"] {
 .cefr-step.on .cefr-step-caption { color: var(--creme-soft); }
 .cefr-step.done .cefr-step-caption { color: var(--creme-mute); }
 
+/* ─── YemaSpine · variantes territoire sources ──────────────────────────
+   Le composant YemaSpine réutilise .cefr-spine mais peut recevoir une
+   ancre culturelle sous le nom de palier, et une équivalence ACTFL
+   plutôt qu'une phrase "ce que tu peux faire". */
+.yema-panel-anchor {
+  margin: 0 0 12px 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--creme-soft);
+}
+.yema-panel-actfl {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--creme-hair);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+  text-transform: uppercase;
+}
+/* Sur territoire sources, la ligne de peinture prend un rappel terre. */
+.territory-sources .cefr-spine::before,
+.yema-spine::before {
+  /* laissé identique — brass + creme_hair fonctionnent aussi sur terre */
+}
+
 .lhero-spine {
   display: flex;
   align-items: center;

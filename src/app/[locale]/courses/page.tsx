@@ -5,6 +5,9 @@ import { Link } from "@/navigation";
 import { usePathname } from "next/navigation";
 import Layout from "@/components/Layout";
 import { YEMA_LESSON_META } from "@/data/courses/index";
+import { useActiveLanguage } from "@/hooks/useActiveLanguage";
+import { YEMA_LEVELS } from "@/lib/yemaScale";
+import { YemaSpine } from "@/components/landing/YemaSpine";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -373,6 +376,7 @@ export default function CoursesPage() {
   const pathname = usePathname();
   const locale: Locale = pathname.startsWith("/en") ? "en" : "fr";
   const t = T[locale];
+  const { language: activeLang, loading: langLoading } = useActiveLanguage();
 
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
@@ -440,6 +444,99 @@ export default function CoursesPage() {
     { key: "all", label: t.filterAll },
     ...LEVELS.map(l => ({ key: l as Filter, label: l })),
   ];
+
+  // Langue natale (échelle YEMA) : les contenus dédiés ne sont pas encore
+  // en ligne, on affiche une préparation éditoriale avec l'échelle YEMA
+  // et les cinq paliers (Écoute · Voix · Récit · Palabre · Foyer) pour
+  // que l'apprenant·e sache déjà ce qu'il va rencontrer. Aucun contenu
+  // CECRL n'est exposé.
+  if (!langLoading && activeLang.scale === "yema") {
+    const langName = locale === "en" ? activeLang.nameEn : activeLang.name;
+    return (
+      <Layout title={t.layoutTitle}>
+        <section className="dash" aria-labelledby="courses-native-h" style={{ maxWidth: 960 }}>
+          <p className="dash-eye" style={{ margin: 0 }}>
+            {locale === "en" ? "Native path · YEMA scale" : "Parcours natal · échelle YEMA"}
+          </p>
+          <h1 id="courses-native-h" className="dash-hero-h" style={{ marginTop: 12 }}>
+            {locale === "en" ? "Learning " : "Apprendre le "}
+            <em>{langName}.</em>
+          </h1>
+          <p className="dash-hero-sub" style={{ maxWidth: 640 }}>
+            {locale === "en"
+              ? "Modules for oral tradition languages are being prepared. Five stages, each anchored in a lived moment — the greeting, the marketplace, the story, the palaver, the home."
+              : "Les modules pour les langues à tradition orale sont en préparation. Cinq paliers, chacun ancré dans un moment de vie — la salutation, le marché, le récit, la palabre, le foyer."}
+          </p>
+
+          <div className="dash-hero" style={{ marginTop: 32, alignItems: "flex-start" }}>
+            <div>
+              <h2 style={{
+                fontFamily: "var(--font-fraunces), Georgia, serif",
+                fontSize: 24, color: "var(--creme)", margin: "0 0 20px",
+              }}>
+                {locale === "en" ? "The five stages" : "Les cinq paliers"}
+              </h2>
+              <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 22 }}>
+                {YEMA_LEVELS.map((lvl) => (
+                  <li key={lvl.id} style={{ display: "grid", gridTemplateColumns: "44px 1fr", gap: 16 }}>
+                    <span aria-hidden="true" style={{
+                      display: "inline-flex", alignItems: "center", justifyContent: "center",
+                      width: 44, height: 44, borderRadius: 12,
+                      background: "var(--brass-glow)", border: "1px solid var(--brass-edge)",
+                      fontFamily: "var(--font-fraunces), Georgia, serif",
+                      fontStyle: "italic", fontSize: 18, color: "var(--brass)",
+                    }}>{lvl.code}</span>
+                    <div>
+                      <p style={{
+                        margin: 0, fontFamily: "var(--font-fraunces), Georgia, serif",
+                        fontSize: 18, color: "var(--creme)", fontStyle: "italic",
+                      }}>
+                        {locale === "en" ? lvl.nameEn : lvl.name}
+                        <span style={{
+                          marginLeft: 10, fontFamily: "var(--font-jetbrains, monospace)",
+                          fontSize: 10, fontStyle: "normal", color: "var(--brass)",
+                          letterSpacing: "0.08em", textTransform: "uppercase",
+                        }}>{lvl.actfl}</span>
+                      </p>
+                      <p style={{
+                        margin: "4px 0 6px", color: "var(--creme-soft)", fontSize: 14,
+                        fontFamily: "var(--font-fraunces), Georgia, serif", fontStyle: "italic",
+                      }}>
+                        {locale === "en" ? lvl.anchorEn : lvl.anchor}
+                      </p>
+                      <ul style={{
+                        margin: 0, paddingLeft: 18, color: "var(--creme-mute)",
+                        fontSize: 13.5, lineHeight: 1.6,
+                      }}>
+                        {(locale === "en" ? lvl.canDoEn : lvl.canDo).map((c) => (
+                          <li key={c}>{c}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <div className="dash-hero-side" aria-label={locale === "en" ? "YEMA scale" : "Échelle YEMA"}>
+              <YemaSpine current={activeLang.levels[0]} locale={locale} compact />
+            </div>
+          </div>
+
+          <div style={{
+            marginTop: 40, padding: "14px 20px", borderRadius: 12,
+            background: "rgba(244, 235, 220, 0.02)",
+            border: "1px solid var(--creme-hair)",
+          }}>
+            <p style={{ color: "var(--creme-mute)", fontSize: "0.82rem", margin: 0, lineHeight: 1.6 }}>
+              {locale === "en"
+                ? "The YEMA scale is inspired by ACTFL and Peace Corps proficiency frameworks, adapted for oral-tradition African languages. Independent of any official examination institute."
+                : "L'échelle YEMA s'inspire des cadres ACTFL et Peace Corps, adaptés aux langues africaines à tradition orale. Indépendante de tout organisme officiel d'examen."}
+            </p>
+          </div>
+        </section>
+      </Layout>
+    );
+  }
 
   return (
     <Layout title={t.layoutTitle} searchQuery={search} onSearchChange={setSearch}>

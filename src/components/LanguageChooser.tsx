@@ -9,8 +9,8 @@ import { frTypo } from "@/components/landing/typo";
 // LanguageChooser · dropdown Kaffeehaus pour choisir la langue active.
 // UX proche du SpaceSwitcher :
 //   · trigger : puce brass avec code 2-lettres + nom langue
-//   · menu   : 2 sections (Étrangères A1→C1, Natales É1→É5) avec
-//              le status affiché (disponible / bientôt)
+//   · menu   : 2 sections (Étrangères · échelle CECRL, Natales · échelle YEMA)
+//              avec le status affiché (disponible / bientôt)
 //   · click sur une langue → persistance via /api/language/switch,
 //     hard reload de la page pour recharger le contexte (spine,
 //     territoire, copy) proprement.
@@ -99,7 +99,7 @@ export function LanguageChooser() {
         <div className="lang-chooser-menu" role="listbox" aria-label={t("menuAria")}>
           <div className="lang-chooser-section">
             <p className="lang-chooser-section-lbl">
-              {locale === "en" ? "Foreign · CEFR A1→C1" : "Étrangères · CECRL A1→C1"}
+              {locale === "en" ? "Foreign · CEFR scale" : "Étrangères · échelle CECRL"}
             </p>
             {FOREIGN.map((l) => (
               <LangItem key={l.id} lang={l} active={l.id === language.id}
@@ -111,7 +111,9 @@ export function LanguageChooser() {
           </div>
           <div className="lang-chooser-section lang-chooser-section-sources">
             <p className="lang-chooser-section-lbl">
-              {locale === "en" ? "Native · YEMA É1→É5" : "Natales · YEMA É1→É5"}
+              {locale === "en"
+                ? "Native · YEMA scale (oral tradition)"
+                : "Natales · échelle YEMA (tradition orale)"}
             </p>
             {NATIVE.map((l) => (
               <LangItem key={l.id} lang={l} active={l.id === language.id}

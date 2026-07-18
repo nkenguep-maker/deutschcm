@@ -5,7 +5,9 @@ import { Link } from "@/navigation";
 import { useLocale } from "next-intl";
 import Layout from "@/components/Layout";
 import { CefrSpine } from "@/components/landing/CefrSpine";
+import { YemaSpine } from "@/components/landing/YemaSpine";
 import { useActiveLanguage } from "@/hooks/useActiveLanguage";
+import { getYemaLevel } from "@/lib/yemaScale";
 import {
   IconMic,
   IconBook,
@@ -138,51 +140,13 @@ function nextLevel(current: Level | null): Level | "C2" {
   return LEVELS[idx + 1];
 }
 
-// Stub visuel pour les langues natales (échelle YEMA É1→É5).
-// Un vrai <YemaSpine/> composant arrivera dans un prochain cycle
-// avec la même mécanique interactive que CefrSpine.
-function YemaSpineStub({ language, levels }: { language: string; levels: string[] }) {
-  return (
-    <div style={{
-      display: "flex",
-      flexDirection: "column",
-      gap: 8,
-      minWidth: 160,
-      padding: "16px 18px",
-      border: "1px solid var(--brass-edge)",
-      borderRadius: 12,
-      background: "var(--brass-glow)",
-    }}>
-      <p style={{
-        fontFamily: "var(--font-jetbrains, monospace)",
-        fontSize: 10.5,
-        fontWeight: 600,
-        letterSpacing: "0.12em",
-        textTransform: "uppercase",
-        color: "var(--brass)",
-        margin: 0,
-      }}>
-        Échelle YEMA · {language}
-      </p>
-      {levels.map((lvl, i) => (
-        <div key={lvl} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{
-            width: 8, height: 8, borderRadius: "50%",
-            background: i === 0 ? "var(--brass)" : "var(--creme-hair)",
-            flexShrink: 0,
-          }} aria-hidden="true" />
-          <span style={{
-            fontFamily: "var(--font-fraunces), Georgia, serif",
-            fontSize: 14,
-            color: i === 0 ? "var(--creme)" : "var(--creme-mute)",
-            fontStyle: "italic",
-          }}>
-            {lvl}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
+// Palier suivant dans une échelle arbitraire (CECRL ou YEMA).
+// Le dernier palier reste sur lui-même — pas de "C2" fictif pour YEMA.
+function nextInScale(current: string | null, levels: readonly string[]): string {
+  if (!current) return levels[0];
+  const idx = levels.indexOf(current);
+  if (idx === -1 || idx === levels.length - 1) return levels[levels.length - 1];
+  return levels[idx + 1];
 }
 
 export default function StudentDashboard() {
@@ -218,17 +182,47 @@ export default function StudentDashboard() {
   // (en attendant le model UserLanguage). Le hero et le spine
   // reflètent tous deux la langue active.
   const isGerman = activeLang.id === "deutsch";
+  const isYema = activeLang.scale === "yema";
   const levelsArray = activeLang.levels;
   const rawLevel = isGerman ? (data?.germanLevel ?? null) : levelsArray[0];
   const level = rawLevel && levelsArray.includes(rawLevel) ? rawLevel : null;
   const hasLevel = !!level;
-  // Spine display : garde CECRL A1 par défaut pour les langues foreign,
-  // les langues natales ont leur propre échelle (le CefrSpine composant
-  // gère uniquement CECRL, un YemaSpine arrivera plus tard).
-  const currentSpine = (isGerman && hasLevel ? level : "A1") as Level;
+  // Spine display : pour foreign on affiche le niveau CECRL réel (fallback A1),
+  // pour native on affiche le palier YEMA (É1 par défaut, en attendant
+  // le model UserLanguage qui portera un niveau par langue).
+  const currentSpineCefr = (isGerman && hasLevel ? level : "A1") as Level;
+  const currentSpineYema = level ?? levelsArray[0];
 
-  const ctaHref = hasLevel ? "/courses" : "/test-niveau";
-  const ctaLabel = hasLevel ? t.ctaContinue : t.ctaTest;
+  // Palier + nom éditorial YEMA (Écoute, Voix, Récit, Palabre, Foyer).
+  // Utilisé pour enrichir le hero sub et l'aria du spine.
+  const yemaMeta = isYema && hasLevel ? getYemaLevel(level as string) : null;
+  const yemaName = yemaMeta ? (locale === "en" ? yemaMeta.nameEn : yemaMeta.name) : null;
+
+  // Copy language-aware. On surcharge les libellés qui parlent explicitement
+  // de CECRL quand l'apprenant·e est sur une langue natale.
+  const spineAria = isYema
+    ? (locale === "en" ? "Your YEMA journey" : "Ton parcours YEMA")
+    : t.spineAria;
+  const courseDesc = isYema
+    ? (locale === "en"
+        ? "Modules built for oral tradition — greeting, marketplace, story, palaver, home. Free pacing."
+        : "Modules pensés pour l'oralité — salut, marché, récit, palabre, foyer. Rythme libre.")
+    : t.courseDesc;
+  const testHref = isYema ? "/courses" : "/test-niveau";
+  const testLabel = isYema
+    ? (locale === "en" ? "Open the first stage" : "Ouvrir le premier palier")
+    : t.ctaTest;
+
+  const ctaHref = hasLevel ? "/courses" : testHref;
+  const ctaLabel = hasLevel ? t.ctaContinue : testLabel;
+  // Sub level enrichi pour YEMA : "Tu es au palier É1 · Écoute" au lieu de "É1"
+  const subLevelText = hasLevel
+    ? (yemaName
+        ? (locale === "en"
+            ? `You're at stage ${level} · ${yemaName}. Come back to it, even briefly.`
+            : `Tu es au palier ${level} · ${yemaName}. Reviens-y, même brièvement.`)
+        : t.subLevel(level as string))
+    : t.subNoLevel;
 
   return (
     <Layout title={t.eye}>
@@ -269,9 +263,7 @@ export default function StudentDashboard() {
               {t.h1a}
               <em>{t.h1b}</em>
             </h1>
-            <p className="dash-hero-sub">
-              {hasLevel ? t.subLevel(level as string) : t.subNoLevel}
-            </p>
+            <p className="dash-hero-sub">{subLevelText}</p>
             <Link href={ctaHref} className="dash-hero-cta">
               {ctaLabel}
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
@@ -290,11 +282,15 @@ export default function StudentDashboard() {
               {t.hint}
             </p>
           </div>
-          <div className="dash-hero-side" aria-label={t.spineAria}>
-            {activeLang.scale === "cefr" ? (
-              <CefrSpine current={currentSpine} locale={locale === "en" ? "en" : "fr"} compact />
+          <div className="dash-hero-side" aria-label={spineAria}>
+            {isYema ? (
+              <YemaSpine
+                current={currentSpineYema}
+                locale={locale === "en" ? "en" : "fr"}
+                compact
+              />
             ) : (
-              <YemaSpineStub language={activeLang.name} levels={activeLang.levels} />
+              <CefrSpine current={currentSpineCefr} locale={locale === "en" ? "en" : "fr"} compact />
             )}
           </div>
         </article>
@@ -333,7 +329,11 @@ export default function StudentDashboard() {
               <span className="dash-stat-icon" aria-hidden="true"><IconChart size={13} /></span>
               {t.statNext}
             </p>
-            <p className="dash-stat-val">{nextLevel(hasLevel ? (level as Level) : null)}</p>
+            <p className="dash-stat-val">
+              {isYema
+                ? nextInScale(hasLevel ? (level as string) : null, levelsArray)
+                : nextLevel(hasLevel ? (level as Level) : null)}
+            </p>
             <p className="dash-stat-sub">{t.statNextSub}</p>
           </div>
         </section>
@@ -357,7 +357,7 @@ export default function StudentDashboard() {
             <Link href="/courses" className="dash-action">
               <span className="dash-action-icon" aria-hidden="true"><IconBook size={18} /></span>
               <h3 className="dash-action-title">{t.courseTitle}</h3>
-              <p className="dash-action-desc">{t.courseDesc}</p>
+              <p className="dash-action-desc">{courseDesc}</p>
               <p className="dash-action-cta">{t.courseCta} →</p>
             </Link>
           </div>
