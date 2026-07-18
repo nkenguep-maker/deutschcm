@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Link } from "@/navigation";
+import { useLocale } from "next-intl";
 import CenterLayout from "@/components/CenterLayout";
 
 interface Teacher {
@@ -18,197 +19,296 @@ interface Teacher {
 }
 
 const MOCK_TEACHERS: Teacher[] = [
-  { id: "t1", name: "Dr. Beatrice Momo",  email: "b.momo@deutschpro.cm",    specialty: "Grammaire · Littérature", classes: 3, students: 48, avgScore: 8.4, joinedAt: "2024-09-01", status: "active",   verified: true },
-  { id: "t2", name: "Jean-Pierre Nkolo",  email: "jp.nkolo@deutschpro.cm",  specialty: "Conversation · B2-C1",    classes: 2, students: 31, avgScore: 7.9, joinedAt: "2024-10-15", status: "active",   verified: true },
-  { id: "t3", name: "Sophie Tanda",       email: "s.tanda@deutschpro.cm",   specialty: "A1-A2 Débutants",         classes: 4, students: 52, avgScore: 8.7, joinedAt: "2024-09-01", status: "active",   verified: true },
-  { id: "t4", name: "Arsène Biyong",      email: "a.biyong@deutschpro.cm",  specialty: "Préparation CEFR/TELC", classes: 2, students: 28, avgScore: 7.2, joinedAt: "2025-01-10", status: "active",   verified: false },
-  { id: "t5", name: "Claudine Ewane",     email: "c.ewane@deutschpro.cm",   specialty: "Business Deutsch",        classes: 1, students: 11, avgScore: 6.8, joinedAt: "2025-02-01", status: "inactive", verified: false },
-  { id: "t6", name: "Dr. Samuel Kameni",  email: "s.kameni@gmail.com",       specialty: "Phonétique",              classes: 0, students: 0,  avgScore: 0,   joinedAt: "2025-05-01", status: "pending",  verified: false },
-  { id: "t7", name: "Alice Fouda",        email: "a.fouda@gmail.com",        specialty: "Culture & Civilisation",  classes: 0, students: 0,  avgScore: 0,   joinedAt: "2025-05-03", status: "pending",  verified: false },
+  { id: "t1", name: "Dr. Beatrice Momo",  email: "b.momo@yema.app",   specialty: "Grammaire · Littérature",   classes: 3, students: 48, avgScore: 8.4, joinedAt: "2024-09-01", status: "active",   verified: true  },
+  { id: "t2", name: "Jean-Pierre Nkolo",  email: "jp.nkolo@yema.app", specialty: "Conversation · B2-C1",      classes: 2, students: 31, avgScore: 7.9, joinedAt: "2024-10-15", status: "active",   verified: true  },
+  { id: "t3", name: "Sophie Tanda",       email: "s.tanda@yema.app",  specialty: "A1-A2 Débutants",           classes: 4, students: 52, avgScore: 8.7, joinedAt: "2024-09-01", status: "active",   verified: true  },
+  { id: "t4", name: "Arsène Biyong",      email: "a.biyong@yema.app", specialty: "Préparation examens CECRL", classes: 2, students: 28, avgScore: 7.2, joinedAt: "2025-01-10", status: "active",   verified: false },
+  { id: "t5", name: "Claudine Ewane",     email: "c.ewane@yema.app",  specialty: "Business Deutsch",          classes: 1, students: 11, avgScore: 6.8, joinedAt: "2025-02-01", status: "inactive", verified: false },
+  { id: "t6", name: "Dr. Samuel Kameni",  email: "s.kameni@gmail.com", specialty: "Phonétique",               classes: 0, students: 0,  avgScore: 0,   joinedAt: "2025-05-01", status: "pending",  verified: false },
+  { id: "t7", name: "Alice Fouda",        email: "a.fouda@gmail.com",  specialty: "Culture & Civilisation",   classes: 0, students: 0,  avgScore: 0,   joinedAt: "2025-05-03", status: "pending",  verified: false },
 ];
 
-const STATUS_STYLE: Record<string, { bg: string; color: string; border: string; label: string }> = {
-  active:   { bg: "rgba(16,185,129,0.12)",  color: "#10b981", border: "rgba(16,185,129,0.3)", label: "Actif" },
-  inactive: { bg: "rgba(100,116,139,0.12)", color: "#64748b", border: "rgba(100,116,139,0.3)", label: "Inactif" },
-  pending:  { bg: "rgba(234,179,8,0.12)",   color: "#eab308", border: "rgba(234,179,8,0.3)",   label: "En attente" },
+type Filter = "all" | "active" | "inactive" | "pending";
+
+interface Copy {
+  title: string;
+  eye: string;
+  h: string;
+  sub: (active: number, pending: number) => string;
+  invite: string;
+  filters: Record<Filter, string>;
+  cols: [string, string, string, string, string, string, string, string];
+  emptyH: string;
+  emptySub: string;
+  profile: string;
+  suspend: string;
+  statusLbl: Record<Teacher["status"], string>;
+  modalEye: string;
+  modalH: string;
+  modalSub: string;
+  fldEmail: string;
+  fldEmailPh: string;
+  fldRole: string;
+  roleTeacher: string;
+  roleAdmin: string;
+  fldMsg: string;
+  fldMsgPh: string;
+  cancel: string;
+  send: string;
+  sending: string;
+  sent: string;
+}
+
+const FR: Copy = {
+  title: "Enseignant·e·s",
+  eye: "Équipe pédagogique",
+  h: "Qui compose ton centre.",
+  sub: (active, pending) => `${active} actif${active > 1 ? "·ve·s" : "·ve"} · ${pending} invitation${pending > 1 ? "s" : ""} en attente.`,
+  invite: "Inviter un·e enseignant·e",
+  filters: { all: "Tou·te·s", active: "Actifs", inactive: "Inactifs", pending: "En attente" },
+  cols: ["Enseignant·e", "Spécialité", "Classes", "Élèves", "Score", "Rejoint le", "Statut", "Actions"],
+  emptyH: "Aucun profil dans ce filtre.",
+  emptySub: "Essaie un autre filtre ou invite un·e nouvel·le enseignant·e.",
+  profile: "Profil",
+  suspend: "Suspendre",
+  statusLbl: { active: "Actif·ve", inactive: "Inactif·ve", pending: "En attente" },
+  modalEye: "Invitation",
+  modalH: "Inviter un·e enseignant·e",
+  modalSub: "Un lien d'invitation sera envoyé par email. Il expire dans 7 jours.",
+  fldEmail: "Adresse email",
+  fldEmailPh: "prenom.nom@exemple.com",
+  fldRole: "Rôle",
+  roleTeacher: "Enseignant·e",
+  roleAdmin: "Administrateur·rice du centre",
+  fldMsg: "Message (optionnel)",
+  fldMsgPh: "Un mot d'accueil…",
+  cancel: "Annuler",
+  send: "Envoyer l'invitation",
+  sending: "Envoi…",
+  sent: "Invitation envoyée",
+};
+
+const EN: Copy = {
+  title: "Teachers",
+  eye: "Teaching team",
+  h: "Who runs your center.",
+  sub: (active, pending) => `${active} active · ${pending} pending invitation${pending > 1 ? "s" : ""}.`,
+  invite: "Invite a teacher",
+  filters: { all: "All", active: "Active", inactive: "Inactive", pending: "Pending" },
+  cols: ["Teacher", "Specialty", "Classes", "Learners", "Score", "Joined", "Status", "Actions"],
+  emptyH: "No profile matches this filter.",
+  emptySub: "Try another filter or invite a new teacher.",
+  profile: "Profile",
+  suspend: "Suspend",
+  statusLbl: { active: "Active", inactive: "Inactive", pending: "Pending" },
+  modalEye: "Invitation",
+  modalH: "Invite a teacher",
+  modalSub: "An email invitation will be sent. It expires in 7 days.",
+  fldEmail: "Email",
+  fldEmailPh: "first.last@example.com",
+  fldRole: "Role",
+  roleTeacher: "Teacher",
+  roleAdmin: "Center administrator",
+  fldMsg: "Message (optional)",
+  fldMsgPh: "A short welcome note…",
+  cancel: "Cancel",
+  send: "Send invitation",
+  sending: "Sending…",
+  sent: "Invitation sent",
 };
 
 export default function CenterTeachersPage() {
+  const locale = useLocale();
+  const t = locale === "en" ? EN : FR;
+  const dateLocale = locale === "en" ? "en-US" : "fr-FR";
+
+  const [filter, setFilter] = useState<Filter>("all");
   const [showModal, setShowModal] = useState(false);
-  const [inviteForm, setInviteForm] = useState({ email: "", role: "teacher", message: "" });
-  const [sent, setSent] = useState(false);
-  const [filter, setFilter] = useState<"all" | "active" | "inactive" | "pending">("all");
+  const [form, setForm] = useState({ email: "", role: "teacher", message: "" });
+  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
 
-  const filtered = filter === "all" ? MOCK_TEACHERS : MOCK_TEACHERS.filter(t => t.status === filter);
+  const filtered = filter === "all" ? MOCK_TEACHERS : MOCK_TEACHERS.filter((x) => x.status === filter);
+  const activeCount = MOCK_TEACHERS.filter((x) => x.status === "active").length;
+  const pendingCount = MOCK_TEACHERS.filter((x) => x.status === "pending").length;
 
-  const sendInvite = () => {
-    setSent(true);
-    setTimeout(() => { setSent(false); setShowModal(false); setInviteForm({ email: "", role: "teacher", message: "" }); }, 2000);
+  const send = () => {
+    setStatus("sending");
+    setTimeout(() => {
+      setStatus("sent");
+      setTimeout(() => {
+        setShowModal(false);
+        setStatus("idle");
+        setForm({ email: "", role: "teacher", message: "" });
+      }, 1400);
+    }, 700);
   };
 
+  const initials = (name: string) => name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+
   return (
-    <CenterLayout title="Gestion des enseignants">
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <div>
-          <h2 style={{ margin: 0, color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 22 }}>
-            Enseignants
-          </h2>
-          <p style={{ margin: "4px 0 0", color: "rgba(255,255,255,0.35)", fontSize: 13 }}>
-            {MOCK_TEACHERS.filter(t => t.status === "active").length} actifs · {MOCK_TEACHERS.filter(t => t.status === "pending").length} invitations en attente
-          </p>
+    <CenterLayout title={t.title}>
+      <section className="subpage">
+        <header className="subpage-head">
+          <div>
+            <p className="subpage-eye">{t.eye}</p>
+            <h2 className="subpage-h">{t.h}</h2>
+            <p className="subpage-sub">{t.sub(activeCount, pendingCount)}</p>
+          </div>
+          <button type="button" className="subpage-cta" onClick={() => setShowModal(true)}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+              <path d="M7 3v8M3 7h8" />
+            </svg>
+            {t.invite}
+          </button>
+        </header>
+
+        <div className="subpage-filters" role="tablist" aria-label={t.filters.all}>
+          {(Object.keys(t.filters) as Filter[]).map((k) => (
+            <button
+              key={k}
+              type="button"
+              role="tab"
+              aria-selected={filter === k}
+              className={`subpage-filter ${filter === k ? "on" : ""}`}
+              onClick={() => setFilter(k)}
+            >
+              {t.filters[k]}
+            </button>
+          ))}
         </div>
-        <button onClick={() => setShowModal(true)} style={{
-          background: "linear-gradient(135deg, #eab308, #ca8a04)",
-          color: "#080c10", border: "none", borderRadius: 10,
-          padding: "10px 20px", fontSize: 13, fontWeight: 700,
-          cursor: "pointer", fontFamily: "'Syne', sans-serif",
-        }}>
-          + Inviter un enseignant
-        </button>
-      </div>
 
-      {/* Filters */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-        {([["all", "Tous"], ["active", "Actifs"], ["inactive", "Inactifs"], ["pending", "En attente"]] as const).map(([k, l]) => (
-          <button key={k} onClick={() => setFilter(k)} style={{
-            padding: "6px 16px", borderRadius: 8, cursor: "pointer",
-            background: filter === k ? "rgba(234,179,8,0.15)" : "rgba(255,255,255,0.04)",
-            color: filter === k ? "#eab308" : "rgba(255,255,255,0.4)",
-            border: `1px solid ${filter === k ? "rgba(234,179,8,0.3)" : "rgba(255,255,255,0.07)"}`,
-            fontSize: 13, fontWeight: 600, transition: "all 0.2s",
-          }}>{l}</button>
-        ))}
-      </div>
+        {filtered.length === 0 ? (
+          <div className="empty-state">
+            <p className="empty-state-h">{t.emptyH}</p>
+            <p className="empty-state-sub">{t.emptySub}</p>
+          </div>
+        ) : (
+          <div className="data-table-wrap">
+            <div className="data-table-scroll">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    {t.cols.map((c, i) => (
+                      <th key={c} className={i === 2 || i === 3 || i === 4 ? "center" : ""}>{c}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((teacher) => {
+                    const scoreClass = teacher.avgScore >= 8 ? "high" : teacher.avgScore >= 7 ? "mid" : "low";
+                    return (
+                      <tr key={teacher.id}>
+                        <td>
+                          <div className="mono-cell">
+                            <span className="mono-avatar" aria-hidden="true">{initials(teacher.name)}</span>
+                            <div>
+                              <p className="mono-cell-name">
+                                {teacher.name}
+                                {teacher.verified && (
+                                  <svg className="mono-cell-check" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Vérifié">
+                                    <path d="M2 6l3 3 5-6" />
+                                  </svg>
+                                )}
+                              </p>
+                              <p className="mono-cell-mail">{teacher.email}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td>{teacher.specialty || "—"}</td>
+                        <td className="center">{teacher.classes}</td>
+                        <td className="center">{teacher.students}</td>
+                        <td className="center">
+                          {teacher.avgScore > 0 ? (
+                            <span className={`score-cell ${scoreClass}`}>{teacher.avgScore}/10</span>
+                          ) : (
+                            <span style={{ color: "var(--creme-mute)" }}>—</span>
+                          )}
+                        </td>
+                        <td>{new Date(teacher.joinedAt).toLocaleDateString(dateLocale, { day: "2-digit", month: "short", year: "numeric" })}</td>
+                        <td>
+                          <span className={`status-pill ${teacher.status}`}>{t.statusLbl[teacher.status]}</span>
+                        </td>
+                        <td>
+                          <div className="row-actions">
+                            <Link href={`/teacher/students/${teacher.id}`} className="row-btn">
+                              {t.profile}
+                            </Link>
+                            {teacher.status === "active" && (
+                              <button type="button" className="row-btn danger">{t.suspend}</button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </section>
 
-      {/* Table */}
-      <div style={{
-        background: "rgba(13,17,23,0.8)", border: "1px solid rgba(255,255,255,0.07)",
-        borderRadius: 14, overflow: "hidden",
-      }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-              {["Enseignant", "Spécialité", "Classes", "Élèves", "Score moy.", "Rejoint le", "Statut", "Actions"].map(h => (
-                <th key={h} style={{
-                  padding: "12px 16px", textAlign: "left", color: "rgba(255,255,255,0.3)",
-                  fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em",
-                }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((t, i) => {
-              const ss = STATUS_STYLE[t.status];
-              return (
-                <tr key={t.id} style={{ borderBottom: i < filtered.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                  <td style={{ padding: "14px 16px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{
-                        width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
-                        background: "linear-gradient(135deg, rgba(234,179,8,0.2), rgba(161,120,0,0.08))",
-                        border: "1px solid rgba(234,179,8,0.2)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        color: "#eab308", fontWeight: 700, fontSize: 12,
-                      }}>
-                        {t.name.split(" ").map(w => w[0]).slice(0, 2).join("")}
-                      </div>
-                      <div>
-                        <div style={{ color: "#e2e8f0", fontWeight: 600, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
-                          {t.name}
-                          {t.verified && <span style={{ color: "#10b981", fontSize: 11 }}>✓</span>}
-                        </div>
-                        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{t.email}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td style={{ padding: "14px 16px", color: "rgba(255,255,255,0.4)", fontSize: 12 }}>{t.specialty || "—"}</td>
-                  <td style={{ padding: "14px 16px", color: "#e2e8f0", fontSize: 13, textAlign: "center" }}>{t.classes}</td>
-                  <td style={{ padding: "14px 16px", color: "#e2e8f0", fontSize: 13, textAlign: "center" }}>{t.students}</td>
-                  <td style={{ padding: "14px 16px" }}>
-                    {t.avgScore > 0 ? (
-                      <span style={{
-                        color: t.avgScore >= 8 ? "#10b981" : t.avgScore >= 7 ? "#f59e0b" : "#ef4444",
-                        fontWeight: 700, fontSize: 13,
-                      }}>{t.avgScore}/10</span>
-                    ) : <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 12 }}>—</span>}
-                  </td>
-                  <td style={{ padding: "14px 16px", color: "rgba(255,255,255,0.35)", fontSize: 12 }}>
-                    {new Date(t.joinedAt).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })}
-                  </td>
-                  <td style={{ padding: "14px 16px" }}>
-                    <span style={{ background: ss.bg, color: ss.color, border: `1px solid ${ss.border}`, borderRadius: 6, padding: "2px 10px", fontSize: 11, fontWeight: 700 }}>
-                      {ss.label}
-                    </span>
-                  </td>
-                  <td style={{ padding: "14px 16px" }}>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      <Link href={`/teacher/students/${t.id}`} style={{
-                        background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)",
-                        border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6,
-                        padding: "4px 10px", fontSize: 11, textDecoration: "none", whiteSpace: "nowrap",
-                      }}>Profil</Link>
-                      {t.status === "active" && (
-                        <button style={{
-                          background: "rgba(239,68,68,0.08)", color: "#ef4444",
-                          border: "1px solid rgba(239,68,68,0.2)", borderRadius: 6,
-                          padding: "4px 10px", fontSize: 11, cursor: "pointer", whiteSpace: "nowrap",
-                        }}>Suspendre</button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Invite modal */}
       {showModal && (
-        <div style={{
-          position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
-          display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000,
-        }} onClick={e => e.target === e.currentTarget && setShowModal(false)}>
-          <div style={{
-            background: "#0d1117", border: "1px solid rgba(234,179,8,0.2)",
-            borderRadius: 16, padding: 32, width: 460, maxWidth: "90vw",
-          }}>
-            <div style={{ color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 18, marginBottom: 6 }}>
-              Inviter un enseignant
-            </div>
-            <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, marginBottom: 24 }}>
-              Un lien d&apos;invitation sera envoyé par email.
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div>
-                <label style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Adresse email</label>
-                <input type="email" value={inviteForm.email} onChange={e => setInviteForm(f => ({ ...f, email: e.target.value }))}
-                  placeholder="professeur@exemple.com"
-                  style={{ width: "100%", background: "#161b22", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "10px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+        <div
+          className="modal-scrim"
+          onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="teacher-invite-h"
+        >
+          <div className="modal-card">
+            <p className="modal-eye">{t.modalEye}</p>
+            <h3 id="teacher-invite-h" className="modal-h">{t.modalH}</h3>
+            <p className="modal-sub">{t.modalSub}</p>
+
+            <div className="modal-form">
+              <div className="modal-field">
+                <label htmlFor="inv-email" className="modal-lbl">{t.fldEmail}</label>
+                <input
+                  id="inv-email"
+                  type="email"
+                  className="modal-input"
+                  placeholder={t.fldEmailPh}
+                  value={form.email}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                />
               </div>
-              <div>
-                <label style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Rôle</label>
-                <select value={inviteForm.role} onChange={e => setInviteForm(f => ({ ...f, role: e.target.value }))}
-                  style={{ width: "100%", background: "#161b22", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "10px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box" }}>
-                  <option value="teacher">Enseignant</option>
-                  <option value="admin">Administrateur centre</option>
+              <div className="modal-field">
+                <label htmlFor="inv-role" className="modal-lbl">{t.fldRole}</label>
+                <select
+                  id="inv-role"
+                  className="modal-select"
+                  value={form.role}
+                  onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
+                >
+                  <option value="teacher">{t.roleTeacher}</option>
+                  <option value="admin">{t.roleAdmin}</option>
                 </select>
               </div>
-              <div>
-                <label style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Message (optionnel)</label>
-                <textarea value={inviteForm.message} onChange={e => setInviteForm(f => ({ ...f, message: e.target.value }))}
-                  placeholder="Bienvenue dans notre équipe..." rows={3}
-                  style={{ width: "100%", background: "#161b22", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "10px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", resize: "vertical", boxSizing: "border-box" }} />
+              <div className="modal-field">
+                <label htmlFor="inv-msg" className="modal-lbl">{t.fldMsg}</label>
+                <textarea
+                  id="inv-msg"
+                  rows={3}
+                  className="modal-textarea"
+                  placeholder={t.fldMsgPh}
+                  value={form.message}
+                  onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+                />
               </div>
             </div>
-            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 24 }}>
-              <button onClick={() => setShowModal(false)} style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "8px 20px", cursor: "pointer" }}>Annuler</button>
-              <button onClick={sendInvite} style={{
-                background: sent ? "#059669" : "linear-gradient(135deg, #eab308, #ca8a04)",
-                color: "#080c10", border: "none", borderRadius: 8, padding: "8px 20px", cursor: "pointer", fontWeight: 700,
-              }}>
-                {sent ? "✓ Invitation envoyée !" : "Envoyer l'invitation"}
+
+            <div className="modal-actions">
+              <button type="button" className="subpage-cta ghost" onClick={() => setShowModal(false)}>
+                {t.cancel}
+              </button>
+              <button
+                type="button"
+                className="subpage-cta"
+                onClick={send}
+                disabled={!form.email || status !== "idle"}
+              >
+                {status === "sending" ? t.sending : status === "sent" ? t.sent : t.send}
               </button>
             </div>
           </div>

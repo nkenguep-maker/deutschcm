@@ -1,321 +1,545 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import CenterLayout from "@/components/CenterLayout";
+import { IconCheck } from "@/components/landing/icons";
 
-const PLANS = [
+interface Plan {
+  id: "STARTER" | "PRO" | "ENTERPRISE";
+  name: string;
+  price: number;
+  teachers: number; // -1 = illimité
+  students: number;
+  features: (locale: "fr" | "en") => string[];
+  highlight?: boolean;
+  current?: boolean;
+}
+
+const PLANS: Plan[] = [
   {
     id: "STARTER",
     name: "Starter",
     price: 25000,
-    icon: "🌱",
-    color: "#64748b",
     teachers: 5,
     students: 100,
-    features: [
-      "5 enseignants maximum",
-      "100 élèves maximum",
+    features: (l) => l === "en" ? [
+      "Up to 5 teachers",
+      "Up to 100 learners",
+      "Center dashboard",
+      "Monthly reports",
+      "Email support",
+    ] : [
+      "Jusqu'à 5 enseignant·e·s",
+      "Jusqu'à 100 apprenant·e·s",
       "Tableau de bord centre",
       "Rapports mensuels",
       "Support email",
     ],
-    current: false,
   },
   {
     id: "PRO",
     name: "Pro",
     price: 75000,
-    icon: "⭐",
-    color: "#eab308",
     teachers: 20,
     students: 500,
-    features: [
-      "20 enseignants maximum",
-      "500 élèves maximum",
+    highlight: true,
+    current: true,
+    features: (l) => l === "en" ? [
+      "Up to 20 teachers",
+      "Up to 500 learners",
+      "Advanced statistics",
+      "CSV / PDF exports",
+      "Unlimited AI simulator",
+      "Priority support",
+      "Mobile Money integration",
+    ] : [
+      "Jusqu'à 20 enseignant·e·s",
+      "Jusqu'à 500 apprenant·e·s",
       "Statistiques avancées",
-      "Export CSV/PDF",
+      "Exports CSV · PDF",
       "Simulateur IA illimité",
       "Support prioritaire",
       "Intégration Mobile Money",
     ],
-    current: true,
   },
   {
     id: "ENTERPRISE",
     name: "Enterprise",
     price: 150000,
-    icon: "🏆",
-    color: "#6366f1",
     teachers: -1,
     students: -1,
-    features: [
-      "Enseignants illimités",
-      "Élèves illimités",
+    features: (l) => l === "en" ? [
+      "Unlimited teachers",
+      "Unlimited learners",
+      "Dedicated API",
+      "On-site training",
+      "Dedicated manager",
+      "SLA 99.9%",
+      "Full customization",
+    ] : [
+      "Enseignant·e·s illimité·e·s",
+      "Apprenant·e·s illimité·e·s",
       "API dédiée",
       "Formations sur site",
       "Manager dédié",
       "SLA 99,9%",
       "Personnalisation complète",
     ],
-    current: false,
   },
 ];
 
 const HISTORY = [
-  { id: "p1", date: "2025-05-01", amount: 75000, method: "MTN Mobile Money", phone: "677 45 23 10", status: "SUCCESS", ref: "MTNCI-2025050187234" },
-  { id: "p2", date: "2025-04-01", amount: 75000, method: "MTN Mobile Money", phone: "677 45 23 10", status: "SUCCESS", ref: "MTNCI-2025040162811" },
-  { id: "p3", date: "2025-03-01", amount: 75000, method: "Orange Money",     phone: "655 12 98 44", status: "SUCCESS", ref: "OM-2025030195532" },
-  { id: "p4", date: "2025-02-01", amount: 75000, method: "MTN Mobile Money", phone: "677 45 23 10", status: "FAILED",  ref: "MTNCI-2025020148119" },
-  { id: "p5", date: "2025-02-02", amount: 75000, method: "Orange Money",     phone: "655 12 98 44", status: "SUCCESS", ref: "OM-2025020299843" },
+  { id: "p1", date: "2026-05-01", amount: 75000, method: "MTN MoMo",     phone: "677 45 23 10", status: "SUCCESS" as const, ref: "MTN-2026050187234" },
+  { id: "p2", date: "2026-04-01", amount: 75000, method: "MTN MoMo",     phone: "677 45 23 10", status: "SUCCESS" as const, ref: "MTN-2026040162811" },
+  { id: "p3", date: "2026-03-01", amount: 75000, method: "Orange Money", phone: "655 12 98 44", status: "SUCCESS" as const, ref: "OM-2026030195532" },
+  { id: "p4", date: "2026-02-02", amount: 75000, method: "Orange Money", phone: "655 12 98 44", status: "SUCCESS" as const, ref: "OM-2026020299843" },
+  { id: "p5", date: "2026-02-01", amount: 75000, method: "MTN MoMo",     phone: "677 45 23 10", status: "FAILED" as const,  ref: "MTN-2026020148119" },
 ];
 
-const STATUS_STYLE: Record<string, { bg: string; color: string; border: string; label: string }> = {
-  SUCCESS: { bg: "rgba(16,185,129,0.12)",  color: "#10b981", border: "rgba(16,185,129,0.3)",  label: "Succès" },
-  FAILED:  { bg: "rgba(239,68,68,0.12)",   color: "#ef4444", border: "rgba(239,68,68,0.3)",   label: "Échoué" },
-  PENDING: { bg: "rgba(234,179,8,0.12)",   color: "#eab308", border: "rgba(234,179,8,0.3)",   label: "En cours" },
+interface Copy {
+  title: string;
+  eye: string;
+  h: string;
+  sub: string;
+  currentPlanLbl: string;
+  currentPlanSub: (teachers: string, students: string, renew: string) => string;
+  perMonth: string;
+  renewCta: string;
+  plansEye: string;
+  plansH: string;
+  planLimits: (t: string, s: string) => string;
+  unlimitedT: string;
+  unlimitedS: (n: number) => string;
+  upToT: (n: number) => string;
+  currentBadge: string;
+  chooseCta: string;
+  renewSame: string;
+  historyEye: string;
+  historyH: string;
+  historyCols: [string, string, string, string, string, string];
+  statusLbl: Record<"SUCCESS" | "FAILED" | "PENDING", string>;
+  modalEye: string;
+  modalHForm: string;
+  modalHConfirm: string;
+  modalHDone: string;
+  modalSubForm: (price: string) => string;
+  modalPhoneLbl: string;
+  modalPhonePh: string;
+  modalConfirmSub: (phone: string, amount: string) => string;
+  modalDoneSub: (plan: string, date: string) => string;
+  back: string;
+  cancel: string;
+  confirm: string;
+  validated: string;
+  close: string;
+}
+
+const FR: Copy = {
+  title: "Facturation",
+  eye: "Facturation",
+  h: "L'abonnement de ton centre.",
+  sub: "Trois plans, Mobile Money natif, factures téléchargeables en XAF. Aucun engagement au-delà du mois en cours.",
+  currentPlanLbl: "Plan actif",
+  currentPlanSub: (teachers, students, renew) => `${teachers} · ${students} · renouvellement le ${renew}.`,
+  perMonth: "par mois",
+  renewCta: "Renouveler",
+  plansEye: "Plans",
+  plansH: "Choisir ou ajuster.",
+  planLimits: (t, s) => `${t} · ${s}`,
+  unlimitedT: "Enseignant·e·s illimité·e·s",
+  unlimitedS: (n) => n === -1 ? "Apprenant·e·s illimité·e·s" : `${n} apprenant·e·s`,
+  upToT: (n) => `Jusqu'à ${n} enseignant·e·s`,
+  currentBadge: "Actuel",
+  chooseCta: "Choisir ce plan",
+  renewSame: "Renouveler",
+  historyEye: "Historique",
+  historyH: "Paiements du centre.",
+  historyCols: ["Date", "Montant", "Méthode", "Téléphone", "Référence", "Statut"],
+  statusLbl: { SUCCESS: "Réussi", FAILED: "Échec", PENDING: "En cours" },
+  modalEye: "Paiement",
+  modalHForm: "Payer par Mobile Money",
+  modalHConfirm: "Confirme sur ton téléphone",
+  modalHDone: "Paiement confirmé.",
+  modalSubForm: (price) => `Montant : ${price} XAF. Aucun débit avant validation sur le mobile.`,
+  modalPhoneLbl: "Numéro de téléphone",
+  modalPhonePh: "6xx xx xx xx",
+  modalConfirmSub: (phone, amount) =>
+    `Une demande a été envoyée au ${phone}. Valide-la depuis ton application MoMo. Montant : ${amount} XAF.`,
+  modalDoneSub: (plan, date) =>
+    `Ton plan ${plan} est actif jusqu'au ${date}. Merci.`,
+  back: "Retour",
+  cancel: "Annuler",
+  confirm: "Confirmer",
+  validated: "J'ai validé",
+  close: "Fermer",
+};
+
+const EN: Copy = {
+  title: "Billing",
+  eye: "Billing",
+  h: "Your center's subscription.",
+  sub: "Three plans, native Mobile Money, downloadable XAF invoices. No commitment beyond the current month.",
+  currentPlanLbl: "Active plan",
+  currentPlanSub: (teachers, students, renew) => `${teachers} · ${students} · renews on ${renew}.`,
+  perMonth: "per month",
+  renewCta: "Renew",
+  plansEye: "Plans",
+  plansH: "Pick or adjust.",
+  planLimits: (t, s) => `${t} · ${s}`,
+  unlimitedT: "Unlimited teachers",
+  unlimitedS: (n) => n === -1 ? "Unlimited learners" : `${n} learners`,
+  upToT: (n) => `Up to ${n} teachers`,
+  currentBadge: "Current",
+  chooseCta: "Choose this plan",
+  renewSame: "Renew",
+  historyEye: "History",
+  historyH: "Center payments.",
+  historyCols: ["Date", "Amount", "Method", "Phone", "Reference", "Status"],
+  statusLbl: { SUCCESS: "Success", FAILED: "Failed", PENDING: "Pending" },
+  modalEye: "Payment",
+  modalHForm: "Pay via Mobile Money",
+  modalHConfirm: "Confirm on your phone",
+  modalHDone: "Payment confirmed.",
+  modalSubForm: (price) => `Amount: ${price} XAF. No charge until you confirm on your phone.`,
+  modalPhoneLbl: "Phone number",
+  modalPhonePh: "6xx xx xx xx",
+  modalConfirmSub: (phone, amount) =>
+    `A request was sent to ${phone}. Confirm it from your MoMo app. Amount: ${amount} XAF.`,
+  modalDoneSub: (plan, date) =>
+    `Your ${plan} plan is active until ${date}. Thank you.`,
+  back: "Back",
+  cancel: "Cancel",
+  confirm: "Confirm",
+  validated: "I confirmed",
+  close: "Close",
 };
 
 export default function CenterBillingPage() {
-  const [showPayModal, setShowPayModal] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<typeof PLANS[0] | null>(null);
+  const locale = useLocale();
+  const t = locale === "en" ? EN : FR;
+  const dateLocale = locale === "en" ? "en-US" : "fr-FR";
+
+  const [showModal, setShowModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [payMethod, setPayMethod] = useState<"MTN" | "ORANGE">("MTN");
   const [phone, setPhone] = useState("");
   const [step, setStep] = useState<"form" | "confirm" | "done">("form");
+  const [doneDate, setDoneDate] = useState("");
 
-  const currentPlan = PLANS.find(p => p.current)!;
-  const renewDate = new Date("2025-05-16").toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  const current = PLANS.find((p) => p.current)!;
+  const renewDate = new Date("2026-06-01").toLocaleDateString(dateLocale, { day: "numeric", month: "long", year: "numeric" });
 
-  const openPay = (plan: typeof PLANS[0]) => {
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDoneDate(new Date(Date.now() + 30 * 24 * 3600 * 1000).toLocaleDateString(dateLocale, { day: "numeric", month: "long", year: "numeric" }));
+  }, [dateLocale]);
+
+  const openPay = (plan: Plan) => {
     setSelectedPlan(plan);
     setStep("form");
-    setShowPayModal(true);
+    setPhone("");
+    setShowModal(true);
   };
 
+  const teacherLimitLabel = (p: Plan) => p.teachers === -1 ? t.unlimitedT : t.upToT(p.teachers);
+  const studentLimitLabel = (p: Plan) => t.unlimitedS(p.students);
+
   return (
-    <CenterLayout title="Facturation">
-
-      {/* Current plan banner */}
-      <div style={{
-        background: "linear-gradient(135deg, rgba(234,179,8,0.08), rgba(161,120,0,0.04))",
-        border: "1px solid rgba(234,179,8,0.25)", borderRadius: 16, padding: "20px 24px",
-        display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div style={{ fontSize: 36 }}>⭐</div>
+    <CenterLayout title={t.title}>
+      <section className="subpage">
+        <header className="subpage-head">
           <div>
-            <div style={{ color: "#eab308", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 18 }}>
-              Plan {currentPlan.name} · Actif
-            </div>
-            <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, marginTop: 2 }}>
-              {currentPlan.teachers} enseignants · {currentPlan.students} élèves · Renouvellement le {renewDate}
-            </div>
+            <p className="subpage-eye">{t.eye}</p>
+            <h2 className="subpage-h">{t.h}</h2>
+            <p className="subpage-sub">{t.sub}</p>
           </div>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ color: "#eab308", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 22 }}>
-              {currentPlan.price.toLocaleString("fr-FR")} XAF
-            </div>
-            <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>par mois</div>
-          </div>
-          <button onClick={() => openPay(currentPlan)} style={{
-            background: "linear-gradient(135deg, #eab308, #ca8a04)",
-            color: "#080c10", border: "none", borderRadius: 10,
-            padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer",
-          }}>
-            Renouveler →
-          </button>
-        </div>
-      </div>
+        </header>
 
-      {/* Plans */}
-      <div style={{ marginBottom: 32 }}>
-        <h3 style={{ margin: "0 0 16px", color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 16 }}>
-          Choisir un plan
-        </h3>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
-          {PLANS.map(plan => (
-            <div key={plan.id} style={{
-              background: plan.current ? "rgba(234,179,8,0.05)" : "rgba(13,17,23,0.8)",
-              border: `2px solid ${plan.current ? "rgba(234,179,8,0.4)" : "rgba(255,255,255,0.07)"}`,
-              borderRadius: 16, padding: 24, display: "flex", flexDirection: "column",
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-                <div>
-                  <div style={{ fontSize: 28, marginBottom: 6 }}>{plan.icon}</div>
-                  <div style={{ color: plan.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 18 }}>{plan.name}</div>
-                </div>
+        <div style={{
+          padding: "24px 28px",
+          background: "linear-gradient(135deg, rgba(184, 135, 62, 0.14), rgba(184, 135, 62, 0.03))",
+          border: "1px solid var(--brass-edge)",
+          borderRadius: 16,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 20,
+          flexWrap: "wrap",
+        }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, minWidth: 0 }}>
+            <p style={{
+              fontFamily: "var(--font-jetbrains, monospace)",
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "var(--brass)",
+              margin: 0,
+            }}>{t.currentPlanLbl}</p>
+            <h3 style={{
+              fontFamily: "var(--font-fraunces), Georgia, serif",
+              fontSize: 24,
+              color: "var(--creme)",
+              margin: 0,
+              fontWeight: 400,
+            }}>{current.name}</h3>
+            <p style={{ color: "var(--creme-soft)", fontSize: 13, margin: 0 }}>
+              {t.currentPlanSub(teacherLimitLabel(current), studentLimitLabel(current), renewDate)}
+            </p>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
+            <div style={{ textAlign: "right" }}>
+              <p style={{
+                fontFamily: "var(--font-fraunces), Georgia, serif",
+                fontSize: 26,
+                color: "var(--creme)",
+                margin: 0,
+                lineHeight: 1,
+              }}>
+                {current.price.toLocaleString(dateLocale)} <span style={{ fontFamily: "var(--font-jetbrains, monospace)", fontSize: 12, letterSpacing: "0.08em", color: "var(--brass)" }}>XAF</span>
+              </p>
+              <p style={{ color: "var(--creme-mute)", fontSize: 11, margin: "4px 0 0", fontFamily: "var(--font-jetbrains, monospace)" }}>
+                {t.perMonth}
+              </p>
+            </div>
+            <button type="button" className="subpage-cta" onClick={() => openPay(current)}>
+              {t.renewCta}
+            </button>
+          </div>
+        </div>
+
+        <section>
+          <p className="dash-eye">{t.plansEye}</p>
+          <h2 className="dash-block-h">{t.plansH}</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
+            {PLANS.map((plan) => (
+              <div key={plan.id} style={{
+                padding: 24,
+                background: plan.highlight ? "rgba(184, 135, 62, 0.06)" : "var(--espresso-2)",
+                border: `1px solid ${plan.highlight ? "var(--brass-edge)" : "var(--creme-hair)"}`,
+                borderRadius: 16,
+                display: "flex",
+                flexDirection: "column",
+                gap: 14,
+                position: "relative",
+              }}>
                 {plan.current && (
                   <span style={{
-                    background: "rgba(234,179,8,0.15)", color: "#eab308",
-                    border: "1px solid rgba(234,179,8,0.3)", borderRadius: 20,
-                    padding: "3px 10px", fontSize: 10, fontWeight: 700,
-                  }}>ACTUEL</span>
+                    position: "absolute",
+                    top: 16, right: 16,
+                    padding: "3px 10px",
+                    background: "var(--brass)",
+                    color: "var(--espresso)",
+                    borderRadius: 999,
+                    fontSize: 10,
+                    fontFamily: "var(--font-jetbrains, monospace)",
+                    fontWeight: 700,
+                    letterSpacing: "0.10em",
+                    textTransform: "uppercase",
+                  }}>{t.currentBadge}</span>
                 )}
+
+                <div>
+                  <h3 style={{
+                    fontFamily: "var(--font-fraunces), Georgia, serif",
+                    fontSize: 22,
+                    color: "var(--creme)",
+                    margin: "0 0 8px",
+                    fontWeight: 400,
+                  }}>{plan.name}</h3>
+                  <p style={{
+                    fontFamily: "var(--font-fraunces), Georgia, serif",
+                    fontSize: 32,
+                    color: plan.highlight ? "var(--brass)" : "var(--creme)",
+                    margin: 0,
+                    lineHeight: 1,
+                    fontWeight: 400,
+                  }}>
+                    {plan.price.toLocaleString(dateLocale)}
+                    <span style={{
+                      fontFamily: "var(--font-jetbrains, monospace)",
+                      fontSize: 12,
+                      color: "var(--creme-mute)",
+                      letterSpacing: "0.08em",
+                      marginLeft: 6,
+                    }}>XAF / {t.perMonth}</span>
+                  </p>
+                  <p style={{
+                    color: "var(--creme-mute)",
+                    fontSize: 12,
+                    marginTop: 8,
+                    fontFamily: "var(--font-jetbrains, monospace)",
+                    letterSpacing: "0.04em",
+                  }}>
+                    {t.planLimits(teacherLimitLabel(plan), studentLimitLabel(plan))}
+                  </p>
+                </div>
+
+                <ul style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                  flex: 1,
+                }}>
+                  {plan.features(locale === "en" ? "en" : "fr").map((f) => (
+                    <li key={f} style={{ color: "var(--creme-soft)", fontSize: 13, display: "flex", gap: 10, alignItems: "flex-start", lineHeight: 1.5 }}>
+                      <span style={{ color: "var(--brass)", flexShrink: 0, marginTop: 3 }} aria-hidden="true">
+                        <IconCheck size={13} />
+                      </span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+
+                <button
+                  type="button"
+                  className={`subpage-cta ${plan.current ? "" : "ghost"}`}
+                  style={{ justifyContent: "center", width: "100%" }}
+                  onClick={() => openPay(plan)}
+                >
+                  {plan.current ? t.renewSame : t.chooseCta}
+                </button>
               </div>
-              <div style={{ marginBottom: 16 }}>
-                <span style={{ color: plan.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 26 }}>
-                  {plan.price.toLocaleString("fr-FR")}
-                </span>
-                <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 12 }}> XAF/mois</span>
-              </div>
-              <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, marginBottom: 16 }}>
-                {plan.teachers === -1 ? "Enseignants illimités" : `Jusqu'à ${plan.teachers} enseignants`} ·{" "}
-                {plan.students === -1 ? "Élèves illimités" : `${plan.students} élèves`}
-              </div>
-              <ul style={{ margin: "0 0 20px", padding: "0 0 0 0", listStyle: "none", display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
-                {plan.features.map(f => (
-                  <li key={f} style={{ color: "rgba(255,255,255,0.55)", fontSize: 12, display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ color: plan.color, fontSize: 13, flexShrink: 0 }}>✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => openPay(plan)}
-                style={{
-                  width: "100%", padding: "10px 0", borderRadius: 10, cursor: "pointer",
-                  background: plan.current
-                    ? "linear-gradient(135deg, #eab308, #ca8a04)"
-                    : `rgba(${plan.color === "#6366f1" ? "99,102,241" : "100,116,139"},0.1)`,
-                  color: plan.current ? "#080c10" : plan.color,
-                  border: `1px solid ${plan.current ? "transparent" : plan.color + "44"}`,
-                  fontWeight: 700, fontSize: 13, fontFamily: "'Syne', sans-serif",
-                }}
-              >
-                {plan.current ? "Renouveler" : "Choisir ce plan"}
-              </button>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <p className="dash-eye">{t.historyEye}</p>
+          <h2 className="dash-block-h">{t.historyH}</h2>
+          <div className="data-table-wrap">
+            <div className="data-table-scroll">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    {t.historyCols.map((c) => <th key={c}>{c}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {HISTORY.map((p) => (
+                    <tr key={p.id}>
+                      <td>{new Date(p.date).toLocaleDateString(dateLocale, { day: "2-digit", month: "long", year: "numeric" })}</td>
+                      <td style={{ fontFamily: "var(--font-jetbrains, monospace)", color: "var(--creme)" }}>
+                        {p.amount.toLocaleString(dateLocale)} XAF
+                      </td>
+                      <td>{p.method}</td>
+                      <td style={{ fontFamily: "var(--font-jetbrains, monospace)", color: "var(--creme-mute)" }}>{p.phone}</td>
+                      <td>
+                        <code style={{
+                          fontFamily: "var(--font-jetbrains, monospace)",
+                          color: "var(--creme-mute)",
+                          fontSize: 11,
+                          background: "var(--brass-glow)",
+                          padding: "2px 8px",
+                          borderRadius: 4,
+                          border: "1px solid var(--brass-edge)",
+                        }}>{p.ref}</code>
+                      </td>
+                      <td>
+                        <span className={`status-pill ${p.status === "SUCCESS" ? "active" : p.status === "FAILED" ? "warning" : "pending"}`}>
+                          {t.statusLbl[p.status]}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        </section>
+      </section>
 
-      {/* Payment history */}
-      <div style={{ background: "rgba(13,17,23,0.8)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 24 }}>
-        <h3 style={{ margin: "0 0 20px", color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 15 }}>
-          Historique des paiements
-        </h3>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-              {["Date", "Montant", "Méthode", "Téléphone", "Référence", "Statut"].map(h => (
-                <th key={h} style={{ padding: "8px 14px", textAlign: "left", color: "rgba(255,255,255,0.3)", fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {HISTORY.map((p, i) => {
-              const ss = STATUS_STYLE[p.status];
-              return (
-                <tr key={p.id} style={{ borderBottom: i < HISTORY.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                  <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.5)", fontSize: 13 }}>
-                    {new Date(p.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" })}
-                  </td>
-                  <td style={{ padding: "12px 14px", color: "#e2e8f0", fontWeight: 700, fontSize: 13 }}>
-                    {p.amount.toLocaleString("fr-FR")} XAF
-                  </td>
-                  <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.5)", fontSize: 12 }}>
-                    {p.method.includes("MTN") ? "🟡" : "🟠"} {p.method}
-                  </td>
-                  <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.4)", fontSize: 12 }}>{p.phone}</td>
-                  <td style={{ padding: "12px 14px" }}>
-                    <code style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, background: "rgba(255,255,255,0.04)", padding: "2px 6px", borderRadius: 4 }}>
-                      {p.ref}
-                    </code>
-                  </td>
-                  <td style={{ padding: "12px 14px" }}>
-                    <span style={{ background: ss.bg, color: ss.color, border: `1px solid ${ss.border}`, borderRadius: 6, padding: "2px 10px", fontSize: 11, fontWeight: 700 }}>
-                      {ss.label}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      {showModal && selectedPlan && (
+        <div
+          className="modal-scrim"
+          onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="pay-h"
+        >
+          <div className="modal-card">
+            <p className="modal-eye">{t.modalEye} · {selectedPlan.name}</p>
 
-      {/* Pay modal */}
-      {showPayModal && selectedPlan && (
-        <div style={{
-          position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)",
-          display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000,
-        }} onClick={e => e.target === e.currentTarget && setShowPayModal(false)}>
-          <div style={{ background: "#0d1117", border: "1px solid rgba(234,179,8,0.2)", borderRadius: 16, padding: 32, width: 440, maxWidth: "90vw" }}>
             {step === "form" && (
               <>
-                <div style={{ color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 18, marginBottom: 4 }}>
-                  Paiement — Plan {selectedPlan.name}
-                </div>
-                <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, marginBottom: 24 }}>
-                  {selectedPlan.price.toLocaleString("fr-FR")} XAF / mois · Via Mobile Money
-                </div>
-                <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-                  {(["MTN", "ORANGE"] as const).map(m => (
-                    <button key={m} onClick={() => setPayMethod(m)} style={{
-                      flex: 1, padding: "12px 0", borderRadius: 10, cursor: "pointer",
-                      background: payMethod === m
-                        ? m === "MTN" ? "rgba(234,179,8,0.15)" : "rgba(249,115,22,0.15)"
-                        : "rgba(255,255,255,0.04)",
-                      color: payMethod === m ? (m === "MTN" ? "#eab308" : "#f97316") : "rgba(255,255,255,0.35)",
-                      border: `1px solid ${payMethod === m ? (m === "MTN" ? "rgba(234,179,8,0.35)" : "rgba(249,115,22,0.35)") : "rgba(255,255,255,0.07)"}`,
-                      fontWeight: 700, fontSize: 13,
-                    }}>
-                      {m === "MTN" ? "🟡 MTN MoMo" : "🟠 Orange Money"}
+                <h3 id="pay-h" className="modal-h">{t.modalHForm}</h3>
+                <p className="modal-sub">{t.modalSubForm(selectedPlan.price.toLocaleString(dateLocale))}</p>
+
+                <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+                  {(["MTN", "ORANGE"] as const).map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      className={`subpage-filter ${payMethod === m ? "on" : ""}`}
+                      style={{ flex: 1 }}
+                      onClick={() => setPayMethod(m)}
+                    >
+                      {m === "MTN" ? "MTN MoMo" : "Orange Money"}
                     </button>
                   ))}
                 </div>
-                <label style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>
-                  Numéro de téléphone
-                </label>
-                <input
-                  type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-                  placeholder={payMethod === "MTN" ? "6XX XX XX XX" : "655 XX XX XX"}
-                  style={{ width: "100%", background: "#161b22", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "10px 14px", color: "#e2e8f0", fontSize: 14, outline: "none", boxSizing: "border-box", marginBottom: 24 }}
-                />
-                <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-                  <button onClick={() => setShowPayModal(false)} style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "8px 20px", cursor: "pointer" }}>Annuler</button>
-                  <button onClick={() => setStep("confirm")} style={{ background: "linear-gradient(135deg, #eab308, #ca8a04)", color: "#080c10", border: "none", borderRadius: 8, padding: "8px 24px", cursor: "pointer", fontWeight: 700 }}>
-                    Confirmer
+
+                <div className="modal-form">
+                  <div className="modal-field">
+                    <label htmlFor="pay-phone" className="modal-lbl">{t.modalPhoneLbl}</label>
+                    <input
+                      id="pay-phone"
+                      type="tel"
+                      className="modal-input"
+                      placeholder={t.modalPhonePh}
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-actions">
+                  <button type="button" className="subpage-cta ghost" onClick={() => setShowModal(false)}>
+                    {t.cancel}
+                  </button>
+                  <button
+                    type="button"
+                    className="subpage-cta"
+                    disabled={!phone}
+                    onClick={() => setStep("confirm")}
+                  >
+                    {t.confirm}
                   </button>
                 </div>
               </>
             )}
+
             {step === "confirm" && (
               <>
-                <div style={{ textAlign: "center", marginBottom: 24 }}>
-                  <div style={{ fontSize: 48, marginBottom: 12 }}>📱</div>
-                  <div style={{ color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 18, marginBottom: 8 }}>
-                    Confirmez sur votre téléphone
-                  </div>
-                  <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 14 }}>
-                    Une demande de paiement a été envoyée au <br />
-                    <strong style={{ color: "#eab308" }}>{phone}</strong>
-                  </div>
-                  <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, marginTop: 8 }}>
-                    Montant : <strong style={{ color: "#e2e8f0" }}>{selectedPlan.price.toLocaleString("fr-FR")} XAF</strong>
-                  </div>
-                </div>
-                <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-                  <button onClick={() => setStep("form")} style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "8px 20px", cursor: "pointer" }}>Retour</button>
-                  <button onClick={() => setStep("done")} style={{ background: "linear-gradient(135deg, #10b981, #059669)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 24px", cursor: "pointer", fontWeight: 700 }}>
-                    J&apos;ai validé →
+                <h3 id="pay-h" className="modal-h">{t.modalHConfirm}</h3>
+                <p className="modal-sub">
+                  {t.modalConfirmSub(phone, selectedPlan.price.toLocaleString(dateLocale))}
+                </p>
+                <div className="modal-actions">
+                  <button type="button" className="subpage-cta ghost" onClick={() => setStep("form")}>
+                    {t.back}
+                  </button>
+                  <button type="button" className="subpage-cta" onClick={() => setStep("done")}>
+                    {t.validated}
                   </button>
                 </div>
               </>
             )}
+
             {step === "done" && (
-              <div style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 56, marginBottom: 16 }}>✅</div>
-                <div style={{ color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 20, marginBottom: 8 }}>
-                  Paiement confirmé !
+              <>
+                <h3 id="pay-h" className="modal-h">{t.modalHDone}</h3>
+                <p className="modal-sub">{t.modalDoneSub(selectedPlan.name, doneDate)}</p>
+                <div className="modal-actions">
+                  <button type="button" className="subpage-cta" onClick={() => setShowModal(false)}>
+                    {t.close}
+                  </button>
                 </div>
-                <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 14, marginBottom: 24 }}>
-                  Votre plan {selectedPlan.name} est actif jusqu&apos;au {new Date(Date.now() + 30 * 24 * 3600 * 1000).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}.
-                </div>
-                <button onClick={() => setShowPayModal(false)} style={{ background: "linear-gradient(135deg, #eab308, #ca8a04)", color: "#080c10", border: "none", borderRadius: 8, padding: "10px 28px", cursor: "pointer", fontWeight: 700, fontFamily: "'Syne', sans-serif" }}>
-                  Fermer
-                </button>
-              </div>
+              </>
             )}
           </div>
         </div>
