@@ -215,13 +215,13 @@ export default function HistoiresPage() {
           }}>
             {locale === "en" ? "Real people, " : "De vraies personnes, "}
             <em style={{ fontStyle: "italic", color: "var(--brass)", fontWeight: 400 }}>
-              {locale === "en" ? "real German." : "de l'allemand réel."}
+              {locale === "en" ? "in their language." : "dans leur langue."}
             </em>
           </h1>
           <p className="lede">
             {locale === "en"
-              ? "Four early-beta learners agreed to share where they started, what they wanted, and how it's going. Names, cities, months — real."
-              : "Quatre apprenants de la bêta ont accepté de partager leur point de départ, leur objectif, et où ils en sont. Prénoms, villes, mois — réels."}
+              ? "Five early-beta learners agreed to share where they started, what they wanted, and how it's going. Four for German, one for Wolof — the languages they chose. Names, cities, months — real."
+              : "Cinq apprenant·e·s de la bêta ont accepté de partager leur point de départ, leur objectif, et où ils en sont. Quatre en allemand, une en wolof — les langues qu'ils ont choisies. Prénoms, villes, mois — réels."}
           </p>
         </div>
 

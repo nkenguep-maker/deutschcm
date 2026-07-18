@@ -235,17 +235,22 @@ export function LandingLanguages({ locale }: { locale: string }) {
           </div>
         </div>
 
-        <div className="llang-family">
+        <div className="llang-family llang-family-native">
           <div className="llang-family-head">
             <div className="llang-family-eye">{labels.familyNativeEye}</div>
             <h2>{labels.familyNativeTitle}</h2>
             <p className="llang-family-scale">{labels.scaleLegendYema}</p>
           </div>
-          <div className="llang-grid">
+          <div className="llang-grid llang-grid-2">
             {NATIVE_LANGS.map((l) => (
               <LangCard key={l.name} lang={l} locale={locale} labels={labels} />
             ))}
           </div>
+          <p className="llang-more">
+            {locale === "en"
+              ? "More native chapters to come — Douala, Fulfulde, Yoruba, Amharic and beyond, prioritized by the diaspora YEMA hears from."
+              : "D'autres chapitres natals à venir — douala, fulfulde, yorùbá, amharique et au-delà, priorisés par la diaspora qui nous écrit."}
+          </p>
         </div>
       </div>
     </section>

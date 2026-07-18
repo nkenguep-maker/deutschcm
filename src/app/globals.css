@@ -2630,11 +2630,26 @@ button, [role="button"] {
 .llang-next .llang-lvl { color: var(--creme); }
 .llang-soon .llang-lvl { color: var(--creme-mute); }
 
+/* Natales : 2 col au lieu de 3, éditorial plus posé */
+.llang-grid.llang-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.llang-more {
+  margin: 22px 0 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--creme-mute);
+  line-height: 1.55;
+  max-width: 62ch;
+}
+
 @media (max-width: 900px) {
   .llang-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) {
-  .llang-grid { grid-template-columns: 1fr; }
+  .llang-grid,
+  .llang-grid-2 { grid-template-columns: 1fr; }
   .llang { grid-template-columns: 40px 1fr auto; gap: 12px; padding: 18px 16px; }
   .llang-mono { width: 40px; height: 40px; font-size: 18px; }
 }

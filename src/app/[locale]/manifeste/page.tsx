@@ -42,7 +42,7 @@ const COPY_FR = {
     {
       strong: "Pour celle qui hésite encore.",
       body:
-        "Aïcha à Yaoundé qui prépare son master. Kevin à Douala qui vise Berlin. Fatima à Bafoussam qui enseigne. Jean à Édéa qui rejoint sa fille. Et surtout : la personne qui, en ce moment, se demande si elle a le temps, l’âge, ou le droit d’apprendre. YEMA est faite pour elle. La première leçon dure dix minutes.",
+        "Aïcha à Yaoundé qui prépare son master. Kevin à Douala qui vise Berlin. Fatima à Bafoussam qui enseigne. Jean à Édéa qui rejoint sa fille. Bintou à Paris qui veut parler wolof à sa grand-mère. Et surtout : la personne qui, en ce moment, se demande si elle a le temps, l’âge, ou le droit d’apprendre. YEMA est faite pour elle. La première leçon dure dix minutes.",
     },
   ],
   signature_line: "YEMA, édition bêta 2026.",
@@ -82,7 +82,7 @@ const COPY_EN = {
     {
       strong: "For the person still hesitating.",
       body:
-        "Aïcha in Yaoundé preparing her master's. Kevin in Douala aiming for Berlin. Fatima in Bafoussam who teaches. Jean in Édéa joining his daughter. And above all: the person who, right now, wonders if they have the time, the age, or the right to learn. YEMA is built for them. The first lesson takes ten minutes.",
+        "Aïcha in Yaoundé preparing her master's. Kevin in Douala aiming for Berlin. Fatima in Bafoussam who teaches. Jean in Édéa joining his daughter. Bintou in Paris who wants to speak Wolof with her grandmother. And above all: the person who, right now, wonders if they have the time, the age, or the right to learn. YEMA is built for them. The first lesson takes ten minutes.",
     },
   ],
   signature_line: "YEMA, beta edition 2026.",
