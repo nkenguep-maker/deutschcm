@@ -1,13 +1,90 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import TeacherLayout from "@/components/TeacherLayout";
 
+interface Copy {
+  title: string;
+  eye: string;
+  h: string;
+  sub: string;
+  profileEye: string;
+  fullName: string;
+  emailLbl: string;
+  specialty: string;
+  city: string;
+  institution: string;
+  verified: string;
+  save: string;
+  saved: string;
+  notifH: string;
+  notifs: Array<{ label: string; defaultOn: boolean; key: string }>;
+  dangerH: string;
+  dangerBody: string;
+  dangerCta: string;
+}
+
+const FR: Copy = {
+  title: "Paramètres",
+  eye: "Paramètres",
+  h: "Ton compte, ton rythme.",
+  sub: "Ajuste tes informations, tes préférences de notification. La suppression du compte reste toujours possible.",
+  profileEye: "Profil enseignant·e",
+  fullName: "Nom complet",
+  emailLbl: "Adresse email",
+  specialty: "Spécialité",
+  city: "Ville",
+  institution: "Centre / institution",
+  verified: "Vérifié·e",
+  save: "Enregistrer",
+  saved: "Sauvegardé",
+  notifH: "Notifications",
+  notifs: [
+    { key: "submission",  label: "Devoir rendu par un·e apprenant·e", defaultOn: true },
+    { key: "newLearner",  label: "Nouvel·le apprenant·e dans une classe", defaultOn: true },
+    { key: "struggling",  label: "Apprenant·e en difficulté (score < 5)", defaultOn: true },
+    { key: "weekly",      label: "Récapitulatif hebdomadaire", defaultOn: false },
+  ],
+  dangerH: "Zone irréversible",
+  dangerBody: "La suppression du compte efface toutes tes classes, corrections et ressources personnelles. L'action est immédiate.",
+  dangerCta: "Supprimer mon compte",
+};
+
+const EN: Copy = {
+  title: "Settings",
+  eye: "Settings",
+  h: "Your account, your pace.",
+  sub: "Adjust your details, tweak notification preferences. Deleting your account remains possible at any time.",
+  profileEye: "Teacher profile",
+  fullName: "Full name",
+  emailLbl: "Email",
+  specialty: "Specialty",
+  city: "City",
+  institution: "Center / institution",
+  verified: "Verified",
+  save: "Save",
+  saved: "Saved",
+  notifH: "Notifications",
+  notifs: [
+    { key: "submission", label: "Learner submission", defaultOn: true },
+    { key: "newLearner", label: "New learner in a class", defaultOn: true },
+    { key: "struggling", label: "Learner struggling (score < 5)", defaultOn: true },
+    { key: "weekly",     label: "Weekly digest", defaultOn: false },
+  ],
+  dangerH: "Irreversible zone",
+  dangerBody: "Deleting your account erases all your classes, corrections and personal resources. The action is immediate.",
+  dangerCta: "Delete my account",
+};
+
 export default function TeacherSettingsPage() {
+  const locale = useLocale();
+  const t = locale === "en" ? EN : FR;
+
   const [fullName, setFullName] = useState("Marie Tchamba");
   const [email, setEmail] = useState("");
-  const [specialty, setSpecialty] = useState("Allemand A1-B2");
+  const [specialty, setSpecialty] = useState(locale === "en" ? "German A1-B2" : "Allemand A1-B2");
   const [institution, setInstitution] = useState("Institut Lingua Plus");
   const [city, setCity] = useState("Yaoundé");
   const [saved, setSaved] = useState(false);
@@ -21,116 +98,167 @@ export default function TeacherSettingsPage() {
     });
   }, []);
 
-  const handleSave = async () => {
+  const handleSave = () => {
     setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    setTimeout(() => setSaved(false), 2400);
   };
 
-  const initials = fullName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-
-  const Field = ({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (v: string) => void; type?: string }) => (
-    <div>
-      <label style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.88rem", display: "block", marginBottom: 6 }}>{label}</label>
-      <input
-        type={type}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        style={{
-          width: "100%", padding: "10px 14px", borderRadius: 10,
-          background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-          color: "white", fontSize: "1rem", outline: "none", boxSizing: "border-box",
-          fontFamily: "'DM Mono', monospace",
-        }}
-        onFocus={e => (e.target.style.borderColor = "rgba(16,185,129,0.5)")}
-        onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
-      />
-    </div>
-  );
+  const initials = fullName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
 
   return (
-    <TeacherLayout title="Paramètres">
-      <div style={{ maxWidth: 580 }}>
+    <TeacherLayout title={t.title}>
+      <section className="subpage">
+        <header className="subpage-head">
+          <div>
+            <p className="subpage-eye">{t.eye}</p>
+            <h2 className="subpage-h">{t.h}</h2>
+            <p className="subpage-sub">{t.sub}</p>
+          </div>
+        </header>
 
-        {/* Profile card */}
-        <div style={{ padding: "24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
-            <div style={{
-              width: 56, height: 56, borderRadius: 16, flexShrink: 0,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              background: "linear-gradient(135deg, rgba(16,185,129,0.25), rgba(5,150,105,0.1))",
-              border: "1px solid rgba(16,185,129,0.3)", color: "white",
-              fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.1rem",
-            }}>{initials}</div>
-            <div>
-              <div style={{ color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>{fullName}</div>
-              <div style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.85rem" }}>Enseignant · Institut Lingua Plus · Yaoundé</div>
+        <section style={{
+          padding: 24,
+          background: "var(--espresso-2)",
+          border: "1px solid var(--creme-hair)",
+          borderRadius: 14,
+        }}>
+          <p className="subpage-eye">{t.profileEye}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
+            <div className="mono-avatar" style={{ width: 52, height: 52, fontSize: 18 }} aria-hidden="true">{initials}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{
+                fontFamily: "var(--font-fraunces), Georgia, serif",
+                fontSize: 20,
+                color: "var(--creme)",
+                margin: 0,
+                fontWeight: 400,
+              }}>{fullName}</p>
+              <p style={{ color: "var(--creme-mute)", fontSize: 12.5, margin: "3px 0 0", fontFamily: "var(--font-jetbrains, monospace)" }}>
+                {specialty} · {institution} · {city}
+              </p>
             </div>
-            <span style={{ marginLeft: "auto", padding: "3px 10px", borderRadius: 20, background: "rgba(16,185,129,0.12)", color: "#10b981", border: "1px solid rgba(16,185,129,0.25)", fontSize: "0.78rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>✓ Vérifié</span>
+            <span className="status-pill active">{t.verified}</span>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <Field label="Nom complet" value={fullName} onChange={setFullName} />
-            <Field label="Adresse email" value={email} onChange={setEmail} type="email" />
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-              <Field label="Spécialité" value={specialty} onChange={setSpecialty} />
-              <Field label="Ville" value={city} onChange={setCity} />
+          <div className="modal-form">
+            <div className="modal-field">
+              <label htmlFor="setting-name" className="modal-lbl">{t.fullName}</label>
+              <input id="setting-name" className="modal-input" value={fullName} onChange={(e) => setFullName(e.target.value)} />
             </div>
-            <Field label="Institution" value={institution} onChange={setInstitution} />
+            <div className="modal-field">
+              <label htmlFor="setting-email" className="modal-lbl">{t.emailLbl}</label>
+              <input id="setting-email" type="email" className="modal-input" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div className="modal-field">
+                <label htmlFor="setting-specialty" className="modal-lbl">{t.specialty}</label>
+                <input id="setting-specialty" className="modal-input" value={specialty} onChange={(e) => setSpecialty(e.target.value)} />
+              </div>
+              <div className="modal-field">
+                <label htmlFor="setting-city" className="modal-lbl">{t.city}</label>
+                <input id="setting-city" className="modal-input" value={city} onChange={(e) => setCity(e.target.value)} />
+              </div>
+            </div>
+            <div className="modal-field">
+              <label htmlFor="setting-institution" className="modal-lbl">{t.institution}</label>
+              <input id="setting-institution" className="modal-input" value={institution} onChange={(e) => setInstitution(e.target.value)} />
+            </div>
           </div>
 
-          <button
-            onClick={handleSave}
-            style={{
-              marginTop: 20, padding: "10px 24px", borderRadius: 10, border: "none", cursor: "pointer",
-              background: saved ? "rgba(16,185,129,0.2)" : "linear-gradient(135deg, #10b981, #059669)",
-              color: saved ? "#10b981" : "white",
-              fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem",
-              boxShadow: saved ? "none" : "0 4px 16px rgba(16,185,129,0.3)",
-              transition: "all 0.2s",
-            }}
-          >
-            {saved ? "✓ Sauvegardé" : "Enregistrer les modifications"}
-          </button>
-        </div>
+          <div className="modal-actions" style={{ marginTop: 20 }}>
+            <button type="button" className="subpage-cta" onClick={handleSave}>
+              {saved ? t.saved : t.save}
+            </button>
+          </div>
+        </section>
 
-        {/* Notifications */}
-        <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", marginBottom: 20 }}>
-          <h3 style={{ margin: "0 0 18px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>Notifications</h3>
-          {[
-            { label: "Devoir rendu par un élève", defaultOn: true },
-            { label: "Nouvel élève dans une classe", defaultOn: true },
-            { label: "Élève en difficulté (score < 5)", defaultOn: true },
-            { label: "Récapitulatif hebdomadaire", defaultOn: false },
-          ].map(item => (
-            <NotifToggle key={item.label} label={item.label} defaultOn={item.defaultOn} />
-          ))}
-        </div>
+        <section style={{
+          padding: 24,
+          background: "var(--espresso-2)",
+          border: "1px solid var(--creme-hair)",
+          borderRadius: 14,
+        }}>
+          <h3 style={{
+            fontFamily: "var(--font-fraunces), Georgia, serif",
+            fontSize: 18,
+            color: "var(--creme)",
+            margin: "0 0 12px",
+            fontWeight: 400,
+          }}>{t.notifH}</h3>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {t.notifs.map((n, i) => (
+              <NotifToggle key={n.key} label={n.label} defaultOn={n.defaultOn} last={i === t.notifs.length - 1} />
+            ))}
+          </div>
+        </section>
 
-        {/* Danger zone */}
-        <div style={{ padding: "22px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(239,68,68,0.2)" }}>
-          <h3 style={{ margin: "0 0 8px", color: "#ef4444", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem" }}>Zone dangereuse</h3>
-          <p style={{ margin: "0 0 16px", color: "rgba(255,255,255,0.65)", fontSize: "0.84rem" }}>
-            La suppression du compte est irréversible. Toutes tes classes et données seront perdues.
-          </p>
-          <button style={{ padding: "8px 18px", borderRadius: 9, background: "transparent", border: "1px solid rgba(239,68,68,0.4)", color: "#ef4444", fontSize: "0.75rem", cursor: "pointer", fontFamily: "'Syne', sans-serif", fontWeight: 600 }}>
-            Supprimer mon compte
-          </button>
-        </div>
-      </div>
+        <section style={{
+          padding: 24,
+          border: "1px solid rgba(122, 40, 48, 0.35)",
+          borderRadius: 14,
+          background: "rgba(122, 40, 48, 0.05)",
+        }}>
+          <h3 style={{
+            fontFamily: "var(--font-fraunces), Georgia, serif",
+            fontSize: 18,
+            color: "var(--oxblood)",
+            margin: "0 0 8px",
+            fontWeight: 400,
+          }}>{t.dangerH}</h3>
+          <p style={{
+            color: "var(--creme-soft)",
+            fontSize: 13.5,
+            margin: "0 0 16px",
+            maxWidth: "60ch",
+            lineHeight: 1.5,
+          }}>{t.dangerBody}</p>
+          <button type="button" className="row-btn danger">{t.dangerCta}</button>
+        </section>
+      </section>
     </TeacherLayout>
   );
 }
 
-function NotifToggle({ label, defaultOn }: { label: string; defaultOn: boolean }) {
+function NotifToggle({ label, defaultOn, last }: { label: string; defaultOn: boolean; last: boolean }) {
   const [on, setOn] = useState(defaultOn);
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-      <span style={{ color: "rgba(255,255,255,0.75)", fontSize: "0.88rem" }}>{label}</span>
-      <button onClick={() => setOn(!on)} style={{
-        width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
-        background: on ? "#10b981" : "rgba(255,255,255,0.1)", position: "relative", transition: "background 0.2s",
-      }}>
-        <div style={{ width: 16, height: 16, borderRadius: "50%", background: "white", position: "absolute", top: 3, left: on ? 21 : 3, transition: "left 0.2s" }} />
+    <div style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "12px 0",
+      borderBottom: last ? "none" : "1px solid var(--creme-hair)",
+      gap: 20,
+    }}>
+      <span style={{ color: "var(--creme-soft)", fontSize: 13.5 }}>{label}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={on}
+        aria-label={label}
+        onClick={() => setOn((v) => !v)}
+        style={{
+          width: 40,
+          height: 22,
+          borderRadius: 999,
+          border: `1px solid ${on ? "var(--brass)" : "var(--creme-hair)"}`,
+          background: on ? "var(--brass-glow)" : "transparent",
+          position: "relative",
+          cursor: "pointer",
+          transition: "all var(--dur-fast) var(--ease-out-expo)",
+          flexShrink: 0,
+        }}
+      >
+        <span style={{
+          position: "absolute",
+          top: 2,
+          left: on ? 20 : 2,
+          width: 16,
+          height: 16,
+          borderRadius: "50%",
+          background: on ? "var(--brass)" : "var(--creme-mute)",
+          transition: "left var(--dur-fast) var(--ease-out-expo), background var(--dur-fast)",
+        }} />
       </button>
     </div>
   );

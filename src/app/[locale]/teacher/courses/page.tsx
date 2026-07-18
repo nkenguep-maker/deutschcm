@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import TeacherLayout from "@/components/TeacherLayout";
+import { IconBook, IconCheck, IconClasse, IconSpark } from "@/components/landing/icons";
 
 type Level = "A1" | "A2" | "B1" | "B2" | "C1";
+type Filter = "all" | Level;
 
 interface DBCourse {
   id: string;
@@ -23,20 +26,103 @@ interface DBCourse {
   tags: string[];
 }
 
-const LEVEL_COLORS: Record<string, string> = {
-  A1: "#10b981", A2: "#14b8a6", B1: "#3b82f6", B2: "#8b5cf6", C1: "#f97316",
-};
-
 const CLASSES = [
   { id: "cls1", name: "Groupe A1 Matin", level: "A1" },
   { id: "cls2", name: "Groupe A2 Soir",  level: "A2" },
-  { id: "cls3", name: "Prépa CEFR B1",  level: "B1" },
+  { id: "cls3", name: "Préparation B1",  level: "B1" },
 ];
 
+interface Copy {
+  title: string;
+  eye: string;
+  h: string;
+  sub: string;
+  kpiTotal: string;
+  kpiPublished: string;
+  kpiDrafts: string;
+  kpiClasses: string;
+  searchPh: string;
+  filters: Record<Filter, string>;
+  loading: string;
+  emptyH: string;
+  emptySub: string;
+  published: string;
+  draft: string;
+  publish: string;
+  unpublish: string;
+  assign: string;
+  assignedTo: string;
+  moduleCount: (n: number) => string;
+  modalH: string;
+  modalSub: (course: string) => string;
+  alreadyAssigned: string;
+  assignSuccess: (klass: string) => string;
+  close: string;
+}
+
+const FR: Copy = {
+  title: "Catalogue de cours",
+  eye: "Bibliothèque pédagogique",
+  h: "Choisis, assigne, publie.",
+  sub: "Vue d'ensemble des leçons alignées CECRL. Publie ce qui est prêt, assigne à tes classes, garde le contrôle du rythme.",
+  kpiTotal: "Cours disponibles",
+  kpiPublished: "Publiés",
+  kpiDrafts: "Brouillons",
+  kpiClasses: "Mes classes",
+  searchPh: "Chercher un titre, un niveau, un tag…",
+  filters: { all: "Tous", A1: "A1", A2: "A2", B1: "B1", B2: "B2", C1: "C1" },
+  loading: "Chargement des cours…",
+  emptyH: "Aucun cours ne correspond.",
+  emptySub: "Essaie un autre filtre — ou demande à un·e admin de générer une leçon.",
+  published: "Publié",
+  draft: "Brouillon",
+  publish: "Publier",
+  unpublish: "Dépublier",
+  assign: "Assigner",
+  assignedTo: "Assigné à",
+  moduleCount: (n) => `${n} module${n > 1 ? "s" : ""}`,
+  modalH: "Assigner à une classe",
+  modalSub: (course) => `Course : ${course}`,
+  alreadyAssigned: "Déjà assigné",
+  assignSuccess: (klass) => `Cours assigné à ${klass}.`,
+  close: "Fermer",
+};
+
+const EN: Copy = {
+  title: "Course catalog",
+  eye: "Teaching library",
+  h: "Pick, assign, publish.",
+  sub: "Overview of CEFR-aligned lessons. Publish what's ready, assign to your classes, keep the pace.",
+  kpiTotal: "Available courses",
+  kpiPublished: "Published",
+  kpiDrafts: "Drafts",
+  kpiClasses: "My classes",
+  searchPh: "Search a title, level, tag…",
+  filters: { all: "All", A1: "A1", A2: "A2", B1: "B1", B2: "B2", C1: "C1" },
+  loading: "Loading courses…",
+  emptyH: "No course matches.",
+  emptySub: "Try another filter — or ask an admin to generate one.",
+  published: "Published",
+  draft: "Draft",
+  publish: "Publish",
+  unpublish: "Unpublish",
+  assign: "Assign",
+  assignedTo: "Assigned to",
+  moduleCount: (n) => `${n} module${n > 1 ? "s" : ""}`,
+  modalH: "Assign to a class",
+  modalSub: (course) => `Course: ${course}`,
+  alreadyAssigned: "Already assigned",
+  assignSuccess: (klass) => `Course assigned to ${klass}.`,
+  close: "Close",
+};
+
 export default function TeacherCoursesPage() {
+  const locale = useLocale();
+  const t = locale === "en" ? EN : FR;
+
   const [courses, setCourses] = useState<DBCourse[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | Level>("all");
+  const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
   const [assignModal, setAssignModal] = useState<DBCourse | null>(null);
   const [assigned, setAssigned] = useState<Record<string, string[]>>({});
@@ -44,19 +130,25 @@ export default function TeacherCoursesPage() {
 
   useEffect(() => {
     fetch("/api/courses?includeUnpublished=true")
-      .then(r => r.json())
-      .then(d => {
-        if (!d.fallback) setCourses(d.courses);
+      .then((r) => r.json())
+      .then((d) => {
+        if (!d.fallback && Array.isArray(d.courses)) setCourses(d.courses);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = courses.filter(c => {
-    const matchLevel = filter === "all" || c.level === filter;
-    const q = search.toLowerCase();
-    return matchLevel && (!q || c.titleDE.toLowerCase().includes(q) || c.level.toLowerCase().includes(q));
+  const filtered = courses.filter((c) => {
+    if (filter !== "all" && c.level !== filter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (!c.titleDE.toLowerCase().includes(q) && !c.level.toLowerCase().includes(q)) return false;
+    }
+    return true;
   });
+
+  const publishedCount = courses.filter((c) => c.isPublished).length;
+  const draftCount = courses.length - publishedCount;
 
   const handlePublish = async (courseId: string, isPublished: boolean) => {
     await fetch("/api/courses", {
@@ -64,191 +156,263 @@ export default function TeacherCoursesPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ courseId, isPublished }),
     });
-    setCourses(prev => prev.map(c => c.courseId === courseId ? { ...c, isPublished } : c));
+    setCourses((prev) => prev.map((c) => (c.courseId === courseId ? { ...c, isPublished } : c)));
   };
 
   const handleAssign = (classId: string) => {
     if (!assignModal) return;
-    setAssigned(prev => {
+    setAssigned((prev) => {
       const existing = prev[classId] ?? [];
       if (existing.includes(assignModal.courseId)) return prev;
       return { ...prev, [classId]: [...existing, assignModal.courseId] };
     });
-    setAssignSuccess(`Cours assigné à ${CLASSES.find(c => c.id === classId)?.name} !`);
-    setTimeout(() => { setAssignModal(null); setAssignSuccess(""); }, 1800);
+    const klass = CLASSES.find((c) => c.id === classId)?.name ?? "";
+    setAssignSuccess(t.assignSuccess(klass));
+    setTimeout(() => {
+      setAssignModal(null);
+      setAssignSuccess("");
+    }, 1800);
   };
 
-  const publishedCount = courses.filter(c => c.isPublished).length;
-  const draftCount = courses.length - publishedCount;
-
   return (
-    <TeacherLayout title="Cours">
-      <div style={{ maxWidth: 900 }}>
+    <TeacherLayout title={t.title}>
+      <section className="subpage">
+        <header className="subpage-head">
+          <div>
+            <p className="subpage-eye">{t.eye}</p>
+            <h2 className="subpage-h">{t.h}</h2>
+            <p className="subpage-sub">{t.sub}</p>
+          </div>
+        </header>
 
-        {/* KPIs */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 28 }}>
-          {[
-            { label: "Cours disponibles", value: courses.length,  color: "#6366f1" },
-            { label: "Publiés",           value: publishedCount,  color: "#10b981" },
-            { label: "Brouillons",        value: draftCount,      color: "#f59e0b" },
-            { label: "Mes classes",       value: CLASSES.length,  color: "#e879f9" },
-          ].map(s => (
-            <div key={s.label} style={{ padding: "18px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderTop: `2px solid ${s.color}` }}>
-              <div style={{ color: s.color, fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.6rem", marginBottom: 4 }}>{s.value}</div>
-              <div style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.78rem" }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
+        <section className="dash-stats">
+          <div className="dash-stat">
+            <p className="dash-stat-lbl">
+              <span className="dash-stat-icon" aria-hidden="true"><IconBook size={13} /></span>
+              {t.kpiTotal}
+            </p>
+            <p className="dash-stat-val">{loading ? "—" : courses.length}</p>
+          </div>
+          <div className="dash-stat">
+            <p className="dash-stat-lbl">
+              <span className="dash-stat-icon" aria-hidden="true"><IconCheck size={13} /></span>
+              {t.kpiPublished}
+            </p>
+            <p className="dash-stat-val">{loading ? "—" : publishedCount}</p>
+          </div>
+          <div className="dash-stat">
+            <p className="dash-stat-lbl">
+              <span className="dash-stat-icon" aria-hidden="true"><IconSpark size={13} /></span>
+              {t.kpiDrafts}
+            </p>
+            <p className="dash-stat-val">{loading ? "—" : draftCount}</p>
+          </div>
+          <div className="dash-stat">
+            <p className="dash-stat-lbl">
+              <span className="dash-stat-icon" aria-hidden="true"><IconClasse size={13} /></span>
+              {t.kpiClasses}
+            </p>
+            <p className="dash-stat-val">{CLASSES.length}</p>
+          </div>
+        </section>
 
-        {/* Controls */}
-        <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
           <input
+            type="search"
+            aria-label={t.searchPh}
+            className="modal-input"
+            style={{ flex: 1, minWidth: 240 }}
             value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher un cours…"
-            style={{ flex: 1, minWidth: 200, padding: "9px 14px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: "1rem", outline: "none" }}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t.searchPh}
           />
-          {(["all", "A1", "A2", "B1", "B2", "C1"] as const).map(f => (
-            <button key={f} onClick={() => setFilter(f)} style={{
-              padding: "7px 14px", borderRadius: 9, border: "none", cursor: "pointer",
-              fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 600,
-              background: filter === f ? "#6366f1" : "rgba(255,255,255,0.05)",
-              color: filter === f ? "white" : "rgba(255,255,255,0.68)",
-            }}>
-              {f === "all" ? "Tous" : f}
-            </button>
-          ))}
+          <div className="subpage-filters" role="tablist" aria-label={t.filters.all}>
+            {(Object.keys(t.filters) as Filter[]).map((k) => (
+              <button
+                key={k}
+                type="button"
+                role="tab"
+                aria-selected={filter === k}
+                className={`subpage-filter ${filter === k ? "on" : ""}`}
+                onClick={() => setFilter(k)}
+              >
+                {t.filters[k]}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Course list */}
         {loading ? (
-          <div style={{ textAlign: "center", padding: "60px 0", color: "rgba(255,255,255,0.55)", fontSize: "0.875rem" }}>
-            Chargement des cours…
+          <div className="empty-state">
+            <p className="empty-state-sub">{t.loading}</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "60px 0" }}>
-            <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>📭</div>
-            <div style={{ color: "rgba(255,255,255,0.65)", fontFamily: "'Syne', sans-serif", fontSize: "0.9rem" }}>
-              {courses.length === 0 ? "Aucun cours en base — demandez à l'admin de générer des cours." : "Aucun cours trouvé pour ce filtre."}
-            </div>
+          <div className="empty-state">
+            <p className="empty-state-h">{t.emptyH}</p>
+            <p className="empty-state-sub">{t.emptySub}</p>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {filtered.map(course => {
-              const c = LEVEL_COLORS[course.level] ?? "#10b981";
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {filtered.map((course) => {
               const assignedClasses = Object.entries(assigned)
                 .filter(([, ids]) => ids.includes(course.courseId))
-                .map(([clsId]) => CLASSES.find(cl => cl.id === clsId)?.name)
-                .filter(Boolean);
+                .map(([clsId]) => CLASSES.find((cl) => cl.id === clsId)?.name)
+                .filter(Boolean) as string[];
 
               return (
-                <div key={course.id} style={{ padding: "18px 22px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                    <span style={{ fontSize: "1.6rem", flexShrink: 0 }}>{course.icon}</span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
-                        <span style={{ color: "rgba(255,255,255,0.9)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.88rem" }}>
-                          {course.titleDE}
-                        </span>
-                        <span style={{ padding: "1px 8px", borderRadius: 5, background: `${c}18`, color: c, border: `1px solid ${c}33`, fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>
-                          {course.level}
-                        </span>
-                        <span style={{ padding: "1px 8px", borderRadius: 5, background: course.isPublished ? "rgba(16,185,129,0.12)" : "rgba(245,158,11,0.12)", color: course.isPublished ? "#10b981" : "#f59e0b", fontSize: "0.75rem" }}>
-                          {course.isPublished ? "Publié" : "Brouillon"}
-                        </span>
-                      </div>
-                      <div style={{ color: "rgba(255,255,255,0.60)", fontSize: "0.78rem" }}>
-                        {course.lektionen} · {course.modules} modules
-                        {assignedClasses.length > 0 && (
-                          <span style={{ marginLeft: 8, color: "#6366f1" }}>
-                            → {assignedClasses.join(", ")}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                      <button
-                        onClick={() => handlePublish(course.courseId, !course.isPublished)}
-                        style={{
-                          padding: "6px 14px", borderRadius: 8, border: "1px solid", cursor: "pointer", fontSize: "0.78rem",
-                          borderColor: course.isPublished ? "rgba(239,68,68,0.3)" : "rgba(16,185,129,0.3)",
-                          background: "transparent",
-                          color: course.isPublished ? "#ef4444" : "#10b981",
-                        }}
-                      >
-                        {course.isPublished ? "Dépublier" : "Publier"}
-                      </button>
-                      <button
-                        onClick={() => setAssignModal(course)}
-                        style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid rgba(99,102,241,0.3)", background: "transparent", color: "#818cf8", fontSize: "0.78rem", cursor: "pointer" }}
-                      >
-                        Assigner
-                      </button>
-                    </div>
+                <article key={course.id} style={{
+                  background: "var(--espresso-2)",
+                  border: "1px solid var(--creme-hair)",
+                  borderRadius: 14,
+                  padding: 18,
+                  display: "grid",
+                  gridTemplateColumns: "44px 1fr auto",
+                  gap: 16,
+                  alignItems: "center",
+                }}>
+                  <div style={{
+                    width: 44, height: 44,
+                    borderRadius: 12,
+                    background: "var(--brass-glow)",
+                    border: "1px solid var(--brass-edge)",
+                    color: "var(--brass)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }} aria-hidden="true">
+                    <IconBook size={22} />
                   </div>
-                </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                      <h3 style={{
+                        fontFamily: "var(--font-fraunces), Georgia, serif",
+                        fontSize: 16,
+                        color: "var(--creme)",
+                        margin: 0,
+                        fontWeight: 400,
+                      }}>{course.titleDE}</h3>
+                      <span className="status-pill active">{course.level}</span>
+                      <span className={`status-pill ${course.isPublished ? "active" : "pending"}`}>
+                        {course.isPublished ? t.published : t.draft}
+                      </span>
+                    </div>
+                    <p style={{
+                      color: "var(--creme-mute)",
+                      fontSize: 12,
+                      fontFamily: "var(--font-jetbrains, monospace)",
+                      letterSpacing: "0.04em",
+                      margin: 0,
+                    }}>
+                      {course.lektionen} · {t.moduleCount(course.modules)}
+                      {assignedClasses.length > 0 && (
+                        <>
+                          {" · "}
+                          <span style={{ color: "var(--brass)" }}>{t.assignedTo}: {assignedClasses.join(", ")}</span>
+                        </>
+                      )}
+                    </p>
+                  </div>
+                  <div className="row-actions">
+                    <button
+                      type="button"
+                      className={course.isPublished ? "row-btn danger" : "row-btn"}
+                      onClick={() => handlePublish(course.courseId, !course.isPublished)}
+                    >
+                      {course.isPublished ? t.unpublish : t.publish}
+                    </button>
+                    <button
+                      type="button"
+                      className="row-btn"
+                      onClick={() => setAssignModal(course)}
+                    >
+                      {t.assign}
+                    </button>
+                  </div>
+                </article>
               );
             })}
           </div>
         )}
+      </section>
 
-        {/* Assign modal */}
-        {assignModal && (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}
-            onClick={e => e.target === e.currentTarget && setAssignModal(null)}>
-            <div style={{ background: "#0d1117", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 18, padding: 32, width: 420, maxWidth: "90vw" }}>
-              <h2 style={{ margin: "0 0 6px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1rem" }}>
-                Assigner à une classe
-              </h2>
-              <p style={{ margin: "0 0 20px", color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>
-                {assignModal.icon} {assignModal.titleDE} — {assignModal.level}
-              </p>
+      {assignModal && (
+        <div
+          className="modal-scrim"
+          onClick={(e) => { if (e.target === e.currentTarget) setAssignModal(null); }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="assign-course-h"
+        >
+          <div className="modal-card">
+            <p className="modal-eye">{assignModal.level}</p>
+            <h3 id="assign-course-h" className="modal-h">{t.modalH}</h3>
+            <p className="modal-sub">{t.modalSub(assignModal.titleDE)}</p>
 
-              {assignSuccess ? (
-                <div style={{ textAlign: "center", padding: "20px 0", color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>
-                  ✓ {assignSuccess}
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {CLASSES.map(cls => {
-                    const alreadyAssigned = (assigned[cls.id] ?? []).includes(assignModal.courseId);
-                    return (
-                      <button
-                        key={cls.id}
-                        onClick={() => handleAssign(cls.id)}
-                        disabled={alreadyAssigned}
-                        style={{
-                          display: "flex", alignItems: "center", justifyContent: "space-between",
-                          padding: "12px 16px", borderRadius: 10,
-                          border: alreadyAssigned ? "1px solid rgba(16,185,129,0.3)" : "1px solid rgba(255,255,255,0.1)",
-                          background: alreadyAssigned ? "rgba(16,185,129,0.06)" : "rgba(255,255,255,0.04)",
-                          color: alreadyAssigned ? "#10b981" : "white",
-                          cursor: alreadyAssigned ? "default" : "pointer",
-                          textAlign: "left",
-                        }}
-                      >
-                        <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.82rem" }}>{cls.name}</span>
-                        <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.60)" }}>
-                          {alreadyAssigned ? "✓ Déjà assigné" : cls.level}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+            {assignSuccess ? (
+              <div style={{
+                padding: "14px 18px",
+                borderRadius: 10,
+                background: "var(--brass-glow)",
+                border: "1px solid var(--brass-edge)",
+                color: "var(--creme)",
+                fontFamily: "var(--font-fraunces), Georgia, serif",
+                fontSize: 15,
+                textAlign: "center",
+              }}>
+                {assignSuccess}
+              </div>
+            ) : (
+              <div className="modal-form">
+                {CLASSES.map((cls) => {
+                  const alreadyAssigned = (assigned[cls.id] ?? []).includes(assignModal.courseId);
+                  return (
+                    <button
+                      key={cls.id}
+                      type="button"
+                      onClick={() => !alreadyAssigned && handleAssign(cls.id)}
+                      disabled={alreadyAssigned}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "14px 18px",
+                        borderRadius: 12,
+                        background: alreadyAssigned ? "var(--brass-glow)" : "rgba(244, 235, 220, 0.02)",
+                        border: `1px solid ${alreadyAssigned ? "var(--brass-edge)" : "var(--creme-hair)"}`,
+                        color: alreadyAssigned ? "var(--brass)" : "var(--creme)",
+                        cursor: alreadyAssigned ? "default" : "pointer",
+                        textAlign: "left",
+                        fontFamily: "inherit",
+                        transition: "border-color var(--dur-fast)",
+                      }}
+                    >
+                      <span style={{
+                        fontFamily: "var(--font-fraunces), Georgia, serif",
+                        fontSize: 15,
+                      }}>{cls.name}</span>
+                      <span style={{
+                        fontSize: 11,
+                        fontFamily: "var(--font-jetbrains, monospace)",
+                        letterSpacing: "0.06em",
+                        textTransform: "uppercase",
+                        color: alreadyAssigned ? "var(--brass)" : "var(--creme-mute)",
+                      }}>
+                        {alreadyAssigned ? t.alreadyAssigned : cls.level}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
-              {!assignSuccess && (
-                <div style={{ marginTop: 20, textAlign: "right" }}>
-                  <button onClick={() => setAssignModal(null)} style={{ padding: "8px 20px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.65)", cursor: "pointer" }}>
-                    Fermer
-                  </button>
-                </div>
-              )}
-            </div>
+            {!assignSuccess && (
+              <div className="modal-actions">
+                <button type="button" className="subpage-cta ghost" onClick={() => setAssignModal(null)}>
+                  {t.close}
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </TeacherLayout>
   );
 }

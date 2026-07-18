@@ -1,182 +1,382 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useLocale } from "next-intl";
 import TeacherLayout from "@/components/TeacherLayout";
-import { useT } from "@/hooks/useT";
+import {
+  IconGrammatik,
+  IconLesen,
+  IconSprechen,
+  IconSchreiben,
+  IconHoeren,
+  IconSpark,
+} from "@/components/landing/icons";
 
-const SAMPLE_ACTIVITIES = [
-  { id: "a1", title: "Quiz Lektion 4 — Wortschatz",      class: "Groupe A1 Matin", due: "12 mai 2026", submitted: 12, total: 18, maxScore: 20, tab: "review",   icon: "✏️", hasAI: true  },
-  { id: "a2", title: "Lesen Arbeit — Textverstehen",      class: "Groupe A1 Matin", due: "15 mai 2026", submitted:  7, total: 18, maxScore: 20, tab: "review",   icon: "📄", hasAI: false },
-  { id: "a3", title: "Simulation Ambassade",              class: "Prépa CEFR B1",   due: "—",           submitted: 14, total: 14, maxScore: 30, tab: "approved", icon: "🎙️", hasAI: true  },
-  { id: "a4", title: "Grammaire : Akkusativ & Dativ",     class: "Groupe A2 Soir",  due: "18 mai 2026", submitted:  3, total: 15, maxScore: 20, tab: "review",   icon: "📝", hasAI: false },
-  { id: "a5", title: "Hörverstehen — Dialog au Café",     class: "Groupe A2 Soir",  due: "22 mai 2026", submitted:  0, total: 15, maxScore: 15, tab: "ai",       icon: "🎧", hasAI: true  },
-  { id: "a6", title: "Schreiben — Brief an einen Freund", class: "Prépa CEFR B1",   due: "20 mai 2026", submitted:  9, total: 14, maxScore: 25, tab: "review",   icon: "✉️", hasAI: true  },
+type Kind = "quiz" | "read" | "sim" | "grammar" | "listen" | "write";
+type TabKey = "review" | "ai" | "approved" | "all";
+
+interface Activity {
+  id: string;
+  title: string;
+  klass: string;
+  due: string;
+  submitted: number;
+  total: number;
+  maxScore: number;
+  tab: "review" | "ai" | "approved";
+  kind: Kind;
+  hasAI: boolean;
+}
+
+const ACTIVITIES: Activity[] = [
+  { id: "a1", title: "Quiz Lektion 4 — Wortschatz",       klass: "Groupe A1 Matin", due: "12 mai 2026", submitted: 12, total: 18, maxScore: 20, tab: "review",   kind: "quiz",    hasAI: true  },
+  { id: "a2", title: "Lesen Arbeit — Textverstehen",       klass: "Groupe A1 Matin", due: "15 mai 2026", submitted:  7, total: 18, maxScore: 20, tab: "review",   kind: "read",    hasAI: false },
+  { id: "a3", title: "Simulation Ambassade",               klass: "Préparation B1",   due: "—",           submitted: 14, total: 14, maxScore: 30, tab: "approved", kind: "sim",     hasAI: true  },
+  { id: "a4", title: "Grammaire : Akkusativ & Dativ",      klass: "Groupe A2 Soir",   due: "18 mai 2026", submitted:  3, total: 15, maxScore: 20, tab: "review",   kind: "grammar", hasAI: false },
+  { id: "a5", title: "Hörverstehen — Dialog au café",      klass: "Groupe A2 Soir",   due: "22 mai 2026", submitted:  0, total: 15, maxScore: 15, tab: "ai",       kind: "listen",  hasAI: true  },
+  { id: "a6", title: "Schreiben — Brief an einen Freund",  klass: "Préparation B1",   due: "20 mai 2026", submitted:  9, total: 14, maxScore: 25, tab: "review",   kind: "write",   hasAI: true  },
 ];
 
-type Tab = "review" | "ai" | "approved" | "all";
+const KIND_ICON: Record<Kind, (p: { size?: number }) => React.ReactElement> = {
+  quiz: IconGrammatik,
+  read: IconLesen,
+  sim: IconSprechen,
+  grammar: IconGrammatik,
+  listen: IconHoeren,
+  write: IconSchreiben,
+};
 
-export default function CorrectionsPage() {
-  const { teacher: tT, common: tC, nav: tNav } = useT();
-  const [activeTab, setActiveTab] = useState<Tab>("review");
+interface Copy {
+  title: string;
+  eye: string;
+  h: string;
+  sub: string;
+  loopEye: string;
+  loop: [string, string, string, string];
+  demoEye: string;
+  demoBody: string;
+  filters: Record<TabKey, string>;
+  submitted: string;
+  submittedPct: string;
+  deadline: string;
+  maxScore: string;
+  aiChip: string;
+  review: string;
+  prepare: string;
+  emptyH: string;
+  emptySub: string;
+  modalEye: string;
+  modalH: string;
+  modalSub: string;
+  fldTitle: [string, string];
+  fldClass: [string, string];
+  fldDue: [string, string];
+  guarantee: string;
+  cancel: string;
+  createDraft: string;
+}
+
+const FR: Copy = {
+  title: "Corrections",
+  eye: "Corrections",
+  h: "Ton regard reste central.",
+  sub: "L'IA propose une piste. Ta validation la publie. Les apprenant·e·s reçoivent ta note, pas celle d'une machine.",
+  loopEye: "Boucle de correction",
+  loop: ["Apprenant·e", "IA suggère", "Tu valides", "Envoi apprenant·e"],
+  demoEye: "Données de démo",
+  demoBody: "Ces activités sont fictives. Elles montrent comment la file de correction se remplira une fois tes classes actives.",
+  filters: { review: "À revoir", ai: "IA proposée", approved: "Envoyées", all: "Toutes" },
+  submitted: "Rendus",
+  submittedPct: "remis",
+  deadline: "Échéance",
+  maxScore: "Note max",
+  aiChip: "IA prête",
+  review: "Revoir les rendus",
+  prepare: "Préparer une activité",
+  emptyH: "Rien dans cette catégorie.",
+  emptySub: "Essaie un autre onglet pour voir les activités concernées.",
+  modalEye: "Nouvelle activité",
+  modalH: "Préparer une activité",
+  modalSub: "Ta consigne, ta classe, ton échéance. La publication demandera ta validation.",
+  fldTitle: ["Titre", "Ex : Vocabulaire Lektion 5"],
+  fldClass: ["Classe", "Groupe A1 Matin"],
+  fldDue: ["Date limite", ""],
+  guarantee: "Rien n'est publié sans ta relecture.",
+  cancel: "Annuler",
+  createDraft: "Enregistrer le brouillon",
+};
+
+const EN: Copy = {
+  title: "Corrections",
+  eye: "Corrections",
+  h: "Your judgement stays central.",
+  sub: "AI drafts a path. Your validation publishes it. Learners receive your grade — not a machine's.",
+  loopEye: "Correction loop",
+  loop: ["Learner", "AI suggests", "You validate", "Sent to learner"],
+  demoEye: "Demo data",
+  demoBody: "These activities are placeholders. They show how the review queue will look once your classes are active.",
+  filters: { review: "To review", ai: "AI drafted", approved: "Sent", all: "All" },
+  submitted: "Submitted",
+  submittedPct: "in",
+  deadline: "Deadline",
+  maxScore: "Max score",
+  aiChip: "AI ready",
+  review: "Review submissions",
+  prepare: "Plan an activity",
+  emptyH: "Nothing in this bucket.",
+  emptySub: "Try another tab to see relevant items.",
+  modalEye: "New activity",
+  modalH: "Plan an activity",
+  modalSub: "Your instructions, your class, your deadline. Publishing needs your approval.",
+  fldTitle: ["Title", "e.g. Lesson 5 vocabulary"],
+  fldClass: ["Class", "Morning A1 group"],
+  fldDue: ["Deadline", ""],
+  guarantee: "Nothing goes out without your review.",
+  cancel: "Cancel",
+  createDraft: "Save draft",
+};
+
+export default function TeacherAssignmentsPage() {
+  const locale = useLocale();
+  const t = locale === "en" ? EN : FR;
+
+  const [tab, setTab] = useState<TabKey>("review");
   const [showModal, setShowModal] = useState(false);
 
-  const filtered = SAMPLE_ACTIVITIES.filter(a => activeTab === "all" || a.tab === activeTab);
-  const scoreColor = (pct: number) => pct >= 80 ? "#10b981" : pct >= 40 ? "#f59e0b" : "#ef4444";
-
-  const tabs: { key: Tab; label: string; count: number }[] = [
-    { key: "review",   label: tT.tabToReview,      count: SAMPLE_ACTIVITIES.filter(a => a.tab === "review").length },
-    { key: "ai",       label: tT.tabAISuggestions,  count: SAMPLE_ACTIVITIES.filter(a => a.tab === "ai").length },
-    { key: "approved", label: tT.tabApproved,       count: SAMPLE_ACTIVITIES.filter(a => a.tab === "approved").length },
-    { key: "all",      label: tT.tabAll,             count: SAMPLE_ACTIVITIES.length },
-  ];
+  const filtered = useMemo(
+    () => ACTIVITIES.filter((a) => tab === "all" || a.tab === tab),
+    [tab],
+  );
+  const counts: Record<TabKey, number> = {
+    review: ACTIVITIES.filter((a) => a.tab === "review").length,
+    ai: ACTIVITIES.filter((a) => a.tab === "ai").length,
+    approved: ACTIVITIES.filter((a) => a.tab === "approved").length,
+    all: ACTIVITIES.length,
+  };
 
   return (
-    <TeacherLayout title={tNav.corrections}>
-      <div style={{ maxWidth: 860 }}>
+    <TeacherLayout title={t.title}>
+      <section className="subpage">
+        <header className="subpage-head">
+          <div>
+            <p className="subpage-eye">{t.eye}</p>
+            <h2 className="subpage-h">{t.h}</h2>
+            <p className="subpage-sub">{t.sub}</p>
+          </div>
+          <button type="button" className="subpage-cta" onClick={() => setShowModal(true)}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+              <path d="M7 3v8M3 7h8" />
+            </svg>
+            {t.prepare}
+          </button>
+        </header>
 
-        {/* Subtitle + positioning */}
-        <p style={{ margin: "0 0 6px", color: "rgba(255,255,255,0.65)", fontSize: "0.86rem" }}>
-          {tT.correctionsSubtitle2}
-        </p>
-        <p style={{ margin: "0 0 16px", color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.82rem" }}>
-          {tT.expertiseCenter}
-        </p>
-
-        {/* Trust note */}
-        <div style={{ marginBottom: 18, padding: "14px 16px", borderRadius: 12, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.18)" }}>
-          <p style={{ margin: "0 0 12px", color: "rgba(255,255,255,0.78)", fontSize: "0.84rem", lineHeight: 1.55 }}>{tT.correctionsTrustCopy}</p>
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {[
-              { step: "1", label: tT.correctionStepLearner, color: "#6366f1" },
-              { step: "2", label: tT.correctionStepAI,      color: "#f59e0b" },
-              { step: "3", label: tT.correctionStepFinal,   color: "#10b981" },
-              { step: "4", label: tT.correctionStepSend,    color: "#10b981" },
-            ].map((s, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                {i > 0 && <span style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.75rem" }}>→</span>}
-                <span style={{ padding: "2px 8px", borderRadius: 6, background: `${s.color}12`, border: `1px solid ${s.color}28`, color: s.color, fontSize: "0.75rem", fontFamily: "'DM Mono', monospace" }}>
-                  {s.step}. {s.label}
+        <section style={{
+          padding: "18px 22px",
+          background: "var(--brass-glow)",
+          border: "1px solid var(--brass-edge)",
+          borderRadius: 14,
+        }}>
+          <p className="subpage-eye">{t.loopEye}</p>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+            {t.loop.map((step, i) => (
+              <span key={step} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                {i > 0 && (
+                  <span aria-hidden="true" style={{ color: "var(--creme-mute)", fontFamily: "var(--font-jetbrains, monospace)" }}>→</span>
+                )}
+                <span style={{
+                  padding: "4px 12px",
+                  borderRadius: 999,
+                  border: "1px solid var(--brass-edge)",
+                  background: "var(--espresso-2)",
+                  color: "var(--creme)",
+                  fontFamily: "var(--font-jetbrains, monospace)",
+                  fontSize: 11,
+                  letterSpacing: "0.06em",
+                }}>
+                  {i + 1}. {step}
                 </span>
-              </div>
+              </span>
             ))}
           </div>
+        </section>
+
+        <div style={{
+          padding: "12px 16px",
+          borderRadius: 10,
+          border: "1px dashed var(--creme-hair)",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 10,
+        }}>
+          <span className="status-pill pending">{t.demoEye}</span>
+          <p style={{ margin: 0, color: "var(--creme-soft)", fontSize: 12.5, lineHeight: 1.5 }}>
+            {t.demoBody}
+          </p>
         </div>
 
-        {/* Demo banner */}
-        <div style={{ marginBottom: 20, padding: "10px 14px", borderRadius: 10, background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(245,158,11,0.15)", color: "#f59e0b", fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 700, flexShrink: 0 }}>{tT.sampleLabel}</span>
-          <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>{tT.aiTrustNote}</span>
-        </div>
-
-        {/* Controls */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 24, alignItems: "center", flexWrap: "wrap" }}>
-          {tabs.map(tab => (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
-              padding: "7px 14px", borderRadius: 9, border: "none", cursor: "pointer",
-              fontSize: "0.75rem", fontFamily: "'Syne', sans-serif", fontWeight: 600,
-              background: activeTab === tab.key ? "#10b981" : "rgba(255,255,255,0.05)",
-              color: activeTab === tab.key ? "white" : "rgba(255,255,255,0.72)",
-              display: "flex", alignItems: "center", gap: 6,
-            }}>
-              {tab.label}
-              <span style={{ padding: "1px 6px", borderRadius: 99, background: activeTab === tab.key ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.08)", fontSize: "0.75rem" }}>{tab.count}</span>
+        <div className="subpage-filters" role="tablist" aria-label={t.filters.review}>
+          {(Object.keys(t.filters) as TabKey[]).map((k) => (
+            <button
+              key={k}
+              type="button"
+              role="tab"
+              aria-selected={tab === k}
+              className={`subpage-filter ${tab === k ? "on" : ""}`}
+              onClick={() => setTab(k)}
+            >
+              {t.filters[k]} · {counts[k]}
             </button>
           ))}
-          <span style={{ flex: 1 }} />
-          <button onClick={() => setShowModal(true)} style={{
-            padding: "8px 18px", borderRadius: 10, border: "none", cursor: "pointer",
-            background: "linear-gradient(135deg, #10b981, #059669)", color: "white",
-            fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.78rem",
-            boxShadow: "0 4px 16px rgba(16,185,129,0.25)",
-          }}>{tT.prepareActivity}</button>
         </div>
 
-        {/* Activity cards */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {filtered.length === 0 ? (
-            <div style={{ padding: "32px", textAlign: "center", borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem", margin: 0 }}>{tT.activityEmpty ?? "Aucune activité dans cette catégorie."}</p>
-            </div>
-          ) : filtered.map(a => {
-            const pct = Math.round((a.submitted / a.total) * 100);
-            return (
-              <div key={a.id} style={{ padding: "18px 20px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
-                  <span style={{ fontSize: "1.3rem", flexShrink: 0, marginTop: 2 }}>{a.icon}</span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
-                      <span style={{ color: "rgba(255,255,255,0.9)", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.85rem" }}>{a.title}</span>
-                      <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(99,102,241,0.12)", color: "#818cf8", fontSize: "0.75rem" }}>{a.class}</span>
+        {filtered.length === 0 ? (
+          <div className="empty-state">
+            <p className="empty-state-h">{t.emptyH}</p>
+            <p className="empty-state-sub">{t.emptySub}</p>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {filtered.map((a) => {
+              const pct = Math.round((a.submitted / a.total) * 100);
+              const scoreClass = pct >= 80 ? "high" : pct >= 40 ? "mid" : "low";
+              const Icon = KIND_ICON[a.kind];
+              return (
+                <article key={a.id} style={{
+                  background: "var(--espresso-2)",
+                  border: "1px solid var(--creme-hair)",
+                  borderRadius: 14,
+                  padding: 20,
+                  display: "grid",
+                  gridTemplateColumns: "44px 1fr auto",
+                  gap: 16,
+                  alignItems: "flex-start",
+                }}>
+                  <div style={{
+                    width: 44, height: 44,
+                    borderRadius: 12,
+                    background: "var(--brass-glow)",
+                    border: "1px solid var(--brass-edge)",
+                    color: "var(--brass)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }} aria-hidden="true">
+                    <Icon size={22} />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
+                      <h3 style={{
+                        fontFamily: "var(--font-fraunces), Georgia, serif",
+                        fontSize: 17,
+                        color: "var(--creme)",
+                        margin: 0,
+                        fontWeight: 400,
+                      }}>{a.title}</h3>
+                      <span className="status-pill inactive">{a.klass}</span>
                       {a.hasAI && (
-                        <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(16,185,129,0.1)", color: "#10b981", fontSize: "0.75rem", border: "1px solid rgba(16,185,129,0.2)" }}>
-                          ✨ {tT.aiSuggestionAvailable}
+                        <span className="status-pill active" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                          <IconSpark size={10} />
+                          {t.aiChip}
                         </span>
                       )}
-                      <span style={{ padding: "1px 8px", borderRadius: 5, background: "rgba(245,158,11,0.1)", color: "#f59e0b", fontSize: "0.75rem", border: "1px solid rgba(245,158,11,0.2)" }}>
-                        {tT.sampleLabel}
-                      </span>
                     </div>
-                    <p style={{ margin: "0 0 10px", color: "rgba(255,255,255,0.72)", fontSize: "0.875rem" }}>
-                      {tT.deadline} : {a.due} · {tT.maxScoreLabel} : {a.maxScore} pts
+                    <p style={{
+                      margin: "0 0 12px",
+                      color: "var(--creme-mute)",
+                      fontFamily: "var(--font-jetbrains, monospace)",
+                      fontSize: 12,
+                      letterSpacing: "0.04em",
+                    }}>
+                      {t.deadline}: {a.due} · {t.maxScore}: {a.maxScore}
                     </p>
-                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                      <div style={{ flex: 1, maxWidth: 220 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+                      <div style={{ flex: 1, minWidth: 180, maxWidth: 280 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                          <span style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.82rem" }}>{tT.submittedLabel}</span>
-                          <span style={{ color: scoreColor(pct), fontSize: "0.78rem", fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>{a.submitted}/{a.total}</span>
+                          <span style={{ color: "var(--creme-soft)", fontSize: 11, fontFamily: "var(--font-jetbrains, monospace)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                            {t.submitted}
+                          </span>
+                          <span className={`score-cell ${scoreClass}`} style={{ fontSize: 12 }}>
+                            {a.submitted}/{a.total}
+                          </span>
                         </div>
-                        <div style={{ height: 4, borderRadius: 99, background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
-                          <div style={{ height: "100%", borderRadius: 99, width: `${pct}%`, background: scoreColor(pct) }} />
+                        <div className="card-progress">
+                          <div className="card-progress-bar" style={{ width: `${pct}%` }} />
                         </div>
                       </div>
-                      <span style={{ color: "rgba(255,255,255,0.72)", fontSize: "0.82rem" }}>{pct}% {tT.submittedPctLabel}</span>
+                      <span style={{
+                        color: "var(--creme-mute)",
+                        fontFamily: "var(--font-jetbrains, monospace)",
+                        fontSize: 11,
+                        letterSpacing: "0.04em",
+                      }}>
+                        {pct}% {t.submittedPct}
+                      </span>
                     </div>
                   </div>
-                  <button style={{
-                    padding: "7px 14px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)",
-                    background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.72)",
-                    fontSize: "0.82rem", cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap",
-                  }}>{tT.reviewBtn}</button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Prepare activity modal */}
-        {showModal && (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }}
-            onClick={e => e.target === e.currentTarget && setShowModal(false)}>
-            <div style={{ background: "#0d1117", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 18, padding: 28, width: "100%", maxWidth: 480 }}>
-              <h2 style={{ margin: "0 0 20px", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem" }}>{tT.newActivityTitle}</h2>
-              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                {[
-                  { label: tT.fieldTitle, ph: tT.fieldTitlePh },
-                  { label: tT.fieldClass, ph: tT.fieldClassPh },
-                  { label: tT.fieldDue,   ph: "" },
-                ].map(f => (
-                  <div key={f.label}>
-                    <label style={{ color: "rgba(255,255,255,0.78)", fontSize: "0.875rem", display: "block", marginBottom: 6 }}>{f.label}</label>
-                    <input placeholder={f.ph} style={{ width: "100%", padding: "10px 14px", borderRadius: 9, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontSize: "1rem", outline: "none", boxSizing: "border-box" }} />
-                  </div>
-                ))}
-                {/* Teacher review always ON */}
-                <div style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", flexDirection: "column", gap: 6 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ color: "#10b981", fontSize: "0.85rem" }}>✓</span>
-                    <span style={{ color: "#10b981", fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: "0.75rem" }}>{tT.activityValidationRequired}</span>
-                  </div>
-                  <p style={{ margin: 0, color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", paddingLeft: 24 }}>{tT.microcopy1}</p>
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 22 }}>
-                <button onClick={() => setShowModal(false)} style={{ padding: "8px 18px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.65)", cursor: "pointer", fontSize: "0.875rem" }}>{tC.cancel}</button>
-                <button onClick={() => setShowModal(false)} style={{ padding: "8px 18px", borderRadius: 9, border: "none", background: "#10b981", color: "white", fontFamily: "'Syne', sans-serif", fontWeight: 700, cursor: "pointer", fontSize: "0.8rem" }}>{tT.createActivityDraft}</button>
-              </div>
-            </div>
+                  <button type="button" className="row-btn" style={{ whiteSpace: "nowrap" }}>
+                    {t.review}
+                  </button>
+                </article>
+              );
+            })}
           </div>
         )}
-      </div>
+      </section>
+
+      {showModal && (
+        <div
+          className="modal-scrim"
+          onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="assign-new-h"
+        >
+          <div className="modal-card">
+            <p className="modal-eye">{t.modalEye}</p>
+            <h3 id="assign-new-h" className="modal-h">{t.modalH}</h3>
+            <p className="modal-sub">{t.modalSub}</p>
+
+            <div className="modal-form">
+              {([
+                { key: "title", label: t.fldTitle[0], ph: t.fldTitle[1], type: "text" },
+                { key: "class", label: t.fldClass[0], ph: t.fldClass[1], type: "text" },
+                { key: "due",   label: t.fldDue[0],   ph: t.fldDue[1],   type: "date" },
+              ] as const).map((f) => (
+                <div key={f.key} className="modal-field">
+                  <label htmlFor={`assign-${f.key}`} className="modal-lbl">{f.label}</label>
+                  <input id={`assign-${f.key}`} type={f.type} className="modal-input" placeholder={f.ph} />
+                </div>
+              ))}
+              <div style={{
+                padding: "10px 14px",
+                borderRadius: 10,
+                background: "var(--brass-glow)",
+                border: "1px solid var(--brass-edge)",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+              }}>
+                <span style={{ color: "var(--brass)" }} aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 7l3 3 5-6" />
+                  </svg>
+                </span>
+                <span style={{ color: "var(--creme-soft)", fontSize: 12.5, lineHeight: 1.4 }}>
+                  {t.guarantee}
+                </span>
+              </div>
+            </div>
+
+            <div className="modal-actions">
+              <button type="button" className="subpage-cta ghost" onClick={() => setShowModal(false)}>
+                {t.cancel}
+              </button>
+              <button type="button" className="subpage-cta" onClick={() => setShowModal(false)}>
+                {t.createDraft}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </TeacherLayout>
   );
 }
