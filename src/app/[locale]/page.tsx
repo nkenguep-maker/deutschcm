@@ -1,68 +1,45 @@
-"use client"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useLocale } from "next-intl"
-import { useT } from "@/hooks/useT"
-import { createClient } from "@/lib/supabase/client"
-import BrandLogo from "@/components/BrandLogo"
-import { LandingNav } from "@/components/landing/LandingNav"
-import { LandingHero } from "@/components/landing/LandingHero"
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
+import { useT } from "@/hooks/useT";
+import { createClient } from "@/lib/supabase/client";
+import { LandingCenters } from "@/components/landing/LandingCenters";
+import { LandingFaq } from "@/components/landing/LandingFaq";
+import { LandingFeatures } from "@/components/landing/LandingFeatures";
+import { LandingFinalCta } from "@/components/landing/LandingFinalCta";
+import { LandingFooter } from "@/components/landing/LandingFooter";
+import { LandingHero } from "@/components/landing/LandingHero";
+import { LandingLevels } from "@/components/landing/LandingLevels";
+import { LandingNav } from "@/components/landing/LandingNav";
+import { LandingProblems } from "@/components/landing/LandingProblems";
+import { LandingSimulator } from "@/components/landing/LandingSimulator";
+import { LandingVision } from "@/components/landing/LandingVision";
+import { LandingWhyGermany } from "@/components/landing/LandingWhyGermany";
 
 export default function LandingPage() {
-  const router = useRouter()
-  const locale = useLocale()
-  const { landing: t, nav: tNav } = useT()
-  const [faqOpen, setFaqOpen] = useState<number | null>(null)
-  const [isMobile, setIsMobile] = useState(false)
+  const router = useRouter();
+  const locale = useLocale();
+  const { landing: t, nav: tNav } = useT();
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768)
-    check()
-    window.addEventListener("resize", check)
-    return () => window.removeEventListener("resize", check)
-  }, [])
-
-  const features = [
-    { icon: "🏛️", title: t.feature1Title, desc: t.feature1Desc, badge: t.feature1Badge },
-    { icon: "🎧", title: t.feature2Title, desc: t.feature2Desc },
-    { icon: "🎙️", title: t.feature3Title, desc: t.feature3Desc, badge: t.feature3Badge },
-    { icon: "✍️", title: t.feature4Title, desc: t.feature4Desc, badge: t.feature4Badge },
-    { icon: "🎯", title: t.feature5Title, desc: t.feature5Desc, badge: t.feature5Badge },
-    { icon: "👨‍🏫", title: t.feature6Title, desc: t.feature6Desc, badge: t.feature6Badge },
-    { icon: "🏫", title: t.feature7Title, desc: t.feature7Desc, badge: t.feature7Badge },
-    { icon: "📊", title: t.feature8Title, desc: t.feature8Desc, badge: t.feature8Badge },
-  ]
-
-  const levels = [
-    { level: "A1", name: t.level1Name, desc: t.level1Desc, modules: 48, color: "#10b981", locked: false },
-    { level: "A2", name: t.level2Name, desc: t.level2Desc, modules: 48, color: "#34d399", locked: false },
-    { level: "B1", name: t.level3Name, desc: t.level3Desc, modules: 60, color: "#60a5fa", locked: true },
-    { level: "B2", name: t.level4Name, desc: t.level4Desc, modules: 40, color: "#a78bfa", locked: true },
-    { level: "C1", name: t.level5Name, desc: t.level5Desc, modules: 40, color: "#f59e0b", locked: true },
-  ]
-
-  const problems = [
-    { title: t.problem1Title, desc: t.problem1Desc, icon: "📚" },
-    { title: t.problem2Title, desc: t.problem2Desc, icon: "💸" },
-    { title: t.problem3Title, desc: t.problem3Desc, icon: "🌍" },
-  ]
-
-  const faqs = [
-    { q: t.faq1Q, a: t.faq1A },
-    { q: t.faq2Q, a: t.faq2A },
-    { q: t.faq3Q, a: t.faq3A },
-    { q: t.faq4Q, a: t.faq4A },
-    { q: t.faq5Q, a: t.faq5A },
-    { q: t.faq6Q, a: t.faq6A },
-  ]
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   async function handleTestLevel() {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (user) {
-      router.push(`/${locale}/test-niveau`)
+      router.push(`/${locale}/test-niveau`);
     } else {
-      router.push(`/${locale}/register?next=/${locale}/test-niveau`)
+      router.push(`/${locale}/register?next=/${locale}/test-niveau`);
     }
   }
 
@@ -103,413 +80,159 @@ export default function LandingPage() {
         }}
       />
 
-      {/* ── VISION ── */}
-      <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(16,185,129,0.02)" }}>
-        <div style={{ maxWidth: 960, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 28 : 36, fontWeight: 800, marginBottom: 12, color: "#f0f4f8" }}>
-              {t.visionTitle}
-            </h2>
-            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 16, maxWidth: 560, margin: "0 auto" }}>
-              {t.visionSubtitle}
-            </p>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: isMobile ? 16 : 24 }}>
-            {[
-              { label: t.vision1Label, title: t.vision1Title, desc: t.vision1Desc, num: "01" },
-              { label: t.vision2Label, title: t.vision2Title, desc: t.vision2Desc, num: "02" },
-              { label: t.vision3Label, title: t.vision3Title, desc: t.vision3Desc, num: "03" },
-            ].map((v, i) => (
-              <div key={i} style={{ padding: "28px 24px", borderRadius: 18, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(16,185,129,0.12)", position: "relative", overflow: "hidden" }}>
-                <div style={{ position: "absolute", top: 16, right: 20, fontFamily: "'Syne',sans-serif", fontSize: 40, fontWeight: 900, color: "rgba(16,185,129,0.08)" }}>{v.num}</div>
-                <span style={{ fontSize: 12, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, display: "block", marginBottom: 10 }}>{v.label}</span>
-                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800, margin: "0 0 12px", color: "#f0f4f8" }}>{v.title}</h3>
-                <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 14, lineHeight: 1.7, margin: 0 }}>{v.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <LandingVision
+        labels={{
+          title: t.visionTitle,
+          subtitle: t.visionSubtitle,
+          items: [
+            { label: t.vision1Label, title: t.vision1Title, desc: t.vision1Desc },
+            { label: t.vision2Label, title: t.vision2Title, desc: t.vision2Desc },
+            { label: t.vision3Label, title: t.vision3Title, desc: t.vision3Desc },
+          ],
+        }}
+      />
 
-      {/* ── FEATURES ── */}
-      <section id="features" style={{ padding: isMobile ? "60px 16px" : "80px 40px", maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12, color: "#f0f4f8" }}>
-            {t.featuresTitle}
-          </h2>
-          <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 16 }}>
-            {t.featuresSubtitle}
-          </p>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 10 : 16 }}>
-          {features.map((f, i) => (
-            <div key={i} style={{ padding: "20px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", transition: "border-color 0.2s" }}
-              onMouseOver={e => (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.25)"}
-              onMouseOut={e => (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)"}
-            >
-              <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, fontWeight: 700, margin: 0, color: "#f0f4f8" }}>{f.title}</h3>
-                {f.badge && <span style={{ fontSize: 8, padding: "2px 6px", borderRadius: 99, background: "rgba(16,185,129,0.12)", color: "#10b981", fontWeight: 700, whiteSpace: "nowrap" }}>{f.badge}</span>}
-              </div>
-              <p style={{ color: "rgba(255,255,255,0.70)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <div className="container"><div className="lsep" /></div>
 
-      {/* ── LEVELS ── */}
-      <section id="levels" style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12, color: "#f0f4f8" }}>
-              {t.levelsTitle}
-            </h2>
-            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 16 }}>
-              {t.levelsSubtitle}
-            </p>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {levels.map((lvl, i) => (
-              <div key={i} style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: `1px solid ${lvl.locked ? "rgba(255,255,255,0.06)" : `${lvl.color}30`}`, display: "flex", alignItems: "center", gap: 20, opacity: lvl.locked ? 0.6 : 1 }}>
-                <div style={{ width: 56, height: 56, borderRadius: 14, background: `${lvl.color}15`, border: `1px solid ${lvl.color}30`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 900, color: lvl.color }}>{lvl.level}</span>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-                    <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 700, margin: 0, color: "#f0f4f8" }}>{lvl.name}</h3>
-                    {!lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: `${lvl.color}15`, color: lvl.color, fontWeight: 700 }}>{t.available}</span>}
-                    {lvl.locked && <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" }}>{t.locked}</span>}
-                  </div>
-                  <p style={{ color: "rgba(255,255,255,0.70)", fontSize: 13, margin: 0 }}>{lvl.desc}</p>
-                </div>
-                <div style={{ textAlign: "right", flexShrink: 0 }}>
-                  <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800, color: lvl.color }}>{lvl.modules}</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.62)" }}>{t.modules}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <LandingFeatures
+        labels={{
+          title: t.featuresTitle,
+          subtitle: t.featuresSubtitle,
+          items: [
+            { title: t.feature1Title, desc: t.feature1Desc, badge: t.feature1Badge },
+            { title: t.feature2Title, desc: t.feature2Desc },
+            { title: t.feature3Title, desc: t.feature3Desc, badge: t.feature3Badge },
+            { title: t.feature4Title, desc: t.feature4Desc, badge: t.feature4Badge },
+            { title: t.feature5Title, desc: t.feature5Desc, badge: t.feature5Badge },
+            { title: t.feature6Title, desc: t.feature6Desc, badge: t.feature6Badge },
+            { title: t.feature7Title, desc: t.feature7Desc, badge: t.feature7Badge },
+            { title: t.feature8Title, desc: t.feature8Desc, badge: t.feature8Badge },
+          ],
+        }}
+      />
 
-      {/* ── WHY GERMANY ── */}
-      <section style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
-        <div style={{ maxWidth: 860, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 56, alignItems: "start" }}>
-          <div>
-            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 26 : 34, fontWeight: 800, marginBottom: 16, lineHeight: 1.2, color: "#f0f4f8" }}>
-              {t.germanyTitle}
-            </h2>
-            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 15, lineHeight: 1.8, margin: 0 }}>
-              {t.germanyText}
-            </p>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {[t.germany1, t.germany2, t.germany3, t.germany4].map((item, i) => (
-              <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-                <span style={{ color: "#10b981", fontSize: 16, flexShrink: 0, marginTop: 1 }}>✓</span>
-                <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 14, lineHeight: 1.6, margin: 0 }}>{item}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <LandingLevels
+        locale={locale}
+        labels={{
+          title: t.levelsTitle,
+          subtitle: t.levelsSubtitle,
+          availableBadge: t.available,
+          lockedBadge: t.locked,
+          modulesLabel: t.modules,
+          items: [
+            { code: "A1", name: t.level1Name, desc: t.level1Desc, modules: 48, locked: false },
+            { code: "A2", name: t.level2Name, desc: t.level2Desc, modules: 48, locked: false },
+            { code: "B1", name: t.level3Name, desc: t.level3Desc, modules: 60, locked: true },
+            { code: "B2", name: t.level4Name, desc: t.level4Desc, modules: 40, locked: true },
+            { code: "C1", name: t.level5Name, desc: t.level5Desc, modules: 40, locked: true },
+          ],
+        }}
+      />
 
-      {/* ── SIMULATOR DEMO ── */}
-      <section style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "center" }}>
-          <div>
-            <span style={{ fontSize: 12, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t.simTitle}</span>
-            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2, color: "#f0f4f8" }}>
-              {t.simHeadline}
-            </h2>
-            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 15, lineHeight: 1.8, marginBottom: 24 }}>
-              {t.simDesc}
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-              {[t.simVisa1, t.simVisa2, t.simVisa3, t.simVisa4, t.simVisa5].map((s, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ color: "#10b981", fontSize: 12 }}>✓</span>
-                  <span style={{ fontSize: 14, color: "rgba(255,255,255,0.78)" }}>{s}</span>
-                </div>
-              ))}
-            </div>
-            <button onClick={() => router.push(`/${locale}/simulateur`)}
-              style={{ padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
-              {t.simCta}
-            </button>
-          </div>
+      <LandingWhyGermany
+        labels={{
+          title: t.germanyTitle,
+          body: t.germanyText,
+          items: [t.germany1, t.germany2, t.germany3, t.germany4],
+        }}
+      />
 
-          {/* Mock conversation */}
-          <div style={{ padding: "20px", borderRadius: 20, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(16,185,129,0.15)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, paddingBottom: 12, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-              <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>🏛️</div>
-              <div>
-                <p style={{ color: "white", fontSize: 13, fontWeight: 700, margin: 0 }}>Herr Klaus Bauer</p>
-                <p style={{ color: "#10b981", fontSize: 12, margin: 0 }}>{t.simConsulOnline}</p>
-              </div>
-            </div>
-            {[
-              { role: "consul", text: "Hallo! Bitte stellen Sie sich vor.", translation: t.simMsg1 },
-              { role: "user", text: "Hallo. Ich heiße Paul. Ich komme aus Kamerun.", translation: t.simMsg2 },
-              { role: "consul", text: "Warum möchten Sie Deutsch lernen?", translation: t.simMsg3 },
-            ].map((msg, i) => (
-              <div key={i} style={{ marginBottom: 12, display: "flex", justifyContent: msg.role === "user" ? "flex-end" : "flex-start" }}>
-                <div style={{ maxWidth: "80%", padding: "10px 14px", borderRadius: msg.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px", background: msg.role === "user" ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.05)", border: msg.role === "user" ? "1px solid rgba(16,185,129,0.25)" : "1px solid rgba(255,255,255,0.08)" }}>
-                  <p style={{ color: "white", fontSize: 12, margin: "0 0 3px" }}>{msg.text}</p>
-                  <p style={{ color: "rgba(255,255,255,0.62)", fontSize: 12, margin: 0, fontStyle: "italic" }}>{msg.translation}</p>
-                </div>
-              </div>
-            ))}
-            <div style={{ padding: "8px 12px", borderRadius: 10, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)", marginTop: 8 }}>
-              <p style={{ color: "#10b981", fontSize: 10, fontWeight: 700, margin: "0 0 3px" }}>{t.simScoreLabel}</p>
-              <div style={{ display: "flex", gap: 12 }}>
-                {[[t.simGrammar,"8/10"],[t.simVocab,"7/10"],[t.simRelevance,"9/10"]].map(([label,val]) => (
-                  <div key={label}>
-                    <span style={{ color: "rgba(255,255,255,0.62)", fontSize: 12 }}>{label} </span>
-                    <span style={{ color: "#10b981", fontSize: 12, fontWeight: 700 }}>{val}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <LandingSimulator
+        locale={locale}
+        labels={{
+          eye: t.simTitle,
+          title: t.simHeadline,
+          body: t.simDesc,
+          scenarios: [t.simVisa1, t.simVisa2, t.simVisa3, t.simVisa4, t.simVisa5],
+          cta: t.simCta,
+          chatName: "Klaus · Coach IA",
+          chatStatus: t.simConsulOnline,
+          msgs: [
+            { who: "them", de: "Hallo! Bitte stellen Sie sich vor.", tr: t.simMsg1 },
+            { who: "you", de: "Hallo. Ich heiße Paul. Ich komme aus Kamerun.", tr: t.simMsg2 },
+            { who: "them", de: "Warum möchten Sie Deutsch lernen?", tr: t.simMsg3 },
+          ],
+          scoreLbl: t.simScoreLabel,
+          scoreGrammar: t.simGrammar,
+          scoreVocab: t.simVocab,
+          scoreRelevance: t.simRelevance,
+        }}
+      />
 
-      {/* ── PROBLEMS ── */}
-      <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 26 : 36, fontWeight: 800, textAlign: "center", marginBottom: 48, color: "#f0f4f8" }}>
-            {t.testimonialsTitle}
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: isMobile ? 12 : 20 }}>
-            {problems.map((p, i) => (
-              <div key={i} style={{ padding: "28px 24px", borderRadius: 18, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div style={{ fontSize: 32, marginBottom: 16 }}>{p.icon}</div>
-                <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 700, margin: "0 0 10px", color: "#f0f4f8" }}>{p.title}</h3>
-                <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 14, lineHeight: 1.7, margin: 0 }}>{p.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <LandingProblems
+        labels={{
+          title: t.testimonialsTitle,
+          items: [
+            { title: t.problem1Title, desc: t.problem1Desc },
+            { title: t.problem2Title, desc: t.problem2Desc },
+            { title: t.problem3Title, desc: t.problem3Desc },
+          ],
+        }}
+      />
 
-      {/* ── CENTERS ── */}
-      <section id="centres" style={{ padding: isMobile ? "60px 16px" : "80px 40px" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 32 : 48, alignItems: "center" }}>
-          <div>
-            <span style={{ fontSize: 12, color: "#10b981", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>{t.b2bLabel}</span>
-            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 32, fontWeight: 800, margin: "12px 0 16px", lineHeight: 1.2, color: "#f0f4f8" }}>
-              {t.centerTitle}
-            </h2>
-            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 15, lineHeight: 1.8, marginBottom: 24 }}>
-              {t.centerDesc}
-            </p>
-            {[
-              { icon: "👨‍🏫", text: t.centerFeature1 },
-              { icon: "📊", text: t.centerFeature2 },
-              { icon: "🏛️", text: t.centerFeature3 },
-              { icon: "📱", text: t.centerFeature4 },
-              { icon: "💳", text: t.centerFeature5 },
-            ].map((item, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                <span style={{ fontSize: 18 }}>{item.icon}</span>
-                <span style={{ fontSize: 14, color: "rgba(255,255,255,0.78)" }}>{item.text}</span>
-              </div>
-            ))}
-            <div style={{ display: "flex", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
-              <button onClick={() => router.push(`/${locale}/register`)}
-                style={{ padding: "12px 24px", borderRadius: 12, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif" }}>
-                {t.centerCta}
-              </button>
-            </div>
-          </div>
+      <LandingCenters
+        locale={locale}
+        labels={{
+          eye: t.b2bLabel,
+          title: t.centerTitle,
+          body: t.centerDesc,
+          features: [
+            t.centerFeature1,
+            t.centerFeature2,
+            t.centerFeature3,
+            t.centerFeature4,
+            t.centerFeature5,
+          ],
+          cta: t.centerCta,
+          plans: [
+            { name: "Essentiel", audience: "Petit centre · équipe réduite", price: t.centerOnDemand },
+            { name: "Pro", audience: "Centre en croissance · plusieurs classes", price: t.centerOnDemand },
+            { name: "Enterprise", audience: "Illimité · support dédié", price: t.centerOnDemand },
+          ],
+          reassurance: t.centerReassurance,
+        }}
+      />
 
-          {locale === "en" ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              {[
-                { icon: "🎓", label: t.centerAudience1Label, desc: t.centerAudience1Desc, color: "#10b981" },
-                { icon: "👨‍🏫", label: t.centerAudience2Label, desc: t.centerAudience2Desc, color: "#60a5fa" },
-                { icon: "🏫", label: t.centerAudience3Label, desc: t.centerAudience3Desc, color: "#a78bfa" },
-              ].map((a, i) => (
-                <div key={i} style={{ padding: "20px 22px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: `1px solid ${a.color}20` }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                    <span style={{ fontSize: 20 }}>{a.icon}</span>
-                    <p style={{ fontFamily: "'Syne',sans-serif", color: "white", fontSize: 14, fontWeight: 700, margin: 0 }}>{a.label}</p>
-                  </div>
-                  <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 14, lineHeight: 1.65, margin: 0 }}>{a.desc}</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {[
-                { plan: "Essentiel", users: "Petit centre · équipe réduite", color: "#10b981" },
-                { plan: "Pro", users: "Centre en croissance · plusieurs classes", color: "#f59e0b" },
-                { plan: "Enterprise", users: "Illimité · support dédié", color: "#a78bfa" },
-              ].map((p, i) => (
-                <div key={i} style={{ padding: "16px 20px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: `1px solid ${p.color}25`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <div>
-                    <p style={{ fontFamily: "'Syne',sans-serif", color: "white", fontSize: 15, fontWeight: 700, margin: "0 0 3px" }}>{p.plan}</p>
-                    <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 13, margin: 0 }}>{p.users}</p>
-                  </div>
-                  <p style={{ fontFamily: "'Syne',sans-serif", color: p.color, fontSize: 14, fontWeight: 800, margin: 0 }}>{t.centerOnDemand}</p>
-                </div>
-              ))}
-              <p style={{ color: "rgba(255,255,255,0.62)", fontSize: 13, lineHeight: 1.6, margin: "4px 0 0", fontStyle: "italic" }}>
-                {t.centerReassurance}
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
+      <LandingFaq
+        labels={{
+          title: t.faqTitle,
+          items: [
+            { q: t.faq1Q, a: t.faq1A },
+            { q: t.faq2Q, a: t.faq2A },
+            { q: t.faq3Q, a: t.faq3A },
+            { q: t.faq4Q, a: t.faq4A },
+            { q: t.faq5Q, a: t.faq5A },
+            { q: t.faq6Q, a: t.faq6A },
+          ],
+        }}
+      />
 
-      {/* ── FAQ ── */}
-      <section style={{ padding: isMobile ? "60px 16px" : "80px 40px", background: "rgba(255,255,255,0.01)" }}>
-        <div style={{ maxWidth: 700, margin: "0 auto" }}>
-          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 24 : 36, fontWeight: 800, textAlign: "center", marginBottom: 40, color: "#f0f4f8" }}>
-            {t.faqTitle}
-          </h2>
-          {faqs.map((faq, i) => (
-            <div key={i} style={{ marginBottom: 8, borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
-              <button onClick={() => setFaqOpen(faqOpen === i ? null : i)}
-                style={{ width: "100%", padding: "16px 20px", background: "none", border: "none", color: "white", textAlign: "left", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, fontWeight: 600, fontFamily: "'Syne',sans-serif" }}>
-                {faq.q}
-                <span style={{ color: "#10b981", fontSize: 18, transition: "transform 0.2s", transform: faqOpen === i ? "rotate(45deg)" : "none" }}>+</span>
-              </button>
-              {faqOpen === i && (
-                <div style={{ padding: "0 20px 16px", color: "rgba(255,255,255,0.75)", fontSize: 14, lineHeight: 1.7 }}>
-                  {faq.a}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
+      <LandingFinalCta
+        locale={locale}
+        labels={{
+          live: "Bêta ouverte · A1 gratuit",
+          titleLine1: locale === "en" ? "Learn German." : "Apprends l'allemand.",
+          titleAccent: locale === "en" ? "Without the fuss." : "Sans détour.",
+          body: t.ctaFinalDesc,
+          cta: t.ctaFinalBtn,
+          micro: t.ctaFinalSocial,
+        }}
+      />
 
-      {/* ── FINAL CTA ── */}
-      <section style={{ padding: isMobile ? "80px 20px 100px" : "100px 40px 120px", textAlign: "center", position: "relative", overflow: "hidden" }}>
-        {/* Ambient glow */}
-        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 900, height: 500, borderRadius: "50%", background: "radial-gradient(ellipse,rgba(16,185,129,0.07) 0%,transparent 70%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg,transparent,rgba(16,185,129,0.25),transparent)" }} />
-
-        <div style={{ maxWidth: 640, margin: "0 auto", position: "relative", zIndex: 2 }}>
-          {/* Live badge */}
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 16px", borderRadius: 99, background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", marginBottom: 32 }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block", animation: "pulse 2s infinite" }} />
-            <span style={{ color: "#10b981", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>Beta · Open Access</span>
-          </div>
-
-          {/* Headline */}
-          <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: isMobile ? 36 : 56, fontWeight: 900, lineHeight: 1.08, letterSpacing: "-0.02em", marginBottom: 20, color: "#f0f4f8" }}>
-            {t.ctaFinalTitle}<br />
-            <span style={{ color: "#10b981", textShadow: "0 0 60px rgba(16,185,129,0.35)" }}>{t.ctaFinalSub}</span>
-          </h2>
-
-          {/* Sub-description */}
-          <p style={{ color: "rgba(255,255,255,0.68)", fontSize: isMobile ? 14 : 16, lineHeight: 1.7, marginBottom: 40, maxWidth: 480, margin: "0 auto 40px" }}>
-            {t.ctaFinalDesc}
-          </p>
-
-          {/* Primary CTA */}
-          <button
-            onClick={() => router.push(`/${locale}/register`)}
-            style={{ padding: isMobile ? "16px 36px" : "18px 52px", borderRadius: 16, background: "linear-gradient(135deg,#10b981,#059669)", border: "none", color: "white", fontSize: isMobile ? 15 : 17, fontWeight: 700, cursor: "pointer", fontFamily: "'Syne',sans-serif", boxShadow: "0 16px 48px rgba(16,185,129,0.32), 0 0 0 1px rgba(16,185,129,0.2) inset", transition: "box-shadow 0.2s, transform 0.15s", letterSpacing: "0.01em" }}
-            onMouseOver={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 20px 60px rgba(16,185,129,0.44), 0 0 0 1px rgba(16,185,129,0.3) inset"; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)" }}
-            onMouseOut={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 16px 48px rgba(16,185,129,0.32), 0 0 0 1px rgba(16,185,129,0.2) inset"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)" }}
-          >
-            {t.ctaFinalBtn} →
-          </button>
-
-          {/* Social proof pill */}
-          <p style={{ color: "rgba(255,255,255,0.58)", fontSize: 13, marginTop: 16, letterSpacing: "0.04em" }}>
-            {t.ctaFinalSocial}
-          </p>
-
-          {/* Divider */}
-          <div style={{ margin: "44px auto", width: 48, height: 1, background: "rgba(255,255,255,0.08)" }} />
-
-          {/* App store section */}
-          <p style={{ color: "rgba(255,255,255,0.62)", fontSize: 13, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 20, fontWeight: 600 }}>
-            {t.ctaFinalAppLabel}
-          </p>
-
-          <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-            {/* App Store badge — not clickable */}
-            <div style={{ position: "relative", cursor: "default" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 20px", borderRadius: 13, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", minWidth: 160, opacity: 0.6 }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" fill="rgba(255,255,255,0.7)" />
-                </svg>
-                <div style={{ textAlign: "left" }}>
-                  <p style={{ margin: 0, color: "rgba(255,255,255,0.62)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.08em" }}>Coming Soon</p>
-                  <p style={{ margin: 0, color: "rgba(255,255,255,0.7)", fontSize: 13, fontWeight: 700, fontFamily: "'Syne',sans-serif" }}>App Store</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Google Play badge — not clickable */}
-            <div style={{ position: "relative", cursor: "default" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 20px", borderRadius: 13, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", minWidth: 160, opacity: 0.6 }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                  <path d="M3.18 23.76c.3.16.64.2.97.1L15.5 12 12 8.5 3.18 23.76z" fill="rgba(255,100,100,0.8)" />
-                  <path d="M21.54 10.27L18.78 8.7 15 12l3.78 3.3 2.76-1.57c.79-.45.79-1.57 0-2.02v-.44z" fill="rgba(255,200,0,0.8)" />
-                  <path d="M3.18.24C2.86.08 2.5.08 2.2.28 1.85.52 1.6.93 1.6 1.4v21.2c0 .47.25.88.6 1.12.3.2.64.2.97.1L15.5 12 3.18.24z" fill="rgba(100,200,100,0.8)" />
-                  <path d="M15.5 12L3.18.24c.3-.16.64-.14.97.1l11.35 6.16L15.5 12z" fill="rgba(100,160,255,0.8)" />
-                </svg>
-                <div style={{ textAlign: "left" }}>
-                  <p style={{ margin: 0, color: "rgba(255,255,255,0.62)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.08em" }}>Coming Soon</p>
-                  <p style={{ margin: 0, color: "rgba(255,255,255,0.7)", fontSize: 13, fontWeight: 700, fontFamily: "'Syne',sans-serif" }}>Google Play</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* City line */}
-          <p style={{ color: "rgba(255,255,255,0.52)", fontSize: 13, marginTop: 28, letterSpacing: "0.06em" }}>
-            {t.ctaFinalCities}
-          </p>
-        </div>
-      </section>
-
-      {/* ── FOOTER ── */}
-      <footer style={{ padding: isMobile ? "28px 20px" : "36px 40px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", gap: 20, flexWrap: "wrap" }}>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
-            <BrandLogo variant="nav" />
-            <span style={{ color: "rgba(255,255,255,0.55)", fontSize: isMobile ? 13 : 15, letterSpacing: "0.01em", lineHeight: 1.4 }}>{t.footerTagline}</span>
-            <span style={{ color: "rgba(255,255,255,0.48)", fontSize: 13 }}>{t.footerMade}</span>
-          </div>
-          <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
-            {[
-              { label: t.footerLegal, href: `/${locale}/terms` },
-              { label: t.footerTerms, href: `/${locale}/terms` },
-              { label: t.footerPrivacy, href: `/${locale}/privacy` },
-              { label: t.footerContact, href: "mailto:legal@yema.app" },
-            ].map(({ label, href }) => (
-              <a key={label} href={href} style={{ color: "rgba(255,255,255,0.58)", fontSize: 13, transition: "color 0.2s" }}
-                onMouseOver={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.9)"}
-                onMouseOut={e => (e.target as HTMLElement).style.color = "rgba(255,255,255,0.58)"}>
-                {label}
-              </a>
-            ))}
-          </div>
-          <div style={{ display: "flex", gap: 10 }}>
-            {["WhatsApp", "Facebook", "Instagram"].map(s => (
-              <a key={s} href="#" style={{ padding: "5px 12px", borderRadius: 7, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.65)", fontSize: 13, transition: "border-color 0.2s, color 0.2s" }}
-                onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(16,185,129,0.3)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.9)" }}
-                onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.65)" }}>
-                {s}
-              </a>
-            ))}
-          </div>
-        </div>
-        <div style={{ maxWidth: 1200, margin: "16px auto 0", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.04)", textAlign: "center" }}>
-          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 12, lineHeight: 1.6 }}>
-            {t.footerDisclaimer}
-          </p>
-        </div>
-      </footer>
+      <LandingFooter
+        locale={locale}
+        labels={{
+          tagline: locale === "en"
+            ? "German, without the fuss. From A1 to C1, independent, CEFR-aligned."
+            : "L'allemand, pas l'accent. De A1 à C1, indépendant, aligné CECRL.",
+          made: t.footerMade,
+          legal: t.footerLegal,
+          terms: t.footerTerms,
+          privacy: t.footerPrivacy,
+          contact: t.footerContact,
+          disclaimer: t.footerDisclaimer,
+        }}
+      />
     </div>
-  )
+  );
 }
