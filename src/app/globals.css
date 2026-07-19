@@ -6952,6 +6952,268 @@ body:has(.test-space-bar) { padding-top: 34px; }
   max-width: 620px;
 }
 
+/* ── Les portes · /register, /login, /not-found ──────────────────
+   Sprint 8 · portes sobres, réutilisent les tokens du seuil. */
+.porte-page {
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--espresso);
+  color: var(--creme);
+  display: flex;
+  flex-direction: column;
+}
+.porte-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--creme-hair);
+}
+.porte-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--creme);
+}
+.porte-brand-y {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1.5px solid var(--brass-edge);
+  background: var(--brass-glow);
+  color: var(--brass);
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 18px;
+}
+.porte-brand-word {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  color: var(--creme-soft);
+  text-transform: uppercase;
+}
+.porte-alt {
+  margin: 0;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 13px;
+  color: var(--creme-mute);
+}
+.porte-alt a {
+  color: var(--brass);
+  text-decoration: none;
+}
+
+.porte-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+.porte-card {
+  width: min(560px, 100%);
+  padding: 40px 32px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-panel);
+  background: rgba(244, 235, 220, 0.02);
+  text-align: center;
+}
+.porte-h {
+  margin: 12px 0 12px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(28px, 3.6vw, 40px);
+  line-height: 1.15;
+  color: var(--creme);
+  letter-spacing: -0.02em;
+}
+.porte-h em {
+  font-style: italic;
+  color: var(--brass);
+}
+.porte-lede {
+  margin: 0 0 24px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 15.5px;
+  color: var(--creme-soft);
+  line-height: 1.55;
+}
+
+.porte-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  text-align: left;
+  margin-top: 8px;
+}
+@media (max-width: 520px) {
+  .porte-form { grid-template-columns: 1fr; }
+}
+.porte-form .ens-form-field-wide { grid-column: 1 / -1; }
+
+.porte-caps {
+  grid-column: 1 / -1;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+.porte-caps legend {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--brass);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.porte-caps-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 520px) {
+  .porte-caps-grid { grid-template-columns: 1fr; }
+}
+.porte-cap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-card);
+  background: rgba(244, 235, 220, 0.02);
+  cursor: pointer;
+  transition: border-color var(--dur-touch) var(--ease-enter),
+              background var(--dur-touch) var(--ease-enter);
+}
+.porte-cap:hover { border-color: var(--brass-edge); }
+.porte-cap input { accent-color: var(--brass); }
+.porte-cap span {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 14.5px;
+  color: var(--creme);
+}
+.porte-cap.on {
+  border-color: var(--brass);
+  background: var(--brass-glow);
+}
+
+.porte-check {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 14px;
+  color: var(--creme-soft);
+  line-height: 1.4;
+}
+.porte-check input { accent-color: var(--brass); margin-top: 4px; }
+
+.porte-form button[type="submit"] {
+  grid-column: 1 / -1;
+  justify-self: center;
+  margin-top: 8px;
+}
+
+.porte-other {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--creme-hair);
+}
+.porte-other-lbl {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 14.5px;
+  color: var(--creme-soft);
+  margin: 0 0 12px;
+}
+.porte-other-lbl em { color: var(--brass); }
+.porte-other-links {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.porte-success {
+  padding: 24px 0;
+}
+
+/* /login · seuil réduit + /not-found aligné */
+.porte-seuil {
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--seuil-bg);
+  color: var(--creme);
+  display: flex;
+  flex-direction: column;
+}
+.porte-seuil-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+.porte-seuil-inner {
+  width: min(500px, 100%);
+  text-align: center;
+}
+.porte-seuil-h {
+  margin: 16px 0 12px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(30px, 4.5vw, 46px);
+  line-height: 1.1;
+  color: var(--creme);
+  letter-spacing: -0.02em;
+}
+.porte-seuil-h em {
+  font-style: italic;
+  color: var(--brass);
+}
+.porte-seuil-lede {
+  margin: 0 0 30px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 15px;
+  color: var(--creme-soft);
+  line-height: 1.55;
+}
+.porte-seuil-form {
+  display: grid;
+  gap: 18px;
+  text-align: left;
+}
+.porte-seuil-form button[type="submit"] {
+  justify-self: center;
+  margin-top: 8px;
+}
+.porte-seuil-footer {
+  margin-top: 24px;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 13px;
+  color: var(--creme-mute);
+}
+.porte-seuil-footer a {
+  color: var(--brass);
+  text-decoration: none;
+}
+
+.porte-404-y {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(100px, 18vw, 180px);
+  line-height: 1;
+  color: var(--brass);
+  text-shadow: 0 0 32px rgba(184, 135, 62, 0.32);
+  margin: 20px 0;
+}
+
 /* ── /landing B2B · Le comptoir ──────────────────────────────────
    Sprint 7 · centres de langues. Aucun tarif visible. */
 .comptoir-page {

@@ -1,96 +1,155 @@
 "use client";
 
-import { useState } from "react";
+// /register · Sprint 8 « La porte ». Élève UNIQUEMENT.
+// Les rôles TEACHER et CENTER ne s'inscrivent plus ici : la maison
+// les rencontre d'abord (voir /enseignants et /landing B2B).
+//
+// Flux :
+//   1. Le compte (nom, email, mot de passe, cap)
+//   2. Le cap devient le but du compte (pilote dashboard + pricing)
+// Une ligne sous le formulaire renvoie vers les portes B2B.
+
+import Link from "next/link";
 import { useRouter } from "@/navigation";
-import { Link } from "@/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { CefrStrip } from "@/components/landing/CefrStrip";
-import {
-  IconClasse,
-  IconInstitution,
-  IconTeacher,
-} from "@/components/landing/icons";
-import { LandingBrand } from "@/components/landing/LandingBrand";
+import { frTypo } from "@/components/landing/typo";
 
-type Role = "STUDENT" | "TEACHER" | "CENTER";
+type Cap = "franchir" | "grandir" | "transmettre" | "moi";
 
-const ONBOARDING_DEST: Record<Role, string> = {
-  STUDENT: "/onboarding/student",
-  TEACHER: "/onboarding/teacher",
-  CENTER: "/onboarding/center",
+interface Copy {
+  brand: string;
+  kicker: string;
+  title: string;
+  titleEm: string;
+  lede: string;
+  fldName: string;
+  fldEmail: string;
+  fldPassword: string;
+  capLbl: string;
+  caps: readonly { id: Cap; label: string }[];
+  consent: string;
+  ageConsent: string;
+  submit: string;
+  submitLoading: string;
+  otherLbl: string;
+  otherEm: string;
+  otherTeacher: string;
+  otherCenter: string;
+  alreadyLbl: string;
+  alreadyLink: string;
+  successTitle: string;
+  successBody: string;
+  errPassword: string;
+  errConsent: string;
+  errAge: string;
+  errInvalid: string;
+}
+
+const COPY_FR: Copy = {
+  brand: "YEMA",
+  kicker: "Créer votre compte",
+  title: "Choisissez votre cap.",
+  titleEm: "La maison s'ouvre.",
+  lede: "Un compte apprenant·e. La première leçon est gratuite. La maison rencontre les enseignants et les centres d'une autre manière.",
+  fldName: "Prénom",
+  fldEmail: "Email",
+  fldPassword: "Mot de passe",
+  capLbl: "Votre cap",
+  caps: [
+    { id: "franchir",    label: "Réussir mon examen, partir" },
+    { id: "grandir",     label: "Progresser là où je vis" },
+    { id: "transmettre", label: "Transmettre à mes enfants" },
+    { id: "moi",         label: "Apprendre pour moi" },
+  ],
+  consent: "J'accepte les conditions générales et la politique de confidentialité.",
+  ageConsent: "Je confirme avoir au moins 16 ans.",
+  submit: "Créer mon compte",
+  submitLoading: "Création…",
+  otherLbl: "Enseignant·e ? Centre ?",
+  otherEm: "La maison vous rencontre d'abord.",
+  otherTeacher: "Enseignant·e — l'accréditation",
+  otherCenter: "Centre — réserver une démo",
+  alreadyLbl: "Déjà un compte ?",
+  alreadyLink: "Se connecter",
+  successTitle: "Vérifiez votre email.",
+  successBody: "Nous vous avons envoyé un lien pour confirmer votre inscription.",
+  errPassword: "Choisissez un mot de passe d'au moins 6 caractères.",
+  errConsent: "Merci d'accepter les conditions.",
+  errAge: "Vous devez confirmer votre âge.",
+  errInvalid: "Cette adresse ne fonctionne pas — essayez-en une autre.",
 };
 
-const ROLE_ICONS: Record<Role, React.ComponentType<{ size?: number }>> = {
-  STUDENT: IconClasse,
-  TEACHER: IconTeacher,
-  CENTER: IconInstitution,
+const COPY_EN: Copy = {
+  brand: "YEMA",
+  kicker: "Create your account",
+  title: "Pick your cap.",
+  titleEm: "The house opens.",
+  lede: "A learner account. The first lesson is free. The house meets teachers and centers another way.",
+  fldName: "First name",
+  fldEmail: "Email",
+  fldPassword: "Password",
+  capLbl: "Your cap",
+  caps: [
+    { id: "franchir",    label: "Pass my exam, leave" },
+    { id: "grandir",     label: "Grow where I live" },
+    { id: "transmettre", label: "Pass on to my children" },
+    { id: "moi",         label: "Learn for me" },
+  ],
+  consent: "I accept the terms and the privacy policy.",
+  ageConsent: "I confirm I am at least 16.",
+  submit: "Create my account",
+  submitLoading: "Creating…",
+  otherLbl: "Teacher? Center?",
+  otherEm: "The house meets you first.",
+  otherTeacher: "Teacher — accreditation",
+  otherCenter: "Center — book a demo",
+  alreadyLbl: "Already have an account?",
+  alreadyLink: "Log in",
+  successTitle: "Check your email.",
+  successBody: "We sent you a link to confirm your registration.",
+  errPassword: "Choose a password of at least 6 characters.",
+  errConsent: "Please accept the terms.",
+  errAge: "You must confirm your age.",
+  errInvalid: "This address didn't work — try another one.",
 };
 
 export default function RegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
-  const t = useTranslations("auth");
-  const tc = useTranslations("common");
   const locale = useLocale();
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
+  const c = loc === "en" ? COPY_EN : COPY_FR;
+  const t = (s: string) => (loc === "fr" ? frTypo(s) : s);
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [cap, setCap] = useState<Cap>("franchir");
+  const [consent, setConsent] = useState(false);
+  const [ageConsent, setAgeConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [consent, setConsent] = useState(false);
-  const [ageConsent, setAgeConsent] = useState(false);
-
-  const getRoleLabel = (key: Role) =>
-    t(
-      key === "STUDENT"
-        ? "roleStudent"
-        : key === "TEACHER"
-          ? "roleTeacher"
-          : "roleCenter",
-    );
-
-  const getRoleDesc = (key: Role) =>
-    t(
-      key === "STUDENT"
-        ? "roleStudentDesc"
-        : key === "TEACHER"
-          ? "roleTeacherDesc"
-          : "roleCenterDesc",
-    );
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
-    if (!selectedRole) return;
     setLoading(true);
     setError(null);
 
-    if (password.length < 6) {
-      setError(t("passwordError"));
-      setLoading(false);
-      return;
-    }
-    if (!consent) {
-      setError(t("consentRequired"));
-      setLoading(false);
-      return;
-    }
-    if (!ageConsent) {
-      setError(t("ageConsentRequired"));
-      setLoading(false);
-      return;
-    }
+    if (password.length < 6) { setError(c.errPassword); setLoading(false); return; }
+    if (!consent) { setError(c.errConsent); setLoading(false); return; }
+    if (!ageConsent) { setError(c.errAge); setLoading(false); return; }
 
     const supabase = createClient();
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName, role: selectedRole },
+        data: { full_name: fullName, role: "STUDENT", cap },
         emailRedirectTo: next
           ? `${location.origin}/auth/callback?next=${encodeURIComponent(next)}`
           : `${location.origin}/auth/callback`,
@@ -98,252 +157,123 @@ export default function RegisterPage() {
     });
 
     if (signUpError) {
-      setError(signUpError.message);
+      setError(signUpError.message || c.errInvalid);
       setLoading(false);
       return;
     }
 
     if (data.session) {
-      // Créer User + UserRole côté DB (rôle de base, onboarded=false)
-      // et synchroniser user_metadata.roles pour le middleware.
       await fetch("/api/fix-role", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ role: selectedRole }),
+        body: JSON.stringify({ role: "STUDENT", cap }),
       }).catch(() => {});
-      document.cookie = `user_role=${selectedRole};path=/;max-age=2592000`;
-      document.cookie = `active_space=${selectedRole};path=/;max-age=2592000`;
-      router.push(ONBOARDING_DEST[selectedRole]);
+      document.cookie = `user_role=STUDENT;path=/;max-age=2592000`;
+      document.cookie = `active_space=STUDENT;path=/;max-age=2592000`;
+      router.push("/onboarding/student");
       router.refresh();
       return;
     }
-
     setSuccess(true);
     setLoading(false);
   }
 
-  const roles: readonly Role[] = ["STUDENT", "TEACHER", "CENTER"];
-
   return (
-    <div className="lauth landing">
-      <header className="lauth-header">
-        <Link href="/" className="lnav-brand">
-          <LandingBrand />
+    <div className="porte-page">
+      <header className="porte-header">
+        <Link href={`/${locale}`} className="porte-brand">
+          <span aria-hidden="true" className="porte-brand-y">Y</span>
+          <span className="porte-brand-word">{c.brand}</span>
         </Link>
-        <Link href="/login" className="lauth-alt-link">
-          {t("signIn")}
-        </Link>
+        <p className="porte-alt">
+          {c.alreadyLbl}{" "}
+          <Link href={`/${locale}/login`}>{t(c.alreadyLink)}</Link>
+        </p>
       </header>
 
-      <main className="lauth-body">
-        <div className="lauth-card">
+      <main className="porte-main">
+        <div className="porte-card">
           {success ? (
-            <div className="lauth-success">
-              <div className="lauth-success-icon" aria-hidden="true">
-                <svg
-                  width="26"
-                  height="26"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M3 7l9 6 9-6" />
-                  <rect x="3" y="6" width="18" height="13" rx="2" />
-                </svg>
-              </div>
-              <h2 className="h">{t("confirmTitle")}</h2>
-              <p>
-                {t("confirmSent")} <b>{email}</b>.
-              </p>
-              <p>
-                {t("confirmClick")}{" "}
-                <b>
-                  {selectedRole ? getRoleLabel(selectedRole) : ""}
-                </b>
-                .
-              </p>
-              <Link
-                href="/login"
-                className="lauth-submit"
-                style={{ display: "inline-block", marginTop: 22, textDecoration: "none" }}
-              >
-                {t("backToLogin")}
-              </Link>
+            <div className="porte-success">
+              <h1 className="porte-h">{t(c.successTitle)}</h1>
+              <p className="porte-lede">{t(c.successBody)}</p>
             </div>
-          ) : selectedRole === null ? (
-            <>
-              <div className="lauth-eye">{t("createAccount")}</div>
-              <h1 className="lauth-h">
-                {locale === "en" ? "Choose your " : "Choisis ton "}
-                <em>{locale === "en" ? "role." : "rôle."}</em>
-              </h1>
-              <p className="lauth-sub">{t("chooseRoleHint")}</p>
-
-              <div className="lauth-roles">
-                {roles.map((role) => {
-                  const Icon = ROLE_ICONS[role];
-                  return (
-                    <button
-                      key={role}
-                      type="button"
-                      className="lauth-role"
-                      onClick={() => setSelectedRole(role)}
-                    >
-                      <span className="lauth-role-icon" aria-hidden="true">
-                        <Icon size={22} />
-                      </span>
-                      <span className="lauth-role-body">
-                        <span className="lauth-role-title">{getRoleLabel(role)}</span>
-                        <span className="lauth-role-desc">{getRoleDesc(role)}</span>
-                      </span>
-                      <span className="lauth-role-arrow" aria-hidden="true">
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 14 14"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                        >
-                          <path d="M4 3l4 4-4 4" />
-                        </svg>
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </>
           ) : (
             <>
-              <div className="lauth-role-head">
-                <span className="lauth-role-tag">
-                  {getRoleLabel(selectedRole)}
-                </span>
-                <button
-                  type="button"
-                  className="lauth-role-change"
-                  onClick={() => setSelectedRole(null)}
-                >
-                  {t("changeRole")}
-                </button>
-              </div>
-
-              <h1 className="lauth-h">
-                {locale === "en" ? "One " : "Un "}
-                <em>{locale === "en" ? "account." : "compte."}</em>
+              <p className="maison-kicker" style={{ textAlign: "center" }}>{t(c.kicker)}</p>
+              <h1 className="porte-h">
+                {t(c.title)} <em>{t(c.titleEm)}</em>
               </h1>
-              <p className="lauth-sub">{t("chooseRoleHint")}</p>
+              <p className="porte-lede">{t(c.lede)}</p>
 
-              {error && <div className="lauth-error">{error}</div>}
-
-              <form onSubmit={handleRegister} noValidate>
-                <div className="lauth-field">
-                  <label htmlFor="reg-name" className="lauth-lbl">
-                    {t("fullName")}
-                  </label>
-                  <input
-                    id="reg-name"
-                    className="lauth-input"
-                    type="text"
-                    autoComplete="name"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder={t("fullNamePlaceholder")}
-                  />
-                </div>
-
-                <div className="lauth-field">
-                  <label htmlFor="reg-email" className="lauth-lbl">
-                    {t("email")}
-                  </label>
-                  <input
-                    id="reg-email"
-                    className="lauth-input"
-                    type="email"
-                    autoComplete="email"
-                    inputMode="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder={t("emailPlaceholder")}
-                  />
-                </div>
-
-                <div className="lauth-field">
-                  <label htmlFor="reg-password" className="lauth-lbl">
-                    {t("password")}
-                  </label>
-                  <input
-                    id="reg-password"
-                    className="lauth-input"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    minLength={6}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={t("passwordMin")}
-                  />
-                </div>
-
-                <label className="lauth-consent">
-                  <input
-                    type="checkbox"
-                    checked={consent}
-                    onChange={(e) => setConsent(e.target.checked)}
-                  />
-                  <span>
-                    {t("consentBefore")}
-                    <a href="/terms" target="_blank" rel="noopener noreferrer">
-                      {t("consentTerms")}
-                    </a>
-                    {t("consentMiddle")}
-                    <a href="/privacy" target="_blank" rel="noopener noreferrer">
-                      {t("consentPrivacy")}
-                    </a>
-                    {t("consentAfter")}
-                  </span>
+              <form onSubmit={handleRegister} className="porte-form" noValidate>
+                <label className="ens-form-field">
+                  <span>{t(c.fldName)}</span>
+                  <input type="text" required autoComplete="given-name"
+                         value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                </label>
+                <label className="ens-form-field">
+                  <span>{t(c.fldEmail)}</span>
+                  <input type="email" required autoComplete="email"
+                         value={email} onChange={(e) => setEmail(e.target.value)} />
+                </label>
+                <label className="ens-form-field ens-form-field-wide">
+                  <span>{t(c.fldPassword)}</span>
+                  <input type="password" required autoComplete="new-password" minLength={6}
+                         value={password} onChange={(e) => setPassword(e.target.value)} />
                 </label>
 
-                <label className="lauth-consent">
-                  <input
-                    type="checkbox"
-                    checked={ageConsent}
-                    onChange={(e) => setAgeConsent(e.target.checked)}
-                  />
-                  <span>{t("ageConsentLabel")}</span>
+                <fieldset className="porte-caps">
+                  <legend>{t(c.capLbl)}</legend>
+                  <div className="porte-caps-grid">
+                    {c.caps.map((k) => (
+                      <label key={k.id} className={`porte-cap ${cap === k.id ? "on" : ""}`}>
+                        <input
+                          type="radio"
+                          name="cap"
+                          value={k.id}
+                          checked={cap === k.id}
+                          onChange={() => setCap(k.id)}
+                        />
+                        <span>{t(k.label)}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+
+                <label className="porte-check">
+                  <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} required />
+                  <span>{t(c.consent)}</span>
+                </label>
+                <label className="porte-check">
+                  <input type="checkbox" checked={ageConsent} onChange={(e) => setAgeConsent(e.target.checked)} required />
+                  <span>{t(c.ageConsent)}</span>
                 </label>
 
-                <button
-                  type="submit"
-                  className="lauth-submit"
-                  disabled={loading || !consent || !ageConsent}
-                >
-                  {loading ? tc("loading") : `${t("registerBtn")} →`}
+                {error ? <p className="ens-form-error" role="alert">{error}</p> : null}
+
+                <button type="submit" className="maison-porte-cta" disabled={loading}>
+                  {loading ? c.submitLoading : t(c.submit)}
                 </button>
               </form>
-            </>
-          )}
 
-          {!success && (
-            <p className="lauth-alt">
-              {t("hasAccount")}{" "}
-              <Link href="/login" className="lauth-alt-link">
-                {t("signIn")}
-              </Link>
-            </p>
+              <div className="porte-other">
+                <p className="porte-other-lbl">
+                  {t(c.otherLbl)} <em>{t(c.otherEm)}</em>
+                </p>
+                <div className="porte-other-links">
+                  <Link href={`/${locale}/enseignants`} className="maison-link-strong">
+                    {t(c.otherTeacher)}
+                  </Link>
+                  <Link href={`/${locale}/landing`} className="maison-link-strong">
+                    {t(c.otherCenter)}
+                  </Link>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </main>
-
-      <footer className="lauth-foot">
-        <CefrStrip current="A1" ariaLabel="Parcours Yema — CECRL" />
-      </footer>
     </div>
   );
 }
