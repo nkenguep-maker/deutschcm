@@ -78,13 +78,18 @@ export async function generateMetadata({
       siteName: "Yema",
       title: m.ogTitle,
       description: m.ogDescription,
-      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: m.ogImageAlt }],
+      // OG image localisée · /fr/opengraph-image vs /en/opengraph-image.
+      // Next génère la route par locale grâce à opengraph-image.tsx
+      // dans [locale]/ — il faut la cibler explicitement, sinon on
+      // hérite du /opengraph-image racine qui n'existe pas.
+      images: [{ url: `/${key}/opengraph-image`, width: 1200, height: 630, alt: m.ogImageAlt }],
     },
     twitter: {
       card: "summary_large_image",
       title: m.twitterTitle,
       description: m.twitterDescription,
-      images: ["/opengraph-image"],
+      // Même image locale que OG — Twitter s'aligne sur la carte OG.
+      images: [`/${key}/opengraph-image`],
       creator: "@yema",
     },
     robots: { index: true, follow: true },

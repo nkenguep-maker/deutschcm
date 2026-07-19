@@ -6,16 +6,27 @@
 // Placeholder : MP3 non encore livrés. Les timings et transcriptions
 // sont éditoriaux, prêts à recevoir les vraies voix.
 //
-// ⚠ VALIDATION PRÉ-PROD · les proverbes en langue natale doivent être
-// relus et confirmés par un locuteur natif AVANT toute mise en prod.
-// Aucun proverbe non validé ne doit atteindre l'audience finale. Poser
-// le drapeau `pending_native_validation` (via commit) au moment de la
-// validation par locuteur — puis retirer ce commentaire.
-//   · Bintou (wolof)   · attribution « Proverbe wolof »          — À VALIDER
-//   · Aïcha  (anglais) · attribution « Proverbe anglophone »      — À VALIDER
-//   · Kevin  (allemand)· attribution « Proverbe allemand »        — À VALIDER
-//   · Jean   (français)· attribution « Proverbe français »        — À VALIDER
-//   · Fatima (allemand)· attribution « Proverbe allemand »        — À VALIDER
+// ⚠ RÈGLE STRICTE · le proverbe d'ouverture vient de la culture
+// D'ORIGINE du conteur (ses racines), JAMAIS de la langue étrangère
+// qu'il apprend, JAMAIS un proverbe européen générique. Les proverbes
+// importés (« Übung macht den Meister », « Where there is a will… »)
+// ont été RETIRÉS. Chaque record garde son originCulture cible et
+// reste `pendingNativeValidation: true` jusqu'à collecte par un
+// locuteur natif — le composant VoixPlayer masque la section proverbe
+// tant que le drapeau est levé, aucun proverbe non validé n'atteint
+// la production.
+//
+// Cibles de collecte par récit
+//   · Kevin  · originCulture "ewondo"       · Yaoundé, Cameroun
+//   · Fatima · originCulture "douala"       · littoral Cameroun
+//   · Aïcha  · originCulture "baoule"       · Côte d'Ivoire, Abidjan
+//   · Jean   · originCulture "grassfields"  · Bamenda, Cameroun anglophone
+//   · Bintou · originCulture "wolof"        · Sénégal
+//
+// Workflow de validation : (1) recueillir le proverbe auprès d'un
+// locuteur natif, (2) noter son nom dans sourceLocuteur, (3) enregistrer
+// l'audio (proverbs/<id>.mp3), (4) passer pendingNativeValidation à
+// false. Alors seulement la section apparaît côté public.
 
 export interface VoixCue {
   from: number;
@@ -31,6 +42,16 @@ export interface VoixProverb {
   translationEn: string;
   audioSrc: string;
   attribution?: string;
+  /** Culture d'origine du conteur (ewondo, douala, wolof, bassa…). Un
+   *  proverbe doit venir des RACINES du personnage, jamais de la langue
+   *  étrangère qu'il apprend. */
+  originCulture: string;
+  /** Nom du locuteur natif qui a validé le proverbe. Vide tant que la
+   *  validation n'a pas été faite. */
+  sourceLocuteur?: string;
+  /** Gate technique · si true, la section proverbe est masquée côté UI.
+   *  Aucun proverbe non validé n'atteint la production. */
+  pendingNativeValidation: boolean;
 }
 
 export interface VoixStory {
@@ -79,11 +100,17 @@ export const STORIES: readonly VoixStory[] = [
     monogram: "K",
     audioSrc: "/audio/voix/kevin-allemand.mp3",
     proverb: {
-      native: "Übung macht den Meister.",
-      translation: "C'est en s'exerçant qu'on devient maître.",
-      translationEn: "Practice makes the master.",
-      audioSrc: "/audio/proverbs/kevin-allemand.mp3",
-      attribution: "Proverbe allemand",
+      // Racines · Kevin est camerounais (Yaoundé). Son proverbe doit
+      // venir d'une langue camerounaise (ewondo, la langue majoritaire
+      // du Centre), pas de l'allemand qu'il apprend. À collecter auprès
+      // d'un locuteur natif avant prod.
+      native: "",
+      translation: "(proverbe des racines · à recueillir auprès d'un locuteur natif)",
+      translationEn: "(proverb from the roots · to be gathered from a native speaker)",
+      audioSrc: "",
+      attribution: "Proverbe ewondo",
+      originCulture: "ewondo",
+      pendingNativeValidation: true,
     },
     cues: [
       { from: 0, to: 8, native: "Als ich klein war, wollte ich Berlin sehen.", translation: "Quand j'étais petit, je voulais voir Berlin.", translationEn: "When I was little, I wanted to see Berlin." },
@@ -111,11 +138,17 @@ export const STORIES: readonly VoixStory[] = [
     monogram: "F",
     audioSrc: "/audio/voix/fatima-allemand.mp3",
     proverb: {
-      native: "Wer wagt, gewinnt.",
-      translation: "Qui ose gagne.",
-      translationEn: "Who dares wins.",
-      audioSrc: "/audio/proverbs/fatima-allemand.mp3",
-      attribution: "Proverbe allemand",
+      // Racines · Fatima est d'origine camerounaise (contexte narratif).
+      // Son proverbe doit venir d'une langue camerounaise du littoral
+      // (douala), pas de l'allemand qu'elle apprend. À collecter auprès
+      // d'un locuteur natif avant prod.
+      native: "",
+      translation: "(proverbe des racines · à recueillir auprès d'un locuteur natif)",
+      translationEn: "(proverb from the roots · to be gathered from a native speaker)",
+      audioSrc: "",
+      attribution: "Proverbe douala",
+      originCulture: "douala",
+      pendingNativeValidation: true,
     },
     cues: [
       { from: 0, to: 10, native: "Ich arbeite seit vier Jahren als Krankenschwester.", translation: "Je travaille comme infirmière depuis quatre ans.", translationEn: "I've been working as a nurse for four years." },
@@ -143,11 +176,16 @@ export const STORIES: readonly VoixStory[] = [
     monogram: "A",
     audioSrc: "/audio/voix/aicha-anglais.mp3",
     proverb: {
-      native: "Where there is a will, there is a way.",
-      translation: "Qui veut, peut.",
-      translationEn: "Where there is a will, there is a way.",
-      audioSrc: "/audio/proverbs/aicha-anglais.mp3",
-      attribution: "English proverb",
+      // Racines · Aïcha vient d'Abidjan. Son proverbe doit venir d'une
+      // langue ivoirienne (baoulé, largement parlé), pas de l'anglais
+      // qu'elle apprend. À collecter auprès d'un locuteur natif.
+      native: "",
+      translation: "(proverbe des racines · à recueillir auprès d'un locuteur natif)",
+      translationEn: "(proverb from the roots · to be gathered from a native speaker)",
+      audioSrc: "",
+      attribution: "Proverbe baoulé",
+      originCulture: "baoule",
+      pendingNativeValidation: true,
     },
     cues: [
       { from: 0, to: 8, native: "My file was ready. Almost ready.", translation: "Mon dossier était prêt. Presque prêt.", translationEn: "My file was ready. Almost ready." },
@@ -175,11 +213,17 @@ export const STORIES: readonly VoixStory[] = [
     monogram: "J",
     audioSrc: "/audio/voix/jean-francais.mp3",
     proverb: {
-      native: "Petit à petit, l'oiseau fait son nid.",
-      translation: "Petit à petit, l'oiseau fait son nid.",
-      translationEn: "Little by little, the bird builds its nest.",
-      audioSrc: "/audio/proverbs/jean-francais.mp3",
-      attribution: "Proverbe français",
+      // Racines · Jean vient de Bamenda (grassfields du Cameroun
+      // anglophone). Son proverbe doit venir d'une langue des
+      // grassfields (nord-ouest), pas du français qu'il apprend.
+      // À collecter auprès d'un locuteur natif avant prod.
+      native: "",
+      translation: "(proverbe des racines · à recueillir auprès d'un locuteur natif)",
+      translationEn: "(proverb from the roots · to be gathered from a native speaker)",
+      audioSrc: "",
+      attribution: "Proverbe des grassfields",
+      originCulture: "grassfields",
+      pendingNativeValidation: true,
     },
     cues: [
       { from: 0, to: 8, native: "Je suis né à Bamenda. J'ai grandi en anglais.", translation: "Je suis né à Bamenda. J'ai grandi en anglais.", translationEn: "I was born in Bamenda. I grew up in English." },
@@ -207,11 +251,17 @@ export const STORIES: readonly VoixStory[] = [
     monogram: "B",
     audioSrc: "/audio/voix/bintou-wolof.mp3",
     proverb: {
-      native: "Nit, nitay garabam.",
-      translation: "L'humain est le remède de l'humain.",
-      translationEn: "The human is the human's remedy.",
-      audioSrc: "/audio/proverbs/bintou-wolof.mp3",
+      // Racines · Bintou parle wolof — son proverbe vient déjà de la
+      // bonne culture. Reste à faire relire par une locutrice native
+      // avant prod (transcription, orthographe, sens exact). Tant que
+      // la validation n'est pas faite, la section reste masquée côté UI.
+      native: "",
+      translation: "(proverbe des racines · à recueillir auprès d'un locuteur natif)",
+      translationEn: "(proverb from the roots · to be gathered from a native speaker)",
+      audioSrc: "",
       attribution: "Proverbe wolof",
+      originCulture: "wolof",
+      pendingNativeValidation: true,
     },
     cues: [
       { from: 0, to: 8, native: "Sama xale bi dafay tontu ci frãse.", translation: "Ma fille répondait en français.", translationEn: "My daughter would answer in French." },

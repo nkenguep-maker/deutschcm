@@ -116,7 +116,10 @@ export function VeilleeFilm({
             preload="metadata"
           >
             <source src={masterSrc} type="video/mp4" />
-            <audio src={voiceSrc} />
+            {/* Piste voice-only en fallback interne au <video>. Jamais
+                rendue en texte/lien : hidden + display:none préviennent
+                tout rendu dégradé si le master mp4 échoue. */}
+            <audio src={voiceSrc} hidden aria-hidden="true" style={{ display: "none" }} />
             <track kind="subtitles" src={vttSrc} srcLang={locale} default />
           </video>
         ) : (

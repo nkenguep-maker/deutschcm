@@ -125,8 +125,13 @@ export function VoixPlayer({
 
   return (
     <article className={`voix-player voix-player-${size}`}>
-      {/* Proverbe d'ouverture — pré-récit, court, l'auteur donne son adage */}
-      {showProverb && size === "full" ? (
+      {/* Proverbe d'ouverture · GATE technique · un proverbe non validé
+          par un locuteur natif (pendingNativeValidation=true) ne sort
+          JAMAIS en production. La section entière est masquée dans ce
+          cas — aucun texte, aucun bouton, aucun fallback vers un
+          proverbe importé. Le drapeau passe à false uniquement une fois
+          la collecte native effectuée (cf. stories.ts en-tête). */}
+      {showProverb && size === "full" && !story.proverb.pendingNativeValidation && story.proverb.native ? (
         <div className="voix-proverb">
           <p className="voix-proverb-kicker">
             {locale === "en" ? "The proverb" : "Le proverbe"}
