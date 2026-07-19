@@ -16,6 +16,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
+import { BrandLockup } from "@/components/brand/BrandLockup";
 
 type Cap = "franchir" | "grandir" | "transmettre" | "moi";
 
@@ -182,8 +183,7 @@ export default function RegisterPage() {
     <div className="porte-page">
       <header className="porte-header">
         <Link href={`/${locale}`} className="porte-brand">
-          <span aria-hidden="true" className="porte-brand-y">Y</span>
-          <span className="porte-brand-word">{c.brand}</span>
+          <BrandLockup orientation="horizontal" variant="world" state="static" size={28} />
         </Link>
         <p className="porte-alt">
           {c.alreadyLbl}{" "}

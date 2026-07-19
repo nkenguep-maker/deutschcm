@@ -1,34 +1,24 @@
 import { MetadataRoute } from "next"
 
+// PWA manifest · aligné sur l'identité YEMA (Confluent + palette
+// Kaffeehaus). background espresso, theme brass.
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Yema — Apprenez l'allemand",
-    short_name: "Yema",
-    description: "Plateforme d'apprentissage de l'allemand avec IA pour le Cameroun",
+    name: "YEMA Languages",
+    short_name: "YEMA",
+    description: "L'Afrique parle. Toutes ses langues — étrangères et natales, sous un même toit.",
     start_url: "/",
     display: "standalone",
-    background_color: "#080c10",
-    theme_color: "#10b981",
+    background_color: "#1B120A",
+    theme_color: "#B8873E",
     orientation: "portrait",
     icons: [
-      { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { src: "/icon-512.png", sizes: "512x512", type: "image/png" },
-      { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }
+      { src: "/icon.svg", sizes: "any", type: "image/svg+xml" },
+      { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "maskable" },
     ],
     categories: ["education", "language"],
     lang: "fr",
     dir: "ltr",
-    shortcuts: [
-      {
-        name: "Simulateur",
-        url: "/simulateur",
-        description: "Simulateur Ambassade IA"
-      },
-      {
-        name: "Mes Cours",
-        url: "/courses",
-        description: "Accéder aux cours"
-      }
-    ]
   }
 }

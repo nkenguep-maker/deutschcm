@@ -1,241 +1,167 @@
 import { ImageResponse } from "next/og"
 
-// Node.js runtime — l'Edge runtime plafonne à 1 MB, @vercel/og + fonts
-// next/font gonflent au-delà. Node runtime a 50 MB de marge.
+// OG image YEMA · variante Confluent. Fond --seuil-bg, Confluent
+// grand à gauche, wordmark et slogan à droite. Aucune police externe
+// (sans-serif système) pour tenir sous la limite.
+
 export const runtime = "nodejs"
 export const alt = "YEMA Languages — L'Afrique parle. Toutes ses langues."
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
-// OG image Kaffeehaus — palette espresso/crème/laiton, tagline éditoriale,
-// CEFR spine A1→C1 en signature à droite. Aucune police externe (sans-serif
-// système) pour tenir sous 1 MB en Edge.
+interface OGParams {
+  params: Promise<{ locale: string }>
+}
 
-const LEVELS = ["A1", "A2", "B1", "B2", "C1"] as const
+export default async function Image({ params }: OGParams) {
+  const { locale } = await params
+  const isEn = locale === "en"
+  const line1 = isEn ? "Africa speaks." : "L'Afrique parle."
+  const line2 = isEn ? "All her tongues." : "Toutes ses langues."
+  const tagline = isEn
+    ? "All your languages, under one roof."
+    : "Toutes vos langues, sous un même toit."
 
-export default async function Image() {
   return new ImageResponse(
     (
       <div
         style={{
           width: "100%",
           height: "100%",
-          background: "#1B120A",
+          background: "#120C06",
           display: "flex",
           fontFamily: "sans-serif",
           position: "relative",
-          padding: "72px 80px",
+          padding: "80px 90px",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        {/* Warm radial light — coin haut gauche, pas centré générique */}
+        {/* Braise centrale — radial laiton pour rappeler le seuil */}
         <div
           style={{
             position: "absolute",
-            top: -220,
-            left: -180,
-            width: 720,
-            height: 720,
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 900,
+            height: 900,
             borderRadius: "50%",
             background:
-              "radial-gradient(circle, rgba(184,135,62,0.22) 0%, transparent 65%)",
+              "radial-gradient(circle, rgba(184,135,62,0.28) 0%, rgba(122,40,48,0.10) 35%, transparent 70%)",
+            filter: "blur(3px)",
           }}
         />
 
-        {/* Colonne gauche — mark + tagline + eye */}
+        {/* Colonne gauche — Confluent monumental */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 420,
+            zIndex: 2,
+          }}
+        >
+          <svg viewBox="0 0 100 120" width="380" height="456" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="ogBg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="#D9A855" />
+                <stop offset="1" stopColor="#B8873E" />
+              </linearGradient>
+              <radialGradient id="ogBe" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0" stopColor="#F0CE8B" />
+                <stop offset="1" stopColor="#D9A855" />
+              </radialGradient>
+            </defs>
+            <path d="M26 12 C33 30 41 46 50 58" stroke="url(#ogBg)" strokeWidth="13" strokeLinecap="round" fill="none" />
+            <path d="M77 14 C71 20 69 28 65 36 C61 44 56 52 50 58" stroke="url(#ogBg)" strokeWidth="13" strokeLinecap="round" fill="none" />
+            <path d="M50 58 L50 103" stroke="url(#ogBg)" strokeWidth="14" strokeLinecap="round" fill="none" />
+            <circle cx="50" cy="58" r="10" fill="rgba(184, 135, 62, 0.25)" />
+            <circle cx="50" cy="58" r="6.5" fill="url(#ogBe)" />
+          </svg>
+        </div>
+
+        {/* Colonne droite — wordmark + titre + slogan */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between",
+            justifyContent: "center",
+            alignItems: "flex-start",
             flex: 1,
             zIndex: 2,
-            paddingRight: 48,
+            paddingLeft: 24,
           }}
         >
-          {/* Mark : Y sérif dans un carré laiton */}
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 10,
-                border: "1.5px solid rgba(184,135,62,0.55)",
-                background: "rgba(184,135,62,0.15)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: "serif",
-                  fontSize: 34,
-                  fontStyle: "italic",
-                  color: "#B8873E",
-                  fontWeight: 500,
-                }}
-              >
-                Y
-              </div>
-            </div>
-            <div
-              style={{
-                fontFamily: "serif",
-                fontSize: 36,
-                fontStyle: "italic",
-                color: "#F4EBDC",
-                letterSpacing: "-0.015em",
-                fontWeight: 500,
-              }}
-            >
-              Yema
-            </div>
-          </div>
-
-          {/* Tagline centrale */}
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            {/* Eye */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 14,
-                color: "#B8873E",
-                fontSize: 18,
-                fontWeight: 600,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                marginBottom: 32,
-              }}
-            >
-              <div
-                style={{
-                  width: 32,
-                  height: 1.5,
-                  background: "#B8873E",
-                }}
-              />
-              1re plateforme africaine · Bêta 2026
-            </div>
-
-            {/* Titre editorial */}
-            <div
-              style={{
-                fontFamily: "serif",
-                fontSize: 96,
-                fontWeight: 400,
-                color: "#F4EBDC",
-                lineHeight: 1.02,
-                letterSpacing: "-0.028em",
-                marginBottom: 8,
-              }}
-            >
-              L&apos;Afrique parle.
-            </div>
-            <div
-              style={{
-                fontFamily: "serif",
-                fontSize: 96,
-                fontWeight: 400,
-                fontStyle: "italic",
-                color: "#B8873E",
-                lineHeight: 1.02,
-                letterSpacing: "-0.028em",
-              }}
-            >
-              Toutes ses langues.
-            </div>
-          </div>
-
-          {/* Bottom line */}
           <div
             style={{
+              fontSize: 28,
+              fontWeight: 800,
+              letterSpacing: "0.34em",
+              color: "#F4EBDC",
+              marginBottom: 40,
+            }}
+          >
+            YEMA
+          </div>
+
+          <div
+            style={{
+              fontFamily: "serif",
+              fontSize: 82,
+              fontWeight: 400,
+              color: "#F4EBDC",
+              lineHeight: 1.05,
+              letterSpacing: "-0.02em",
+              marginBottom: 4,
+            }}
+          >
+            {line1}
+          </div>
+          <div
+            style={{
+              fontFamily: "serif",
+              fontSize: 82,
+              fontWeight: 400,
+              fontStyle: "italic",
+              color: "#B8873E",
+              lineHeight: 1.05,
+              letterSpacing: "-0.02em",
+              marginBottom: 32,
+            }}
+          >
+            {line2}
+          </div>
+
+          <div
+            style={{
+              fontFamily: "serif",
+              fontStyle: "italic",
+              fontSize: 24,
+              color: "rgba(244,235,220,0.72)",
+              lineHeight: 1.4,
+              maxWidth: 480,
+            }}
+          >
+            {tagline}
+          </div>
+
+          <div
+            style={{
+              marginTop: 40,
               display: "flex",
               alignItems: "center",
               gap: 12,
-              color: "rgba(244,235,220,0.55)",
-              fontSize: 18,
-              letterSpacing: "0.03em",
+              color: "rgba(244,235,220,0.45)",
+              fontSize: 16,
+              letterSpacing: "0.06em",
             }}
           >
-            <span>yema.app</span>
-            <span style={{ color: "rgba(244,235,220,0.25)" }}>·</span>
-            <span>Conçu au Cameroun</span>
+            <span>YEMA Languages</span>
+            <span style={{ color: "rgba(244,235,220,0.24)" }}>·</span>
+            <span>{isEn ? "Built in Cameroon" : "Bâtie au Cameroun"}</span>
           </div>
-        </div>
-
-        {/* Colonne droite — CEFR spine signature */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            justifyContent: "center",
-            width: 200,
-            zIndex: 2,
-            position: "relative",
-          }}
-        >
-          {/* La colonne verticale — laiton du haut jusqu'à A1, filet ensuite */}
-          <div
-            style={{
-              position: "absolute",
-              left: 15,
-              top: 0,
-              bottom: 0,
-              width: 1.5,
-              background:
-                "linear-gradient(to bottom, #B8873E 0%, #B8873E 20%, rgba(244,235,220,0.14) 20%, rgba(244,235,220,0.14) 100%)",
-            }}
-          />
-
-          {LEVELS.map((lvl, i) => {
-            const isCurrent = i === 0 // A1 active
-            const isDone = i < 0
-            return (
-              <div
-                key={lvl}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 20,
-                  height: 96,
-                  color: isCurrent
-                    ? "#F4EBDC"
-                    : isDone
-                      ? "rgba(244,235,220,0.72)"
-                      : "rgba(244,235,220,0.44)",
-                }}
-              >
-                <div
-                  style={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: 999,
-                    background: isCurrent || isDone ? "#B8873E" : "#1B120A",
-                    border: "1.5px solid",
-                    borderColor:
-                      isCurrent || isDone
-                        ? "#B8873E"
-                        : "rgba(244,235,220,0.18)",
-                    boxShadow: isCurrent
-                      ? "0 0 0 8px rgba(184,135,62,0.18)"
-                      : "none",
-                  }}
-                />
-                <div
-                  style={{
-                    fontFamily: "serif",
-                    fontSize: 22,
-                    fontWeight: 500,
-                    letterSpacing: "-0.01em",
-                  }}
-                >
-                  {lvl}
-                </div>
-              </div>
-            )
-          })}
         </div>
       </div>
     ),

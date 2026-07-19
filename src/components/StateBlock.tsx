@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import { useLocale } from "next-intl";
 import { frTypo } from "@/components/landing/typo";
 import { IconArrow, IconCheck } from "@/components/landing/icons";
+import { BrandY } from "@/components/brand/BrandY";
 
 // StateBlock — l'UNIQUE façon d'afficher un état secondaire (error,
 // empty, loading, success, confirm) dans toute l'application YEMA.
@@ -111,7 +112,11 @@ export function StateBlock({
       aria-live={ariaLive}
     >
       {isLoading && (
-        <span className="state-pulse" aria-hidden="true" />
+        // Loader unifié : BrandY state="loader" — braise qui pulse
+        // en boucle 2.4s, aucun spinner générique.
+        <span className="state-pulse" aria-hidden="true">
+          <BrandY variant="mono" state="loader" size={40} />
+        </span>
       )}
       {kind === "success" && (
         <span className="state-check" aria-hidden="true">

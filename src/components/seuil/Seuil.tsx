@@ -22,6 +22,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SeuilGreetings } from "./SeuilGreeting";
+import { BrandY } from "@/components/brand/BrandY";
 
 const SESSION_KEY = "yema.seuil.seen";
 
@@ -199,7 +200,15 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
             data-off={phase >= 2 ? "" : undefined}
             aria-hidden={phase >= 2 ? "true" : undefined}
           >
-            <p className="seuil-mark-y" aria-hidden="true">Y</p>
+            {/* Le Y devient le Confluent — SVG vivant, partition
+                signature jouée une seule fois (arm world 200ms, arm
+                source 340ms, ignite 900ms, trunk 1050ms). Une seule
+                respiration ambiante sur le site : la braise du seuil
+                sous cette signature — pas d'autre state="breathing"
+                ici pour ne pas doubler. */}
+            <div className="seuil-mark-y-wrap" aria-hidden="true">
+              <BrandY variant="world" state="signature" size={220} />
+            </div>
           </div>
 
           {/* Acte II · le hero — seul, prend toute la place à la phase 3.

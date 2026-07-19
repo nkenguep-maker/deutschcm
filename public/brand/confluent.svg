@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Confluent — logo YEMA (variante world / laiton chaud).
+  viewBox 0 0 100 120. Deux bras qui convergent au confluent (50, 58)
+  puis un tronc jusqu'à (50, 103). Braise au point de confluence.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="YEMA Confluent">
+  <defs>
+    <linearGradient id="bg-world" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D9A855"/>
+      <stop offset="1" stop-color="#B8873E"/>
+    </linearGradient>
+    <radialGradient id="be-world" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#F0CE8B"/>
+      <stop offset="1" stop-color="#D9A855"/>
+    </radialGradient>
+  </defs>
+  <path d="M26 12 C33 30 41 46 50 58" stroke="url(#bg-world)" stroke-width="13" stroke-linecap="round" fill="none"/>
+  <path d="M77 14 C71 20 69 28 65 36 C61 44 56 52 50 58" stroke="url(#bg-world)" stroke-width="13" stroke-linecap="round" fill="none"/>
+  <path d="M50 58 L50 103" stroke="url(#bg-world)" stroke-width="14" stroke-linecap="round" fill="none"/>
+  <circle cx="50" cy="58" r="10" fill="rgba(184, 135, 62, 0.18)"/>
+  <circle cx="50" cy="58" r="6.5" fill="url(#be-world)"/>
+</svg>

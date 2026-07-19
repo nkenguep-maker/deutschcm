@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { BrandY } from "@/components/brand/BrandY";
 
 // Seam · la couture entre les deux territoires YEMA.
 // Dégradé espresso → terre sur ~120 px + halo laiton radial centré
@@ -58,7 +59,9 @@ export function Seam({ ariaLabel }: SeamProps) {
     >
       <span className="seam-line seam-line-top" aria-hidden="true" />
       <span className="seam-halo" aria-hidden="true" />
-      <span className="seam-key" aria-hidden="true">Y</span>
+      <span className="seam-key" aria-hidden="true">
+        <BrandY variant="world" state="static" size={36} />
+      </span>
       <span className="seam-line seam-line-bottom" aria-hidden="true" />
     </div>
   );

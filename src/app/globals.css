@@ -4138,19 +4138,20 @@ button, [role="button"] {
 .seam-key {
   position: relative;
   z-index: 2;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
   background: var(--espresso-2);
   border: 1.5px solid var(--brass-edge);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-style: italic;
-  font-size: 22px;
-  color: var(--brass);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  padding: 4px;
+}
+.seam-key .brand-y {
+  width: 100%;
+  height: auto;
 }
 .seam-line {
   position: absolute;
@@ -5639,12 +5640,14 @@ button, [role="button"] {
 
 /* Le pulse en tête pour les chargements */
 .state-pulse {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--brass);
-  animation: motion-pulse 960ms var(--ease-enter) infinite;
+  /* Loader unifié · BrandY state="loader" est monté à l'intérieur.
+     Le wrapper ne fait qu'assurer l'alignement et le shrink. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  width: 40px;
+  height: 48px;
 }
 
 /* Le check pour les succès */
@@ -6316,29 +6319,30 @@ body:has(.test-space-bar) { padding-top: 34px; }
   pointer-events: none;
 }
 
-/* ── ACTE I · le logo Y — seul, grand, centré ─────────────────── */
+/* ── ACTE I · le Confluent — seul, grand, centré ─────────────── */
 .seuil-act-mark {
   gap: 0;
 }
-.seuil-act-mark .seuil-mark-y {
+.seuil-act-mark .seuil-mark-y-wrap {
   opacity: 0;
   transform: translateY(28px) scale(0.94);
   transition: opacity 1400ms var(--ease-enter),
               transform 1400ms var(--ease-enter);
   will-change: opacity, transform;
-  margin: 0;
+  display: inline-flex;
+  filter: drop-shadow(0 0 48px rgba(184, 135, 62, 0.38));
 }
-.seuil-act-mark.in .seuil-mark-y {
+.seuil-act-mark.in .seuil-mark-y-wrap {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
-.seuil-mark-y {
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-style: italic;
-  font-size: clamp(120px, 20vw, 220px);
-  line-height: 1;
-  color: var(--brass);
-  text-shadow: 0 0 48px rgba(184, 135, 62, 0.38);
+/* Le SVG BrandY se dimensionne via prop size ; wrapper ajuste
+   la respons­ivité en dessous de 640px. */
+@media (max-width: 640px) {
+  .seuil-act-mark .brand-y {
+    width: clamp(140px, 40vw, 200px) !important;
+    height: auto !important;
+  }
 }
 
 /* ── ACTE III · le hero ────────────────────────────────────────── */
@@ -6952,6 +6956,169 @@ body:has(.test-space-bar) { padding-top: 34px; }
   max-width: 620px;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   SPRINT « CONFLUENT » — le logo YEMA en composants.
+   BrandY (SVG vivant) + BrandLockup (wordmark).
+   Quatre états : static · breathing · signature · loader.
+   Trois variants : world · sources · mono.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.brand-y {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: visible;
+}
+
+/* ── static · rien ne bouge ────────────────────────────────────── */
+.brand-y[data-state="static"] .brand-halo { opacity: 0; }
+
+/* ── breathing · halo 7s, RÉSERVÉ hors seuil ──────────────────── */
+.brand-y[data-state="breathing"] .brand-halo {
+  opacity: 0;
+  animation: brand-breath var(--dur-breath, 7000ms) ease-in-out infinite;
+  transform-origin: 50px 58px;
+  will-change: opacity, transform;
+}
+@keyframes brand-breath {
+  0%, 100% { opacity: 0.28; transform: scale(0.94); }
+  50%      { opacity: 0.55; transform: scale(1.08); }
+}
+
+/* ── signature · partition unique (arm world 200ms, arm source 340,
+      ignite 900, trunk 1050). Draw via pathLength=1 + dashoffset. ── */
+.brand-y[data-state="signature"] .brand-arm,
+.brand-y[data-state="signature"] .brand-trunk {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation-fill-mode: forwards;
+}
+.brand-y[data-state="signature"] .brand-arm-world {
+  animation: brand-draw 700ms var(--ease-enter) 200ms forwards;
+}
+.brand-y[data-state="signature"] .brand-arm-source {
+  animation: brand-draw 700ms var(--ease-enter) 340ms forwards;
+}
+.brand-y[data-state="signature"] .brand-trunk {
+  animation: brand-draw 600ms var(--ease-enter) 1050ms forwards;
+}
+.brand-y[data-state="signature"] .brand-bed,
+.brand-y[data-state="signature"] .brand-ember {
+  opacity: 0;
+  transform-origin: 50px 58px;
+  transform-box: fill-box;
+  animation-fill-mode: forwards;
+}
+.brand-y[data-state="signature"] .brand-bed {
+  animation: brand-ignite 400ms var(--ease-enter) 900ms forwards;
+}
+.brand-y[data-state="signature"] .brand-ember {
+  animation: brand-ignite 500ms var(--ease-enter) 950ms forwards;
+}
+.brand-y[data-state="signature"] .brand-halo {
+  opacity: 0;
+  animation: brand-signature-halo 900ms var(--ease-glide) 900ms forwards;
+}
+@keyframes brand-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes brand-ignite {
+  0%   { opacity: 0; transform: scale(0.3); }
+  60%  { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes brand-signature-halo {
+  0%   { opacity: 0; }
+  40%  { opacity: 0.4; }
+  100% { opacity: 0.14; }
+}
+
+/* ── loader · braise pulse 2.4s ease-glide en boucle, halo respire
+      en écho. Remplace tout spinner générique. ─────────────────── */
+.brand-y[data-state="loader"] .brand-ember {
+  animation: brand-loader-ember 2400ms var(--ease-glide) infinite;
+  transform-origin: 50px 58px;
+  transform-box: fill-box;
+  will-change: opacity, transform;
+}
+.brand-y[data-state="loader"] .brand-halo {
+  opacity: 0.14;
+  animation: brand-loader-halo 2400ms var(--ease-glide) infinite;
+  transform-origin: 50px 58px;
+  will-change: opacity, transform;
+}
+@keyframes brand-loader-ember {
+  0%, 100% { opacity: 0.55; transform: scale(0.82); }
+  50%      { opacity: 1;    transform: scale(1.14); }
+}
+@keyframes brand-loader-halo {
+  0%, 100% { opacity: 0.10; transform: scale(0.85); }
+  50%      { opacity: 0.24; transform: scale(1.10); }
+}
+
+/* prefers-reduced-motion : dégradation universelle vers static. */
+@media (prefers-reduced-motion: reduce) {
+  .brand-y .brand-halo,
+  .brand-y .brand-arm,
+  .brand-y .brand-trunk,
+  .brand-y .brand-bed,
+  .brand-y .brand-ember {
+    animation: none !important;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .brand-y[data-state="static"] .brand-halo,
+  .brand-y[data-state="signature"] .brand-halo { opacity: 0.14; }
+}
+
+/* ── BrandLockup · Y + wordmark ──────────────────────────────── */
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.brand-lockup-horizontal {
+  gap: 12px;
+  flex-direction: row;
+}
+.brand-lockup-vertical {
+  gap: 16px;
+  flex-direction: column;
+  text-align: center;
+}
+.brand-lockup-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+}
+.brand-lockup-vertical .brand-lockup-text {
+  align-items: center;
+}
+.brand-lockup-word {
+  font-family: var(--font-manrope), sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.34em;
+  color: var(--creme);
+  text-transform: uppercase;
+  line-height: 1;
+}
+.brand-lockup-vertical .brand-lockup-word {
+  font-size: 18px;
+  margin-top: 4px;
+}
+.brand-lockup-tag {
+  margin-top: 6px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--creme-soft);
+  text-transform: none;
+}
+
 /* ── /admin/applications · La file des portes ────────────────────
    Sprint 8bis · vue admin des demandes enseignants + centres. */
 .admin-app-page {
@@ -7366,13 +7533,9 @@ body:has(.test-space-bar) { padding-top: 34px; }
 }
 
 .porte-404-y {
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-style: italic;
-  font-size: clamp(100px, 18vw, 180px);
-  line-height: 1;
-  color: var(--brass);
-  text-shadow: 0 0 32px rgba(184, 135, 62, 0.32);
   margin: 20px 0;
+  display: inline-block;
+  filter: drop-shadow(0 0 32px rgba(184, 135, 62, 0.32));
 }
 
 /* ── /landing B2B · Le comptoir ──────────────────────────────────

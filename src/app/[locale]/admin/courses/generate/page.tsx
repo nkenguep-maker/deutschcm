@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef } from 'react';
 import { Sparkles, Database, RefreshCw, FileJson, BookOpen, Headphones, Mic, PenTool, Check, Upload, Download, Video } from 'lucide-react';
+import { BrandY } from "@/components/brand/BrandY";
 
 const MANUELS = {
   "Netzwerk neu A1": {
@@ -523,7 +524,7 @@ export default function AdminGenerateCourse() {
               fontFamily: "'Syne',sans-serif"
             }}
           >
-            {loading ? <RefreshCw size={16} className="animate-spin" /> : <Sparkles size={16} />}
+            {loading ? <BrandY variant="world" state="loader" size={20} /> : <Sparkles size={16} />}
             {loading ? "Création du brouillon..." : "Créer un brouillon"}
           </button>
         </div>
