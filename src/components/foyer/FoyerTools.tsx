@@ -21,10 +21,7 @@ interface ToolSpec {
 
 interface Copy {
   title: string;
-  tools: {
-    standard: ToolSpec[];
-    transmettre: ToolSpec[];
-  };
+  tools: Record<Cap | "default", ToolSpec[]>;
 }
 
 interface FoyerToolsProps {
@@ -35,7 +32,7 @@ interface FoyerToolsProps {
 
 export function FoyerTools({ locale, cap, copy }: FoyerToolsProps) {
   const t = (s: string) => (locale === "fr" ? frTypo(s) : s);
-  const tools = cap === "transmettre" ? copy.tools.transmettre : copy.tools.standard;
+  const tools = cap ? copy.tools[cap] : copy.tools.default;
 
   return (
     <section className="foyer-tools" aria-labelledby="foyer-tools-h">

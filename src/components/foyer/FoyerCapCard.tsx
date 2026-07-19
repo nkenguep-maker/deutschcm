@@ -18,6 +18,7 @@ interface Copy {
   jalonTitle: string;
   jalonSub: (level: string) => string;
   jalonRemaining: (n: number) => string;
+  jalonReady: string;
   jalonEmpty: string;
   procedureTitle: string;
   procedureEmpty: { soul: string; action: string };
@@ -64,12 +65,19 @@ export function FoyerCapCard({ locale, urlLocale, cap, personalGoal, capContext,
   }
 
   if (cap === "franchir" && capContext?.kind === "franchir") {
+    const ready = capContext.leconsRestantes === 0;
     return (
-      <section className="foyer-cap-card" aria-labelledby="foyer-cap-card-h">
+      <section className="foyer-cap-card foyer-cap-card-franchir" aria-labelledby="foyer-cap-card-h" data-cap="franchir">
         <p className="maison-kicker">{t(copy.jalonTitle)}</p>
         <p id="foyer-cap-card-h" className="foyer-cap-card-h">{t(copy.jalonSub(capContext.examenBlancLevel))}</p>
         {capContext.leconsRestantes !== null ? (
-          <p className="foyer-cap-card-note">{t(copy.jalonRemaining(capContext.leconsRestantes))}</p>
+          ready ? (
+            <p className="foyer-cap-card-note">
+              {fragmentStars(t(copy.jalonReady))}
+            </p>
+          ) : (
+            <p className="foyer-cap-card-note">{t(copy.jalonRemaining(capContext.leconsRestantes))}</p>
+          )
         ) : (
           <p className="foyer-cap-card-note foyer-cap-card-note-mute">{t(copy.jalonEmpty)}</p>
         )}
@@ -83,7 +91,7 @@ export function FoyerCapCard({ locale, urlLocale, cap, personalGoal, capContext,
   if (cap === "grandir" && capContext?.kind === "grandir") {
     const hasData = capContext.dossiersTotal !== null && capContext.dossiersCompletes !== null;
     return (
-      <section className="foyer-cap-card" aria-labelledby="foyer-cap-card-h">
+      <section className="foyer-cap-card foyer-cap-card-grandir" aria-labelledby="foyer-cap-card-h" data-cap="grandir">
         <p className="maison-kicker">{t(copy.procedureTitle)}</p>
         {hasData ? (
           <>
@@ -108,7 +116,7 @@ export function FoyerCapCard({ locale, urlLocale, cap, personalGoal, capContext,
 
   if (cap === "transmettre" && capContext?.kind === "transmettre") {
     return (
-      <section className="foyer-cap-card" aria-labelledby="foyer-cap-card-h">
+      <section className="foyer-cap-card foyer-cap-card-transmettre" aria-labelledby="foyer-cap-card-h" data-cap="transmettre">
         <p className="maison-kicker">{t(copy.ritualTitle)}</p>
         <p id="foyer-cap-card-h" className="foyer-cap-card-h">
           {fragmentStars(t(copy.ritualLine(capContext.soirsCetteSemaine)))}
@@ -121,7 +129,7 @@ export function FoyerCapCard({ locale, urlLocale, cap, personalGoal, capContext,
   }
 
   return (
-    <section className="foyer-cap-card" aria-labelledby="foyer-cap-card-h">
+    <section className="foyer-cap-card foyer-cap-card-moi" aria-labelledby="foyer-cap-card-h" data-cap="moi">
       <p className="maison-kicker">{t(copy.rythmeTitle)}</p>
       <p id="foyer-cap-card-h" className="foyer-cap-card-h">{t(copy.rythmeLine)}</p>
       {personalGoal ? (

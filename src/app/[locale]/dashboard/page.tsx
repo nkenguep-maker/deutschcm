@@ -75,12 +75,19 @@ export default function FoyerPage() {
     );
   }
 
-  const territoryClass = `territory-${data.activeLangue.territory}`;
+  // Territoire · la langue active pose le fond par défaut, mais Transmettre
+  // force la terre : le cap l'emporte visuellement car il signale que la
+  // maison écoute cette pièce, quelle que soit la langue en cours.
+  const territoryClass =
+    data.cap === "transmettre"
+      ? "territory-sources"
+      : `territory-${data.activeLangue.territory}`;
+  const capClass = data.cap ? `foyer-cap-${data.cap}` : "foyer-cap-none";
   const otherLanguages = data.langues.filter((l) => l.id !== data.activeLangue.id);
 
   return (
     <Layout title="Foyer">
-      <div className={`foyer ${territoryClass}`}>
+      <div className={`foyer ${territoryClass} ${capClass}`}>
         <FoyerTopbar
           locale={locale}
           prenom={data.prenom}

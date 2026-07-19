@@ -8204,6 +8204,52 @@ body.foyer-switching .foyer {
   }
 }
 
+/* ─── Foyer étape 2 · les 4 configs de cap ──────────────────────────
+   Le cap l'emporte sur la langue pour Transmettre (fond terre forcé).
+   Chaque hero et cap-card reçoit un accent discret via data-cap :
+     Franchir    · liseré laiton un peu plus vif (le but nomme la voix)
+     Grandir     · même laiton, pas plus (zéro urgence)
+     Transmettre · fond terre + accent orange-terrestre (le foyer)
+     Moi         · plus sobre, hairline très discret
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Cap Transmettre force la terre, quelle que soit la langue active. */
+.foyer.foyer-cap-transmettre {
+  background: var(--terre);
+}
+.foyer.foyer-cap-transmettre .foyer-hero {
+  background: linear-gradient(
+    135deg,
+    rgba(240, 206, 139, 0.18) 0%,
+    rgba(201, 132, 63, 0.12) 45%,
+    rgba(139, 74, 41, 0.05) 100%
+  );
+  border-color: rgba(217, 168, 85, 0.32);
+}
+
+/* Franchir · le but nomme la voix — accent laiton légèrement plus
+   affirmé sur le hero, pas de changement de fond. */
+.foyer-hero[data-cap="franchir"] {
+  border-color: rgba(217, 168, 85, 0.38);
+}
+.foyer-hero[data-cap="franchir"]::before {
+  background: radial-gradient(ellipse at 12% 15%, rgba(240, 206, 139, 0.11), transparent 60%);
+}
+
+/* Grandir · zéro urgence, aucun accent particulier — la sobriété
+   fait le calme (identique au socle). */
+
+/* Moi · même socle, hairline plus discret pour rappeler la neutralité. */
+.foyer-hero[data-cap="moi"] {
+  border-color: rgba(217, 168, 85, 0.22);
+}
+.foyer-hero[data-cap="moi"]::before { opacity: 0.65; }
+
+/* Cap-card · un liseré cap-spécifique pour aider le repérage. */
+.foyer-cap-card[data-cap] { border-color: var(--creme-hair); }
+.foyer-cap-card[data-cap="franchir"] { border-color: rgba(217, 168, 85, 0.28); }
+.foyer-cap-card[data-cap="transmettre"] { border-color: rgba(201, 132, 63, 0.30); }
+
 /* ═══════════════════════════════════════════════════════════════════════
    SPRINT « LE CAP » — onboarding par but (élève).
    Trois pas : Cap · Langue · But. Doctrine Kaffeehaus, Fraunces italique

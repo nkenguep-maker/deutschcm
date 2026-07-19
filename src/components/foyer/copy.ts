@@ -1,7 +1,9 @@
-// Copy éditoriale · Sprint « Le Foyer » — refonte premium, étape 1.
-// La voix de la maison, centralisée. Les composants n'ont pas de
-// strings inline — tout passe par ce fichier pour rester relisible
-// d'un coup et respecter la doctrine (Fraunces sur les fragments *…*).
+// Copy éditoriale · Sprint « Le Foyer » — étape 2.
+// Les 4 configs de cap sont désormais explicitement différenciées :
+//   Franchir    · précis, distance en LEÇONS (jamais en jours)
+//   Grandir     · doux, à son rythme, zéro urgence
+//   Transmettre · chaleureux, « ce soir — le conte », rituel du foyer
+//   Moi         · sobre, pas de compte à rebours
 
 import type { Cap } from "./types";
 
@@ -20,10 +22,14 @@ interface HeroCopy {
   ctaResume: string;
   ctaListen: string;
   ctaOpenFirst: string;
+  transmettreKicker: string;
   transmettreTitle: (conteTitre: string) => string;
   transmettreSub: (minutes: number) => string;
+  franchirKicker: string;
   franchirSub: (level: string, remaining: number) => string;
+  grandirKicker: string;
   grandirSub: string;
+  moiKicker: string;
   moiSub: string;
   minutesUnit: string;
 }
@@ -38,6 +44,7 @@ interface CapCardCopy {
   jalonTitle: string;
   jalonSub: (level: string) => string;
   jalonRemaining: (n: number) => string;
+  jalonReady: string;
   jalonEmpty: string;
   procedureTitle: string;
   procedureEmpty: { soul: string; action: string };
@@ -69,10 +76,12 @@ interface ToolSpec {
 
 interface ToolsCopy {
   title: string;
-  tools: {
-    standard: ToolSpec[];
-    transmettre: ToolSpec[];
-  };
+  /** Une trousse par cap · Transmettre a la sienne (contes/chansons/
+   *  jeux/nos-mots), Franchir cible l'examen (simulateur/quiz/examen
+   *  blanc/historique), Grandir la vie réelle (simulateur/écrit/
+   *  procédure/veillée), Moi le rythme libre (simulateur/quiz/
+   *  veillée/historique). */
+  tools: Record<Cap | "default", ToolSpec[]>;
 }
 
 interface FoyerCopy {
@@ -112,13 +121,19 @@ export const COPY_FR: FoyerCopy = {
     ctaResume: "Reprendre",
     ctaListen: "Écouter ce soir",
     ctaOpenFirst: "Ouvrir",
-    transmettreTitle: (conteTitre) => `Ce soir — *${conteTitre}.*`,
+    transmettreKicker: "Ce soir",
+    transmettreTitle: (conteTitre) => `Le conte — *${conteTitre}.*`,
     transmettreSub: (minutes) => `*À écouter ensemble* — ${minutes} min.`,
+    franchirKicker: "Reprendre",
     franchirSub: (level, remaining) =>
-      remaining === 1
-        ? `Encore *une leçon* avant votre examen blanc ${level}.`
-        : `Encore *${remaining} leçons* avant votre examen blanc ${level}.`,
+      remaining === 0
+        ? `Vous êtes prêt·e — *l'examen blanc ${level} vous attend.*`
+        : remaining === 1
+          ? `Encore *une leçon* avant votre examen blanc ${level}.`
+          : `Encore *${remaining} leçons* avant votre examen blanc ${level}.`,
+    grandirKicker: "Reprendre",
     grandirSub: "À votre rythme, *ce soir*.",
+    moiKicker: "Reprendre",
     moiSub: "Une porte parmi d'autres — *à votre main*.",
     minutesUnit: "min",
   },
@@ -131,16 +146,20 @@ export const COPY_FR: FoyerCopy = {
       soul: "Le chemin s'écrit — *posez votre but.*",
       action: "Compléter mon profil",
     },
+    // FRANCHIR · le jalon, distance en LEÇONS jamais en jours
     jalonTitle: "Prochain jalon",
     jalonSub: (level) => `Examen blanc ${level}`,
     jalonRemaining: (n) => (n === 1 ? "1 leçon reste à faire." : `${n} leçons restent à faire.`),
+    jalonReady: "Le niveau est complet. *Le blanc peut s'ouvrir.*",
     jalonEmpty: "Le curriculum se met en place.",
+    // GRANDIR · la procédure, zéro urgence
     procedureTitle: "Ma procédure",
     procedureEmpty: {
       soul: "Votre procédure vous ressemble — *racontez-la.*",
       action: "Décrire ma procédure",
     },
     procedureLine: (done, total) => `${done} dossier${done > 1 ? "s" : ""} sur ${total}.`,
+    // TRANSMETTRE · le rituel, chaleureux
     ritualTitle: "Le rituel",
     ritualLine: (soirs) =>
       soirs === 0
@@ -148,6 +167,7 @@ export const COPY_FR: FoyerCopy = {
         : soirs === 1
           ? "Un soir cette semaine — *une voix a été portée.*"
           : `${soirs} soirs cette semaine — *chaque conte laisse une trace.*`,
+    // MOI · le rythme, aucune pression
     rythmeTitle: "Mon rythme",
     rythmeLine: "Sans compte à rendre. Sans compte à rebours.",
   },
@@ -167,17 +187,35 @@ export const COPY_FR: FoyerCopy = {
   tools: (urlLocale: string) => ({
     title: "Vos outils",
     tools: {
-      standard: [
-        { key: "sim",       title: "Le simulateur", desc: "Des scénarios réels. Voix, correction, encouragement.", href: `/${urlLocale}/simulateur` },
-        { key: "quiz",      title: "Quiz",          desc: "Points de grammaire, révisions ciblées.",              href: `/${urlLocale}/quiz` },
-        { key: "veillee",   title: "La Veillée",    desc: "Vos récits natals, portés à l'oral.",                  href: `/${urlLocale}/hoeren` },
-        { key: "historique",title: "Mon historique",desc: "Les modules déjà traversés.",                          href: `/${urlLocale}/progress` },
+      franchir: [
+        { key: "sim",       title: "Le simulateur",     desc: "Ambassade, entretien, guichet — les scènes de l'examen.", href: `/${urlLocale}/simulateur` },
+        { key: "quiz",      title: "Quiz",              desc: "Points de grammaire, révisions ciblées.",                 href: `/${urlLocale}/quiz` },
+        { key: "examen",    title: "Examen blanc",      desc: "Une répétition complète, corrigée.",                      href: `/${urlLocale}/test-niveau` },
+        { key: "historique",title: "Mon historique",    desc: "Les modules déjà traversés.",                             href: `/${urlLocale}/progress` },
+      ],
+      grandir: [
+        { key: "sim",       title: "Le simulateur",     desc: "Situations réelles — appartement, banque, mairie.",       href: `/${urlLocale}/simulateur` },
+        { key: "ecrit",     title: "Écrit relu",        desc: "Vos lettres, vos formulaires — correction humaine.",      href: `/${urlLocale}/schreiben` },
+        { key: "procedure", title: "Ma procédure",      desc: "Le dossier qui vous concerne, une étape à la fois.",      href: `/${urlLocale}/settings` },
+        { key: "veillee",   title: "La Veillée",        desc: "Une pause chaleureuse dans la semaine.",                  href: `/${urlLocale}/hoeren` },
       ],
       transmettre: [
-        { key: "contes",   title: "Les contes",  desc: "À écouter ensemble, chaque soir.",           href: `/${urlLocale}/hoeren` },
-        { key: "chansons", title: "Les chansons",desc: "Comptines et refrains à reprendre.",         href: `/${urlLocale}/hoeren` },
-        { key: "jeux",     title: "Les jeux",    desc: "Devinettes et prises de langue.",            href: `/${urlLocale}/quiz` },
-        { key: "nosmots",  title: "Nos mots",    desc: "Le lexique familial qu'on veut transmettre.",href: `/${urlLocale}/schreiben` },
+        { key: "contes",   title: "Les contes",   desc: "À écouter ensemble, chaque soir.",              href: `/${urlLocale}/hoeren` },
+        { key: "chansons", title: "Les chansons", desc: "Comptines et refrains à reprendre.",            href: `/${urlLocale}/hoeren` },
+        { key: "jeux",     title: "Les jeux",     desc: "Devinettes et prises de langue.",               href: `/${urlLocale}/quiz` },
+        { key: "nosmots",  title: "Nos mots",     desc: "Le lexique familial qu'on veut transmettre.",   href: `/${urlLocale}/schreiben` },
+      ],
+      moi: [
+        { key: "sim",       title: "Le simulateur",     desc: "Des scénarios réels. Voix, correction, encouragement.",   href: `/${urlLocale}/simulateur` },
+        { key: "quiz",      title: "Quiz",              desc: "Grammaire, vocabulaire — au fil de l'envie.",             href: `/${urlLocale}/quiz` },
+        { key: "veillee",   title: "La Veillée",        desc: "Vos récits natals, portés à l'oral.",                     href: `/${urlLocale}/hoeren` },
+        { key: "historique",title: "Mon historique",    desc: "Les modules déjà traversés.",                             href: `/${urlLocale}/progress` },
+      ],
+      default: [
+        { key: "sim",       title: "Le simulateur",     desc: "Des scénarios réels. Voix, correction, encouragement.",   href: `/${urlLocale}/simulateur` },
+        { key: "quiz",      title: "Quiz",              desc: "Points de grammaire, révisions ciblées.",                 href: `/${urlLocale}/quiz` },
+        { key: "veillee",   title: "La Veillée",        desc: "Vos récits natals, portés à l'oral.",                     href: `/${urlLocale}/hoeren` },
+        { key: "historique",title: "Mon historique",    desc: "Les modules déjà traversés.",                             href: `/${urlLocale}/progress` },
       ],
     },
   }),
@@ -210,13 +248,19 @@ export const COPY_EN: FoyerCopy = {
     ctaResume: "Resume",
     ctaListen: "Listen tonight",
     ctaOpenFirst: "Open",
-    transmettreTitle: (conteTitre) => `Tonight — *${conteTitre}.*`,
+    transmettreKicker: "Tonight",
+    transmettreTitle: (conteTitre) => `The tale — *${conteTitre}.*`,
     transmettreSub: (minutes) => `*To listen together* — ${minutes} min.`,
+    franchirKicker: "Resume",
     franchirSub: (level, remaining) =>
-      remaining === 1
-        ? `*One lesson* before your ${level} mock exam.`
-        : `*${remaining} lessons* before your ${level} mock exam.`,
+      remaining === 0
+        ? `You're ready — *the ${level} mock exam awaits.*`
+        : remaining === 1
+          ? `*One lesson* before your ${level} mock exam.`
+          : `*${remaining} lessons* before your ${level} mock exam.`,
+    grandirKicker: "Resume",
     grandirSub: "At your pace, *tonight*.",
+    moiKicker: "Resume",
     moiSub: "One door among others — *yours to open*.",
     minutesUnit: "min",
   },
@@ -232,6 +276,7 @@ export const COPY_EN: FoyerCopy = {
     jalonTitle: "Next milestone",
     jalonSub: (level) => `${level} mock exam`,
     jalonRemaining: (n) => (n === 1 ? "1 lesson left." : `${n} lessons left.`),
+    jalonReady: "The level is complete. *The mock can open.*",
     jalonEmpty: "The curriculum is being laid out.",
     procedureTitle: "My procedure",
     procedureEmpty: {
@@ -265,17 +310,35 @@ export const COPY_EN: FoyerCopy = {
   tools: (urlLocale: string) => ({
     title: "Your tools",
     tools: {
-      standard: [
-        { key: "sim",        title: "The simulator", desc: "Real scenarios. Voice, correction, encouragement.", href: `/${urlLocale}/simulateur` },
-        { key: "quiz",       title: "Quiz",          desc: "Grammar points, targeted review.",                 href: `/${urlLocale}/quiz` },
-        { key: "veillee",    title: "The Veillée",   desc: "Your native stories, carried aloud.",              href: `/${urlLocale}/hoeren` },
-        { key: "history",    title: "My history",    desc: "Modules already crossed.",                         href: `/${urlLocale}/progress` },
+      franchir: [
+        { key: "sim",       title: "The simulator", desc: "Embassy, interview, counter — the exam scenes.",  href: `/${urlLocale}/simulateur` },
+        { key: "quiz",      title: "Quiz",          desc: "Grammar points, targeted review.",                href: `/${urlLocale}/quiz` },
+        { key: "mock",      title: "Mock exam",     desc: "A full rehearsal, corrected.",                    href: `/${urlLocale}/test-niveau` },
+        { key: "history",   title: "My history",    desc: "Modules already crossed.",                        href: `/${urlLocale}/progress` },
+      ],
+      grandir: [
+        { key: "sim",       title: "The simulator", desc: "Real situations — apartment, bank, town hall.",   href: `/${urlLocale}/simulateur` },
+        { key: "writing",   title: "Reviewed writing", desc: "Your letters, your forms — human review.",     href: `/${urlLocale}/schreiben` },
+        { key: "procedure", title: "My procedure",  desc: "The file that concerns you, one step at a time.", href: `/${urlLocale}/settings` },
+        { key: "veillee",   title: "The Veillée",   desc: "A warm pause in the week.",                       href: `/${urlLocale}/hoeren` },
       ],
       transmettre: [
         { key: "tales",   title: "Tales",     desc: "To listen to together, every evening.", href: `/${urlLocale}/hoeren` },
         { key: "songs",   title: "Songs",     desc: "Rhymes and refrains to sing back.",     href: `/${urlLocale}/hoeren` },
         { key: "games",   title: "Games",     desc: "Riddles and language plays.",           href: `/${urlLocale}/quiz` },
         { key: "ourwords",title: "Our words", desc: "The family lexicon to pass on.",        href: `/${urlLocale}/schreiben` },
+      ],
+      moi: [
+        { key: "sim",       title: "The simulator", desc: "Real scenarios. Voice, correction, encouragement.", href: `/${urlLocale}/simulateur` },
+        { key: "quiz",      title: "Quiz",          desc: "Grammar, vocabulary — as you please.",              href: `/${urlLocale}/quiz` },
+        { key: "veillee",   title: "The Veillée",   desc: "Your native stories, carried aloud.",               href: `/${urlLocale}/hoeren` },
+        { key: "history",   title: "My history",    desc: "Modules already crossed.",                          href: `/${urlLocale}/progress` },
+      ],
+      default: [
+        { key: "sim",       title: "The simulator", desc: "Real scenarios. Voice, correction, encouragement.", href: `/${urlLocale}/simulateur` },
+        { key: "quiz",      title: "Quiz",          desc: "Grammar, targeted review.",                         href: `/${urlLocale}/quiz` },
+        { key: "veillee",   title: "The Veillée",   desc: "Your native stories, carried aloud.",               href: `/${urlLocale}/hoeren` },
+        { key: "history",   title: "My history",    desc: "Modules already crossed.",                          href: `/${urlLocale}/progress` },
       ],
     },
   }),

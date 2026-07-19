@@ -26,13 +26,15 @@ interface Copy {
   ctaResume: string;
   ctaListen: string;
   ctaOpenFirst: string;
-  /** « Ce soir — le conte » (Transmettre) */
+  /** « Ce soir » (Transmettre) — kicker plus chaleureux que « Reprendre » */
+  transmettreKicker: string;
   transmettreTitle: (conteTitre: string) => string;
   transmettreSub: (minutes: number) => string;
-  /** « Encore N leçons avant l'examen blanc … » (Franchir) */
+  franchirKicker: string;
   franchirSub: (level: string, remaining: number) => string;
-  /** Grandir & Moi : sous-ligne douce */
+  grandirKicker: string;
   grandirSub: string;
+  moiKicker: string;
   moiSub: string;
   minutesUnit: string;
 }
@@ -126,13 +128,13 @@ export function FoyerHero({ locale, urlLocale, cap, nextLesson, copy, anchorId }
     );
   }
 
-  // Cas 2 · Transmettre — « Ce soir — le conte »
+  // Cas 2 · Transmettre — « Ce soir · le conte »
   if (cap === "transmettre" && nextLesson.capContext?.kind === "transmettre") {
     const ctx = nextLesson.capContext;
     return (
-      <section id={anchorId} className="foyer-hero foyer-hero-cap-transmettre" aria-labelledby="foyer-hero-h">
+      <section id={anchorId} className="foyer-hero foyer-hero-cap-transmettre" aria-labelledby="foyer-hero-h" data-cap="transmettre">
         <div className="foyer-hero-body">
-          <p className="foyer-hero-kicker">{t(copy.kicker).toUpperCase()}</p>
+          <p className="foyer-hero-kicker">{t(copy.transmettreKicker).toUpperCase()}</p>
           <h2 id="foyer-hero-h" className="foyer-hero-title">
             {fragmentStars(t(copy.transmettreTitle(ctx.conteTitre)))}
           </h2>
@@ -166,18 +168,22 @@ export function FoyerHero({ locale, urlLocale, cap, nextLesson, copy, anchorId }
 
   // Cas 4 · Franchir / Grandir / Moi — leçon réelle
   let sub: string | null = null;
+  let kicker: string = copy.kicker;
   if (cap === "franchir" && nextLesson.capContext?.kind === "franchir" && nextLesson.capContext.leconsRestantes !== null) {
     sub = copy.franchirSub(nextLesson.capContext.examenBlancLevel, nextLesson.capContext.leconsRestantes);
+    kicker = copy.franchirKicker;
   } else if (cap === "grandir") {
     sub = copy.grandirSub;
+    kicker = copy.grandirKicker;
   } else if (cap === "moi") {
     sub = copy.moiSub;
+    kicker = copy.moiKicker;
   }
 
   return (
-    <section id={anchorId} className={`foyer-hero foyer-hero-cap-${cap}`} aria-labelledby="foyer-hero-h">
+    <section id={anchorId} className={`foyer-hero foyer-hero-cap-${cap}`} aria-labelledby="foyer-hero-h" data-cap={cap}>
       <div className="foyer-hero-body">
-        <p className="foyer-hero-kicker">{t(copy.kicker).toUpperCase()}</p>
+        <p className="foyer-hero-kicker">{t(kicker).toUpperCase()}</p>
         <h2 id="foyer-hero-h" className="foyer-hero-title">
           {nextLesson.lesson.title}
         </h2>
