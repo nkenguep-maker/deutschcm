@@ -11807,9 +11807,114 @@ body.foyer-switching .foyer {
   .child-tiles { grid-template-columns: repeat(2, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .child-story, .child-tile, .child-loading-dot, .famille-card {
+  .child-story, .child-tile, .child-loading-dot, .famille-card, .child-universe-pastel {
     transition: none;
     animation: none;
   }
+}
+
+/* ─── Multi-langues enfant · sélecteur d'univers + langues dialog ─── */
+
+/* Rangée de pastilles rondes en tête de mode enfant · aucun texte de
+   menu, cibles ≥52px. Chaque pastille a sa couleur (paletteFor). */
+.child-universe {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  padding: 4px 0 6px;
+}
+.child-universe-pastel {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+  transition: transform var(--dur-touch) var(--ease-enter);
+  position: relative;
+}
+.child-universe-pastel:hover { transform: translateY(-2px); }
+.child-universe-pastel:focus-visible { outline: 3px solid var(--brass); outline-offset: 3px; }
+.child-universe-pastel.active {
+  transform: scale(1.06);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+.child-universe-code {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+/* Fondu doux quand on bascule d'univers. Les 3 étapes visibles :
+   1) le shell perd 30% d'opacité pendant la transition serveur
+   2) le nouveau contenu arrive avec un léger translate
+   3) retour à la normale. */
+.child-shell.child-switching {
+  opacity: 0.72;
+  transition: opacity var(--dur-move) var(--ease-glide);
+}
+
+/* Dialogue « Nouveau profil » · groupes de langues natales/étrangères */
+.famille-help {
+  margin: -2px 0 8px;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 12.5px;
+  color: var(--creme-mute);
+  font-style: italic;
+}
+.famille-field-sublbl {
+  margin: 10px 0 6px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--creme-soft);
+}
+.famille-lang-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.famille-lang-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--terre-hair);
+  background: rgba(0, 0, 0, 0.14);
+  color: var(--creme);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color var(--dur-touch) var(--ease-enter),
+              background var(--dur-touch) var(--ease-enter);
+}
+.famille-lang-chip:hover { border-color: var(--brass-edge); }
+.famille-lang-chip:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.famille-lang-chip.on {
+  background: rgba(240, 206, 139, 0.14);
+  border-color: var(--brass);
+  color: var(--creme);
+}
+.famille-lang-code {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--brass);
+  font-weight: 700;
+}
+.famille-lang-name { font-style: italic; font-family: var(--font-fraunces), Georgia, serif; }
+
+.famille-card-meta-langues {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+  text-transform: uppercase;
 }
 

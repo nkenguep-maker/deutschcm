@@ -648,20 +648,27 @@ model TeacherApplication {
 
 // ─── Profils enfants · formule Famille ────────────────────────────
 // Un ChildProfile appartient à un compte parent (User.supabaseId via
-// parentUserId). AUCUNE authentification propre — pas d'email, pas
-// de mot de passe. Les enfants sont sélectionnés depuis /famille.
-// Aucune PII sensible ne doit être stockée ici : prénom court, âge
-// (année) et animal avatar suffisent.
+// parentUserId). AUCUNE authentification propre. Les enfants sont
+// sélectionnés depuis /famille.
+//
+// Multi-langues · un enfant peut apprendre plusieurs langues à la fois,
+// certaines natales (échelle YEMA É1→É5) et d'autres étrangères
+// (échelle douce M1→M4 · Premiers mots → On se raconte). Le CONTENU
+// diffère (contes du pays vs comptines/jeux) mais le TON reste le
+// même — chaleureux, ludique, terre.
+//
+// langues · jsonb ChildLangue[] · { langue, type, echelle, etoiles,
+//   motsAppris } · une entrée par langue apprise.
+// activeLangue · id de la langue en cours d'écoute · null si aucune
+//   sélection n'a encore été faite.
 model ChildProfile {
   id           String   @id @default(uuid())
   parentUserId String
-  prenom       String   // court, non affiché dehors
-  avatarAnimal String   // clé animal : chouette, tortue, panda, éléphant, girafe, renard
-  age          Int      // 3-11 typiquement — jamais 0 ni 18+
-  langue       String   // id du registre languages (bassa, wolof, deutsch…)
-  echelleYema  String   @default("E1")   // É1 → É5
-  etoiles      Int      @default(0)      // douces, jamais un score
-  motsAppris   String[] @default([])     // preuve de transmission, mots réels
+  prenom       String
+  avatarAnimal String
+  age          Int
+  langues      Json     @default("[]")
+  activeLangue String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

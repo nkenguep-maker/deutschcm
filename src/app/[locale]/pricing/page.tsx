@@ -144,8 +144,8 @@ const PRODUITS_EUR_FR: Record<ProductId, Product> = {
     price: "99", priceUnit: "€ / an · tarif fondateur",
     features: [
       "Profils enfants + parent",
+      "Toutes les langues de la maison, natales comme étrangères, pour les enfants",
       "Contes, chansons, jeux parent-enfant",
-      "Toutes les natales · YEMA",
       "La Veillée pour tous",
     ],
     cta: "Rejoindre la Famille", href: "/register?plan=famille",
@@ -174,9 +174,15 @@ const PRODUITS_FCFA_EN: Record<ProductId, Product> = Object.fromEntries(
       .replace("Prendre mon Passage", "Take my Passage")
       .replace("Ouvrir la Grande Maison", "Open the Great House")
       .replace("Rejoindre la Famille", "Join the Family"),
-    features: p.features,
+    features: p.features.map((f) => f
+      .replace("Toutes les langues de la maison, natales comme étrangères, pour les enfants",
+               "All the house languages — native and foreign — for the children")
+      .replace("Profils enfants + parent", "Child + parent profiles")
+      .replace("Contes, chansons, jeux parent-enfant", "Tales, songs, parent-child games")
+      .replace("Toutes les natales · YEMA", "All native languages · YEMA")
+      .replace("La Veillée pour tous", "The Veillée for everyone")),
   }]),
-) as Record<ProductId, Product>;
+) as unknown as Record<ProductId, Product>;
 
 const PRODUITS_EUR_EN: Record<ProductId, Product> = Object.fromEntries(
   Object.entries(PRODUITS_EUR_FR).map(([k, p]) => [k, {

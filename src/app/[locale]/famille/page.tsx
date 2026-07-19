@@ -1,13 +1,12 @@
 "use client";
 
 // /famille · sélecteur de profil « Qui apprend ce soir ? » + gestion
-// des profils enfants sous compte parent. C'est la porte d'entrée de
-// l'espace Famille. Un enfant est un ChildProfile — pas de compte,
-// pas d'email, pas de mot de passe.
+// des profils enfants sous compte parent. Multi-langues : un enfant
+// peut avoir des langues natales (territory=sources · échelle YEMA)
+// ET/OU étrangères (territory=world · échelle douce M1-M4).
 //
 // Sécurité mineurs · seul le parent authentifié voit ses propres
-// profils. L'ajout et la suppression passent par /api/family/children,
-// qui résout parentUserId serveur-side.
+// profils. Toutes les mutations passent par /api/family/children.
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -16,16 +15,19 @@ import { StateBlock } from "@/components/StateBlock";
 import { frTypo } from "@/components/landing/typo";
 import { AnimalAvatar, AVATAR_ANIMALS, ANIMAL_LABEL_FR, ANIMAL_LABEL_EN, type AvatarAnimal } from "@/components/famille/AnimalAvatar";
 import { LANGUAGES } from "@/lib/languages";
+import type { ChildLangue } from "@/lib/childScales";
 
 interface Child {
   id: string;
   prenom: string;
   avatarAnimal: AvatarAnimal;
   age: number;
-  langue: string;
-  echelleYema: string;
-  etoiles: number;
+  activeLangue: string | null;
+  langues: ChildLangue[];
 }
+
+const NATAL_LANGS = Object.values(LANGUAGES).filter((l) => l.territory === "sources");
+const FOREIGN_LANGS = Object.values(LANGUAGES).filter((l) => l.territory === "world");
 
 const COPY = {
   fr: {
@@ -42,15 +44,21 @@ const COPY = {
     prenomLbl: "Prénom",
     ageLbl: "Âge",
     animalLbl: "Animal",
-    langueLbl: "Langue à écouter",
+    languesLbl: "Langues à écouter",
+    nativeLbl: "Langues natales",
+    foreignLbl: "Langues étrangères",
+    natalePick: "Notre langue de la maison",
+    foreignPick: "Une langue à découvrir",
+    languesHelp: "Choisissez une ou deux langues. Vous pourrez en ajouter plus tard.",
     cancel: "Annuler",
     create: "Créer le profil",
     stars: (n: number) => (n <= 1 ? `${n} étoile` : `${n} étoiles`),
-    level: "Niveau",
+    total: (n: number) => (n <= 1 ? `${n} langue` : `${n} langues`),
     errName: "Prénom manquant.",
     errAge: "Âge entre 3 et 12.",
     errAnimal: "Choisissez un animal.",
-    errLang: "Choisissez une langue.",
+    errLang: "Choisissez au moins une langue.",
+    errServer: "Impossible de créer le profil.",
   },
   en: {
     kicker: "Family space",
@@ -66,21 +74,23 @@ const COPY = {
     prenomLbl: "First name",
     ageLbl: "Age",
     animalLbl: "Animal",
-    langueLbl: "Language to listen to",
+    languesLbl: "Languages to listen to",
+    nativeLbl: "Native languages",
+    foreignLbl: "Foreign languages",
+    natalePick: "Our house language",
+    foreignPick: "A language to discover",
+    languesHelp: "Pick one or two. You can add more later.",
     cancel: "Cancel",
     create: "Create profile",
     stars: (n: number) => (n <= 1 ? `${n} star` : `${n} stars`),
-    level: "Level",
+    total: (n: number) => (n <= 1 ? `${n} language` : `${n} languages`),
     errName: "Name missing.",
     errAge: "Age between 3 and 12.",
     errAnimal: "Pick an animal.",
-    errLang: "Pick a language.",
+    errLang: "Pick at least one language.",
+    errServer: "Could not create profile.",
   },
 };
-
-/** Restreint aux langues « sources » (natales) — la formule Famille
- *  cible la transmission, pas les langues étrangères. */
-const NATAL_LANGS = Object.values(LANGUAGES).filter((l) => l.territory === "sources");
 
 export default function FamillePage() {
   const locale = useLocale();
@@ -127,18 +137,28 @@ export default function FamillePage() {
         />
       ) : (
         <ul className="famille-grid">
-          {(children ?? []).map((child) => (
-            <li key={child.id} className="famille-card-item">
-              <Link href={`/${locale}/famille/enfant/${child.id}`} className="famille-card">
-                <AnimalAvatar animal={child.avatarAnimal} size={112} ariaLabel={loc === "en" ? ANIMAL_LABEL_EN[child.avatarAnimal] : ANIMAL_LABEL_FR[child.avatarAnimal]} />
-                <p className="famille-card-name">{child.prenom}</p>
-                <p className="famille-card-meta">
-                  {child.age} · {loc === "en" ? LANGUAGES[child.langue]?.nameEn : LANGUAGES[child.langue]?.name}
-                </p>
-                <p className="famille-card-stars">✦ {c.stars(child.etoiles)}</p>
-              </Link>
-            </li>
-          ))}
+          {(children ?? []).map((child) => {
+            const activeLangue = child.langues.find((l) => l.langue === child.activeLangue) ?? child.langues[0];
+            const totalStars = child.langues.reduce((sum, l) => sum + l.etoiles, 0);
+            return (
+              <li key={child.id} className="famille-card-item">
+                <Link href={`/${locale}/famille/enfant/${child.id}`} className="famille-card">
+                  <AnimalAvatar animal={child.avatarAnimal} size={112} ariaLabel={loc === "en" ? ANIMAL_LABEL_EN[child.avatarAnimal] : ANIMAL_LABEL_FR[child.avatarAnimal]} />
+                  <p className="famille-card-name">{child.prenom}</p>
+                  <p className="famille-card-meta">
+                    {child.age}
+                    {activeLangue ? (
+                      <> · {loc === "en" ? LANGUAGES[activeLangue.langue]?.nameEn : LANGUAGES[activeLangue.langue]?.name}</>
+                    ) : null}
+                  </p>
+                  <p className="famille-card-meta famille-card-meta-langues">
+                    {c.total(child.langues.length)}
+                  </p>
+                  <p className="famille-card-stars">✦ {c.stars(totalStars)}</p>
+                </Link>
+              </li>
+            );
+          })}
           <li className="famille-card-item">
             <button
               type="button"
@@ -174,7 +194,7 @@ export default function FamillePage() {
   );
 }
 
-// ── Dialogue Ajouter un enfant ─────────────────────────────────────
+// ── Dialogue Ajouter un enfant · multi-langues ────────────────────
 function AddChildDialog({
   loc,
   copy,
@@ -189,27 +209,38 @@ function AddChildDialog({
   const [prenom, setPrenom] = useState("");
   const [age, setAge] = useState<number>(6);
   const [animal, setAnimal] = useState<AvatarAnimal>("chouette");
-  const [langue, setLangue] = useState<string>(NATAL_LANGS[0]?.id ?? "bassa");
+  const [natal, setNatal] = useState<string[]>([]);
+  const [foreign, setForeign] = useState<string[]>([]);
   const [err, setErr] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const t = (s: string) => (loc === "fr" ? frTypo(s) : s);
+
+  const toggle = (list: string[], setList: (v: string[]) => void, id: string) => {
+    setList(list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
+  };
+
+  const totalLangues = natal.length + foreign.length;
 
   const submit = async () => {
     setErr(null);
     if (!prenom.trim()) return setErr(copy.errName);
     if (age < 3 || age > 12) return setErr(copy.errAge);
     if (!animal) return setErr(copy.errAnimal);
-    if (!langue) return setErr(copy.errLang);
+    if (totalLangues === 0) return setErr(copy.errLang);
     setSubmitting(true);
+    const langues = [
+      ...natal.map((id) => ({ langue: id, type: "native" })),
+      ...foreign.map((id) => ({ langue: id, type: "foreign" })),
+    ];
     try {
       const res = await fetch("/api/family/children", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ prenom: prenom.trim(), age, avatarAnimal: animal, langue }),
+        body: JSON.stringify({ prenom: prenom.trim(), age, avatarAnimal: animal, langues }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setErr(String(data.error ?? "error"));
+        setErr(String(data.error ?? copy.errServer));
       } else {
         onCreated(data.child as Child);
       }
@@ -260,20 +291,53 @@ function AddChildDialog({
             ))}
           </div>
         </div>
-        <label className="famille-field">
-          <span className="famille-field-lbl">{t(copy.langueLbl)}</span>
-          <select
-            value={langue}
-            onChange={(e) => setLangue(e.target.value)}
-            className="famille-select"
-          >
-            {NATAL_LANGS.map((l) => (
-              <option key={l.id} value={l.id}>
-                {loc === "en" ? l.nameEn : l.name}
-              </option>
-            ))}
-          </select>
-        </label>
+
+        {/* Langues : deux groupes distincts pour poser la nuance côté
+            parent (natale = maison ; étrangère = découverte). Côté
+            enfant, la nuance disparaît (même monde chaleureux). */}
+        <div className="famille-field">
+          <span className="famille-field-lbl">{t(copy.languesLbl)}</span>
+          <p className="famille-help">{t(copy.languesHelp)}</p>
+
+          <p className="famille-field-sublbl">{t(copy.nativeLbl)}</p>
+          <div className="famille-lang-list">
+            {NATAL_LANGS.map((l) => {
+              const on = natal.includes(l.id);
+              return (
+                <button
+                  key={l.id}
+                  type="button"
+                  className={`famille-lang-chip ${on ? "on" : ""}`}
+                  onClick={() => toggle(natal, setNatal, l.id)}
+                  aria-pressed={on}
+                >
+                  <span className="famille-lang-code">{l.code}</span>
+                  <span className="famille-lang-name">{loc === "en" ? l.nameEn : l.name}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <p className="famille-field-sublbl">{t(copy.foreignLbl)}</p>
+          <div className="famille-lang-list">
+            {FOREIGN_LANGS.map((l) => {
+              const on = foreign.includes(l.id);
+              return (
+                <button
+                  key={l.id}
+                  type="button"
+                  className={`famille-lang-chip ${on ? "on" : ""}`}
+                  onClick={() => toggle(foreign, setForeign, l.id)}
+                  aria-pressed={on}
+                >
+                  <span className="famille-lang-code">{l.code}</span>
+                  <span className="famille-lang-name">{loc === "en" ? l.nameEn : l.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {err ? <p className="famille-err" role="alert">{err}</p> : null}
         <div className="famille-dialog-actions">
           <button type="button" className="famille-btn ghost" onClick={onCancel}>{copy.cancel}</button>
