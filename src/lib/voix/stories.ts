@@ -5,6 +5,17 @@
 //
 // Placeholder : MP3 non encore livrés. Les timings et transcriptions
 // sont éditoriaux, prêts à recevoir les vraies voix.
+//
+// ⚠ VALIDATION PRÉ-PROD · les proverbes en langue natale doivent être
+// relus et confirmés par un locuteur natif AVANT toute mise en prod.
+// Aucun proverbe non validé ne doit atteindre l'audience finale. Poser
+// le drapeau `pending_native_validation` (via commit) au moment de la
+// validation par locuteur — puis retirer ce commentaire.
+//   · Bintou (wolof)   · attribution « Proverbe wolof »          — À VALIDER
+//   · Aïcha  (anglais) · attribution « Proverbe anglophone »      — À VALIDER
+//   · Kevin  (allemand)· attribution « Proverbe allemand »        — À VALIDER
+//   · Jean   (français)· attribution « Proverbe français »        — À VALIDER
+//   · Fatima (allemand)· attribution « Proverbe allemand »        — À VALIDER
 
 export interface VoixCue {
   from: number;

@@ -144,13 +144,20 @@ export function PortraitSpeaking({
       </span>
 
       {audioSrc && (
+        // Élément audio invisible · le chemin ne doit JAMAIS être rendu
+        // en texte/lien sous le portrait. Si l'audio 404, l'utilisateur
+        // ne verra rien plutôt qu'un lien nu vers un .mp3 cassé. Le
+        // style + hidden préviennent tout fallback de rendu navigateur.
         <audio
           ref={audioRef}
           src={audioSrc}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
           onEnded={() => setPlaying(false)}
-          preload="metadata"
+          preload="none"
+          hidden
+          aria-hidden="true"
+          style={{ display: "none" }}
         />
       )}
     </button>

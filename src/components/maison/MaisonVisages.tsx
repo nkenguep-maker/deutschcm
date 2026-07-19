@@ -43,8 +43,8 @@ const VISAGES: readonly Visage[] = [
     variant: "world",
     audioSrc: "/audio/voix/fatima-allemand.mp3",
     portraitSrc: "/portraits/fatima.avif",
-    citation: "Le passeport, on ne l'obtient pas avec l'accent. Alors j'apprends chaque soir.",
-    citationEn: "You don't get the passport with an accent. So I learn every evening.",
+    citation: "Le B2 n'est pas un visa — c'est un passeport. Alors je prépare, chaque soir.",
+    citationEn: "B2 isn't a visa — it's a passport. So I prepare, every evening.",
   },
   {
     name: "Aïcha",

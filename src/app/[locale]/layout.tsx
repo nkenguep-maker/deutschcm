@@ -4,47 +4,98 @@ import { notFound } from "next/navigation"
 import { routing } from "@/i18n/routing"
 import { TestSpaceBar } from "@/components/TestSpaceBar"
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://deutschcm.vercel.app"),
-  title: {
-    default: "Yema Languages | Learn a language, prepare and belong",
-    template: "%s | Yema"
+// SEO · métadonnées localisées par locale. Le canonique et les
+// alternates hreflang pointent vers l'URL locale (jamais la racine)
+// pour éviter le duplicate content FR/EN vu par Google. Le domaine
+// canonique est configurable via NEXT_PUBLIC_SITE_URL — aujourd'hui
+// deutschcm.vercel.app, demain yema.app sans re-déploiement de code.
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://deutschcm.vercel.app").replace(/\/$/, "")
+
+// Copies bilingues gardées ici pour rester au plus près de la balise
+// meta — jamais dans messages/*.json (SEO doit être stable côté SSR).
+const META = {
+  fr: {
+    title: "Yema Languages — Apprenez, préparez-vous, appartenez",
+    ogTitle: "Yema Languages — Apprenez, préparez-vous, appartenez",
+    twitterTitle: "Yema — apprenez une langue, préparez votre projet",
+    description:
+      "Une plateforme indépendante alignée CECRL, ouverte aux langues natales africaines et aux langues étrangères. Premier chapitre : l'allemand.",
+    ogDescription:
+      "Yema — apprenez, préparez-vous, appartenez. Interactif, correction en direct, simulations réalistes. Premier chapitre : l'allemand.",
+    twitterDescription:
+      "Apprenez une langue, préparez votre projet, appartenez à la maison. On commence par l'allemand.",
+    ogImageAlt: "Yema Languages — langues étrangères et natales, apprentissage aligné CECRL",
+    ogLocale: "fr_FR",
   },
-  description: "Yema helps learners build language skills, practice speaking and prepare for their international journey. First destination: German and Germany.",
-  keywords: [
-    "learn german", "german learning platform", "CEFR A1 C1",
-    "yema languages", "apprendre allemand", "langues africaines",
-    "language learning africa", "study in germany", "german for beginners",
-    "language preparation", "international learning platform"
-  ],
-  authors: [{ name: "Yema Team" }],
-  creator: "Yema",
-  publisher: "Yema",
-  category: "education",
-  openGraph: {
-    type: "website",
-    locale: "fr_FR",
-    alternateLocale: ["en_US"],
-    url: "https://deutschcm.vercel.app",
-    siteName: "Yema",
-    title: "Learn. Prepare. Belong. — Yema Languages",
-    description: "Start with German and prepare your international future with Yema. Interactive lessons, speaking practice and realistic simulations.",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Yema Languages — foreign & native languages" }]
+  en: {
+    title: "Yema Languages — Learn, prepare, belong",
+    ogTitle: "Yema Languages — Learn, prepare, belong",
+    twitterTitle: "Yema — learn a language, prepare your journey",
+    description:
+      "An independent CEFR-aligned platform, open to African native languages and to foreign ones. First chapter: German.",
+    ogDescription:
+      "Yema — learn, prepare, belong. Interactive, live correction, realistic simulations. First chapter: German.",
+    twitterDescription:
+      "Learn a language, prepare your journey, belong to the house. We start with German.",
+    ogImageAlt: "Yema Languages — foreign and native languages, CEFR-aligned learning",
+    ogLocale: "en_US",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Yema — Apprenez une langue, préparez-vous, appartenez",
-    description: "Learn a language, prepare for life abroad, and belong. Starting with German and Germany.",
-    images: ["/opengraph-image"],
-    creator: "@yema"
-  },
-  robots: { index: true, follow: true },
-  alternates: {
-    canonical: "https://deutschcm.vercel.app",
-    languages: {
-      "fr": "https://deutschcm.vercel.app/fr",
-      "en": "https://deutschcm.vercel.app/en"
-    }
+} as const
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const isEn = locale === "en"
+  const key: "fr" | "en" = isEn ? "en" : "fr"
+  const m = META[key]
+  const url = `${SITE_URL}/${key}`
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: m.title,
+      template: "%s | Yema",
+    },
+    description: m.description,
+    keywords: [
+      "yema languages",
+      "learn german", "german learning platform", "CEFR A1 C1",
+      "apprendre allemand", "langues africaines",
+      "language learning africa", "study in germany", "german for beginners",
+      "language preparation", "international learning platform",
+    ],
+    authors: [{ name: "Yema Team" }],
+    creator: "Yema",
+    publisher: "Yema",
+    category: "education",
+    openGraph: {
+      type: "website",
+      locale: m.ogLocale,
+      alternateLocale: [isEn ? "fr_FR" : "en_US"],
+      url,
+      siteName: "Yema",
+      title: m.ogTitle,
+      description: m.ogDescription,
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: m.ogImageAlt }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: m.twitterTitle,
+      description: m.twitterDescription,
+      images: ["/opengraph-image"],
+      creator: "@yema",
+    },
+    robots: { index: true, follow: true },
+    alternates: {
+      canonical: url,
+      languages: {
+        "fr": `${SITE_URL}/fr`,
+        "en": `${SITE_URL}/en`,
+        "x-default": `${SITE_URL}/fr`,
+      },
+    },
   }
 }
 
@@ -57,12 +108,10 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params
 
-  // Validate the locale
   if (!routing.locales.includes(locale as "fr" | "en")) {
     notFound()
   }
 
-  // Load messages directly from file to guarantee the right locale is used
   const messages = (await import(`../../../messages/${locale}.json`)).default
 
   return (

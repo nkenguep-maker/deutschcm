@@ -280,7 +280,17 @@ export function VoixPlayer({
         </div>
       ) : null}
 
-      <audio ref={audioRef} src={story.audioSrc} preload="metadata" />
+      {/* Audio invisible · même règle que PortraitSpeaking : jamais de
+          fallback texte/lien vers le .mp3. Le player affiche ses propres
+          contrôles (bouton + ring + cues), l'élément <audio> reste caché. */}
+      <audio
+        ref={audioRef}
+        src={story.audioSrc}
+        preload="none"
+        hidden
+        aria-hidden="true"
+        style={{ display: "none" }}
+      />
     </article>
   );
 }
