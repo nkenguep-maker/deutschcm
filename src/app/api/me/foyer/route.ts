@@ -1,16 +1,36 @@
-// GET /api/me/foyer — l'unique endpoint qui alimente le foyer élève.
-// Renvoie tout ce dont l'écran a besoin : prénom, cap, langues actives
-// avec niveau + spine, braise (jours consécutifs), classe si inscrit·e.
-// Aucun compte à rebours en jours, aucune invention — les zones vides
-// arrivent via null pour laisser StateBlock parler.
+// GET /api/me/foyer · Sprint « Le Foyer » — refonte premium.
+// L'unique endpoint qui alimente le foyer élève. Renvoie tout ce dont
+// l'écran a besoin en une seule requête :
+//   · prénom, cap, personalGoal
+//   · langues supportées + activeLangue (avec territoire + échelle)
+//   · niveau réel + spine visible (aucune invention)
+//   · braise (jours consécutifs + activité du jour)
+//   · classe si l'user y est inscrit
+//   · nextLesson (leçon à reprendre) + pct (progression réelle du niveau)
+//   · capContext (jalon Franchir / procédure Grandir / rituel Transmettre
+//     / rythme Moi) — configuré par le cap du profil
+//
+// Doctrine : zéro placeholder mensonger. Toute zone vide arrive à
+// `null` et le composant client rend un StateBlock. La braise reste
+// éteinte si aucune activité — jamais de compteur inventé.
+//
+// Étape 1 · squelette + états vides. Les copies éditoriales du hero
+// et de la cap-card sont figées côté client (les compteurs viennent
+// d'ici, la voix vient de là).
+// Étape 2 · alimentera vraiment le capContext pour les 4 caps.
+// Étape 3 · seed Jacob (allemand B1, 12 jours de braise) pour tester
+// les 4 profils en donnée réelle.
 
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { getLanguage } from "@/lib/languages";
+import { STORIES as VOIX_STORIES } from "@/lib/voix/stories";
 
 export const dynamic = "force-dynamic";
+
+type Cap = "franchir" | "grandir" | "transmettre" | "moi";
 
 interface FoyerLangue {
   id: string;
@@ -22,20 +42,40 @@ interface FoyerLangue {
   level: string | null;
   levels: readonly string[];
 }
-
 interface FoyerBraise {
   jours: number;
   activeAujourdhui: boolean;
 }
-
 interface FoyerClasse {
   name: string;
   teacherName: string;
 }
+interface FoyerLessonRef {
+  id: string;
+  title: string;
+}
+interface FoyerModuleRef {
+  id: string;
+  kind: string;
+}
 
-/** Calcule les jours consécutifs (jusqu'à aujourd'hui inclus) avec ≥1
- *  module complété. Zéro invention : si l'utilisateur n'a jamais fini
- *  un module, on retourne 0. */
+type CapContext =
+  | { kind: "franchir"; examenBlancLevel: string; leconsRestantes: number | null }
+  | { kind: "grandir"; step: string; dossiersCompletes: number | null; dossiersTotal: number | null }
+  | { kind: "transmettre"; conteId: string; conteTitre: string; minutes: number; soirsCetteSemaine: number }
+  | { kind: "moi"; rythme: string };
+
+interface FoyerNextLesson {
+  lesson: FoyerLessonRef | null;
+  module: FoyerModuleRef | null;
+  minutes: number;
+  /** Progression 0-100 du niveau actif (modules complétés / total du niveau). */
+  pct: number | null;
+  capContext: CapContext | null;
+}
+
+/** Jours consécutifs avec ≥1 module complété (jusqu'à aujourd'hui inclus).
+ *  Zéro invention : si l'user n'a jamais fini un module, renvoie 0. */
 async function computeBraise(userId: string): Promise<FoyerBraise> {
   const progress = await prisma.moduleProgress.findMany({
     where: { userId, status: "COMPLETED" },
@@ -45,19 +85,16 @@ async function computeBraise(userId: string): Promise<FoyerBraise> {
   });
   if (progress.length === 0) return { jours: 0, activeAujourdhui: false };
 
-  // Distinct days (YYYY-MM-DD in UTC) — évite les doublons du même jour.
   const days = new Set<string>();
   for (const p of progress) {
     if (!p.completedAt) continue;
-    const iso = p.completedAt.toISOString().slice(0, 10);
-    days.add(iso);
+    days.add(p.completedAt.toISOString().slice(0, 10));
   }
-  const daysList = Array.from(days).sort().reverse(); // du plus récent
+  const daysList = Array.from(days).sort().reverse();
 
   const today = new Date().toISOString().slice(0, 10);
   const activeAujourdhui = daysList[0] === today;
 
-  // Compter consécutif à partir du plus récent (aujourd'hui ou hier).
   const cursor = new Date(daysList[0]);
   let jours = 0;
   for (const day of daysList) {
@@ -69,18 +106,112 @@ async function computeBraise(userId: string): Promise<FoyerBraise> {
       break;
     }
   }
-  // Si la dernière activité n'était pas aujourd'hui ni hier, la braise
-  // s'est assoupie — on remonte le compteur au dernier streak connu.
-  if (!activeAujourdhui) {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yiso = yesterday.toISOString().slice(0, 10);
-    if (daysList[0] !== yiso) {
-      // Assoupie depuis plus d'un jour : compteur figé au streak d'avant.
-      // On retourne la longueur mais activeAujourdhui reste false.
-    }
-  }
   return { jours, activeAujourdhui };
+}
+
+/** Trouve le premier module non complété par l'user. MVP allemand. */
+async function nextModuleFor(userId: string): Promise<{ lesson: FoyerLessonRef; module: FoyerModuleRef; minutes: number } | null> {
+  const doneIds = (await prisma.moduleProgress.findMany({
+    where: { userId, status: "COMPLETED" },
+    select: { moduleId: true },
+  })).map((r) => r.moduleId);
+
+  const next = await prisma.module.findFirst({
+    where: {
+      isPublished: true,
+      id: { notIn: doneIds.length ? doneIds : undefined },
+    },
+    orderBy: [
+      { course: { level: "asc" } },
+      { sortOrder: "asc" },
+    ],
+    include: { course: true },
+  });
+  if (!next) return null;
+  return {
+    lesson: { id: next.course.id, title: next.course.title },
+    module: { id: next.id, kind: next.type },
+    minutes: 15,
+  };
+}
+
+/** Progression 0-100 dans le niveau actif. null si le niveau n'a
+ *  encore aucun module publié (rien à mesurer). */
+async function computeLevelPct(userId: string, level: string): Promise<number | null> {
+  const totalCount = await prisma.module.count({
+    where: {
+      isPublished: true,
+      course: { level: level as "A1" | "A2" | "B1" | "B2" | "C1" | "C2" },
+    },
+  });
+  if (totalCount === 0) return null;
+  const doneCount = await prisma.moduleProgress.count({
+    where: {
+      userId,
+      status: "COMPLETED",
+      module: { course: { level: level as "A1" | "A2" | "B1" | "B2" | "C1" | "C2" } },
+    },
+  });
+  return Math.round((doneCount / totalCount) * 100);
+}
+
+async function computeSoirsCetteSemaine(userId: string): Promise<number> {
+  const now = new Date();
+  const day = now.getDay();
+  const daysSinceMonday = day === 0 ? 6 : day - 1;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - daysSinceMonday);
+  monday.setHours(0, 0, 0, 0);
+
+  const rows = await prisma.moduleProgress.findMany({
+    where: { userId, status: "COMPLETED", completedAt: { gte: monday } },
+    select: { completedAt: true },
+  });
+  const days = new Set<string>();
+  for (const r of rows) {
+    if (r.completedAt) days.add(r.completedAt.toISOString().slice(0, 10));
+  }
+  return days.size;
+}
+
+async function buildCapContext(userId: string, cap: Cap | null, level: string | null): Promise<CapContext | null> {
+  if (!cap) return null;
+  if (cap === "franchir") {
+    const lv = level ?? "A1";
+    const totalCount = await prisma.module.count({
+      where: { isPublished: true, course: { level: lv as "A1" | "A2" | "B1" | "B2" | "C1" | "C2" } },
+    });
+    const doneCount = await prisma.moduleProgress.count({
+      where: {
+        userId,
+        status: "COMPLETED",
+        module: { course: { level: lv as "A1" | "A2" | "B1" | "B2" | "C1" | "C2" } },
+      },
+    });
+    const remaining = Math.max(0, totalCount - doneCount);
+    return {
+      kind: "franchir",
+      examenBlancLevel: lv,
+      leconsRestantes: totalCount > 0 ? remaining : null,
+    };
+  }
+  if (cap === "grandir") {
+    // Étape 2 branchera les vraies dossiers (immigration/visa).
+    return { kind: "grandir", step: "en préparation", dossiersCompletes: null, dossiersTotal: null };
+  }
+  if (cap === "transmettre") {
+    const conte = VOIX_STORIES.find((s) => s.territory === "sources");
+    const soirs = await computeSoirsCetteSemaine(userId);
+    if (!conte) return null;
+    return {
+      kind: "transmettre",
+      conteId: conte.id,
+      conteTitre: conte.title,
+      minutes: Math.ceil(conte.duration / 60),
+      soirsCetteSemaine: soirs,
+    };
+  }
+  return { kind: "moi", rythme: "libre" };
 }
 
 export async function GET() {
@@ -99,33 +230,24 @@ export async function GET() {
     },
   );
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   const dbUser = await prisma.user.findUnique({
     where: { supabaseId: user.id },
     include: {
       classroomEnrollments: {
         where: { isActive: true },
-        include: {
-          classroom: {
-            include: {
-              teacher: { include: { user: true } },
-            },
-          },
-        },
+        include: { classroom: { include: { teacher: { include: { user: true } } } } },
         take: 1,
       },
     },
   });
-  if (!dbUser) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
-  }
+  if (!dbUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
   const metadata = (user.user_metadata ?? {}) as Record<string, unknown>;
   const prenom = (dbUser.fullName ?? user.email ?? "").split(/[ @]/)[0] || "";
-  const cap = (metadata.cap as string | undefined) ?? null;
+  const avatarUrl = (metadata.avatar_url as string | undefined) ?? (dbUser.avatarUrl ?? null);
+  const cap = ((metadata.cap as string | undefined) ?? null) as Cap | null;
   const personalGoal = (metadata.personalGoal as string | undefined) ?? null;
 
   const activeLanguageId = (metadata.activeLanguage as string | undefined) ?? "deutsch";
@@ -133,12 +255,9 @@ export async function GET() {
     ? (metadata.supportedLanguages as string[])
     : [activeLanguageId];
 
-  // Récupère les métas de chaque langue supportée.
   const langues: FoyerLangue[] = supportedIds.map((id) => {
     const l = getLanguage(id);
     const isDeutsch = l.id === "deutsch";
-    // Niveau : germanLevel legacy pour l'allemand, sinon premier palier
-    // en attendant le model UserLanguage.
     const level = isDeutsch ? (dbUser.germanLevel ?? null) : null;
     return {
       id: l.id,
@@ -151,7 +270,6 @@ export async function GET() {
       levels: l.levels,
     };
   });
-
   const activeLangue = langues.find((l) => l.id === activeLanguageId) ?? langues[0];
 
   const braise = await computeBraise(dbUser.id);
@@ -164,13 +282,27 @@ export async function GET() {
       }
     : null;
 
+  const next = await nextModuleFor(dbUser.id);
+  const pct = activeLangue.level ? await computeLevelPct(dbUser.id, activeLangue.level) : null;
+  const capContext = await buildCapContext(dbUser.id, cap, activeLangue.level);
+
+  const nextLesson: FoyerNextLesson = {
+    lesson: next?.lesson ?? null,
+    module: next?.module ?? null,
+    minutes: next?.minutes ?? 0,
+    pct,
+    capContext,
+  };
+
   return NextResponse.json({
     prenom,
+    avatarUrl,
     cap,
     personalGoal,
     langues,
     activeLangue,
     braise,
     classe,
+    nextLesson,
   });
 }
