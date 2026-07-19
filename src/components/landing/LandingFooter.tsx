@@ -1,10 +1,12 @@
 // LandingFooter · Sprint « Les mots de la maison ».
 // Trois colonnes :
-//   · La maison  · Langues, Méthode, Manifeste, Histoires
+//   · La maison  · Langues, Méthode, Histoires
 //   · Les portes · Devenir enseignant·e, Pour les centres, Tarifs
 //   · La règle   · Confidentialité, Conditions, Contact
 // Sous les colonnes : slogan support « Toutes vos langues, une
 // seule maison. » + signature YEMA + disclaimer CEFR.
+// Le manifeste est parqué : page conservée pour réactivation
+// ultérieure mais aucun lien depuis nav ou footer.
 
 import { LandingBrand } from "./LandingBrand";
 
@@ -34,7 +36,6 @@ export function LandingFooter({
     items: [
       { label: isEn ? "Languages" : "Langues",      href: `/${locale}/langues` },
       { label: isEn ? "Method" : "Méthode",         href: `/${locale}/methode` },
-      { label: isEn ? "Manifesto" : "Manifeste",    href: `/${locale}/manifeste` },
       { label: isEn ? "Stories" : "Histoires",      href: `/${locale}/histoires` },
     ],
   };

@@ -732,7 +732,7 @@ export default function DemoPage() {
           </span>
         </div>
         <h1 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 900, fontSize: isMobile ? "1.6rem" : "2.2rem", color: "white", lineHeight: 1.15, marginBottom: 10 }}>
-          {lang === "fr" ? "L'allemand conçu pour le Cameroun" : "German designed for Cameroon"}
+          {lang === "fr" ? "L'allemand, pour l'Afrique qui part et qui revient" : "German, for the Africa that leaves and returns"}
         </h1>
         <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.85rem", lineHeight: 1.6 }}>
           {lang === "fr"

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "Yema helps learners build language skills, practice speaking and prepare for their international journey. First destination: German and Germany.",
   keywords: [
     "learn german", "german learning platform", "CEFR A1 C1",
-    "yema languages", "apprendre allemand", "cours allemand cameroun",
+    "yema languages", "apprendre allemand", "langues africaines",
     "language learning africa", "study in germany", "german for beginners",
     "language preparation", "international learning platform"
   ],
@@ -23,17 +23,17 @@ export const metadata: Metadata = {
   category: "education",
   openGraph: {
     type: "website",
-    locale: "fr_CM",
-    alternateLocale: ["fr_FR", "en_US"],
+    locale: "fr_FR",
+    alternateLocale: ["en_US"],
     url: "https://deutschcm.vercel.app",
     siteName: "Yema",
     title: "Learn. Prepare. Belong. — Yema Languages",
     description: "Start with German and prepare your international future with Yema. Interactive lessons, speaking practice and realistic simulations.",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Yema — Apprenez l'allemand au Cameroun" }]
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Yema Languages — foreign & native languages" }]
   },
   twitter: {
     card: "summary_large_image",
-    title: "Yema — Apprenez l'allemand avec l'IA",
+    title: "Yema — Apprenez une langue, préparez-vous, appartenez",
     description: "Learn a language, prepare for life abroad, and belong. Starting with German and Germany.",
     images: ["/opengraph-image"],
     creator: "@yema"
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://deutschcm.vercel.app",
     languages: {
-      "fr-CM": "https://deutschcm.vercel.app/fr",
+      "fr": "https://deutschcm.vercel.app/fr",
       "en": "https://deutschcm.vercel.app/en"
     }
   }

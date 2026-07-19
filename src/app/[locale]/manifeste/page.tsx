@@ -1,10 +1,9 @@
 "use client";
 
-// /manifeste · Sprint 4. Sept clauses.
-// Retiré : récit d'origine (l'ancienne clause « Depuis le Cameroun,
-// vers le monde »). Ajouté : la clause du prof au centre. Ajouté :
-// une 7e clause de clôture qui laisse le manifeste ouvert.
-// Zéro concurrent nommé.
+// /manifeste · fichier parqué.
+// La page reste en place pour réactivation ultérieure mais n'est
+// plus reliée depuis la nav ni le footer. Aucun concurrent nommé,
+// aucune provenance-pays revendiquée pour YEMA.
 
 import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
@@ -173,8 +172,8 @@ export default function ManifestePage() {
             ? "Africa speaks. All its languages — foreign and native, at last one place."
             : "L'Afrique parle. Toutes ses langues — étrangères et natales, enfin un lieu.",
           made: loc === "en"
-            ? "Built in Cameroon, for the continent and the world"
-            : "Construit au Cameroun, pour le continent et le monde",
+            ? "Africa speaks. From Douala to Dakar, from Kinshasa to Abidjan."
+            : "L'Afrique parle. De Douala à Dakar, de Kinshasa à Abidjan.",
           legal: loc === "en" ? "Legal" : "Mentions légales",
           terms: loc === "en" ? "Terms" : "CGU",
           privacy: loc === "en" ? "Privacy" : "Confidentialité",

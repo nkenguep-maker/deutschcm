@@ -109,10 +109,10 @@ const landing = {
     ctaFinalTitle: "Apprendre. Se préparer.", ctaFinalSub: "S'intégrer.",
     ctaFinalDesc: "Pas de carte bancaire. Pas d'engagement. Accès immédiat au niveau A1 complet.",
     ctaFinalBtn: "Rejoins la bêta", ctaFinalSocial: "Sans carte bancaire · A1 gratuit · CECRL A1→C1",
-    ctaFinalAppLabel: "Bientôt disponible sur", ctaFinalCities: "Bêta lancée depuis le Cameroun — ouverte à tous les apprenants",
+    ctaFinalAppLabel: "Bientôt disponible sur", ctaFinalCities: "Bêta ouverte à toute l'Afrique — de Douala à Dakar, de Kinshasa à Abidjan.",
     footerTagline: "Apprendre. Se préparer. S'intégrer.",
     footerDisclaimer: "Yema Languages propose une pratique linguistique indépendante alignée sur le CECRL et n'est affiliée à aucun organisme officiel d'examen.",
-    footerMade: "Construit au Cameroun, pour les apprenants du monde entier", footerLegal: "Mentions légales", footerTerms: "CGU", footerPrivacy: "Confidentialité", footerContact: "Contact",
+    footerMade: "L'Afrique parle. De Douala à Dakar, de Kinshasa à Abidjan.", footerLegal: "Mentions légales", footerTerms: "CGU", footerPrivacy: "Confidentialité", footerContact: "Contact",
   },
   en: {
     badge: "1st pan-African languages platform · Beta 2026",
@@ -204,7 +204,7 @@ const landing = {
     ctaFinalAppLabel: "Coming soon on", ctaFinalCities: "Starting with German and Germany — more languages coming.",
     footerTagline: "Learn. Prepare. Belong.",
     footerDisclaimer: "Yema Languages provides independent CEFR-aligned language practice and is not affiliated with any official examination institute.",
-    footerMade: "Built from Cameroon for learners with international ambitions.", footerLegal: "Legal", footerTerms: "Terms", footerPrivacy: "Privacy", footerContact: "Contact",
+    footerMade: "Africa speaks. From Douala to Dakar, from Kinshasa to Abidjan.", footerLegal: "Legal", footerTerms: "Terms", footerPrivacy: "Privacy", footerContact: "Contact",
   },
 }
 

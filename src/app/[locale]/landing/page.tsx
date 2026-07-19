@@ -141,7 +141,7 @@ const COPY_FR: Copy = {
   error: "Quelque chose ne nous est pas parvenu. Réessayez.",
 
   footerTagline: "L'Afrique parle. Toutes ses langues — étrangères et natales, enfin un lieu.",
-  footerMade: "Construit au Cameroun, pour le continent et le monde",
+  footerMade: "L'Afrique parle. De Douala à Dakar, de Kinshasa à Abidjan.",
   footerLegal: "Mentions légales",
   footerTerms: "CGU",
   footerPrivacy: "Confidentialité",
@@ -216,7 +216,7 @@ const COPY_EN: Copy = {
   error: "Something didn't reach us. Try again.",
 
   footerTagline: "Africa speaks. All its languages — foreign and native, at last one place.",
-  footerMade: "Built in Cameroon, for the continent and the world",
+  footerMade: "Africa speaks. From Douala to Dakar, from Kinshasa to Abidjan.",
   footerLegal: "Legal",
   footerTerms: "Terms",
   footerPrivacy: "Privacy",

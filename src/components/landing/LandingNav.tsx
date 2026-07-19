@@ -8,13 +8,14 @@ import { LandingBrand } from "./LandingBrand";
 type NavLabels = {
   features: string;    // "Langues"
   levels: string;      // "Méthode"
-  pricing: string;     // "Manifeste"
+  /** legacy — pointait vers /manifeste, désormais non rendu (nav = Langues · Méthode · Histoires · Tarifs) */
+  pricing?: string;
   centers: string;
   login: string;
   register: string;
   methode?: string;
   histoires?: string;
-  /** "Tarifs" — nouveau item nav (Sprint « Les mots ») */
+  /** "Tarifs" — item final de la nav */
   tarifs?: string;
 };
 
@@ -46,13 +47,13 @@ export function LandingNav({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Sprint « Les mots » · nav = Langues · Méthode · Histoires · Manifeste
-  // · Tarifs. Enseignants/Centres vivent dans le footer (les portes).
+  // Nav finale : Langues · Méthode · Histoires · Tarifs.
+  // Enseignants/Centres vivent dans le footer (les portes). Le
+  // manifeste est parqué (fichier conservé pour réactivation).
   const navItems = [
-    { label: labels.features,                                       href: `/${locale}/langues` },
-    { label: labels.methode ?? labels.levels,                       href: `/${locale}/methode` },
+    { label: labels.features,                                                 href: `/${locale}/langues` },
+    { label: labels.methode ?? labels.levels,                                 href: `/${locale}/methode` },
     { label: labels.histoires ?? (locale === "en" ? "Stories" : "Histoires"), href: `/${locale}/histoires` },
-    { label: labels.pricing,                                        href: `/${locale}/manifeste` },
     { label: labels.tarifs ?? (locale === "en" ? "Pricing" : "Tarifs"),       href: `/${locale}/pricing` },
   ];
 
