@@ -7202,7 +7202,10 @@ body:has(.test-space-bar) { padding-top: 34px; }
   text-transform: uppercase;
 }
 
-/* Braise · point laiton + label mono */
+/* Braise · point laiton + label mono
+   Trois états visuels · on (allumée) / off (assoupie) / new (éteinte).
+   La respiration 7s (--dur-breath) n'est active que si .breathing
+   est posé (contrôlé par le composant · allowBreathing prop). */
 .braise {
   display: inline-flex;
   align-items: center;
@@ -7219,10 +7222,11 @@ body:has(.test-space-bar) { padding-top: 34px; }
   border-radius: 50%;
   background: radial-gradient(circle, #F0CE8B 0%, #D9A855 55%, #B8873E 100%);
   box-shadow: 0 0 12px rgba(240, 206, 139, 0.35);
-  transition: opacity var(--dur-move) var(--ease-glide);
+  transform-origin: center;
 }
-.braise.on { border-color: var(--brass-edge); }
-.braise.off .braise-dot { opacity: 0.35; box-shadow: none; }
+.braise-on { border-color: var(--brass-edge); }
+.braise-off .braise-dot { opacity: 0.35; box-shadow: none; }
+.braise-new .braise-dot { opacity: 0.2; box-shadow: none; }
 .braise-label {
   font-family: var(--font-jetbrains, monospace);
   font-size: 9px;
@@ -7230,7 +7234,32 @@ body:has(.test-space-bar) { padding-top: 34px; }
   color: var(--brass);
   text-transform: uppercase;
 }
-.braise.off .braise-label { color: var(--creme-mute); }
+.braise-off .braise-label { color: var(--creme-mute); }
+.braise-new .braise-label { color: var(--creme-faint); }
+
+/* Respiration 7s réservée au seuil ET à la braise, jamais aux deux
+   en même temps. Contrôlée par la classe .breathing posée par le
+   composant après vérif prefers-reduced-motion + activeAujourdhui. */
+.braise.breathing .braise-dot {
+  animation: braise-breath var(--dur-breath, 7000ms) ease-in-out infinite;
+  will-change: transform, opacity;
+}
+@keyframes braise-breath {
+  0%, 100% { opacity: 0.85; transform: scale(0.94); }
+  50%      { opacity: 1;    transform: scale(1.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .braise.breathing .braise-dot { animation: none; }
+}
+
+/* StateBlock « La braise s'est assoupie » — inline sous le header */
+.braise-assoupie-wrap {
+  margin-top: 16px;
+  padding: 14px 18px;
+  border: 1px dashed var(--brass-edge);
+  border-radius: var(--r-card);
+  background: rgba(184, 135, 62, 0.04);
+}
 
 /* b) Reprendre · unique zone laiton, configurée par cap */
 .foyer-reprendre {
@@ -7408,6 +7437,17 @@ body:has(.test-space-bar) { padding-top: 34px; }
   text-decoration: none;
   line-height: 1.4;
   transition: color var(--dur-touch) var(--ease-enter);
+  /* Reset button */
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+.foyer-other-single:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 .foyer-other-single em { color: var(--brass); font-style: italic; }
 .foyer-other-single:hover em { text-decoration: underline; }
@@ -7429,8 +7469,15 @@ body:has(.test-space-bar) { padding-top: 34px; }
   color: var(--brass);
   text-decoration: none;
   transition: background var(--dur-touch) var(--ease-enter);
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
 }
 .foyer-other-item:hover { background: var(--brass-glow); }
+.foyer-other-item:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
 .foyer-other-code {
   font-family: var(--font-jetbrains, monospace);
   font-size: 10px;
@@ -7486,6 +7533,18 @@ body:has(.test-space-bar) { padding-top: 34px; }
   font-size: 13.5px;
   color: var(--creme-soft);
   line-height: 1.4;
+}
+
+/* Bascule de langue · la couture 240ms ease-glide sur le fond +
+   fondu du contenu. Le composant pose la classe .foyer-switching sur
+   <body> avant le POST, la retire après reload. */
+body.foyer-switching {
+  transition: background var(--dur-move) var(--ease-glide);
+}
+body.foyer-switching .foyer {
+  opacity: 0.55;
+  transition: opacity var(--dur-move) var(--ease-glide);
+  pointer-events: none;
 }
 
 /* Territoire · le foyer prend le fond de sa langue active. Le

@@ -17,6 +17,7 @@ import { StateBlock } from "@/components/StateBlock";
 import { CefrSpine } from "@/components/landing/CefrSpine";
 import { YemaSpine } from "@/components/landing/YemaSpine";
 import { frTypo } from "@/components/landing/typo";
+import { Braise } from "@/components/foyer/Braise";
 
 // ─── Types remontés par /api/me/foyer et /api/me/next-lesson ─────
 interface FoyerLangue {
@@ -315,6 +316,29 @@ export default function FoyerPage() {
   const otherLanguages = data.langues.filter((l) => l.id !== data.activeLangue.id);
   const hasOther = otherLanguages.length >= 1;
 
+  // Bascule de langue · POST /api/language/switch puis hard reload
+  // pour laisser la couture 240ms se jouer proprement (le fond change,
+  // le spine change, tout le foyer se recharge dans le nouveau
+  // territoire — une pièce à la fois, jamais deux en parallèle).
+  const switchLanguage = async (languageId: string) => {
+    document.body.classList.add("foyer-switching");
+    try {
+      await fetch("/api/language/switch", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ languageId }),
+      });
+    } catch {
+      // silent-fail — la page ne bougera pas, l'user peut réessayer
+      document.body.classList.remove("foyer-switching");
+      return;
+    }
+    // 240ms d'ease-glide (couture) puis rechargement.
+    window.setTimeout(() => {
+      window.location.reload();
+    }, 240);
+  };
+
   return (
     <Layout title="Foyer">
       <div className={`foyer ${territoryClass}`}>
@@ -330,9 +354,18 @@ export default function FoyerPage() {
               </p>
             ) : null}
           </div>
-          {/* Braise · étape 3 (placeholder statique pour l'étape 1) */}
-          <div className="foyer-braise-slot" aria-hidden={data.braise.jours === 0}>
-            <BraisePlaceholder braise={data.braise} locale={loc} />
+          {/* Braise · composant complet · state on/off/new avec
+              respiration 7s (--dur-breath) uniquement si activeAujourdhui
+              et allowBreathing. */}
+          <div className="foyer-braise-slot">
+            <Braise
+              jours={data.braise.jours}
+              activeAujourdhui={data.braise.activeAujourdhui}
+              locale={loc}
+              reprendreHref="#foyer-reprendre-h"
+              allowBreathing
+              compact={false}
+            />
           </div>
         </header>
 
@@ -391,28 +424,37 @@ export default function FoyerPage() {
           )}
         </section>
 
-        {/* e) L'AUTRE VOIX (si 2+ langues) */}
+        {/* e) L'AUTRE VOIX (si 2+ langues) — bascule via API + transition
+             ease-glide 240ms sur le fond (voir CSS .foyer). */}
         {hasOther ? (
           <section className="foyer-other" aria-labelledby="foyer-other-h">
             <p className="maison-kicker">{t(c.otherVoiceKicker)}</p>
             {otherLanguages.length === 1 ? (
-              <Link href={`/${locale}/dashboard?lang=${otherLanguages[0].id}`} className="foyer-other-single">
+              <button
+                type="button"
+                className="foyer-other-single"
+                onClick={() => switchLanguage(otherLanguages[0].id)}
+              >
                 {t(c.otherVoicePrefix)}{" "}
                 <em>
                   {t(c.otherVoiceSuffix)}{" "}
                   {loc === "en" ? otherLanguages[0].nameEn : otherLanguages[0].name} →
                 </em>
-              </Link>
+              </button>
             ) : (
               <ul className="foyer-other-list">
                 {otherLanguages.map((l) => (
                   <li key={l.id}>
-                    <Link href={`/${locale}/dashboard?lang=${l.id}`} className="foyer-other-item">
+                    <button
+                      type="button"
+                      className="foyer-other-item"
+                      onClick={() => switchLanguage(l.id)}
+                    >
                       <span className="foyer-other-code">{l.code}</span>
                       <span className="foyer-other-name">
                         {loc === "en" ? l.nameEn : l.name}
                       </span>
-                    </Link>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -632,16 +674,3 @@ function renderStars(s: string): string {
   return s.replace(/\*([^*]+)\*/g, '<em class="foyer-em">$1</em>');
 }
 
-// ─── Braise · placeholder étape 1 (composant complet en étape 3) ──
-function BraisePlaceholder({ braise, locale }: { braise: FoyerBraise; locale: "fr" | "en" }) {
-  const label = locale === "en"
-    ? `The ember burns · ${braise.jours} ${braise.jours === 1 ? "day" : "days"}`
-    : `La braise brûle · ${braise.jours} ${braise.jours === 1 ? "jour" : "jours"}`;
-  return (
-    <div className={`braise ${braise.activeAujourdhui ? "on" : "off"}`}
-         aria-label={label}>
-      <span className="braise-dot" aria-hidden="true" />
-      <span className="braise-label">{label}</span>
-    </div>
-  );
-}
