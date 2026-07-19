@@ -21,28 +21,19 @@ interface Visage {
   citationEn: string;
 }
 
+// Ordre du mur — Franchir (Kevin, Aïcha) · Grandir (Fatima, Jean) ·
+// Transmettre (Bintou). Rééquilibrage 4 langues, 4 pays, 3 mouvements.
 const VISAGES: readonly Visage[] = [
-  {
-    name: "Aïcha",
-    monogram: "A",
-    langue: "allemand",
-    langueEn: "German",
-    variant: "world",
-    audioSrc: "/audio/portraits/aicha.mp3",
-    portraitSrc: "/portraits/aicha.avif",
-    citation: "J'ai passé mon test B1. Je pars à Cologne en septembre.",
-    citationEn: "I passed my B1 test. I leave for Cologne in September.",
-  },
   {
     name: "Kevin",
     monogram: "K",
     langue: "allemand",
     langueEn: "German",
     variant: "world",
-    audioSrc: "/audio/portraits/kevin.mp3",
+    audioSrc: "/audio/voix/kevin-allemand.mp3",
     portraitSrc: "/portraits/kevin.avif",
-    citation: "L'entretien s'est fait dans les deux langues. J'étais prêt.",
-    citationEn: "The interview happened in both languages. I was ready.",
+    citation: "Trois lettres m'obsédaient : A2, B1, B2. Je les ai gravies une à une.",
+    citationEn: "Three letters obsessed me: A2, B1, B2. I climbed them one by one.",
   },
   {
     name: "Fatima",
@@ -50,21 +41,32 @@ const VISAGES: readonly Visage[] = [
     langue: "allemand",
     langueEn: "German",
     variant: "world",
-    audioSrc: "/audio/portraits/fatima.mp3",
+    audioSrc: "/audio/voix/fatima-allemand.mp3",
     portraitSrc: "/portraits/fatima.avif",
-    citation: "Chaque leçon, quinze minutes le matin, avant les enfants.",
-    citationEn: "Each lesson, fifteen minutes in the morning, before the kids.",
+    citation: "Le passeport, on ne l'obtient pas avec l'accent. Alors j'apprends chaque soir.",
+    citationEn: "You don't get the passport with an accent. So I learn every evening.",
+  },
+  {
+    name: "Aïcha",
+    monogram: "A",
+    langue: "anglais",
+    langueEn: "English",
+    variant: "world",
+    audioSrc: "/audio/voix/aicha-anglais.mp3",
+    portraitSrc: "/portraits/aicha.avif",
+    citation: "J'ai arrêté d'avoir peur de mes erreurs. La note est tombée. Le départ aussi.",
+    citationEn: "I stopped being afraid of my mistakes. The score came. So did the departure.",
   },
   {
     name: "Jean",
     monogram: "J",
-    langue: "allemand",
-    langueEn: "German",
+    langue: "français",
+    langueEn: "French",
     variant: "world",
-    audioSrc: "/audio/portraits/jean.mp3",
+    audioSrc: "/audio/voix/jean-francais.mp3",
     portraitSrc: "/portraits/jean.avif",
-    citation: "Je regroupe ma famille. La langue était le dernier verrou.",
-    citationEn: "I'm reuniting with my family. Language was the last lock.",
+    citation: "Aujourd'hui, je réponds en français sans baisser les yeux.",
+    citationEn: "Today, I answer in French without lowering my eyes.",
   },
   {
     name: "Bintou",
@@ -72,10 +74,10 @@ const VISAGES: readonly Visage[] = [
     langue: "wolof",
     langueEn: "Wolof",
     variant: "sources",
-    audioSrc: "/audio/portraits/bintou.mp3",
+    audioSrc: "/audio/voix/bintou-wolof.mp3",
     portraitSrc: "/portraits/bintou.avif",
-    citation: "Ma fille répond en wolof. C'est la première fois.",
-    citationEn: "My daughter answers in Wolof. It's the first time.",
+    citation: "Ma fille répond en wolof, maintenant. C'est ma grand-mère qui parle par sa bouche.",
+    citationEn: "My daughter answers in Wolof now. It's my grandmother speaking through her mouth.",
   },
 ];
 
@@ -91,8 +93,8 @@ interface Copy {
 const COPY_FR: Copy = {
   kicker: "Le mur des visages",
   title: "Cinq voix.",
-  titleEm: "Cinq maisons.",
-  phrase: "Chaque parcours a son territoire. Chacun sa langue première, chacun son cap.",
+  titleEm: "Cinq chemins.",
+  phrase: "Cinq voix, cinq chemins. Chacune parle sa langue.",
   seeMore: "Toutes les histoires",
   listenLabel: "Écouter",
 };
@@ -100,8 +102,8 @@ const COPY_FR: Copy = {
 const COPY_EN: Copy = {
   kicker: "The wall of faces",
   title: "Five voices.",
-  titleEm: "Five homes.",
-  phrase: "Each journey has its territory. Each has a first language, each a cap.",
+  titleEm: "Five paths.",
+  phrase: "Five voices, five paths. Each speaks their own language.",
   seeMore: "All the stories",
   listenLabel: "Listen",
 };
