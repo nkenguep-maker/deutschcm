@@ -88,7 +88,7 @@ export default function LandingPage() {
           labels={{
             tagline: loc === "en"
               ? "Africa speaks. All its languages — foreign and native, at last one place."
-              : "L'Afrique parle. Toutes ses langues — étrangères et natales, enfin un lieu.",
+              : "L'Afrique parle. Toutes ses langues — du monde et africaines, enfin un lieu.",
             made: t.footerMade,
             legal: t.footerLegal,
             terms: t.footerTerms,

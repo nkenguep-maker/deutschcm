@@ -96,16 +96,16 @@ function TermsEN() {
         licensed educators.
       </P>
 
-      <H2>6. Foreign languages and no certification guarantee</H2>
+      <H2>6. World languages and no certification guarantee</H2>
       <P>
-        YEMA prepares learners for CEFR-aligned foreign languages (A1–C1).
+        YEMA prepares learners for CEFR-aligned world languages (A1–C1).
         Official exams are issued by independent bodies. YEMA is not
         affiliated with any of these organizations.
       </P>
 
-      <H2>7. African native languages and independent scale</H2>
+      <H2>7. African languages and independent scale</H2>
       <P>
-        For African native languages, YEMA uses its own progression scale
+        For African languages, YEMA uses its own progression scale
         (É1 Listen · É2 Voice · É3 Story · É4 Palaver · É5 Home). This scale
         is proprietary and does not constitute an official standard.
       </P>
@@ -231,16 +231,16 @@ function TermsFR() {
         des erreurs. YEMA ne garantit pas leur exactitude.
       </P>
 
-      <H2>6. Langues étrangères et absence de garantie de certification</H2>
+      <H2>6. Langues du monde et absence de garantie de certification</H2>
       <P>
-        YEMA prépare aux langues étrangères alignées CECRL (A1–C1). Les
+        YEMA prépare aux langues du monde alignées CECRL (A1–C1). Les
         examens officiels sont délivrés par des organismes indépendants. YEMA
         n&apos;est affilié à aucun de ces organismes.
       </P>
 
-      <H2>7. Langues natales africaines et échelle propre</H2>
+      <H2>7. Langues africaines et échelle propre</H2>
       <P>
-        Pour les langues natales africaines, YEMA utilise sa propre échelle de
+        Pour les langues africaines, YEMA utilise sa propre échelle de
         progression (É1 Écoute · É2 Voix · É3 Récit · É4 Palabre · É5 Foyer).
         Cette échelle est propriétaire et ne constitue pas un standard
         officiel.

@@ -143,7 +143,7 @@ function buildPrompt(
 }`);
   }
 
-  return `Tu es un expert en didactique de l'allemand langue étrangère (DaF), spécialisé dans le cadre CEFR (A1–C1).
+  return `Tu es un expert en didactique de l'allemand langue du monde (DaF), spécialisé dans le cadre CEFR (A1–C1).
 
 Génère le contenu pédagogique complet pour la lektion suivante, en JSON strict et sans texte autour.
 

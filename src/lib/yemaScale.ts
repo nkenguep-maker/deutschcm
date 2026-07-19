@@ -1,4 +1,4 @@
-// Échelle YEMA · framework pédagogique pour les langues natales africaines.
+// Échelle YEMA · framework pédagogique pour les langues africaines.
 //
 // Conçue à partir de trois sources :
 //   1. ACTFL Proficiency Guidelines 2024 (Novice/Intermediate/Advanced/
@@ -133,12 +133,12 @@ export const YEMA_LEVELS: readonly YemaLevel[] = [
     actfl: "ACTFL Advanced High → Superior",
     canDo: [
       "Manier les proverbes, jouer avec les registres, comprendre l'implicite",
-      "Basculer avec fluidité entre la langue natale et le français",
+      "Basculer avec fluidité entre la langue africaine et le français",
       "Transmettre — enseigner, raconter à un enfant, animer une assemblée",
     ],
     canDoEn: [
       "Wield proverbs, play with registers, catch the unspoken",
-      "Code-switch fluidly between the native language and French",
+      "Code-switch fluidly between the African language and French",
       "Pass on — teach, tell a child, host an assembly",
     ],
     modalities: "Toute modalité · maîtrise culturelle",

@@ -2,8 +2,8 @@
 
 // /famille · sélecteur de profil « Qui apprend ce soir ? » + gestion
 // des profils enfants sous compte parent. Multi-langues : un enfant
-// peut avoir des langues natales (territory=sources · échelle YEMA)
-// ET/OU étrangères (territory=world · échelle douce M1-M4).
+// peut avoir des langues africaines (territory=sources · échelle YEMA)
+// ET/OU du monde (territory=world · échelle douce M1-M4).
 //
 // Sécurité mineurs · seul le parent authentifié voit ses propres
 // profils. Toutes les mutations passent par /api/family/children.
@@ -45,8 +45,8 @@ const COPY = {
     ageLbl: "Âge",
     animalLbl: "Animal",
     languesLbl: "Langues à écouter",
-    nativeLbl: "Langues natales",
-    foreignLbl: "Langues étrangères",
+    nativeLbl: "Langues africaines",
+    foreignLbl: "Langues du monde",
     natalePick: "Notre langue de la maison",
     foreignPick: "Une langue à découvrir",
     languesHelp: "Choisissez une ou deux langues. Vous pourrez en ajouter plus tard.",
@@ -75,8 +75,8 @@ const COPY = {
     ageLbl: "Age",
     animalLbl: "Animal",
     languesLbl: "Languages to listen to",
-    nativeLbl: "Native languages",
-    foreignLbl: "Foreign languages",
+    nativeLbl: "African languages",
+    foreignLbl: "World languages",
     natalePick: "Our house language",
     foreignPick: "A language to discover",
     languesHelp: "Pick one or two. You can add more later.",

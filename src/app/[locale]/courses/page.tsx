@@ -445,7 +445,7 @@ export default function CoursesPage() {
     ...LEVELS.map(l => ({ key: l as Filter, label: l })),
   ];
 
-  // Langue natale (échelle YEMA) : les contenus dédiés ne sont pas encore
+  // Langue africaine (échelle YEMA) : les contenus dédiés ne sont pas encore
   // en ligne, on affiche une préparation éditoriale avec l'échelle YEMA
   // et les cinq paliers (Écoute · Voix · Récit · Palabre · Foyer) pour
   // que l'apprenant·e sache déjà ce qu'il va rencontrer. Aucun contenu

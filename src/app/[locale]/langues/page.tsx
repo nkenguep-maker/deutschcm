@@ -1,10 +1,10 @@
 "use client";
 
 // /langues · Sprint 2 « La carte des voix ».
-// Territoire world (espresso) : les 6 étrangères, CECRL, présent sec.
+// Territoire world (espresso) : les 6 langues du monde, CECRL, présent sec.
 // L'allemand porte « le premier chapitre » — seul repère de statut.
 // Couture Seam avec halo brass au scroll.
-// Territoire sources (terre) : les 4 natales (bassa, wolof, swahili,
+// Territoire sources (terre) : les 4 langues africaines (bassa, wolof, swahili,
 // lingala) avec l'échelle YEMA en cinq paliers (ancres culturelles
 // + can-do + équivalence ACTFL discrète). SeuilGreetings dispersées
 // dans les murs — la page s'écoute.
@@ -117,15 +117,15 @@ const COPY_FR: Copy = {
   navCenters: "Centres",
   navLogin: "Se connecter",
   navRegister: "Commencer",
-  footerTagline: "L'Afrique parle. Toutes ses langues — étrangères et natales, enfin un lieu.",
+  footerTagline: "L'Afrique parle. Toutes ses langues — du monde et africaines, enfin un lieu.",
   footerMade: "L'Afrique parle. De Douala à Dakar, de Kinshasa à Abidjan.",
   footerLegal: "Mentions légales",
   footerTerms: "CGU",
   footerPrivacy: "Confidentialité",
   footerContact: "Contact",
-  footerDisclaimer: "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues étrangères, et indépendante pour les langues natales africaines. N'est affiliée à aucun organisme officiel d'examen.",
-  ariaWorld: "Territoire des langues étrangères",
-  ariaSources: "Territoire des langues natales",
+  footerDisclaimer: "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues du monde, et indépendante pour les langues africaines. N'est affiliée à aucun organisme officiel d'examen.",
+  ariaWorld: "Territoire des langues du monde",
+  ariaSources: "Territoire des langues africaines",
   ariaSeam: "La couture entre les deux territoires",
 };
 
@@ -159,9 +159,9 @@ const COPY_EN: Copy = {
   footerTerms: "Terms",
   footerPrivacy: "Privacy",
   footerContact: "Contact",
-  footerDisclaimer: "YEMA Languages is a pan-African CEFR-aligned platform for foreign languages, and independent for African native languages. Not affiliated with any official examination institute.",
-  ariaWorld: "Foreign languages territory",
-  ariaSources: "Native languages territory",
+  footerDisclaimer: "YEMA Languages is a pan-African CEFR-aligned platform for world languages, and independent for African languages. Not affiliated with any official examination institute.",
+  ariaWorld: "World languages territory",
+  ariaSources: "African languages territory",
   ariaSeam: "The seam between the two territories",
 };
 
@@ -228,15 +228,15 @@ export default function LanguesPage() {
       />
 
       <main>
-        {/* ─── Territoire world · 6 étrangères ───────────────────── */}
+        {/* ─── Territoire world · 6 langues du monde ───────────────────── */}
         <section
           className="langues-territoire langues-world"
           aria-label={c.ariaWorld}
         >
           {/* Aucune salutation dans le territoire world — les
-              étrangères ne murmurent pas dans les murs, elles
+              langues du monde ne murmurent pas dans les murs, elles
               vivent dans les cartes de langues. Le seuil réserve
-              son souffle aux voix natales. */}
+              son souffle aux voix africaines. */}
 
           <div className="maison-container langues-world-inner">
             <div className="maison-section-head">
@@ -259,13 +259,13 @@ export default function LanguesPage() {
         {/* ─── Couture ─── */}
         <Seam ariaLabel={c.ariaSeam} />
 
-        {/* ─── Territoire sources · 4 natales avec échelle YEMA ─── */}
+        {/* ─── Territoire sources · 4 langues africaines avec échelle YEMA ─── */}
         <section
           id="sources"
           className="langues-territoire langues-sources"
           aria-label={c.ariaSources}
         >
-          {/* Salutations natales dispersées dans les murs de la section
+          {/* Salutations africaines dispersées dans les murs de la section
               (Mbolo, Na nga def, Mbote, Jambo, Ẹ n lẹ, Sannu, Akwaaba,
               Muraho, Selam, Sawubona). Pool filtré sur sources uniquement. */}
           <div className="langues-sources-greetings" aria-hidden="false">

@@ -23,7 +23,7 @@ const COPY_FR = {
   clauses: [
     {
       strong: "Nos langues valent les leurs.",
-      body: "Le wolof n'est pas moins précis que le français. Le bassa n'est pas plus difficile que l'allemand. Le swahili traverse plus de pays que l'espagnol. YEMA place les langues du continent sur le même plan éditorial que les langues étrangères — même méthode, même exigence, même dignité.",
+      body: "Le wolof n'est pas moins précis que le français. Le bassa n'est pas plus difficile que l'allemand. Le swahili traverse plus de pays que l'espagnol. YEMA place les langues du continent sur le même plan éditorial que les langues du monde — même méthode, même exigence, même dignité.",
     },
     {
       strong: "L'allemand est notre premier chapitre.",
@@ -61,7 +61,7 @@ const COPY_EN = {
   clauses: [
     {
       strong: "Our languages are worth theirs.",
-      body: "Wolof is no less precise than French. Bassa is no harder than German. Swahili crosses more countries than Spanish. YEMA places continent languages on the same editorial plane as foreign ones — same method, same rigor, same dignity.",
+      body: "Wolof is no less precise than French. Bassa is no harder than German. Swahili crosses more countries than Spanish. YEMA places continent languages on the same editorial plane as world ones — same method, same rigor, same dignity.",
     },
     {
       strong: "German is our first chapter.",
@@ -170,7 +170,7 @@ export default function ManifestePage() {
         labels={{
           tagline: loc === "en"
             ? "Africa speaks. All its languages — foreign and native, at last one place."
-            : "L'Afrique parle. Toutes ses langues — étrangères et natales, enfin un lieu.",
+            : "L'Afrique parle. Toutes ses langues — du monde et africaines, enfin un lieu.",
           made: loc === "en"
             ? "Africa speaks. From Douala to Dakar, from Kinshasa to Abidjan."
             : "L'Afrique parle. De Douala à Dakar, de Kinshasa à Abidjan.",
@@ -179,8 +179,8 @@ export default function ManifestePage() {
           privacy: loc === "en" ? "Privacy" : "Confidentialité",
           contact: loc === "en" ? "Contact" : "Contact",
           disclaimer: loc === "en"
-            ? "YEMA Languages is a pan-African CEFR-aligned platform for foreign languages, and independent for African native languages. Not affiliated with any official examination institute."
-            : "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues étrangères, et indépendante pour les langues natales africaines. N'est affiliée à aucun organisme officiel d'examen.",
+            ? "YEMA Languages is a pan-African CEFR-aligned platform for world languages, and independent for African languages. Not affiliated with any official examination institute."
+            : "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues du monde, et indépendante pour les langues africaines. N'est affiliée à aucun organisme officiel d'examen.",
         }}
       />
     </div>

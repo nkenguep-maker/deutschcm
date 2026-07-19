@@ -31,13 +31,13 @@ export interface GreetingItem {
   countryEn: string;
   langTag: string;
   /** Territoire d'origine — permet de filtrer par pool sur les pages
-   *  où le contexte impose (page langues étrangères vs natales). */
+   *  où le contexte impose (page langues du monde vs africaines). */
   territory: "world" | "sources";
 }
 
 // Pool des salutations · UNIQUEMENT les 10 natales africaines validées.
 // Les langues d'interface (Bonjour, Hello, Hola…) ne murmurent pas ici :
-// le seuil est le vestibule des voix natales, jamais l'inverse.
+// le seuil est le vestibule des voix africaines, jamais l'inverse.
 export const GREETINGS: readonly GreetingItem[] = [
   { id: "mbolo",     word: "Mbolo",     language: "ewondo",       languageEn: "Ewondo",       country: "Cameroun",           countryEn: "Cameroon",              langTag: "ewo", territory: "sources" },
   { id: "nangadef",  word: "Na nga def", language: "wolof",        languageEn: "Wolof",        country: "Sénégal",            countryEn: "Senegal",               langTag: "wol", territory: "sources" },

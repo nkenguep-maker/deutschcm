@@ -158,7 +158,7 @@ export default async function Image({ params }: OGParams) {
           >
             <span>YEMA Languages</span>
             <span style={{ color: "rgba(244,235,220,0.24)" }}>·</span>
-            <span>{isEn ? "Africa speaks — foreign & native languages" : "L'Afrique parle — langues étrangères & natales"}</span>
+            <span>{isEn ? "Africa speaks — world & African languages" : "L'Afrique parle — langues du monde & africaines"}</span>
           </div>
         </div>
       </div>

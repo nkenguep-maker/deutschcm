@@ -111,8 +111,8 @@ export function LessonCompletePreview() {
             onChange={(e) => { setTerritory(e.target.value as "world" | "sources"); setKey((k) => k + 1); }}
             style={selectStyle}
           >
-            <option value="world">world (étrangères · CECRL)</option>
-            <option value="sources">sources (natales · YEMA)</option>
+            <option value="world">world (du monde · CECRL)</option>
+            <option value="sources">sources (africaines · YEMA)</option>
           </select>
         </label>
 

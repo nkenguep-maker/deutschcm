@@ -7,7 +7,7 @@
 // sont éditoriaux, prêts à recevoir les vraies voix.
 //
 // ⚠ RÈGLE STRICTE · le proverbe d'ouverture vient de la culture
-// D'ORIGINE du conteur (ses racines), JAMAIS de la langue étrangère
+// D'ORIGINE du conteur (ses racines), JAMAIS de la langue du monde
 // qu'il apprend, JAMAIS un proverbe européen générique. Les proverbes
 // importés (« Übung macht den Meister », « Where there is a will… »)
 // ont été RETIRÉS. Chaque record garde son originCulture cible et

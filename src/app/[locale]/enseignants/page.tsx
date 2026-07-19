@@ -145,13 +145,13 @@ const COPY_FR: Copy = {
   navCenters: "Centres",
   navLogin: "Se connecter",
   navRegister: "Commencer",
-  footerTagline: "L'Afrique parle. Toutes ses langues — étrangères et natales, enfin un lieu.",
+  footerTagline: "L'Afrique parle. Toutes ses langues — du monde et africaines, enfin un lieu.",
   footerMade: "L'Afrique parle. De Douala à Dakar, de Kinshasa à Abidjan.",
   footerLegal: "Mentions légales",
   footerTerms: "CGU",
   footerPrivacy: "Confidentialité",
   footerContact: "Contact",
-  footerDisclaimer: "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues étrangères, et indépendante pour les langues natales africaines. N'est affiliée à aucun organisme officiel d'examen.",
+  footerDisclaimer: "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues du monde, et indépendante pour les langues africaines. N'est affiliée à aucun organisme officiel d'examen.",
 };
 
 const COPY_EN: Copy = {
@@ -230,7 +230,7 @@ const COPY_EN: Copy = {
   footerTerms: "Terms",
   footerPrivacy: "Privacy",
   footerContact: "Contact",
-  footerDisclaimer: "YEMA Languages is a pan-African CEFR-aligned platform for foreign languages, and independent for African native languages. Not affiliated with any official examination institute.",
+  footerDisclaimer: "YEMA Languages is a pan-African CEFR-aligned platform for world languages, and independent for African languages. Not affiliated with any official examination institute.",
 };
 
 export default function EnseignantsPage() {

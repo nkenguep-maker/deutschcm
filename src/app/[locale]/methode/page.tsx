@@ -245,7 +245,7 @@ const COPY_FR: Copy = {
   eye: "La méthode",
   title: "Six principes.",
   titleEm: "Toutes les langues.",
-  lede: "Ces six principes guident chaque module qu'on publie, en langue étrangère comme en natale. On ne les récite pas. On les montre dans une scène.",
+  lede: "Ces six principes guident chaque module qu'on publie, en langue du monde comme en natale. On ne les récite pas. On les montre dans une scène.",
   navFeatures: "Langues",
   navLevels: "Méthode",
   navPricing: "Manifeste",
@@ -253,20 +253,20 @@ const COPY_FR: Copy = {
   navLogin: "Se connecter",
   navRegister: "Commencer",
   cta: "Ouvrir une leçon",
-  footerTagline: "L'Afrique parle. Toutes ses langues — étrangères et natales, enfin un lieu.",
+  footerTagline: "L'Afrique parle. Toutes ses langues — du monde et africaines, enfin un lieu.",
   footerMade: "L'Afrique parle. De Douala à Dakar, de Kinshasa à Abidjan.",
   footerLegal: "Mentions légales",
   footerTerms: "CGU",
   footerPrivacy: "Confidentialité",
   footerContact: "Contact",
-  footerDisclaimer: "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues étrangères, et indépendante pour les langues natales africaines. N'est affiliée à aucun organisme officiel d'examen.",
+  footerDisclaimer: "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues du monde, et indépendante pour les langues africaines. N'est affiliée à aucun organisme officiel d'examen.",
 };
 
 const COPY_EN: Copy = {
   eye: "The method",
   title: "Six principles.",
   titleEm: "All languages.",
-  lede: "These six principles guide every module we publish, in foreign languages as in native ones. We don't recite them. We show them in a scene.",
+  lede: "These six principles guide every module we publish, in world languages as in native ones. We don't recite them. We show them in a scene.",
   navFeatures: "Languages",
   navLevels: "Method",
   navPricing: "Manifesto",
@@ -280,7 +280,7 @@ const COPY_EN: Copy = {
   footerTerms: "Terms",
   footerPrivacy: "Privacy",
   footerContact: "Contact",
-  footerDisclaimer: "YEMA Languages is a pan-African CEFR-aligned platform for foreign languages, and independent for African native languages. Not affiliated with any official examination institute.",
+  footerDisclaimer: "YEMA Languages is a pan-African CEFR-aligned platform for world languages, and independent for African languages. Not affiliated with any official examination institute.",
 };
 
 export default function MethodePage() {

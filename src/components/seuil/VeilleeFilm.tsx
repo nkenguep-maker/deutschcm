@@ -11,7 +11,7 @@
 //   /public/video/veillee.fr.vtt      — subtitles FR
 //   /public/video/veillee.en.vtt      — subtitles EN
 //
-// L'ouverture — la grand-mère parlant dans SA langue natale — n'est
+// L'ouverture — la grand-mère parlant dans SA langue africaine — n'est
 // jamais remplacée : elle vit dans la piste master, sans doublage.
 //
 // En attendant le tournage : slideshow lent de portraits duotone

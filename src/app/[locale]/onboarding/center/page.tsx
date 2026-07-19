@@ -47,7 +47,7 @@ interface Form {
   payStep: "form" | "confirm" | "done";
 }
 
-// Langues enseignées — deux clusters : étrangères CECRL alignées + natales africaines
+// Langues enseignées — deux clusters : du monde (CECRL) + africaines (YEMA)
 // (échelle YEMA É1→É5). Cohérent avec la page /langues.
 const LANGS_FOREIGN = ["Allemand", "Anglais", "Français", "Espagnol", "Chinois", "Arabe", "Portugais"];
 const LANGS_NATIVE = ["Bassa", "Wolof", "Swahili", "Lingala", "Douala", "Ewondo", "Fulfulde", "Yoruba"];
@@ -295,12 +295,12 @@ export default function CenterOnboardingPage() {
               <div>
                 <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 4 }}>LANGUES ENSEIGNÉES</label>
                 <p style={{ color: "var(--creme-mute)", fontSize: 11, margin: "0 0 10px" }}>
-                  Cochez toutes les langues proposées par votre centre. Deux familles disponibles — étrangères (CECRL) et natales africaines (échelle YEMA).
+                  Cochez toutes les langues proposées par votre centre. Deux familles disponibles — du monde (CECRL) et africaines (échelle YEMA).
                 </p>
 
                 <div style={{ marginTop: 6 }}>
                   <p style={{ fontFamily: "var(--font-jetbrains, monospace)", color: "var(--brass)", fontSize: 10, fontWeight: 600, letterSpacing: "0.10em", textTransform: "uppercase", margin: "0 0 8px" }}>
-                    Étrangères · A1 → C1
+                    Langues du monde · A1 → C1
                   </p>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     {LANGS_FOREIGN.map(l => {
@@ -320,7 +320,7 @@ export default function CenterOnboardingPage() {
 
                 <div style={{ marginTop: 14 }}>
                   <p style={{ fontFamily: "var(--font-jetbrains, monospace)", color: "var(--brass)", fontSize: 10, fontWeight: 600, letterSpacing: "0.10em", textTransform: "uppercase", margin: "0 0 8px" }}>
-                    Natales africaines · É1 → É5
+                    Langues africaines · É1 → É5
                   </p>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     {LANGS_NATIVE.map(l => {

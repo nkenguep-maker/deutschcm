@@ -169,7 +169,7 @@ function PrivacyFR() {
       <Ul
         items={[
           "Données de compte : nom, email, rôle (élève, enseignant, responsable de centre)",
-          "Données d'apprentissage : progression, scores, XP, streak, badges — pour les langues étrangères comme natales",
+          "Données d'apprentissage : progression, scores, XP, streak, badges — pour les langues du monde comme africaines",
           "Données vocales : enregistrements audio traités en temps réel lors des exercices de prononciation et du simulateur — non stockés",
           "Données d'utilisation : pages visitées, fonctionnalités utilisées (analytics anonymisés)",
           "Données de paiement : références Mobile Money traitées par MTN/Orange, non stockées par YEMA",
@@ -180,7 +180,7 @@ function PrivacyFR() {
       <Ul
         items={[
           "Fournir et améliorer la plateforme",
-          "Personnaliser votre apprentissage (langues étrangères ou natales)",
+          "Personnaliser votre apprentissage (langues du monde ou africaines)",
           "Traitement IA (voix, écriture) — avec votre consentement",
           "Envoi d'emails liés au compte (avec votre accord)",
           "Statistiques anonymes d'utilisation",

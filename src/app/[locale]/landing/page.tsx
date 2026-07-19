@@ -118,7 +118,7 @@ const COPY_FR: Copy = {
   atoutTitleEm: "Qu'aucun autre ne donne.",
   atoutItems: [
     "L'accompagnement humain — un référent de la maison, joignable, qui connaît votre centre.",
-    "Les langues natales africaines — pour les familles de diaspora, les héritages, les publics rares. Ni gadget, ni supplément.",
+    "Les langues africaines — pour les familles de diaspora, les héritages, les publics rares. Ni gadget, ni supplément.",
   ],
 
   guaranteeKicker: "La garantie",
@@ -140,13 +140,13 @@ const COPY_FR: Copy = {
   sentBody: "Nous vous rappelons sous 48 heures.",
   error: "Quelque chose ne nous est pas parvenu. Réessayez.",
 
-  footerTagline: "L'Afrique parle. Toutes ses langues — étrangères et natales, enfin un lieu.",
+  footerTagline: "L'Afrique parle. Toutes ses langues — du monde et africaines, enfin un lieu.",
   footerMade: "L'Afrique parle. De Douala à Dakar, de Kinshasa à Abidjan.",
   footerLegal: "Mentions légales",
   footerTerms: "CGU",
   footerPrivacy: "Confidentialité",
   footerContact: "Contact",
-  footerDisclaimer: "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues étrangères, et indépendante pour les langues natales africaines. N'est affiliée à aucun organisme officiel d'examen.",
+  footerDisclaimer: "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues du monde, et indépendante pour les langues africaines. N'est affiliée à aucun organisme officiel d'examen.",
 };
 
 const COPY_EN: Copy = {
@@ -221,7 +221,7 @@ const COPY_EN: Copy = {
   footerTerms: "Terms",
   footerPrivacy: "Privacy",
   footerContact: "Contact",
-  footerDisclaimer: "YEMA Languages is a pan-African CEFR-aligned platform for foreign languages, and independent for African native languages. Not affiliated with any official examination institute.",
+  footerDisclaimer: "YEMA Languages is a pan-African CEFR-aligned platform for world languages, and independent for African languages. Not affiliated with any official examination institute.",
 };
 
 // Icônes mono-trait laiton pour les 4 douleurs.

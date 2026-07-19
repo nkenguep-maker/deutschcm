@@ -34,10 +34,10 @@ export const SITE_META: SiteMeta = {
   fr: {
     langues: {
       title: "Langues — YEMA",
-      description: "Deux territoires, une seule maison. Les langues étrangères sur l'échelle CECRL et les langues natales africaines sur l'échelle YEMA — voix, récits, palabres.",
-      ogTitle: "Les langues de YEMA — étrangères et natales, côte à côte",
+      description: "Deux territoires, une seule maison. Les langues du monde sur l'échelle CECRL et les langues africaines sur l'échelle YEMA — voix, récits, palabres.",
+      ogTitle: "Les langues de YEMA — du monde et africaines, côte à côte",
       twitterTitle: "Toutes les langues de la maison — YEMA",
-      ogImageAlt: "YEMA — la carte des voix, étrangères et natales",
+      ogImageAlt: "YEMA — la carte des voix, du monde et africaines",
     },
     methode: {
       title: "La méthode — YEMA",
@@ -106,7 +106,7 @@ export const SITE_META: SiteMeta = {
   en: {
     langues: {
       title: "Languages — YEMA",
-      description: "Two territories, one home. Foreign languages on the CEFR scale, African native languages on the YEMA scale — voice, story, palaver.",
+      description: "Two territories, one home. World languages on the CEFR scale, African languages on the YEMA scale — voice, story, palaver.",
       ogTitle: "YEMA languages — foreign and native, side by side",
       twitterTitle: "All the languages of the house — YEMA",
       ogImageAlt: "YEMA — the map of voices, foreign and native",
@@ -134,7 +134,7 @@ export const SITE_META: SiteMeta = {
     },
     enseignants: {
       title: "Teachers — YEMA",
-      description: "The teacher at the center. A paid, valued role backed by the house. Join YEMA teachers — German, English, native languages.",
+      description: "The teacher at the center. A paid, valued role backed by the house. Join YEMA teachers — German, English, African languages.",
       ogTitle: "Teach with YEMA — the teacher at the center",
       twitterTitle: "Join YEMA teachers",
       ogImageAlt: "YEMA — the teacher space",

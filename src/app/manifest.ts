@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "YEMA Languages",
     short_name: "YEMA",
-    description: "L'Afrique parle. Toutes ses langues — étrangères et natales, sous un même toit.",
+    description: "L'Afrique parle. Toutes ses langues — du monde et africaines, sous un même toit.",
     start_url: "/",
     display: "standalone",
     background_color: "#1B120A",

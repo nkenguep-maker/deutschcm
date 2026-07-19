@@ -19,12 +19,12 @@ const META = {
     ogTitle: "Yema Languages — Apprenez, préparez-vous, appartenez",
     twitterTitle: "Yema — apprenez une langue, préparez votre projet",
     description:
-      "Une plateforme indépendante alignée CECRL, ouverte aux langues natales africaines et aux langues étrangères. Premier chapitre : l'allemand.",
+      "Une plateforme indépendante alignée CECRL, ouverte aux langues africaines et aux langues du monde. Premier chapitre : l'allemand.",
     ogDescription:
       "Yema — apprenez, préparez-vous, appartenez. Interactif, correction en direct, simulations réalistes. Premier chapitre : l'allemand.",
     twitterDescription:
       "Apprenez une langue, préparez votre projet, appartenez à la maison. On commence par l'allemand.",
-    ogImageAlt: "Yema Languages — langues étrangères et natales, apprentissage aligné CECRL",
+    ogImageAlt: "Yema Languages — langues du monde et africaines, apprentissage aligné CECRL",
     ogLocale: "fr_FR",
   },
   en: {
@@ -32,12 +32,12 @@ const META = {
     ogTitle: "Yema Languages — Learn, prepare, belong",
     twitterTitle: "Yema — learn a language, prepare your journey",
     description:
-      "An independent CEFR-aligned platform, open to African native languages and to foreign ones. First chapter: German.",
+      "An independent CEFR-aligned platform, open to African languages and to world ones. First chapter: German.",
     ogDescription:
       "Yema — learn, prepare, belong. Interactive, live correction, realistic simulations. First chapter: German.",
     twitterDescription:
       "Learn a language, prepare your journey, belong to the house. We start with German.",
-    ogImageAlt: "Yema Languages — foreign and native languages, CEFR-aligned learning",
+    ogImageAlt: "Yema Languages — world and African languages, CEFR-aligned learning",
     ogLocale: "en_US",
   },
 } as const

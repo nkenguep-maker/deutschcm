@@ -56,7 +56,7 @@ const PRODUITS_FCFA_FR: Record<ProductId, Product> = {
     price: "4 900", priceUnit: "FCFA / mois",
     features: [
       "La Veillée complète — toutes les voix",
-      "Toutes les langues natales · É1 → É5",
+      "Toutes les langues africaines · É1 → É5",
       "Révisions des niveaux déjà acquis",
       "Pratique quotidienne, écrit relu",
     ],
@@ -66,7 +66,7 @@ const PRODUITS_FCFA_FR: Record<ProductId, Product> = {
     id: "passage", name: "Le Passage", audience: "Un niveau complet, pour un projet précis.",
     price: "49 000", priceUnit: "FCFA / niveau · 4 mois",
     features: [
-      "Une langue étrangère · niveau entier",
+      "Une langue du monde · niveau entier",
       "Examens blancs corrigés",
       "Votre écrit relu et expliqué",
       "Attestation de fin de niveau",
@@ -110,7 +110,7 @@ const PRODUITS_EUR_FR: Record<ProductId, Product> = {
     price: "9,90", priceUnit: "€ / mois · 79 / an",
     features: [
       "La Veillée complète — toutes les voix",
-      "Toutes les langues natales · É1 → É5",
+      "Toutes les langues africaines · É1 → É5",
       "Révisions des niveaux déjà acquis",
       "Pratique quotidienne, écrit relu",
     ],
@@ -120,7 +120,7 @@ const PRODUITS_EUR_FR: Record<ProductId, Product> = {
     id: "passage", name: "Le Passage", audience: "Un niveau complet, pour un projet précis.",
     price: "89", priceUnit: "€ / niveau · 4 mois",
     features: [
-      "Une langue étrangère · niveau entier",
+      "Une langue du monde · niveau entier",
       "Examens blancs corrigés",
       "Votre écrit relu et expliqué",
       "Attestation de fin de niveau",
@@ -144,7 +144,7 @@ const PRODUITS_EUR_FR: Record<ProductId, Product> = {
     price: "99", priceUnit: "€ / an · tarif fondateur",
     features: [
       "Profils enfants + parent",
-      "Toutes les langues de la maison, natales comme étrangères, pour les enfants",
+      "Toutes les langues de la maison, africaines comme du monde, pour les enfants",
       "Contes, chansons, jeux parent-enfant",
       "La Veillée pour tous",
     ],
@@ -175,11 +175,11 @@ const PRODUITS_FCFA_EN: Record<ProductId, Product> = Object.fromEntries(
       .replace("Ouvrir la Grande Maison", "Open the Great House")
       .replace("Rejoindre la Famille", "Join the Family"),
     features: p.features.map((f) => f
-      .replace("Toutes les langues de la maison, natales comme étrangères, pour les enfants",
+      .replace("Toutes les langues de la maison, africaines comme du monde, pour les enfants",
                "All the house languages — native and foreign — for the children")
       .replace("Profils enfants + parent", "Child + parent profiles")
       .replace("Contes, chansons, jeux parent-enfant", "Tales, songs, parent-child games")
-      .replace("Toutes les natales · YEMA", "All native languages · YEMA")
+      .replace("Toutes les langues africaines · YEMA", "All African languages · YEMA")
       .replace("La Veillée pour tous", "The Veillée for everyone")),
   }]),
 ) as unknown as Record<ProductId, Product>;
@@ -248,7 +248,7 @@ interface ComparisonRow {
 const COMPARISON_FR: readonly ComparisonRow[] = [
   { label: "Nouveaux niveaux étrangers (cours complets)",
     entree: "—", braise: "—", passage: "1 langue", grande: "illimités" },
-  { label: "Langues natales · É1 → É5",
+  { label: "Langues africaines · É1 → É5",
     entree: "1 récit", braise: "toutes", passage: "toutes", grande: "toutes" },
   { label: "Examens blancs corrigés",
     entree: "—", braise: "—", passage: "✓", grande: "✓" },
@@ -264,7 +264,7 @@ const COMPARISON_FR: readonly ComparisonRow[] = [
 const COMPARISON_EN: readonly ComparisonRow[] = [
   { label: "New foreign levels (full courses)",
     entree: "—", braise: "—", passage: "1 language", grande: "unlimited" },
-  { label: "Native languages · É1 → É5",
+  { label: "African languages · É1 → É5",
     entree: "1 tale", braise: "all", passage: "all", grande: "all" },
   { label: "Corrected mock exams",
     entree: "—", braise: "—", passage: "✓", grande: "✓" },
@@ -345,13 +345,13 @@ const COPY_FR: Copy = {
   navCenters: "Centres",
   navLogin: "Se connecter",
   navRegister: "Commencer",
-  footerTagline: "L'Afrique parle. Toutes ses langues — étrangères et natales, enfin un lieu.",
+  footerTagline: "L'Afrique parle. Toutes ses langues — du monde et africaines, enfin un lieu.",
   footerMade: "L'Afrique parle. De Douala à Dakar, de Kinshasa à Abidjan.",
   footerLegal: "Mentions légales",
   footerTerms: "CGU",
   footerPrivacy: "Confidentialité",
   footerContact: "Contact",
-  footerDisclaimer: "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues étrangères, et indépendante pour les langues natales africaines. N'est affiliée à aucun organisme officiel d'examen.",
+  footerDisclaimer: "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues du monde, et indépendante pour les langues africaines. N'est affiliée à aucun organisme officiel d'examen.",
 };
 
 const COPY_EN: Copy = {
@@ -391,7 +391,7 @@ const COPY_EN: Copy = {
   footerTerms: "Terms",
   footerPrivacy: "Privacy",
   footerContact: "Contact",
-  footerDisclaimer: "YEMA Languages is a pan-African CEFR-aligned platform for foreign languages, and independent for African native languages. Not affiliated with any official examination institute.",
+  footerDisclaimer: "YEMA Languages is a pan-African CEFR-aligned platform for world languages, and independent for African languages. Not affiliated with any official examination institute.",
 };
 
 // ─── Détection rail par défaut selon locale/région ────────────────

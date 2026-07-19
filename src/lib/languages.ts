@@ -1,8 +1,8 @@
 // Registre des langues YEMA · unique source de vérité.
 //
 // Deux mondes :
-//   · world   → langues étrangères, échelle CECRL (A1 → C1/C2)
-//   · sources → langues natales africaines, échelle YEMA (É1 → É5 :
+//   · world   → langues du monde, échelle CECRL (A1 → C1/C2)
+//   · sources → langues africaines, échelle YEMA (É1 → É5 :
 //               Écoute · Voix · Récit · Palabre · Foyer)
 //
 // Chaque langue porte son territoire visuel, son code 2 lettres pour
@@ -51,7 +51,7 @@ export interface Language {
 const CEFR: string[] = ["A1", "A2", "B1", "B2", "C1"];
 const YEMA_SCALE: string[] = ["É1", "É2", "É3", "É4", "É5"];
 
-// ─── Langues étrangères · territoire WORLD · échelle CECRL ─────────────
+// ─── Langues du monde · territoire WORLD · échelle CECRL ─────────────
 export const FOREIGN: Language[] = [
   {
     id: "deutsch",
@@ -170,7 +170,7 @@ export const FOREIGN: Language[] = [
   },
 ];
 
-// ─── Langues natales africaines · territoire SOURCES · échelle YEMA ──────
+// ─── Langues africaines · territoire SOURCES · échelle YEMA ──────
 // Ordre priorisé par la diaspora YEMA à qui nous avons parlé.
 export const NATIVE: Language[] = [
   {

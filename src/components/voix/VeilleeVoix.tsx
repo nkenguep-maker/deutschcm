@@ -1,7 +1,7 @@
 "use client";
 
 // VeilleeVoix · la Veillée devient AUDIO-FIRST.
-// Sélecteur de langues (natales + étrangères) au-dessus, un player
+// Sélecteur de langues (africaines + du monde) au-dessus, un player
 // <VoixPlayer> plein cadre en dessous. L'utilisateur choisit une
 // voix — le player charge le récit et son proverbe d'ouverture.
 //

@@ -24,7 +24,7 @@ html[data-theme="dark"] {
   --oxblood:       #7A2830;   /* pour accent secondaire, badges attention */
 
   /* ── Territoire SOURCES — terre-latérite ── */
-  /* Deuxième monde : langues natales africaines. Le laiton, Fraunces,
+  /* Deuxième monde : langues africaines. Le laiton, Fraunces,
      JetBrains Mono et le crème restent communs — seul le fond change.
      WCAG AA vérifié : creme (15.09:1) et brass (5.59:1) passent sur --terre. */
   --terre:         #2A0F14;
@@ -4377,7 +4377,7 @@ button, [role="button"] {
 /* ─── Territoires · deux mondes YEMA ─────────────────────────────
    Le pont : mêmes typographies, mêmes chips laiton, mêmes cartes.
    Seul le fond change — espresso pour le monde CECRL (world),
-   terre-latérite pour les langues natales (sources). Les classes
+   terre-latérite pour les langues africaines (sources). Les classes
    ne redéfinissent QUE la couleur de fond, tout le reste hérite. */
 .territory-world {
   background: var(--espresso);
@@ -6025,7 +6025,7 @@ button, [role="button"] {
 
 /* ─── LanguageChooser · sélecteur de langue active ────────────────
    Dropdown Kaffeehaus, dans le header à côté du SpaceSwitcher.
-   Deux sections : étrangères (CECRL) et natales (YEMA scale).
+   Deux sections : du monde (CECRL) et africaines (YEMA scale).
    Statut par langue : disponible, bientôt, à venir. */
 
 .lang-chooser { position: relative; display: inline-block; }
@@ -11228,12 +11228,12 @@ body.foyer-switching .foyer {
 
 /* ── /langues · La carte des voix ────────────────────────────────
    Sprint 2 · deux territoires en un lieu.
-   world (espresso) : 6 étrangères, CECRL, allemand porte le chapitre.
-   sources (terre)  : 4 natales, échelle YEMA, salutations dispersées. */
+   world (espresso) : 6 langues du monde, CECRL, allemand porte le chapitre.
+   sources (terre)  : 4 langues africaines, échelle YEMA, salutations dispersées. */
 /* /langues · panneaux miroirs verticaux. Les deux territoires ont
    EXACTEMENT le même padding, la même respiration, la même
    structure de header. Différence unique : le fond (espresso vs
-   terre) et le contenu (6 étrangères / 4 natales + table YEMA). */
+   terre) et le contenu (6 du monde / 4 africaines + table YEMA). */
 .langues-territoire {
   padding: 96px 0;
   color: var(--creme);
@@ -12118,7 +12118,7 @@ body.foyer-switching .foyer {
   transition: opacity var(--dur-move) var(--ease-glide);
 }
 
-/* Dialogue « Nouveau profil » · groupes de langues natales/étrangères */
+/* Dialogue « Nouveau profil » · groupes de langues africaines / du monde */
 .famille-help {
   margin: -2px 0 8px;
   font-family: var(--font-manrope), system-ui, sans-serif;

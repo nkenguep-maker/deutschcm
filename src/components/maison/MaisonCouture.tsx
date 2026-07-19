@@ -28,12 +28,12 @@ const COPY_FR: Copy = {
   worldTitle: "Parlez au",
   worldTitleEm: "monde entier.",
   worldPhrase: "Allemand, anglais, français. Un examen, un visa, une carrière — l'échelle CECRL, pas à pas.",
-  worldLink: "Découvrir les langues étrangères",
+  worldLink: "Découvrir les langues du monde",
   sourcesKicker: "Retour aux sources",
   sourcesTitle: "Parlez la langue de vos",
   sourcesTitleEm: "ancêtres.",
   sourcesPhrase: "Bassa, wolof, swahili, lingala. Le foyer, le récit, la palabre — l'échelle YEMA, voix d'abord.",
-  sourcesLink: "Découvrir les langues natales",
+  sourcesLink: "Découvrir les langues africaines",
   ariaSeam: "La couture entre les deux territoires",
 };
 
@@ -42,12 +42,12 @@ const COPY_EN: Copy = {
   worldTitle: "Speak to the",
   worldTitleEm: "whole world.",
   worldPhrase: "German, English, French. An exam, a visa, a career — the CEFR scale, step by step.",
-  worldLink: "Discover foreign languages",
+  worldLink: "Discover world languages",
   sourcesKicker: "A return to the source",
   sourcesTitle: "Speak the language of your",
   sourcesTitleEm: "ancestors.",
   sourcesPhrase: "Bassa, Wolof, Swahili, Lingala. The home, the story, the palaver — the YEMA scale, voice first.",
-  sourcesLink: "Discover native languages",
+  sourcesLink: "Discover African languages",
   ariaSeam: "The seam between the two territories",
 };
 
