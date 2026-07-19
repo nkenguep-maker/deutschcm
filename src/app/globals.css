@@ -6271,20 +6271,62 @@ body:has(.test-space-bar) { padding-top: 34px; }
   gap: 28px;
 }
 
-/* Chaque ligne de la séquence — opacity/translateY only. */
-.seuil-line {
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity var(--dur-moment) var(--ease-enter),
-              transform var(--dur-moment) var(--ease-enter);
-  will-change: opacity, transform;
-  max-width: 640px;
+/* ── SCÈNE — trois actes superposés en grille ──────────────────────
+   Les trois actes vivent dans la même cellule de grille. Ils entrent
+   avec leurs enfants staggerés puis s'effacent en cross-dissolve
+   quand le suivant arrive. Le rythme est cinématographique : chaque
+   élément prend son temps, chaque acte respire avant de céder la
+   place au suivant. */
+.seuil-stage {
+  grid-row: 2;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  min-height: min(70vh, 640px);
+  width: 100%;
+  position: relative;
 }
-.seuil-line.in {
+.seuil-act {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 720px;
+  width: 100%;
+}
+/* Un acte qui s'efface — cross-dissolve long, cinématographique. */
+.seuil-act[data-off] {
+  opacity: 0;
+  transform: translateY(-14px);
+  pointer-events: none;
+  transition: opacity 1200ms var(--ease-glide),
+              transform 1200ms var(--ease-glide);
+}
+/* Marque qui devient une mémoire quand le hero arrive : au lieu de
+   disparaître complètement, elle reste très en retrait derrière. */
+.seuil-act-mark[data-off] {
+  opacity: 0.14;
+  transform: translateY(-18px) scale(0.94);
+}
+
+/* ── ACTE I · les chuchotements ────────────────────────────────── */
+.seuil-act-whispers {
+  gap: 22px;
+  padding-top: 40px;
+}
+.seuil-l1, .seuil-l2 {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 1100ms var(--ease-enter),
+              transform 1100ms var(--ease-enter);
+  will-change: opacity, transform;
+  margin: 0;
+}
+.seuil-l1.in, .seuil-l2.in {
   opacity: 1;
   transform: translateY(0);
 }
-
 .seuil-l1 {
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
@@ -6292,7 +6334,6 @@ body:has(.test-space-bar) { padding-top: 34px; }
   color: var(--creme);
   line-height: 1.35;
   letter-spacing: -0.01em;
-  margin: 0;
 }
 .seuil-l2 {
   font-family: var(--font-fraunces), Georgia, serif;
@@ -6300,23 +6341,31 @@ body:has(.test-space-bar) { padding-top: 34px; }
   font-size: clamp(18px, 3vw, 24px);
   color: var(--creme-mute);
   line-height: 1.4;
-  margin: 0;
 }
 
-.seuil-mark {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
+/* ── ACTE II · la marque (Y + YEMA + slogan) ──────────────────── */
+.seuil-act-mark {
+  gap: 14px;
+}
+.seuil-act-mark > * {
+  opacity: 0;
+  transform: translateY(24px) scale(0.96);
+  transition: opacity 1100ms var(--ease-enter) var(--stagger, 0ms),
+              transform 1100ms var(--ease-enter) var(--stagger, 0ms);
+  will-change: opacity, transform;
+  margin: 0;
+}
+.seuil-act-mark.in > * {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 .seuil-mark-y {
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
-  font-size: 76px;
+  font-size: clamp(72px, 11vw, 96px);
   line-height: 1;
   color: var(--brass);
-  text-shadow: 0 0 24px rgba(184, 135, 62, 0.28);
-  margin: 0;
+  text-shadow: 0 0 32px rgba(184, 135, 62, 0.34);
 }
 .seuil-mark-name {
   font-family: var(--font-jetbrains, monospace);
@@ -6324,23 +6373,31 @@ body:has(.test-space-bar) { padding-top: 34px; }
   letter-spacing: 0.34em;
   color: var(--creme-soft);
   text-transform: uppercase;
-  margin: 0;
+  margin-top: 4px;
 }
 .seuil-mark-slogan {
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-size: clamp(14px, 2vw, 17px);
   color: var(--creme-mute);
-  margin: 6px 0 0;
+  margin-top: 10px;
 }
 
-/* Hero central. Le texte est TOUJOURS dans le DOM (SEO + LCP). */
-.seuil-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* ── ACTE III · le hero ────────────────────────────────────────── */
+.seuil-act-hero {
   gap: 22px;
-  max-width: 720px;
+}
+.seuil-act-hero > * {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 1200ms var(--ease-enter) var(--stagger, 0ms),
+              transform 1200ms var(--ease-enter) var(--stagger, 0ms);
+  will-change: opacity, transform;
+  margin: 0;
+}
+.seuil-act-hero.in > * {
+  opacity: 1;
+  transform: translateY(0);
 }
 .seuil-hero-h {
   font-family: var(--font-fraunces), Georgia, serif;
@@ -6349,18 +6406,33 @@ body:has(.test-space-bar) { padding-top: 34px; }
   line-height: 1.05;
   color: var(--creme);
   letter-spacing: -0.02em;
-  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 .seuil-hero-h em {
   font-style: italic;
   color: var(--brass);
+}
+/* Les deux lignes du h1 staggerent chacune de leur côté — le h1
+   entier n'est pas un seul élément, il est composé de <span> qui
+   ont leur --stagger propre pour lever chacun à leur tour. */
+.seuil-hero-line {
+  display: block;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 1200ms var(--ease-enter) var(--stagger, 0ms),
+              transform 1200ms var(--ease-enter) var(--stagger, 0ms);
+}
+.seuil-act-hero.in .seuil-hero-line {
+  opacity: 1;
+  transform: translateY(0);
 }
 .seuil-hero-sub {
   font-family: var(--font-fraunces), Georgia, serif;
   font-size: clamp(15px, 2vw, 18px);
   line-height: 1.6;
   color: var(--creme-soft);
-  margin: 0;
   max-width: 560px;
 }
 
@@ -6504,7 +6576,11 @@ body:has(.test-space-bar) { padding-top: 34px; }
     animation: none;
     opacity: 0.85;
   }
-  .seuil-line,
+  .seuil-act,
+  .seuil-l1, .seuil-l2,
+  .seuil-act-mark > *,
+  .seuil-act-hero > *,
+  .seuil-hero-line,
   .seuil-scroll-hint,
   .seuil-greeting {
     transition: none;
@@ -6512,7 +6588,12 @@ body:has(.test-space-bar) { padding-top: 34px; }
     opacity: 1;
     transform: none;
   }
-  .seuil-line { opacity: 1; transform: none; }
+  /* En reduced-motion, le seuil montre l'acte HERO d'entrée — les
+     chuchotements et la marque sont mémorisés mais silencieux. */
+  .seuil-act-whispers,
+  .seuil-act-mark {
+    display: none;
+  }
   .seuil-greeting { opacity: 0.6; }
   .seuil-scroll-hint { opacity: 1; }
 }

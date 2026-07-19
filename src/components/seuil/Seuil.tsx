@@ -102,14 +102,24 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
       return;
     }
 
+    // Timeline cinématographique — chaque acte respire avant le suivant.
+    //   0.6s   L1 monte doucement (fade 1100ms)
+    //   2.4s   L2 rejoint L1 (les deux chuchotements ensemble ~2s)
+    //   4.6s   Marque entre — L1+L2 s'effacent en cross-dissolve (1200ms).
+    //          À l'intérieur : Y à 0ms, YEMA à +420, slogan à +840.
+    //          Fin d'entrée de l'acte II vers 4.6 + 0.84 + 1.1 = ~6.5s
+    //   7.4s   Hero entre — la marque devient une mémoire (opacity 0.14).
+    //          Stagger interne : L1 à 0ms, L2 à +420, sub à +980,
+    //          CTA à +1440, ghost à +1780. Dernière ligne visible
+    //          autour de 7.4 + 1.78 + 1.2 = ~10.4s.
     const timers: number[] = [];
-    timers.push(window.setTimeout(() => setPhase(1), 400));
-    timers.push(window.setTimeout(() => setPhase(2), 1500));
-    timers.push(window.setTimeout(() => setPhase(3), 2600));
+    timers.push(window.setTimeout(() => setPhase(1), 600));
+    timers.push(window.setTimeout(() => setPhase(2), 2400));
+    timers.push(window.setTimeout(() => setPhase(3), 4600));
     timers.push(window.setTimeout(() => {
       setPhase(4);
       sessionStorage.setItem(SESSION_KEY, "1");
-    }, 3900));
+    }, 7400));
     return () => {
       timers.forEach((t) => window.clearTimeout(t));
     };
@@ -186,38 +196,51 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
       </div>
 
       <div className="seuil-inner">
-        <div className="seuil-center">
-          {/* t=400 · première ligne */}
-          <p className={`seuil-line seuil-l1 ${phase >= 1 ? "in" : ""}`}>
-            {copy.l1}
-          </p>
+        {/* Scène — trois actes superposés (grid overlap). Chaque acte
+            entre avec ses enfants staggerés, puis s'efface en douceur
+            quand le suivant arrive (cross-dissolve cinéma). */}
+        <div className="seuil-stage">
 
-          {/* t=1500 · seconde ligne */}
-          <p className={`seuil-line seuil-l2 ${phase >= 2 ? "in" : ""}`}>
-            {copy.l2}
-          </p>
-
-          {/* t=2600 · marque Y + YEMA + slogan */}
+          {/* Acte I · les chuchotements (phases 1 → 2) */}
           <div
-            className={`seuil-line seuil-mark ${phase >= 3 ? "in" : ""}`}
-            aria-hidden={phase < 3 ? "true" : undefined}
+            className="seuil-act seuil-act-whispers"
+            data-off={phase >= 3 ? "" : undefined}
+            aria-hidden={phase >= 3 ? "true" : undefined}
           >
-            <p className="seuil-mark-y" aria-hidden="true">Y</p>
-            <p className="seuil-mark-name">{copy.brand}</p>
-            <p className="seuil-mark-slogan">{copy.slogan}</p>
+            <p className={`seuil-l1 ${phase >= 1 ? "in" : ""}`}>
+              {copy.l1}
+            </p>
+            <p className={`seuil-l2 ${phase >= 2 ? "in" : ""}`}>
+              {copy.l2}
+            </p>
           </div>
 
-          {/* t=3900 · hero + sub + CTA + ghost */}
-          <div className={`seuil-line seuil-hero ${phase >= 4 ? "in" : ""}`}>
+          {/* Acte II · la marque (phase 3, stagger interne Y → YEMA → slogan) */}
+          <div
+            className={`seuil-act seuil-act-mark ${phase >= 3 ? "in" : ""}`}
+            data-off={phase >= 4 ? "" : undefined}
+            aria-hidden={phase < 3 || phase >= 4 ? "true" : undefined}
+          >
+            <p className="seuil-mark-y" aria-hidden="true" style={{ ["--stagger" as string]: "0ms" }}>Y</p>
+            <p className="seuil-mark-name" style={{ ["--stagger" as string]: "420ms" }}>{copy.brand}</p>
+            <p className="seuil-mark-slogan" style={{ ["--stagger" as string]: "840ms" }}>{copy.slogan}</p>
+          </div>
+
+          {/* Acte III · le hero (phase 4, stagger h1a → h1b → sub → CTA → ghost) */}
+          <div className={`seuil-act seuil-act-hero ${phase >= 4 ? "in" : ""}`}>
             <h1 className="seuil-hero-h">
-              {copy.heroL1}
-              <br />
-              <em>{copy.heroL2}</em>
+              <span className="seuil-hero-line" style={{ ["--stagger" as string]: "0ms" }}>
+                {copy.heroL1}
+              </span>
+              <span className="seuil-hero-line" style={{ ["--stagger" as string]: "420ms" }}>
+                <em>{copy.heroL2}</em>
+              </span>
             </h1>
-            <p className="seuil-hero-sub">{copy.heroSub}</p>
+            <p className="seuil-hero-sub" style={{ ["--stagger" as string]: "980ms" }}>{copy.heroSub}</p>
 
             <div className="seuil-cta-row">
-              <a href={entryHref} className="seuil-cta" onClick={handleEntry}>
+              <a href={entryHref} className="seuil-cta" onClick={handleEntry}
+                 style={{ ["--stagger" as string]: "1440ms" }}>
                 {copy.cta}
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
                      stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"
@@ -225,11 +248,13 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
                   <path d="M8 3v10M3 8l5 5 5-5" />
                 </svg>
               </a>
-              <button type="button" className="seuil-cta-ghost" onClick={handleGhostAudio}>
+              <button type="button" className="seuil-cta-ghost" onClick={handleGhostAudio}
+                      style={{ ["--stagger" as string]: "1780ms" }}>
                 {copy.ctaGhost}
               </button>
             </div>
           </div>
+
         </div>
 
         <p className="seuil-scroll-hint" aria-hidden="true">
