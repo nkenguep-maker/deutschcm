@@ -544,22 +544,24 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* Ligne d'ancrage · Fraunces italique laiton */}
-        {anchor ? (
-          <section className="pricing-anchor" aria-live="polite">
-            <div className="maison-container">
-              <p><em>{t(anchor)}</em></p>
-            </div>
-          </section>
-        ) : null}
-
-        {/* Grille · 3 cartes CÔTE À CÔTE (jamais 4) */}
+        {/* Bloc grille · anchor DANS la grille (sous sélecteur, au-dessus
+            des cartes). Cadre à hauteur réservée · le contenu se fond
+            en 240ms sur changement de cap (key={cap} rejoue l'anim),
+            aucun reflow, aucun saut vertical. */}
         <section className="pricing-grid-section">
           <div className="maison-container">
-            <div className="pricing-grid pricing-grid-3">
+            {/* Ligne d'ancrage · Fraunces italique laiton, hauteur
+                fixe pour ne rien pousser quand elle change. */}
+            <div className="pricing-anchor" aria-live="polite">
+              {anchor ? <p><em>{t(anchor)}</em></p> : <p aria-hidden="true">&nbsp;</p>}
+            </div>
+
+            <div key={cap} className="pricing-grid pricing-grid-3">
               {visibleIds.map((pid) => {
                 const p = products[pid];
                 const isHero = pid === heroId;
+                const isFree = p.price === "0" || p.price === "0,00";
+                const freeLabel = loc === "en" ? "Free" : "Gratuit";
                 return (
                   <article
                     key={pid}
@@ -574,8 +576,16 @@ export default function PricingPage() {
                     </h3>
                     <p className="pricing-plan-audience">{t(p.audience)}</p>
                     <div className="pricing-plan-price">
-                      <span className="pricing-plan-price-num">{p.price}</span>
-                      <span className="pricing-plan-price-unit">{p.priceUnit}</span>
+                      {isFree ? (
+                        <span className="pricing-plan-price-num pricing-plan-price-free">
+                          {freeLabel}
+                        </span>
+                      ) : (
+                        <>
+                          <span className="pricing-plan-price-num">{p.price}</span>
+                          <span className="pricing-plan-price-unit">{p.priceUnit}</span>
+                        </>
+                      )}
                     </div>
                     <ul className="pricing-plan-features">
                       {p.features.map((f) => (
@@ -592,6 +602,28 @@ export default function PricingPage() {
                 );
               })}
             </div>
+
+            {/* La Braise reste découvrable · une ligne discrète sous
+                la grille sur les caps où elle n'est pas affichée
+                (Franchir / Grandir). Bascule le cap vers « Pour moi ». */}
+            {(cap === "franchir" || cap === "grandir") ? (
+              <div className="pricing-braise-hint">
+                <p>
+                  {t(loc === "en"
+                    ? "Just want to keep a language alive, without an exam? "
+                    : "Vous voulez juste entretenir la langue, sans projet d'examen ? ")}
+                  <a
+                    href="#pricing-caps"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCap("moi");
+                    }}
+                  >
+                    {t(loc === "en" ? "Discover the Ember." : "Découvrez la Braise.")}
+                  </a>
+                </p>
+              </div>
+            ) : null}
           </div>
         </section>
 

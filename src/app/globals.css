@@ -10163,9 +10163,16 @@ body.foyer-switching .foyer {
   outline-offset: 3px;
 }
 
+/* Ligne d'ancrage · hauteur RÉSERVÉE fixe (2 lignes max) pour ne
+   pas pousser la grille en dessous quand le texte change entre les
+   caps. min-height calibré sur 2× line-height à la taille max. */
 .pricing-anchor {
-  padding: 20px 0 20px;
+  padding: 12px 0 8px;
   text-align: center;
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .pricing-anchor p {
   font-family: var(--font-fraunces), Georgia, serif;
@@ -10173,9 +10180,11 @@ body.foyer-switching .foyer {
   color: var(--brass);
   margin: 0;
   max-width: 720px;
-  margin-left: auto;
-  margin-right: auto;
   line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .pricing-grid-section {
@@ -10195,10 +10204,58 @@ body.foyer-switching .foyer {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   align-items: stretch;
+  /* Cross-fade au changement de cap · key={cap} sur la grille
+     remonte le sous-arbre, l'anim se rejoue. Le cadre reste
+     immobile (min-height sur .pricing-plan) — seul le contenu
+     se fond en 240ms. */
+  animation: pricing-grid-fade var(--dur-move) var(--ease-glide);
+}
+@keyframes pricing-grid-fade {
+  from { opacity: 0.35; transform: translateY(2px); }
+  to   { opacity: 1;    transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pricing-grid-3 { animation: none; }
 }
 @media (max-width: 900px) {
   .pricing-grid-3 { grid-template-columns: 1fr; }
   .pricing-grid-3 .pricing-plan-hero { order: -1; }
+}
+
+/* Ligne « découvrez la Braise » · discrète, sous la grille, sur
+   les caps Franchir et Grandir uniquement (voir page.tsx). Aide la
+   Braise à rester découvrable sans faire de tapage. */
+.pricing-braise-hint {
+  margin: 24px auto 0;
+  max-width: 640px;
+  padding: 12px 20px;
+  text-align: center;
+  border-top: 1px solid var(--creme-hair);
+}
+.pricing-braise-hint p {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 14.5px;
+  color: var(--creme-soft);
+  line-height: 1.55;
+}
+.pricing-braise-hint a {
+  color: var(--brass);
+  text-decoration: none;
+  border-bottom: 1px solid var(--brass-edge);
+  padding-bottom: 1px;
+  transition: color var(--dur-touch) var(--ease-enter),
+              border-color var(--dur-touch) var(--ease-enter);
+}
+.pricing-braise-hint a:hover {
+  color: var(--creme);
+  border-color: var(--creme);
+}
+.pricing-braise-hint a:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 .pricing-plan {
   position: relative;
@@ -10208,9 +10265,17 @@ body.foyer-switching .foyer {
   background: rgba(244, 235, 220, 0.02);
   display: flex;
   flex-direction: column;
+  /* Hauteur fixe · calibrée sur la carte la plus dense (Le Passage,
+     5 features) · les autres cartes gardent cette hauteur avec CTA
+     collé en bas grâce à margin-top:auto. Changement de cap = fondu
+     du contenu, jamais reflow du cadre. */
+  min-height: 540px;
   transition: border-color var(--dur-touch) var(--ease-enter),
               background var(--dur-touch) var(--ease-enter),
               transform var(--dur-touch) var(--ease-enter);
+}
+@media (max-width: 900px) {
+  .pricing-plan { min-height: 460px; }
 }
 .pricing-plan:hover {
   border-color: var(--creme-faint);
@@ -10250,27 +10315,42 @@ body.foyer-switching .foyer {
   color: var(--creme-soft);
   line-height: 1.4;
 }
+/* Prix · montant seul en grand mono, devise et période sur une
+   seconde ligne discrète. Jamais collé (« 49 000FCFA » interdit).
+   Zéro → « Gratuit » / « Free » rendu par le composant, pas de
+   « 0 FCFA ». */
 .pricing-plan-price {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   margin: 0 0 20px;
   padding-bottom: 20px;
   border-bottom: 1px solid var(--creme-hair);
 }
 .pricing-plan-price-num {
+  font-family: var(--font-jetbrains, monospace);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 26px;
+  letter-spacing: -0.005em;
+  color: var(--creme);
+  line-height: 1.15;
+}
+.pricing-plan-price-num.pricing-plan-price-free {
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
-  font-size: 36px;
+  font-size: 24px;
   color: var(--brass);
-  line-height: 1;
+  letter-spacing: 0;
 }
 .pricing-plan-price-unit {
   font-family: var(--font-jetbrains, monospace);
-  font-size: 11px;
+  font-size: 10.5px;
   letter-spacing: 0.14em;
   color: var(--creme-mute);
   text-transform: uppercase;
+  line-height: 1.4;
 }
 .pricing-plan-features {
   list-style: none;
@@ -10284,8 +10364,8 @@ body.foyer-switching .foyer {
 .pricing-plan-features li {
   padding-left: 20px;
   position: relative;
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 14.5px;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 14px;
   color: var(--creme-soft);
   line-height: 1.5;
 }
