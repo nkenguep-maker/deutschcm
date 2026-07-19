@@ -20,6 +20,11 @@ interface Example {
   cap: string;
   quote: string;
   gloss: string;
+  /** Uniquement les phrases natales · validated=true après relecture
+   *  par un locuteur natif (tons, orthographe, sens). Non validée →
+   *  l'exemple est masqué en prod, seul le world reste. Aucune phrase
+   *  native non validée ne doit atteindre l'audience finale. */
+  validated?: boolean;
 }
 interface Principle {
   tag: string;
@@ -43,6 +48,7 @@ const PRINCIPLES_FR: readonly Principle[] = [
       cap: "Wolof · É1",
       quote: "Na nga def ?",
       gloss: "Comment vas-tu ?",
+      validated: false,
     },
   },
   {
@@ -58,12 +64,13 @@ const PRINCIPLES_FR: readonly Principle[] = [
       cap: "Bassa · É2",
       quote: "Mə́ nlámbá ndap.",
       gloss: "Le ton bas ouvre la phrase — le sens change avec la mélodie.",
+      validated: false,
     },
   },
   {
     tag: "Principe 03 · Oral",
     title: "Parler tôt — se tromper vite, se corriger précis.",
-    body: "Attendre B1 (ou É3 en YEMA) pour parler est un piège. Dès la première leçon, le coach IA entraîne dans des scénarios réels : commander un café en allemand, saluer une aînée en bassa, prendre un rendez-vous en anglais. Correction immédiate sur trois axes — grammaire, vocabulaire, pertinence culturelle.",
+    body: "Attendre B1 (ou É3 en YEMA) pour parler est un piège. Dès la première leçon, vous vous entraînez sur des scènes réelles — commander un café en allemand, saluer une aînée en bassa, prendre un rendez-vous en anglais — avec une correction immédiate sur trois axes : grammaire, vocabulaire, justesse culturelle.",
     world: {
       cap: "Allemand · A1",
       quote: "Guten Tag, ich hätte gern einen Termin.",
@@ -73,6 +80,7 @@ const PRINCIPLES_FR: readonly Principle[] = [
       cap: "Lingala · É1",
       quote: "Mbote — nakoki kolobana na yo ?",
       gloss: "Bonjour — puis-je te parler ?",
+      validated: false,
     },
   },
   {
@@ -88,6 +96,7 @@ const PRINCIPLES_FR: readonly Principle[] = [
       cap: "Wolof · É3",
       quote: "Kaaraange — laa tudd Bintou.",
       gloss: "Je suis, je m'appelle Bintou — l'écrit s'ouvre à partir du récit.",
+      validated: false,
     },
   },
   {
@@ -103,6 +112,7 @@ const PRINCIPLES_FR: readonly Principle[] = [
       cap: "Wolof · culture",
       quote: "Teranga.",
       gloss: "L'accueil comme devoir — pas comme faveur.",
+      validated: false,
     },
   },
   {
@@ -131,6 +141,7 @@ const PRINCIPLES_EN: readonly Principle[] = [
       cap: "Wolof · É1",
       quote: "Na nga def?",
       gloss: "How are you?",
+      validated: false,
     },
   },
   {
@@ -146,12 +157,13 @@ const PRINCIPLES_EN: readonly Principle[] = [
       cap: "Bassa · É2",
       quote: "Mə́ nlámbá ndap.",
       gloss: "The low tone opens the sentence — meaning shifts with melody.",
+      validated: false,
     },
   },
   {
     tag: "Principle 03 · Oral",
     title: "Speak early — mistakes fast, corrections precise.",
-    body: "Waiting for B1 (or É3 at YEMA) to speak is a trap. From the first lesson, the AI coach trains through real scenarios: order a coffee in German, greet an elder in Bassa, book an appointment in English. Immediate correction on three axes — grammar, vocabulary, cultural fit.",
+    body: "Waiting for B1 (or É3 at YEMA) to speak is a trap. From the first lesson, you practice on real scenes — order a coffee in German, greet an elder in Bassa, book an appointment in English — with immediate correction on three axes: grammar, vocabulary, cultural fit.",
     world: {
       cap: "German · A1",
       quote: "Guten Tag, ich hätte gern einen Termin.",
@@ -161,6 +173,7 @@ const PRINCIPLES_EN: readonly Principle[] = [
       cap: "Lingala · É1",
       quote: "Mbote — nakoki kolobana na yo?",
       gloss: "Hello — may I speak with you?",
+      validated: false,
     },
   },
   {
@@ -176,6 +189,7 @@ const PRINCIPLES_EN: readonly Principle[] = [
       cap: "Wolof · É3",
       quote: "Kaaraange — laa tudd Bintou.",
       gloss: "I am, I'm called Bintou — writing opens from the narrative.",
+      validated: false,
     },
   },
   {
@@ -191,6 +205,7 @@ const PRINCIPLES_EN: readonly Principle[] = [
       cap: "Wolof · culture",
       quote: "Teranga.",
       gloss: "Hospitality as a duty — not as a favor.",
+      validated: false,
     },
   },
   {
@@ -330,7 +345,14 @@ export default function MethodePage() {
                         <p className="methode-example-gloss">{t(p.world.gloss)}</p>
                       </div>
                     ) : null}
-                    {p.sources ? (
+                    {/* Gate technique · un exemple natal apparaît
+                        uniquement quand validated !== false. Toute
+                        phrase (tons, orthographe, sens) doit être
+                        relue par un locuteur natif avant prod ; en
+                        attendant, seul l'exemple world reste — le
+                        principe garde son sens sans transiger sur
+                        la justesse de la langue natale. */}
+                    {p.sources && p.sources.validated !== false ? (
                       <div className="methode-example methode-example-sources">
                         <p className="methode-example-cap">{p.sources.cap}</p>
                         <p className="methode-example-quote">{p.sources.quote}</p>

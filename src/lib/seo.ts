@@ -40,8 +40,8 @@ export const SITE_META: SiteMeta = {
       ogImageAlt: "YEMA — la carte des voix, étrangères et natales",
     },
     methode: {
-      title: "Méthode — YEMA",
-      description: "L'oral d'abord, l'écrit ensuite. Un prof au centre, une IA au service, des paliers concrets. Pas d'étoiles — des choses que vous saurez faire.",
+      title: "La méthode — YEMA",
+      description: "L'oral d'abord, l'écrit ensuite. Un prof au centre, des paliers concrets. Pas d'étoiles — des choses que vous saurez faire.",
       ogTitle: "La méthode YEMA — l'oral d'abord, le prof au centre",
       twitterTitle: "Comment YEMA enseigne — méthode",
       ogImageAlt: "YEMA — la méthode : oral d'abord, prof au centre",
@@ -119,8 +119,8 @@ export const SITE_META: SiteMeta = {
       ogImageAlt: "YEMA — the map of voices, foreign and native",
     },
     methode: {
-      title: "Method — YEMA",
-      description: "Voice first, writing next. A teacher at the center, AI in the background, real skills at each stage. Not stars — things you'll actually do.",
+      title: "The method — YEMA",
+      description: "Voice first, writing next. A teacher at the center, real skills at each stage. Not stars — things you'll actually do.",
       ogTitle: "The YEMA method — voice first, teacher at the center",
       twitterTitle: "How YEMA teaches — the method",
       ogImageAlt: "YEMA — the method: voice first, teacher at center",
