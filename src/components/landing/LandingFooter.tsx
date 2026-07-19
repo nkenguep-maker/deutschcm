@@ -36,7 +36,7 @@ export function LandingFooter({
     items: [
       { label: isEn ? "Languages" : "Langues",      href: `/${locale}/langues` },
       { label: isEn ? "Method" : "Méthode",         href: `/${locale}/methode` },
-      { label: isEn ? "Stories" : "Histoires",      href: `/${locale}/histoires` },
+      { label: isEn ? "The Veillée" : "La Veillée", href: `/${locale}/veillee` },
     ],
   };
   const colDoors = {

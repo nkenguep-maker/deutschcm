@@ -47,14 +47,15 @@ export function LandingNav({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Nav finale : Langues · Méthode · Histoires · Tarifs.
+  // Nav finale : Langues · Méthode · La Veillée · Tarifs.
   // Enseignants/Centres vivent dans le footer (les portes). Le
   // manifeste est parqué (fichier conservé pour réactivation).
+  // /histoires est redirigé 308 vers /veillee via next.config.
   const navItems = [
-    { label: labels.features,                                                 href: `/${locale}/langues` },
-    { label: labels.methode ?? labels.levels,                                 href: `/${locale}/methode` },
-    { label: labels.histoires ?? (locale === "en" ? "Stories" : "Histoires"), href: `/${locale}/histoires` },
-    { label: labels.tarifs ?? (locale === "en" ? "Pricing" : "Tarifs"),       href: `/${locale}/pricing` },
+    { label: labels.features,                                                       href: `/${locale}/langues` },
+    { label: labels.methode ?? labels.levels,                                       href: `/${locale}/methode` },
+    { label: labels.histoires ?? (locale === "en" ? "The Veillée" : "La Veillée"), href: `/${locale}/veillee` },
+    { label: labels.tarifs ?? (locale === "en" ? "Pricing" : "Tarifs"),             href: `/${locale}/pricing` },
   ];
 
   return (

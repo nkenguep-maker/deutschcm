@@ -95,7 +95,7 @@ const COPY_FR: Copy = {
   title: "Cinq voix.",
   titleEm: "Cinq chemins.",
   phrase: "Cinq voix, cinq chemins. Chacune parle sa langue.",
-  seeMore: "Toutes les histoires",
+  seeMore: "Toute la Veillée",
   listenLabel: "Écouter",
 };
 
@@ -104,7 +104,7 @@ const COPY_EN: Copy = {
   title: "Five voices.",
   titleEm: "Five paths.",
   phrase: "Five voices, five paths. Each speaks their own language.",
-  seeMore: "All the stories",
+  seeMore: "The whole Veillée",
   listenLabel: "Listen",
 };
 
@@ -155,7 +155,7 @@ export function MaisonVisages({ locale }: { locale: "fr" | "en" }) {
         </ul>
 
         <div className="maison-visages-more">
-          <Link href={`/${locale}/histoires`} className="maison-link-strong">
+          <Link href={`/${locale}/veillee`} className="maison-link-strong">
             {t(c.seeMore)}
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
                  stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"

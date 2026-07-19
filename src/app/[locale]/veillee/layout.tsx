@@ -7,9 +7,9 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return buildPageMetadata({ locale, pageKey: "histoires", path: "/histoires" });
+  return buildPageMetadata({ locale, pageKey: "veillee", path: "/veillee" });
 }
 
-export default function HistoiresLayout({ children }: { children: React.ReactNode }) {
+export default function VeilleeLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

@@ -71,6 +71,16 @@ export interface VoixStory {
   capEn: string;
   duration: number;
   territory: "world" | "sources";
+  /** Gate technique · zéro persona en prod. Un récit ne s'affiche que
+   *  si validated === true (voix native réelle enregistrée + relue
+   *  par le locuteur). Les personas éditoriaux restent en data mais
+   *  sont filtrés côté UI · si aucun récit validé, la Veillée montre
+   *  un état vide « on prépare les vraies voix ». */
+  validated: boolean;
+  /** Catégorie du récit · contes / proverbes / récits du quotidien.
+   *  Plus tard : « voix de nos apprenants » quand de vrais témoignages
+   *  seront enregistrés (jamais avant). */
+  category?: "conte" | "proverbe" | "quotidien" | "apprenant";
   portraitSrc?: string;
   monogram: string;
   audioSrc: string;
@@ -96,6 +106,8 @@ export const STORIES: readonly VoixStory[] = [
     capEn: "B2 REACHED · STUDIES IN BERLIN",
     duration: 82,
     territory: "world",
+    validated: false,
+    category: "quotidien",
     portraitSrc: "/portraits/kevin.avif",
     monogram: "K",
     audioSrc: "/audio/voix/kevin-allemand.mp3",
@@ -134,6 +146,8 @@ export const STORIES: readonly VoixStory[] = [
     capEn: "GROW ON PLACE · NATURALIZATION AHEAD",
     duration: 88,
     territory: "world",
+    validated: false,
+    category: "quotidien",
     portraitSrc: "/portraits/fatima.avif",
     monogram: "F",
     audioSrc: "/audio/voix/fatima-allemand.mp3",
@@ -172,6 +186,8 @@ export const STORIES: readonly VoixStory[] = [
     capEn: "OBJECTIVE REACHED · DEPARTURE APPROVED",
     duration: 78,
     territory: "world",
+    validated: false,
+    category: "quotidien",
     portraitSrc: "/portraits/aicha.avif",
     monogram: "A",
     audioSrc: "/audio/voix/aicha-anglais.mp3",
@@ -209,6 +225,8 @@ export const STORIES: readonly VoixStory[] = [
     capEn: "PROFESSIONAL FRENCH · EXAMS IN SIGHT",
     duration: 76,
     territory: "world",
+    validated: false,
+    category: "quotidien",
     portraitSrc: "/portraits/jean.avif",
     monogram: "J",
     audioSrc: "/audio/voix/jean-francais.mp3",
@@ -247,6 +265,8 @@ export const STORIES: readonly VoixStory[] = [
     capEn: "É2 VOICE · TRANSMISSION UNDERWAY",
     duration: 92,
     territory: "sources",
+    validated: false,
+    category: "quotidien",
     portraitSrc: "/portraits/bintou.avif",
     monogram: "B",
     audioSrc: "/audio/voix/bintou-wolof.mp3",
