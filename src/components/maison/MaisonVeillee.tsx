@@ -18,16 +18,16 @@ interface Copy {
 
 const COPY_FR: Copy = {
   kicker: "La veillée",
-  title: "Choisissez une voix.",
-  titleEm: "Écoutez.",
-  phrase: "Une voix, une langue, un récit. La voix reste dans sa langue — vous suivez les mots au fil, si vous le voulez.",
+  title: "Des histoires racontées —",
+  titleEm: "et d'autres qu'on n'a jamais dites.",
+  phrase: "Choisissez une langue. Écoutez quelqu'un vous parler — comme un message du pays.",
 };
 
 const COPY_EN: Copy = {
   kicker: "The vigil",
-  title: "Choose a voice.",
-  titleEm: "Listen.",
-  phrase: "A voice, a language, a story. The voice stays in its language — you follow the words along, if you wish.",
+  title: "Stories told —",
+  titleEm: "and others never spoken.",
+  phrase: "Choose a language. Listen to someone speak — like a message from home.",
 };
 
 export function MaisonVeillee({ locale }: { locale: "fr" | "en" }) {

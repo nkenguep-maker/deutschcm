@@ -12,10 +12,12 @@ import { frTypo } from "@/components/landing/typo";
 interface Copy {
   worldKicker: string;
   worldTitle: string;
+  worldTitleEm: string;
   worldPhrase: string;
   worldLink: string;
   sourcesKicker: string;
   sourcesTitle: string;
+  sourcesTitleEm: string;
   sourcesPhrase: string;
   sourcesLink: string;
   ariaSeam: string;
@@ -23,24 +25,28 @@ interface Copy {
 
 const COPY_FR: Copy = {
   worldKicker: "Voyage vers le monde",
-  worldTitle: "Les langues qui ouvrent la porte.",
-  worldPhrase: "L'échelle CECRL, de la première salutation au discours nuancé — pour partir, étudier, travailler, se lier.",
+  worldTitle: "Parlez au",
+  worldTitleEm: "monde entier.",
+  worldPhrase: "Allemand, anglais, français. Un examen, un visa, une carrière — l'échelle CECRL, pas à pas.",
   worldLink: "Découvrir les langues étrangères",
   sourcesKicker: "Retour aux sources",
-  sourcesTitle: "Les langues qui gardent la mémoire.",
-  sourcesPhrase: "L'échelle YEMA en cinq paliers — Écoute, Voix, Récit, Palabre, Foyer — pour parler comme on parle chez soi.",
+  sourcesTitle: "Parlez la langue de vos",
+  sourcesTitleEm: "ancêtres.",
+  sourcesPhrase: "Bassa, wolof, swahili, lingala. Le foyer, le récit, la palabre — l'échelle YEMA, voix d'abord.",
   sourcesLink: "Découvrir les langues natales",
   ariaSeam: "La couture entre les deux territoires",
 };
 
 const COPY_EN: Copy = {
   worldKicker: "A journey outward",
-  worldTitle: "The languages that open the door.",
-  worldPhrase: "The CEFR scale, from the first greeting to the nuanced discourse — to leave, study, work, connect.",
+  worldTitle: "Speak to the",
+  worldTitleEm: "whole world.",
+  worldPhrase: "German, English, French. An exam, a visa, a career — the CEFR scale, step by step.",
   worldLink: "Discover foreign languages",
   sourcesKicker: "A return to the source",
-  sourcesTitle: "The languages that hold the memory.",
-  sourcesPhrase: "The YEMA scale, five stages — Listen, Voice, Story, Palaver, Home — to speak as one speaks at home.",
+  sourcesTitle: "Speak the language of your",
+  sourcesTitleEm: "ancestors.",
+  sourcesPhrase: "Bassa, Wolof, Swahili, Lingala. The home, the story, the palaver — the YEMA scale, voice first.",
   sourcesLink: "Discover native languages",
   ariaSeam: "The seam between the two territories",
 };
@@ -54,7 +60,7 @@ export function MaisonCouture({ locale }: { locale: "fr" | "en" }) {
       {/* Bloc world · espresso */}
       <div className="maison-couture-side maison-couture-world">
         <p className="maison-couture-kicker">{t(c.worldKicker)}</p>
-        <h2 className="maison-couture-h">{t(c.worldTitle)}</h2>
+        <h2 className="maison-couture-h">{t(c.worldTitle)} <em>{t(c.worldTitleEm)}</em></h2>
         <p className="maison-couture-phrase">{t(c.worldPhrase)}</p>
         <Link href={`/${locale}/langues`} className="maison-couture-link">
           {t(c.worldLink)}
@@ -72,7 +78,7 @@ export function MaisonCouture({ locale }: { locale: "fr" | "en" }) {
       {/* Bloc sources · terre */}
       <div className="maison-couture-side maison-couture-sources">
         <p className="maison-couture-kicker">{t(c.sourcesKicker)}</p>
-        <h2 className="maison-couture-h">{t(c.sourcesTitle)}</h2>
+        <h2 className="maison-couture-h">{t(c.sourcesTitle)} <em>{t(c.sourcesTitleEm)}</em></h2>
         <p className="maison-couture-phrase">{t(c.sourcesPhrase)}</p>
         <Link href={`/${locale}/langues#sources`} className="maison-couture-link">
           {t(c.sourcesLink)}

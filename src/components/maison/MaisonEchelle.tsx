@@ -26,9 +26,9 @@ interface Copy {
 
 const COPY_FR: Copy = {
   kicker: "L'échelle",
-  title: "Deux échelles.",
-  titleEm: "Le même laiton.",
-  phrase: "Chaque palier révèle une compétence concrète. Passez sur un niveau — la maison vous montre.",
+  title: "Chaque palier",
+  titleEm: "est une compétence réelle.",
+  phrase: "Survolez : le design vous montre où vous allez. Pas des étoiles — des choses que vous saurez faire.",
   worldCap: "CECRL · le voyage extérieur",
   sourcesCap: "YEMA · le retour intérieur",
   linkLangues: "Voir toutes les langues",
@@ -36,9 +36,9 @@ const COPY_FR: Copy = {
 
 const COPY_EN: Copy = {
   kicker: "The scale",
-  title: "Two scales.",
-  titleEm: "The same brass.",
-  phrase: "Each stage reveals a concrete skill. Hover over a level — the house shows you.",
+  title: "Each stage",
+  titleEm: "is a real skill.",
+  phrase: "Hover: the design shows you where you're going. Not stars — things you'll actually do.",
   worldCap: "CEFR · the outward journey",
   sourcesCap: "YEMA · the inward return",
   linkLangues: "See all languages",

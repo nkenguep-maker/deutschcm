@@ -68,7 +68,7 @@ export default function LandingPage() {
           {/* d) L'ÉCHELLE — deux échelles côte à côte */}
           <MaisonEchelle locale={loc} />
 
-          {/* e) TEASER — le premier chapitre s'écrit en allemand */}
+          {/* e) TEASER · Le premier chapitre s'écrit en allemand */}
           <Teaser
             locale={loc}
             line1={loc === "en"

@@ -18,14 +18,14 @@ const COPY_FR: Copy = {
   kicker: "La porte du fond",
   title: "Entrez.",
   titleEm: "La maison est ouverte.",
-  cta: "Commencer, gratuitement",
+  cta: "Créer mon compte",
 };
 
 const COPY_EN: Copy = {
   kicker: "The back door",
   title: "Come in.",
   titleEm: "The house is open.",
-  cta: "Start, free",
+  cta: "Create my account",
 };
 
 export function MaisonPorte({ locale }: { locale: "fr" | "en" }) {

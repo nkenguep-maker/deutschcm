@@ -22,6 +22,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SeuilGreetings } from "./SeuilGreeting";
+import { SeuilPolyglot } from "./SeuilPolyglot";
 import { VoixPlayer } from "@/components/voix/VoixPlayer";
 import { STORIES } from "@/lib/voix/stories";
 
@@ -164,6 +165,9 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
 
       {/* Salutations flottantes */}
       <SeuilGreetings locale={locale} />
+
+      {/* Banner polyglotte · accueil aux ES/PT/IT/DE dans leur langue */}
+      <SeuilPolyglot currentLocale={locale} />
 
       {/* Sélecteur de langue, discret, top-right */}
       <div className="seuil-locale" role="group" aria-label={locale === "en" ? "Interface language" : "Langue de l'interface"}>

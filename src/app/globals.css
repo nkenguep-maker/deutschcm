@@ -1640,6 +1640,65 @@ button, [role="button"] {
   gap: 32px;
   align-items: start;
 }
+/* Sprint « Les mots » · 4 colonnes (brand + 3 nav) sur desktop,
+   empilement mobile. */
+.lfooter-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+  padding-bottom: 32px;
+}
+@media (max-width: 900px) {
+  .lfooter-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .lfooter-grid { grid-template-columns: 1fr; gap: 24px; }
+}
+.lfooter-line {
+  margin: 12px 0 4px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 15px;
+  color: var(--creme);
+  font-style: italic;
+}
+.lfooter-line em { font-style: italic; color: var(--brass); }
+.lfooter-support {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 13.5px;
+  color: var(--creme-mute);
+  max-width: 32ch;
+}
+.lfooter-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lfooter-col-lbl {
+  margin: 0 0 8px;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: var(--brass);
+  text-transform: uppercase;
+}
+.lfooter-col a {
+  color: var(--creme-soft);
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 13.5px;
+  text-decoration: none;
+  transition: color var(--dur-touch) var(--ease-enter);
+}
+.lfooter-col a:hover { color: var(--brass); }
+.lfooter-made {
+  margin: 6px 0 0;
+  color: var(--creme-mute);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
 .lfooter-brand {
   display: flex;
   flex-direction: column;
@@ -6214,6 +6273,85 @@ body:has(.test-space-bar) { padding-top: 34px; }
   }
 }
 
+/* Banner polyglotte · accueil aux ES/PT/IT/DE dans leur langue.
+   Discret, en bas à droite, animation douce d'entrée. */
+.seuil-polyglot {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 40;
+  max-width: 340px;
+  padding: 16px 18px;
+  border: 1px solid var(--brass-edge);
+  border-radius: var(--r-panel);
+  background: rgba(18, 12, 6, 0.94);
+  backdrop-filter: blur(10px);
+  color: var(--creme);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  animation: seuil-polyglot-in 720ms var(--ease-enter) 480ms both;
+}
+@keyframes seuil-polyglot-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.seuil-polyglot-hello {
+  margin: 0 0 6px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--creme);
+}
+.seuil-polyglot-both {
+  margin: 0 0 14px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 13.5px;
+  color: var(--creme-soft);
+  line-height: 1.45;
+}
+.seuil-polyglot-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.seuil-polyglot-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--brass-edge);
+  background: transparent;
+  color: var(--brass);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--dur-touch) var(--ease-enter);
+}
+.seuil-polyglot-btn:hover { background: var(--brass-glow); }
+.seuil-polyglot-btn:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.seuil-polyglot-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--creme-hair);
+  background: transparent;
+  color: var(--creme-mute);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--dur-touch) var(--ease-enter);
+}
+.seuil-polyglot-close:hover { color: var(--creme); }
+@media (prefers-reduced-motion: reduce) {
+  .seuil-polyglot { animation: none; }
+}
+@media (max-width: 500px) {
+  .seuil-polyglot { left: 12px; right: 12px; bottom: 12px; max-width: none; }
+}
+
 /* Sélecteur locale, top-right, très discret. */
 .seuil-locale {
   position: absolute;
@@ -6805,6 +6943,10 @@ body:has(.test-space-bar) { padding-top: 34px; }
   color: var(--creme);
   margin: 0 auto 16px;
   max-width: 620px;
+}
+.maison-couture-h em {
+  font-style: italic;
+  color: var(--brass);
 }
 .maison-couture-phrase {
   font-family: var(--font-fraunces), Georgia, serif;

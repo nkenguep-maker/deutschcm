@@ -1,8 +1,11 @@
-// LandingFooter — warm minimal. Brand, tagline, deux colonnes de liens,
-// social en pills laiton. Signature CEFR strip horizontale sous le tag
-// (5e apparition de la signature).
+// LandingFooter · Sprint « Les mots de la maison ».
+// Trois colonnes :
+//   · La maison  · Langues, Méthode, Manifeste, Histoires
+//   · Les portes · Devenir enseignant·e, Pour les centres, Tarifs
+//   · La règle   · Confidentialité, Conditions, Contact
+// Sous les colonnes : slogan support « Toutes vos langues, une
+// seule maison. » + signature YEMA + disclaimer CEFR.
 
-import { CefrStrip } from "./CefrStrip";
 import { LandingBrand } from "./LandingBrand";
 
 type Labels = {
@@ -22,33 +25,71 @@ export function LandingFooter({
   locale: string;
   labels: Labels;
 }) {
+  const isEn = locale === "en";
+  const line = isEn ? "YEMA — your way, your voice." : "YEMA — votre voie, votre voix.";
+  const support = isEn ? "All your languages, one home." : "Toutes vos langues, une seule maison.";
+
+  const colHome = {
+    label: isEn ? "The house" : "La maison",
+    items: [
+      { label: isEn ? "Languages" : "Langues",      href: `/${locale}/langues` },
+      { label: isEn ? "Method" : "Méthode",         href: `/${locale}/methode` },
+      { label: isEn ? "Manifesto" : "Manifeste",    href: `/${locale}/manifeste` },
+      { label: isEn ? "Stories" : "Histoires",      href: `/${locale}/histoires` },
+    ],
+  };
+  const colDoors = {
+    label: isEn ? "The doors" : "Les portes",
+    items: [
+      { label: isEn ? "Become a teacher" : "Devenir enseignant·e", href: `/${locale}/enseignants` },
+      { label: isEn ? "For language centers" : "Pour les centres", href: `/${locale}/landing` },
+      { label: isEn ? "Pricing" : "Tarifs",                        href: `/${locale}/pricing` },
+    ],
+  };
+  const colLaw = {
+    label: isEn ? "The rule" : "La règle",
+    items: [
+      { label: labels.privacy, href: `/${locale}/privacy` },
+      { label: labels.terms,   href: `/${locale}/terms` },
+      { label: labels.contact, href: "mailto:hello@yema.app" },
+    ],
+  };
+
   return (
     <footer className="lfooter">
       <div className="container">
-        <div className="lfooter-inner">
+        <div className="lfooter-grid">
           <div className="lfooter-brand">
             <LandingBrand />
-            <p className="lfooter-tag">{labels.tagline}</p>
-            <p className="lfooter-tag lfooter-tag-mute">{labels.made}</p>
-            <CefrStrip current="A1" ariaLabel="Parcours Yema — CECRL" />
+            <p className="lfooter-line"><em>{line}</em></p>
+            <p className="lfooter-support">{support}</p>
           </div>
 
-          <nav className="lfooter-links" aria-label="Légal">
-            <a href={`/${locale}/terms`}>{labels.terms}</a>
-            <a href={`/${locale}/privacy`}>{labels.privacy}</a>
-            <a href={`/${locale}/terms`}>{labels.legal}</a>
-            <a href="mailto:legal@yema.app">{labels.contact}</a>
+          <nav className="lfooter-col" aria-label={colHome.label}>
+            <p className="lfooter-col-lbl">{colHome.label}</p>
+            {colHome.items.map((it) => (
+              <a key={it.href} href={it.href}>{it.label}</a>
+            ))}
           </nav>
 
-          <nav className="lfooter-social" aria-label="Réseaux">
-            <a href="#" rel="me">WhatsApp</a>
-            <a href="#" rel="me">Instagram</a>
-            <a href="#" rel="me">Facebook</a>
+          <nav className="lfooter-col" aria-label={colDoors.label}>
+            <p className="lfooter-col-lbl">{colDoors.label}</p>
+            {colDoors.items.map((it) => (
+              <a key={it.href} href={it.href}>{it.label}</a>
+            ))}
+          </nav>
+
+          <nav className="lfooter-col" aria-label={colLaw.label}>
+            <p className="lfooter-col-lbl">{colLaw.label}</p>
+            {colLaw.items.map((it) => (
+              <a key={it.href} href={it.href}>{it.label}</a>
+            ))}
           </nav>
         </div>
 
         <div className="lfooter-bottom">
-          {labels.disclaimer}
+          <p>{labels.disclaimer}</p>
+          <p className="lfooter-made">{labels.made}</p>
         </div>
       </div>
     </footer>

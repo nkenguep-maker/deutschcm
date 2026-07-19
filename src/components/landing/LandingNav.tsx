@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { LandingBrand } from "./LandingBrand";
 
 type NavLabels = {
-  features: string;    // "Langues" — nom du hub multi-langues
+  features: string;    // "Langues"
   levels: string;      // "Méthode"
   pricing: string;     // "Manifeste"
   centers: string;
@@ -14,6 +14,8 @@ type NavLabels = {
   register: string;
   methode?: string;
   histoires?: string;
+  /** "Tarifs" — nouveau item nav (Sprint « Les mots ») */
+  tarifs?: string;
 };
 
 // LandingNav — mécanique client (scroll → .solid). Le locale-switch
@@ -37,25 +39,14 @@ export function LandingNav({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Nav items : ordre = Langues · Méthode · Histoires · Manifeste.
-  // Toutes pointent vers des pages dédiées (pas d'ancre landing).
+  // Sprint « Les mots » · nav = Langues · Méthode · Histoires · Manifeste
+  // · Tarifs. Enseignants/Centres vivent dans le footer (les portes).
   const navItems = [
-    {
-      label: labels.features, // "Langues"
-      href: `/${locale}/langues`,
-    },
-    {
-      label: labels.methode ?? labels.levels, // "Méthode"
-      href: `/${locale}/methode`,
-    },
-    {
-      label: labels.histoires ?? (locale === "en" ? "Journeys" : "Histoires"),
-      href: `/${locale}/histoires`,
-    },
-    {
-      label: labels.pricing, // "Manifeste"
-      href: `/${locale}/manifeste`,
-    },
+    { label: labels.features,                                       href: `/${locale}/langues` },
+    { label: labels.methode ?? labels.levels,                       href: `/${locale}/methode` },
+    { label: labels.histoires ?? (locale === "en" ? "Stories" : "Histoires"), href: `/${locale}/histoires` },
+    { label: labels.pricing,                                        href: `/${locale}/manifeste` },
+    { label: labels.tarifs ?? (locale === "en" ? "Pricing" : "Tarifs"),       href: `/${locale}/pricing` },
   ];
 
   return (
