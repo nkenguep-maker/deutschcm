@@ -615,3 +615,50 @@ model UserConnection {
   @@unique([userId, connectedId])
   @@map("user_connections")
 }
+
+// ─── Demandes d'accréditation (enseignant·e·s) ───────────────────
+// Le premier contact — YEMA rencontre chaque prof avant de créer un
+// compte TEACHER. Le statut évolue à la main dans /admin.
+enum ApplicationStatus {
+  RECEIVED    // en file
+  CONTACTED   // à contacter
+  MET         // entretien fait
+  ACCREDITED  // accrédité, compte créé
+  DECLINED    // décliné (courtoisement)
+}
+
+model TeacherApplication {
+  id            String            @id @default(uuid())
+  fullName      String
+  email         String
+  whatsapp      String?
+  city          String
+  languages     String            // langue(s) enseignée(s), texte libre
+  experience    String            // diplôme / années d'expérience
+  status        ApplicationStatus @default(RECEIVED)
+  notes         String?           // notes internes admin
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("teacher_applications")
+}
+
+// ─── Demandes de démo (centres) ──────────────────────────────────
+// Sprint 7 · B2B. Formulaire court sur /landing.
+model CenterApplication {
+  id            String            @id @default(uuid())
+  centerName    String
+  city          String
+  whatsapp      String?
+  email         String
+  status        ApplicationStatus @default(RECEIVED)
+  notes         String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("center_applications")
+}
