@@ -32,11 +32,19 @@ export interface GreetingItem {
   langTag: string;
 }
 
+// Pool des salutations · natales africaines ET étrangères, entrelacées
+// pour que l'entrée immédiate du seuil montre déjà les deux territoires
+// YEMA (world + sources). Une salutation africaine, une étrangère, une
+// africaine, une étrangère — jamais un bloc mono-territoire au démarrage.
 export const GREETINGS: readonly GreetingItem[] = [
   { id: "mbolo",     word: "Mbolo",     language: "ewondo",       languageEn: "Ewondo",       country: "Cameroun",           countryEn: "Cameroon",              langTag: "ewo" },
+  { id: "bonjour",   word: "Bonjour",   language: "français",     languageEn: "French",       country: "France",             countryEn: "France",                langTag: "fr"  },
   { id: "nangadef",  word: "Na nga def", language: "wolof",        languageEn: "Wolof",        country: "Sénégal",            countryEn: "Senegal",               langTag: "wol" },
+  { id: "gutentag",  word: "Guten Tag", language: "allemand",     languageEn: "German",       country: "Allemagne",          countryEn: "Germany",               langTag: "de"  },
   { id: "mbote",     word: "Mbote",     language: "lingala",      languageEn: "Lingala",      country: "RDC",                countryEn: "DRC",                   langTag: "lin" },
+  { id: "hello",     word: "Hello",     language: "anglais",      languageEn: "English",      country: "International",      countryEn: "International",         langTag: "en"  },
   { id: "jambo",     word: "Jambo",     language: "swahili",      languageEn: "Swahili",      country: "Kenya · Tanzanie",   countryEn: "Kenya · Tanzania",      langTag: "swa" },
+  { id: "hola",      word: "Hola",      language: "espagnol",     languageEn: "Spanish",      country: "Espagne",            countryEn: "Spain",                 langTag: "es"  },
   { id: "enle",      word: "Ẹ n lẹ",    language: "yorùbá",       languageEn: "Yoruba",       country: "Nigeria",            countryEn: "Nigeria",               langTag: "yor" },
   { id: "sannu",     word: "Sannu",     language: "haoussa",      languageEn: "Hausa",        country: "Niger · Nigeria",    countryEn: "Niger · Nigeria",       langTag: "hau" },
   { id: "akwaaba",   word: "Akwaaba",   language: "twi",          languageEn: "Twi",          country: "Ghana",              countryEn: "Ghana",                 langTag: "twi" },
