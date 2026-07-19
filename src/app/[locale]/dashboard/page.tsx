@@ -29,6 +29,8 @@ interface UserData {
   streakDays: number;
   isValidated?: boolean;
   studentType?: string | null;
+  cap?: string | null;
+  personalGoal?: string | null;
 }
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1"] as const;
@@ -141,6 +143,23 @@ function nextLevel(current: Level | null): Level | "C2" {
   return LEVELS[idx + 1];
 }
 
+// Libellés éditoriaux du cap · rappelés dans la carte du dashboard
+// pour que l'apprenant·e reconnaisse son chemin d'un coup d'œil.
+function capLabelFr(cap: string | null | undefined): string {
+  if (cap === "franchir") return "Franchir. Partir, réussir.";
+  if (cap === "grandir") return "Grandir. Là où vous vivez.";
+  if (cap === "transmettre") return "Transmettre. La langue du foyer.";
+  if (cap === "moi") return "Apprendre pour vous.";
+  return "Votre parcours.";
+}
+function capLabelEn(cap: string | null | undefined): string {
+  if (cap === "franchir") return "Cross over. Leave, succeed.";
+  if (cap === "grandir") return "Grow. Right where you are.";
+  if (cap === "transmettre") return "Pass on. The language of home.";
+  if (cap === "moi") return "Learn for you.";
+  return "Your path.";
+}
+
 // Palier suivant dans une échelle arbitraire (CECRL ou YEMA).
 // Le dernier palier reste sur lui-même — pas de "C2" fictif pour YEMA.
 function nextInScale(current: string | null, levels: readonly string[]): string {
@@ -169,6 +188,8 @@ export default function StudentDashboard() {
             streakDays: d.streakDays ?? 0,
             isValidated: d.isValidated,
             studentType: d.studentType,
+            cap: d.cap ?? null,
+            personalGoal: d.personalGoal ?? null,
           });
         }
       })
@@ -338,6 +359,24 @@ export default function StudentDashboard() {
             <p className="dash-stat-sub">{t.statNextSub}</p>
           </div>
         </section>
+
+        {/* Carte cap · si l'utilisateur a fini l'onboarding par but, on
+            rappelle son cap et sa phrase — la maison écoute. */}
+        {data?.cap || data?.personalGoal ? (
+          <section className="dash-cap" aria-label={locale === "en" ? "Your cap" : "Votre cap"}>
+            <p className="maison-kicker">
+              {locale === "en" ? "Your cap" : "Votre cap"}
+            </p>
+            <h2 className="dash-cap-title">
+              {locale === "en" ? capLabelEn(data?.cap) : capLabelFr(data?.cap)}
+            </h2>
+            {data?.personalGoal ? (
+              <blockquote className="dash-cap-quote">
+                <p><em>« {data.personalGoal} »</em></p>
+              </blockquote>
+            ) : null}
+          </section>
+        ) : null}
 
         <section aria-labelledby="dash-explore-h">
           <p className="dash-eye">{t.exploreEye}</p>

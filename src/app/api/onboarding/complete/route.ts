@@ -29,12 +29,20 @@ export async function POST(req: NextRequest) {
 
     let role: SpaceRole | undefined
     let profileData: Record<string, string | null | undefined> = {}
+    let cap: string | undefined
+    let activeLanguage: string | undefined
+    let personalGoal: string | undefined
+    let availability: string | undefined
 
     try {
       const body = await req.json()
       const bodyRole = body.role as string | undefined
       if (bodyRole && VALID.includes(bodyRole as SpaceRole)) role = bodyRole as SpaceRole
       profileData = body.profileData ?? {}
+      cap = typeof body.cap === "string" ? body.cap : undefined
+      activeLanguage = typeof body.activeLanguage === "string" ? body.activeLanguage : undefined
+      personalGoal = typeof body.personalGoal === "string" ? body.personalGoal : undefined
+      availability = typeof body.availability === "string" ? body.availability : undefined
     } catch {
       // pas de body — on tombera sur le fallback ci-dessous
     }
@@ -94,14 +102,43 @@ export async function POST(req: NextRequest) {
     await grantRole({ userId: updated.id, role: effectiveRole })
     await markRoleOnboarded(updated.id, effectiveRole)
 
-    // Sync user_metadata pour le middleware
+    // Cap · langue · but perso · disponibilité → user_metadata direct.
+    // Ces champs sont utilisés par le dashboard et /pricing pour
+    // adapter l'expérience sans requête DB à chaque page.
+    if (cap || activeLanguage || personalGoal || availability) {
+      const { createClient: createAdminClient } = await import("@supabase/supabase-js")
+      const SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY
+      if (SERVICE) {
+        const admin = createAdminClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          SERVICE,
+          { auth: { autoRefreshToken: false, persistSession: false } },
+        )
+        const { data: current } = await admin.auth.admin.getUserById(user.id)
+        const existing = (current?.user?.user_metadata ?? {}) as Record<string, unknown>
+        await admin.auth.admin.updateUserById(user.id, {
+          user_metadata: {
+            ...existing,
+            ...(cap ? { cap } : {}),
+            ...(activeLanguage ? { activeLanguage } : {}),
+            ...(personalGoal ? { personalGoal } : {}),
+            ...(availability ? { availability } : {}),
+          },
+        })
+      }
+    }
+
+    // Sync user_metadata pour le middleware (roles + onboarded)
     await syncUserMetadata({ supabaseId: user.id, activeSpace: effectiveRole })
 
+    // Après onboarding STUDENT → dashboard direct. Le cap et la
+    // langue pilotent l'affichage. Le test-niveau reste accessible
+    // depuis le dashboard pour affiner le point de départ.
     const redirectTo = effectiveRole === "TEACHER"
       ? "/teacher"
       : effectiveRole === "CENTER"
       ? "/center"
-      : "/test-niveau"
+      : "/dashboard"
 
     const response = NextResponse.json({
       success: true,

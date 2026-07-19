@@ -82,6 +82,10 @@ export async function GET() {
   const supportedLanguages = Array.isArray(user.user_metadata?.supportedLanguages)
     ? (user.user_metadata.supportedLanguages as string[])
     : [activeLanguage];
+  // Cap · but perso · disponibilité (Sprint « Le Cap »)
+  const cap = (user.user_metadata?.cap as string | undefined) ?? null;
+  const personalGoal = (user.user_metadata?.personalGoal as string | undefined) ?? null;
+  const availability = (user.user_metadata?.availability as string | undefined) ?? null;
 
   return NextResponse.json({
     role: dbUser?.role ?? "STUDENT",
@@ -89,6 +93,9 @@ export async function GET() {
     activeSpace,
     activeLanguage,
     supportedLanguages,
+    cap,
+    personalGoal,
+    availability,
     fullName: dbUser?.fullName,
     email: dbUser?.email,
     onboardingDone: dbUser?.onboardingDone ?? false,
