@@ -20,6 +20,7 @@ import { Seam } from "@/components/design/Seam";
 import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import { Teaser } from "@/components/maison/Teaser";
 import { YEMA_LEVELS } from "@/lib/yemaScale";
+import { LANGUAGES } from "@/lib/languages";
 import { frTypo } from "@/components/landing/typo";
 
 // ─── Registre local pour cette page ────────────────────────────────
@@ -96,7 +97,7 @@ const COPY_FR: Copy = {
   worldKicker: "Voyage vers le monde",
   worldTitle: "Les langues qui",
   worldTitleEm: "ouvrent le monde.",
-  worldLede: "Échelle CECRL. Chaque niveau, des compétences réelles — pas des étoiles. L'allemand porte le premier chapitre ; anglais, français, espagnol, portugais, arabe suivent.",
+  worldLede: "Échelle CECRL. Chaque niveau, des compétences réelles — pas des étoiles. L'allemand porte le premier chapitre.",
   worldScaleCap: "CECRL · A1 → C1",
   sourcesKicker: "Retour aux sources",
   sourcesTitle: "Les langues qui",
@@ -132,7 +133,7 @@ const COPY_EN: Copy = {
   worldKicker: "A journey outward",
   worldTitle: "The languages that",
   worldTitleEm: "open the world.",
-  worldLede: "CEFR scale. Each level, real skills — not stars. German carries the first chapter; English, French, Spanish, Portuguese, Arabic follow.",
+  worldLede: "CEFR scale. Each level, real skills — not stars. German carries the first chapter.",
   worldScaleCap: "CEFR · A1 → C1",
   sourcesKicker: "A return to the source",
   sourcesTitle: "The languages that",
@@ -170,11 +171,26 @@ function LangueCard({ lang, locale }: { lang: LangueDisplay; locale: "fr" | "en"
   const region = locale === "en" ? lang.regionEn : lang.region;
   const note = locale === "en" ? lang.noteEn : lang.note;
   const t = (s: string) => (locale === "fr" ? frTypo(s) : s);
+  // Statut source de vérité · registre LANGUAGES. Une langue « live »
+  // a une carte pleine · les autres passent en état « à venir »
+  // (estompée, mention discrète, non cliquable). Aucune date affichée.
+  const meta = LANGUAGES[lang.id];
+  const isLive = meta?.status === "live";
+  const comingLabel = locale === "en" ? "Coming soon" : "Bientôt";
   return (
-    <article className="langue-card">
+    <article
+      className={`langue-card ${isLive ? "langue-card-live" : "langue-card-coming"}`}
+      data-status={isLive ? "live" : "coming"}
+      aria-disabled={!isLive}
+    >
       <div className="langue-card-mono" aria-hidden="true">{lang.code}</div>
       <div className="langue-card-body">
-        <h3 className="langue-card-name">{name}</h3>
+        <h3 className="langue-card-name">
+          {name}
+          {!isLive ? (
+            <span className="langue-card-badge" aria-label={comingLabel}>· {comingLabel}</span>
+          ) : null}
+        </h3>
         <p className="langue-card-region">{t(region)}</p>
         {note ? <p className="langue-card-note">{t(note)}</p> : null}
       </div>

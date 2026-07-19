@@ -1,0 +1,15 @@
+import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({ locale, pageKey: "methode", path: "/methode" });
+}
+
+export default function MethodeLayout({ children }: { children: React.ReactNode }) {
+  return children;
+}

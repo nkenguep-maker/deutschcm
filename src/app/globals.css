@@ -11297,6 +11297,42 @@ body.foyer-switching .foyer {
   line-height: 1.4;
 }
 
+/* État live vs à venir · une seule langue vivante au lancement
+   (allemand). Les autres cartes passent estompées avec un petit
+   badge « bientôt » sans date. Pas cliquables, mais toujours
+   lisibles pour montrer la profondeur de la maison. */
+.langue-card-live {
+  border-color: var(--brass-edge);
+}
+.langue-card-coming {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: saturate(0.85);
+  background: rgba(244, 235, 220, 0.015);
+}
+.langue-card-coming:hover {
+  opacity: 0.68;
+  transform: none;
+  border-color: var(--creme-hair);
+  background: rgba(244, 235, 220, 0.02);
+}
+.langue-card-coming .langue-card-mono { color: var(--creme-mute); }
+.langue-card-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--creme-hair);
+  background: rgba(244, 235, 220, 0.05);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: var(--creme-mute);
+  text-transform: uppercase;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
 /* Table éditoriale des 5 paliers YEMA */
 .langues-scale-table {
   margin: 60px 0 20px;
