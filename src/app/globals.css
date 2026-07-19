@@ -524,8 +524,14 @@ button, [role="button"] {
 .spine-item[data-status="on"] .spine-code { color: var(--brass); }
 
 
-/* Panneau d'info révélé au hover (Cefr) ou au hover (Yema) */
-.spine-panel {
+/* Ancien popover flottant · retiré (débordait le viewport à droite
+   sur YEMA, masquait le panneau opposé sur CECRL). Remplacé par la
+   zone .maison-echelle-detail lifted dans MaisonEchelle. Le sélecteur
+   reste défini avec display:none par sécurité si un vestige d'ancien
+   markup persiste. */
+.spine-panel { display: none !important; }
+
+.spine-panel-legacy-noop {
   position: absolute;
   top: 0;
   left: calc(100% + 24px);
@@ -7323,6 +7329,141 @@ body:has(.test-space-bar) { padding-top: 34px; }
 .maison-echelle-col .cefr-spine {
   width: 100%;
   --step: 40px;
+}
+
+/* ─── Zone détail unique · lifted par MaisonEchelle ────────────────
+   Remplit le trou laissé par l'ancien popover flottant. Une seule
+   zone visible à la fois, positionnée SOUS la grille des deux échelles.
+   La teinte de fond suit la source (espresso pour CECRL, terre pour
+   YEMA) pour rappeler la continuité visuelle sans casser le grid.
+   L'ACTFL chip a un min-width qui laisse tenir « ACTFL ADVANCED LOW
+   → MID » sans troncature. */
+.maison-echelle-detail {
+  margin: 0 0 32px;
+  padding: 22px 26px 20px;
+  border: 1px solid var(--creme-hair);
+  border-radius: 16px;
+  background: rgba(244, 235, 220, 0.02);
+  transition: background var(--dur-move) var(--ease-glide),
+              border-color var(--dur-move) var(--ease-glide);
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.maison-echelle-detail[data-source="cefr"] {
+  background: var(--espresso-2);
+  border-color: var(--brass-edge);
+}
+.maison-echelle-detail[data-source="yema"] {
+  background: var(--terre);
+  border-color: rgba(201, 132, 63, 0.45);
+}
+.maison-echelle-detail-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.maison-echelle-detail-code {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(36px, 5vw, 48px);
+  line-height: 1;
+  color: var(--brass-glow);
+  flex-shrink: 0;
+}
+.maison-echelle-detail-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1 1 240px;
+}
+.maison-echelle-detail-h {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(18px, 2.4vw, 22px);
+  color: var(--creme);
+  line-height: 1.25;
+}
+.maison-echelle-detail-anchor {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--creme-soft);
+  line-height: 1.45;
+}
+.maison-echelle-detail-actfl {
+  align-self: flex-start;
+  padding: 6px 12px;
+  border: 1px solid var(--brass-edge);
+  border-radius: var(--r-pill);
+  background: rgba(240, 206, 139, 0.08);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+  max-width: 100%;
+}
+.maison-echelle-detail-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px 24px;
+}
+.maison-echelle-detail-list li {
+  position: relative;
+  padding-left: 14px;
+  color: var(--creme-soft);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.maison-echelle-detail-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 8px;
+  height: 1px;
+  background: var(--brass);
+}
+.maison-echelle-detail-fine {
+  margin: 4px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--creme-hair);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--creme-mute);
+  text-transform: uppercase;
+}
+.maison-echelle-detail-hint {
+  margin: 8px 0 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 14.5px;
+  color: var(--creme-mute);
+  text-align: center;
+}
+/* Item sélectionné (via activeCode) reçoit un accent laiton discret
+   qui persiste tant que le détail est ouvert — feedback visuel de
+   correspondance item/détail. */
+.spine-item[data-selected="true"] .spine-code { color: var(--brass); }
+.spine-item[data-selected="true"] .spine-label {
+  color: var(--creme);
+  text-shadow: 0 0 0.4px currentColor;
+}
+@media (max-width: 640px) {
+  .maison-echelle-detail { padding: 18px 18px 16px; }
+  .maison-echelle-detail-list { grid-template-columns: 1fr; }
 }
 
 .maison-echelle-more {

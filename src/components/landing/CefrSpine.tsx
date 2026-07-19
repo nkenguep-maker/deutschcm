@@ -7,6 +7,7 @@
 
 import { useState } from "react";
 import { SpineItem, type SpineStatus } from "./SpineItem";
+import type { SpineDetail } from "./spineDetail";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1"] as const;
 type Level = (typeof LEVELS)[number];
@@ -85,21 +86,53 @@ export function CefrSpine({
   locale = "fr",
   compact = false,
   interactive = true,
+  activeCode = null,
+  onDetailChange,
 }: {
   current?: Level;
   locale?: "fr" | "en";
   compact?: boolean;
   interactive?: boolean;
+  /** Code de l'item dont le détail est affiché (source de vérité soulevée). */
+  activeCode?: string | null;
+  /** Callback appelé quand un item est sélectionné (hover/focus/tap).
+   *  null quand le détail doit se fermer. */
+  onDetailChange?: (detail: SpineDetail | null) => void;
 }) {
   const [hovered, setHovered] = useState<Level | null>(null);
   const currentIdx = LEVELS.indexOf(current);
   const langKey = locale === "en" ? "en" : "fr";
-
-  // Position de la portion peinte de la barre · du top jusqu'au centre
-  // du dot de l'item actif. Chaque item fait ~44px de hauteur avec 26px
-  // de gap → le centre du n-ième item est à n * 44 + n * 26 - 22.
-  // Approximation par pourcentage pour rester responsive.
   const pct = ((currentIdx + 0.5) / LEVELS.length) * 100;
+
+  const emitDetail = (lvl: Level | null) => {
+    if (!onDetailChange) return;
+    if (!lvl) {
+      onDetailChange(null);
+      return;
+    }
+    const meta = LEVEL_META[lvl][langKey];
+    onDetailChange({
+      source: "cefr",
+      code: lvl,
+      headline: meta.headline,
+      skills: meta.skills,
+      fine: locale === "en"
+        ? "What you can actually do at this level."
+        : "Ce que vous saurez faire à ce niveau.",
+    });
+  };
+
+  const onEnter = interactive
+    ? (lvl: Level) => { setHovered(lvl); emitDetail(lvl); }
+    : undefined;
+  // Tap tactile · toggle · re-taper le même item ferme le détail.
+  const onSelect = interactive
+    ? (lvl: Level) => {
+        const next = activeCode === lvl ? null : lvl;
+        setHovered(next);
+        emitDetail(next);
+      }
+    : undefined;
 
   return (
     <div className="spine-wrap">
@@ -109,15 +142,15 @@ export function CefrSpine({
         aria-label={locale === "fr"
           ? `Progression CECRL — niveau actuel ${current}`
           : `CEFR progression — current level ${current}`}
-        onMouseLeave={() => setHovered(null)}
+        onMouseLeave={() => { setHovered(null); emitDetail(null); }}
       >
-        {/* Barre verticale · position absolute, jamais dans le grid */}
         <span className="spine-bar" aria-hidden="true" />
         <span className="spine-bar-fill" aria-hidden="true" />
 
         {LEVELS.map((lvl, i) => {
           const status: SpineStatus = i < currentIdx ? "done" : i === currentIdx ? "on" : "next";
           const meta = LEVEL_META[lvl][langKey];
+          const selected = (activeCode ?? hovered) === lvl;
           return (
             <SpineItem
               key={lvl}
@@ -125,31 +158,15 @@ export function CefrSpine({
               label={compact ? "" : meta.headline}
               status={status}
               ariaLabel={`${lvl} — ${meta.headline}`}
-              ariaDescribedBy={`cefr-panel-${lvl}`}
-              onEnter={interactive ? () => setHovered(lvl) : undefined}
-              onFocus={interactive ? () => setHovered(lvl) : undefined}
-              onBlur={interactive ? () => setHovered(null) : undefined}
+              onEnter={onEnter ? () => onEnter(lvl) : undefined}
+              onFocus={onEnter ? () => onEnter(lvl) : undefined}
+              onBlur={interactive ? () => { setHovered(null); emitDetail(null); } : undefined}
+              onSelect={onSelect ? () => onSelect(lvl) : undefined}
+              selected={selected}
             />
           );
         })}
       </ul>
-
-      {interactive && hovered ? (
-        <aside id={`cefr-panel-${hovered}`} className="spine-panel" role="tooltip">
-          <div className="spine-panel-code" aria-hidden="true">{hovered}</div>
-          <div className="spine-panel-head">{LEVEL_META[hovered][langKey].headline}</div>
-          <ul className="spine-panel-list">
-            {LEVEL_META[hovered][langKey].skills.map((s) => (
-              <li key={s}>{s}</li>
-            ))}
-          </ul>
-          <div className="spine-panel-fine">
-            {locale === "en"
-              ? "What you can actually do at this level."
-              : "Ce que tu peux réellement faire à ce niveau."}
-          </div>
-        </aside>
-      ) : null}
     </div>
   );
 }
