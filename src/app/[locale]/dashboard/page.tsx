@@ -1,418 +1,370 @@
 "use client";
 
+// /dashboard · Sprint « Le Foyer » — étape 1.
+// Ancienne page dashboard supprimée intégralement. Reconstruction
+// selon la doctrine du sprint : quatre couches (structure invariante,
+// territoire, cap qui configure, multi-langues une pièce à la fois).
+//
+// Étape 1 · structure vide branchée aux APIs. Les états vides sont
+// portés par StateBlock — aucune donnée fictive. Les configurations
+// de cap et la braise complète arrivent en étapes 2 et 3.
+
 import { useEffect, useState } from "react";
-import { Link } from "@/navigation";
+import Link from "next/link";
 import { useLocale } from "next-intl";
 import Layout from "@/components/Layout";
+import { StateBlock } from "@/components/StateBlock";
 import { CefrSpine } from "@/components/landing/CefrSpine";
 import { YemaSpine } from "@/components/landing/YemaSpine";
-import { useActiveLanguage } from "@/hooks/useActiveLanguage";
-import { getYemaLevel } from "@/lib/yemaScale";
-import { Teaser } from "@/components/maison/Teaser";
-import {
-  IconMic,
-  IconBook,
-  IconContext,
-  IconFlame,
-  IconSpark,
-  IconChart,
-  IconCheck,
-} from "@/components/landing/icons";
+import { frTypo } from "@/components/landing/typo";
 
-// Dashboard étudiant · Kaffeehaus. Focus continuité d'apprentissage.
-// Hero "Ta prochaine étape" · streak/XP bande secondaire · 3 quick actions.
-
-interface UserData {
-  fullName?: string;
-  germanLevel?: string | null;
-  xpTotal: number;
-  streakDays: number;
-  isValidated?: boolean;
-  studentType?: string | null;
-  cap?: string | null;
-  personalGoal?: string | null;
+// ─── Types remontés par /api/me/foyer ─────────────────────────────
+interface FoyerLangue {
+  id: string;
+  code: string;
+  name: string;
+  nameEn: string;
+  territory: "world" | "sources";
+  scale: "cefr" | "yema";
+  level: string | null;
+  levels: readonly string[];
+}
+interface FoyerBraise {
+  jours: number;
+  activeAujourdhui: boolean;
+}
+interface FoyerClasse {
+  name: string;
+  teacherName: string;
+}
+interface FoyerData {
+  prenom: string;
+  cap: "franchir" | "grandir" | "transmettre" | "moi" | null;
+  personalGoal: string | null;
+  langues: FoyerLangue[];
+  activeLangue: FoyerLangue;
+  braise: FoyerBraise;
+  classe: FoyerClasse | null;
 }
 
-const LEVELS = ["A1", "A2", "B1", "B2", "C1"] as const;
-type Level = (typeof LEVELS)[number];
-
-interface Copy {
-  eye: string;
-  greet: (name: string) => string;
-  h1a: string;
-  h1b: string;
-  subNoLevel: string;
-  subLevel: (level: string) => string;
-  ctaTest: string;
-  ctaContinue: string;
-  hint: string;
-  statStreak: string;
-  statStreakSub: (n: number) => string;
-  statXp: string;
-  statXpSub: string;
-  statLevel: string;
-  statLevelSub: string;
-  statNext: string;
-  statNextSub: string;
-  exploreEye: string;
-  exploreH: string;
-  simTitle: string;
-  simDesc: string;
-  simCta: string;
-  discTitle: string;
-  discDesc: string;
-  discCta: string;
-  courseTitle: string;
-  courseDesc: string;
-  courseCta: string;
-  spineAria: string;
+// ─── Copy éditoriale ──────────────────────────────────────────────
+interface FoyerCopy {
+  greetingMorning: string;
+  greetingAfternoon: string;
+  greetingEvening: string;
+  capLabel: string;
+  cap: Record<"franchir" | "grandir" | "transmettre" | "moi", string>;
+  reprendreEye: string;
+  reprendreEmpty: { soul: string; action: string };
+  echelleTitle: string;
+  capCardTitle: string;
+  capCardEmpty: { soul: string; action: string };
+  classeTitle: string;
+  classeEmpty: { soul: string; action: string };
+  otherVoiceKicker: string;
+  otherVoicePrefix: string;
+  otherVoiceSuffix: string;
+  toolsTitle: string;
+  toolSim: string;
+  toolSimDesc: string;
+  toolDiscover: string;
+  toolDiscoverDesc: string;
+  toolCourses: string;
+  toolCoursesDesc: string;
 }
 
-const FR: Copy = {
-  eye: "Tableau de bord",
-  greet: (name) => `Bonjour, ${name}.`,
-  h1a: "Ta prochaine ",
-  h1b: "étape.",
-  subNoLevel:
-    "Commence par un test de niveau — dix minutes qui décident du chapitre à ouvrir.",
-  subLevel: (level) =>
-    `Tu es au niveau ${level}. Reprends là où tu t'es arrêté·e, même quelques minutes.`,
-  ctaTest: "Tester mon niveau",
-  ctaContinue: "Continuer ma leçon",
-  hint: "Cinq minutes par jour valent mieux qu'une heure une fois par semaine.",
-  statStreak: "Série",
-  statStreakSub: (n) => (n === 0 ? "Commence aujourd'hui" : n === 1 ? "1 jour d'affilée" : `${n} jours d'affilée`),
-  statXp: "XP cumulés",
-  statXpSub: "Progression totale",
-  statLevel: "Niveau",
-  statLevelSub: "CECRL A1 → C1",
-  statNext: "Prochain palier",
-  statNextSub: "Continuité",
-  exploreEye: "Explorer",
-  exploreH: "Trois portes ouvertes.",
-  simTitle: "Simulateur",
-  simDesc: "Une conversation avec Klaus, ton coach IA. Scénarios réels, correction en direct.",
-  simCta: "Ouvrir",
-  discTitle: "Découvrir",
-  discDesc: "Trouve d'autres apprenant·e·s, partage ton parcours, entraîne-toi ensemble.",
-  discCta: "Explorer",
-  courseTitle: "Cours",
-  courseDesc: "Le catalogue complet des leçons alignées CECRL, du A1 au C1. Rythme libre.",
-  courseCta: "Voir",
-  spineAria: "Ton parcours CECRL",
+function useCopy(locale: "fr" | "en"): { c: FoyerCopy; t: (s: string) => string } {
+  const c: FoyerCopy = locale === "en" ? COPY_EN : COPY_FR;
+  const t = (s: string) => (locale === "fr" ? frTypo(s) : s);
+  return { c, t };
+}
+
+const COPY_FR: FoyerCopy = {
+  greetingMorning: "Bonjour",
+  greetingAfternoon: "Bon après-midi",
+  greetingEvening: "Bonsoir",
+  capLabel: "Votre cap",
+  cap: {
+    franchir: "Franchir",
+    grandir: "Grandir",
+    transmettre: "Transmettre",
+    moi: "Apprendre pour vous",
+  },
+  reprendreEye: "Reprendre",
+  reprendreEmpty: {
+    soul: "La première leçon — *ouvrez la porte.*",
+    action: "Ouvrir",
+  },
+  echelleTitle: "Mon échelle",
+  capCardTitle: "Votre chemin",
+  capCardEmpty: {
+    soul: "Le chemin s'écrit — *posez votre but.*",
+    action: "Compléter mon profil",
+  },
+  classeTitle: "Ma classe",
+  classeEmpty: {
+    soul: "Aucune classe pour l'instant. *Rejoignez avec un code.*",
+    action: "Entrer un code",
+  },
+  otherVoiceKicker: "L'autre voix",
+  otherVoicePrefix: "L'autre voix vous attend.",
+  otherVoiceSuffix: "Passer au",
+  toolsTitle: "Vos outils",
+  toolSim: "Le simulateur",
+  toolSimDesc: "Des scénarios réels. Voix, correction, encouragement.",
+  toolDiscover: "Rencontrer",
+  toolDiscoverDesc: "D'autres voix qui apprennent la même langue.",
+  toolCourses: "Le catalogue",
+  toolCoursesDesc: "Tous les modules de la langue active — rythme libre.",
 };
 
-const EN: Copy = {
-  eye: "Dashboard",
-  greet: (name) => `Hello, ${name}.`,
-  h1a: "Your next ",
-  h1b: "step.",
-  subNoLevel:
-    "Start with a level test — ten minutes that decide which chapter to open.",
-  subLevel: (level) =>
-    `You're at level ${level}. Pick up where you left off, even for a few minutes.`,
-  ctaTest: "Take the level test",
-  ctaContinue: "Resume my lesson",
-  hint: "Five minutes a day beats one hour once a week.",
-  statStreak: "Streak",
-  statStreakSub: (n) => (n === 0 ? "Start today" : n === 1 ? "1 day" : `${n} days in a row`),
-  statXp: "XP earned",
-  statXpSub: "Total progress",
-  statLevel: "Level",
-  statLevelSub: "CEFR A1 → C1",
-  statNext: "Next step",
-  statNextSub: "Continuity",
-  exploreEye: "Explore",
-  exploreH: "Three open doors.",
-  simTitle: "Simulator",
-  simDesc: "A conversation with Klaus, your AI coach. Real scenarios, instant correction.",
-  simCta: "Open",
-  discTitle: "Discover",
-  discDesc: "Find fellow learners, share your journey, practice together.",
-  discCta: "Explore",
-  courseTitle: "Courses",
-  courseDesc: "The full CEFR-aligned catalog, from A1 to C1. Free pacing.",
-  courseCta: "Browse",
-  spineAria: "Your CEFR journey",
+const COPY_EN: FoyerCopy = {
+  greetingMorning: "Good morning",
+  greetingAfternoon: "Good afternoon",
+  greetingEvening: "Good evening",
+  capLabel: "Your cap",
+  cap: {
+    franchir: "Cross over",
+    grandir: "Grow",
+    transmettre: "Pass on",
+    moi: "Learn for you",
+  },
+  reprendreEye: "Resume",
+  reprendreEmpty: {
+    soul: "Your first lesson — *open the door.*",
+    action: "Open",
+  },
+  echelleTitle: "My scale",
+  capCardTitle: "Your path",
+  capCardEmpty: {
+    soul: "The path is being written — *set your goal.*",
+    action: "Complete my profile",
+  },
+  classeTitle: "My class",
+  classeEmpty: {
+    soul: "No class yet. *Join with a code.*",
+    action: "Enter a code",
+  },
+  otherVoiceKicker: "The other voice",
+  otherVoicePrefix: "The other voice is waiting.",
+  otherVoiceSuffix: "Switch to",
+  toolsTitle: "Your tools",
+  toolSim: "The simulator",
+  toolSimDesc: "Real scenarios. Voice, correction, encouragement.",
+  toolDiscover: "Meet",
+  toolDiscoverDesc: "Other voices learning the same language.",
+  toolCourses: "The catalog",
+  toolCoursesDesc: "All modules of the active language — free pacing.",
 };
 
-function nextLevel(current: Level | null): Level | "C2" {
-  if (!current) return "A1";
-  const idx = LEVELS.indexOf(current);
-  if (idx === -1 || idx === LEVELS.length - 1) return "C2";
-  return LEVELS[idx + 1];
+function greetingFor(hour: number, c: FoyerCopy): string {
+  if (hour < 12) return c.greetingMorning;
+  if (hour < 18) return c.greetingAfternoon;
+  return c.greetingEvening;
 }
 
-// Libellés éditoriaux du cap · rappelés dans la carte du dashboard
-// pour que l'apprenant·e reconnaisse son chemin d'un coup d'œil.
-function capLabelFr(cap: string | null | undefined): string {
-  if (cap === "franchir") return "Franchir. Partir, réussir.";
-  if (cap === "grandir") return "Grandir. Là où vous vivez.";
-  if (cap === "transmettre") return "Transmettre. La langue du foyer.";
-  if (cap === "moi") return "Apprendre pour vous.";
-  return "Votre parcours.";
-}
-function capLabelEn(cap: string | null | undefined): string {
-  if (cap === "franchir") return "Cross over. Leave, succeed.";
-  if (cap === "grandir") return "Grow. Right where you are.";
-  if (cap === "transmettre") return "Pass on. The language of home.";
-  if (cap === "moi") return "Learn for you.";
-  return "Your path.";
-}
-
-// Palier suivant dans une échelle arbitraire (CECRL ou YEMA).
-// Le dernier palier reste sur lui-même — pas de "C2" fictif pour YEMA.
-function nextInScale(current: string | null, levels: readonly string[]): string {
-  if (!current) return levels[0];
-  const idx = levels.indexOf(current);
-  if (idx === -1 || idx === levels.length - 1) return levels[levels.length - 1];
-  return levels[idx + 1];
-}
-
-export default function StudentDashboard() {
+export default function FoyerPage() {
   const locale = useLocale();
-  const t = locale === "en" ? EN : FR;
-  const { language: activeLang } = useActiveLanguage();
-  const [data, setData] = useState<UserData | null>(null);
+  const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
+  const { c, t } = useCopy(loc);
+
+  const [data, setData] = useState<FoyerData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/me")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (d) {
-          setData({
-            fullName: d.fullName,
-            germanLevel: d.germanLevel,
-            xpTotal: d.xpTotal ?? 0,
-            streakDays: d.streakDays ?? 0,
-            isValidated: d.isValidated,
-            studentType: d.studentType,
-            cap: d.cap ?? null,
-            personalGoal: d.personalGoal ?? null,
-          });
-        }
-      })
-      .catch(() => {})
+    fetch("/api/me/foyer")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("foyer_fetch_failed"))))
+      .then((d) => setData(d as FoyerData))
+      .catch((e) => setError(String(e)))
       .finally(() => setLoading(false));
   }, []);
 
-  const firstName = (data?.fullName ?? "").split(" ")[0] || (locale === "en" ? "you" : "toi");
+  if (loading) {
+    return (
+      <Layout title="Foyer">
+        <StateBlock
+          kind="loading"
+          soul={loc === "en" ? "The house is opening — *just a moment.*" : "La maison s'ouvre — *un instant.*"}
+        />
+      </Layout>
+    );
+  }
 
-  // Niveau adapté à la langue active. Pour l'allemand → germanLevel
-  // legacy. Pour les autres langues → premier palier de l'échelle
-  // (en attendant le model UserLanguage). Le hero et le spine
-  // reflètent tous deux la langue active.
-  const isGerman = activeLang.id === "deutsch";
-  const isYema = activeLang.scale === "yema";
-  const levelsArray = activeLang.levels;
-  const rawLevel = isGerman ? (data?.germanLevel ?? null) : levelsArray[0];
-  const level = rawLevel && levelsArray.includes(rawLevel) ? rawLevel : null;
-  const hasLevel = !!level;
-  // Spine display : pour foreign on affiche le niveau CECRL réel (fallback A1),
-  // pour native on affiche le palier YEMA (É1 par défaut, en attendant
-  // le model UserLanguage qui portera un niveau par langue).
-  const currentSpineCefr = (isGerman && hasLevel ? level : "A1") as Level;
-  const currentSpineYema = level ?? levelsArray[0];
+  if (error || !data) {
+    return (
+      <Layout title="Foyer">
+        <StateBlock
+          kind="error"
+          soul={loc === "en" ? "The voice got lost on the way. *Not yours.*" : "La voix s'est perdue en route. *Pas la vôtre.*"}
+          action={{ label: loc === "en" ? "Try again" : "Réessayer", onClick: () => window.location.reload() }}
+        />
+      </Layout>
+    );
+  }
 
-  // Palier + nom éditorial YEMA (Écoute, Voix, Récit, Palabre, Foyer).
-  // Utilisé pour enrichir le hero sub et l'aria du spine.
-  const yemaMeta = isYema && hasLevel ? getYemaLevel(level as string) : null;
-  const yemaName = yemaMeta ? (locale === "en" ? yemaMeta.nameEn : yemaMeta.name) : null;
+  const hour = new Date().getHours();
+  const greeting = greetingFor(hour, c);
+  const capLabel = data.cap ? c.cap[data.cap] : null;
+  const territoryClass = `territory-${data.activeLangue.territory}`;
+  const isYema = data.activeLangue.scale === "yema";
+  const currentSpine = data.activeLangue.level ?? data.activeLangue.levels[0];
 
-  // Copy language-aware. On surcharge les libellés qui parlent explicitement
-  // de CECRL quand l'apprenant·e est sur une langue natale.
-  const spineAria = isYema
-    ? (locale === "en" ? "Your YEMA journey" : "Ton parcours YEMA")
-    : t.spineAria;
-  const courseDesc = isYema
-    ? (locale === "en"
-        ? "Modules built for oral tradition — greeting, marketplace, story, palaver, home. Free pacing."
-        : "Modules pensés pour l'oralité — salut, marché, récit, palabre, foyer. Rythme libre.")
-    : t.courseDesc;
-  const testHref = isYema ? "/courses" : "/test-niveau";
-  const testLabel = isYema
-    ? (locale === "en" ? "Open the first stage" : "Ouvrir le premier palier")
-    : t.ctaTest;
-
-  const ctaHref = hasLevel ? "/courses" : testHref;
-  const ctaLabel = hasLevel ? t.ctaContinue : testLabel;
-  // Sub level enrichi pour YEMA : "Tu es au palier É1 · Écoute" au lieu de "É1"
-  const subLevelText = hasLevel
-    ? (yemaName
-        ? (locale === "en"
-            ? `You're at stage ${level} · ${yemaName}. Come back to it, even briefly.`
-            : `Tu es au palier ${level} · ${yemaName}. Reviens-y, même brièvement.`)
-        : t.subLevel(level as string))
-    : t.subNoLevel;
+  // Multi-langues : autres langues supportées que la langue active
+  const otherLanguages = data.langues.filter((l) => l.id !== data.activeLangue.id);
+  const hasOther = otherLanguages.length >= 1;
 
   return (
-    <Layout title={t.eye}>
-      <section className="dash" aria-labelledby="dash-h1">
-        <header style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-          <p className="dash-eye" style={{ margin: 0 }}>{t.greet(firstName)}</p>
-          <span style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "4px 10px 4px 4px",
-            borderRadius: 999,
-            border: "1px solid var(--brass-edge)",
-            background: "var(--brass-glow)",
-            fontFamily: "var(--font-jetbrains, monospace)",
-            fontSize: 11,
-            fontWeight: 600,
-            letterSpacing: "0.08em",
-            color: "var(--brass)",
-          }}>
-            <span style={{
-              width: 20, height: 20,
-              borderRadius: 5,
-              background: "var(--brass)",
-              color: "var(--espresso)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 9.5, fontWeight: 700, letterSpacing: 0,
-            }} aria-hidden="true">{activeLang.code}</span>
-            <span style={{ textTransform: "uppercase" }}>
-              {locale === "en" ? activeLang.nameEn : activeLang.name} · {activeLang.scale === "yema" ? "YEMA" : "CECRL"}
-            </span>
-          </span>
+    <Layout title="Foyer">
+      <div className={`foyer ${territoryClass}`}>
+        {/* a) L'EN-TÊTE DU FOYER */}
+        <header className="foyer-header">
+          <div className="foyer-header-side">
+            <p className="foyer-greeting">
+              {t(greeting)}, <em>{data.prenom}.</em>
+            </p>
+            {capLabel ? (
+              <p className="foyer-cap-line">
+                {t(c.capLabel).toUpperCase()} · {t(capLabel).toUpperCase()}
+              </p>
+            ) : null}
+          </div>
+          {/* Braise · étape 3 (placeholder statique pour l'étape 1) */}
+          <div className="foyer-braise-slot" aria-hidden={data.braise.jours === 0}>
+            <BraisePlaceholder braise={data.braise} locale={loc} />
+          </div>
         </header>
 
-        <article className="dash-hero">
-          <div>
-            <h1 id="dash-h1" className="dash-hero-h">
-              {t.h1a}
-              <em>{t.h1b}</em>
-            </h1>
-            <p className="dash-hero-sub">{subLevelText}</p>
-            <Link href={ctaHref} className="dash-hero-cta">
-              {ctaLabel}
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                   stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"
-                   strokeLinejoin="round" aria-hidden="true">
-                <path d="M3 8h10M9 4l4 4-4 4" />
-              </svg>
-            </Link>
-            <p style={{
-              marginTop: 18,
-              color: "var(--creme-mute)",
-              fontSize: 12.5,
-              fontFamily: "var(--font-jetbrains, monospace)",
-              letterSpacing: "0.04em",
-            }}>
-              {t.hint}
-            </p>
-          </div>
-          <div className="dash-hero-side" aria-label={spineAria}>
-            {isYema ? (
-              <YemaSpine
-                current={currentSpineYema}
-                locale={locale === "en" ? "en" : "fr"}
-                compact
-              />
-            ) : (
-              <CefrSpine current={currentSpineCefr} locale={locale === "en" ? "en" : "fr"} compact />
-            )}
-          </div>
-        </article>
-
-        <section aria-label={t.exploreEye} className="dash-stats">
-          <div className="dash-stat">
-            <p className="dash-stat-lbl">
-              <span className="dash-stat-icon" aria-hidden="true"><IconFlame size={13} /></span>
-              {t.statStreak}
-            </p>
-            <p className="dash-stat-val">{loading ? "—" : data?.streakDays ?? 0}</p>
-            <p className="dash-stat-sub">{t.statStreakSub(data?.streakDays ?? 0)}</p>
-          </div>
-          <div className="dash-stat">
-            <p className="dash-stat-lbl">
-              <span className="dash-stat-icon" aria-hidden="true"><IconSpark size={13} /></span>
-              {t.statXp}
-            </p>
-            <p className="dash-stat-val">{loading ? "—" : (data?.xpTotal ?? 0).toLocaleString()}</p>
-            <p className="dash-stat-sub">{t.statXpSub}</p>
-          </div>
-          <div className="dash-stat">
-            <p className="dash-stat-lbl">
-              <span className="dash-stat-icon" aria-hidden="true"><IconCheck size={13} /></span>
-              {t.statLevel}
-            </p>
-            <p className="dash-stat-val">{hasLevel ? level : "—"}</p>
-            <p className="dash-stat-sub">
-              {activeLang.scale === "yema"
-                ? "É1 → É5"
-                : `${activeLang.levels[0]} → ${activeLang.levels[activeLang.levels.length - 1]}`}
-            </p>
-          </div>
-          <div className="dash-stat">
-            <p className="dash-stat-lbl">
-              <span className="dash-stat-icon" aria-hidden="true"><IconChart size={13} /></span>
-              {t.statNext}
-            </p>
-            <p className="dash-stat-val">
-              {isYema
-                ? nextInScale(hasLevel ? (level as string) : null, levelsArray)
-                : nextLevel(hasLevel ? (level as Level) : null)}
-            </p>
-            <p className="dash-stat-sub">{t.statNextSub}</p>
-          </div>
+        {/* b) REPRENDRE — l'unique zone laiton de l'écran */}
+        <section className="foyer-reprendre" aria-labelledby="foyer-reprendre-h">
+          <p className="maison-kicker">{t(c.reprendreEye)}</p>
+          {/* Étape 1 · placeholder StateBlock. Étape 2 branchera
+              /api/me/next-lesson avec capContext par cap. */}
+          <StateBlock
+            kind="empty"
+            soul={c.reprendreEmpty.soul}
+            action={{ label: c.reprendreEmpty.action, href: `/${locale}/courses` }}
+          />
         </section>
 
-        {/* Carte cap · si l'utilisateur a fini l'onboarding par but, on
-            rappelle son cap et sa phrase — la maison écoute. */}
-        {data?.cap || data?.personalGoal ? (
-          <section className="dash-cap" aria-label={locale === "en" ? "Your cap" : "Votre cap"}>
-            <p className="maison-kicker">
-              {locale === "en" ? "Your cap" : "Votre cap"}
-            </p>
-            <h2 className="dash-cap-title">
-              {locale === "en" ? capLabelEn(data?.cap) : capLabelFr(data?.cap)}
-            </h2>
-            {data?.personalGoal ? (
-              <blockquote className="dash-cap-quote">
-                <p><em>« {data.personalGoal} »</em></p>
-              </blockquote>
-            ) : null}
+        {/* c) RANGÉE Mon échelle + carte de cap */}
+        <div className="foyer-row">
+          <section className="foyer-echelle" aria-labelledby="foyer-echelle-h">
+            <p className="maison-kicker">{t(c.echelleTitle)}</p>
+            <div className="foyer-echelle-holder">
+              {isYema ? (
+                <YemaSpine current={currentSpine} locale={loc} compact />
+              ) : (
+                <CefrSpine current={currentSpine as "A1" | "A2" | "B1" | "B2" | "C1"} locale={loc} compact />
+              )}
+            </div>
+          </section>
+
+          <section className="foyer-cap-card" aria-labelledby="foyer-cap-card-h">
+            <p className="maison-kicker">{t(c.capCardTitle)}</p>
+            {/* Étape 1 · placeholder. Étape 2 · contenu selon cap. */}
+            {data.cap ? (
+              <div className="foyer-cap-inner">
+                <p className="foyer-cap-inner-h">{t(c.cap[data.cap])}.</p>
+                {data.personalGoal ? (
+                  <blockquote className="foyer-cap-quote">
+                    <p><em>« {data.personalGoal} »</em></p>
+                  </blockquote>
+                ) : null}
+              </div>
+            ) : (
+              <StateBlock
+                kind="empty"
+                soul={c.capCardEmpty.soul}
+                action={{ label: c.capCardEmpty.action, href: `/${locale}/onboarding/student` }}
+              />
+            )}
+          </section>
+        </div>
+
+        {/* d) MA CLASSE (ou rejoindre) */}
+        <section className="foyer-classe" aria-labelledby="foyer-classe-h">
+          <p className="maison-kicker">{t(c.classeTitle)}</p>
+          {data.classe ? (
+            <article className="foyer-classe-card">
+              <p className="foyer-classe-name">{data.classe.name}</p>
+              {data.classe.teacherName ? (
+                <p className="foyer-classe-teacher">
+                  {loc === "en" ? "With" : "Avec"} {data.classe.teacherName}
+                </p>
+              ) : null}
+            </article>
+          ) : (
+            <StateBlock
+              kind="empty"
+              soul={c.classeEmpty.soul}
+              action={{ label: c.classeEmpty.action, href: `/${locale}/discover` }}
+            />
+          )}
+        </section>
+
+        {/* e) L'AUTRE VOIX (si 2+ langues) */}
+        {hasOther ? (
+          <section className="foyer-other" aria-labelledby="foyer-other-h">
+            <p className="maison-kicker">{t(c.otherVoiceKicker)}</p>
+            {otherLanguages.length === 1 ? (
+              <Link href={`/${locale}/dashboard?lang=${otherLanguages[0].id}`} className="foyer-other-single">
+                {t(c.otherVoicePrefix)}{" "}
+                <em>
+                  {t(c.otherVoiceSuffix)}{" "}
+                  {loc === "en" ? otherLanguages[0].nameEn : otherLanguages[0].name} →
+                </em>
+              </Link>
+            ) : (
+              <ul className="foyer-other-list">
+                {otherLanguages.map((l) => (
+                  <li key={l.id}>
+                    <Link href={`/${locale}/dashboard?lang=${l.id}`} className="foyer-other-item">
+                      <span className="foyer-other-code">{l.code}</span>
+                      <span className="foyer-other-name">
+                        {loc === "en" ? l.nameEn : l.name}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         ) : null}
 
-        <section aria-labelledby="dash-explore-h">
-          <p className="dash-eye">{t.exploreEye}</p>
-          <h2 id="dash-explore-h" className="dash-block-h">{t.exploreH}</h2>
-          <div className="dash-actions">
-            <Link href="/simulateur" className="dash-action">
-              <span className="dash-action-icon" aria-hidden="true"><IconMic size={18} /></span>
-              <h3 className="dash-action-title">{t.simTitle}</h3>
-              <p className="dash-action-desc">{t.simDesc}</p>
-              <p className="dash-action-cta">{t.simCta} →</p>
+        {/* f) OUTILS + HISTORIQUE */}
+        <section className="foyer-tools" aria-labelledby="foyer-tools-h">
+          <p className="maison-kicker">{t(c.toolsTitle)}</p>
+          <div className="foyer-tools-grid">
+            <Link href={`/${locale}/simulateur`} className="foyer-tool">
+              <h3>{t(c.toolSim)}</h3>
+              <p>{t(c.toolSimDesc)}</p>
             </Link>
-            <Link href="/discover" className="dash-action">
-              <span className="dash-action-icon" aria-hidden="true"><IconContext size={18} /></span>
-              <h3 className="dash-action-title">{t.discTitle}</h3>
-              <p className="dash-action-desc">{t.discDesc}</p>
-              <p className="dash-action-cta">{t.discCta} →</p>
+            <Link href={`/${locale}/discover`} className="foyer-tool">
+              <h3>{t(c.toolDiscover)}</h3>
+              <p>{t(c.toolDiscoverDesc)}</p>
             </Link>
-            <Link href="/courses" className="dash-action">
-              <span className="dash-action-icon" aria-hidden="true"><IconBook size={18} /></span>
-              <h3 className="dash-action-title">{t.courseTitle}</h3>
-              <p className="dash-action-desc">{courseDesc}</p>
-              <p className="dash-action-cta">{t.courseCta} →</p>
+            <Link href={`/${locale}/courses`} className="foyer-tool">
+              <h3>{t(c.toolCourses)}</h3>
+              <p>{t(c.toolCoursesDesc)}</p>
             </Link>
           </div>
         </section>
-
-        {/* Teaser dashboard · discret, sans bouton — le seul teaser connecté */}
-        <div style={{ marginTop: 40 }}>
-          <Teaser
-            locale={locale === "en" ? "en" : "fr"}
-            compact
-            line1={locale === "en" ? "A new language is settling in." : "Une nouvelle langue s'installe."}
-            line2={locale === "en" ? "The house grows a little every week." : "La maison grandit un peu chaque semaine."}
-          />
-        </div>
-      </section>
+      </div>
     </Layout>
+  );
+}
+
+// ─── Braise · placeholder étape 1 (composant complet en étape 3) ──
+function BraisePlaceholder({ braise, locale }: { braise: FoyerBraise; locale: "fr" | "en" }) {
+  const label = locale === "en"
+    ? `The ember burns · ${braise.jours} ${braise.jours === 1 ? "day" : "days"}`
+    : `La braise brûle · ${braise.jours} ${braise.jours === 1 ? "jour" : "jours"}`;
+  return (
+    <div className={`braise ${braise.activeAujourdhui ? "on" : "off"}`}
+         aria-label={label}>
+      <span className="braise-dot" aria-hidden="true" />
+      <span className="braise-label">{label}</span>
+    </div>
   );
 }

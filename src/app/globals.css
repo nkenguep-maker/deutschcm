@@ -7149,7 +7149,289 @@ body:has(.test-space-bar) { padding-top: 34px; }
   font-style: italic;
 }
 
-/* Carte cap · rappel du chemin choisi sur le dashboard élève */
+/* ═══════════════════════════════════════════════════════════════════════
+   SPRINT « LE FOYER » — dashboard élève neuf, une pièce, quatre caps.
+   Mobile-first une colonne, territoire hérité de la langue active,
+   Reprendre en unique zone laiton, braise en tête.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.foyer {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 12px 0 60px;
+  color: var(--creme);
+}
+
+/* a) L'en-tête du foyer · salutation + cap + braise */
+.foyer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--creme-hair);
+  flex-wrap: wrap;
+}
+.foyer-header-side {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+.foyer-greeting {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(28px, 3.4vw, 34px);
+  line-height: 1.15;
+  color: var(--creme);
+  letter-spacing: -0.01em;
+}
+.foyer-greeting em {
+  font-style: italic;
+  color: var(--brass);
+}
+.foyer-cap-line {
+  margin: 0;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: var(--brass);
+  text-transform: uppercase;
+}
+
+/* Braise · point laiton + label mono */
+.braise {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-pill);
+  background: rgba(244, 235, 220, 0.03);
+  transition: border-color var(--dur-touch) var(--ease-enter);
+}
+.braise-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #F0CE8B 0%, #D9A855 55%, #B8873E 100%);
+  box-shadow: 0 0 12px rgba(240, 206, 139, 0.35);
+  transition: opacity var(--dur-move) var(--ease-glide);
+}
+.braise.on { border-color: var(--brass-edge); }
+.braise.off .braise-dot { opacity: 0.35; box-shadow: none; }
+.braise-label {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--brass);
+  text-transform: uppercase;
+}
+.braise.off .braise-label { color: var(--creme-mute); }
+
+/* b) Reprendre · unique zone laiton */
+.foyer-reprendre {
+  padding: 22px 24px;
+  border: 1px solid var(--brass-edge);
+  border-radius: var(--r-panel);
+  background: var(--brass-glow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* c) Rangée · échelle + carte cap */
+.foyer-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 800px) {
+  .foyer-row { grid-template-columns: 1fr; }
+}
+.foyer-echelle,
+.foyer-cap-card {
+  padding: 22px 24px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-panel);
+  background: rgba(244, 235, 220, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.foyer-echelle-holder {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+.foyer-cap-inner-h {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 22px;
+  color: var(--brass);
+  line-height: 1.2;
+}
+.foyer-cap-quote {
+  margin: 8px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--creme-hair);
+}
+.foyer-cap-quote p {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 15px;
+  color: var(--creme-soft);
+  line-height: 1.55;
+}
+.foyer-cap-quote em { color: var(--brass); }
+
+/* d) Classe · carte ou état vide */
+.foyer-classe {
+  padding: 22px 24px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-panel);
+  background: rgba(244, 235, 220, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.foyer-classe-card {
+  padding: 14px 0 0;
+}
+.foyer-classe-name {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 20px;
+  color: var(--creme);
+  line-height: 1.15;
+}
+.foyer-classe-teacher {
+  margin: 6px 0 0;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--creme-mute);
+  text-transform: uppercase;
+}
+
+/* e) L'autre voix · bascule de langue discrète */
+.foyer-other {
+  padding: 20px 24px;
+  border: 1px dashed var(--brass-edge);
+  border-radius: var(--r-panel);
+  background: rgba(184, 135, 62, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.foyer-other-single {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 16px;
+  color: var(--creme);
+  text-decoration: none;
+  line-height: 1.4;
+  transition: color var(--dur-touch) var(--ease-enter);
+}
+.foyer-other-single em { color: var(--brass); font-style: italic; }
+.foyer-other-single:hover em { text-decoration: underline; }
+.foyer-other-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.foyer-other-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--brass-edge);
+  border-radius: var(--r-pill);
+  color: var(--brass);
+  text-decoration: none;
+  transition: background var(--dur-touch) var(--ease-enter);
+}
+.foyer-other-item:hover { background: var(--brass-glow); }
+.foyer-other-code {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.foyer-other-name {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+}
+
+/* f) Outils · 3 cartes */
+.foyer-tools {
+  padding: 20px 24px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-panel);
+  background: rgba(244, 235, 220, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.foyer-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.foyer-tool {
+  padding: 16px 18px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-card);
+  background: rgba(244, 235, 220, 0.02);
+  text-decoration: none;
+  color: var(--creme);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color var(--dur-touch) var(--ease-enter),
+              background var(--dur-touch) var(--ease-enter);
+}
+.foyer-tool:hover { border-color: var(--brass-edge); background: var(--brass-glow); }
+.foyer-tool h3 {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--creme);
+}
+.foyer-tool p {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 13.5px;
+  color: var(--creme-soft);
+  line-height: 1.4;
+}
+
+/* Territoire · le foyer prend le fond de sa langue active. Le
+   Layout.tsx applique déjà .territory-{world|sources} sur .app-shell,
+   ce bloc ajuste juste les cartes internes pour rester lisible sur
+   les deux fonds. */
+.foyer.territory-sources .foyer-echelle,
+.foyer.territory-sources .foyer-cap-card,
+.foyer.territory-sources .foyer-classe,
+.foyer.territory-sources .foyer-tools,
+.foyer.territory-sources .foyer-tool {
+  border-color: rgba(244, 235, 220, 0.14);
+  background: rgba(244, 235, 220, 0.04);
+}
+
+/* Carte cap · rappel du chemin choisi sur le dashboard élève (OBSOLETE
+   — remplacé par foyer-cap-card. Conservé le temps de vérifier qu'aucun
+   composant hors du foyer ne le référence). */
 .dash-cap {
   margin: 32px 0;
   padding: 24px 26px;
