@@ -8,6 +8,7 @@ import { CefrSpine } from "@/components/landing/CefrSpine";
 import { YemaSpine } from "@/components/landing/YemaSpine";
 import { useActiveLanguage } from "@/hooks/useActiveLanguage";
 import { getYemaLevel } from "@/lib/yemaScale";
+import { Teaser } from "@/components/maison/Teaser";
 import {
   IconMic,
   IconBook,
@@ -362,6 +363,16 @@ export default function StudentDashboard() {
             </Link>
           </div>
         </section>
+
+        {/* Teaser dashboard · discret, sans bouton — le seul teaser connecté */}
+        <div style={{ marginTop: 40 }}>
+          <Teaser
+            locale={locale === "en" ? "en" : "fr"}
+            compact
+            line1={locale === "en" ? "A new language is settling in." : "Une nouvelle langue s'installe."}
+            line2={locale === "en" ? "The house grows a little every week." : "La maison grandit un peu chaque semaine."}
+          />
+        </div>
       </section>
     </Layout>
   );
