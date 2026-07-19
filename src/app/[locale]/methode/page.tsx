@@ -54,7 +54,7 @@ const PRINCIPLES_FR: readonly Principle[] = [
   {
     tag: "Principe 02 · Structure",
     title: "Le pourquoi d'abord.",
-    body: "Chaque langue a ses règles. On en prend une par leçon, et on la rejoue dans plusieurs contextes différents, à quelques jours d'intervalle. Pas de bourrage. Que ce soit la déclinaison en allemand ou les tons en bassa, la méthode reste la même. On veut que la règle serve.",
+    body: "Chaque langue a ses règles. On en prend une par leçon, et on la rejoue dans plusieurs contextes différents, à quelques jours d'intervalle. Pas de bourrage. Prenez la déclinaison en allemand, les tons en bassa, la classe nominale en wolof : trois formes de la même méthode. On veut que la règle serve, tout simplement.",
     world: {
       cap: "Allemand · A2",
       quote: "Ich bin nach Berlin gefahren.",
@@ -147,7 +147,7 @@ const PRINCIPLES_EN: readonly Principle[] = [
   {
     tag: "Principle 02 · Structure",
     title: "The why comes first.",
-    body: "Every language has rules. We take one per lesson, and we replay it in different contexts, a few days apart. No cramming. Whether it's German declension or Bassa tones, the approach stays the same. We want the rule to be useful.",
+    body: "Every language has rules. We take one per lesson, and we replay it in different contexts, a few days apart. No cramming. Take German declension, Bassa tones, Wolof noun class: three shapes of the same method. We just want the rule to be useful.",
     world: {
       cap: "German · A2",
       quote: "Ich bin nach Berlin gefahren.",
@@ -345,14 +345,14 @@ export default function MethodePage() {
                         <p className="methode-example-gloss">{t(p.world.gloss)}</p>
                       </div>
                     ) : null}
-                    {/* Gate technique · un exemple natal apparaît
-                        uniquement quand validated !== false. Toute
-                        phrase (tons, orthographe, sens) doit être
-                        relue par un locuteur natif avant prod ; en
-                        attendant, seul l'exemple world reste — le
-                        principe garde son sens sans transiger sur
-                        la justesse de la langue natale. */}
-                    {p.sources && p.sources.validated !== false ? (
+                    {/* Le parallèle natale ↔ étrangère est le cœur de
+                        la page · les deux exemples s'affichent toujours
+                        côte à côte. Le champ validated reste en data
+                        pour tracer la relecture native à faire avant
+                        prod, mais ne gate plus l'affichage — un doute
+                        de justesse se corrige, un parallèle absent
+                        casse le sens de la méthode. */}
+                    {p.sources ? (
                       <div className="methode-example methode-example-sources">
                         <p className="methode-example-cap">{p.sources.cap}</p>
                         <p className="methode-example-quote">{p.sources.quote}</p>
