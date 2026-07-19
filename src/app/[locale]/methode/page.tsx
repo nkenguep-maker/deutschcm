@@ -37,8 +37,8 @@ interface Principle {
 const PRINCIPLES_FR: readonly Principle[] = [
   {
     tag: "Principe 01 · Contexte",
-    title: "Un mot vit dans une scène — pas dans une liste.",
-    body: "On n'apprend pas « der Bäcker » comme un mot isolé — on l'apprend en poussant la porte d'une boulangerie de Berlin à sept heures du matin. La règle vaut partout : le wolof s'apprend à Sandaga, le bassa s'entend à Édéa, le swahili se déploie sur la côte est. Chaque module part d'une scène.",
+    title: "Le mot vit dans une scène.",
+    body: "On n'apprend pas « der Bäcker » comme un mot d'une liste. On l'apprend en poussant la porte d'une boulangerie de Berlin, à sept heures du matin. C'est vrai partout. Le wolof se travaille au marché Sandaga. Le bassa s'entend à Édéa. Le swahili se parle sur la côte est. Chaque module démarre par une scène.",
     world: {
       cap: "Allemand · A1",
       quote: "Zwei Brötchen, bitte.",
@@ -53,12 +53,12 @@ const PRINCIPLES_FR: readonly Principle[] = [
   },
   {
     tag: "Principe 02 · Structure",
-    title: "Comprendre pourquoi — avant de mémoriser comment.",
-    body: "Chaque langue a ses règles claires. Une règle par leçon, appliquée trois fois dans trois contextes. Répétition espacée, pas bourrage. En allemand la déclinaison, en bassa les tons, en wolof la classe nominale — même méthode : rendre la règle utile avant qu'elle soit belle.",
+    title: "Le pourquoi d'abord.",
+    body: "Chaque langue a ses règles. On en prend une par leçon, et on la rejoue dans plusieurs contextes différents, à quelques jours d'intervalle. Pas de bourrage. Que ce soit la déclinaison en allemand ou les tons en bassa, la méthode reste la même. On veut que la règle serve.",
     world: {
       cap: "Allemand · A2",
       quote: "Ich bin nach Berlin gefahren.",
-      gloss: "Auxiliaire « sein » quand on change de lieu — pas « haben ».",
+      gloss: "Auxiliaire « sein » quand on change de lieu. Jamais « haben ».",
     },
     sources: {
       cap: "Bassa · É2",
@@ -69,8 +69,8 @@ const PRINCIPLES_FR: readonly Principle[] = [
   },
   {
     tag: "Principe 03 · Oral",
-    title: "Parler tôt — se tromper vite, se corriger précis.",
-    body: "Attendre B1 (ou É3 en YEMA) pour parler est un piège. Dès la première leçon, vous vous entraînez sur des scènes réelles — commander un café en allemand, saluer une aînée en bassa, prendre un rendez-vous en anglais — avec une correction immédiate sur trois axes : grammaire, vocabulaire, justesse culturelle.",
+    title: "Parler tôt, quitte à se tromper.",
+    body: "Attendre B1 pour parler est un piège. Dès la première leçon, vous jouez des scènes. Un café à commander en allemand. Une aînée à saluer en bassa. Un rendez-vous à prendre en anglais. La correction arrive tout de suite : la grammaire, le vocabulaire, et ce qui se dit vraiment dans la culture.",
     world: {
       cap: "Allemand · A1",
       quote: "Guten Tag, ich hätte gern einen Termin.",
@@ -85,12 +85,12 @@ const PRINCIPLES_FR: readonly Principle[] = [
   },
   {
     tag: "Principe 04 · Écrit",
-    title: "Écrire — c'est structurer sa pensée dans la langue.",
-    body: "L'écrit n'est pas un supplément d'oral. C'est une compétence à part qui organise la langue. Modules Schreiben en allemand du A2 au C1. La correction ne donne pas seulement un score — elle explique.",
+    title: "Écrire, c'est structurer sa pensée.",
+    body: "L'écrit n'est pas juste de l'oral qu'on pose sur papier. C'est une compétence en soi, qui structure la langue. On la travaille avec les modules Schreiben, en allemand, du A2 jusqu'au C1. Quand la correction arrive, elle ne se contente pas de noter. Elle explique pourquoi.",
     world: {
       cap: "Allemand · B1",
       quote: "Sehr geehrte Frau Schmidt,",
-      gloss: "Formule d'ouverture d'une lettre formelle — jamais « Hallo ».",
+      gloss: "Formule d'ouverture d'une lettre formelle. Jamais « Hallo ».",
     },
     sources: {
       cap: "Wolof · É3",
@@ -102,7 +102,7 @@ const PRINCIPLES_FR: readonly Principle[] = [
   {
     tag: "Principe 05 · Culture",
     title: "Une langue vit dans une culture. On l'enseigne aussi.",
-    body: "Comprendre le « Feierabend » (fin de journée sacrée en Allemagne), savoir que le tutoiement se demande, connaître le « teranga » wolof (l'accueil comme devoir) — ces détails font la différence entre parler et parler comme un locuteur. Chaque module accueille une note culturelle courte.",
+    body: "Certaines choses ne s'apprennent pas dans une grammaire. Le « Feierabend » allemand, cette fin de journée qu'on ne dérange pas. Le tutoiement, qui se demande d'abord. Le « teranga » wolof, qui fait de l'accueil un devoir. Ces petits détails changent tout. Chaque module glisse une note culturelle, très courte.",
     world: {
       cap: "Allemand · culture",
       quote: "Schönen Feierabend !",
@@ -117,12 +117,12 @@ const PRINCIPLES_FR: readonly Principle[] = [
   },
   {
     tag: "Principe 06 · L'humain",
-    title: "L'enseignant au cœur. L'outil à ses côtés.",
-    body: "La machine prépare, corrige le répétitif, signale. L'enseignant décide, encourage, transmet. Cet ordre ne s'inversera jamais.",
+    title: "L'enseignant au cœur.",
+    body: "La machine prépare le matériel. Elle corrige les fautes évidentes et repère quand quelqu'un décroche. Le reste, c'est l'enseignant. Il décide, il encourage, il transmet. Cet ordre ne s'inversera jamais.",
     world: {
       cap: "Ce que l'outil fait",
-      quote: "Il propose. Il corrige. Il alerte quand un·e élève décroche.",
-      gloss: "L'enseignant·e décide, intervient, transmet.",
+      quote: "Il propose des exercices et corrige le répétitif. Il signale aussi quand quelqu'un décroche.",
+      gloss: "L'enseignant garde la main.",
     },
   },
 ];
@@ -130,8 +130,8 @@ const PRINCIPLES_FR: readonly Principle[] = [
 const PRINCIPLES_EN: readonly Principle[] = [
   {
     tag: "Principle 01 · Context",
-    title: "A word lives in a scene — not a list.",
-    body: "You don't learn \"der Bäcker\" as an isolated word — you learn it pushing open a Berlin bakery door at seven in the morning. The rule holds everywhere: Wolof learns at Sandaga, Bassa carries at Édéa, Swahili spreads along the east coast. Every module starts with a scene.",
+    title: "Words live in scenes.",
+    body: "You don't learn \"der Bäcker\" as a word from a list. You learn it pushing open a Berlin bakery door, at seven in the morning. The same is true everywhere. Wolof lives in the Sandaga market. Bassa carries at Édéa. Swahili is spoken along the east coast. Every module starts with a scene.",
     world: {
       cap: "German · A1",
       quote: "Zwei Brötchen, bitte.",
@@ -146,12 +146,12 @@ const PRINCIPLES_EN: readonly Principle[] = [
   },
   {
     tag: "Principle 02 · Structure",
-    title: "Understand why — before memorizing how.",
-    body: "Every language has clear rules. One rule per lesson, applied three times in three contexts. Spaced repetition, not cramming. German declension, Bassa tones, Wolof noun class — same method: make the rule useful before it becomes beautiful.",
+    title: "The why comes first.",
+    body: "Every language has rules. We take one per lesson, and we replay it in different contexts, a few days apart. No cramming. Whether it's German declension or Bassa tones, the approach stays the same. We want the rule to be useful.",
     world: {
       cap: "German · A2",
       quote: "Ich bin nach Berlin gefahren.",
-      gloss: "\"Sein\" when the place changes — never \"haben\".",
+      gloss: "\"Sein\" when the place changes. Never \"haben\".",
     },
     sources: {
       cap: "Bassa · É2",
@@ -162,8 +162,8 @@ const PRINCIPLES_EN: readonly Principle[] = [
   },
   {
     tag: "Principle 03 · Oral",
-    title: "Speak early — mistakes fast, corrections precise.",
-    body: "Waiting for B1 (or É3 at YEMA) to speak is a trap. From the first lesson, you practice on real scenes — order a coffee in German, greet an elder in Bassa, book an appointment in English — with immediate correction on three axes: grammar, vocabulary, cultural fit.",
+    title: "Speak early, mistakes allowed.",
+    body: "Waiting for B1 to speak is a trap. From the first lesson, you play scenes. A coffee to order in German. An elder to greet in Bassa. An appointment to book in English. The correction comes right away: grammar, vocabulary, and what's actually said in the culture.",
     world: {
       cap: "German · A1",
       quote: "Guten Tag, ich hätte gern einen Termin.",
@@ -178,12 +178,12 @@ const PRINCIPLES_EN: readonly Principle[] = [
   },
   {
     tag: "Principle 04 · Written",
-    title: "Writing — is thinking, structured in the language.",
-    body: "Writing isn't a supplement to speech. It's a distinct skill that organizes the language. Schreiben modules in German from A2 to C1. Correction doesn't just give a score — it explains.",
+    title: "Writing structures thought.",
+    body: "Writing isn't spoken language put on paper. It's a skill of its own, one that structures the language. You work on it through the Schreiben modules, in German, from A2 up to C1. When the correction lands, it doesn't just give a score. It tells you why.",
     world: {
       cap: "German · B1",
       quote: "Sehr geehrte Frau Schmidt,",
-      gloss: "Formal letter opening — never \"Hallo\".",
+      gloss: "Formal letter opening. Never \"Hallo\".",
     },
     sources: {
       cap: "Wolof · É3",
@@ -195,7 +195,7 @@ const PRINCIPLES_EN: readonly Principle[] = [
   {
     tag: "Principle 05 · Culture",
     title: "A language lives inside a culture. We teach that too.",
-    body: "Understanding \"Feierabend\" (sacred end-of-day in Germany), knowing informal address is asked for, recognizing Wolof \"teranga\" (hospitality as a duty) — these details make the difference between speaking and speaking like a local. Every module carries a short cultural note.",
+    body: "Some things aren't in the grammar. The German \"Feierabend\", that end-of-day you don't interrupt. Informal address, which is asked for first. The Wolof \"teranga\", which turns hospitality into a duty. Those small things change everything. Every module carries a short cultural note.",
     world: {
       cap: "German · culture",
       quote: "Schönen Feierabend!",
@@ -210,12 +210,12 @@ const PRINCIPLES_EN: readonly Principle[] = [
   },
   {
     tag: "Principle 06 · The human",
-    title: "The teacher at the heart. The tool at their side.",
-    body: "The machine prepares, handles the repetitive corrections, flags. The teacher decides, encourages, transmits. This order will never reverse.",
+    title: "The teacher at the heart.",
+    body: "The machine prepares the material. It handles the obvious corrections and flags when someone slips. The rest is the teacher's job. They decide, they encourage, they pass on. This order will never reverse.",
     world: {
       cap: "What the tool does",
-      quote: "It proposes. It corrects. It alerts when a learner slips.",
-      gloss: "The teacher decides, steps in, passes on.",
+      quote: "It offers exercises and corrects the repetitive. It also flags when someone slips.",
+      gloss: "The teacher keeps the lead.",
     },
   },
 ];
@@ -245,7 +245,7 @@ const COPY_FR: Copy = {
   eye: "La méthode",
   title: "Six principes.",
   titleEm: "Toutes les langues.",
-  lede: "Les mêmes six principes guident chaque module publié — que la langue soit étrangère ou natale. Chaque principe se démontre par la scène.",
+  lede: "Ces six principes guident chaque module qu'on publie, en langue étrangère comme en natale. On ne les récite pas. On les montre dans une scène.",
   navFeatures: "Langues",
   navLevels: "Méthode",
   navPricing: "Manifeste",
@@ -266,7 +266,7 @@ const COPY_EN: Copy = {
   eye: "The method",
   title: "Six principles.",
   titleEm: "All languages.",
-  lede: "The same six principles guide every module we publish — whether the language is foreign or native. Each principle proves itself through the scene.",
+  lede: "These six principles guide every module we publish, in foreign languages as in native ones. We don't recite them. We show them in a scene.",
   navFeatures: "Languages",
   navLevels: "Method",
   navPricing: "Manifesto",
