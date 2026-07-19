@@ -20,6 +20,13 @@ type NavLabels = {
 
 // LandingNav — mécanique client (scroll → .solid). Le locale-switch
 // préserve le pathname : /fr/... ↔ /en/...
+function switchLocale(target: "fr" | "en", current: string) {
+  if (target === current) return;
+  document.cookie = `NEXT_LOCALE=${target}; path=/; max-age=31536000; SameSite=Lax`;
+  const path = window.location.pathname.replace(/^\/(fr|en)/, `/${target}`);
+  window.location.assign(path + window.location.hash);
+}
+
 export function LandingNav({
   locale,
   labels,
@@ -66,8 +73,6 @@ export function LandingNav({
       ) : null}
 
       <div className="lnav-right">
-        {/* Le sélecteur de langue vit sur le Seuil (top-right), pas
-            deux fois — la nav reste dédiée à la navigation. */}
         <button
           type="button"
           className="lnav-btn-ghost"
@@ -82,6 +87,27 @@ export function LandingNav({
         >
           {labels.register}
         </button>
+        {/* Sélecteur de langue · JetBrains Mono discret, aligné
+            après les CTA. Persistance via cookie NEXT_LOCALE + hard
+            nav pour recharger le contexte serveur. */}
+        <div className="lnav-locale" role="group" aria-label={locale === "en" ? "Interface language" : "Langue de l'interface"}>
+          <button
+            type="button"
+            className={`lnav-locale-btn ${locale === "fr" ? "active" : ""}`}
+            onClick={() => switchLocale("fr", locale)}
+            aria-pressed={locale === "fr"}
+          >
+            FR
+          </button>
+          <button
+            type="button"
+            className={`lnav-locale-btn ${locale === "en" ? "active" : ""}`}
+            onClick={() => switchLocale("en", locale)}
+            aria-pressed={locale === "en"}
+          >
+            EN
+          </button>
+        </div>
       </div>
     </nav>
   );

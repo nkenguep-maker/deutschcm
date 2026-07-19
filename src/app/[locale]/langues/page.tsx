@@ -217,12 +217,10 @@ export default function LanguesPage() {
           className="langues-territoire langues-world"
           aria-label={c.ariaWorld}
         >
-          {/* Salutations étrangères dispersées dans les murs de la
-              section (Bonjour, Hallo, Guten Tag, Hello, Hola, Olá,
-              As-salām). Pool filtré sur territoire world uniquement. */}
-          <div className="langues-world-greetings" aria-hidden="false">
-            <SeuilGreetings locale={loc} visibleCount={4} pool="world" />
-          </div>
+          {/* Aucune salutation dans le territoire world — les
+              étrangères ne murmurent pas dans les murs, elles
+              vivent dans les cartes de langues. Le seuil réserve
+              son souffle aux voix natales. */}
 
           <div className="maison-container langues-world-inner">
             <div className="maison-section-head">

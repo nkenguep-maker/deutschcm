@@ -332,25 +332,42 @@ button, [role="button"] {
   align-items: center;
   gap: 10px;
 }
+/* Sélecteur FR/EN dans la nav landing. Ligne verticale, JetBrains
+   Mono, aligné aux boutons login/register. */
 .lnav-locale {
   display: inline-flex;
   align-items: center;
   height: 30px;
-  padding: 0 10px;
+  padding: 2px;
   border: 1px solid var(--creme-hair);
   border-radius: var(--r-pill);
-  color: var(--creme-soft);
+  gap: 0;
+}
+.lnav-locale-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-pill);
+  color: var(--creme-mute);
   font-family: var(--font-jetbrains, monospace);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-decoration: none;
-  transition: color var(--dur-touch), border-color var(--dur-touch), background var(--dur-touch);
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  transition: color var(--dur-touch) var(--ease-enter),
+              background var(--dur-touch) var(--ease-enter);
 }
-.lnav-locale:hover {
+.lnav-locale-btn:hover { color: var(--creme); }
+.lnav-locale-btn.active {
   color: var(--brass);
-  border-color: var(--brass-edge);
-  background: rgba(184, 135, 62, 0.05);
+  background: var(--brass-glow);
+}
+.lnav-locale-btn:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+@media (max-width: 400px) {
+  .lnav-locale { display: none; }
 }
 .lnav-btn-ghost {
   padding: 9px 18px;
@@ -373,10 +390,10 @@ button, [role="button"] {
   background: var(--brass);
   border: 0;
   color: var(--ink);
-  font-family: var(--font-fraunces), Georgia, serif;
+  font-family: var(--font-manrope), system-ui, sans-serif;
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: -0.005em;
+  letter-spacing: 0.01em;
   transition: background var(--dur-touch) ease, transform var(--dur-touch) var(--ease-glide);
 }
 .lnav-btn-primary:hover { background: #C99A55; }
@@ -2816,9 +2833,10 @@ button, [role="button"] {
   align-items: center;
   gap: 8px;
   color: var(--brass);
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 16px;
-  font-weight: 500;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   text-decoration: none;
   padding-bottom: 3px;
   border-bottom: 1px solid var(--brass-edge);
@@ -8347,10 +8365,20 @@ body.foyer-switching .foyer {
    ═══════════════════════════════════════════════════════════════════════ */
 
 .brand-y {
-  display: inline-block;
+  display: block;
   vertical-align: middle;
+  overflow: visible !important;
+  flex-shrink: 0;
+}
+.brand-lockup,
+.brand-lockup-text,
+.lnav-brand,
+.seam-key,
+.porte-brand,
+.cap-brand {
   overflow: visible;
 }
+.seam-key { min-height: 52px; min-width: 52px; padding: 5px; }
 
 /* ── static · rien ne bouge ────────────────────────────────────── */
 .brand-y[data-state="static"] .brand-halo { opacity: 0; }
@@ -9112,8 +9140,9 @@ body.foyer-switching .foyer {
   border: 1px solid var(--creme-hair);
   background: transparent;
   color: var(--creme-mute);
-  font-family: var(--font-fraunces), Georgia, serif;
+  font-family: var(--font-manrope), system-ui, sans-serif;
   font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: color var(--dur-touch) var(--ease-enter),
               border-color var(--dur-touch) var(--ease-enter),

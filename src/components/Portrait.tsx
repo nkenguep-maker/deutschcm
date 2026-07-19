@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { BridgePattern } from "@/components/design/BridgePattern";
 
@@ -75,7 +76,10 @@ export function Portrait({
     aspectRatio: RATIO_STYLE[ratio],
   };
 
-  const hasImage = Boolean(src);
+  // Fallback : si l'image échoue (404 en dev, chemin cassé), on
+  // bascule vers le monogramme sans afficher d'icône cassée.
+  const [imgFailed, setImgFailed] = useState(false);
+  const hasImage = Boolean(src) && !imgFailed;
 
   return (
     <figure
@@ -92,6 +96,7 @@ export function Portrait({
             sizes={`(max-width: 640px) 60vw, ${width}px`}
             className="portrait-img"
             priority={priority}
+            onError={() => setImgFailed(true)}
           />
           {/* Couche 2 : duotone gradient multiply */}
           <span className="portrait-duo" aria-hidden="true" />

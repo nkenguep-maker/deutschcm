@@ -48,7 +48,7 @@ export default function LandingPage() {
           labels={{
             features: loc === "en" ? "Languages" : "Langues",
             levels: loc === "en" ? "Method" : "Méthode",
-            pricing: loc === "en" ? "Stories" : "Histoires",
+            pricing: loc === "en" ? "Manifesto" : "Manifeste",
             centers: loc === "en" ? "Centers" : "Centres",
             login: tNav.login,
             register: isMobile ? t.getStarted : tNav.register,

@@ -35,12 +35,10 @@ export interface GreetingItem {
   territory: "world" | "sources";
 }
 
-// Pool des salutations · natales africaines ET étrangères, entrelacées
-// pour que l'entrée immédiate du seuil montre déjà les deux territoires
-// YEMA (world + sources). Une salutation africaine, une étrangère, une
-// africaine, une étrangère — jamais un bloc mono-territoire au démarrage.
+// Pool des salutations · UNIQUEMENT les 10 natales africaines validées.
+// Les langues d'interface (Bonjour, Hello, Hola…) ne murmurent pas ici :
+// le seuil est le vestibule des voix natales, jamais l'inverse.
 export const GREETINGS: readonly GreetingItem[] = [
-  // ── Territoire sources · natales africaines ────────────────────
   { id: "mbolo",     word: "Mbolo",     language: "ewondo",       languageEn: "Ewondo",       country: "Cameroun",           countryEn: "Cameroon",              langTag: "ewo", territory: "sources" },
   { id: "nangadef",  word: "Na nga def", language: "wolof",        languageEn: "Wolof",        country: "Sénégal",            countryEn: "Senegal",               langTag: "wol", territory: "sources" },
   { id: "mbote",     word: "Mbote",     language: "lingala",      languageEn: "Lingala",      country: "RDC",                countryEn: "DRC",                   langTag: "lin", territory: "sources" },
@@ -51,14 +49,6 @@ export const GREETINGS: readonly GreetingItem[] = [
   { id: "muraho",    word: "Muraho",    language: "kinyarwanda",  languageEn: "Kinyarwanda",  country: "Rwanda",             countryEn: "Rwanda",                langTag: "kin", territory: "sources" },
   { id: "selam",     word: "Selam",     language: "amharique",    languageEn: "Amharic",      country: "Éthiopie",           countryEn: "Ethiopia",              langTag: "amh", territory: "sources" },
   { id: "sawubona",  word: "Sawubona",  language: "zoulou",       languageEn: "Zulu",         country: "Afrique du Sud",     countryEn: "South Africa",          langTag: "zul", territory: "sources" },
-  // ── Territoire world · étrangères ──────────────────────────────
-  { id: "bonjour",   word: "Bonjour",   language: "français",     languageEn: "French",       country: "France",             countryEn: "France",                langTag: "fr",  territory: "world" },
-  { id: "gutentag",  word: "Guten Tag", language: "allemand",     languageEn: "German",       country: "Allemagne",          countryEn: "Germany",               langTag: "de",  territory: "world" },
-  { id: "hallo",     word: "Hallo",     language: "allemand",     languageEn: "German",       country: "Allemagne",          countryEn: "Germany",               langTag: "de",  territory: "world" },
-  { id: "hello",     word: "Hello",     language: "anglais",      languageEn: "English",      country: "International",      countryEn: "International",         langTag: "en",  territory: "world" },
-  { id: "hola",      word: "Hola",      language: "espagnol",     languageEn: "Spanish",      country: "Espagne",            countryEn: "Spain",                 langTag: "es",  territory: "world" },
-  { id: "ola",       word: "Olá",       language: "portugais",    languageEn: "Portuguese",   country: "Portugal · Brésil",  countryEn: "Portugal · Brazil",     langTag: "pt",  territory: "world" },
-  { id: "salam",     word: "As-salām",  language: "arabe",        languageEn: "Arabic",       country: "Monde arabe",        countryEn: "Arab world",            langTag: "ar",  territory: "world" },
 ] as const;
 
 interface SeuilGreetingsProps {

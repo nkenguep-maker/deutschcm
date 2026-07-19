@@ -91,9 +91,11 @@ export function BrandY({
       viewBox="0 0 100 120"
       width={size}
       height={(size * 120) / 100}
+      preserveAspectRatio="xMidYMid meet"
       role={decorative ? undefined : "img"}
       aria-label={ariaLabel}
       aria-hidden={decorative || undefined}
+      style={{ display: "block", overflow: "visible" }}
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>

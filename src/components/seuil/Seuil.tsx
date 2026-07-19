@@ -44,7 +44,7 @@ const COPY_FR: SeuilCopy = {
   heroL1: "L'Afrique parle.",
   heroL2: "Toutes ses langues.",
   heroSub:
-    "Celles qui portent au large. Celles qui gardent la mémoire. Ici, elles vivent ensemble.",
+    "Celles qui ouvrent le monde. Celles qui racontent d'où l'on vient. Ici, elles vivent sous le même toit.",
   slogan: "Votre voie. Votre voix.",
   cta: "Entrez — la maison est ouverte",
   ctaGhost: "écouter la voix du seuil",
@@ -57,7 +57,7 @@ const COPY_EN: SeuilCopy = {
   heroL1: "Africa speaks.",
   heroL2: "All her tongues.",
   heroSub:
-    "The ones that carry you far. The ones that hold the memory. Here, they live together.",
+    "The ones that open the world. The ones that tell where we come from. Here, they live under the same roof.",
   slogan: "Your way. Your voice.",
   cta: "Come in — the house is open",
   ctaGhost: "listen to the voice of the threshold",
@@ -145,15 +145,6 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
 
   const seuilStory = STORIES[0]; // Bintou · wolof · voix d'ouverture
 
-  const handleLocaleSwitch = (target: "fr" | "en") => {
-    if (target === locale) return;
-    // Persistance via cookie next-intl standard (NEXT_LOCALE).
-    document.cookie = `NEXT_LOCALE=${target}; path=/; max-age=31536000; SameSite=Lax`;
-    // Bascule vers la même URL mais avec la nouvelle locale.
-    const path = window.location.pathname.replace(/^\/(fr|en)/, `/${target}`);
-    window.location.assign(path + window.location.hash);
-  };
-
   return (
     <section
       ref={rootRef}
@@ -169,25 +160,9 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
       {/* Banner polyglotte · accueil aux ES/PT/IT/DE dans leur langue */}
       <SeuilPolyglot currentLocale={locale} />
 
-      {/* Sélecteur de langue, discret, top-right */}
-      <div className="seuil-locale" role="group" aria-label={locale === "en" ? "Interface language" : "Langue de l'interface"}>
-        <button
-          type="button"
-          className={`seuil-locale-btn ${locale === "fr" ? "active" : ""}`}
-          onClick={() => handleLocaleSwitch("fr")}
-          aria-pressed={locale === "fr"}
-        >
-          {copy.localeFrLabel}
-        </button>
-        <button
-          type="button"
-          className={`seuil-locale-btn ${locale === "en" ? "active" : ""}`}
-          onClick={() => handleLocaleSwitch("en")}
-          aria-pressed={locale === "en"}
-        >
-          {copy.localeEnLabel}
-        </button>
-      </div>
+      {/* Sélecteur de langue · déménagé dans la nav landing (côté
+          droit, après CTA login/register). Un seul point de bascule,
+          jamais flottant sous les boutons. */}
 
       <div className="seuil-inner">
         {/* Scène — un seul acte (hero). Le Confluent central a été

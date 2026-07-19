@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- YEMA · apple-icon. Même identité que /icon.svg, format Apple. -->
+<!-- YEMA · apple-icon. Même identité que /icon.svg, densité identique. -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
   <rect width="256" height="256" rx="56" fill="#B8873E"/>
-  <g transform="translate(78 68)">
+  <g transform="translate(28 8) scale(2)">
     <path d="M26 12 C33 30 41 46 50 58" stroke="#1B120A" stroke-width="13" stroke-linecap="round" fill="none"/>
     <path d="M77 14 C71 20 69 28 65 36 C61 44 56 52 50 58" stroke="#1B120A" stroke-width="13" stroke-linecap="round" fill="none"/>
     <path d="M50 58 L50 103" stroke="#1B120A" stroke-width="14" stroke-linecap="round" fill="none"/>
