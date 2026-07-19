@@ -412,16 +412,209 @@ button, [role="button"] {
   --level-count: 5;
   display: flex;
   flex-direction: column;
-  gap: 20px; /* espacement vertical uniforme entre items */
+  gap: 20px;
   position: relative;
   font-family: var(--font-jetbrains, monospace);
   list-style: none;
   padding: 0;
   margin: 0;
 }
-/* Chaque item du spine occupe --step de hauteur : la barre verticale
-   passe par les centres des dots, régulièrement espacés. */
 .cefr-spine > .cefr-step { min-height: var(--step); }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SpineItem · anatomie STRUCTURELLE partagée par CefrSpine et YemaSpine.
+   Le gap code/label est un grid, pas un inline gap → « A1Se présenter »
+   impossible par construction. Barre verticale absolute (jamais dans le
+   grid, ne mange pas la largeur label).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.spine-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.spine-list {
+  position: relative;
+  padding: 0 0 0 22px;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+/* La barre · absolue à gauche du contenu, ne prend pas de place dans
+   le grid des items. Filet clair + span de peinte laiton par-dessus. */
+.spine-bar {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 1.5px;
+  background: var(--creme-hair);
+  pointer-events: none;
+}
+.spine-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  height: calc(var(--spine-paint, 25%) * 1);
+  width: 1.5px;
+  background: var(--brass);
+  pointer-events: none;
+  animation: spine-paint-in var(--dur-moment) var(--ease-enter) both;
+}
+@keyframes spine-paint-in {
+  from { height: 0; }
+  to   { height: var(--spine-paint, 25%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spine-bar-fill { animation: none; }
+}
+
+/* L'item · grid 34px + 1fr, gap STRUCTUREL 12px, baselines alignées */
+.spine-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: baseline;
+  min-height: 28px;
+}
+.spine-item-btn {
+  all: unset;
+  display: contents; /* propage le grid au btn sans casser le layout */
+  cursor: pointer;
+}
+
+/* Colonne 1 · le code, JetBrains Mono 500 12px letter-spacing 0.04em laiton */
+.spine-code {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--brass);
+  line-height: 1.2;
+  text-transform: none;
+  align-self: center;
+}
+
+/* Colonne 2 · le label, Manrope 500 15px creme-soft. Zéro wrap.
+   Si un libellé dépasse, la colonne s'élargit — le conteneur parent
+   doit avoir min-width 220px (imposé par la carte-panneau qui héberge
+   le spine). */
+.spine-label {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--creme-soft);
+  line-height: 1.3;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  align-self: center;
+}
+.spine-item[data-status="on"] .spine-label { color: var(--creme); }
+.spine-item[data-status="done"] .spine-label { color: var(--creme-mute); }
+.spine-item[data-status="on"] .spine-code { color: var(--brass); }
+
+/* Hover · le btn permet l'interaction, le label s'éclaircit */
+.spine-item-btn:hover ~ .spine-label,
+.spine-item-btn:focus-visible ~ .spine-label { color: var(--creme); }
+.spine-item-btn:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* Panneau d'info révélé au hover (Cefr) ou au hover (Yema) */
+.spine-panel {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 24px);
+  width: 288px;
+  padding: 18px 20px 16px;
+  background: var(--espresso-2);
+  border: 1px solid var(--brass-edge);
+  border-radius: var(--r-card);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+  animation: spine-panel-in 0.18s var(--ease-enter);
+  z-index: 20;
+  pointer-events: none;
+}
+@keyframes spine-panel-in {
+  from { opacity: 0; transform: translateY(4px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.spine-panel-code {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 44px;
+  font-weight: 400;
+  color: var(--brass-glow);
+  line-height: 1;
+}
+.spine-panel-head {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--creme);
+  margin-bottom: 12px;
+  max-width: 200px;
+}
+.spine-panel-anchor {
+  margin: 0 0 12px 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--creme-soft);
+}
+.spine-panel-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.spine-panel-list li {
+  padding-left: 12px;
+  position: relative;
+  color: var(--creme-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.spine-panel-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 6px;
+  height: 1px;
+  background: var(--brass);
+}
+.spine-panel-fine {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--creme-hair);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--creme-mute);
+  text-transform: uppercase;
+}
+.spine-panel-actfl {
+  color: var(--brass);
+  letter-spacing: 0.08em;
+}
+@media (max-width: 900px) {
+  .spine-panel { display: none; }
+}
+
 /* Signature moment #1 — Le spine qui se peint.
    Au chargement, la colonne laiton se remplit de 0% à --current-pct
    en var(--dur-moment) var(--ease-enter). Une seule fois. Aucun

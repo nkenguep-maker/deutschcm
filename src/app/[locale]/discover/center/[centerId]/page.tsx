@@ -26,12 +26,12 @@ const CENTERS: Record<string, CenterData> = {
 
 const CENTER_CLASSES: Record<string, ClassData[]> = {
   ctr1: [
-    { id: "cls1", teacherName: "Prof. Marie Tchamba", teacherAvatar: "MT", level: "A1", schedule: "Lun/Mer 18h–20h", students: 12, max: 20, description: "Cours pour grands débutants — accent sur l'oral et la phonétique. Méthode Netzwerk A1.", tags: ["Débutant", "Oral", "CEFR A1"], code: "DEUTSCH-A1-2024", rating: 4.9 },
-    { id: "cls4", teacherName: "Prof. Samuel Foto", teacherAvatar: "SF", level: "B2", schedule: "Mer/Sam 9h–11h", students: 5, max: 10, description: "B2 avancé — préparation TestDaF et études en Allemagne.", tags: ["B2", "TestDaF", "Académique"], code: "FOTO-B2-SAM1", rating: 5.0 },
-    { id: "cls8", teacherName: "Prof. Robert Essama", teacherAvatar: "RE", level: "B1", schedule: "Lun/Jeu 17h–19h", students: 7, max: 10, description: "Prépa TestDaF B1 — lecture, écriture, écoute. Taux de réussite 89%.", tags: ["B1", "TestDaF", "CEFR B1"], code: "ESSA-B1-TDF8", rating: 4.8 },
+    { id: "cls1", teacherName: "Prof. Marie Tchamba", teacherAvatar: "MT", level: "A1", schedule: "Lun/Mer 18h–20h", students: 12, max: 20, description: "Cours pour grands débutants — accent sur l'oral et la phonétique.", tags: ["Débutant", "Oral", "CECRL A1"], code: "DEUTSCH-A1-2024", rating: 4.9 },
+    { id: "cls4", teacherName: "Prof. Samuel Foto", teacherAvatar: "SF", level: "B2", schedule: "Mer/Sam 9h–11h", students: 5, max: 10, description: "B2 avancé — préparation aux examens et études en Allemagne.", tags: ["B2", "Prépa examens", "Académique"], code: "FOTO-B2-SAM1", rating: 5.0 },
+    { id: "cls8", teacherName: "Prof. Robert Essama", teacherAvatar: "RE", level: "B1", schedule: "Lun/Jeu 17h–19h", students: 7, max: 10, description: "Prépa examen B1 — lecture, écriture, écoute.", tags: ["B1", "Prépa examen", "CECRL B1"], code: "ESSA-B1-TDF8", rating: 4.8 },
   ],
   ctr2: [
-    { id: "cls2", teacherName: "Prof. Jean Mbarga", teacherAvatar: "JB", level: "A2", schedule: "Mar/Jeu 14h–16h", students: 8, max: 15, description: "Préparation CEFR A2 avec focus sur la compréhension orale et écrite. Examen TELC préparé.", tags: ["A2", "TELC", "Prépa"], code: "LINGUA-A2-0512", rating: 4.7 },
+    { id: "cls2", teacherName: "Prof. Jean Mbarga", teacherAvatar: "JB", level: "A2", schedule: "Mar/Jeu 14h–16h", students: 8, max: 15, description: "Préparation CECRL A2 avec focus sur la compréhension orale et écrite.", tags: ["A2", "Prépa", "CECRL A2"], code: "LINGUA-A2-0512", rating: 4.7 },
     { id: "cls6", teacherName: "Prof. David Kamga", teacherAvatar: "DK", level: "C1", schedule: "Sam/Dim 10h–12h", students: 6, max: 8, description: "Conversation niveau C1 — débats, actualités, culture allemande. 100% en ligne.", tags: ["C1", "Conversation", "En ligne"], code: "KAMG-C1-CONV", rating: 4.9 },
   ],
   ctr3: [

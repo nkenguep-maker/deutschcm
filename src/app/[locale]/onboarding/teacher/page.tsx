@@ -260,7 +260,7 @@ export default function TeacherOnboardingPage() {
               </div>
               <div>
                 <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>CERTIFICATIONS <span style={{ fontWeight: 400 }}>(séparées par virgule)</span></label>
-                <input value={form.certifications} onChange={e => set("certifications", e.target.value)} placeholder="ex: Goethe-Zertifikat B2, DAAD, TestDaF..." style={inp()} />
+                <input value={form.certifications} onChange={e => set("certifications", e.target.value)} placeholder="ex: certifications officielles, diplômes, formations..." style={inp()} />
               </div>
               <div style={{ background: "rgba(244, 235, 220, 0.03)", border: "1px solid rgba(244, 235, 220, 0.06)", borderRadius: 10, padding: "14px 16px" }}>
                 <div style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, marginBottom: 4 }}>JUSTIFICATIFS</div>
