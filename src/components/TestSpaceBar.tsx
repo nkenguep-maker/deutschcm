@@ -78,6 +78,15 @@ export function TestSpaceBar() {
   // Gate : au moins les 4 rôles présents. Sinon rien.
   if (!roles || roles.length < 4) return null;
 
+  // Gate #2 : ne s'affiche PAS sur les pages publiques (landing, register,
+  // login, pages légales, etc.). La barre est un outil de test intra-app —
+  // pas un élément d'accueil.
+  const noLocale = pathname.replace(/^\/(fr|en)/, "") || "/";
+  const APP_PREFIXES = ["/dashboard", "/courses", "/progress", "/simulateur",
+    "/settings", "/teacher", "/center", "/admin", "/discover", "/test-niveau"];
+  const isAppRoute = APP_PREFIXES.some((p) => noLocale === p || noLocale.startsWith(p + "/"));
+  if (!isAppRoute) return null;
+
   const switchTo = async (role: SpaceRole, route: string) => {
     setActive(role);
     try {
