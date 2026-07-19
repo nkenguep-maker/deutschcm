@@ -17,6 +17,7 @@ import { LandingProblems } from "@/components/landing/LandingProblems";
 import { LandingSimulator } from "@/components/landing/LandingSimulator";
 import { LandingVision } from "@/components/landing/LandingVision";
 import { LandingWhyGermany } from "@/components/landing/LandingWhyGermany";
+import { Seuil } from "@/components/seuil/Seuil";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -45,6 +46,17 @@ export default function LandingPage() {
 
   return (
     <div className="landing">
+      {/* ── LE SEUIL ── entrée immersive, une session par visiteur.
+          Vit au-dessus du landing existant, ne le remplace pas.
+          Le CTA "Entrez" scroll vers #landing (ancre juste après). */}
+      <Seuil locale={locale === "en" ? "en" : "fr"} entryHref="#landing" />
+
+      {/* ── LE LANDING EXISTANT ─────────────────────────────────────
+          Ancre stable pour le CTA du Seuil. Reste INTACT pendant
+          le sprint « Le Seuil » — remplacé section par section dans
+          les sprints ultérieurs (Veillée, Couture, Mur, Échelle,
+          Porte du fond). */}
+      <div id="landing" tabIndex={-1}>
       <LandingNav
         locale={locale}
         isMobile={isMobile}
@@ -235,6 +247,7 @@ export default function LandingPage() {
           disclaimer: t.footerDisclaimer,
         }}
       />
+      </div>{/* fin #landing */}
     </div>
   );
 }

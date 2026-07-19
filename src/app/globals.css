@@ -56,6 +56,16 @@ html[data-theme="dark"] {
      Ne JAMAIS utiliser pour du hover, une modale ou une transition
      de page ordinaire. */
   --dur-ceremony:   960ms;
+  /* --dur-breath · RESPIRATION AMBIANTE.
+     Une seule par site : la braise du Seuil qui inspire et expire
+     lentement. Ne JAMAIS réutiliser ailleurs — c'est le pouls unique
+     de la maison YEMA. Utilisation : transform+opacity uniquement. */
+  --dur-breath:     7000ms;
+
+  /* ── Seuil ─ le seuil d'entrée YEMA ─────────────────────────
+     Fond plus profond que l'espresso. On y arrive avant tout.
+     La braise centrale respire (voir .seuil-brasier). */
+  --seuil-bg:       #120C06;
 
   /* Aliases pour l'existant — mêmes valeurs, nouveaux noms.
      À supprimer une fois la migration finie. */
@@ -6138,5 +6148,451 @@ body:has(.test-space-bar) { padding-top: 34px; }
   }
   .portrait-speaking-badge { transition: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SPRINT « LE SEUIL » — Refonte du landing en entrée immersive
+   Le seuil vient AVANT le landing existant. Une entrée avant la lecture.
+   Ce bloc CSS est self-contained : ne touche pas au landing en dessous.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.seuil {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--seuil-bg);
+  color: var(--creme);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Grain SVG partagé — réutilise /public/grain.svg (celui déjà servi au
+   Portrait duotone). Un seul asset pour tout le site. */
+.seuil::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("/grain.svg");
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: overlay;
+}
+
+/* Braise centrale — respiration ambiante unique du site.
+   transform + opacity seulement. Radial laiton → oxblood → transparent. */
+.seuil-brasier {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(1100px, 140vw);
+  height: min(1100px, 140vw);
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(184, 135, 62, 0.32) 0%,
+    rgba(122, 40, 48, 0.10) 35%,
+    transparent 70%
+  );
+  filter: blur(4px);
+  animation: seuil-braise var(--dur-breath) ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes seuil-braise {
+  0%, 100% {
+    opacity: 0.75;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+}
+
+/* Sélecteur locale, top-right, très discret. */
+.seuil-locale {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 3;
+  display: inline-flex;
+  gap: 0;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-pill);
+  padding: 3px;
+  background: rgba(18, 12, 6, 0.6);
+  backdrop-filter: blur(6px);
+}
+.seuil-locale-btn {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  color: var(--creme-mute);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color var(--dur-touch) var(--ease-enter),
+              background var(--dur-touch) var(--ease-enter);
+}
+.seuil-locale-btn:hover { color: var(--creme); }
+.seuil-locale-btn.active {
+  color: var(--brass);
+  background: var(--brass-glow);
+}
+.seuil-locale-btn:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+/* Contenu — grille pleine hauteur, centré. */
+.seuil-inner {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  padding: 80px 24px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 24px;
+}
+
+.seuil-center {
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 28px;
+}
+
+/* Chaque ligne de la séquence — opacity/translateY only. */
+.seuil-line {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity var(--dur-moment) var(--ease-enter),
+              transform var(--dur-moment) var(--ease-enter);
+  will-change: opacity, transform;
+  max-width: 640px;
+}
+.seuil-line.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.seuil-l1 {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(22px, 4vw, 30px);
+  color: var(--creme);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.seuil-l2 {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(18px, 3vw, 24px);
+  color: var(--creme-mute);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.seuil-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.seuil-mark-y {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 76px;
+  line-height: 1;
+  color: var(--brass);
+  text-shadow: 0 0 24px rgba(184, 135, 62, 0.28);
+  margin: 0;
+}
+.seuil-mark-name {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 12px;
+  letter-spacing: 0.34em;
+  color: var(--creme-soft);
+  text-transform: uppercase;
+  margin: 0;
+}
+.seuil-mark-slogan {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(14px, 2vw, 17px);
+  color: var(--creme-mute);
+  margin: 6px 0 0;
+}
+
+/* Hero central. Le texte est TOUJOURS dans le DOM (SEO + LCP). */
+.seuil-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  max-width: 720px;
+}
+.seuil-hero-h {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(38px, 6.5vw, 68px);
+  line-height: 1.05;
+  color: var(--creme);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.seuil-hero-h em {
+  font-style: italic;
+  color: var(--brass);
+}
+.seuil-hero-sub {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(15px, 2vw, 18px);
+  line-height: 1.6;
+  color: var(--creme-soft);
+  margin: 0;
+  max-width: 560px;
+}
+
+/* CTA unique brass + bouton ghost discret. */
+.seuil-cta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  margin-top: 6px;
+}
+.seuil-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 26px;
+  border-radius: var(--r-pill);
+  background: var(--brass);
+  color: var(--espresso);
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background var(--dur-touch) var(--ease-enter),
+              transform var(--dur-touch) var(--ease-enter);
+  box-shadow: 0 8px 32px rgba(184, 135, 62, 0.28);
+}
+.seuil-cta:hover { background: var(--brass-deep); transform: translateY(-1px); }
+.seuil-cta:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+
+.seuil-cta-ghost {
+  background: transparent;
+  border: none;
+  color: var(--creme-mute);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 6px 10px;
+  transition: color var(--dur-touch) var(--ease-enter);
+}
+.seuil-cta-ghost:hover { color: var(--creme); }
+.seuil-cta-ghost:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+/* Bas du seuil — micro-indice de scroll. */
+.seuil-scroll-hint {
+  grid-row: 3;
+  align-self: end;
+  justify-self: center;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--creme-faint);
+  text-transform: uppercase;
+  margin: 0;
+  opacity: 0;
+  transition: opacity var(--dur-moment) var(--ease-enter) 4200ms;
+}
+.seuil.in-final .seuil-scroll-hint { opacity: 1; }
+
+/* ── Salutations flottantes ─────────────────────────────────────── */
+.seuil-greetings {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.seuil-greeting {
+  position: absolute;
+  pointer-events: auto;
+  background: transparent;
+  border: none;
+  padding: 10px 14px;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.14;
+  transition: opacity var(--dur-move) var(--ease-enter),
+              transform var(--dur-move) var(--ease-enter);
+  border-radius: var(--r-card);
+}
+.seuil-greeting-word {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(18px, 2.4vw, 26px);
+  color: var(--brass);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.seuil-greeting-meta {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--creme-soft);
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity var(--dur-touch) var(--ease-enter);
+  white-space: nowrap;
+}
+.seuil-greeting:hover,
+.seuil-greeting:focus-visible,
+.seuil-greeting.playing {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+.seuil-greeting:hover .seuil-greeting-meta,
+.seuil-greeting:focus-visible .seuil-greeting-meta,
+.seuil-greeting.playing .seuil-greeting-meta {
+  opacity: 1;
+}
+.seuil-greeting:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 4px;
+}
+
+/* Positions — 4 langues visibles à la fois, jamais superposées au texte. */
+.seuil-greeting-p0 { top: 12%;  left: 8%; }
+.seuil-greeting-p1 { top: 20%;  right: 10%; }
+.seuil-greeting-p2 { bottom: 24%; left: 12%; }
+.seuil-greeting-p3 { bottom: 18%; right: 14%; }
+
+@media (max-width: 767px) {
+  .seuil-greeting-p0 { top: 6%;  left: 4%; }
+  .seuil-greeting-p1 { top: 8%;  right: 4%; }
+  .seuil-greeting-p2 { display: none; }
+  .seuil-greeting-p3 { display: none; }
+  .seuil-inner { padding: 60px 20px 30px; }
+}
+
+/* ── Reduced motion : rien ne bouge, tout est final. ─────────── */
+@media (prefers-reduced-motion: reduce) {
+  .seuil-brasier {
+    animation: none;
+    opacity: 0.85;
+  }
+  .seuil-line,
+  .seuil-scroll-hint,
+  .seuil-greeting {
+    transition: none;
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .seuil-line { opacity: 1; transform: none; }
+  .seuil-greeting { opacity: 0.6; }
+  .seuil-scroll-hint { opacity: 1; }
+}
+
+/* ── La Veillée — film stub / slideshow duotone ──────────────── */
+.seuil-veillee {
+  background: var(--seuil-bg);
+  padding: 80px 24px;
+  display: flex;
+  justify-content: center;
+}
+.seuil-veillee-frame {
+  width: min(960px, 100%);
+  aspect-ratio: 16 / 9;
+  border-radius: var(--r-panel);
+  overflow: hidden;
+  border: 1px solid var(--brass-edge);
+  background: var(--espresso-2);
+  position: relative;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+}
+.seuil-veillee-video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: black;
+}
+.seuil-veillee-poster {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: black;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.seuil-veillee-poster[disabled] {
+  cursor: default;
+}
+.seuil-veillee-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.05) brightness(0.75);
+  transition: opacity var(--dur-ceremony) var(--ease-glide);
+}
+.seuil-veillee-overlay {
+  position: absolute;
+  left: 24px;
+  bottom: 22px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  color: var(--creme);
+  font-size: clamp(16px, 2vw, 22px);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+  max-width: 460px;
+}
+.seuil-veillee-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--brass);
+  filter: drop-shadow(0 0 12px rgba(184, 135, 62, 0.6));
+  transition: transform var(--dur-touch) var(--ease-enter);
+}
+.seuil-veillee-poster:not([disabled]):hover .seuil-veillee-play {
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+/* ── Ancres pièces suivantes (SPRINTS ULTÉRIEURS) ─────────────
+   Ne pas encore remplacer l'existant. On pose juste les ancres
+   pour le scroll interne et les futures sections.
+
+   #landing        — le landing existant reste intact ici
+   #veillee        — le film (la grand-mère)
+   #couture        — Seam existant, espresso → terre
+   #mur-visages    — <PortraitSpeaking> × 5
+   #echelle        — CefrSpine / YemaSpine qui se peint au scroll
+   #porte-fond     — CTA final "Entrez. La maison est ouverte." */
 
 
