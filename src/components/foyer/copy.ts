@@ -13,6 +13,10 @@ interface HeadCopy {
   greetingEvening: string;
   capLabel: string;
   capName: Record<Cap, string>;
+  /** Petit lien discret « Changer » à côté du cap — bascule /onboarding/student. */
+  changeCap: string;
+  /** Version « Poser mon cap » quand aucun cap n'est encore choisi. */
+  setCap: string;
 }
 
 interface HeroCopy {
@@ -107,6 +111,8 @@ export const COPY_FR: FoyerCopy = {
       transmettre: "Transmettre",
       moi: "Apprendre pour vous",
     },
+    changeCap: "Changer",
+    setCap: "Poser mon cap",
   },
   hero: {
     kicker: "Reprendre",
@@ -234,6 +240,8 @@ export const COPY_EN: FoyerCopy = {
       transmettre: "Pass on",
       moi: "Learn for you",
     },
+    changeCap: "Change",
+    setCap: "Set my cap",
   },
   hero: {
     kicker: "Resume",

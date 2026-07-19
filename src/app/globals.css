@@ -7991,6 +7991,40 @@ body.foyer-switching .foyer {
   letter-spacing: 0.18em;
   color: var(--brass);
   text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.foyer-head-cap-lbl { color: var(--brass); }
+.foyer-head-cap-edit {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+  text-transform: none;
+  color: var(--creme-soft);
+  text-decoration: none;
+  padding: 3px 10px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-pill);
+  transition: color var(--dur-touch) var(--ease-enter),
+              border-color var(--dur-touch) var(--ease-enter);
+}
+.foyer-head-cap-edit:hover {
+  color: var(--creme);
+  border-color: var(--brass-edge);
+}
+.foyer-head-cap-edit:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+.foyer-head-cap-edit-set {
+  color: var(--brass);
+  border-color: var(--brass-edge);
+}
+.foyer-head-cap-edit-set:hover {
+  background: var(--brass-glow);
 }
 .foyer-head-braise {
   display: inline-flex;

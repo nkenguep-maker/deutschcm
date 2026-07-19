@@ -98,6 +98,7 @@ export default function FoyerPage() {
         <FoyerHead
           prenom={data.prenom}
           locale={loc}
+          urlLocale={locale}
           cap={data.cap}
           braise={data.braise}
           copy={copy.head}

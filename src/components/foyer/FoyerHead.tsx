@@ -5,6 +5,7 @@
 // cap (Manrope mono uppercase) + Braise vivante en pastille. C'est la
 // première pièce de la cascade d'entrée (--dur-move).
 
+import Link from "next/link";
 import { Braise } from "@/components/foyer/Braise";
 import { frTypo } from "@/components/landing/typo";
 import type { Cap, FoyerBraise } from "@/components/foyer/types";
@@ -15,11 +16,15 @@ interface Copy {
   greetingEvening: string;
   capLabel: string;
   capName: Record<Cap, string>;
+  changeCap: string;
+  setCap: string;
 }
 
 interface FoyerHeadProps {
   prenom: string;
   locale: "fr" | "en";
+  /** URL locale pour la route de changement de cap (`/${urlLocale}/onboarding/student`). */
+  urlLocale: string;
   cap: Cap | null;
   braise: FoyerBraise;
   copy: Copy;
@@ -33,11 +38,12 @@ function greetingFor(hour: number, c: Copy): string {
   return c.greetingEvening;
 }
 
-export function FoyerHead({ prenom, locale, cap, braise, copy, reprendreHref }: FoyerHeadProps) {
+export function FoyerHead({ prenom, locale, urlLocale, cap, braise, copy, reprendreHref }: FoyerHeadProps) {
   const t = (s: string) => (locale === "fr" ? frTypo(s) : s);
   const hour = new Date().getHours();
   const greet = greetingFor(hour, copy);
   const capName = cap ? copy.capName[cap] : null;
+  const capHref = `/${urlLocale}/onboarding/student`;
 
   return (
     <section className="foyer-head" aria-label={t("Votre foyer")}>
@@ -45,11 +51,25 @@ export function FoyerHead({ prenom, locale, cap, braise, copy, reprendreHref }: 
         <p className="foyer-head-greeting">
           {t(greet)}, <em>{prenom}.</em>
         </p>
-        {capName ? (
-          <p className="foyer-head-cap">
-            {t(copy.capLabel).toUpperCase()} · {t(capName).toUpperCase()}
-          </p>
-        ) : null}
+        {/* Ligne de cap · si un cap est posé, on affiche la valeur +
+            un petit lien discret « Changer ». Sinon on invite à en poser
+            un — même endroit visuel, jamais deux zones concurrentes. */}
+        <p className="foyer-head-cap">
+          {capName ? (
+            <>
+              <span className="foyer-head-cap-lbl">
+                {t(copy.capLabel).toUpperCase()} · {t(capName).toUpperCase()}
+              </span>
+              <Link className="foyer-head-cap-edit" href={capHref}>
+                {t(copy.changeCap)}
+              </Link>
+            </>
+          ) : (
+            <Link className="foyer-head-cap-edit foyer-head-cap-edit-set" href={capHref}>
+              {t(copy.setCap)} →
+            </Link>
+          )}
+        </p>
       </div>
 
       <div className="foyer-head-braise">
