@@ -6952,6 +6952,146 @@ body:has(.test-space-bar) { padding-top: 34px; }
   max-width: 620px;
 }
 
+/* ── /histoires · Le mur des visages ─────────────────────────────
+   Sprint 3 · cinq parcours plein format, fond selon territoire. */
+.histoires-page {
+  color: var(--creme);
+}
+.histoires-head {
+  padding: 80px 0 40px;
+  background: var(--espresso);
+  text-align: center;
+}
+.histoires-head .maison-h {
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.histoires-head .maison-lede {
+  max-width: 620px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.histoires-wall {
+  display: flex;
+  flex-direction: column;
+}
+.histoire {
+  padding: 80px 0;
+  border-bottom: 1px solid var(--creme-hair);
+}
+.histoire-world { background: var(--espresso); }
+.histoire-sources { background: var(--terre); }
+.histoire-inner {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 60px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .histoire-inner {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    justify-items: center;
+    text-align: center;
+  }
+}
+.histoire-portrait {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.histoire-meta {
+  text-align: center;
+}
+.histoire-name {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 22px;
+  color: var(--brass);
+  line-height: 1.1;
+}
+.histoire-loc {
+  margin: 6px 0 0;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--creme-mute);
+  text-transform: uppercase;
+}
+.histoire-level {
+  margin: 4px 0 0;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--brass);
+  text-transform: uppercase;
+}
+.histoire-body {
+  max-width: 640px;
+}
+.histoire-headline {
+  margin: 0 0 20px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(24px, 3.4vw, 34px);
+  line-height: 1.2;
+  color: var(--creme);
+  letter-spacing: -0.01em;
+}
+.histoire-quote {
+  margin: 0 0 20px;
+  padding: 0 0 0 18px;
+  border-left: 2px solid var(--brass);
+}
+.histoire-quote p {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--creme-soft);
+}
+.histoire-body-text {
+  margin: 0 0 24px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--creme-soft);
+}
+.histoire-goal {
+  display: flex;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid var(--brass-edge);
+  border-radius: var(--r-card);
+  background: var(--brass-glow);
+  align-items: baseline;
+}
+@media (max-width: 900px) {
+  .histoire-goal { justify-content: center; flex-wrap: wrap; }
+}
+.histoire-goal-lbl {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--brass);
+  text-transform: uppercase;
+}
+.histoire-goal-text {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 14.5px;
+  color: var(--creme);
+}
+.histoires-cta {
+  padding: 40px 24px 100px;
+  text-align: center;
+  background: var(--espresso);
+}
+
 /* ── /langues · La carte des voix ────────────────────────────────
    Sprint 2 · deux territoires en un lieu.
    world (espresso) : 6 étrangères, CECRL, allemand porte le chapitre.
