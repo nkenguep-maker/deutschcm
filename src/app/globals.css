@@ -6682,15 +6682,327 @@ body:has(.test-space-bar) { padding-top: 34px; }
   transform: translate(-50%, -50%) scale(1.08);
 }
 
-/* ── Ancres pièces suivantes (SPRINTS ULTÉRIEURS) ─────────────
-   Ne pas encore remplacer l'existant. On pose juste les ancres
-   pour le scroll interne et les futures sections.
+/* ═══════════════════════════════════════════════════════════════════════
+   PROGRAMME « LA MAISON » — pièces de la landing sous le Seuil
+   Sprint 1 · les 6 pièces (couture, veillée, visages, échelle, teaser,
+   porte). Chaque pièce a sa voix éditoriale et son fond de territoire.
+   ═══════════════════════════════════════════════════════════════════════ */
 
-   #landing        — le landing existant reste intact ici
-   #veillee        — le film (la grand-mère)
-   #couture        — Seam existant, espresso → terre
-   #mur-visages    — <PortraitSpeaking> × 5
-   #echelle        — CefrSpine / YemaSpine qui se peint au scroll
-   #porte-fond     — CTA final "Entrez. La maison est ouverte." */
+.maison-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+@media (max-width: 640px) {
+  .maison-container { padding: 0 20px; }
+}
+
+.maison-section-head {
+  max-width: 760px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+.maison-kicker {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--brass);
+  text-transform: uppercase;
+  margin: 0 0 14px;
+}
+.maison-h {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(34px, 5vw, 54px);
+  line-height: 1.1;
+  color: var(--creme);
+  letter-spacing: -0.015em;
+  margin: 0 0 18px;
+}
+.maison-h em {
+  font-style: italic;
+  color: var(--brass);
+}
+.maison-lede {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(15px, 1.6vw, 18px);
+  line-height: 1.6;
+  color: var(--creme-soft);
+  margin: 0;
+}
+.maison-link-strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--brass);
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 10px 16px;
+  border: 1px solid var(--brass-edge);
+  border-radius: var(--r-pill);
+  transition: background var(--dur-touch) var(--ease-enter),
+              border-color var(--dur-touch) var(--ease-enter);
+}
+.maison-link-strong:hover {
+  background: var(--brass-glow);
+  border-color: var(--brass);
+}
+.maison-link-strong:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+
+/* ── MaisonCouture · Seam entre world (espresso) et sources (terre) ── */
+.maison-couture {
+  position: relative;
+}
+.maison-couture-side {
+  padding: 80px 24px;
+}
+.maison-couture-world {
+  background: var(--espresso);
+  color: var(--creme);
+  text-align: center;
+}
+.maison-couture-sources {
+  background: var(--terre);
+  color: var(--creme);
+  text-align: center;
+}
+.maison-couture-kicker {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--brass);
+  text-transform: uppercase;
+  margin: 0 0 14px;
+}
+.maison-couture-h {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.15;
+  color: var(--creme);
+  margin: 0 auto 16px;
+  max-width: 620px;
+}
+.maison-couture-phrase {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(15px, 1.4vw, 17px);
+  line-height: 1.6;
+  color: var(--creme-soft);
+  margin: 0 auto 22px;
+  max-width: 560px;
+}
+.maison-couture-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--brass);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color var(--dur-touch) var(--ease-enter);
+}
+.maison-couture-link:hover { color: var(--creme); }
+.maison-couture-link:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── MaisonVeillee · fond espresso profond ────────────────────── */
+.maison-veillee {
+  background: var(--espresso);
+  padding: 80px 0 40px;
+  color: var(--creme);
+}
+
+/* ── MaisonVisages · fond espresso ────────────────────────────── */
+.maison-visages {
+  background: var(--espresso);
+  padding: 80px 0;
+  color: var(--creme);
+}
+.maison-visages-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 40px 32px;
+  justify-items: center;
+}
+.maison-visage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 260px;
+}
+.maison-visage-portrait {
+  margin-bottom: 18px;
+}
+.maison-visage-cite {
+  margin: 0;
+  padding: 0;
+  border-left: none;
+}
+.maison-visage-cite p {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--creme-soft);
+  margin: 0 0 10px;
+}
+.maison-visage-attr {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--creme-mute);
+  text-transform: uppercase;
+}
+.maison-visage-name { color: var(--brass); }
+.maison-visage-sources .maison-visage-portrait {
+  /* Le portrait sources garde son duotone terre, on ne peint pas le fond */
+}
+.maison-visages-more {
+  text-align: center;
+}
+
+/* ── MaisonEchelle · les deux échelles côte à côte ─────────────── */
+.maison-echelle {
+  background: var(--espresso);
+  padding: 80px 0;
+  color: var(--creme);
+}
+.maison-echelle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+  margin: 0 0 40px;
+}
+@media (max-width: 768px) {
+  .maison-echelle-grid {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+}
+.maison-echelle-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.maison-echelle-cap {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--brass);
+  text-transform: uppercase;
+  margin: 0 0 24px;
+}
+.maison-echelle-sources {
+  background: var(--terre);
+  padding: 28px 22px;
+  border-radius: var(--r-panel);
+}
+.maison-echelle-more {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* ── Teaser · deux lignes murmurées, pas de bouton ─────────────── */
+.maison-teaser {
+  background: var(--espresso);
+  padding: 80px 24px;
+  color: var(--creme);
+  text-align: center;
+}
+.maison-teaser-compact {
+  padding: 24px 20px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-card);
+  background: rgba(244, 235, 220, 0.02);
+}
+.maison-teaser-l1 {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(20px, 2.4vw, 28px);
+  line-height: 1.35;
+  color: var(--creme);
+  margin: 0 auto 8px;
+  max-width: 620px;
+}
+.maison-teaser-l2 {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.4;
+  color: var(--brass);
+  margin: 0 auto;
+  max-width: 620px;
+}
+
+/* ── MaisonPorte · CTA final, sobre ─────────────────────────────── */
+.maison-porte {
+  background: var(--espresso);
+  padding: 100px 0 120px;
+  color: var(--creme);
+  text-align: center;
+}
+.maison-porte-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+.maison-porte-h {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(38px, 6vw, 62px);
+  line-height: 1.05;
+  color: var(--creme);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.maison-porte-h em {
+  font-style: italic;
+  color: var(--brass);
+}
+.maison-porte-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: var(--r-pill);
+  background: var(--brass);
+  color: var(--espresso);
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background var(--dur-touch) var(--ease-enter),
+              transform var(--dur-touch) var(--ease-enter);
+  box-shadow: 0 8px 32px rgba(184, 135, 62, 0.28);
+  margin-top: 8px;
+}
+.maison-porte-cta:hover {
+  background: var(--brass-deep);
+  transform: translateY(-1px);
+}
+.maison-porte-cta:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 4px;
+}
+
 
 
