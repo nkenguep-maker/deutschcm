@@ -10161,8 +10161,12 @@ body.foyer-switching .foyer {
    Sprint 2 · deux territoires en un lieu.
    world (espresso) : 6 étrangères, CECRL, allemand porte le chapitre.
    sources (terre)  : 4 natales, échelle YEMA, salutations dispersées. */
+/* /langues · panneaux miroirs verticaux. Les deux territoires ont
+   EXACTEMENT le même padding, la même respiration, la même
+   structure de header. Différence unique : le fond (espresso vs
+   terre) et le contenu (6 étrangères / 4 natales + table YEMA). */
 .langues-territoire {
-  padding: 80px 0;
+  padding: 96px 0;
   color: var(--creme);
   position: relative;
   overflow: hidden;
@@ -10173,6 +10177,11 @@ body.foyer-switching .foyer {
 .langues-sources {
   background: var(--terre);
   min-height: 620px;
+}
+/* Symétrie du header : même margin-bottom sur les deux section-head,
+   même position pour le kicker + h1. */
+.langues-territoire .maison-section-head {
+  margin-bottom: 48px;
 }
 .langues-sources-inner {
   position: relative;
