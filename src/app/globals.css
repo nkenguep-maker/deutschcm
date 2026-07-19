@@ -7232,7 +7232,7 @@ body:has(.test-space-bar) { padding-top: 34px; }
 }
 .braise.off .braise-label { color: var(--creme-mute); }
 
-/* b) Reprendre · unique zone laiton */
+/* b) Reprendre · unique zone laiton, configurée par cap */
 .foyer-reprendre {
   padding: 22px 24px;
   border: 1px solid var(--brass-edge);
@@ -7242,6 +7242,78 @@ body:has(.test-space-bar) { padding-top: 34px; }
   flex-direction: column;
   gap: 12px;
 }
+.foyer-reprendre-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.foyer-reprendre-title {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(20px, 2.4vw, 24px);
+  color: var(--creme);
+  line-height: 1.25;
+}
+.foyer-reprendre-title em {
+  font-style: italic;
+  color: var(--brass);
+}
+.foyer-reprendre-sub {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 15px;
+  color: var(--creme-soft);
+  line-height: 1.5;
+}
+.foyer-em {
+  font-style: italic;
+  color: var(--brass);
+}
+.foyer-reprendre-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.foyer-reprendre-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: var(--r-pill);
+  background: var(--brass);
+  color: var(--espresso);
+  font-family: var(--font-manrope), sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background var(--dur-touch) var(--ease-enter),
+              transform var(--dur-touch) var(--ease-enter);
+}
+.foyer-reprendre-cta:hover {
+  background: var(--brass-deep);
+  transform: translateY(-1px);
+}
+.foyer-reprendre-cta:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+.foyer-reprendre-min {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--creme-mute);
+  text-transform: uppercase;
+}
+.foyer-cap-note {
+  margin: 4px 0 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 14.5px;
+  color: var(--creme-soft);
+  line-height: 1.5;
+}
+.foyer-cap-note-mute { color: var(--creme-mute); font-style: italic; }
 
 /* c) Rangée · échelle + carte cap */
 .foyer-row {
