@@ -58,7 +58,7 @@ const COPY_FR: Copy = {
   fldName: "Prénom",
   fldEmail: "Email",
   fldPassword: "Mot de passe",
-  capLbl: "Votre cap",
+  capLbl: "Quel est votre but ultime ?",
   caps: [
     { id: "franchir",    label: "Réussir mon examen, partir" },
     { id: "grandir",     label: "Progresser là où je vis" },
@@ -92,7 +92,7 @@ const COPY_EN: Copy = {
   fldName: "First name",
   fldEmail: "Email",
   fldPassword: "Password",
-  capLbl: "Your cap",
+  capLbl: "What is your ultimate goal?",
   caps: [
     { id: "franchir",    label: "Pass my exam, leave" },
     { id: "grandir",     label: "Grow where I live" },

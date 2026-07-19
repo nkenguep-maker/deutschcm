@@ -31,12 +31,12 @@ const COPY_FR = {
       body: "On commence quelque part. L'allemand ouvre une porte concrète à celles et ceux qui préparent études, travail, famille en Europe. C'est le premier chapitre — pas le dernier. D'autres s'annoncent déjà.",
     },
     {
-      strong: "L'enseignant·e reste au cœur.",
-      body: "La machine prépare, corrige, encaisse le répétitif — jamais elle ne remplace la voix d'un·e aîné·e qui te dit un proverbe, ni la patience d'un·e enseignant·e qui te réexplique une règle une troisième fois. YEMA outille les êtres humains, pas l'inverse.",
+      strong: "Le prof au centre.",
+      body: "L'outil sert, l'humain enseigne. La machine prépare et corrige le répétitif ; l'enseignant·e décide, encourage, transmet. Cet ordre ne s'inversera jamais.",
     },
     {
-      strong: "L'IA travaille pour l'humain — sous son contrôle.",
-      body: "Notre coach IA guide, corrige, encourage. Il propose. C'est l'apprenant·e ou l'enseignant·e qui dispose. Aucun automatisme n'est laissé sans porte de sortie humaine.",
+      strong: "Les bibliothèques parlent.",
+      body: "« Un vieillard qui meurt est une bibliothèque qui brûle. » — Amadou Hampâté Bâ. Ici, les bibliothèques parlent. Chaque voix natale accueillie est un livre qui reste ouvert.",
     },
     {
       strong: "Pas de score. Pas de gamification. Pas de badges.",
@@ -69,12 +69,12 @@ const COPY_EN = {
       body: "You start somewhere. German opens a concrete door for those preparing studies, work or family reunification in Europe. It's the first chapter — not the last. Others are already announced.",
     },
     {
-      strong: "The teacher stays at the heart.",
-      body: "The machine prepares, corrects, absorbs the repetitive — it never replaces the voice of an elder telling a proverb, nor the patience of a teacher explaining a rule for the third time. YEMA equips human beings, not the reverse.",
+      strong: "The teacher at the center.",
+      body: "The tool serves, the human teaches. The machine prepares and corrects the repetitive; the teacher decides, encourages, transmits. This order will never reverse.",
     },
     {
-      strong: "AI works for the human — under their control.",
-      body: "Our AI coach guides, corrects, encourages. It proposes. The learner or teacher decides. No automation is left without a human exit door.",
+      strong: "The libraries speak.",
+      body: "\"When an old man dies, a library burns.\" — Amadou Hampâté Bâ. Here, the libraries speak. Every native voice welcomed is a book that stays open.",
     },
     {
       strong: "No score. No gamification. No badges.",

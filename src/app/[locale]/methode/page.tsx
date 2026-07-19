@@ -108,7 +108,7 @@ const PRINCIPLES_FR: readonly Principle[] = [
   {
     tag: "Principe 06 · L'humain",
     title: "L'enseignant au cœur. L'outil à ses côtés.",
-    body: "La machine prépare, corrige, encaisse le répétitif — jamais elle ne remplace. C'est l'enseignant·e qui décide de ce qui compte, qui reconnaît la fatigue de la semaine, qui explique une troisième fois. YEMA outille cette relation — jamais l'inverse.",
+    body: "La machine prépare, corrige le répétitif, signale. L'enseignant décide, encourage, transmet. Cet ordre ne s'inversera jamais.",
     world: {
       cap: "Ce que l'outil fait",
       quote: "Il propose. Il corrige. Il alerte quand un·e élève décroche.",
@@ -196,7 +196,7 @@ const PRINCIPLES_EN: readonly Principle[] = [
   {
     tag: "Principle 06 · The human",
     title: "The teacher at the heart. The tool at their side.",
-    body: "The machine prepares, corrects, absorbs the repetitive — never does it replace. The teacher decides what matters, notices the tiredness of the week, explains a third time. YEMA equips this relationship — never the reverse.",
+    body: "The machine prepares, handles the repetitive corrections, flags. The teacher decides, encourages, transmits. This order will never reverse.",
     world: {
       cap: "What the tool does",
       quote: "It proposes. It corrects. It alerts when a learner slips.",

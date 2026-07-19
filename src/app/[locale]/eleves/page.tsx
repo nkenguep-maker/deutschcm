@@ -74,9 +74,9 @@ interface Copy {
 
 const COPY_FR: Copy = {
   heroKicker: "Apprenant·e·s",
-  heroTitle: "Une langue vous sépare de votre rêve.",
+  heroTitle: "Une langue vous sépare de votre but.",
   heroTitleEm: "On la met à portée.",
-  heroLede: "Que le rêve soit ailleurs ou chez vous, la langue est le dernier verrou. La maison YEMA vous en donne la clé.",
+  heroLede: "Que le but soit ailleurs ou chez vous, la langue est le dernier verrou. La maison YEMA vous en donne la clé.",
   ctaPrimary: "Commencer gratuitement",
   ctaSecondary: "Passer le test",
 
@@ -111,16 +111,16 @@ const COPY_FR: Copy = {
   outilsTitle: "Quatre pièces.",
   outilsTitleEm: "Un seul apprentissage.",
   outils: [
-    { title: "L'écrit corrigé", body: "Chaque texte est relu, expliqué. Pas un score — une lecture attentive de ce que vous vouliez dire." },
-    { title: "Les dialogues", body: "Voix réelles. Scénarios réels. Café, banque, entretien, aînée — vous vous entendez parler avant d'y être." },
-    { title: "Le quiz adaptatif", body: "Il révise ce que vous oubliez. Il passe ce que vous savez. Il ne perd pas votre temps." },
-    { title: "Un·e prof avec vous", body: "Accrédité·e par la maison. Humain·e. Il ou elle décide de ce qui compte pour votre parcours." },
+    { title: "Votre écrit, relu et expliqué", body: "Chaque texte est lu, corrigé, expliqué. Pas un score — une lecture attentive de ce que vous vouliez dire." },
+    { title: "Des voix réelles à écouter", body: "Voix réelles, scénarios réels. Café, banque, entretien, aînée — vous vous entendez parler avant d'y être." },
+    { title: "Des questions à votre niveau", body: "Le quiz révise ce que vous oubliez. Il passe ce que vous savez. Il ne perd pas votre temps." },
+    { title: "Un enseignant accrédité, si vous le souhaitez", body: "Accrédité·e par la maison. Humain·e. Il ou elle décide de ce qui compte pour votre parcours." },
   ],
 
   histKicker: "Une histoire",
-  histTitle: "Aïcha, Yaoundé.",
-  histTitleEm: "A2 → B1 en huit mois.",
-  histQuote: "Je pensais que l'allemand serait un mur. En fait, c'est une porte — YEMA m'a montré comment la pousser.",
+  histTitle: "Fatima, Francfort.",
+  histTitleEm: "Grandir sur place.",
+  histQuote: "Le passeport, on ne l'obtient pas avec l'accent. Alors j'apprends chaque soir.",
 
   ctaClose: "Votre première leçon est gratuite.",
   ctaCloseEm: "Aujourd'hui.",
@@ -145,9 +145,9 @@ const COPY_FR: Copy = {
 
 const COPY_EN: Copy = {
   heroKicker: "Learners",
-  heroTitle: "One language stands between you and your dream.",
+  heroTitle: "One language stands between you and your goal.",
   heroTitleEm: "We put it within reach.",
-  heroLede: "Whether the dream is far or at home, the language is the last lock. The YEMA house gives you the key.",
+  heroLede: "Whether the goal is far or at home, the language is the last lock. The YEMA house gives you the key.",
   ctaPrimary: "Start, free",
   ctaSecondary: "Take the test",
 
@@ -182,16 +182,16 @@ const COPY_EN: Copy = {
   outilsTitle: "Four rooms.",
   outilsTitleEm: "One learning.",
   outils: [
-    { title: "Written work, corrected", body: "Each text is read, explained. Not a score — a careful reading of what you meant." },
-    { title: "The dialogues", body: "Real voices. Real scenarios. Café, bank, interview, elder — you hear yourself speak before you're there." },
-    { title: "The adaptive quiz", body: "It reviews what you forget. It skips what you know. It doesn't waste your time." },
-    { title: "A teacher with you", body: "Accredited by the house. Human. They decide what matters for your path." },
+    { title: "Your writing, read and explained", body: "Each text is read, corrected, explained. Not a score — a careful reading of what you meant." },
+    { title: "Real voices to listen to", body: "Real voices, real scenarios. Café, bank, interview, elder — you hear yourself speak before you're there." },
+    { title: "Questions at your level", body: "The quiz reviews what you forget. Skips what you know. Doesn't waste your time." },
+    { title: "An accredited teacher, if you wish", body: "Accredited by the house. Human. They decide what matters for your path." },
   ],
 
   histKicker: "A story",
-  histTitle: "Aïcha, Yaoundé.",
-  histTitleEm: "A2 → B1 in eight months.",
-  histQuote: "I thought German would be a wall. Turns out it's a door — YEMA showed me how to push it open.",
+  histTitle: "Fatima, Frankfurt.",
+  histTitleEm: "Growing on place.",
+  histQuote: "You don't get the passport with an accent. So I learn every evening.",
 
   ctaClose: "Your first lesson is free.",
   ctaCloseEm: "Today.",
@@ -354,15 +354,15 @@ export default function ElevesPage() {
           <div className="maison-container chemin-histoire-inner">
             <div className="chemin-histoire-portrait">
               <PortraitSpeaking
-                name="Aïcha"
+                name="Fatima"
                 variant="world"
                 size="lg"
                 lang={loc === "en" ? "German" : "allemand"}
-                audioSrc="/audio/portraits/aicha.mp3"
+                audioSrc="/audio/voix/fatima-allemand.mp3"
                 transcript={c.histQuote}
-                mono="A"
+                mono="F"
                 listenLabel={loc === "en" ? "Listen" : "Écouter"}
-                src="/portraits/aicha.avif"
+                src="/portraits/fatima.avif"
               />
             </div>
             <div className="chemin-histoire-body">
