@@ -6952,6 +6952,122 @@ body:has(.test-space-bar) { padding-top: 34px; }
   max-width: 620px;
 }
 
+/* ── /methode · Six principes ─────────────────────────────────────
+   Sprint 4 · chaque principe porte 1 ou 2 exemples territoriaux. */
+.methode-page {
+  color: var(--creme);
+  background: var(--espresso);
+}
+.methode-head {
+  padding: 80px 0 40px;
+  text-align: center;
+}
+.methode-head .maison-h,
+.methode-head .maison-lede {
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.methode-principles {
+  display: flex;
+  flex-direction: column;
+}
+.methode-principle {
+  padding: 60px 0;
+  border-bottom: 1px solid var(--creme-hair);
+}
+.methode-principle-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 60px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .methode-principle-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+.methode-principle-tag {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.methode-principle-num {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 44px;
+  line-height: 1;
+  color: var(--brass);
+}
+.methode-principle-lbl {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--creme-mute);
+  text-transform: uppercase;
+}
+.methode-principle-h {
+  margin: 0 0 16px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(24px, 3.2vw, 32px);
+  line-height: 1.2;
+  color: var(--creme);
+  letter-spacing: -0.01em;
+}
+.methode-principle-p {
+  margin: 0 0 24px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--creme-soft);
+  max-width: 640px;
+}
+.methode-examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+.methode-example {
+  padding: 16px 20px;
+  border-radius: var(--r-card);
+  border: 1px solid var(--brass-edge);
+  background: var(--brass-glow);
+}
+.methode-example-sources {
+  background: rgba(122, 40, 48, 0.12);
+  border-color: rgba(184, 135, 62, 0.28);
+}
+.methode-example-cap {
+  margin: 0 0 8px;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--brass);
+  text-transform: uppercase;
+}
+.methode-example-quote {
+  margin: 0 0 6px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--creme);
+  line-height: 1.35;
+}
+.methode-example-gloss {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 14px;
+  color: var(--creme-soft);
+  line-height: 1.5;
+}
+.methode-cta {
+  text-align: center;
+  padding: 40px 24px 100px;
+  background: var(--espresso);
+}
+
 /* ── /histoires · Le mur des visages ─────────────────────────────
    Sprint 3 · cinq parcours plein format, fond selon territoire. */
 .histoires-page {
