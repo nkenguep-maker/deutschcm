@@ -22,7 +22,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SeuilGreetings } from "./SeuilGreeting";
-import { BrandY } from "@/components/brand/BrandY";
 
 const SESSION_KEY = "yema.seuil.seen";
 
@@ -73,12 +72,13 @@ interface SeuilProps {
 export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: SeuilProps) {
   const router = useRouter();
   const copy = locale === "en" ? COPY_EN : COPY_FR;
-  // Deux beats de cinéma séparés par un moment de vide :
-  //   0 · silence initial (rideau noir)
-  //   1 · Y entre grand, seul, tient sa présence
-  //   2 · Y quitte la scène — moment de vide, aucun texte
-  //   3 · Hero entre, seul (L1 → L2 → sub → CTA → ghost)
-  const [phase, setPhase] = useState<0 | 1 | 2 | 3>(0);
+  // Un seul beat : le silence puis le hero. Le Confluent central du
+  // seuil a été retiré — il apparaissait parfois en même temps que
+  // le texte et cassait la ligne cinéma. La braise ambiante + les
+  // salutations flottantes portent seuls l'identité visuelle du
+  // seuil ; le Confluent réapparaît partout ailleurs (nav, /login,
+  // /not-found, footer, StateBlock loader).
+  const [phase, setPhase] = useState<0 | 1>(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const rootRef = useRef<HTMLElement | null>(null);
@@ -91,25 +91,24 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
 
     const alreadySeen = !forceReplay && sessionStorage.getItem(SESSION_KEY) === "1";
     if (reduced || alreadySeen) {
-      // Tout apparaît sans attendre.
-      setPhase(3);
+      setPhase(1);
       return;
     }
 
-    // Deux beats séparés par un vrai moment de vide.
-    //   0.6s   Y émerge (fade 1400ms). Grand, centré, seul.
-    //   ~2s    Y en pleine présence pendant ~3s.
-    //   4.8s   Y quitte la scène (fade 1400ms).
-    //   6.4s   Scène VIDE — silence noir pendant 400ms.
-    //   6.8s   Hero entre — L1 à +0, L2 à +550, sub à +1200,
-    //          CTA à +1750, ghost à +2100. Dernier ~8.9s.
+    // Un seul beat, plus de logo central. Silence de 1.4s (le temps
+    // de sentir la braise et les salutations qui flottent), puis le
+    // hero entre en stagger :
+    //   1.4s   L1 (« L'Afrique parle. »)
+    //   +550   L2 (« Toutes ses langues. »)
+    //   +1200  sous-titre
+    //   +1750  CTA laiton
+    //   +2100  ghost audio
+    // Dernier élément visible ~3.5s au total.
     const timers: number[] = [];
-    timers.push(window.setTimeout(() => setPhase(1), 600));
-    timers.push(window.setTimeout(() => setPhase(2), 4800));
     timers.push(window.setTimeout(() => {
-      setPhase(3);
+      setPhase(1);
       sessionStorage.setItem(SESSION_KEY, "1");
-    }, 6800));
+    }, 1400));
     return () => {
       timers.forEach((t) => window.clearTimeout(t));
     };
@@ -156,7 +155,7 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
   return (
     <section
       ref={rootRef}
-      className={`seuil ${phase === 3 ? "in-final" : ""}`}
+      className={`seuil ${phase === 1 ? "in-final" : ""}`}
       aria-label={locale === "en" ? "YEMA threshold" : "Seuil YEMA"}
     >
       {/* Braise ambiante — respiration unique du site */}
@@ -186,34 +185,15 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
       </div>
 
       <div className="seuil-inner">
-        {/* Scène — deux actes seulement, séparés par un moment de vide.
-            Le Y entre grand, seul, tient sa présence, puis quitte
-            complètement la scène AVANT que le hero arrive. Aucune
-            superposition, aucune cohabitation. */}
+        {/* Scène — un seul acte (hero). Le Confluent central a été
+            retiré : il apparaissait parfois en même temps que le
+            texte. Le silence initial (1.4s) laisse la braise et les
+            salutations qui flottent porter l'atmosphère seules. */}
         <div className="seuil-stage">
 
-          {/* Acte I · le logo Y — seul, grand, centré.
-              phase 1 : Y entre en fade lent
-              phase 2 : Y sort — la scène devient vide */}
-          <div
-            className={`seuil-act seuil-act-mark ${phase >= 1 ? "in" : ""}`}
-            data-off={phase >= 2 ? "" : undefined}
-            aria-hidden={phase >= 2 ? "true" : undefined}
-          >
-            {/* Le Y devient le Confluent — SVG vivant, partition
-                signature jouée une seule fois (arm world 200ms, arm
-                source 340ms, ignite 900ms, trunk 1050ms). Une seule
-                respiration ambiante sur le site : la braise du seuil
-                sous cette signature — pas d'autre state="breathing"
-                ici pour ne pas doubler. */}
-            <div className="seuil-mark-y-wrap" aria-hidden="true">
-              <BrandY variant="world" state="signature" size={220} />
-            </div>
-          </div>
-
-          {/* Acte II · le hero — seul, prend toute la place à la phase 3.
-              Stagger interne h1a → h1b → sub → CTA → ghost. */}
-          <div className={`seuil-act seuil-act-hero ${phase >= 3 ? "in" : ""}`}>
+          {/* Acte unique · le hero — stagger interne h1a → h1b → sub
+              → CTA → ghost. */}
+          <div className={`seuil-act seuil-act-hero ${phase >= 1 ? "in" : ""}`}>
             <h1 className="seuil-hero-h">
               <span className="seuil-hero-line" style={{ ["--stagger" as string]: "0ms" }}>
                 {copy.heroL1}
