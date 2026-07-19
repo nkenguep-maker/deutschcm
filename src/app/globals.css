@@ -6295,7 +6295,9 @@ body:has(.test-space-bar) { padding-top: 34px; }
   max-width: 720px;
   width: 100%;
 }
-/* Un acte qui s'efface — cross-dissolve long, cinématographique. */
+/* Un acte qui s'efface — cross-dissolve long, cinématographique.
+   Les chuchotements + le hero utilisent ce comportement de bloc.
+   La marque, elle, a un traitement par élément (voir plus bas). */
 .seuil-act[data-off] {
   opacity: 0;
   transform: translateY(-14px);
@@ -6303,84 +6305,40 @@ body:has(.test-space-bar) { padding-top: 34px; }
   transition: opacity 1200ms var(--ease-glide),
               transform 1200ms var(--ease-glide);
 }
-/* Marque qui devient une mémoire quand le hero arrive : au lieu de
-   disparaître complètement, elle reste très en retrait derrière. */
+/* La marque (Y seul) sort — fade lent 1400ms, translate up subtile.
+   Elle disparaît DÉFINITIVEMENT. Aucune mémoire derrière le hero.
+   Le hero n'entre qu'après un moment de vide (voir séquence JS). */
 .seuil-act-mark[data-off] {
-  opacity: 0.14;
-  transform: translateY(-18px) scale(0.94);
-}
-
-/* ── ACTE I · les chuchotements ────────────────────────────────── */
-.seuil-act-whispers {
-  gap: 22px;
-  padding-top: 40px;
-}
-.seuil-l1, .seuil-l2 {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 1100ms var(--ease-enter),
-              transform 1100ms var(--ease-enter);
-  will-change: opacity, transform;
-  margin: 0;
-}
-.seuil-l1.in, .seuil-l2.in {
-  opacity: 1;
-  transform: translateY(0);
-}
-.seuil-l1 {
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-style: italic;
-  font-size: clamp(22px, 4vw, 30px);
-  color: var(--creme);
-  line-height: 1.35;
-  letter-spacing: -0.01em;
-}
-.seuil-l2 {
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-style: italic;
-  font-size: clamp(18px, 3vw, 24px);
-  color: var(--creme-mute);
-  line-height: 1.4;
+  transform: translateY(-24px);
+  transition: opacity 1400ms var(--ease-glide),
+              transform 1400ms var(--ease-glide);
+  pointer-events: none;
 }
 
-/* ── ACTE II · la marque (Y + YEMA + slogan) ──────────────────── */
+/* ── ACTE I · le logo Y — seul, grand, centré ─────────────────── */
 .seuil-act-mark {
-  gap: 14px;
+  gap: 0;
 }
-.seuil-act-mark > * {
+.seuil-act-mark .seuil-mark-y {
   opacity: 0;
-  transform: translateY(24px) scale(0.96);
-  transition: opacity 1100ms var(--ease-enter) var(--stagger, 0ms),
-              transform 1100ms var(--ease-enter) var(--stagger, 0ms);
+  transform: translateY(28px) scale(0.94);
+  transition: opacity 1400ms var(--ease-enter),
+              transform 1400ms var(--ease-enter);
   will-change: opacity, transform;
   margin: 0;
 }
-.seuil-act-mark.in > * {
+.seuil-act-mark.in .seuil-mark-y {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
 .seuil-mark-y {
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
-  font-size: clamp(72px, 11vw, 96px);
+  font-size: clamp(120px, 20vw, 220px);
   line-height: 1;
   color: var(--brass);
-  text-shadow: 0 0 32px rgba(184, 135, 62, 0.34);
-}
-.seuil-mark-name {
-  font-family: var(--font-jetbrains, monospace);
-  font-size: 12px;
-  letter-spacing: 0.34em;
-  color: var(--creme-soft);
-  text-transform: uppercase;
-  margin-top: 4px;
-}
-.seuil-mark-slogan {
-  font-family: var(--font-fraunces), Georgia, serif;
-  font-style: italic;
-  font-size: clamp(14px, 2vw, 17px);
-  color: var(--creme-mute);
-  margin-top: 10px;
+  text-shadow: 0 0 48px rgba(184, 135, 62, 0.38);
 }
 
 /* ── ACTE III · le hero ────────────────────────────────────────── */
@@ -6633,8 +6591,6 @@ body:has(.test-space-bar) { padding-top: 34px; }
     opacity: 0.85;
   }
   .seuil-act,
-  .seuil-l1, .seuil-l2,
-  .seuil-act-mark > *,
   .seuil-act-hero > *,
   .seuil-hero-line,
   .seuil-scroll-hint,
@@ -6644,9 +6600,8 @@ body:has(.test-space-bar) { padding-top: 34px; }
     opacity: 1;
     transform: none;
   }
-  /* En reduced-motion, le seuil montre l'acte HERO d'entrée — les
-     chuchotements et la marque sont mémorisés mais silencieux. */
-  .seuil-act-whispers,
+  /* En reduced-motion, seul le hero apparaît — le logo Y intro est
+     masqué. Pas d'attente, pas de cinéma. */
   .seuil-act-mark {
     display: none;
   }
