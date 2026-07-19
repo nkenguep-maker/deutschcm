@@ -6952,6 +6952,167 @@ body:has(.test-space-bar) { padding-top: 34px; }
   max-width: 620px;
 }
 
+/* ── /admin/applications · La file des portes ────────────────────
+   Sprint 8bis · vue admin des demandes enseignants + centres. */
+.admin-app-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  color: var(--creme);
+}
+.admin-app-head {
+  margin-bottom: 32px;
+  text-align: center;
+}
+.admin-app-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-pill);
+  background: rgba(244, 235, 220, 0.02);
+  margin: 0 auto 32px;
+  max-width: 420px;
+}
+.admin-app-tab {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--creme-mute);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.admin-app-tab.on {
+  color: var(--brass);
+  background: var(--brass-glow);
+}
+.admin-app-body {
+  min-height: 200px;
+}
+.admin-app-empty {
+  text-align: center;
+  color: var(--creme-mute);
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  padding: 40px 0;
+}
+.admin-app-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.admin-app-row {
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-panel);
+  background: rgba(244, 235, 220, 0.02);
+  overflow: hidden;
+}
+.admin-app-row-accredited { border-color: var(--brass-edge); background: var(--brass-glow); }
+.admin-app-row-declined { opacity: 0.55; }
+.admin-app-row-head {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--creme-hair);
+  flex-wrap: wrap;
+}
+.admin-app-name {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 20px;
+  color: var(--creme);
+}
+.admin-app-meta {
+  margin: 4px 0 0;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--creme-mute);
+}
+.admin-app-status {
+  padding: 6px 10px;
+  border: 1px solid var(--brass-edge);
+  border-radius: var(--r-input);
+  background: var(--espresso);
+  color: var(--brass);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  cursor: pointer;
+}
+.admin-app-row-body {
+  padding: 16px 20px;
+}
+.admin-app-info {
+  margin: 0 0 8px;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 13.5px;
+  color: var(--creme-soft);
+  line-height: 1.55;
+}
+.admin-app-info strong {
+  color: var(--brass);
+  font-weight: 600;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.admin-app-notes {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-input);
+  background: rgba(244, 235, 220, 0.03);
+  color: var(--creme);
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 13px;
+  resize: vertical;
+}
+.admin-app-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+.admin-app-btn {
+  padding: 10px 18px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--brass-edge);
+  background: transparent;
+  color: var(--brass);
+}
+.admin-app-btn:hover { background: var(--brass-glow); }
+.admin-app-btn-primary {
+  background: var(--brass);
+  color: var(--espresso);
+  border-color: var(--brass);
+}
+.admin-app-btn-primary:hover { background: var(--brass-deep); }
+.admin-app-tag {
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  background: var(--brass-glow);
+  color: var(--brass);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
 /* ── Les portes · /register, /login, /not-found ──────────────────
    Sprint 8 · portes sobres, réutilisent les tokens du seuil. */
 .porte-page {
