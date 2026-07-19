@@ -217,7 +217,14 @@ export default function LanguesPage() {
           className="langues-territoire langues-world"
           aria-label={c.ariaWorld}
         >
-          <div className="maison-container">
+          {/* Salutations étrangères dispersées dans les murs de la
+              section (Bonjour, Hallo, Guten Tag, Hello, Hola, Olá,
+              As-salām). Pool filtré sur territoire world uniquement. */}
+          <div className="langues-world-greetings" aria-hidden="false">
+            <SeuilGreetings locale={loc} visibleCount={4} pool="world" />
+          </div>
+
+          <div className="maison-container langues-world-inner">
             <div className="maison-section-head">
               <p className="maison-kicker">{t(c.worldKicker)}</p>
               <h1 className="maison-h">
@@ -244,9 +251,11 @@ export default function LanguesPage() {
           className="langues-territoire langues-sources"
           aria-label={c.ariaSources}
         >
-          {/* Salutations dispersées dans les murs de la section */}
+          {/* Salutations natales dispersées dans les murs de la section
+              (Mbolo, Na nga def, Mbote, Jambo, Ẹ n lẹ, Sannu, Akwaaba,
+              Muraho, Selam, Sawubona). Pool filtré sur sources uniquement. */}
           <div className="langues-sources-greetings" aria-hidden="false">
-            <SeuilGreetings locale={loc} visibleCount={4} />
+            <SeuilGreetings locale={loc} visibleCount={4} pool="sources" />
           </div>
 
           <div className="maison-container langues-sources-inner">

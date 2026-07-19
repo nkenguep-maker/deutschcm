@@ -30,6 +30,9 @@ export interface GreetingItem {
   country: string;
   countryEn: string;
   langTag: string;
+  /** Territoire d'origine — permet de filtrer par pool sur les pages
+   *  où le contexte impose (page langues étrangères vs natales). */
+  territory: "world" | "sources";
 }
 
 // Pool des salutations · natales africaines ET étrangères, entrelacées
@@ -37,26 +40,36 @@ export interface GreetingItem {
 // YEMA (world + sources). Une salutation africaine, une étrangère, une
 // africaine, une étrangère — jamais un bloc mono-territoire au démarrage.
 export const GREETINGS: readonly GreetingItem[] = [
-  { id: "mbolo",     word: "Mbolo",     language: "ewondo",       languageEn: "Ewondo",       country: "Cameroun",           countryEn: "Cameroon",              langTag: "ewo" },
-  { id: "bonjour",   word: "Bonjour",   language: "français",     languageEn: "French",       country: "France",             countryEn: "France",                langTag: "fr"  },
-  { id: "nangadef",  word: "Na nga def", language: "wolof",        languageEn: "Wolof",        country: "Sénégal",            countryEn: "Senegal",               langTag: "wol" },
-  { id: "gutentag",  word: "Guten Tag", language: "allemand",     languageEn: "German",       country: "Allemagne",          countryEn: "Germany",               langTag: "de"  },
-  { id: "mbote",     word: "Mbote",     language: "lingala",      languageEn: "Lingala",      country: "RDC",                countryEn: "DRC",                   langTag: "lin" },
-  { id: "hello",     word: "Hello",     language: "anglais",      languageEn: "English",      country: "International",      countryEn: "International",         langTag: "en"  },
-  { id: "jambo",     word: "Jambo",     language: "swahili",      languageEn: "Swahili",      country: "Kenya · Tanzanie",   countryEn: "Kenya · Tanzania",      langTag: "swa" },
-  { id: "hola",      word: "Hola",      language: "espagnol",     languageEn: "Spanish",      country: "Espagne",            countryEn: "Spain",                 langTag: "es"  },
-  { id: "enle",      word: "Ẹ n lẹ",    language: "yorùbá",       languageEn: "Yoruba",       country: "Nigeria",            countryEn: "Nigeria",               langTag: "yor" },
-  { id: "sannu",     word: "Sannu",     language: "haoussa",      languageEn: "Hausa",        country: "Niger · Nigeria",    countryEn: "Niger · Nigeria",       langTag: "hau" },
-  { id: "akwaaba",   word: "Akwaaba",   language: "twi",          languageEn: "Twi",          country: "Ghana",              countryEn: "Ghana",                 langTag: "twi" },
-  { id: "muraho",    word: "Muraho",    language: "kinyarwanda",  languageEn: "Kinyarwanda",  country: "Rwanda",             countryEn: "Rwanda",                langTag: "kin" },
-  { id: "selam",     word: "Selam",     language: "amharique",    languageEn: "Amharic",      country: "Éthiopie",           countryEn: "Ethiopia",              langTag: "amh" },
-  { id: "sawubona",  word: "Sawubona",  language: "zoulou",       languageEn: "Zulu",         country: "Afrique du Sud",     countryEn: "South Africa",          langTag: "zul" },
+  // ── Territoire sources · natales africaines ────────────────────
+  { id: "mbolo",     word: "Mbolo",     language: "ewondo",       languageEn: "Ewondo",       country: "Cameroun",           countryEn: "Cameroon",              langTag: "ewo", territory: "sources" },
+  { id: "nangadef",  word: "Na nga def", language: "wolof",        languageEn: "Wolof",        country: "Sénégal",            countryEn: "Senegal",               langTag: "wol", territory: "sources" },
+  { id: "mbote",     word: "Mbote",     language: "lingala",      languageEn: "Lingala",      country: "RDC",                countryEn: "DRC",                   langTag: "lin", territory: "sources" },
+  { id: "jambo",     word: "Jambo",     language: "swahili",      languageEn: "Swahili",      country: "Kenya · Tanzanie",   countryEn: "Kenya · Tanzania",      langTag: "swa", territory: "sources" },
+  { id: "enle",      word: "Ẹ n lẹ",    language: "yorùbá",       languageEn: "Yoruba",       country: "Nigeria",            countryEn: "Nigeria",               langTag: "yor", territory: "sources" },
+  { id: "sannu",     word: "Sannu",     language: "haoussa",      languageEn: "Hausa",        country: "Niger · Nigeria",    countryEn: "Niger · Nigeria",       langTag: "hau", territory: "sources" },
+  { id: "akwaaba",   word: "Akwaaba",   language: "twi",          languageEn: "Twi",          country: "Ghana",              countryEn: "Ghana",                 langTag: "twi", territory: "sources" },
+  { id: "muraho",    word: "Muraho",    language: "kinyarwanda",  languageEn: "Kinyarwanda",  country: "Rwanda",             countryEn: "Rwanda",                langTag: "kin", territory: "sources" },
+  { id: "selam",     word: "Selam",     language: "amharique",    languageEn: "Amharic",      country: "Éthiopie",           countryEn: "Ethiopia",              langTag: "amh", territory: "sources" },
+  { id: "sawubona",  word: "Sawubona",  language: "zoulou",       languageEn: "Zulu",         country: "Afrique du Sud",     countryEn: "South Africa",          langTag: "zul", territory: "sources" },
+  // ── Territoire world · étrangères ──────────────────────────────
+  { id: "bonjour",   word: "Bonjour",   language: "français",     languageEn: "French",       country: "France",             countryEn: "France",                langTag: "fr",  territory: "world" },
+  { id: "gutentag",  word: "Guten Tag", language: "allemand",     languageEn: "German",       country: "Allemagne",          countryEn: "Germany",               langTag: "de",  territory: "world" },
+  { id: "hallo",     word: "Hallo",     language: "allemand",     languageEn: "German",       country: "Allemagne",          countryEn: "Germany",               langTag: "de",  territory: "world" },
+  { id: "hello",     word: "Hello",     language: "anglais",      languageEn: "English",      country: "International",      countryEn: "International",         langTag: "en",  territory: "world" },
+  { id: "hola",      word: "Hola",      language: "espagnol",     languageEn: "Spanish",      country: "Espagne",            countryEn: "Spain",                 langTag: "es",  territory: "world" },
+  { id: "ola",       word: "Olá",       language: "portugais",    languageEn: "Portuguese",   country: "Portugal · Brésil",  countryEn: "Portugal · Brazil",     langTag: "pt",  territory: "world" },
+  { id: "salam",     word: "As-salām",  language: "arabe",        languageEn: "Arabic",       country: "Monde arabe",        countryEn: "Arab world",            langTag: "ar",  territory: "world" },
 ] as const;
 
 interface SeuilGreetingsProps {
   locale: "fr" | "en";
   /** Nombre de salutations visibles à la fois (default 4) */
   visibleCount?: number;
+  /** Pool à afficher : "all" (par défaut, seuil landing), "world"
+   *  (étrangères uniquement), "sources" (natales africaines uniquement).
+   *  Utilisé sur /langues pour aligner les salutations avec le
+   *  territoire de la section. */
+  pool?: "all" | "world" | "sources";
 }
 
 const POSITIONS = ["p0", "p1", "p2", "p3"] as const;
@@ -68,14 +81,22 @@ const CYCLE_MS = 12000;
 export function SeuilGreetings({
   locale,
   visibleCount = 4,
+  pool = "all",
 }: SeuilGreetingsProps) {
-  const slotCount = Math.min(visibleCount, POSITIONS.length);
+  // Filtre le pool si territoire imposé (pages world / sources).
+  const items = useMemo(() => {
+    if (pool === "world") return GREETINGS.filter((g) => g.territory === "world");
+    if (pool === "sources") return GREETINGS.filter((g) => g.territory === "sources");
+    return GREETINGS;
+  }, [pool]);
+
+  const slotCount = Math.min(visibleCount, POSITIONS.length, items.length);
 
   // État par slot — index du mot en cours dans le pool. Incrémenté
   // à chaque cycle terminé (onAnimationIteration) — jamais tous ensemble.
   const initial = useMemo(
-    () => Array.from({ length: slotCount }, (_, i) => i % GREETINGS.length),
-    [slotCount],
+    () => Array.from({ length: slotCount }, (_, i) => i % items.length),
+    [slotCount, items.length],
   );
   const [wordIdx, setWordIdx] = useState<number[]>(initial);
   const nextRef = useRef(slotCount);
@@ -98,11 +119,11 @@ export function SeuilGreetings({
   const handleIteration = useCallback((slot: number) => {
     setWordIdx((prev) => {
       const copy = [...prev];
-      copy[slot] = nextRef.current % GREETINGS.length;
+      copy[slot] = nextRef.current % items.length;
       nextRef.current += 1;
       return copy;
     });
-  }, []);
+  }, [items.length]);
 
   const ensureAudio = (item: GreetingItem): HTMLAudioElement => {
     let audio = audioRefs.current.get(item.id);
@@ -141,7 +162,7 @@ export function SeuilGreetings({
       aria-label={locale === "en" ? "African greetings" : "Salutations africaines"}
     >
       {Array.from({ length: slotCount }, (_, i) => {
-        const item = GREETINGS[wordIdx[i]];
+        const item = items[wordIdx[i]];
         // Chaque slot démarre son cycle à un point différent.
         // Offset négatif = déjà en cours au mount → un est en
         // émergence, un en vie, un en effacement, un endormi.

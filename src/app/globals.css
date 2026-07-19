@@ -8523,27 +8523,44 @@ body:has(.test-space-bar) { padding-top: 34px; }
   position: relative;
   z-index: 2;
 }
-.langues-sources-greetings {
+.langues-sources-greetings,
+.langues-world-greetings {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
 }
-.langues-sources-greetings .seuil-greetings {
+.langues-sources-greetings .seuil-greetings,
+.langues-world-greetings .seuil-greetings {
   pointer-events: none;
 }
-.langues-sources-greetings .seuil-greeting {
+.langues-sources-greetings .seuil-greeting,
+.langues-world-greetings .seuil-greeting {
   pointer-events: auto;
 }
-/* Placement des salutations dans la section sources — plus vaste que
-   dans le seuil, on les répartit dans les quatre coins hors du texte. */
-.langues-sources-greetings .seuil-greeting-p0 { top: 10%;  left: 4%; }
-.langues-sources-greetings .seuil-greeting-p1 { top: 12%;  right: 5%; }
-.langues-sources-greetings .seuil-greeting-p2 { bottom: 18%; left: 6%; }
-.langues-sources-greetings .seuil-greeting-p3 { bottom: 22%; right: 4%; }
+/* Placement des salutations — plus vaste que dans le seuil, on les
+   répartit dans les quatre coins hors du texte central. Le placement
+   est identique pour les deux territoires. */
+.langues-sources-greetings .seuil-greeting-p0,
+.langues-world-greetings .seuil-greeting-p0 { top: 10%;  left: 4%; }
+.langues-sources-greetings .seuil-greeting-p1,
+.langues-world-greetings .seuil-greeting-p1 { top: 12%;  right: 5%; }
+.langues-sources-greetings .seuil-greeting-p2,
+.langues-world-greetings .seuil-greeting-p2 { bottom: 18%; left: 6%; }
+.langues-sources-greetings .seuil-greeting-p3,
+.langues-world-greetings .seuil-greeting-p3 { bottom: 22%; right: 4%; }
 @media (max-width: 767px) {
   .langues-sources-greetings .seuil-greeting-p2,
-  .langues-sources-greetings .seuil-greeting-p3 { display: none; }
+  .langues-sources-greetings .seuil-greeting-p3,
+  .langues-world-greetings .seuil-greeting-p2,
+  .langues-world-greetings .seuil-greeting-p3 { display: none; }
+}
+/* La section world a besoin de min-height pour que les salutations
+   aient de l'air en haut / en bas. Contenu au-dessus (z-index 2). */
+.langues-world { min-height: 620px; }
+.langues-world-inner {
+  position: relative;
+  z-index: 2;
 }
 
 .langues-scale-cap {
