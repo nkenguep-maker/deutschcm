@@ -46,20 +46,6 @@ export const SITE_META: SiteMeta = {
       twitterTitle: "Comment YEMA enseigne — méthode",
       ogImageAlt: "YEMA — la méthode : oral d'abord, prof au centre",
     },
-    histoires: {
-      title: "La Veillée — YEMA",
-      description: "Écoutez le wolof, le bassa, l'allemand. Des voix réelles, des contes, des proverbes. On s'assied, on écoute.",
-      ogTitle: "La Veillée — écouter les langues, des vraies voix",
-      twitterTitle: "La Veillée — YEMA",
-      ogImageAlt: "YEMA — La Veillée, écouter les langues",
-    },
-    veillee: {
-      title: "La Veillée — YEMA",
-      description: "Écoutez le wolof, le bassa, l'allemand. Des voix réelles, des contes, des proverbes. On s'assied, on écoute.",
-      ogTitle: "La Veillée — écouter les langues, des vraies voix",
-      twitterTitle: "La Veillée — YEMA",
-      ogImageAlt: "YEMA — La Veillée, écouter les langues",
-    },
     pricing: {
       title: "Tarifs — YEMA",
       description: "L'entrée, la Braise, le Passage, la Grande Maison, la Famille. Un prix simple pour un but précis. Mobile Money ou carte, 14 jours sans risque.",
@@ -131,20 +117,6 @@ export const SITE_META: SiteMeta = {
       ogTitle: "The YEMA method — voice first, teacher at the center",
       twitterTitle: "How YEMA teaches — the method",
       ogImageAlt: "YEMA — the method: voice first, teacher at center",
-    },
-    histoires: {
-      title: "The Veillée — YEMA",
-      description: "Listen to Wolof, Bassa, German. Real voices, tales, proverbs. Sit down, listen.",
-      ogTitle: "The Veillée — listen to languages, real voices",
-      twitterTitle: "The Veillée — YEMA",
-      ogImageAlt: "YEMA — The Veillée, listen to languages",
-    },
-    veillee: {
-      title: "The Veillée — YEMA",
-      description: "Listen to Wolof, Bassa, German. Real voices, tales, proverbs. Sit down, listen.",
-      ogTitle: "The Veillée — listen to languages, real voices",
-      twitterTitle: "The Veillée — YEMA",
-      ogImageAlt: "YEMA — The Veillée, listen to languages",
     },
     pricing: {
       title: "Pricing — YEMA",

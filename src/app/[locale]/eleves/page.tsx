@@ -373,14 +373,6 @@ export default function ElevesPage() {
               <blockquote className="chemin-histoire-quote">
                 <p>« {t(c.histQuote)} »</p>
               </blockquote>
-              <Link href={`/${locale}/veillee`} className="maison-link-strong">
-                {loc === "en" ? "The Veillée" : "La Veillée"}
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-                     stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"
-                     strokeLinejoin="round" aria-hidden="true">
-                  <path d="M3 7h8M8 3l4 4-4 4" />
-                </svg>
-              </Link>
             </div>
           </div>
         </section>
