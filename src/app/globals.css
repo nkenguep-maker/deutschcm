@@ -6497,7 +6497,15 @@ body:has(.test-space-bar) { padding-top: 34px; }
 }
 .seuil.in-final .seuil-scroll-hint { opacity: 1; }
 
-/* ── Salutations flottantes ─────────────────────────────────────── */
+/* ── Salutations flottantes ─────────────────────────────────────
+   Chaque salutation vit sa propre vie (cycle 12s). L'une émerge,
+   une autre est déjà pleine, une troisième s'efface, une quatrième
+   est endormie. Jamais toutes ensemble. Elles retournent dans le
+   fond en filigrane (opacité 0.06) avant de disparaître complètement,
+   puis renaissent avec le mot suivant du pool.
+
+   Le CSS var --seuil-greet-cycle doit rester en phase avec la
+   constante CYCLE_MS de SeuilGreeting.tsx (12000ms). */
 .seuil-greetings {
   position: absolute;
   inset: 0;
@@ -6516,11 +6524,53 @@ body:has(.test-space-bar) { padding-top: 34px; }
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  opacity: 0.14;
-  transition: opacity var(--dur-move) var(--ease-enter),
-              transform var(--dur-move) var(--ease-enter);
   border-radius: var(--r-card);
+  opacity: 0;
+  animation: seuil-greeting-breath 12000ms var(--ease-glide) infinite;
+  will-change: opacity, transform;
+  /* Transition ne s'applique qu'aux states hover/focus/playing — elle
+     doit être rapide pour prendre le pas sur l'animation en cours. */
+  transition: opacity var(--dur-touch) var(--ease-enter),
+              transform var(--dur-touch) var(--ease-enter);
 }
+
+/* Cycle de vie : émergence (0→10%), pleine présence (10→30%),
+   fondu vers le fond (30→60%), filigrane (60→80%), disparition
+   complète (80→100%). Le mot dans le slot change à la fin du cycle
+   via onAnimationIteration. */
+@keyframes seuil-greeting-breath {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(2px);
+  }
+  10% {
+    opacity: 0.55;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  32% {
+    opacity: 0.55;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  60% {
+    opacity: 0.10;
+    transform: translateY(-4px);
+    filter: blur(1px);
+  }
+  82% {
+    opacity: 0.04;
+    transform: translateY(-8px);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14px);
+    filter: blur(3px);
+  }
+}
+
 .seuil-greeting-word {
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
@@ -6540,11 +6590,17 @@ body:has(.test-space-bar) { padding-top: 34px; }
   transition: opacity var(--dur-touch) var(--ease-enter);
   white-space: nowrap;
 }
+
+/* Hover/focus/playing : pause l'animation et met en pleine lumière.
+   !important sur opacity/transform pour prendre le pas sur les
+   keyframes en cours d'exécution. */
 .seuil-greeting:hover,
 .seuil-greeting:focus-visible,
 .seuil-greeting.playing {
-  opacity: 0.9;
-  transform: translateY(-2px);
+  animation-play-state: paused;
+  opacity: 0.95 !important;
+  transform: translateY(-2px) !important;
+  filter: blur(0) !important;
 }
 .seuil-greeting:hover .seuil-greeting-meta,
 .seuil-greeting:focus-visible .seuil-greeting-meta,
@@ -6594,7 +6650,13 @@ body:has(.test-space-bar) { padding-top: 34px; }
   .seuil-act-mark {
     display: none;
   }
-  .seuil-greeting { opacity: 0.6; }
+  /* Salutations statiques, opacité intermédiaire — pas de cycle. */
+  .seuil-greeting {
+    animation: none !important;
+    opacity: 0.5 !important;
+    transform: none !important;
+    filter: none !important;
+  }
   .seuil-scroll-hint { opacity: 1; }
 }
 

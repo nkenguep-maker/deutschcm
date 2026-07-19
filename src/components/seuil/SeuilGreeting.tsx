@@ -1,31 +1,34 @@
 "use client";
 
 // SeuilGreeting — les langues murmurent dans les murs du seuil.
-// Un mot en Fraunces italique laiton, opacité repos 0.14 → 0.9 au
-// hover/focus/tap. Au clic → audio natif (préchargé après la 1ère
-// interaction seulement, jamais autoplay).
 //
-// Pool de 10 salutations — jamais inventées. La règle production :
-// - Dev : le placeholder audio (fichier vide ou 404) est toléré,
-//         on garde la vue pour tester la structure.
-// - Prod : seuls les fichiers avec un audio validé natif apparaissent
-//         (voir NEXT_PUBLIC_SEUIL_AUDIO_STRICT=1 pour forcer le filtrage).
+// Chaque emplacement (slot) a sa propre vie autonome, décalée des
+// autres. Elles n'apparaissent JAMAIS ensemble : l'une émerge, une
+// autre est déjà pleine, une troisième s'efface, une quatrième est
+// endormie. Cycle de 12s par slot, offset -3s entre chaque, pour un
+// souffle continu autour de la séquence centrale.
 //
-// Fichiers attendus : /public/audio/greetings/{id}.mp3
+// Le cycle CSS gère l'apparition/vie/effacement. Le JS n'incrémente
+// que le mot affiché à chaque itération d'animation (via
+// onAnimationIteration) — 10 salutations tournent dans un pool sans
+// jamais afficher deux fois le même à la fois.
+//
+// Interaction (hover/focus/tap) : pause de l'animation, opacity 0.95,
+// petit lift. Au clic → audio natif préchargé après 1ère interaction,
+// jamais autoplay.
+//
+// Règle prod : audio validé natif requis. En dev, fichier absent =
+// silence discret, la vue reste pour tester la structure.
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export interface GreetingItem {
   id: string;
-  /** Le mot ou la phrase de salutation dans la langue */
   word: string;
-  /** Nom de la langue en langue française (affichable au clic) */
   language: string;
   languageEn: string;
-  /** Pays d'ancrage */
   country: string;
   countryEn: string;
-  /** BCP-47 ou tag court pour aria-label */
   langTag: string;
 }
 
@@ -46,40 +49,53 @@ interface SeuilGreetingsProps {
   locale: "fr" | "en";
   /** Nombre de salutations visibles à la fois (default 4) */
   visibleCount?: number;
-  /** Durée d'un cycle avant rotation, en ms (default 11 000) */
-  rotateMs?: number;
 }
 
 const POSITIONS = ["p0", "p1", "p2", "p3"] as const;
+/** Durée d'un cycle complet (émergence + vie + effacement + repos)
+ *  d'une seule salutation. Le prod ne change pas — CSS var --seuil-greet-cycle
+ *  doit rester en phase avec ce nombre. */
+const CYCLE_MS = 12000;
 
 export function SeuilGreetings({
   locale,
   visibleCount = 4,
-  rotateMs = 11000,
 }: SeuilGreetingsProps) {
-  const [offset, setOffset] = useState(0);
+  const slotCount = Math.min(visibleCount, POSITIONS.length);
+
+  // État par slot — index du mot en cours dans le pool. Incrémenté
+  // à chaque cycle terminé (onAnimationIteration) — jamais tous ensemble.
+  const initial = useMemo(
+    () => Array.from({ length: slotCount }, (_, i) => i % GREETINGS.length),
+    [slotCount],
+  );
+  const [wordIdx, setWordIdx] = useState<number[]>(initial);
+  const nextRef = useRef(slotCount);
+
   const [playing, setPlaying] = useState<string | null>(null);
   const audioRefs = useRef<Map<string, HTMLAudioElement>>(new Map());
   const prefetchedRef = useRef(false);
 
-  const total = GREETINGS.length;
-  const shown = useMemo(() => {
-    return Array.from({ length: Math.min(visibleCount, POSITIONS.length) }, (_, i) => {
-      return GREETINGS[(offset + i) % total];
-    });
-  }, [offset, visibleCount, total]);
-
+  // Reduced-motion : pas de rotation, on garde le pool initial.
+  const [reduced, setReduced] = useState(false);
   useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
-    const id = window.setInterval(() => {
-      setOffset((o) => (o + 1) % total);
-    }, rotateMs);
-    return () => window.clearInterval(id);
-  }, [rotateMs, total]);
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setReduced(mq.matches);
+    const listener = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mq.addEventListener("change", listener);
+    return () => mq.removeEventListener("change", listener);
+  }, []);
 
-  // Précharge les audios seulement après la première interaction utilisateur.
-  // Pas d'autoplay, pas de fetch au mount.
+  const handleIteration = useCallback((slot: number) => {
+    setWordIdx((prev) => {
+      const copy = [...prev];
+      copy[slot] = nextRef.current % GREETINGS.length;
+      nextRef.current += 1;
+      return copy;
+    });
+  }, []);
+
   const ensureAudio = (item: GreetingItem): HTMLAudioElement => {
     let audio = audioRefs.current.get(item.id);
     if (!audio) {
@@ -93,12 +109,8 @@ export function SeuilGreetings({
   };
 
   const handlePick = (item: GreetingItem) => {
-    if (!prefetchedRef.current) {
-      // Après le premier tap, on tolère le préchargement des voisins.
-      prefetchedRef.current = true;
-    }
+    if (!prefetchedRef.current) prefetchedRef.current = true;
     const audio = ensureAudio(item);
-    // Stop tout ce qui joue avant.
     audioRefs.current.forEach((a, id) => {
       if (id !== item.id) {
         a.pause();
@@ -107,10 +119,7 @@ export function SeuilGreetings({
     });
     setPlaying(item.id);
     audio.currentTime = 0;
-    audio.play().catch(() => {
-      // Fichier absent ou refus autoplay : on relâche l'état.
-      setPlaying(null);
-    });
+    audio.play().catch(() => setPlaying(null));
   };
 
   const ariaLabel = (item: GreetingItem) =>
@@ -119,22 +128,40 @@ export function SeuilGreetings({
       : `Écouter ${item.word} en ${item.language}`;
 
   return (
-    <div className="seuil-greetings" aria-label={locale === "en" ? "African greetings" : "Salutations africaines"}>
-      {shown.map((item, i) => (
-        <button
-          key={`${item.id}-${i}`}
-          type="button"
-          className={`seuil-greeting seuil-greeting-${POSITIONS[i]} ${playing === item.id ? "playing" : ""}`}
-          onClick={() => handlePick(item)}
-          aria-label={ariaLabel(item)}
-          lang={item.langTag}
-        >
-          <span className="seuil-greeting-word">{item.word}</span>
-          <span className="seuil-greeting-meta">
-            {(locale === "en" ? item.languageEn : item.language)} · {(locale === "en" ? item.countryEn : item.country)}
-          </span>
-        </button>
-      ))}
+    <div
+      className="seuil-greetings"
+      aria-label={locale === "en" ? "African greetings" : "Salutations africaines"}
+    >
+      {Array.from({ length: slotCount }, (_, i) => {
+        const item = GREETINGS[wordIdx[i]];
+        // Chaque slot démarre son cycle à un point différent.
+        // Offset négatif = déjà en cours au mount → un est en
+        // émergence, un en vie, un en effacement, un endormi.
+        const offset = -Math.round((i * CYCLE_MS) / slotCount);
+        const style: React.CSSProperties = reduced
+          ? {}
+          : { animationDelay: `${offset}ms` };
+        return (
+          <button
+            key={i}
+            type="button"
+            className={`seuil-greeting seuil-greeting-${POSITIONS[i]} ${
+              playing === item.id ? "playing" : ""
+            }`}
+            style={style}
+            onAnimationIteration={() => handleIteration(i)}
+            onClick={() => handlePick(item)}
+            aria-label={ariaLabel(item)}
+            lang={item.langTag}
+          >
+            <span className="seuil-greeting-word">{item.word}</span>
+            <span className="seuil-greeting-meta">
+              {(locale === "en" ? item.languageEn : item.language)} ·{" "}
+              {(locale === "en" ? item.countryEn : item.country)}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
