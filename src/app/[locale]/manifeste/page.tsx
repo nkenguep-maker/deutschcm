@@ -130,6 +130,20 @@ export default function ManifestePage() {
           <em>{t(c.h1_line2)}</em>
         </h1>
 
+        {/* Citation Hampâté Bâ · en tête de manifeste, avec la
+            réponse YEMA sous forme d'écho italique laiton. */}
+        <blockquote className="lmanifest-hampate">
+          <p className="lmanifest-hampate-quote">
+            {loc === "en"
+              ? "“In Africa, when an old man dies, a library burns.”"
+              : "« En Afrique, quand un vieillard meurt, c'est une bibliothèque qui brûle. »"}
+          </p>
+          <p className="lmanifest-hampate-attr">— Amadou Hampâté Bâ</p>
+          <p className="lmanifest-hampate-answer">
+            <em>{loc === "en" ? "Here, the libraries speak." : "Ici, les bibliothèques parlent."}</em>
+          </p>
+        </blockquote>
+
         <div className="lmanifest-body">
           {c.clauses.map((cl, i) => (
             <section key={i} className="lmanifest-clause">

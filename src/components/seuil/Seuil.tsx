@@ -22,6 +22,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SeuilGreetings } from "./SeuilGreeting";
+import { VoixPlayer } from "@/components/voix/VoixPlayer";
+import { STORIES } from "@/lib/voix/stories";
 
 const SESSION_KEY = "yema.seuil.seen";
 
@@ -29,6 +31,7 @@ interface SeuilCopy {
   heroL1: string;
   heroL2: string;
   heroSub: string;
+  slogan: string;
   cta: string;
   ctaGhost: string;
   scrollHint: string;
@@ -41,6 +44,7 @@ const COPY_FR: SeuilCopy = {
   heroL2: "Toutes ses langues.",
   heroSub:
     "Celles qui portent au large. Celles qui gardent la mémoire. Ici, elles vivent ensemble.",
+  slogan: "Votre voie. Votre voix.",
   cta: "Entrez — la maison est ouverte",
   ctaGhost: "écouter la voix du seuil",
   scrollHint: "faites défiler",
@@ -53,6 +57,7 @@ const COPY_EN: SeuilCopy = {
   heroL2: "All her tongues.",
   heroSub:
     "The ones that carry you far. The ones that hold the memory. Here, they live together.",
+  slogan: "Your way. Your voice.",
   cta: "Come in — the house is open",
   ctaGhost: "listen to the voice of the threshold",
   scrollHint: "scroll",
@@ -80,7 +85,7 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
   // /not-found, footer, StateBlock loader).
   const [phase, setPhase] = useState<0 | 1>(0);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [miniPlayerOpen, setMiniPlayerOpen] = useState(false);
   const rootRef = useRef<HTMLElement | null>(null);
 
   // Séquence — respecte prefers-reduced-motion et sessionStorage.
@@ -132,16 +137,12 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
   };
 
   const handleGhostAudio = () => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio("/audio/seuil.mp3");
-      audioRef.current.preload = "auto";
-    }
-    const audio = audioRef.current;
-    audio.currentTime = 0;
-    audio.play().catch(() => {
-      /* placeholder absent en dev — silence discret, pas d'erreur bruyante */
-    });
+    // Ouvre / ferme un mini VoixPlayer sous le CTA — le premier
+    // récit du recueil devient la voix du seuil. Jamais d'autoplay.
+    setMiniPlayerOpen((v) => !v);
   };
+
+  const seuilStory = STORIES[0]; // Bintou · wolof · voix d'ouverture
 
   const handleLocaleSwitch = (target: "fr" | "en") => {
     if (target === locale) return;
@@ -204,9 +205,14 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
             </h1>
             <p className="seuil-hero-sub" style={{ ["--stagger" as string]: "1050ms" }}>{copy.heroSub}</p>
 
+            {/* Le slogan — signature courte de la maison YEMA */}
+            <p className="seuil-hero-slogan" style={{ ["--stagger" as string]: "1350ms" }}>
+              <em>{copy.slogan}</em>
+            </p>
+
             <div className="seuil-cta-row">
               <a href={entryHref} className="seuil-cta" onClick={handleEntry}
-                 style={{ ["--stagger" as string]: "1500ms" }}>
+                 style={{ ["--stagger" as string]: "1700ms" }}>
                 {copy.cta}
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
                      stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"
@@ -214,11 +220,30 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
                   <path d="M8 3v10M3 8l5 5 5-5" />
                 </svg>
               </a>
-              <button type="button" className="seuil-cta-ghost" onClick={handleGhostAudio}
-                      style={{ ["--stagger" as string]: "1850ms" }}>
+              <button
+                type="button"
+                className={`seuil-cta-ghost ${miniPlayerOpen ? "open" : ""}`}
+                onClick={handleGhostAudio}
+                aria-expanded={miniPlayerOpen}
+                style={{ ["--stagger" as string]: "2050ms" }}
+              >
                 {copy.ctaGhost}
               </button>
             </div>
+
+            {/* Mini player du seuil — inline sous les CTAs, se déploie
+                au clic sur "écouter la voix du seuil". Un clic supplé-
+                mentaire le referme. */}
+            {miniPlayerOpen && seuilStory ? (
+              <div className="seuil-mini-player">
+                <VoixPlayer
+                  story={seuilStory}
+                  locale={locale}
+                  size="compact"
+                  showProverb={false}
+                />
+              </div>
+            ) : null}
           </div>
 
         </div>

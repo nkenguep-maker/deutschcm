@@ -1,12 +1,12 @@
 "use client";
 
-// MaisonVeillee · section landing autour du composant VeilleeFilm.
-// Poser un kicker, un titre en Fraunces italique, une phrase courte,
-// puis le film (ou son fallback slideshow). La piste voix suit la
-// locale du seuil (fr.mp3 / en.mp3), la vidéo master ne change pas
-// (l'ouverture avec la grand-mère dans SA langue reste immuable).
+// MaisonVeillee · la Veillée devient audio-first.
+// Kicker, titre Fraunces, une phrase, puis <VeilleeVoix> —
+// sélecteur de voix + player avec proverbe et transcription
+// bilingue synchronisée. Le film cinéma reviendra plus tard,
+// la voix est le premier chapitre.
 
-import { VeilleeFilm } from "@/components/seuil/VeilleeFilm";
+import { VeilleeVoix } from "@/components/voix/VeilleeVoix";
 import { frTypo } from "@/components/landing/typo";
 
 interface Copy {
@@ -18,16 +18,16 @@ interface Copy {
 
 const COPY_FR: Copy = {
   kicker: "La veillée",
-  title: "La grand-mère parle.",
-  titleEm: "Nous écoutons.",
-  phrase: "Un film de quarante secondes. Sa voix reste dans sa langue — c'est nous qui apprenons.",
+  title: "Choisissez une voix.",
+  titleEm: "Écoutez.",
+  phrase: "Une voix, une langue, un récit. La voix reste dans sa langue — vous suivez les mots au fil, si vous le voulez.",
 };
 
 const COPY_EN: Copy = {
   kicker: "The vigil",
-  title: "The grandmother speaks.",
-  titleEm: "We listen.",
-  phrase: "A forty-second film. Her voice stays in her language — we are the ones who learn.",
+  title: "Choose a voice.",
+  titleEm: "Listen.",
+  phrase: "A voice, a language, a story. The voice stays in its language — you follow the words along, if you wish.",
 };
 
 export function MaisonVeillee({ locale }: { locale: "fr" | "en" }) {
@@ -44,7 +44,7 @@ export function MaisonVeillee({ locale }: { locale: "fr" | "en" }) {
           </h2>
           <p className="maison-lede">{t(c.phrase)}</p>
         </div>
-        <VeilleeFilm locale={locale} />
+        <VeilleeVoix locale={locale} />
       </div>
     </section>
   );

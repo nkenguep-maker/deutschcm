@@ -18,9 +18,7 @@ export default async function Image({ params }: OGParams) {
   const isEn = locale === "en"
   const line1 = isEn ? "Africa speaks." : "L'Afrique parle."
   const line2 = isEn ? "All her tongues." : "Toutes ses langues."
-  const tagline = isEn
-    ? "All your languages, under one roof."
-    : "Toutes vos langues, sous un même toit."
+  const tagline = isEn ? "Your way. Your voice." : "Votre voie. Votre voix."
 
   return new ImageResponse(
     (
