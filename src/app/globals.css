@@ -6952,6 +6952,228 @@ body:has(.test-space-bar) { padding-top: 34px; }
   max-width: 620px;
 }
 
+/* ── /langues · La carte des voix ────────────────────────────────
+   Sprint 2 · deux territoires en un lieu.
+   world (espresso) : 6 étrangères, CECRL, allemand porte le chapitre.
+   sources (terre)  : 4 natales, échelle YEMA, salutations dispersées. */
+.langues-territoire {
+  padding: 80px 0;
+  color: var(--creme);
+  position: relative;
+  overflow: hidden;
+}
+.langues-world {
+  background: var(--espresso);
+}
+.langues-sources {
+  background: var(--terre);
+  min-height: 620px;
+}
+.langues-sources-inner {
+  position: relative;
+  z-index: 2;
+}
+.langues-sources-greetings {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.langues-sources-greetings .seuil-greetings {
+  pointer-events: none;
+}
+.langues-sources-greetings .seuil-greeting {
+  pointer-events: auto;
+}
+/* Placement des salutations dans la section sources — plus vaste que
+   dans le seuil, on les répartit dans les quatre coins hors du texte. */
+.langues-sources-greetings .seuil-greeting-p0 { top: 10%;  left: 4%; }
+.langues-sources-greetings .seuil-greeting-p1 { top: 12%;  right: 5%; }
+.langues-sources-greetings .seuil-greeting-p2 { bottom: 18%; left: 6%; }
+.langues-sources-greetings .seuil-greeting-p3 { bottom: 22%; right: 4%; }
+@media (max-width: 767px) {
+  .langues-sources-greetings .seuil-greeting-p2,
+  .langues-sources-greetings .seuil-greeting-p3 { display: none; }
+}
+
+.langues-scale-cap {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--brass);
+  text-transform: uppercase;
+  margin: 20px 0 0;
+}
+
+.langues-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin: 40px 0;
+}
+.langues-grid-4 {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.langue-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 18px 20px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-card);
+  background: rgba(244, 235, 220, 0.02);
+  transition: border-color var(--dur-touch) var(--ease-enter),
+              background var(--dur-touch) var(--ease-enter);
+}
+.langue-card:hover {
+  border-color: var(--brass-edge);
+  background: var(--brass-glow);
+}
+.langue-card-mono {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--brass-edge);
+  border-radius: var(--r-input);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--brass);
+  background: var(--brass-glow);
+}
+.langue-card-body {
+  min-width: 0;
+}
+.langue-card-name {
+  margin: 0 0 4px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 20px;
+  color: var(--creme);
+  line-height: 1.2;
+}
+.langue-card-region {
+  margin: 0;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--creme-mute);
+  text-transform: uppercase;
+}
+.langue-card-note {
+  margin: 8px 0 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--brass);
+  line-height: 1.4;
+}
+
+/* Table éditoriale des 5 paliers YEMA */
+.langues-scale-table {
+  margin: 60px 0 20px;
+  padding: 32px 0 0;
+  border-top: 1px solid var(--terre-hair);
+}
+.scale-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.scale-row {
+  display: grid;
+  grid-template-columns: 60px 120px 1fr 140px;
+  gap: 20px;
+  align-items: baseline;
+  padding: 16px 8px;
+  border-bottom: 1px solid var(--creme-hair);
+}
+.scale-row-head {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--brass-edge);
+}
+.scale-row-head span {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--brass);
+  text-transform: uppercase;
+}
+.scale-col-stage {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 22px;
+  color: var(--brass);
+  line-height: 1;
+}
+.scale-row-head .scale-col-stage {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  font-style: normal;
+}
+.scale-col-name {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--creme);
+}
+.scale-row-head .scale-col-name {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  font-style: normal;
+  color: var(--brass);
+}
+.scale-col-anchor {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 14.5px;
+  color: var(--creme-soft);
+  line-height: 1.5;
+}
+.scale-row-head .scale-col-anchor {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  color: var(--brass);
+}
+.scale-col-actfl {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+  text-transform: uppercase;
+}
+@media (max-width: 767px) {
+  .scale-row {
+    grid-template-columns: 44px 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 4px 14px;
+    padding: 18px 0;
+  }
+  .scale-row-head { display: none; }
+  .scale-col-stage {
+    grid-row: 1 / 4;
+    align-self: center;
+    text-align: center;
+  }
+  .scale-col-name {
+    grid-column: 2;
+  }
+  .scale-col-anchor {
+    grid-column: 2;
+    font-size: 13px;
+  }
+  .scale-col-actfl {
+    grid-column: 2;
+  }
+}
+
 /* ── MaisonPorte · CTA final, sobre ─────────────────────────────── */
 .maison-porte {
   background: var(--espresso);
