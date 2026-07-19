@@ -9,6 +9,7 @@
 import Link from "next/link";
 import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingNav } from "@/components/landing/LandingNav";
 import { frTypo } from "@/components/landing/typo";
@@ -369,6 +370,7 @@ export default function PricingPage() {
   const [isMobile, setIsMobile] = useState(false);
   const [cap, setCap] = useState<Cap>("franchir");
   const [rail, setRail] = useState<Rail>("mobile");
+  const searchParams = useSearchParams();
   const t = (s: string) => (loc === "fr" ? frTypo(s) : s);
 
   useEffect(() => {
@@ -377,6 +379,27 @@ export default function PricingPage() {
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
+
+  // Pré-selection du cap · priorité au query param (?cap=grandir depuis
+  // un CTA sponsor), sinon /api/me/user_metadata.cap (utilisateur
+  // connecté après onboarding), sinon défaut "franchir".
+  useEffect(() => {
+    const qCap = searchParams.get("cap");
+    if (qCap && (["franchir", "grandir", "transmettre", "moi"] as const).includes(qCap as Cap)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCap(qCap as Cap);
+      return;
+    }
+    fetch("/api/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const uCap = d?.cap as Cap | undefined;
+        if (uCap && (["franchir", "grandir", "transmettre", "moi"] as const).includes(uCap)) {
+          setCap(uCap);
+        }
+      })
+      .catch(() => {});
+  }, [searchParams]);
 
   const plans = rail === "mobile"
     ? (loc === "en" ? RAIL_MOBILE_EN : RAIL_MOBILE_FR)
