@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LandingBrand } from "./LandingBrand";
 
@@ -29,7 +29,6 @@ export function LandingNav({
 }) {
   const [solid, setSolid] = useState(false);
   const router = useRouter();
-  const pathname = usePathname() ?? `/${locale}`;
 
   useEffect(() => {
     const onScroll = () => setSolid(window.scrollY > 50);
@@ -37,11 +36,6 @@ export function LandingNav({
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const otherLocale = locale === "fr" ? "en" : "fr";
-  const switchedHref = pathname.startsWith(`/${locale}`)
-    ? `/${otherLocale}${pathname.slice(3)}`
-    : `/${otherLocale}`;
 
   // Nav items : ordre = Langues · Méthode · Histoires · Manifeste.
   // Toutes pointent vers des pages dédiées (pas d'ancre landing).
@@ -81,16 +75,8 @@ export function LandingNav({
       ) : null}
 
       <div className="lnav-right">
-        <Link
-          className="lnav-locale"
-          href={switchedHref}
-          hrefLang={otherLocale}
-          rel="alternate"
-          aria-label={otherLocale.toUpperCase()}
-          title={otherLocale === "fr" ? "Français" : "English"}
-        >
-          {otherLocale.toUpperCase()}
-        </Link>
+        {/* Le sélecteur de langue vit sur le Seuil (top-right), pas
+            deux fois — la nav reste dédiée à la navigation. */}
         <button
           type="button"
           className="lnav-btn-ghost"
