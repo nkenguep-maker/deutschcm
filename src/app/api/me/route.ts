@@ -45,7 +45,7 @@ export async function GET() {
     select: {
       id: true, role: true, fullName: true, email: true, onboardingDone: true,
       germanLevel: true, city: true, xpTotal: true, streakDays: true,
-      studentType: true, isValidated: true, testAttempts: true,
+      studentType: true, isValidated: true, testAttempts: true, plan: true,
       userRoles: {
         where: { status: "ACTIVE" },
         select: { role: true, onboarded: true },
@@ -54,6 +54,11 @@ export async function GET() {
       groupMemberships: {
         where: { isActive: true },
         select: { groupId: true },
+        take: 1,
+      },
+      classroomEnrollments: {
+        where: { isActive: true },
+        select: { id: true },
         take: 1,
       },
     },
@@ -107,5 +112,7 @@ export async function GET() {
     isValidated: dbUser?.isValidated ?? false,
     testAttempts: dbUser?.testAttempts ?? 0,
     groupId: dbUser?.groupMemberships?.[0]?.groupId ?? null,
+    plan: dbUser?.plan ?? "FREE",
+    hasClassroom: (dbUser?.classroomEnrollments?.length ?? 0) > 0,
   });
 }

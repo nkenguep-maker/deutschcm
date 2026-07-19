@@ -8284,6 +8284,136 @@ body.foyer-switching .foyer {
 .foyer-cap-card[data-cap="franchir"] { border-color: rgba(217, 168, 85, 0.28); }
 .foyer-cap-card[data-cap="transmettre"] { border-color: rgba(201, 132, 63, 0.30); }
 
+/* ─── FoyerSidebar · sidebar adaptative pilotée par le cap ─────────
+   Le shell app hérite déjà de .territory-{world|sources}. On ajoute
+   .foyer-cap-transmettre pour forcer la terre sur toute l'app quand
+   le cap l'exige (foyer > langue). Le rail lui-même reste .app-sidebar
+   (styles existants) — on n'ajoute ici que les blocs nouveaux :
+   sélecteur de langue en tête, « Mon autre voix », variantes cap.
+   ────────────────────────────────────────────────────────────────── */
+
+.app-shell.foyer-cap-transmettre {
+  background: var(--terre);
+}
+.app-shell.foyer-cap-transmettre .app-sidebar {
+  background: var(--terre);
+  border-right-color: var(--terre-hair);
+}
+
+.foyer-sidebar-brand-lbl {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 20px;
+  color: var(--creme);
+  letter-spacing: -0.01em;
+}
+
+.foyer-sidebar-space-lbl {
+  margin: 0 0 12px;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  color: var(--brass);
+}
+
+/* Sélecteur de langue en tête · pastille cliquable + menu. */
+.foyer-sidebar-langs {
+  position: relative;
+  margin: 0 0 14px;
+  padding: 0 6px;
+}
+.foyer-sidebar-lang-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-pill);
+  background: rgba(244, 235, 220, 0.03);
+  color: var(--creme);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  width: 100%;
+  transition: border-color var(--dur-touch) var(--ease-enter),
+              background var(--dur-touch) var(--ease-enter);
+}
+.foyer-sidebar-lang-chip:hover { border-color: var(--brass-edge); background: var(--brass-glow); }
+.foyer-sidebar-lang-chip:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.foyer-sidebar-lang-name { font-weight: 500; }
+.foyer-sidebar-lang-sep { color: var(--creme-mute); }
+.foyer-sidebar-lang-level {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--brass);
+}
+.foyer-sidebar-lang-swap { color: var(--creme-soft); margin-left: auto; }
+
+.foyer-sidebar-lang-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 6px;
+  right: 6px;
+  z-index: 10;
+  padding: 6px;
+  margin: 0;
+  list-style: none;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-card);
+  background: var(--espresso-2);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+.app-shell.foyer-cap-transmettre .foyer-sidebar-lang-menu {
+  background: var(--terre-2);
+}
+.foyer-sidebar-lang-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--r-input);
+  background: transparent;
+  color: var(--creme);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background var(--dur-touch) var(--ease-enter);
+}
+.foyer-sidebar-lang-item:hover { background: var(--brass-glow); }
+.foyer-sidebar-lang-code {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--brass);
+  font-weight: 600;
+}
+.foyer-sidebar-lang-item-name { font-style: italic; font-family: var(--font-fraunces), Georgia, serif; }
+
+.foyer-sidebar-other-voice {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  color: var(--brass);
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+}
+.foyer-sidebar-other-voice:hover { text-decoration: underline; }
+.foyer-sidebar-other-voice:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; border-radius: 4px; }
+
+.foyer-sidebar-space-switch {
+  padding: 0 6px 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--creme-hair);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    SPRINT « LE CAP » — onboarding par but (élève).
    Trois pas : Cap · Langue · But. Doctrine Kaffeehaus, Fraunces italique

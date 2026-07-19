@@ -11,6 +11,8 @@ import { SpaceSwitcher, type SpaceRole } from "@/components/SpaceSwitcher";
 import { LanguageChooser } from "@/components/LanguageChooser";
 import { useActiveLanguage } from "@/hooks/useActiveLanguage";
 import { useT } from "@/hooks/useT";
+import { FoyerSidebar, foyerShellClass } from "@/components/foyer/FoyerSidebar";
+import type { Cap } from "@/components/foyer/types";
 import {
   IconHome,
   IconBook,
@@ -153,6 +155,15 @@ export default function Layout({ children, title }: LayoutProps) {
   const [userRoles, setUserRoles] = useState<SpaceRole[]>([]);
   const [activeSpace, setActiveSpace] = useState<SpaceRole>("STUDENT");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Sidebar adaptative · pilotée par le cap du profil. Ces champs
+  // viennent de /api/me (déjà étendue). Fallback prudent tant que
+  // le fetch n'est pas revenu.
+  const [cap, setCap] = useState<Cap | null>(null);
+  const [activeLanguage, setActiveLanguage] = useState<string>("deutsch");
+  const [supportedLanguages, setSupportedLanguages] = useState<string[]>(["deutsch"]);
+  const [germanLevel, setGermanLevel] = useState<string | null>(null);
+  const [hasClassroom, setHasClassroom] = useState(false);
+  const [paidPlan, setPaidPlan] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -172,6 +183,13 @@ export default function Layout({ children, title }: LayoutProps) {
       if (Array.isArray(d.roles)) setUserRoles(d.roles as SpaceRole[]);
       if (d.activeSpace) setActiveSpace(d.activeSpace as SpaceRole);
       if (d.fullName) setUserName(d.fullName);
+      // Sidebar adaptative · récupère les inputs du cap-pilotage
+      if (d.cap) setCap(d.cap as Cap);
+      if (typeof d.activeLanguage === "string") setActiveLanguage(d.activeLanguage);
+      if (Array.isArray(d.supportedLanguages)) setSupportedLanguages(d.supportedLanguages);
+      if (typeof d.germanLevel === "string" || d.germanLevel === null) setGermanLevel(d.germanLevel ?? null);
+      setHasClassroom(Boolean(d.hasClassroom));
+      setPaidPlan(typeof d.plan === "string" && d.plan !== "FREE");
       const skipOnboarding =
         pathname.startsWith("/onboarding") ||
         pathname.startsWith("/test-niveau") ||
@@ -215,8 +233,35 @@ export default function Layout({ children, title }: LayoutProps) {
     ADMIN:   tl.adminRole ?? "Espace admin",
   };
 
+  // Sidebar adaptative · pour l'espace STUDENT (navRole), on route vers
+  // FoyerSidebar qui rend une nav pilotée par le cap. Les autres espaces
+  // (TEACHER/CENTER/ADMIN) gardent l'aside historique inline ci-dessous.
+  const isStudentSpace = navRole === "STUDENT";
+  const shellClass = isStudentSpace
+    ? foyerShellClass(cap, activeLang.territory)
+    : `territory-${activeLang.territory}`;
+  const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
+
   return (
-    <div className={`app-shell territory-${activeLang.territory}`}>
+    <div className={`app-shell ${shellClass}`}>
+      {isStudentSpace ? (
+        <FoyerSidebar
+          locale={locale}
+          loc={loc}
+          cap={cap}
+          activeLanguage={activeLanguage}
+          supportedLanguages={supportedLanguages}
+          activeLangueLevel={activeLanguage === "deutsch" ? germanLevel : null}
+          roles={userRoles}
+          activeSpace={activeSpace}
+          hasClassroom={hasClassroom}
+          paidPlan={paidPlan}
+          userName={userName}
+          userEmail={userEmail}
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
+      ) : (
       <aside className={`app-sidebar ${sidebarOpen ? "open" : ""}`}>
         <Link href="/dashboard" className="app-sidebar-brand">
           <span
@@ -319,6 +364,7 @@ export default function Layout({ children, title }: LayoutProps) {
           </button>
         </div>
       </aside>
+      )}
 
       <div
         className={`app-scrim ${sidebarOpen ? "open" : ""}`}
