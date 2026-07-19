@@ -64,6 +64,9 @@ export function MaisonEchelle({ locale }: { locale: "fr" | "en" }) {
             <p className="maison-echelle-cap">{t(c.worldCap)}</p>
             <CefrSpine current="A1" locale={locale} />
           </div>
+          {/* Mini couture affichée en empilement mobile · CSS-only,
+              masquée sur desktop. */}
+          <div className="maison-echelle-seam-mini" aria-hidden="true" />
           <div className="maison-echelle-col maison-echelle-sources">
             <p className="maison-echelle-cap">{t(c.sourcesCap)}</p>
             <YemaSpine current="É1" locale={locale} />
