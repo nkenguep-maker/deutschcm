@@ -480,12 +480,15 @@ button, [role="button"] {
   column-gap: 12px;
   align-items: baseline;
   min-height: 28px;
+  outline: none;
 }
-.spine-item-btn {
-  all: unset;
-  display: contents; /* propage le grid au btn sans casser le layout */
-  cursor: pointer;
+.spine-item[role="button"] { cursor: pointer; }
+.spine-item[role="button"]:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 4px;
+  border-radius: 4px;
 }
+.spine-item[role="button"]:hover .spine-label { color: var(--creme); }
 
 /* Colonne 1 · le code, JetBrains Mono 500 12px letter-spacing 0.04em laiton */
 .spine-code {
@@ -518,14 +521,6 @@ button, [role="button"] {
 .spine-item[data-status="done"] .spine-label { color: var(--creme-mute); }
 .spine-item[data-status="on"] .spine-code { color: var(--brass); }
 
-/* Hover · le btn permet l'interaction, le label s'éclaircit */
-.spine-item-btn:hover ~ .spine-label,
-.spine-item-btn:focus-visible ~ .spine-label { color: var(--creme); }
-.spine-item-btn:focus-visible {
-  outline: 2px solid var(--brass);
-  outline-offset: 4px;
-  border-radius: 4px;
-}
 
 /* Panneau d'info révélé au hover (Cefr) ou au hover (Yema) */
 .spine-panel {
@@ -7294,6 +7289,14 @@ body:has(.test-space-bar) { padding-top: 34px; }
   flex-direction: column;
   align-items: stretch;
   gap: 0;
+  /* Le contenu (spine) doit avoir au moins 220px de large côté label
+     pour absorber les libellés les plus longs sans wrap. */
+  min-width: 0;
+}
+/* Le kicker · exactement 28px de marge basse, alignement top-left */
+.maison-echelle-col .maison-echelle-cap {
+  margin: 0 0 28px;
+  text-align: left;
 }
 .maison-echelle-world {
   background: var(--espresso-2);

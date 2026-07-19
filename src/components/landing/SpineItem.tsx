@@ -1,39 +1,30 @@
 "use client";
 
-// SpineItem · anatomie unique partagée par CefrSpine et YemaSpine.
-// STRUCTURELLE, pas héritée du texte :
+// SpineItem · anatomie STRUCTURELLE partagée par CefrSpine et YemaSpine.
+//
 //   <li className="spine-item">
-//     <span className="spine-code">{code}</span>      colonne 1 · 34px fixe
-//     <span className="spine-label">{label}</span>    colonne 2 · 1fr
+//     <span className="spine-code">{code}</span>       col 1 · 34px fixe
+//     <span className="spine-label">{label}</span>     col 2 · 1fr
 //   </li>
-// Grid 34px + 1fr, column-gap 12px, align-items baseline.
-// Zero wrap sur .spine-label (white-space: nowrap).
-// La barre verticale du spine vit en position absolute dans le parent
-// <ul className="spine-list">, elle ne mange PAS la largeur du grid.
+//
+// Le <li> lui-même est le grid container — pas de <button> imbriqué,
+// pas de display:contents piégeux. Si l'item est interactif, on pose
+// role="button" + tabIndex 0 + onKeyDown pour Enter/Space.
 
-import type { ReactNode } from "react";
+import type { KeyboardEvent } from "react";
 
 export type SpineStatus = "done" | "on" | "next";
 
 interface SpineItemProps {
-  /** Code court du palier · "A1", "É2", etc. */
   code: string;
-  /** Libellé du palier · "Se présenter", "Voix", etc. */
   label: string;
-  /** État visuel · done · on · next */
   status: SpineStatus;
-  /** aria-label complet, si absent : `${code} — ${label}`. */
   ariaLabel?: string;
-  /** Optionnel · si l'item est interactif (hover révèle compétences),
-   *  le parent Cefr/YemaSpine passe onEnter/onLeave. */
+  ariaDescribedBy?: string;
   onEnter?: () => void;
   onLeave?: () => void;
   onFocus?: () => void;
   onBlur?: () => void;
-  /** Description accessible (id du panel révélé au hover). */
-  ariaDescribedBy?: string;
-  /** Content extra rendu à l'intérieur (rare — pour le panel absolute). */
-  children?: ReactNode;
 }
 
 export function SpineItem({
@@ -41,44 +32,39 @@ export function SpineItem({
   label,
   status,
   ariaLabel,
+  ariaDescribedBy,
   onEnter,
   onLeave,
   onFocus,
   onBlur,
-  ariaDescribedBy,
-  children,
 }: SpineItemProps) {
   const interactive = Boolean(onEnter || onFocus);
-  const inner = (
-    <>
-      <span className="spine-code">{code}</span>
-      <span className="spine-label">{label}</span>
-      {children}
-    </>
-  );
+
+  const handleKey = (e: KeyboardEvent<HTMLLIElement>) => {
+    if (!interactive) return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onFocus?.();
+    }
+  };
 
   return (
     <li
       className="spine-item"
       data-status={status}
       aria-current={status === "on" ? "step" : undefined}
+      role={interactive ? "button" : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      aria-label={interactive ? (ariaLabel ?? `${code} — ${label}`) : undefined}
+      aria-describedby={interactive ? ariaDescribedBy : undefined}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      onKeyDown={handleKey}
     >
-      {interactive ? (
-        <button
-          type="button"
-          className="spine-item-btn"
-          onMouseEnter={onEnter}
-          onMouseLeave={onLeave}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          aria-label={ariaLabel ?? `${code} — ${label}`}
-          aria-describedby={ariaDescribedBy}
-        >
-          {inner}
-        </button>
-      ) : (
-        inner
-      )}
+      <span className="spine-code">{code}</span>
+      <span className="spine-label">{label}</span>
     </li>
   );
 }
