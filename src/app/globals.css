@@ -11305,6 +11305,10 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-page {
   position: relative;
   isolation: isolate;
+  /* La LandingNav est position: fixed, top:0, z-index: 100.
+     On pousse le contenu de la page en dessous pour éviter que le
+     topbar (retour + rail) se retrouve caché derrière la nav. */
+  padding-top: 76px;
 }
 .pricing-page::before {
   content: "";
