@@ -132,6 +132,22 @@ export default function OnboardingMondePage() {
           activeLanguage: "deutsch",
         },
       });
+      // Crée aussi le LearningPath côté DB (source de vérité v1).
+      const intentionMap: Record<string, string> = {
+        study: "VISA_DEPART",
+        exam: "SUR_PLACE",
+        envie: "SUR_PLACE",
+      };
+      await fetch("/api/learning-paths", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          universe: "MONDE",
+          language: "DEUTSCH",
+          intention: why ? intentionMap[why] : undefined,
+          onboardingAnswers: { why, startPoint },
+        }),
+      });
     } catch { /* on continue même si l'update échoue */ }
     // Chemin NU pour @/navigation router · évite /fr/fr/…
     const dest = startPoint === "test" ? "/test-niveau" : "/dashboard";

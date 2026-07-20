@@ -125,6 +125,22 @@ export default function OnboardingRacinesPage() {
           activeLanguage: "wolof",
         },
       });
+      // Crée aussi le LearningPath côté DB (source de vérité v1).
+      const intentionMap: Record<string, string> = {
+        understand: "RACINES_SOI",
+        family_words: "TRANSMISSION",
+        zero: "RACINES_SOI",
+      };
+      await fetch("/api/learning-paths", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          universe: "RACINES",
+          language: "WOLOF",
+          intention: link ? intentionMap[link] : undefined,
+          onboardingAnswers: { link, startPoint },
+        }),
+      });
     } catch { /* on continue même si l'update échoue */ }
     // Chemin NU · router de @/navigation ajoute la locale
     router.push("/dashboard");

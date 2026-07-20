@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { callAI } from "@/lib/ai/provider";
 import { fixA1Grammar } from "@/lib/ai/guardrails";
+import { requireCapability } from "@/lib/entitlements/http";
 
 function applyGrammarGuardrail(analysis: Record<string, unknown>): Record<string, unknown> {
   if (typeof analysis.texte_corrige === "string") {
@@ -80,6 +81,15 @@ Retourne UNIQUEMENT ce JSON valide :
 }`;
 
 export async function POST(req: NextRequest) {
+  // Gate serveur · AI_VOICE via getEntitlements.
+  // Deny automatique si le parcours actif est RACINES.
+  const learningPathId = req.nextUrl.searchParams.get("pathId");
+  const gate = await requireCapability({
+    capability: "AI_VOICE",
+    learningPathId,
+  });
+  if (!gate.ok) return gate.response;
+
   const locale = req.headers.get("accept-language")?.startsWith("en") ? "en" : "fr";
   let { transcript, expectedText, level, exerciseType } = await req.json();
 

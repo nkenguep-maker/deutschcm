@@ -47,13 +47,8 @@ export async function GET() {
       centerName: true,
       xpTotal: true,
       streakDays: true,
+      plan: true,
       teacher: { select: { id: true } },
-      subscriptions: {
-        where: { status: "ACTIVE" },
-        select: { plan: true },
-        orderBy: { createdAt: "desc" },
-        take: 1,
-      },
     },
   });
 
@@ -125,6 +120,8 @@ export async function GET() {
     centerName: profile?.centerName || null,
     xpTotal: profile?.xpTotal || 0,
     streakDays: profile?.streakDays || 0,
-    plan: profile?.subscriptions?.[0]?.plan || "FREE",
+    // Le plan legacy vit encore sur User.plan (déprécié V1 · à supprimer post-refactor).
+    // Le vrai droit d'usage passe par /api/activation-status + getEntitlements.
+    plan: profile?.plan || "FREE",
   });
 }

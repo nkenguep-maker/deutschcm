@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { callAI } from "@/lib/ai/provider";
 import { fixA1Grammar } from "@/lib/ai/guardrails";
+import { requireCapability } from "@/lib/entitlements/http";
 
 function applyGrammarGuardrail(correction: Record<string, unknown>): Record<string, unknown> {
   if (typeof correction.texte_corrige === "string") {
@@ -124,6 +125,14 @@ Retourne UNIQUEMENT ce JSON valide :
 }`;
 
 export async function POST(req: NextRequest) {
+  // Gate serveur · AI_TEXT via getEntitlements (deny automatique en racines).
+  const learningPathId = req.nextUrl.searchParams.get("pathId");
+  const gate = await requireCapability({
+    capability: "AI_TEXT",
+    learningPathId,
+  });
+  if (!gate.ok) return gate.response;
+
   const { text, task, level, exerciseType } = await req.json();
 
   if (!text?.trim()) {

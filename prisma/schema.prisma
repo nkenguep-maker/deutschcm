@@ -18,27 +18,168 @@ enum RoleStatus {
   PENDING
 }
 
-enum SubscriptionStatus {
-  PENDING
-  ACTIVE
-  EXPIRED
-  CANCELLED
-  FAILED
+// ─── V1 · YEMA schéma utilisateurs & droits ─────────────────────
+// Doctrine : profil oriente · package finance · grant prouve · entitlement autorise.
+// Toutes les capacités passent par getEntitlements. Aucun accès à la main.
+
+enum Universe {
+  MONDE
+  RACINES
 }
 
-enum PaymentMethod {
-  MTN_MOBILE_MONEY
-  ORANGE_MONEY
-  EXPRESS_UNION
+enum Intention {
+  VISA_DEPART
+  SUR_PLACE
+  RACINES_SOI
+  TRANSMISSION
+}
+
+enum LanguageCode {
+  DEUTSCH
+  WOLOF
+  DOUALA
+  LINGALA
+  BAMBARA
+  YORUBA
+  SWAHILI
+}
+
+enum CefrLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+}
+
+enum AppRole {
+  LEARNER
+  PARENT
+  TEACHER
+  CAREER_COACH
+  CENTER_ADMIN
+  YEMA_ADMIN
+}
+
+enum ProductCode {
+  PASSAGE
+  TEACHER_ADDON
+  CAREER_COACH_ADDON
+  ROOTS_SOLO
+  ROOTS_FAMILY
+  ROOTS_FOLLOWUP_ADDON
+  COMPANION
+}
+
+enum BillingType {
+  ONE_TIME
+  SUBSCRIPTION
+  SEAT
+}
+
+enum Currency {
+  XAF
+  EUR
+}
+
+enum Capability {
+  COURSE_ACCESS
+  AI_TEXT
+  AI_VOICE
+  MOCK_EXAMS
+  CLASSROOM
+  THREAD_POST
+  HOMEWORK
+  CERTIFICATE
+  VEILLEE_CONTENT
+  CHILD_PROFILES
+}
+
+enum BeneficiaryType {
+  USER
+  HOUSEHOLD
+  LEARNING_PATH
+}
+
+enum GrantSourceType {
+  ORDER
+  SUBSCRIPTION
+  CENTER_SEAT
+  PROMO
+}
+
+enum GrantStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+enum LearningPathStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentProviderV2 {
+  CINETPAY
   CARD
 }
 
-enum PaymentStatus {
+enum PaymentV2Status {
   PENDING
-  SUCCESS
+  CONFIRMED
   FAILED
-  REFUNDED
 }
+
+enum HouseholdRole {
+  OWNER
+  ADULT
+}
+
+enum HouseholdStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ClassType {
+  TEACHER
+  CAREER_COACH
+  CENTER
+}
+
+enum ClassStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum ClassMemberRole {
+  LEARNER
+  TEACHER
+  COACH
+}
+
+enum ThreadType {
+  MAIN
+  ANNOUNCEMENT
+  ASSIGNMENT
+  ONE_TO_ONE
+}
+
+enum MessageType {
+  TEXT
+  AUDIO
+}
+
+// ─── Legacy (déprécié, plus lu par le code v1) ──────────────────────
+// Kept for coexistence : PlanGate/usePermissions y liront encore le
+// temps du refactor. À supprimer dans la migration V2 quand plus rien
+// ne l'importe.
 
 enum SubscriptionPlan {
   FREE
@@ -114,8 +255,6 @@ model User {
   enrollments           Enrollment[]
   moduleProgress        ModuleProgress[]
   conversationSessions  ConversationSession[]
-  subscriptions         Subscription[]
-  payments              Payment[]
   quizAttempts          QuizAttempt[]
   badges                UserBadge[]
   notifications         Notification[]
@@ -132,6 +271,21 @@ model User {
   connectedBy           UserConnection[]     @relation("connectedBy")
   userRoles             UserRole[]
   childProfiles         ChildProfile[]
+
+  // ─── V1 · relations vers le socle YEMA ─────────────────────────
+  appRoles              UserAppRole[]
+  learningPaths         LearningPath[]
+  ordersOwned           Order[]              @relation("orderUser")
+  accessGrantsAsUser    AccessGrant[]        @relation("grantsAsUser")
+  householdsOwned       Household[]          @relation("householdOwner")
+  householdMemberships  HouseholdMembership[]
+  dependentsManaged     DependentProfile[]   @relation("dependentManager")
+  classMemberships      ClassMembership[]
+  classesTaught         Class[]              @relation("classProvider")
+  messagesAuthored      Message[]
+  submissionsMade       Submission[]
+  feedbackAuthored      ClassFeedback[]      @relation("feedbackAuthor")
+  providerProfile       ProviderProfile?
 
   @@index([email])
   @@index([supabaseId])
@@ -312,51 +466,349 @@ model QuizAnswer {
   @@map("quiz_answers")
 }
 
-model Subscription {
-  id           String             @id @default(uuid())
-  userId       String
-  plan         SubscriptionPlan
-  status       SubscriptionStatus @default(PENDING)
-  priceXAF     Int
-  startDate    DateTime?
-  endDate      DateTime?
-  autoRenew    Boolean            @default(false)
-  cancelledAt  DateTime?
-  cancelReason String?
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+// ─── V1 · Socle YEMA (identité, catalogue, droits) ──────────────────
+// Doctrine : le profil oriente · le package finance · le grant prouve
+// · l'entitlement autorise. Aucun accès à la main : tout passe par
+// getEntitlements() qui lit ces tables.
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  payments Payment[]
+// --- Multi-rôles v2 (coexiste avec l'ancien UserRole legacy) --------
+model UserAppRole {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      AppRole
+  grantedBy String?
+  createdAt DateTime @default(now())
 
+  @@unique([userId, role])
   @@index([userId])
-  @@index([status])
-  @@map("subscriptions")
+  @@map("user_app_roles")
+}
+
+// --- Parcours d'apprentissage (le cœur : 1 user → N parcours) -------
+model LearningPath {
+  id                 String              @id @default(cuid())
+  userId             String
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  universe           Universe
+  language           LanguageCode
+  currentLevel       CefrLevel?
+  intention          Intention?
+  onboardingAnswers  Json                @default("{}")
+  status             LearningPathStatus  @default(ACTIVE)
+  createdAt          DateTime            @default(now())
+  archivedAt         DateTime?
+
+  grants             AccessGrant[]       @relation("grantsAsLearningPath")
+  classMemberships   ClassMembership[]
+
+  @@index([userId, status])
+  @@index([universe, language])
+  @@map("learning_paths")
+}
+
+// --- Catalogue : produit ≠ variante commerciale ---------------------
+model Product {
+  id          String       @id @default(cuid())
+  code        ProductCode  @unique
+  universe    Universe?
+  billingType BillingType
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+
+  variants           ProductVariant[]
+  entitlementRules   ProductEntitlementRule[]
+
+  @@map("products")
+}
+
+model ProductVariant {
+  id             String        @id @default(cuid())
+  productId      String
+  product        Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  language       LanguageCode?
+  level          CefrLevel?
+  currency       Currency
+  amount         Int
+  durationDays   Int?
+  market         String?
+  active         Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+
+  orderItems     OrderItem[]
+  grants         AccessGrant[]
+
+  @@unique([productId, language, level, currency, durationDays])
+  @@index([productId])
+  @@map("product_variants")
+}
+
+model ProductEntitlementRule {
+  id         String     @id @default(cuid())
+  productId  String
+  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  capability Capability
+  scopeRule  Json?
+  limitValue Int?
+
+  @@unique([productId, capability])
+  @@index([productId])
+  @@map("product_entitlement_rules")
+}
+
+// --- Achats & paiements v2 (les vrais) ------------------------------
+model Order {
+  id         String       @id @default(cuid())
+  userId     String
+  user       User         @relation("orderUser", fields: [userId], references: [id], onDelete: Cascade)
+  status     OrderStatus  @default(PENDING)
+  currency   Currency
+  total      Int          @default(0)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  items      OrderItem[]
+  payments   Payment[]
+
+  @@index([userId, status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id                 String          @id @default(cuid())
+  orderId            String
+  order              Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productVariantId   String
+  productVariant     ProductVariant  @relation(fields: [productVariantId], references: [id])
+  beneficiaryType    BeneficiaryType
+  beneficiaryId      String
+  quantity           Int             @default(1)
+  unitAmount         Int
+  grants             AccessGrant[]
+
+  @@index([orderId])
+  @@map("order_items")
 }
 
 model Payment {
-  id             String        @id @default(uuid())
-  userId         String
-  subscriptionId String?
-  amountXAF      Int
-  method         PaymentMethod
-  status         PaymentStatus @default(PENDING)
-  phoneNumber    String?
-  operatorTxId   String?
-  operatorRef    String?
-  metadata       Json?
-  failureReason  String?
-  paidAt         DateTime?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  id           String            @id @default(cuid())
+  orderId      String
+  order        Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider     PaymentProviderV2
+  status       PaymentV2Status   @default(PENDING)
+  amount       Int
+  currency     Currency
+  externalRef  String?
+  confirmedAt  DateTime?
+  failedAt     DateTime?
+  metadata     Json?
+  createdAt    DateTime          @default(now())
 
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
-
-  @@index([userId])
+  @@index([orderId])
   @@index([status])
-  @@index([operatorTxId])
   @@map("payments")
+}
+
+// --- Access grants : LA pierre angulaire ---------------------------
+model AccessGrant {
+  id                String           @id @default(cuid())
+  beneficiaryType   BeneficiaryType
+  beneficiaryId     String
+  productVariantId  String
+  productVariant    ProductVariant   @relation(fields: [productVariantId], references: [id])
+  sourceType        GrantSourceType
+  sourceId          String
+  orderItemId       String?
+  orderItem         OrderItem?       @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
+  startsAt          DateTime         @default(now())
+  endsAt            DateTime?
+  status            GrantStatus      @default(ACTIVE)
+  metadata          Json?
+  createdAt         DateTime         @default(now())
+
+  // FK optionnelles pour lookup rapide (une seule sera set selon type)
+  userBeneficiary        User?          @relation("grantsAsUser",         fields: [beneficiaryId], references: [id], onDelete: NoAction, map: "access_grants_user_fk")
+  householdBeneficiary   Household?     @relation("grantsAsHousehold",    fields: [beneficiaryId], references: [id], onDelete: NoAction, map: "access_grants_household_fk")
+  learningPathBeneficiary LearningPath? @relation("grantsAsLearningPath", fields: [beneficiaryId], references: [id], onDelete: NoAction, map: "access_grants_lp_fk")
+
+  @@index([beneficiaryType, beneficiaryId, status])
+  @@index([productVariantId])
+  @@index([sourceType, sourceId])
+  @@map("access_grants")
+}
+
+// --- Foyer (Famille) ----------------------------------------------
+model Household {
+  id           String                @id @default(cuid())
+  ownerUserId  String
+  owner        User                  @relation("householdOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  status       HouseholdStatus       @default(ACTIVE)
+  createdAt    DateTime              @default(now())
+
+  memberships  HouseholdMembership[]
+  dependents   DependentProfile[]
+  grants       AccessGrant[]         @relation("grantsAsHousehold")
+
+  @@index([ownerUserId])
+  @@map("households")
+}
+
+model HouseholdMembership {
+  id           String           @id @default(cuid())
+  householdId  String
+  household    Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role         HouseholdRole
+  status       HouseholdStatus  @default(ACTIVE)
+  joinedAt     DateTime         @default(now())
+
+  @@unique([householdId, userId])
+  @@index([userId])
+  @@map("household_memberships")
+}
+
+model DependentProfile {
+  id                String          @id @default(cuid())
+  householdId       String
+  household         Household       @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  managedByUserId   String
+  managedBy         User            @relation("dependentManager", fields: [managedByUserId], references: [id], onDelete: Cascade)
+  firstName         String
+  birthYear         Int?
+  status            HouseholdStatus @default(ACTIVE)
+  metadata          Json?
+  createdAt         DateTime        @default(now())
+
+  @@index([householdId])
+  @@index([managedByUserId])
+  @@map("dependent_profiles")
+}
+
+// --- Classes v2, threads, messages, devoirs ------------------------
+model Class {
+  id                String            @id @default(cuid())
+  classType         ClassType
+  organizationId    String?
+  language          LanguageCode
+  level             CefrLevel?
+  providerUserId    String
+  provider          User              @relation("classProvider", fields: [providerUserId], references: [id], onDelete: Cascade)
+  status            ClassStatus       @default(ACTIVE)
+  createdAt         DateTime          @default(now())
+
+  memberships       ClassMembership[]
+  threads           Thread[]
+  assignments       ClassAssignment[]
+
+  @@index([providerUserId])
+  @@index([language, level])
+  @@map("classes")
+}
+
+model ClassMembership {
+  id              String            @id @default(cuid())
+  classId         String
+  class           Class             @relation(fields: [classId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  learningPathId  String?
+  learningPath    LearningPath?     @relation(fields: [learningPathId], references: [id], onDelete: SetNull)
+  role            ClassMemberRole
+  status          HouseholdStatus   @default(ACTIVE)
+  joinedAt        DateTime          @default(now())
+
+  @@unique([classId, userId])
+  @@index([userId])
+  @@map("class_memberships")
+}
+
+model Thread {
+  id         String     @id @default(cuid())
+  classId    String
+  class      Class      @relation(fields: [classId], references: [id], onDelete: Cascade)
+  threadType ThreadType @default(MAIN)
+  title      String?
+  createdAt  DateTime   @default(now())
+
+  messages   Message[]
+
+  @@index([classId])
+  @@map("threads")
+}
+
+model Message {
+  id            String      @id @default(cuid())
+  threadId      String
+  thread        Thread      @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  authorUserId  String
+  author        User        @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
+  messageType   MessageType @default(TEXT)
+  body          String?
+  audioUrl      String?
+  createdAt     DateTime    @default(now())
+
+  @@index([threadId, createdAt])
+  @@map("messages")
+}
+
+model ClassAssignment {
+  id           String       @id @default(cuid())
+  classId      String
+  class        Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?
+  dueAt        DateTime?
+  createdAt    DateTime     @default(now())
+
+  submissions  Submission[]
+
+  @@index([classId])
+  @@map("class_assignments")
+}
+
+model Submission {
+  id             String          @id @default(cuid())
+  assignmentId   String
+  assignment     ClassAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  body           String?
+  audioUrl       String?
+  submittedAt    DateTime        @default(now())
+
+  feedback       ClassFeedback[]
+
+  @@unique([assignmentId, userId])
+  @@map("submissions")
+}
+
+model ClassFeedback {
+  id            String      @id @default(cuid())
+  submissionId  String
+  submission    Submission  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  authorUserId  String
+  author        User        @relation("feedbackAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
+  score         Float?
+  body          String?
+  createdAt     DateTime    @default(now())
+
+  @@index([submissionId])
+  @@map("class_feedback")
+}
+
+// --- Provider profiles (profs / coachs) ----------------------------
+model ProviderProfile {
+  id         String         @id @default(cuid())
+  userId     String         @unique
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio        String?
+  languages  LanguageCode[]
+  levels     CefrLevel[]
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@map("provider_profiles")
 }
 
 model Badge {
