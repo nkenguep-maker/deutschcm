@@ -158,9 +158,16 @@ export function BrandY({
         pathLength="1"
       />
 
-      {/* Braise — un lit + une braise, au point de confluence */}
-      <circle className="brand-bed" cx="50" cy="58" r="10" fill={bedFill} />
-      <circle className="brand-ember" cx="50" cy="58" r="6.5" fill={braiseFill} />
+      {/* Braise — masquée sous 60px pour ne pas casser la lecture Y
+          en nav (le bed r=10 dominait le trunk stroke=14 et faisait
+          lire « V + dot »). À taille hero/splash, la braise reste
+          la signature du Confluent. */}
+      {size >= 60 ? (
+        <>
+          <circle className="brand-bed" cx="50" cy="58" r="10" fill={bedFill} />
+          <circle className="brand-ember" cx="50" cy="58" r="6.5" fill={braiseFill} />
+        </>
+      ) : null}
     </svg>
   );
 }
