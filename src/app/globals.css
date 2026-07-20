@@ -11214,13 +11214,18 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 
 /* Univers · topbar retour + toggle rail ─────────────────────────── */
 .pricing-universe { padding-bottom: 48px; }
-/* Respiration après la LandingNav · 48px de haut, 32 en bas */
-.pricing-universe-topbar { padding: 48px 0 32px; }
+/* Topbar = strip contextuel compact sous la nav · pas un bloc géant.
+   Le hero prend le relais avec sa propre respiration en dessous. */
+.pricing-universe-topbar {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--creme-hair);
+  margin-bottom: 0;
+}
 .pricing-universe-topbar-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
   flex-wrap: wrap;
 }
 /* « ← Retour au seuil » · pastille discrète, hairline crème, hover
@@ -11254,7 +11259,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 /* Hero univers · asymétrique · BrandY filigrane haut-droite ────── */
 .pricing-universe-hero {
   position: relative;
-  padding: 12px 0 24px;
+  padding: 56px 0 32px;
   overflow: hidden;
 }
 .pricing-universe-hero-grid {
