@@ -510,7 +510,7 @@ button, [role="button"] {
    le spine). */
 .spine-label {
   font-family: var(--font-manrope), system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--creme-soft);
   line-height: 1.3;
@@ -662,7 +662,7 @@ button, [role="button"] {
   align-items: center;
   gap: 14px;
   color: var(--creme-mute);
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 0;
   text-transform: none;
 }
@@ -827,7 +827,7 @@ button, [role="button"] {
    étroite. */
 .cefr-step-caption {
   font-family: var(--font-manrope), system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: 0;
   text-transform: none;
@@ -951,7 +951,7 @@ button, [role="button"] {
   border: 0;
   color: var(--ink);
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.005em;
   transition: background var(--dur-touch), transform var(--dur-touch) var(--ease-glide),
@@ -1008,7 +1008,7 @@ button, [role="button"] {
 }
 .lhero-stat-num {
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: clamp(20px, 2.4vw, 24px);
+  font-size: clamp(17px, 2vw, 20px);
   font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--creme);
@@ -1193,7 +1193,7 @@ button, [role="button"] {
 }
 .lvision-body p {
   color: var(--creme-soft);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.7;
   margin: 12px 0 0;
   max-width: 52ch;
@@ -1479,7 +1479,7 @@ button, [role="button"] {
 }
 .lsim-chat-name {
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--creme);
   margin: 0;
@@ -1891,7 +1891,7 @@ button, [role="button"] {
 .lfooter-line {
   margin: 12px 0 4px;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme);
   font-style: italic;
 }
@@ -2111,7 +2111,7 @@ button, [role="button"] {
   background: var(--espresso-2);
   border: 1px solid var(--creme-hair);
   border-radius: var(--r-panel);
-  padding: 24px 24px 24px;
+  padding: 16px 18px 16px;
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4);
 }
 .lauth-eye {
@@ -2173,7 +2173,7 @@ button, [role="button"] {
   border-radius: var(--r-input);
   color: var(--creme);
   font-family: var(--font-manrope, sans-serif);
-  font-size: 15px;
+  font-size: 14px;
   transition: border-color var(--dur-touch), background var(--dur-touch);
   min-width: 0;
 }
@@ -2227,7 +2227,7 @@ button, [role="button"] {
   background: var(--brass);
   color: var(--ink);
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.005em;
   cursor: pointer;
@@ -2311,7 +2311,7 @@ button, [role="button"] {
 }
 .lauth-role-title {
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--creme);
   letter-spacing: -0.005em;
@@ -2473,7 +2473,7 @@ button, [role="button"] {
 }
 .lonboard-h {
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: clamp(20px, 2.4vw, 24px);
+  font-size: clamp(17px, 2vw, 20px);
   font-weight: 500;
   line-height: 1.15;
   letter-spacing: -0.01em;
@@ -2608,7 +2608,7 @@ button, [role="button"] {
 .lonboard-choice-title {
   display: block;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--creme);
   letter-spacing: -0.005em;
@@ -2659,7 +2659,7 @@ button, [role="button"] {
 .lonboard-choice-compact.selected { border-color: var(--brass); background: rgba(184, 135, 62, 0.06); }
 .lonboard-choice-compact-title {
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--creme);
   letter-spacing: -0.005em;
@@ -2704,7 +2704,7 @@ button, [role="button"] {
   border-radius: var(--r-input);
   color: var(--creme);
   font-family: var(--font-manrope), sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   transition: border-color var(--dur-touch), background var(--dur-touch);
   min-width: 0;
   box-sizing: border-box;
@@ -3050,7 +3050,7 @@ button, [role="button"] {
   gap: 8px;
   color: var(--brass);
   font-family: var(--font-manrope), system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.01em;
   text-decoration: none;
@@ -3156,7 +3156,7 @@ button, [role="button"] {
 }
 .lstory-body p {
   color: var(--creme-soft);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.7;
   margin: 0 0 14px;
   max-width: 50ch;
@@ -3291,7 +3291,7 @@ button, [role="button"] {
   border: 0;
   color: var(--ink);
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.005em;
   text-decoration: none;
@@ -3404,7 +3404,7 @@ button, [role="button"] {
 }
 .lb2b-solution-bullet p {
   color: var(--creme-soft);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.6;
   margin: 0;
 }
@@ -3560,7 +3560,7 @@ button, [role="button"] {
 }
 .lb2b-unique-item p {
   color: var(--creme-soft);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.65;
   margin: 0;
 }
@@ -3579,7 +3579,7 @@ button, [role="button"] {
   background: var(--espresso-2);
   border: 1px solid var(--creme-hair);
   border-radius: var(--r-panel);
-  padding: 20px 20px 20px;
+  padding: 16px 18px 16px;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -3801,7 +3801,7 @@ button, [role="button"] {
   border-radius: var(--r-input);
   color: var(--creme);
   font-family: var(--font-manrope), sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   transition: border-color var(--dur-touch), background var(--dur-touch);
   min-width: 0;
 }
@@ -3821,7 +3821,7 @@ button, [role="button"] {
   background: var(--brass);
   color: var(--ink);
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.005em;
   cursor: pointer;
@@ -4106,7 +4106,7 @@ button, [role="button"] {
   margin: 22px 0 0;
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme-mute);
   line-height: 1.55;
   max-width: 62ch;
@@ -4799,7 +4799,7 @@ button, [role="button"] {
 }
 .dash-hero-sub {
   color: var(--creme-soft);
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.55;
   margin: 0 0 22px;
   max-width: 52ch;
@@ -4963,7 +4963,7 @@ button, [role="button"] {
 }
 .dash-teacher-slot-title {
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme);
   margin: 0;
 }
@@ -5073,7 +5073,7 @@ button, [role="button"] {
 }
 .dash-center-team-name {
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme);
   margin: 0;
 }
@@ -5961,7 +5961,7 @@ button, [role="button"] {
 .state-soul {
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
-  font-size: clamp(18px, 2.2vw, 22px);
+  font-size: clamp(16px, 1.9vw, 18px);
   font-weight: 400;
   line-height: 1.25;
   letter-spacing: -0.012em;
@@ -6532,7 +6532,7 @@ body:has(.test-space-bar) { padding-top: 34px; }
   margin: 0 0 6px;
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.4;
   color: var(--creme);
 }
@@ -6800,7 +6800,7 @@ body:has(.test-space-bar) { padding-top: 34px; }
   background: var(--brass);
   color: var(--espresso);
   font-family: var(--font-manrope), sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.01em;
   text-decoration: none;
@@ -7249,7 +7249,7 @@ body:has(.test-space-bar) { padding-top: 34px; }
 .maison-visage-cite p {
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.5;
   color: var(--creme-soft);
   margin: 0 0 10px;
@@ -7475,7 +7475,7 @@ body:has(.test-space-bar) { padding-top: 34px; }
 .maison-echelle-more .maison-link-strong {
   font-family: var(--font-manrope), system-ui, sans-serif;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 0.005em;
   text-transform: none;
   padding: 12px 22px;
@@ -7717,7 +7717,7 @@ body:has(.test-space-bar) { padding-top: 34px; }
   margin: 0;
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
-  font-size: clamp(20px, 2.4vw, 24px);
+  font-size: clamp(17px, 2vw, 20px);
   color: var(--creme);
   line-height: 1.25;
 }
@@ -7728,7 +7728,7 @@ body:has(.test-space-bar) { padding-top: 34px; }
 .foyer-reprendre-sub {
   margin: 0;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme-soft);
   line-height: 1.5;
 }
@@ -7821,7 +7821,7 @@ body:has(.test-space-bar) { padding-top: 34px; }
 .foyer-cap-quote p {
   margin: 0;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme-soft);
   line-height: 1.55;
 }
@@ -8229,7 +8229,7 @@ body.foyer-switching .foyer {
   font-family: var(--font-fraunces), Georgia, serif;
   font-weight: 500;
   font-style: italic;
-  font-size: clamp(18px, 2.2vw, 22px);
+  font-size: clamp(16px, 1.9vw, 18px);
   line-height: 1.25;
   color: var(--creme);
 }
@@ -8289,7 +8289,7 @@ body.foyer-switching .foyer {
   align-items: center;
   justify-content: center;
   font-family: var(--font-jetbrains, monospace);
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 0.04em;
   color: var(--brass);
   font-weight: 600;
@@ -8816,7 +8816,7 @@ body.foyer-switching .foyer {
   background: rgba(244, 235, 220, 0.04);
   color: var(--creme);
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.55;
   resize: vertical;
   transition: border-color var(--dur-touch) var(--ease-enter);
@@ -8899,7 +8899,7 @@ body.foyer-switching .foyer {
   flex-wrap: wrap;
 }
 .cap-btn-ghost {
-  padding: 12px 20px;
+  padding: 10px 16px;
   border: 1px solid var(--creme-hair);
   border-radius: var(--r-pill);
   background: transparent;
@@ -8921,7 +8921,7 @@ body.foyer-switching .foyer {
   background: var(--brass);
   color: var(--espresso);
   font-family: var(--font-manrope), sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: background var(--dur-touch) var(--ease-enter),
@@ -9085,7 +9085,7 @@ body.foyer-switching .foyer {
   margin: 0;
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
-  font-size: clamp(15px, 1.7vw, 18px);
+  font-size: clamp(14px, 1.5vw, 16px);
   color: var(--creme);
   line-height: 1.3;
 }
@@ -9457,7 +9457,7 @@ body.foyer-switching .foyer {
 .brand-lockup-word {
   font-family: var(--font-manrope), sans-serif;
   font-weight: 800;
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 0.34em;
   color: var(--creme);
   text-transform: uppercase;
@@ -9866,7 +9866,7 @@ body.foyer-switching .foyer {
 .porte-seuil-lede {
   margin: 0 0 30px;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme-soft);
   line-height: 1.55;
 }
@@ -9989,7 +9989,7 @@ body.foyer-switching .foyer {
 .comptoir-sol-note {
   margin: 30px 0 0;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--brass);
   text-align: center;
 }
@@ -10228,7 +10228,7 @@ body.foyer-switching .foyer {
 .pricing-braise-hint {
   margin: 24px auto 0;
   max-width: 640px;
-  padding: 12px 20px;
+  padding: 10px 16px;
   text-align: center;
   border-top: 1px solid var(--creme-hair);
 }
@@ -10382,7 +10382,7 @@ body.foyer-switching .foyer {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 20px;
+  padding: 10px 16px;
   border-radius: var(--r-pill);
   border: 1px solid var(--brass);
   color: var(--brass);
@@ -10662,7 +10662,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-entry-free-inner {
   border: 1px solid var(--creme-hair);
   border-radius: var(--r-panel);
-  padding: 24px 24px 20px;
+  padding: 18px 20px 16px;
   background: rgba(244, 235, 220, 0.02);
 }
 .pricing-entry-free-body {
@@ -10682,7 +10682,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-entry-free-sub {
   margin: 0 0 6px;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme-soft);
 }
 .pricing-entry-free-list {
@@ -10719,14 +10719,14 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   margin: 8px 0 6px;
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
-  font-size: clamp(20px, 2.4vw, 24px);
+  font-size: clamp(17px, 2vw, 20px);
   color: var(--creme);
   line-height: 1.15;
 }
 .pricing-step-sub {
   margin: 0 0 24px;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme-soft);
   max-width: 640px;
 }
@@ -10786,7 +10786,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-passage-card { min-height: auto; }
 .pricing-plan-price-symbol {
   font-family: var(--font-jetbrains, monospace);
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme-soft);
   font-weight: 500;
   letter-spacing: 0.06em;
@@ -10868,7 +10868,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   margin: 6px 0 12px;
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme-soft);
 }
 .pricing-prof-reminder-cta {
@@ -11064,7 +11064,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
    Composition asymétrique · kicker à gauche, question dominante,
    deux portes séparées par le Confluent sur la ligne de bascule. */
 .pricing-seuil {
-  padding-bottom: 88px;
+  padding-bottom: 48px;
 }
 .pricing-seuil-head {
   padding: 64px 0 32px;
@@ -11082,7 +11082,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(28px, 4.4vw, 44px);
+  font-size: clamp(24px, 3.4vw, 34px);
   line-height: 1.02;
   letter-spacing: -0.02em;
   color: var(--creme);
@@ -11092,7 +11092,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-seuil-lede {
   margin: 0;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: clamp(15px, 1.7vw, 18px);
+  font-size: clamp(14px, 1.5vw, 16px);
   line-height: 1.4;
   color: var(--creme-soft);
   max-width: 44ch;
@@ -11113,8 +11113,8 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-door {
   position: relative;
   overflow: hidden;
-  padding: 20px 20px 20px;
-  min-height: 260px;
+  padding: 16px 18px 16px;
+  min-height: 220px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -11173,7 +11173,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(22px, 2.8vw, 30px);
+  font-size: clamp(18px, 2.4vw, 22px);
   line-height: 1.05;
   letter-spacing: -0.015em;
   color: var(--creme);
@@ -11199,7 +11199,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-door-cta {
   margin-top: auto;
   align-self: flex-start;
-  padding: 12px 20px;
+  padding: 10px 16px;
   border-radius: 999px;
   background: var(--brass);
   color: var(--espresso);
@@ -11213,7 +11213,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 }
 
 /* Univers · topbar retour + toggle rail ─────────────────────────── */
-.pricing-universe { padding-bottom: 88px; }
+.pricing-universe { padding-bottom: 48px; }
 .pricing-universe-topbar { padding: 20px 0 40px; }
 .pricing-universe-topbar-inner {
   display: flex;
@@ -11237,7 +11237,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 /* Hero univers · asymétrique · BrandY filigrane haut-droite ────── */
 .pricing-universe-hero {
   position: relative;
-  padding: 24px 0 48px;
+  padding: 12px 0 24px;
   overflow: hidden;
 }
 .pricing-universe-hero-grid {
@@ -11256,7 +11256,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(26px, 4vw, 38px);
+  font-size: clamp(22px, 3vw, 28px);
   line-height: 1.02;
   letter-spacing: -0.02em;
   color: var(--creme);
@@ -11267,7 +11267,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-universe-sub {
   margin: 0;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: clamp(14px, 1.6vw, 16px);
+  font-size: clamp(13px, 1.4vw, 15px);
   line-height: 1.5;
   color: var(--creme-soft);
   max-width: 44ch;
@@ -11312,7 +11312,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 }
 
 /* L'entrée · asymétrique · titre à gauche · liste à droite ─────── */
-.pricing-entry { padding: 24px 0 48px; }
+.pricing-entry { padding: 12px 0 24px; }
 .pricing-entry-grid {
   display: grid;
   grid-template-columns: 5fr 7fr;
@@ -11326,7 +11326,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(20px, 2.4vw, 24px);
+  font-size: clamp(17px, 2vw, 20px);
   line-height: 1.15;
   color: var(--creme);
   text-wrap: balance;
@@ -11351,7 +11351,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   position: relative;
   padding-left: 20px;
   font-family: var(--font-manrope), system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme);
   line-height: 1.5;
 }
@@ -11370,7 +11370,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 13px 24px;
+  padding: 10px 18px;
   border-radius: 999px;
   font-family: var(--font-manrope), system-ui, sans-serif;
   font-weight: 600;
@@ -11397,7 +11397,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-cta-ghost:hover { color: var(--creme); border-color: var(--brass); background: var(--brass-glow); }
 
 /* Passage · 3 formes distinctes ────────────────────────────────── */
-.pricing-passage { padding: 24px 0 16px; opacity: 0.6; transform: translateY(16px); transition: opacity 480ms var(--ease-enter), transform 480ms var(--ease-enter); }
+.pricing-passage { padding: 12px 0 8px; opacity: 0.6; transform: translateY(16px); transition: opacity 480ms var(--ease-enter), transform 480ms var(--ease-enter); }
 .pricing-passage.in-view { opacity: 1; transform: none; }
 .pricing-passage-grid {
   display: grid;
@@ -11412,7 +11412,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(20px, 2.4vw, 24px);
+  font-size: clamp(17px, 2vw, 20px);
   line-height: 1.15;
   color: var(--creme);
   text-wrap: balance;
@@ -11434,7 +11434,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 12px 6px;
+  padding: 10px 4px;
   background: transparent;
   border: 1px solid transparent;
   border-radius: 8px;
@@ -11468,16 +11468,16 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 
 /* Forme 2 · carte Passage · éditoriale, radius 16, laiton posé */
 .pricing-passage-card {
-  padding: 24px 24px 20px;
+  padding: 18px 20px 16px;
   border: 1px solid var(--brass-edge);
-  border-radius: 16px;
+  border-radius: 14px;
   background:
     radial-gradient(ellipse 60% 50% at 100% 0%, rgba(240, 206, 139, 0.08), transparent 60%),
     var(--espresso-3);
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  box-shadow: 0 12px 40px rgba(11, 8, 6, 0.35);
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(11, 8, 6, 0.3);
 }
 .pricing-passage-card-head {
   display: flex;
@@ -11501,9 +11501,9 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: 24px;
+  font-size: 18px;
   color: var(--creme);
-  line-height: 1.15;
+  line-height: 1.2;
 }
 .pricing-passage-card-price {
   display: flex;
@@ -11549,7 +11549,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   white-space: nowrap;
 }
 .pricing-price-num {
-  font-size: clamp(22px, 2.8vw, 30px);
+  font-size: clamp(18px, 2.4vw, 22px);
   font-weight: 500;
   color: var(--creme);
   letter-spacing: -0.01em;
@@ -11604,7 +11604,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   line-height: 1;
 }
 .pricing-teacher {
-  padding: 20px 20px 20px;
+  padding: 16px 18px 16px;
   border: 1.5px dashed var(--brass-edge);
   border-radius: 12px;
   background: rgba(240, 206, 139, 0.03);
@@ -11631,7 +11631,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(18px, 2.2vw, 22px);
+  font-size: clamp(16px, 1.9vw, 18px);
   color: var(--creme);
   line-height: 1.15;
 }
@@ -11680,7 +11680,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-teacher-price .pricing-price-sign { color: var(--brass); }
 
 /* /racines · toggle périodicité + 2 offres ──────────────────────── */
-.pricing-racines-offers { padding: 24px 0 16px; opacity: 0.6; transform: translateY(16px); transition: opacity 480ms var(--ease-enter), transform 480ms var(--ease-enter); }
+.pricing-racines-offers { padding: 12px 0 8px; opacity: 0.6; transform: translateY(16px); transition: opacity 480ms var(--ease-enter), transform 480ms var(--ease-enter); }
 .pricing-racines-offers.in-view { opacity: 1; transform: none; }
 .pricing-period-toggle {
   display: inline-flex;
@@ -11718,7 +11718,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 @media (max-width: 900px) { .pricing-racines-grid { grid-template-columns: 1fr; } }
 .pricing-offer {
   position: relative;
-  padding: 24px 24px 24px;
+  padding: 16px 18px 16px;
   border-radius: 20px;
   border: 1px solid rgba(244, 235, 220, 0.12);
   background: rgba(244, 235, 220, 0.03);
@@ -11751,14 +11751,14 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(20px, 2.4vw, 24px);
+  font-size: clamp(17px, 2vw, 20px);
   color: var(--creme);
   line-height: 1.1;
 }
 .pricing-offer-lede {
   margin: 0 0 8px;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme-soft);
   line-height: 1.45;
 }
@@ -11823,7 +11823,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-prof-reminder-inner {
   max-width: 640px;
   margin: 0 auto;
-  padding: 24px 24px 20px;
+  padding: 18px 20px 16px;
   text-align: center;
   border-top: 1px solid var(--creme-hair);
   border-bottom: 1px solid var(--creme-hair);
@@ -11857,7 +11857,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 
 /* Réassurance · sobre, une ligne max par item ───────────────────── */
 .pricing-trust {
-  padding: 24px 0 40px;
+  padding: 16px 0 24px;
 }
 .pricing-trust-grid {
   display: grid;
@@ -12228,7 +12228,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   flex-direction: column;
 }
 .ens-dash-header {
-  padding: 12px 20px;
+  padding: 10px 16px;
   border-bottom: 1px solid var(--creme-hair);
   font-family: var(--font-jetbrains, monospace);
   font-size: 11px;
@@ -12372,7 +12372,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .ens-form-sent p {
   margin: 0;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme-soft);
 }
 
@@ -12951,7 +12951,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   background: var(--brass);
   color: var(--espresso);
   font-family: var(--font-manrope), sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   text-decoration: none;
   transition: background var(--dur-touch) var(--ease-enter),
@@ -13013,7 +13013,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .famille-sub {
   margin: 0;
   font-family: var(--font-manrope), system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme-soft);
 }
 
@@ -13135,7 +13135,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   background: rgba(0, 0, 0, 0.18);
   color: var(--creme);
   font-family: var(--font-manrope), system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 14px;
 }
 .famille-input:focus, .famille-select:focus {
   outline: 2px solid var(--brass);
@@ -13263,7 +13263,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .child-stars-glyph { color: var(--brass); font-size: 18px; }
 .child-stars-num {
   font-family: var(--font-jetbrains, monospace);
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme);
   font-weight: 600;
 }
@@ -13305,7 +13305,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 }
 .child-story-sub {
   font-family: var(--font-manrope), system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   color: rgba(244, 235, 220, 0.86);
 }
 .child-story-arrow {
@@ -13510,7 +13510,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 }
 .child-universe-code {
   font-family: var(--font-jetbrains, monospace);
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 0.04em;
   font-weight: 700;
 }
@@ -13536,7 +13536,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   margin: 10px 0 6px;
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--creme-soft);
 }
 .famille-lang-list {
