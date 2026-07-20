@@ -11214,7 +11214,8 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 
 /* Univers · topbar retour + toggle rail ─────────────────────────── */
 .pricing-universe { padding-bottom: 48px; }
-.pricing-universe-topbar { padding: 20px 0 40px; }
+/* Respiration après la LandingNav · 48px de haut, 32 en bas */
+.pricing-universe-topbar { padding: 48px 0 32px; }
 .pricing-universe-topbar-inner {
   display: flex;
   align-items: center;
@@ -11222,17 +11223,33 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   gap: 24px;
   flex-wrap: wrap;
 }
+/* « ← Retour au seuil » · pastille discrète, hairline crème, hover
+   laiton. Cible tactile 32px min, cohérente avec les autres pastilles
+   nav du site. */
 .pricing-universe-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-family: var(--font-manrope), system-ui, sans-serif;
-  font-size: 13px;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   color: var(--creme-soft);
   text-decoration: none;
-  padding: 8px 0;
-  border-bottom: 1px solid transparent;
-  transition: color 160ms var(--ease-enter), border-color 160ms var(--ease-enter);
+  padding: 7px 14px;
+  border: 1px solid var(--creme-hair);
+  border-radius: 999px;
+  background: rgba(244, 235, 220, 0.02);
+  transition: color 160ms var(--ease-enter),
+              border-color 160ms var(--ease-enter),
+              background 160ms var(--ease-enter);
 }
-.pricing-universe-back:hover { color: var(--brass); border-color: var(--brass-edge); }
-.pricing-universe-back:focus-visible { outline: 2px solid var(--brass); outline-offset: 4px; border-radius: 4px; }
+.pricing-universe-back:hover {
+  color: var(--creme);
+  border-color: var(--brass-edge);
+  background: var(--brass-glow);
+}
+.pricing-universe-back:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
 
 /* Hero univers · asymétrique · BrandY filigrane haut-droite ────── */
 .pricing-universe-hero {
