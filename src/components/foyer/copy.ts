@@ -13,7 +13,7 @@ interface HeadCopy {
   greetingEvening: string;
   capLabel: string;
   capName: Record<Cap, string>;
-  /** Petit lien discret « Changer » à côté du cap — bascule /onboarding/student. */
+  /** Petit lien discret « Changer » à côté du cap — bascule /pricing. */
   changeCap: string;
   /** Version « Poser mon cap » quand aucun cap n'est encore choisi. */
   setCap: string;

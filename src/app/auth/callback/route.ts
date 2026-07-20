@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
         redirectUrl = dbRole === Role.ADMIN ? "/admin"
           : dbRole === Role.TEACHER ? "/onboarding/teacher"
           : dbRole === Role.CENTER ? "/onboarding/center"
-          : "/onboarding/student";
+          : "/pricing";
       }
 
       const redirectResponse = NextResponse.redirect(`${origin}${redirectUrl}`);

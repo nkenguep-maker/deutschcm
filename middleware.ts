@@ -81,6 +81,16 @@ const intlMiddleware = createMiddleware(routing)
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // Garde-fou · empêche /fr/fr/..., /fr/en/..., /en/fr/..., /en/en/...
+  // Bug next-intl · un helper localisé + un chemin déjà localisé
+  // produit une double locale. On strip la seconde et on redirige.
+  const dupLocale = pathname.match(/^\/(fr|en)\/(fr|en)(\/.*)?$/)
+  if (dupLocale) {
+    const [, first, , rest] = dupLocale
+    const target = `/${first}${rest ?? ""}`
+    return NextResponse.redirect(new URL(target, request.url))
+  }
+
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||

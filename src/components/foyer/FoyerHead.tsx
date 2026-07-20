@@ -23,7 +23,7 @@ interface Copy {
 interface FoyerHeadProps {
   prenom: string;
   locale: "fr" | "en";
-  /** URL locale pour la route de changement de cap (`/${urlLocale}/onboarding/student`). */
+  /** URL locale pour la route de changement de cap (`/${urlLocale}/pricing`). */
   urlLocale: string;
   cap: Cap | null;
   braise: FoyerBraise;
@@ -43,7 +43,7 @@ export function FoyerHead({ prenom, locale, urlLocale, cap, braise, copy, repren
   const hour = new Date().getHours();
   const greet = greetingFor(hour, copy);
   const capName = cap ? copy.capName[cap] : null;
-  const capHref = `/${urlLocale}/onboarding/student`;
+  const capHref = `/${urlLocale}/pricing`;
 
   return (
     <section className="foyer-head" aria-label={t("Votre foyer")}>

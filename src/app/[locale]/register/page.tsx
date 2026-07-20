@@ -3,7 +3,7 @@
 // /register · La porte d'entrée YEMA · commune aux deux univers.
 // Accepte ?universe=monde|racines et ?plan=<slug> depuis /pricing.
 // Après signup, route vers /onboarding/{universe} · si aucun univers,
-// tombe sur /onboarding/student (legacy fallback).
+// renvoie sur /pricing pour choisir une porte d'entrée.
 //
 // Un seul champ email/téléphone (auto-détection · +237… vs email).
 // Google OAuth optionnel · si non configuré côté Supabase, le bouton
@@ -143,11 +143,13 @@ export default function RegisterPage() {
     el?.focus();
   }, []);
 
+  // Fallback si l'utilisateur arrive sans univers · on le renvoie
+  // vers /pricing pour choisir une porte avant de continuer.
   const onboardingRoute = universe === "racines"
     ? "/onboarding/racines"
     : universe === "monde"
       ? "/onboarding/monde"
-      : "/onboarding/student";
+      : "/pricing";
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
@@ -174,6 +176,8 @@ export default function RegisterPage() {
         plan: plan || null,
         prof,
       },
+      // Callback URL est ABSOLU (pas next-intl) · on passe le chemin
+      // complet avec locale pour que le handler redirige correctement.
       emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/${locale}${onboardingRoute}`)}`,
     };
 
@@ -205,8 +209,10 @@ export default function RegisterPage() {
     } catch { /* ok */ }
 
     if (data.session) {
-      // Session immédiate (téléphone confirmation sms, ou email confirmé)
-      router.push(`/${locale}${onboardingRoute}`);
+      // Session immédiate (téléphone confirmation sms, ou email confirmé).
+      // Router de @/navigation AJOUTE déjà la locale · on passe un
+      // chemin NU pour éviter /fr/fr/onboarding/…
+      router.push(onboardingRoute);
       router.refresh();
       return;
     }

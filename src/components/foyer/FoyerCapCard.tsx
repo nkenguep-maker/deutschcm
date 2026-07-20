@@ -58,7 +58,7 @@ export function FoyerCapCard({ locale, urlLocale, cap, personalGoal, capContext,
         <StateBlock
           kind="empty"
           soul={copy.emptyNoCap.soul}
-          action={{ label: copy.emptyNoCap.action, href: `/${urlLocale}/onboarding/student` }}
+          action={{ label: copy.emptyNoCap.action, href: `/${urlLocale}/pricing` }}
         />
       </section>
     );

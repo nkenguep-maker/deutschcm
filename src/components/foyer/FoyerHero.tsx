@@ -122,7 +122,7 @@ export function FoyerHero({ locale, urlLocale, cap, nextLesson, copy, anchorId }
         <StateBlock
           kind="empty"
           soul={copy.emptyNoCap.soul}
-          action={{ label: copy.emptyNoCap.action, href: `/${urlLocale}/onboarding/student` }}
+          action={{ label: copy.emptyNoCap.action, href: `/${urlLocale}/pricing` }}
         />
       </section>
     );

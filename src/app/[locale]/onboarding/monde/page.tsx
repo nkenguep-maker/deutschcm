@@ -1,8 +1,9 @@
 "use client";
 
 // /onboarding/monde · Ambiance espresso/laiton, le voyage.
-// Trois étapes, une minute · langue, pourquoi, point de départ.
-// Réponses stockées dans user_metadata.onboarding pour personnaliser.
+// Deux étapes seulement · pourquoi + point de départ. La langue est
+// déjà connue via le plan choisi sur /pricing (deutsch au lancement).
+// Rappel de l'offre en haut si l'user vient d'un plan.
 
 import Link from "next/link";
 import { useRouter } from "@/navigation";
@@ -12,83 +13,74 @@ import { createClient } from "@/lib/supabase/client";
 import { BrandY } from "@/components/brand/BrandY";
 import { frTypo } from "@/components/landing/typo";
 
-type LangId = "deutsch";
 type Why = "study" | "exam" | "envie";
 type StartPoint = "beginner" | "some_basics" | "test";
 
+const PLAN_LABEL_FR: Record<string, string> = {
+  "passage-a1": "Le Passage · Allemand A1",
+  "passage-a2": "Le Passage · Allemand A2",
+  "passage-b1": "Le Passage · Allemand B1",
+  "passage-b2": "Le Passage · Allemand B2",
+  "passage-c1": "Le Passage · Allemand C1",
+};
+const PLAN_LABEL_EN: Record<string, string> = {
+  "passage-a1": "The Passage · German A1",
+  "passage-a2": "The Passage · German A2",
+  "passage-b1": "The Passage · German B1",
+  "passage-b2": "The Passage · German B2",
+  "passage-c1": "The Passage · German C1",
+};
+
 const COPY_FR = {
-  progress: (n: number) => `Étape ${n} sur 3 · une minute`,
+  progress: (n: number) => `Étape ${n} sur 2 · une minute`,
   back: "Retour",
   next: "Continuer",
   finish: "Terminer",
   saving: "On enregistre…",
-  // Étape 1 · langue
-  s1Kicker: "Le voyage",
-  s1Title: "Quelle langue vous emmène ?",
-  s1Lede: "Une seule au lancement. Les autres suivront.",
-  langs: [
-    { id: "deutsch" as LangId, name: "Allemand", status: "live" },
-    { id: "anglais", name: "Anglais", status: "soon" },
-    { id: "francais", name: "Français", status: "soon" },
-    { id: "espagnol", name: "Espagnol", status: "soon" },
-  ],
-  langSoon: "bientôt",
-  // Étape 2 · pourquoi
-  s2Kicker: "Le pourquoi",
-  s2Title: "Pourquoi cette langue ?",
-  s2Lede: "Pour adapter vos exemples et votre rythme. Vous pourrez changer plus tard.",
+  contextPrefix: "Vous avez choisi",
+  s1Kicker: "Le pourquoi",
+  s1Title: "Pourquoi l'allemand ?",
+  s1Lede: "Pour adapter vos exemples et votre rythme. Vous pourrez changer plus tard.",
   whys: [
     { id: "study" as Why, name: "Partir étudier ou travailler", desc: "Ausbildung, université, visa." },
     { id: "exam" as Why, name: "Passer un examen officiel", desc: "Une note à obtenir, une date à tenir." },
     { id: "envie" as Why, name: "Pour moi, par envie", desc: "Culture, voyage, curiosité." },
   ],
-  // Étape 3 · point de départ
-  s3Kicker: "Le point de départ",
-  s3Title: "Où en êtes-vous ?",
-  s3Lede: "Trois options honnêtes. Aucun jugement.",
+  s2Kicker: "Le point de départ",
+  s2Title: "Où en êtes-vous ?",
+  s2Lede: "Trois options honnêtes. Aucun jugement.",
   starts: [
     { id: "beginner" as StartPoint, name: "Je débute", desc: "Premiers mots, première leçon." },
     { id: "some_basics" as StartPoint, name: "J'ai déjà des bases", desc: "Quelques cours ou souvenirs de classe." },
     { id: "test" as StartPoint, name: "Faire un test de niveau rapide", desc: "Cinq minutes, on situe votre niveau." },
   ],
-  errNoLang: "Choisissez une langue disponible.",
   errNoWhy: "Choisissez un motif.",
   errNoStart: "Choisissez un point de départ.",
 } as const;
 
 const COPY_EN = {
-  progress: (n: number) => `Step ${n} of 3 · one minute`,
+  progress: (n: number) => `Step ${n} of 2 · one minute`,
   back: "Back",
   next: "Continue",
   finish: "Finish",
   saving: "Saving…",
-  s1Kicker: "The journey",
-  s1Title: "Which language takes you along?",
-  s1Lede: "Just one at launch. The others will follow.",
-  langs: [
-    { id: "deutsch" as LangId, name: "German", status: "live" },
-    { id: "anglais", name: "English", status: "soon" },
-    { id: "francais", name: "French", status: "soon" },
-    { id: "espagnol", name: "Spanish", status: "soon" },
-  ],
-  langSoon: "soon",
-  s2Kicker: "The why",
-  s2Title: "Why this language?",
-  s2Lede: "To adapt your examples and your rhythm. You can change later.",
+  contextPrefix: "You picked",
+  s1Kicker: "The why",
+  s1Title: "Why German?",
+  s1Lede: "To adapt your examples and your rhythm. You can change later.",
   whys: [
     { id: "study" as Why, name: "Leave to study or work", desc: "Ausbildung, university, visa." },
     { id: "exam" as Why, name: "Take an official exam", desc: "A score to get, a date to hold." },
     { id: "envie" as Why, name: "For me, out of interest", desc: "Culture, travel, curiosity." },
   ],
-  s3Kicker: "The starting point",
-  s3Title: "Where are you now?",
-  s3Lede: "Three honest options. No judgment.",
+  s2Kicker: "The starting point",
+  s2Title: "Where are you now?",
+  s2Lede: "Three honest options. No judgment.",
   starts: [
     { id: "beginner" as StartPoint, name: "I'm starting out", desc: "First words, first lesson." },
     { id: "some_basics" as StartPoint, name: "I have some basics", desc: "A few classes or school memories." },
     { id: "test" as StartPoint, name: "Take a quick level test", desc: "Five minutes to place your level." },
   ],
-  errNoLang: "Pick an available language.",
   errNoWhy: "Pick a reason.",
   errNoStart: "Pick a starting point.",
 } as const;
@@ -100,23 +92,31 @@ export default function OnboardingMondePage() {
   const c = loc === "en" ? COPY_EN : COPY_FR;
   const t = (s: string) => (loc === "fr" ? frTypo(s) : s);
 
-  const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [lang, setLang] = useState<LangId | null>("deutsch"); // pre-selected live
+  const [step, setStep] = useState<1 | 2>(1);
   const [why, setWhy] = useState<Why | null>(null);
   const [startPoint, setStartPoint] = useState<StartPoint | null>(null);
+  const [planLabel, setPlanLabel] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => { setError(null); }, [step]);
+  // Récupère le plan depuis user_metadata (posé au signup).
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      const plan = (data.user?.user_metadata as { plan?: string })?.plan;
+      if (!plan) return;
+      const map = loc === "en" ? PLAN_LABEL_EN : PLAN_LABEL_FR;
+      setPlanLabel(map[plan] ?? "");
+    }).catch(() => { /* silent */ });
+  }, [loc]);
 
   function goNext() {
-    if (step === 1 && !lang) { setError(c.errNoLang); return; }
-    if (step === 2 && !why) { setError(c.errNoWhy); return; }
-    if (step < 3) setStep((s) => (s + 1) as 1 | 2 | 3);
+    if (step === 1 && !why) { setError(c.errNoWhy); return; }
+    if (step < 2) { setError(null); setStep(2); }
   }
   function goBack() {
     setError(null);
-    if (step > 1) setStep((s) => (s - 1) as 1 | 2 | 3);
+    if (step > 1) setStep((s) => (s - 1) as 1 | 2);
   }
 
   async function handleFinish() {
@@ -128,14 +128,13 @@ export default function OnboardingMondePage() {
       await supabase.auth.updateUser({
         data: {
           universe: "monde",
-          onboarding: { language: lang, why, startPoint },
-          activeLanguage: lang,
+          onboarding: { language: "deutsch", why, startPoint },
+          activeLanguage: "deutsch",
         },
       });
-    } catch { /* on continue même si l'update échoue silencieusement */ }
-    const dest = startPoint === "test"
-      ? `/${locale}/test-niveau`
-      : `/${locale}/dashboard`;
+    } catch { /* on continue même si l'update échoue */ }
+    // Chemin NU pour @/navigation router · évite /fr/fr/…
+    const dest = startPoint === "test" ? "/test-niveau" : "/dashboard";
     router.push(dest);
     router.refresh();
   }
@@ -149,14 +148,22 @@ export default function OnboardingMondePage() {
         <div className="entry-progress" aria-label={c.progress(step)}>
           <span className={`entry-progress-dot ${step >= 1 ? "on" : ""}`} aria-hidden="true" />
           <span className={`entry-progress-dot ${step >= 2 ? "on" : ""}`} aria-hidden="true" />
-          <span className={`entry-progress-dot ${step >= 3 ? "on" : ""}`} aria-hidden="true" />
         </div>
       </header>
 
       <main className="entry-main">
         <div className="entry-card entry-card-onboarding">
+          {planLabel ? (
+            <div className="entry-context" role="note">
+              <span className="entry-context-dot" aria-hidden="true" />
+              <span className="entry-context-text">
+                {t(c.contextPrefix)} <em>{planLabel}</em>.
+              </span>
+            </div>
+          ) : null}
+
           <p className="entry-kicker">
-            {step === 1 ? t(c.s1Kicker) : step === 2 ? t(c.s2Kicker) : t(c.s3Kicker)}
+            {step === 1 ? t(c.s1Kicker) : t(c.s2Kicker)}
             <span aria-hidden="true"> · </span>
             <span className="entry-kicker-progress">{t(c.progress(step))}</span>
           </p>
@@ -166,36 +173,6 @@ export default function OnboardingMondePage() {
               <h1 className="entry-h">{t(c.s1Title)}</h1>
               <p className="entry-lede">{t(c.s1Lede)}</p>
               <ul className="entry-choices" role="radiogroup" aria-label={t(c.s1Title)}>
-                {c.langs.map((l) => {
-                  const isLive = l.status === "live";
-                  const active = lang === l.id;
-                  return (
-                    <li key={l.id}>
-                      <button
-                        type="button"
-                        role="radio"
-                        aria-checked={active}
-                        disabled={!isLive}
-                        className={`entry-choice ${active ? "on" : ""} ${!isLive ? "entry-choice-soon" : ""}`}
-                        onClick={() => isLive && setLang(l.id as LangId)}
-                      >
-                        <span className="entry-choice-name">{t(l.name)}</span>
-                        {!isLive ? (
-                          <span className="entry-choice-badge">{c.langSoon}</span>
-                        ) : null}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </>
-          ) : null}
-
-          {step === 2 ? (
-            <>
-              <h1 className="entry-h">{t(c.s2Title)}</h1>
-              <p className="entry-lede">{t(c.s2Lede)}</p>
-              <ul className="entry-choices" role="radiogroup" aria-label={t(c.s2Title)}>
                 {c.whys.map((w) => {
                   const active = why === w.id;
                   return (
@@ -215,13 +192,11 @@ export default function OnboardingMondePage() {
                 })}
               </ul>
             </>
-          ) : null}
-
-          {step === 3 ? (
+          ) : (
             <>
-              <h1 className="entry-h">{t(c.s3Title)}</h1>
-              <p className="entry-lede">{t(c.s3Lede)}</p>
-              <ul className="entry-choices" role="radiogroup" aria-label={t(c.s3Title)}>
+              <h1 className="entry-h">{t(c.s2Title)}</h1>
+              <p className="entry-lede">{t(c.s2Lede)}</p>
+              <ul className="entry-choices" role="radiogroup" aria-label={t(c.s2Title)}>
                 {c.starts.map((s) => {
                   const active = startPoint === s.id;
                   return (
@@ -241,7 +216,7 @@ export default function OnboardingMondePage() {
                 })}
               </ul>
             </>
-          ) : null}
+          )}
 
           {error ? <p className="entry-err" role="alert">{error}</p> : null}
 
@@ -254,7 +229,7 @@ export default function OnboardingMondePage() {
             >
               ← {t(c.back)}
             </button>
-            {step < 3 ? (
+            {step < 2 ? (
               <button type="button" className="entry-cta entry-cta-primary" onClick={goNext}>
                 {t(c.next)} →
               </button>

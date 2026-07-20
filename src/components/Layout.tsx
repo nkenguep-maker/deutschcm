@@ -203,7 +203,7 @@ export default function Layout({ children, title }: LayoutProps) {
         if (d.onboardingDone === false) {
           const dest = d.role === "TEACHER" ? "/onboarding/teacher"
             : d.role === "CENTER" ? "/onboarding/center"
-            : "/onboarding/student";
+            : "/pricing";
           router.replace(dest);
           return;
         }
