@@ -11068,6 +11068,912 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   overflow-wrap: normal;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   PRICING · REFONTE SIGNATURE · le seuil (/pricing) + les deux univers.
+   Grille asymétrique. Trois formes distinctes pour Passage/prof/offres.
+   Un Confluent, une seule audace. Aucun radius uniforme. Grain SVG,
+   deux sources lumineuses, motion mesurée.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Le seuil · /pricing · 2 portes + BrandY articulation ─────────────
+   Composition asymétrique · kicker à gauche, question dominante,
+   deux portes séparées par le Confluent sur la ligne de bascule. */
+.pricing-seuil {
+  padding-bottom: 160px;
+}
+.pricing-seuil-head {
+  padding: 128px 0 72px;
+}
+.pricing-seuil-kicker {
+  margin: 0 0 20px;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--brass);
+  text-transform: uppercase;
+}
+.pricing-seuil-h {
+  margin: 0 0 20px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(40px, 6.4vw, 76px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--creme);
+  text-wrap: balance;
+  max-width: 16ch;
+}
+.pricing-seuil-lede {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(18px, 2.4vw, 24px);
+  line-height: 1.4;
+  color: var(--creme-soft);
+  max-width: 44ch;
+}
+.pricing-seuil-doors-wrap { padding: 40px 0 0; }
+.pricing-seuil-doors {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+@media (max-width: 768px) {
+  .pricing-seuil-doors { grid-template-columns: 1fr; gap: 24px; }
+}
+.pricing-seuil-y {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  padding: 12px;
+  background: var(--espresso);
+  border: 1px solid var(--brass-edge);
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(11, 8, 6, 0.5);
+  filter: drop-shadow(0 0 12px rgba(184, 135, 62, 0.15));
+}
+@media (max-width: 768px) {
+  .pricing-seuil-y {
+    top: 50%;
+    left: 50%;
+  }
+}
+
+/* Portes · trois radius différents (grand, arrondi, généreux). */
+.pricing-door {
+  position: relative;
+  overflow: hidden;
+  padding: 56px 40px 40px;
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-decoration: none;
+  border-radius: 28px;
+  border: 1px solid var(--creme-hair);
+  transition: transform 240ms var(--ease-enter),
+              box-shadow 240ms var(--ease-enter),
+              border-color 240ms var(--ease-enter);
+}
+.pricing-door::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.pricing-door > * { position: relative; z-index: 1; }
+.pricing-door-monde {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 0%, rgba(217, 168, 85, 0.15), transparent 65%),
+    radial-gradient(ellipse 60% 50% at 100% 100%, rgba(184, 135, 62, 0.10), transparent 60%),
+    var(--espresso-2);
+  border-color: var(--brass-edge);
+  box-shadow: 0 12px 32px rgba(11, 8, 6, 0.35);
+}
+.pricing-door-racines {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 0%, rgba(240, 206, 139, 0.12), transparent 65%),
+    radial-gradient(ellipse 60% 50% at 100% 100%, rgba(201, 132, 63, 0.16), transparent 60%),
+    var(--terre-2);
+  border-color: rgba(201, 132, 63, 0.42);
+  box-shadow: 0 12px 32px rgba(42, 15, 20, 0.45);
+}
+.pricing-door:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 60px rgba(11, 8, 6, 0.5);
+}
+.pricing-door-racines:hover {
+  box-shadow: 0 24px 60px rgba(42, 15, 20, 0.55);
+}
+.pricing-door:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 6px;
+}
+.pricing-door-kicker {
+  margin: 0;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.24em;
+  color: var(--brass);
+  text-transform: uppercase;
+}
+.pricing-door-title {
+  margin: 4px 0 8px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(30px, 3.6vw, 42px);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: var(--creme);
+  text-wrap: balance;
+}
+.pricing-door-lede {
+  margin: 0 0 12px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--creme);
+  max-width: 32ch;
+}
+.pricing-door-langs {
+  margin: 0;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--creme-mute);
+  text-transform: lowercase;
+  flex: 1;
+}
+.pricing-door-cta {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: var(--brass);
+  color: var(--espresso);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Univers · topbar retour + toggle rail ─────────────────────────── */
+.pricing-universe { padding-bottom: 160px; }
+.pricing-universe-topbar { padding: 20px 0 40px; }
+.pricing-universe-topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.pricing-universe-back {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--creme-soft);
+  text-decoration: none;
+  padding: 8px 0;
+  border-bottom: 1px solid transparent;
+  transition: color 160ms var(--ease-enter), border-color 160ms var(--ease-enter);
+}
+.pricing-universe-back:hover { color: var(--brass); border-color: var(--brass-edge); }
+.pricing-universe-back:focus-visible { outline: 2px solid var(--brass); outline-offset: 4px; border-radius: 4px; }
+
+/* Hero univers · asymétrique · BrandY filigrane haut-droite ────── */
+.pricing-universe-hero {
+  position: relative;
+  padding: 40px 0 88px;
+  overflow: hidden;
+}
+.pricing-universe-hero-brand {
+  position: absolute;
+  top: 8px;
+  right: -32px;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+@media (max-width: 768px) {
+  .pricing-universe-hero-brand { display: none; }
+}
+.pricing-universe-hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 8fr 4fr;
+  gap: 32px;
+}
+@media (max-width: 900px) {
+  .pricing-universe-hero-grid { grid-template-columns: 1fr; }
+}
+.pricing-universe-hero-body { min-width: 0; }
+.pricing-universe-h {
+  margin: 0 0 20px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(36px, 5.6vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--creme);
+  text-wrap: balance;
+  max-width: 22ch;
+}
+.pricing-universe-h em { color: var(--brass); font-style: italic; }
+.pricing-universe-sub {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(17px, 2vw, 22px);
+  line-height: 1.5;
+  color: var(--creme-soft);
+  max-width: 44ch;
+}
+
+/* /racines · fond terre effectif sur la page entière ─────────────── */
+.pricing-universe-racines {
+  background: var(--terre);
+}
+.pricing-universe-racines .pricing-universe-back:hover { color: #F0CE8B; }
+
+/* Grain SVG discret · deux sources lumineuses par univers ───────── */
+.pricing-page {
+  position: relative;
+  isolation: isolate;
+}
+.pricing-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.96   0 0 0 0 0.92   0 0 0 0 0.86   0 0 0 0.028 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+  pointer-events: none;
+}
+.pricing-universe-monde::after,
+.pricing-universe-racines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.pricing-universe-monde::after {
+  background:
+    radial-gradient(ellipse 65% 40% at 12% 0%, rgba(240, 206, 139, 0.08), transparent 55%),
+    radial-gradient(ellipse 50% 35% at 92% 6%, rgba(217, 168, 85, 0.06), transparent 55%);
+}
+.pricing-universe-racines::after {
+  background:
+    radial-gradient(ellipse 75% 45% at 12% 0%, rgba(240, 206, 139, 0.10), transparent 55%),
+    radial-gradient(ellipse 55% 40% at 92% 8%, rgba(201, 132, 63, 0.10), transparent 55%);
+}
+
+/* L'entrée · asymétrique · titre à gauche · liste à droite ─────── */
+.pricing-entry { padding: 40px 0 88px; }
+.pricing-entry-grid {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 48px;
+  align-items: start;
+}
+@media (max-width: 900px) { .pricing-entry-grid { grid-template-columns: 1fr; gap: 24px; } }
+.pricing-entry-side { padding-top: 4px; }
+.pricing-entry-h {
+  margin: 0 0 12px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.15;
+  color: var(--creme);
+  text-wrap: balance;
+}
+.pricing-entry-sub {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--creme-soft);
+}
+.pricing-entry-body { min-width: 0; }
+.pricing-entry-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px 32px;
+}
+.pricing-entry-list li {
+  position: relative;
+  padding-left: 20px;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 15px;
+  color: var(--creme);
+  line-height: 1.5;
+}
+.pricing-entry-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 11px;
+  width: 12px;
+  height: 1px;
+  background: var(--brass);
+}
+
+/* CTA · système à 2 variants ──────────────────────────────────── */
+.pricing-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: 999px;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition: transform 160ms var(--ease-enter),
+              background 160ms var(--ease-enter),
+              color 160ms var(--ease-enter),
+              border-color 160ms var(--ease-enter);
+}
+.pricing-cta:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+.pricing-cta-primary {
+  background: var(--brass);
+  color: var(--espresso);
+  border: 1px solid var(--brass);
+}
+.pricing-cta-primary:hover { background: var(--brass-deep); border-color: var(--brass-deep); transform: translateY(-1px); }
+.pricing-cta-ghost {
+  background: transparent;
+  color: var(--brass);
+  border: 1px solid var(--brass-edge);
+}
+.pricing-cta-ghost:hover { color: var(--creme); border-color: var(--brass); background: var(--brass-glow); }
+
+/* Passage · 3 formes distinctes ────────────────────────────────── */
+.pricing-passage { padding: 40px 0 24px; opacity: 0.6; transform: translateY(16px); transition: opacity 480ms var(--ease-enter), transform 480ms var(--ease-enter); }
+.pricing-passage.in-view { opacity: 1; transform: none; }
+.pricing-passage-grid {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 48px;
+  align-items: start;
+}
+@media (max-width: 900px) { .pricing-passage-grid { grid-template-columns: 1fr; gap: 24px; } }
+.pricing-passage-intro { padding-top: 4px; min-width: 0; }
+.pricing-passage-h {
+  margin: 0 0 24px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.15;
+  color: var(--creme);
+  text-wrap: balance;
+}
+
+/* Forme 1 · niveaux · puces mono compactes, alignement tabulaire */
+.pricing-levels {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--creme-hair);
+  border-radius: 12px;
+  background: rgba(244, 235, 220, 0.02);
+}
+@media (max-width: 640px) { .pricing-levels { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.pricing-level {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--creme);
+  cursor: pointer;
+  font-family: var(--font-jetbrains, monospace);
+  transition: border-color 160ms var(--ease-enter), background 160ms var(--ease-enter);
+}
+.pricing-level:hover { border-color: var(--creme-hair); }
+.pricing-level:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.pricing-level.on {
+  border-color: var(--brass);
+  background: var(--brass-glow);
+}
+.pricing-level-code {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--brass);
+}
+.pricing-level-price {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--creme-mute);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.pricing-level-price-val { color: var(--creme); }
+.pricing-level-price-cur { margin-left: 3px; color: var(--creme-mute); }
+
+/* Forme 2 · carte Passage · éditoriale, radius 16, laiton posé */
+.pricing-passage-card {
+  padding: 32px 32px 28px;
+  border: 1px solid var(--brass-edge);
+  border-radius: 16px;
+  background:
+    radial-gradient(ellipse 60% 50% at 100% 0%, rgba(240, 206, 139, 0.08), transparent 60%),
+    var(--espresso-3);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 12px 40px rgba(11, 8, 6, 0.35);
+}
+.pricing-passage-card-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.pricing-passage-card-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--brass);
+  background: var(--brass-glow);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--brass);
+}
+.pricing-passage-card-h {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 24px;
+  color: var(--creme);
+  line-height: 1.15;
+}
+.pricing-passage-card-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--creme-hair);
+}
+.pricing-passage-card-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pricing-passage-card-list li {
+  position: relative;
+  padding-left: 20px;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 14.5px;
+  color: var(--creme-soft);
+  line-height: 1.5;
+}
+.pricing-passage-card-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 11px;
+  width: 12px;
+  height: 1px;
+  background: var(--brass);
+}
+
+/* Prix · système unifié · tabular-nums + Fraunces italique num */
+.pricing-price-num,
+.pricing-price-cur,
+.pricing-price-sign {
+  font-family: var(--font-jetbrains, monospace);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  white-space: nowrap;
+}
+.pricing-price-num {
+  font-size: clamp(28px, 3.6vw, 38px);
+  font-weight: 500;
+  color: var(--creme);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.pricing-price-cur {
+  font-size: 18px;
+  color: var(--creme-soft);
+  font-weight: 500;
+  margin-left: 4px;
+}
+.pricing-price-sign {
+  font-size: 28px;
+  color: var(--brass);
+  font-weight: 500;
+  margin-right: 2px;
+}
+.pricing-price-per {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--creme-mute);
+  text-transform: uppercase;
+  margin-left: 12px;
+}
+
+/* Forme 3 · encadré prof · pointillé indenté avec charnière + */
+.pricing-teacher-wrap {
+  margin-top: 32px;
+  position: relative;
+  padding-left: 48px;
+}
+@media (max-width: 900px) { .pricing-teacher-wrap { padding-left: 24px; } }
+.pricing-teacher-hinge {
+  position: absolute;
+  top: -18px;
+  left: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--espresso);
+  border: 1px solid var(--brass-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pricing-teacher-plus {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 24px;
+  color: var(--brass);
+  line-height: 1;
+}
+.pricing-teacher {
+  padding: 32px 28px 28px;
+  border: 1.5px dashed var(--brass-edge);
+  border-radius: 12px;
+  background: rgba(240, 206, 139, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+.pricing-teacher-badge {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border: 1px solid var(--brass-edge);
+  border-radius: 999px;
+  background: var(--brass-glow);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--brass);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.pricing-teacher-h {
+  margin: 6px 0 4px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(22px, 2.6vw, 28px);
+  color: var(--creme);
+  line-height: 1.15;
+}
+.pricing-teacher-lede {
+  margin: 0 0 8px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 16px;
+  color: var(--creme);
+  line-height: 1.45;
+  max-width: 44ch;
+}
+.pricing-teacher-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px 32px;
+}
+.pricing-teacher-list li {
+  position: relative;
+  padding-left: 18px;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--creme-soft);
+  line-height: 1.5;
+}
+.pricing-teacher-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 10px;
+  height: 1px;
+  background: var(--brass);
+}
+.pricing-teacher-price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 12px 0;
+  border-top: 1px solid var(--creme-hair);
+  flex-wrap: wrap;
+}
+.pricing-teacher-price .pricing-price-num,
+.pricing-teacher-price .pricing-price-sign { color: var(--brass); }
+
+/* /racines · toggle périodicité + 2 offres ──────────────────────── */
+.pricing-racines-offers { padding: 40px 0 24px; opacity: 0.6; transform: translateY(16px); transition: opacity 480ms var(--ease-enter), transform 480ms var(--ease-enter); }
+.pricing-racines-offers.in-view { opacity: 1; transform: none; }
+.pricing-period-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin: 0 0 32px;
+  border: 1px solid rgba(244, 235, 220, 0.14);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.15);
+}
+.pricing-period-tab {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--creme-soft);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 160ms var(--ease-enter), color 160ms var(--ease-enter);
+}
+.pricing-period-tab.on {
+  background: var(--brass);
+  color: var(--espresso);
+  font-weight: 600;
+}
+.pricing-period-tab:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+.pricing-racines-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: stretch;
+}
+@media (max-width: 900px) { .pricing-racines-grid { grid-template-columns: 1fr; } }
+.pricing-offer {
+  position: relative;
+  padding: 36px 32px 32px;
+  border-radius: 20px;
+  border: 1px solid rgba(244, 235, 220, 0.12);
+  background: rgba(244, 235, 220, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 8px 28px rgba(42, 15, 20, 0.35);
+}
+.pricing-offer-family {
+  background:
+    radial-gradient(ellipse 60% 50% at 100% 0%, rgba(240, 206, 139, 0.10), transparent 60%),
+    rgba(58, 26, 22, 0.65);
+  border-color: rgba(201, 132, 63, 0.42);
+}
+.pricing-offer-badge {
+  position: absolute;
+  top: -10px;
+  right: 24px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--brass);
+  color: var(--espresso);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+.pricing-offer-h {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(26px, 3vw, 32px);
+  color: var(--creme);
+  line-height: 1.1;
+}
+.pricing-offer-lede {
+  margin: 0 0 8px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 15px;
+  color: var(--creme-soft);
+  line-height: 1.45;
+}
+.pricing-offer-price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px 0;
+}
+.pricing-offer-alt {
+  margin: 0;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11.5px;
+  color: var(--creme-mute);
+  letter-spacing: 0.02em;
+}
+.pricing-offer-alt-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--creme-soft);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--brass-edge);
+  text-underline-offset: 3px;
+  transition: color 160ms var(--ease-enter);
+}
+.pricing-offer-alt-btn:hover { color: var(--brass); }
+.pricing-offer-list {
+  list-style: none;
+  padding: 12px 0 0;
+  margin: 0;
+  border-top: 1px solid rgba(244, 235, 220, 0.10);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+.pricing-offer-list li {
+  position: relative;
+  padding-left: 18px;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 14.5px;
+  color: var(--creme-soft);
+  line-height: 1.5;
+}
+.pricing-offer-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 11px;
+  width: 10px;
+  height: 1px;
+  background: var(--brass);
+}
+.pricing-offer .pricing-cta { align-self: flex-start; margin-top: 8px; }
+
+/* Prof reminder · sobre ────────────────────────────────────────── */
+.pricing-prof-reminder { padding: 32px 0 40px; }
+.pricing-prof-reminder-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 24px 20px;
+  text-align: center;
+  border-top: 1px solid var(--creme-hair);
+  border-bottom: 1px solid var(--creme-hair);
+}
+.pricing-prof-reminder-h {
+  margin: 0 0 8px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--creme);
+  line-height: 1.3;
+}
+.pricing-prof-reminder-sub {
+  margin: 0 0 14px;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--creme-soft);
+}
+.pricing-prof-reminder-cta {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--brass);
+  text-decoration: none;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--brass-edge);
+  transition: color 160ms var(--ease-enter), border-color 160ms var(--ease-enter);
+}
+.pricing-prof-reminder-cta:hover { color: var(--creme); border-color: var(--creme); }
+
+/* Réassurance · sobre, une ligne max par item ───────────────────── */
+.pricing-trust {
+  padding: 40px 0 64px;
+}
+.pricing-trust-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px 40px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--creme-hair);
+  margin-bottom: 20px;
+}
+.pricing-trust-line {
+  margin: 0;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 13.5px;
+  color: var(--creme-soft);
+  line-height: 1.5;
+}
+.pricing-founders {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--creme-mute);
+  line-height: 1.55;
+  max-width: 720px;
+}
+
+/* Motion · séquence d'entrée · stagger sur portes et niveaux ────── */
+@keyframes pricing-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.pricing-seuil-head,
+.pricing-seuil-doors > * {
+  animation: pricing-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.pricing-seuil-doors > *:nth-child(1) { animation-delay:  80ms; }
+.pricing-seuil-doors > *:nth-child(2) { animation-delay: 160ms; }
+.pricing-seuil-doors > *:nth-child(3) { animation-delay: 240ms; }
+.pricing-universe-hero-body,
+.pricing-entry-side,
+.pricing-entry-body,
+.pricing-passage-intro,
+.pricing-passage-card,
+.pricing-racines-grid > * {
+  animation: pricing-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.pricing-passage-card { animation-delay: 120ms; }
+.pricing-racines-grid > *:nth-child(1) { animation-delay:  60ms; }
+.pricing-racines-grid > *:nth-child(2) { animation-delay: 140ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pricing-seuil-head,
+  .pricing-seuil-doors > *,
+  .pricing-universe-hero-body,
+  .pricing-entry-side,
+  .pricing-entry-body,
+  .pricing-passage-intro,
+  .pricing-passage-card,
+  .pricing-racines-grid > *,
+  .pricing-passage,
+  .pricing-racines-offers,
+  .pricing-door,
+  .pricing-cta {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
 /* ── /eleves + /enseignants · Les chemins ────────────────────────
    Sprint 5. Deux portes émotionnelles. */
 .chemin-page {

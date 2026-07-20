@@ -1,12 +1,10 @@
 // Config tarifaire centralisée · YEMA.
-// Deux univers séparés : « les langues du monde » (le voyage) et
-// « les langues africaines » (les racines). Chaque univers a ses
-// prix sur deux rails · FCFA (Mobile Money, Afrique) et EUR (carte).
+// Deux univers séparés · « les langues du monde » (le voyage) et
+// « les langues africaines » (les racines). Un prix d'un univers ne
+// s'affiche jamais à côté de l'autre.
 //
-// Doctrine · on n'affiche jamais un prix d'un univers à côté de
-// l'autre. La page /pricing est un écran de choix ; /pricing/monde
-// et /pricing/racines rendent chacun son univers avec un seul rail
-// visible à la fois.
+// /pricing = seuil (aucun prix). /pricing/monde et /pricing/racines
+// rendent chacun leur univers avec un seul rail visible.
 
 export type Rail = "fcfa" | "eur";
 export type LevelId = "A1" | "A2" | "B1" | "B2" | "C1";
@@ -14,9 +12,6 @@ export type LevelId = "A1" | "A2" | "B1" | "B2" | "C1";
 export const LEVELS: readonly LevelId[] = ["A1", "A2", "B1", "B2", "C1"];
 
 // ── Univers 1 · Langues du monde · Le Passage par niveau ──────────
-// Le Passage · programme complet d'un niveau, en autonomie · 4 mois,
-// examens blancs corrigés, écrit relu, attestation. Prix qui grimpent
-// par niveau (charge pédagogique croissante).
 export const WORLD_PASSAGE_PRICES: Record<LevelId, Record<Rail, number>> = {
   A1: { fcfa: 49000, eur: 75 },
   A2: { fcfa: 54000, eur: 78 },
@@ -26,8 +21,7 @@ export const WORLD_PASSAGE_PRICES: Record<LevelId, Record<Rail, number>> = {
 };
 
 // Supplément « pack professeur » · s'AJOUTE au Passage, jamais un
-// produit parallèle. Affiché avec « + » devant le prix pour lever
-// toute ambiguïté.
+// produit parallèle. Affiché avec « + » devant.
 export const WORLD_TEACHER_ADD: Record<LevelId, Record<Rail, number>> = {
   A1: { fcfa: 30000, eur: 45 },
   A2: { fcfa: 40000, eur: 60 },
@@ -36,9 +30,7 @@ export const WORLD_TEACHER_ADD: Record<LevelId, Record<Rail, number>> = {
   C1: { fcfa: 75000, eur: 115 },
 };
 
-// ── Univers 2 · Langues africaines · deux offres seulement ───────
-// Pas de paliers complexes au lancement. Solo (1 personne, 1 langue)
-// ou Famille (2 adultes + 4 enfants max, chacun son profil).
+// ── Univers 2 · Langues africaines · Solo · Famille ──────────────
 export interface AfricanOfferPrice {
   month: number;
   year: number;
@@ -56,13 +48,29 @@ export const AFRICAN_FAMILY: AfricanOffer = {
   eur:  { month: 19.90, year: 149 },
 };
 
-// ── Format helpers · locale FR pour espaces fins entre milliers ──
+export type Period = "month" | "year";
+/** Périodicité par défaut adaptée au rail · mensuel accessible en
+ *  FCFA (Cameroun / Afrique de l'Ouest), annuel en EUR (diaspora,
+ *  paiement CB rare à petit ticket). L'autre reste visible d'un tap. */
+export function defaultPeriodFor(rail: Rail): Period {
+  return rail === "fcfa" ? "month" : "year";
+}
+
+// ── Langues citées dans les portes · toujours en groupe ──────────
+// Doctrine · au moins 2 langues cohabitent, jamais un pays d'origine
+// unique. On ne dit pas d'où viennent les langues, on dit ce qu'elles
+// permettent.
+export const WORLD_LANGS_FR = "allemand, anglais, français, et d’autres à venir";
+export const WORLD_LANGS_EN = "German, English, French, and more soon";
+export const RACINES_LANGS_FR = "wolof, bassa, douala, lingala, et d’autres à venir";
+export const RACINES_LANGS_EN = "Wolof, Bassa, Douala, Lingala, and more soon";
+
+// ── Format helpers · locale FR pour espaces insécables ───────────
+const NBSP = " ";
 export function fmtFcfa(v: number): string {
-  // Espace fine   entre milliers, remplacée par insécable
-  // pour garantir le rendu sur tous les navigateurs.
   return new Intl.NumberFormat("fr-FR", { useGrouping: true })
     .format(v)
-    .replace(/ /g, " ");
+    .replace(/ /g, NBSP);
 }
 export function fmtEur(v: number): string {
   const decimals = v % 1 === 0 ? 0 : 2;
@@ -74,174 +82,241 @@ export function fmtEur(v: number): string {
 export function fmtPrice(v: number, rail: Rail): string {
   return rail === "fcfa" ? fmtFcfa(v) : fmtEur(v);
 }
+/** Rend un prix + devise avec insécable garantie · « 49 000 FCFA », « 75 € ». */
+export function fmtPriceUnit(v: number, rail: Rail): string {
+  const value = fmtPrice(v, rail);
+  const unit = rail === "fcfa" ? "FCFA" : "€";
+  return `${value}${NBSP}${unit}`;
+}
 
 // ── Détection du rail par défaut · client-side ───────────────────
-// Heuristique · navigator.language (-CM, -SN, -CI, -CD, -TG, -BF,
-// -BJ, -ML, -NE, -GN, -MG, -CG, -GA) ou timezone Africa/* → FCFA.
-// Sinon EUR. L'utilisateur peut toujours basculer via le toggle.
 export function detectDefaultRail(): Rail {
   if (typeof window === "undefined") return "eur";
   try {
     const lang = navigator.language || "";
-    if (/-(CM|SN|CI|CD|TG|BF|BJ|ML|NE|GN|MG|CG|GA|GN|TD|CF|BI|RW|GH|NG)$/i.test(lang)) {
+    if (/-(CM|SN|CI|CD|TG|BF|BJ|ML|NE|GN|MG|CG|GA|TD|CF|BI|RW|GH|NG)$/i.test(lang)) {
       return "fcfa";
     }
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (tz && /^africa\//i.test(tz)) return "fcfa";
-  } catch {
-    // silent — défaut EUR
-  }
+  } catch { /* défaut EUR */ }
   return "eur";
 }
 
-// ── Copy éditoriale · bilingue, une seule source ──────────────────
-// Structuré pour matcher la doctrine actuelle du repo (inline dans
-// chaque page, jamais dans messages/*.json).
+// ── Copy éditoriale · bilingue, source de vérité unique ──────────
 export const PRICING_COPY = {
   fr: {
-    // Écran de choix · /pricing
-    doorsKicker: "Deux mondes, deux façons d'entrer.",
+    // Écran de choix · /pricing (seuil bref, aucun prix)
+    doorsKicker: "Le seuil",
     doorsTitle: "Que voulez-vous apprendre ?",
-    doorsSub: "Choisissez d'abord l'univers. Le tarif suit.",
+    doorsSub: "Deux mondes. Deux façons d’entrer dans la maison.",
     doorMonde: {
       kicker: "Le voyage",
       title: "Les langues du monde",
-      sub: "Partir, étudier, travailler. Un niveau, un but précis, une attestation.",
+      lede: "Partir. Étudier. Travailler. Rejoindre.",
+      langs: WORLD_LANGS_FR,
       cta: "Entrer",
     },
     doorRacines: {
       kicker: "Les racines",
       title: "Les langues africaines",
-      sub: "Pour soi, pour ses enfants. On habite la langue, on la transmet.",
+      lede: "Comprendre. Entretenir. Transmettre.",
+      langs: RACINES_LANGS_FR,
       cta: "Entrer",
     },
-    back: "← Retour au choix",
+    back: "← Retour au seuil",
     railFcfa: "FCFA",
     railEur: "€",
-    railNoteFcfa: "Mobile Money",
-    railNoteEur: "Carte bancaire",
-    // Bloc L'entrée · gratuit (haut des DEUX univers)
-    entryKicker: "L'entrée",
-    entryTitle: "Gratuit",
-    entrySub: "Pour tester la maison.",
+    railNoteFcfa: "Paiement Mobile Money",
+    railNoteEur: "Paiement par carte",
+    railPeriodMonth: "Mensuel",
+    railPeriodYear: "Annuel",
+    railPeriodMonthShort: "/ mois",
+    railPeriodYearShort: "/ an",
+
+    // Bloc L'entrée · une vraie leçon, pas un « essai »
+    entryKicker: "L’entrée",
+    entryTitle: "Commencer par une vraie leçon.",
+    entrySub: "Pour sentir la maison avant d’y entrer.",
     entryFeatures: [
-      "Test de niveau court",
-      "Première leçon complète",
+      "Un test de niveau court",
+      "Une première leçon complète",
       "Un récit de la Veillée, avec ses mots",
-      "Une conversation Klaus de 5 minutes",
-      "Mini-rapport personnalisé à la fin",
+      "Une conversation Klaus de cinq minutes",
+      "Un mini-rapport personnalisé",
     ],
-    entryCta: "Commencer gratuitement",
+    entryCta: "Commencer par une leçon",
+
     // Univers 1 · monde
-    mondeTitle: "Les langues du monde",
-    mondeSub: "Le programme complet d'un niveau, à votre rythme.",
-    passageKicker: "Étape 1 · Le Passage",
-    passageTitle: "Un niveau complet, en autonomie",
-    passageSub: "Exercices, IA, examens blancs corrigés, écrit relu, attestation. Accès 4 mois.",
-    passageLevel: "Niveau",
-    passagePrice: (level: LevelId) => `Le Passage · ${level}`,
+    mondeKicker: "Le voyage",
+    mondeTitle: "Un niveau complet, à votre rythme.",
+    mondeSub: "Le programme entier d’un niveau, sur quatre mois. Vous partez.",
+    passageStepLabel: "Le Passage",
+    passageIntro: "Choisissez un niveau. Le programme complet suit.",
     passagePer: "par niveau · 4 mois",
-    passageCta: "Prendre ce Passage",
-    // Univers 1 · pack prof
-    teacherKicker: "Étape 2 · Optionnel",
+    passageIncludes: [
+      "Programme complet du niveau",
+      "Exercices, pratique IA, écrit relu",
+      "Examens blancs corrigés",
+      "Attestation de fin de niveau",
+      "Accès quatre mois",
+    ],
+    passageCta: (lvl: LevelId) => `Commencer ${lvl}`,
+    passageLevelChoose: (lvl: LevelId) => `Choisir ${lvl}`,
+
+    teacherStepLabel: "Un professeur qui vous suit",
     teacherLede: "En option, ajoutez un professeur à votre Passage.",
-    teacherTitle: "Un professeur qui vous suit",
-    teacherSub: "Il corrige vos épreuves, pose des devoirs, anime le fil de discussion (audio compris). Un prix par niveau, en supplément du Passage.",
+    teacherIncludes: [
+      "Correction des épreuves",
+      "Devoirs et audios",
+      "Fil de discussion",
+      "Retour humain, rythme accompagné",
+    ],
     teacherBadge: "Supplément au Passage · optionnel",
-    teacherAdd: "en plus",
+    teacherPer: "à ajouter au Passage",
     teacherCta: "Ajouter un professeur",
+
     // Univers 2 · racines
-    racinesTitle: "Les langues africaines",
-    racinesSub: "On habite la langue. On la transmet.",
+    racinesKicker: "Les racines",
+    racinesTitle: "Habiter la langue.",
+    racinesTitleEm: "La transmettre.",
+    racinesSub: "Pour soi, pour ses enfants. Un abonnement sobre.",
     soloName: "Solo",
-    soloSub: "Une personne, une langue.",
-    soloMonth: "par mois",
-    soloYear: "par an",
-    soloOr: "ou",
-    soloCta: "Rejoindre",
+    soloLede: "Pour une personne.",
+    soloIncludes: [
+      "Une personne, une langue",
+      "La Veillée complète",
+      "Contes, proverbes, pratique",
+      "Résiliable à tout moment",
+    ],
+    soloCta: "Rejoindre Solo",
     familyName: "Famille",
-    familySub: "Deux adultes, jusqu'à quatre enfants. Chacun son profil.",
-    familyMonth: "par mois",
-    familyYear: "par an",
-    familyOr: "ou",
-    familyCta: "Rejoindre",
-    profReminderTitle: "Un professeur en supplément",
-    profReminderSub: "Le pack professeur des langues du monde est aussi disponible ici. Un prix par niveau, à ajouter à votre offre.",
+    familyLede: "Pour deux adultes et jusqu’à quatre enfants.",
+    familyIncludes: [
+      "Deux adultes, quatre enfants maximum",
+      "Un profil nominatif par personne, progression séparée",
+      "Contes, chansons, jeux pour enfants",
+      "Contrôle parental, limite de temps d’écran",
+    ],
+    familyCta: "Créer les profils de ma famille",
+    familyBadge: "Pour tout le foyer",
+
+    profReminderTitle: "Un professeur peut aussi accompagner votre parcours.",
+    profReminderSub: "Un pack par niveau, jamais au mois. Un locuteur natif accrédité assure le suivi.",
     profReminderCta: "Voir les tarifs professeur",
-    // Bas de page · mentions
-    foundersLine: "Cercle des Fondateurs · tarif garanti 24 mois, puis −30 % permanent tant que l'abonnement reste actif.",
-    guaranteeLine: "14 jours satisfait ou remboursé.",
-    // Sep & labels
-    sep: "·",
+
+    // Réassurance · sous le prix
+    trust: [
+      "Accès quatre mois pour Le Passage.",
+      "Abonnement mensuel ou annuel pour les racines.",
+      "Mobile Money ou carte bancaire.",
+      "Quatorze jours satisfait ou remboursé.",
+    ],
+    foundersLine: "Cercle des Fondateurs · tarif garanti vingt-quatre mois, puis −30 % permanent tant que l’abonnement reste actif.",
   },
   en: {
-    doorsKicker: "Two worlds, two ways in.",
+    doorsKicker: "The threshold",
     doorsTitle: "What do you want to learn?",
-    doorsSub: "Pick the universe first. Pricing follows.",
+    doorsSub: "Two worlds. Two ways to enter the house.",
     doorMonde: {
       kicker: "The journey",
       title: "World languages",
-      sub: "Leave, study, work. One level, one precise goal, one certificate.",
+      lede: "Leave. Study. Work. Reach out.",
+      langs: WORLD_LANGS_EN,
       cta: "Enter",
     },
     doorRacines: {
       kicker: "The roots",
       title: "African languages",
-      sub: "For yourself, for your children. Live in the language, pass it on.",
+      lede: "Understand. Tend. Pass on.",
+      langs: RACINES_LANGS_EN,
       cta: "Enter",
     },
-    back: "← Back to choice",
+    back: "← Back to the threshold",
     railFcfa: "FCFA",
     railEur: "€",
-    railNoteFcfa: "Mobile Money",
+    railNoteFcfa: "Mobile Money payment",
     railNoteEur: "Card payment",
-    entryKicker: "The Entrance",
-    entryTitle: "Free",
-    entrySub: "To taste the house.",
+    railPeriodMonth: "Monthly",
+    railPeriodYear: "Yearly",
+    railPeriodMonthShort: "/ month",
+    railPeriodYearShort: "/ year",
+
+    entryKicker: "The entrance",
+    entryTitle: "Start with a real lesson.",
+    entrySub: "To feel the house before entering it.",
     entryFeatures: [
-      "Short level test",
+      "A short level test",
       "One full lesson",
       "One story from the Veillée",
       "A five-minute Klaus conversation",
-      "Personal mini-report at the end",
+      "A personal mini-report",
     ],
-    entryCta: "Start free",
-    mondeTitle: "World languages",
-    mondeSub: "The full programme of one level, at your own pace.",
-    passageKicker: "Step 1 · The Passage",
-    passageTitle: "A full level, on your own",
-    passageSub: "Exercises, AI, corrected mock exams, reviewed writing, certificate. Four-month access.",
-    passageLevel: "Level",
-    passagePrice: (level: LevelId) => `The Passage · ${level}`,
+    entryCta: "Start with a lesson",
+
+    mondeKicker: "The journey",
+    mondeTitle: "A full level, at your own pace.",
+    mondeSub: "The complete programme of one level, across four months. You leave.",
+    passageStepLabel: "The Passage",
+    passageIntro: "Pick a level. The full programme follows.",
     passagePer: "per level · 4 months",
-    passageCta: "Take this Passage",
-    teacherKicker: "Step 2 · Optional",
+    passageIncludes: [
+      "Full level programme",
+      "Exercises, AI practice, reviewed writing",
+      "Corrected mock exams",
+      "End-of-level certificate",
+      "Four-month access",
+    ],
+    passageCta: (lvl: LevelId) => `Start ${lvl}`,
+    passageLevelChoose: (lvl: LevelId) => `Choose ${lvl}`,
+
+    teacherStepLabel: "A teacher who follows you",
     teacherLede: "Optionally, add a teacher to your Passage.",
-    teacherTitle: "A teacher who follows you",
-    teacherSub: "They mark your work, set homework, run the class thread (audio included). One price per level, on top of the Passage.",
+    teacherIncludes: [
+      "Marked assignments",
+      "Homework and audio",
+      "Class thread",
+      "Human feedback, guided rhythm",
+    ],
     teacherBadge: "Add-on to the Passage · optional",
-    teacherAdd: "extra",
+    teacherPer: "to add to the Passage",
     teacherCta: "Add a teacher",
-    racinesTitle: "African languages",
-    racinesSub: "Live in the language. Pass it on.",
+
+    racinesKicker: "The roots",
+    racinesTitle: "Live in the language.",
+    racinesTitleEm: "Pass it on.",
+    racinesSub: "For yourself, for your children. A sober subscription.",
     soloName: "Solo",
-    soloSub: "One person, one language.",
-    soloMonth: "per month",
-    soloYear: "per year",
-    soloOr: "or",
-    soloCta: "Join",
+    soloLede: "For one person.",
+    soloIncludes: [
+      "One person, one language",
+      "The full Veillée",
+      "Tales, proverbs, practice",
+      "Cancel any time",
+    ],
+    soloCta: "Join Solo",
     familyName: "Family",
-    familySub: "Two adults, up to four children. Each with their own profile.",
-    familyMonth: "per month",
-    familyYear: "per year",
-    familyOr: "or",
-    familyCta: "Join",
-    profReminderTitle: "A teacher as an add-on",
-    profReminderSub: "The world-languages teacher pack is also available here. One price per level, on top of your offer.",
+    familyLede: "For two adults and up to four children.",
+    familyIncludes: [
+      "Two adults, four children maximum",
+      "One named profile per person, separate progress",
+      "Tales, songs, games for children",
+      "Parent controls, screen-time limit",
+    ],
+    familyCta: "Create my family profiles",
+    familyBadge: "For the whole home",
+
+    profReminderTitle: "A teacher can also accompany your journey.",
+    profReminderSub: "One pack per level, never per month. A vetted native speaker leads the follow-up.",
     profReminderCta: "See teacher prices",
-    foundersLine: "Founders' Circle · rate locked for 24 months, then −30% forever as long as the subscription is active.",
-    guaranteeLine: "14 days money-back.",
-    sep: "·",
+
+    trust: [
+      "Four-month access for the Passage.",
+      "Monthly or yearly subscription for the roots.",
+      "Mobile Money or card payment.",
+      "Fourteen days money-back.",
+    ],
+    foundersLine: "Founders’ Circle · rate locked for twenty-four months, then −30% forever as long as the subscription stays active.",
   },
 } as const;
 
