@@ -1008,7 +1008,7 @@ button, [role="button"] {
 }
 .lhero-stat-num {
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: clamp(24px, 3vw, 32px);
+  font-size: clamp(20px, 2.4vw, 24px);
   font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--creme);
@@ -2111,7 +2111,7 @@ button, [role="button"] {
   background: var(--espresso-2);
   border: 1px solid var(--creme-hair);
   border-radius: var(--r-panel);
-  padding: 36px 32px 32px;
+  padding: 24px 24px 24px;
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4);
 }
 .lauth-eye {
@@ -2473,7 +2473,7 @@ button, [role="button"] {
 }
 .lonboard-h {
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: clamp(24px, 3vw, 32px);
+  font-size: clamp(20px, 2.4vw, 24px);
   font-weight: 500;
   line-height: 1.15;
   letter-spacing: -0.01em;
@@ -3579,7 +3579,7 @@ button, [role="button"] {
   background: var(--espresso-2);
   border: 1px solid var(--creme-hair);
   border-radius: var(--r-panel);
-  padding: 32px 28px 28px;
+  padding: 20px 20px 20px;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -8229,7 +8229,7 @@ body.foyer-switching .foyer {
   font-family: var(--font-fraunces), Georgia, serif;
   font-weight: 500;
   font-style: italic;
-  font-size: clamp(22px, 2.6vw, 28px);
+  font-size: clamp(18px, 2.2vw, 22px);
   line-height: 1.25;
   color: var(--creme);
 }
@@ -10662,7 +10662,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-entry-free-inner {
   border: 1px solid var(--creme-hair);
   border-radius: var(--r-panel);
-  padding: 32px 32px 28px;
+  padding: 24px 24px 20px;
   background: rgba(244, 235, 220, 0.02);
 }
 .pricing-entry-free-body {
@@ -10719,7 +10719,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   margin: 8px 0 6px;
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
-  font-size: clamp(24px, 3vw, 32px);
+  font-size: clamp(20px, 2.4vw, 24px);
   color: var(--creme);
   line-height: 1.15;
 }
@@ -11014,21 +11014,6 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-step-plus::before { right: calc(100% + 16px); }
 .pricing-step-plus::after  { left:  calc(100% + 16px); }
 
-/* Filigrane BrandY dans les hero d'univers · absolute, opacity très
-   basse, position discrète en haut-droite pour rappeler la marque
-   sans écraser le contenu. Composant BrandY posé côté JSX. */
-.pricing-universe-hero-brand {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  opacity: 0.08;
-  pointer-events: none;
-  z-index: 0;
-}
-@media (max-width: 640px) {
-  .pricing-universe-hero-brand { display: none; }
-}
-
 /* Séquence d'entrée · stagger sur les blocs et niveaux · UNE fois. */
 @keyframes pricing-in {
   from { opacity: 0; transform: translateY(24px); }
@@ -11079,10 +11064,10 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
    Composition asymétrique · kicker à gauche, question dominante,
    deux portes séparées par le Confluent sur la ligne de bascule. */
 .pricing-seuil {
-  padding-bottom: 160px;
+  padding-bottom: 88px;
 }
 .pricing-seuil-head {
-  padding: 128px 0 72px;
+  padding: 64px 0 32px;
 }
 .pricing-seuil-kicker {
   margin: 0 0 20px;
@@ -11097,7 +11082,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(40px, 6.4vw, 76px);
+  font-size: clamp(28px, 4.4vw, 44px);
   line-height: 1.02;
   letter-spacing: -0.02em;
   color: var(--creme);
@@ -11107,12 +11092,12 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-seuil-lede {
   margin: 0;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: clamp(18px, 2.4vw, 24px);
+  font-size: clamp(15px, 1.7vw, 18px);
   line-height: 1.4;
   color: var(--creme-soft);
   max-width: 44ch;
 }
-.pricing-seuil-doors-wrap { padding: 40px 0 0; }
+.pricing-seuil-doors-wrap { padding: 16px 0 0; }
 .pricing-seuil-doors {
   position: relative;
   display: grid;
@@ -11124,37 +11109,17 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 @media (max-width: 768px) {
   .pricing-seuil-doors { grid-template-columns: 1fr; gap: 24px; }
 }
-.pricing-seuil-y {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 3;
-  padding: 12px;
-  background: var(--espresso);
-  border: 1px solid var(--brass-edge);
-  border-radius: 999px;
-  box-shadow: 0 8px 24px rgba(11, 8, 6, 0.5);
-  filter: drop-shadow(0 0 12px rgba(184, 135, 62, 0.15));
-}
-@media (max-width: 768px) {
-  .pricing-seuil-y {
-    top: 50%;
-    left: 50%;
-  }
-}
-
-/* Portes · trois radius différents (grand, arrondi, généreux). */
+/* Portes · radius généreux, ombre teintée par univers. */
 .pricing-door {
   position: relative;
   overflow: hidden;
-  padding: 56px 40px 40px;
-  min-height: 380px;
+  padding: 20px 20px 20px;
+  min-height: 260px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   text-decoration: none;
-  border-radius: 28px;
+  border-radius: 18px;
   border: 1px solid var(--creme-hair);
   transition: transform 240ms var(--ease-enter),
               box-shadow 240ms var(--ease-enter),
@@ -11208,7 +11173,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(30px, 3.6vw, 42px);
+  font-size: clamp(22px, 2.8vw, 30px);
   line-height: 1.05;
   letter-spacing: -0.015em;
   color: var(--creme);
@@ -11248,7 +11213,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 }
 
 /* Univers · topbar retour + toggle rail ─────────────────────────── */
-.pricing-universe { padding-bottom: 160px; }
+.pricing-universe { padding-bottom: 88px; }
 .pricing-universe-topbar { padding: 20px 0 40px; }
 .pricing-universe-topbar-inner {
   display: flex;
@@ -11272,19 +11237,8 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 /* Hero univers · asymétrique · BrandY filigrane haut-droite ────── */
 .pricing-universe-hero {
   position: relative;
-  padding: 40px 0 88px;
+  padding: 24px 0 48px;
   overflow: hidden;
-}
-.pricing-universe-hero-brand {
-  position: absolute;
-  top: 8px;
-  right: -32px;
-  opacity: 0.08;
-  pointer-events: none;
-  z-index: 0;
-}
-@media (max-width: 768px) {
-  .pricing-universe-hero-brand { display: none; }
 }
 .pricing-universe-hero-grid {
   position: relative;
@@ -11302,7 +11256,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(36px, 5.6vw, 64px);
+  font-size: clamp(26px, 4vw, 38px);
   line-height: 1.02;
   letter-spacing: -0.02em;
   color: var(--creme);
@@ -11313,7 +11267,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-universe-sub {
   margin: 0;
   font-family: var(--font-fraunces), Georgia, serif;
-  font-size: clamp(17px, 2vw, 22px);
+  font-size: clamp(14px, 1.6vw, 16px);
   line-height: 1.5;
   color: var(--creme-soft);
   max-width: 44ch;
@@ -11358,7 +11312,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 }
 
 /* L'entrée · asymétrique · titre à gauche · liste à droite ─────── */
-.pricing-entry { padding: 40px 0 88px; }
+.pricing-entry { padding: 24px 0 48px; }
 .pricing-entry-grid {
   display: grid;
   grid-template-columns: 5fr 7fr;
@@ -11372,7 +11326,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(24px, 3vw, 32px);
+  font-size: clamp(20px, 2.4vw, 24px);
   line-height: 1.15;
   color: var(--creme);
   text-wrap: balance;
@@ -11443,7 +11397,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-cta-ghost:hover { color: var(--creme); border-color: var(--brass); background: var(--brass-glow); }
 
 /* Passage · 3 formes distinctes ────────────────────────────────── */
-.pricing-passage { padding: 40px 0 24px; opacity: 0.6; transform: translateY(16px); transition: opacity 480ms var(--ease-enter), transform 480ms var(--ease-enter); }
+.pricing-passage { padding: 24px 0 16px; opacity: 0.6; transform: translateY(16px); transition: opacity 480ms var(--ease-enter), transform 480ms var(--ease-enter); }
 .pricing-passage.in-view { opacity: 1; transform: none; }
 .pricing-passage-grid {
   display: grid;
@@ -11458,7 +11412,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(24px, 3vw, 32px);
+  font-size: clamp(20px, 2.4vw, 24px);
   line-height: 1.15;
   color: var(--creme);
   text-wrap: balance;
@@ -11514,7 +11468,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 
 /* Forme 2 · carte Passage · éditoriale, radius 16, laiton posé */
 .pricing-passage-card {
-  padding: 32px 32px 28px;
+  padding: 24px 24px 20px;
   border: 1px solid var(--brass-edge);
   border-radius: 16px;
   background:
@@ -11595,7 +11549,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   white-space: nowrap;
 }
 .pricing-price-num {
-  font-size: clamp(28px, 3.6vw, 38px);
+  font-size: clamp(22px, 2.8vw, 30px);
   font-weight: 500;
   color: var(--creme);
   letter-spacing: -0.01em;
@@ -11626,7 +11580,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-teacher-wrap {
   margin-top: 32px;
   position: relative;
-  padding-left: 48px;
+  padding-left: 32px;
 }
 @media (max-width: 900px) { .pricing-teacher-wrap { padding-left: 24px; } }
 .pricing-teacher-hinge {
@@ -11650,7 +11604,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   line-height: 1;
 }
 .pricing-teacher {
-  padding: 32px 28px 28px;
+  padding: 20px 20px 20px;
   border: 1.5px dashed var(--brass-edge);
   border-radius: 12px;
   background: rgba(240, 206, 139, 0.03);
@@ -11677,7 +11631,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(22px, 2.6vw, 28px);
+  font-size: clamp(18px, 2.2vw, 22px);
   color: var(--creme);
   line-height: 1.15;
 }
@@ -11726,7 +11680,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-teacher-price .pricing-price-sign { color: var(--brass); }
 
 /* /racines · toggle périodicité + 2 offres ──────────────────────── */
-.pricing-racines-offers { padding: 40px 0 24px; opacity: 0.6; transform: translateY(16px); transition: opacity 480ms var(--ease-enter), transform 480ms var(--ease-enter); }
+.pricing-racines-offers { padding: 24px 0 16px; opacity: 0.6; transform: translateY(16px); transition: opacity 480ms var(--ease-enter), transform 480ms var(--ease-enter); }
 .pricing-racines-offers.in-view { opacity: 1; transform: none; }
 .pricing-period-toggle {
   display: inline-flex;
@@ -11764,7 +11718,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 @media (max-width: 900px) { .pricing-racines-grid { grid-template-columns: 1fr; } }
 .pricing-offer {
   position: relative;
-  padding: 36px 32px 32px;
+  padding: 24px 24px 24px;
   border-radius: 20px;
   border: 1px solid rgba(244, 235, 220, 0.12);
   background: rgba(244, 235, 220, 0.03);
@@ -11797,7 +11751,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-fraunces), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(26px, 3vw, 32px);
+  font-size: clamp(20px, 2.4vw, 24px);
   color: var(--creme);
   line-height: 1.1;
 }
@@ -11903,7 +11857,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 
 /* Réassurance · sobre, une ligne max par item ───────────────────── */
 .pricing-trust {
-  padding: 40px 0 64px;
+  padding: 24px 0 40px;
 }
 .pricing-trust-grid {
   display: grid;

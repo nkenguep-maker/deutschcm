@@ -12,7 +12,6 @@ import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingNav } from "@/components/landing/LandingNav";
-import { BrandY } from "@/components/brand/BrandY";
 import { frTypo } from "@/components/landing/typo";
 import {
   PRICING_COPY,
@@ -106,11 +105,8 @@ export default function PricingMondePage() {
           </div>
         </section>
 
-        {/* Hero · asymétrique · BrandY en filigrane haut-droite */}
+        {/* Hero · asymétrique */}
         <section className="pricing-universe-hero">
-          <div className="pricing-universe-hero-brand" aria-hidden="true">
-            <BrandY variant="world" state="static" size={220} />
-          </div>
           <div className="maison-container pricing-universe-hero-grid">
             <div className="pricing-universe-hero-body">
               <p className="pricing-seuil-kicker">{t(c.mondeKicker).toUpperCase()}</p>

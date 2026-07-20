@@ -10,7 +10,6 @@ import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingNav } from "@/components/landing/LandingNav";
-import { BrandY } from "@/components/brand/BrandY";
 import { frTypo } from "@/components/landing/typo";
 import { PRICING_COPY } from "@/lib/pricing";
 
@@ -90,11 +89,6 @@ export default function PricingChoicePage() {
                   {t(c.doorMonde.cta)} <span aria-hidden="true">→</span>
                 </span>
               </Link>
-
-              {/* Le Confluent · seule audace visuelle · signe l'articulation */}
-              <div className="pricing-seuil-y" aria-hidden="true">
-                <BrandY variant="mono" state="static" size={64} />
-              </div>
 
               <Link
                 href={`/${locale}/pricing/racines`}
