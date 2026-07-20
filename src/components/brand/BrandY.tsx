@@ -121,10 +121,12 @@ export function BrandY({
         opacity="0"
       />
 
-      {/* Bras monde — part de (26,12), plonge vers le confluent */}
+      {/* Bras monde — ligne droite de (24,10) au confluent · évite
+          le blob des bras courbes qui rendaient le logo illisible à
+          taille nav. Y géométrique clair à toute taille. */}
       <path
         className="brand-arm brand-arm-world"
-        d="M26 12 C33 30 41 46 50 58"
+        d="M24 10 L50 58"
         stroke={strokeColor}
         strokeWidth="13"
         strokeLinecap="round"
@@ -132,10 +134,10 @@ export function BrandY({
         pathLength="1"
       />
 
-      {/* Bras source — part de (77,14), descend en spirale douce */}
+      {/* Bras source — ligne droite de (76,10) au confluent. */}
       <path
         className="brand-arm brand-arm-source"
-        d="M77 14 C71 20 69 28 65 36 C61 44 56 52 50 58"
+        d="M76 10 L50 58"
         stroke={strokeColor}
         strokeWidth="13"
         strokeLinecap="round"

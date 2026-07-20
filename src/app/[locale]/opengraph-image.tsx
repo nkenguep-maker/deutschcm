@@ -72,8 +72,8 @@ export default async function Image({ params }: OGParams) {
                 <stop offset="1" stopColor="#D9A855" />
               </radialGradient>
             </defs>
-            <path d="M26 12 C33 30 41 46 50 58" stroke="url(#ogBg)" strokeWidth="13" strokeLinecap="round" fill="none" />
-            <path d="M77 14 C71 20 69 28 65 36 C61 44 56 52 50 58" stroke="url(#ogBg)" strokeWidth="13" strokeLinecap="round" fill="none" />
+            <path d="M24 10 L50 58" stroke="url(#ogBg)" strokeWidth="13" strokeLinecap="round" fill="none" />
+            <path d="M76 10 L50 58" stroke="url(#ogBg)" strokeWidth="13" strokeLinecap="round" fill="none" />
             <path d="M50 58 L50 128" stroke="url(#ogBg)" strokeWidth="14" strokeLinecap="round" fill="none" />
             <circle cx="50" cy="58" r="10" fill="rgba(184, 135, 62, 0.25)" />
             <circle cx="50" cy="58" r="6.5" fill="url(#ogBe)" />
