@@ -61,7 +61,7 @@ export default async function Image({ params }: OGParams) {
             zIndex: 2,
           }}
         >
-          <svg viewBox="0 0 100 120" width="380" height="456" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 100 140" width="360" height="504" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="ogBg" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0" stopColor="#D9A855" />
@@ -74,7 +74,7 @@ export default async function Image({ params }: OGParams) {
             </defs>
             <path d="M26 12 C33 30 41 46 50 58" stroke="url(#ogBg)" strokeWidth="13" strokeLinecap="round" fill="none" />
             <path d="M77 14 C71 20 69 28 65 36 C61 44 56 52 50 58" stroke="url(#ogBg)" strokeWidth="13" strokeLinecap="round" fill="none" />
-            <path d="M50 58 L50 103" stroke="url(#ogBg)" strokeWidth="14" strokeLinecap="round" fill="none" />
+            <path d="M50 58 L50 128" stroke="url(#ogBg)" strokeWidth="14" strokeLinecap="round" fill="none" />
             <circle cx="50" cy="58" r="10" fill="rgba(184, 135, 62, 0.25)" />
             <circle cx="50" cy="58" r="6.5" fill="url(#ogBe)" />
           </svg>

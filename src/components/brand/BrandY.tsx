@@ -2,8 +2,10 @@
 
 // BrandY · le Confluent — logo YEMA définitif, composant SVG vivant.
 // Deux bras (monde + source) qui convergent au niveau du confluent
-// (50, 58), puis un tronc qui descend jusqu'à 103. Une braise au
-// confluent — la lettre naît d'un feu, pas d'une police.
+// (50, 58), puis un tronc qui descend jusqu'à 128 dans un viewBox
+// 100×140. Le tronc mesure ~70 unités contre ~46 pour la V du haut :
+// le rapport donne un Y sans ambiguïté (jamais un V à queue courte).
+// Une braise au confluent — la lettre naît d'un feu, pas d'une police.
 //
 // Variantes visuelles
 //   world   · gradient laiton chaud (D9A855 → B8873E), braise F0CE8B→D9A855
@@ -88,9 +90,9 @@ export function BrandY({
       className={`brand-y ${className}`}
       data-variant={variant}
       data-state={effectiveState}
-      viewBox="0 0 100 120"
+      viewBox="0 0 100 140"
       width={size}
-      height={(size * 120) / 100}
+      height={(size * 140) / 100}
       preserveAspectRatio="xMidYMid meet"
       role={decorative ? undefined : "img"}
       aria-label={ariaLabel}
@@ -141,10 +143,12 @@ export function BrandY({
         pathLength="1"
       />
 
-      {/* Tronc — descend depuis le confluent (50,58) jusqu'à (50,103) */}
+      {/* Tronc — descend depuis le confluent (50,58) jusqu'à (50,128).
+          70 unités de long dans un viewBox 140, contre 46 pour la V du
+          haut. Le trunk domine visuellement · lecture Y sans ambiguïté. */}
       <path
         className="brand-trunk"
-        d="M50 58 L50 103"
+        d="M50 58 L50 128"
         stroke={strokeColor}
         strokeWidth="14"
         strokeLinecap="round"
