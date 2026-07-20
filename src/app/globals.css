@@ -10892,6 +10892,182 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   .pricing-grid-2 { grid-template-columns: 1fr; }
 }
 
+/* ── Pricing · passe de raffinement premium ────────────────────────
+   Micro-typo, matière, motion, ambiances. Ne change ni prix ni
+   structure — seulement la forme. */
+
+/* Grain SVG discret · appliqué sur les grands fonds pour rappeler
+   la matière (papier, textile). Data-URL inline, 40×40 tuilé, opacity
+   dans le SVG lui-même (0.04). Aucune requête HTTP additionnelle. */
+.pricing-page {
+  position: relative;
+  isolation: isolate;
+}
+.pricing-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95   0 0 0 0 0.92   0 0 0 0 0.86   0 0 0 0.035 0'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+  background-repeat: repeat;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* Univers racines · fond terre effectif sur toute la page + halo
+   radial doux depuis le coin haut-gauche pour la chaleur. */
+.pricing-universe-racines {
+  background: var(--terre);
+  position: relative;
+}
+.pricing-universe-racines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 80% 40% at 15% 0%, rgba(240, 206, 139, 0.10), transparent 60%),
+    radial-gradient(ellipse 60% 30% at 85% 10%, rgba(201, 132, 63, 0.08), transparent 55%);
+  pointer-events: none;
+}
+.pricing-universe-monde {
+  position: relative;
+}
+.pricing-universe-monde::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 70% 35% at 15% 0%, rgba(240, 206, 139, 0.07), transparent 60%),
+    radial-gradient(ellipse 55% 30% at 90% 8%, rgba(217, 168, 85, 0.05), transparent 55%);
+  pointer-events: none;
+}
+
+/* Doors · hover renforcé (lift + ombre projetée qui s'étend) */
+.pricing-door {
+  transition: transform 220ms var(--ease-enter),
+              box-shadow 220ms var(--ease-enter),
+              filter 220ms var(--ease-enter);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+.pricing-door:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.32);
+  filter: brightness(1.05);
+}
+
+/* Titres · text-wrap balance sur les gros, plus d'air en desktop */
+.pricing-choice-head { padding: 96px 0 32px; }
+.pricing-doors-section { padding: 32px 0 120px; }
+.pricing-choice-head .maison-h,
+.pricing-door-title,
+.pricing-entry-free-title,
+.pricing-step-h {
+  text-wrap: balance;
+}
+@media (min-width: 768px) {
+  .pricing-entry-free { padding: 40px 0 56px; }
+  .pricing-step { padding: 40px 0 96px; }
+  .pricing-universe-topbar { padding: 24px 0 0; }
+}
+
+/* tabular-nums sur TOUS les prix — alignement vertical parfait dans
+   la grille de niveaux et cohérence entre cartes. white-space nowrap
+   pour empêcher toute coupure entre montant et devise. */
+.pricing-plan-price-num,
+.pricing-plan-price-unit,
+.pricing-level-price,
+.pricing-level-price-unit,
+.pricing-teacher-add,
+.pricing-plan-price-symbol {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.pricing-plan-price-num,
+.pricing-level-price,
+.pricing-teacher-add {
+  white-space: nowrap;
+}
+
+/* Séparateur renforcé entre étape 1 et étape 2 · filet sur toute la
+   largeur + kicker Étape 2 plus grand pour lever l'ambiguïté « deux
+   Passages ». Le décalage 32px de l'encadré reste. */
+.pricing-teacher-kicker {
+  margin: 8px 0 2px;
+  font-size: 12px !important;
+  letter-spacing: 0.22em !important;
+}
+.pricing-step-plus {
+  margin: 48px auto 32px;
+  position: relative;
+}
+.pricing-step-plus::before,
+.pricing-step-plus::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: min(200px, calc(50vw - 60px));
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--creme-hair), transparent);
+}
+.pricing-step-plus::before { right: calc(100% + 16px); }
+.pricing-step-plus::after  { left:  calc(100% + 16px); }
+
+/* Filigrane BrandY dans les hero d'univers · absolute, opacity très
+   basse, position discrète en haut-droite pour rappeler la marque
+   sans écraser le contenu. Composant BrandY posé côté JSX. */
+.pricing-universe-hero-brand {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+@media (max-width: 640px) {
+  .pricing-universe-hero-brand { display: none; }
+}
+
+/* Séquence d'entrée · stagger sur les blocs et niveaux · UNE fois. */
+@keyframes pricing-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.pricing-choice-head,
+.pricing-doors,
+.pricing-entry-free-inner,
+.pricing-step > .maison-container > * {
+  animation: pricing-in 480ms var(--ease-enter) both;
+}
+.pricing-doors .pricing-door:nth-child(1) { animation-delay: 60ms; }
+.pricing-doors .pricing-door:nth-child(2) { animation-delay: 140ms; }
+.pricing-level-grid .pricing-level:nth-child(1) { animation: pricing-in 480ms var(--ease-enter) both; animation-delay:  60ms; }
+.pricing-level-grid .pricing-level:nth-child(2) { animation: pricing-in 480ms var(--ease-enter) both; animation-delay: 120ms; }
+.pricing-level-grid .pricing-level:nth-child(3) { animation: pricing-in 480ms var(--ease-enter) both; animation-delay: 180ms; }
+.pricing-level-grid .pricing-level:nth-child(4) { animation: pricing-in 480ms var(--ease-enter) both; animation-delay: 240ms; }
+.pricing-level-grid .pricing-level:nth-child(5) { animation: pricing-in 480ms var(--ease-enter) both; animation-delay: 300ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pricing-choice-head,
+  .pricing-doors,
+  .pricing-doors .pricing-door,
+  .pricing-entry-free-inner,
+  .pricing-step > .maison-container > *,
+  .pricing-level-grid .pricing-level {
+    animation: none !important;
+  }
+}
+
+/* Insécable dans les prix affichés · classe utilitaire · les JSX
+   posent {" "} entre montant et symbole, mais on renforce ici
+   pour éviter toute coupure orpheline. */
+.pricing-plan-price,
+.pricing-level {
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+
 /* ── /eleves + /enseignants · Les chemins ────────────────────────
    Sprint 5. Deux portes émotionnelles. */
 .chemin-page {

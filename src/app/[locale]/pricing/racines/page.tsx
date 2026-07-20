@@ -15,6 +15,7 @@ import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingNav } from "@/components/landing/LandingNav";
+import { BrandY } from "@/components/brand/BrandY";
 import { frTypo } from "@/components/landing/typo";
 import {
   PRICING_COPY,
@@ -108,7 +109,10 @@ export default function PricingRacinesPage() {
           </div>
         </section>
 
-        <section className="pricing-choice-head">
+        <section className="pricing-choice-head" style={{ position: "relative" }}>
+          <div className="pricing-universe-hero-brand" aria-hidden="true">
+            <BrandY variant="sources" state="static" size={180} />
+          </div>
           <div className="maison-container">
             <p className="maison-kicker">{t(c.doorRacines.kicker).toUpperCase()}</p>
             <h1 className="maison-h">{t(c.racinesTitle)}</h1>

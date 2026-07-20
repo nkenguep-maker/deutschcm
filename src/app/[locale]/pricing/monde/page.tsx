@@ -15,6 +15,7 @@ import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingNav } from "@/components/landing/LandingNav";
+import { BrandY } from "@/components/brand/BrandY";
 import { frTypo } from "@/components/landing/typo";
 import {
   PRICING_COPY,
@@ -112,8 +113,11 @@ export default function PricingMondePage() {
           </div>
         </section>
 
-        {/* En-tête univers */}
-        <section className="pricing-choice-head">
+        {/* En-tête univers · signature Confluent en filigrane discret */}
+        <section className="pricing-choice-head" style={{ position: "relative" }}>
+          <div className="pricing-universe-hero-brand" aria-hidden="true">
+            <BrandY variant="world" state="static" size={180} />
+          </div>
           <div className="maison-container">
             <p className="maison-kicker">{t(c.doorMonde.kicker).toUpperCase()}</p>
             <h1 className="maison-h">{t(c.mondeTitle)}</h1>
@@ -162,7 +166,7 @@ export default function PricingMondePage() {
                   >
                     <span className="pricing-level-code">{lvl}</span>
                     <span className="pricing-level-price">
-                      {fmtPrice(price, rail)} <span className="pricing-level-price-unit">{railSymbol}</span>
+                      {fmtPrice(price, rail)}{" "}<span className="pricing-level-price-unit">{railSymbol}</span>
                     </span>
                   </button>
                 );
