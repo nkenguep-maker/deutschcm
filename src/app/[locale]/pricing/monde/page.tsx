@@ -128,7 +128,7 @@ export default function PricingMondePage() {
               <ul className="pricing-entry-list">
                 {c.entryFeatures.map((f) => <li key={f}>{t(f)}</li>)}
               </ul>
-              <Link href={`/${locale}/register`} className="pricing-cta pricing-cta-ghost">
+              <Link href={`/${locale}/register?universe=monde`} className="pricing-cta pricing-cta-ghost">
                 {t(c.entryCta)} <span aria-hidden="true">→</span>
               </Link>
             </div>
@@ -176,7 +176,7 @@ export default function PricingMondePage() {
               <ul className="pricing-passage-card-list">
                 {c.passageIncludes.map((f) => <li key={f}>{t(f)}</li>)}
               </ul>
-              <Link href={`/${locale}/register?plan=passage-${level.toLowerCase()}`} className="pricing-cta pricing-cta-primary">
+              <Link href={`/${locale}/register?universe=monde&plan=passage-${level.toLowerCase()}`} className="pricing-cta pricing-cta-primary">
                 {t(c.passageCta(level))} <span aria-hidden="true">→</span>
               </Link>
             </article>
@@ -200,7 +200,7 @@ export default function PricingMondePage() {
                 <span className="pricing-price-cur">{railSymbol}</span>
                 <span className="pricing-price-per">{t(c.teacherPer)} · {level}</span>
               </div>
-              <Link href={`/${locale}/register?plan=passage-${level.toLowerCase()}&prof=1`} className="pricing-cta pricing-cta-ghost">
+              <Link href={`/${locale}/register?universe=monde&plan=passage-${level.toLowerCase()}&prof=1`} className="pricing-cta pricing-cta-ghost">
                 {t(c.teacherCta)} <span aria-hidden="true">→</span>
               </Link>
             </aside>

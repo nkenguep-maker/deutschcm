@@ -95,6 +95,20 @@ export const SITE_META: SiteMeta = {
       twitterTitle: "S'inscrire · YEMA",
       ogImageAlt: "YEMA — ouvrir la porte, créer un compte",
     },
+    onboardingMonde: {
+      title: "Le voyage · Onboarding — YEMA",
+      description: "Trois questions, une minute. La langue, le pourquoi, votre point de départ.",
+      ogTitle: "Le voyage · Onboarding YEMA",
+      twitterTitle: "Onboarding · Le voyage",
+      ogImageAlt: "YEMA — onboarding, les langues du monde",
+    },
+    onboardingRacines: {
+      title: "Les racines · Onboarding — YEMA",
+      description: "Trois questions, une minute. Choisissez votre langue, dites votre lien, pour qui vous apprenez.",
+      ogTitle: "Les racines · Onboarding YEMA",
+      twitterTitle: "Onboarding · Les racines",
+      ogImageAlt: "YEMA — onboarding, les langues africaines",
+    },
     login: {
       title: "Se connecter — YEMA",
       description: "Retour au foyer. Reprendre la leçon là où vous l'avez laissée.",
@@ -180,6 +194,20 @@ export const SITE_META: SiteMeta = {
       ogTitle: "Sign up to YEMA — start tonight",
       twitterTitle: "Sign up · YEMA",
       ogImageAlt: "YEMA — open the door, create an account",
+    },
+    onboardingMonde: {
+      title: "The journey · Onboarding — YEMA",
+      description: "Three questions, one minute. Your language, your why, your starting point.",
+      ogTitle: "The journey · YEMA onboarding",
+      twitterTitle: "Onboarding · The journey",
+      ogImageAlt: "YEMA — onboarding, world languages",
+    },
+    onboardingRacines: {
+      title: "The roots · Onboarding — YEMA",
+      description: "Three questions, one minute. Pick your language, name your bond, tell us for whom.",
+      ogTitle: "The roots · YEMA onboarding",
+      twitterTitle: "Onboarding · The roots",
+      ogImageAlt: "YEMA — onboarding, African languages",
     },
     login: {
       title: "Sign in — YEMA",

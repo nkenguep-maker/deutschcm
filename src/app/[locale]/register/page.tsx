@@ -1,275 +1,349 @@
 "use client";
 
-// /register · Sprint 8 « La porte ». Élève UNIQUEMENT.
-// Les rôles TEACHER et CENTER ne s'inscrivent plus ici : la maison
-// les rencontre d'abord (voir /enseignants et /landing B2B).
+// /register · La porte d'entrée YEMA · commune aux deux univers.
+// Accepte ?universe=monde|racines et ?plan=<slug> depuis /pricing.
+// Après signup, route vers /onboarding/{universe} · si aucun univers,
+// tombe sur /onboarding/student (legacy fallback).
 //
-// Flux :
-//   1. Le compte (nom, email, mot de passe, cap)
-//   2. Le cap devient le but du compte (pilote dashboard + pricing)
-// Une ligne sous le formulaire renvoie vers les portes B2B.
+// Un seul champ email/téléphone (auto-détection · +237… vs email).
+// Google OAuth optionnel · si non configuré côté Supabase, le bouton
+// affiche une erreur douce sans casser le flow.
 
 import Link from "next/link";
 import { useRouter } from "@/navigation";
 import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
-import { BrandLockup } from "@/components/brand/BrandLockup";
+import { BrandY } from "@/components/brand/BrandY";
 
-type Cap = "franchir" | "grandir" | "transmettre" | "moi";
+type Universe = "monde" | "racines";
 
-interface Copy {
-  brand: string;
-  kicker: string;
-  title: string;
-  titleEm: string;
-  lede: string;
-  fldName: string;
-  fldEmail: string;
-  fldPassword: string;
-  capLbl: string;
-  caps: readonly { id: Cap; label: string }[];
-  consent: string;
-  ageConsent: string;
-  submit: string;
-  submitLoading: string;
-  otherLbl: string;
-  otherEm: string;
-  otherTeacher: string;
-  otherCenter: string;
-  alreadyLbl: string;
-  alreadyLink: string;
-  successTitle: string;
-  successBody: string;
-  errPassword: string;
-  errConsent: string;
-  errAge: string;
-  errInvalid: string;
-}
-
-const COPY_FR: Copy = {
+const COPY_FR = {
   brand: "YEMA",
-  kicker: "Créer votre compte",
-  title: "Choisissez votre cap.",
-  titleEm: "La maison s'ouvre.",
-  lede: "Un compte apprenant·e. La première leçon est gratuite. La maison rencontre les enseignants et les centres d'une autre manière.",
-  fldName: "Prénom",
-  fldEmail: "Email",
+  kicker: "L'entrée",
+  title: "Créer votre compte.",
+  lede: "Gratuit pour goûter, avant tout paiement.",
+  contextMonde: (plan: string) => `Vous avez choisi ${plan}.`,
+  contextRacines: (plan: string) => `Vous avez choisi ${plan}.`,
+  fldName: "Nom",
+  fldContact: "E-mail ou téléphone",
+  fldContactHint: "Format e-mail (nom@domaine) ou téléphone (+237…).",
   fldPassword: "Mot de passe",
-  capLbl: "Quel est votre but ultime ?",
-  caps: [
-    { id: "franchir",    label: "Réussir mon examen, partir" },
-    { id: "grandir",     label: "Progresser là où je vis" },
-    { id: "transmettre", label: "Transmettre à mes enfants" },
-    { id: "moi",         label: "Apprendre pour moi" },
-  ],
-  consent: "J'accepte les conditions générales et la politique de confidentialité.",
-  ageConsent: "Je confirme avoir au moins 16 ans.",
+  fldPasswordHint: "Au moins huit caractères.",
   submit: "Créer mon compte",
-  submitLoading: "Création…",
-  otherLbl: "Enseignant·e ? Centre ?",
-  otherEm: "La maison vous rencontre d'abord.",
-  otherTeacher: "Enseignant·e — l'accréditation",
-  otherCenter: "Centre — réserver une démo",
-  alreadyLbl: "Déjà un compte ?",
-  alreadyLink: "Se connecter",
-  successTitle: "Vérifiez votre email.",
+  submitLoading: "On ouvre la porte…",
+  sep: "ou",
+  google: "Continuer avec Google",
+  googleUnavailable: "Google n'est pas encore branché.",
+  errPassword: "Mot de passe · au moins huit caractères.",
+  errContactEmpty: "Un e-mail ou un numéro, pour vous retrouver.",
+  errContactInvalid: "Ce numéro n'a pas l'air complet.",
+  errEmailInvalid: "Cet e-mail n'a pas l'air valide.",
+  errExists: "Cet e-mail a déjà un compte. Se connecter ?",
+  errGeneric: "Un souci de connexion. Réessayez dans un instant.",
+  loginPrompt: "Déjà un compte ?",
+  loginCta: "Se connecter",
+  legal: "En créant votre compte, vous acceptez nos conditions et notre politique de confidentialité.",
+  successTitle: "Vérifiez votre boîte.",
   successBody: "Nous vous avons envoyé un lien pour confirmer votre inscription.",
-  errPassword: "Choisissez un mot de passe d'au moins 6 caractères.",
-  errConsent: "Merci d'accepter les conditions.",
-  errAge: "Vous devez confirmer votre âge.",
-  errInvalid: "Cette adresse ne fonctionne pas — essayez-en une autre.",
+} as const;
+
+const COPY_EN = {
+  brand: "YEMA",
+  kicker: "The entrance",
+  title: "Create your account.",
+  lede: "Free to taste, before any payment.",
+  contextMonde: (plan: string) => `You picked ${plan}.`,
+  contextRacines: (plan: string) => `You picked ${plan}.`,
+  fldName: "Name",
+  fldContact: "Email or phone",
+  fldContactHint: "Email format (name@domain) or phone (+237…).",
+  fldPassword: "Password",
+  fldPasswordHint: "At least eight characters.",
+  submit: "Create my account",
+  submitLoading: "Opening the door…",
+  sep: "or",
+  google: "Continue with Google",
+  googleUnavailable: "Google isn't wired up yet.",
+  errPassword: "Password · at least eight characters.",
+  errContactEmpty: "An email or a phone, to find you again.",
+  errContactInvalid: "This number doesn't look complete.",
+  errEmailInvalid: "This email doesn't look valid.",
+  errExists: "This email already has an account. Sign in?",
+  errGeneric: "A connection hiccup. Try again in a moment.",
+  loginPrompt: "Already have an account?",
+  loginCta: "Sign in",
+  legal: "By creating your account, you accept our terms and privacy policy.",
+  successTitle: "Check your inbox.",
+  successBody: "We sent you a link to confirm your registration.",
+} as const;
+
+const PLAN_LABEL_FR: Record<string, string> = {
+  "passage-a1": "Le Passage · Allemand A1",
+  "passage-a2": "Le Passage · Allemand A2",
+  "passage-b1": "Le Passage · Allemand B1",
+  "passage-b2": "Le Passage · Allemand B2",
+  "passage-c1": "Le Passage · Allemand C1",
+  "racines-solo": "Solo · une personne, une langue",
+  "racines-famille": "Famille · deux adultes et jusqu'à quatre enfants",
+};
+const PLAN_LABEL_EN: Record<string, string> = {
+  "passage-a1": "The Passage · German A1",
+  "passage-a2": "The Passage · German A2",
+  "passage-b1": "The Passage · German B1",
+  "passage-b2": "The Passage · German B2",
+  "passage-c1": "The Passage · German C1",
+  "racines-solo": "Solo · one person, one language",
+  "racines-famille": "Family · two adults and up to four children",
 };
 
-const COPY_EN: Copy = {
-  brand: "YEMA",
-  kicker: "Create your account",
-  title: "Pick your cap.",
-  titleEm: "The house opens.",
-  lede: "A learner account. The first lesson is free. The house meets teachers and centers another way.",
-  fldName: "First name",
-  fldEmail: "Email",
-  fldPassword: "Password",
-  capLbl: "What is your ultimate goal?",
-  caps: [
-    { id: "franchir",    label: "Pass my exam, leave" },
-    { id: "grandir",     label: "Grow where I live" },
-    { id: "transmettre", label: "Pass on to my children" },
-    { id: "moi",         label: "Learn for me" },
-  ],
-  consent: "I accept the terms and the privacy policy.",
-  ageConsent: "I confirm I am at least 16.",
-  submit: "Create my account",
-  submitLoading: "Creating…",
-  otherLbl: "Teacher? Center?",
-  otherEm: "The house meets you first.",
-  otherTeacher: "Teacher — accreditation",
-  otherCenter: "Center — book a demo",
-  alreadyLbl: "Already have an account?",
-  alreadyLink: "Log in",
-  successTitle: "Check your email.",
-  successBody: "We sent you a link to confirm your registration.",
-  errPassword: "Choose a password of at least 6 characters.",
-  errConsent: "Please accept the terms.",
-  errAge: "You must confirm your age.",
-  errInvalid: "This address didn't work — try another one.",
-};
+/** Détecte si la valeur ressemble à un téléphone (+237… ou digits). */
+function isPhoneLike(v: string): boolean {
+  const s = v.trim().replace(/[\s-]/g, "");
+  return /^\+?\d{7,}$/.test(s);
+}
+function isEmailLike(v: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+}
 
 export default function RegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next");
   const locale = useLocale();
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
   const c = loc === "en" ? COPY_EN : COPY_FR;
   const t = (s: string) => (loc === "fr" ? frTypo(s) : s);
 
+  const universeParam = searchParams.get("universe");
+  const universe: Universe | null =
+    universeParam === "monde" || universeParam === "racines" ? universeParam : null;
+  const plan = searchParams.get("plan") ?? "";
+  const prof = searchParams.get("prof") === "1";
+
+  const planLabel = useMemo(() => {
+    const map = loc === "en" ? PLAN_LABEL_EN : PLAN_LABEL_FR;
+    const base = map[plan] ?? "";
+    if (base && prof) return loc === "en" ? `${base} + teacher` : `${base} + professeur`;
+    return base;
+  }, [plan, prof, loc]);
+
   const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
+  const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
-  const [cap, setCap] = useState<Cap>("franchir");
-  const [consent, setConsent] = useState(false);
-  const [ageConsent, setAgeConsent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // Auto-focus premier champ visible au mount (accessibilité)
+  useEffect(() => {
+    const el = document.querySelector<HTMLInputElement>("input[data-autofocus]");
+    el?.focus();
+  }, []);
+
+  const onboardingRoute = universe === "racines"
+    ? "/onboarding/racines"
+    : universe === "monde"
+      ? "/onboarding/monde"
+      : "/onboarding/student";
+
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError(null);
 
-    if (password.length < 6) { setError(c.errPassword); setLoading(false); return; }
-    if (!consent) { setError(c.errConsent); setLoading(false); return; }
-    if (!ageConsent) { setError(c.errAge); setLoading(false); return; }
+    const trimmed = contact.trim();
+    if (!trimmed) { setError(c.errContactEmpty); return; }
+    if (password.length < 8) { setError(c.errPassword); return; }
 
+    const usePhone = isPhoneLike(trimmed);
+    const useEmail = isEmailLike(trimmed);
+    if (!usePhone && !useEmail) {
+      setError(loc === "en" ? "That doesn't look like an email or a phone." : "Ce n'est ni un e-mail ni un numéro.");
+      return;
+    }
+
+    setLoading(true);
     const supabase = createClient();
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName, role: "STUDENT", cap },
-        emailRedirectTo: next
-          ? `${location.origin}/auth/callback?next=${encodeURIComponent(next)}`
-          : `${location.origin}/auth/callback`,
+    const options = {
+      data: {
+        full_name: fullName || null,
+        role: "STUDENT" as const,
+        universe: universe ?? null,
+        plan: plan || null,
+        prof,
       },
-    });
+      emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/${locale}${onboardingRoute}`)}`,
+    };
+
+    const credentials = usePhone
+      ? { phone: trimmed.replace(/[\s-]/g, ""), password, options }
+      : { email: trimmed, password, options };
+
+    const { data, error: signUpError } = await supabase.auth.signUp(credentials);
 
     if (signUpError) {
-      setError(signUpError.message || c.errInvalid);
+      const msg = signUpError.message?.toLowerCase() ?? "";
+      if (msg.includes("already") || msg.includes("exists") || msg.includes("registered")) {
+        setError(c.errExists);
+      } else if (msg.includes("email")) {
+        setError(c.errEmailInvalid);
+      } else if (msg.includes("phone")) {
+        setError(c.errContactInvalid);
+      } else {
+        setError(c.errGeneric);
+      }
       setLoading(false);
       return;
     }
 
-    if (data.session) {
-      await fetch("/api/fix-role", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ role: "STUDENT", cap }),
-      }).catch(() => {});
+    // Cookie rôle pour le middleware (ne bloque pas si échec)
+    try {
       document.cookie = `user_role=STUDENT;path=/;max-age=2592000`;
       document.cookie = `active_space=STUDENT;path=/;max-age=2592000`;
-      router.push("/onboarding/student");
+    } catch { /* ok */ }
+
+    if (data.session) {
+      // Session immédiate (téléphone confirmation sms, ou email confirmé)
+      router.push(`/${locale}${onboardingRoute}`);
       router.refresh();
       return;
     }
+    // Sinon on montre l'écran « vérifiez votre boîte »
     setSuccess(true);
     setLoading(false);
   }
 
+  async function handleGoogle() {
+    setError(null);
+    setGoogleLoading(true);
+    try {
+      const supabase = createClient();
+      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/${locale}${onboardingRoute}`)}`;
+      const params = new URLSearchParams();
+      if (universe) params.set("universe", universe);
+      if (plan) params.set("plan", plan);
+      if (prof) params.set("prof", "1");
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${redirectTo}${params.toString() ? `&${params.toString()}` : ""}`,
+          queryParams: { access_type: "offline", prompt: "consent" },
+        },
+      });
+      if (oauthError) {
+        setError(c.googleUnavailable);
+        setGoogleLoading(false);
+      }
+      // Redirect handled by supabase · loading stays true
+    } catch {
+      setError(c.googleUnavailable);
+      setGoogleLoading(false);
+    }
+  }
+
+  const universeClass = universe === "racines" ? "entry-universe-racines" : universe === "monde" ? "entry-universe-monde" : "";
+
   return (
-    <div className="porte-page">
-      <header className="porte-header">
-        <Link href={`/${locale}`} className="porte-brand">
-          <BrandLockup orientation="horizontal" variant="world" state="static" size={28} />
+    <div className={`entry-page ${universeClass}`} data-universe={universe ?? "none"}>
+      <header className="entry-header">
+        <Link href={`/${locale}`} className="entry-brand" aria-label={c.brand}>
+          <BrandY variant={universe === "racines" ? "sources" : "world"} state="static" size={36} />
         </Link>
-        <p className="porte-alt">
-          {c.alreadyLbl}{" "}
-          <Link href={`/${locale}/login`}>{t(c.alreadyLink)}</Link>
+        <p className="entry-header-alt">
+          {t(c.loginPrompt)}{" "}
+          <Link href={`/${locale}/login`} className="entry-header-link">{t(c.loginCta)}</Link>
         </p>
       </header>
 
-      <main className="porte-main">
-        <div className="porte-card">
+      <main className="entry-main">
+        <div className="entry-card">
           {success ? (
-            <div className="porte-success">
-              <h1 className="porte-h">{t(c.successTitle)}</h1>
-              <p className="porte-lede">{t(c.successBody)}</p>
+            <div className="entry-success">
+              <h1 className="entry-h">{t(c.successTitle)}</h1>
+              <p className="entry-lede">{t(c.successBody)}</p>
             </div>
           ) : (
             <>
-              <p className="maison-kicker" style={{ textAlign: "center" }}>{t(c.kicker)}</p>
-              <h1 className="porte-h">
-                {t(c.title)} <em>{t(c.titleEm)}</em>
-              </h1>
-              <p className="porte-lede">{t(c.lede)}</p>
+              <p className="entry-kicker">{t(c.kicker).toUpperCase()}</p>
+              <h1 className="entry-h">{t(c.title)}</h1>
+              <p className="entry-lede">{t(c.lede)}</p>
 
-              <form onSubmit={handleRegister} className="porte-form" noValidate>
-                <label className="ens-form-field">
-                  <span>{t(c.fldName)}</span>
-                  <input type="text" required autoComplete="given-name"
-                         value={fullName} onChange={(e) => setFullName(e.target.value)} />
-                </label>
-                <label className="ens-form-field">
-                  <span>{t(c.fldEmail)}</span>
-                  <input type="email" required autoComplete="email"
-                         value={email} onChange={(e) => setEmail(e.target.value)} />
-                </label>
-                <label className="ens-form-field ens-form-field-wide">
-                  <span>{t(c.fldPassword)}</span>
-                  <input type="password" required autoComplete="new-password" minLength={6}
-                         value={password} onChange={(e) => setPassword(e.target.value)} />
-                </label>
+              {planLabel ? (
+                <div className="entry-context" role="note">
+                  <span className="entry-context-dot" aria-hidden="true" />
+                  <span className="entry-context-text">
+                    {universe === "racines"
+                      ? t(c.contextRacines(planLabel))
+                      : t(c.contextMonde(planLabel))}
+                  </span>
+                </div>
+              ) : null}
 
-                <fieldset className="porte-caps">
-                  <legend>{t(c.capLbl)}</legend>
-                  <div className="porte-caps-grid">
-                    {c.caps.map((k) => (
-                      <label key={k.id} className={`porte-cap ${cap === k.id ? "on" : ""}`}>
-                        <input
-                          type="radio"
-                          name="cap"
-                          value={k.id}
-                          checked={cap === k.id}
-                          onChange={() => setCap(k.id)}
-                        />
-                        <span>{t(k.label)}</span>
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-
-                <label className="porte-check">
-                  <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} required />
-                  <span>{t(c.consent)}</span>
-                </label>
-                <label className="porte-check">
-                  <input type="checkbox" checked={ageConsent} onChange={(e) => setAgeConsent(e.target.checked)} required />
-                  <span>{t(c.ageConsent)}</span>
+              <form onSubmit={handleRegister} className="entry-form" noValidate>
+                <label className="entry-field">
+                  <span className="entry-field-lbl">{t(c.fldName)}</span>
+                  <input
+                    type="text"
+                    autoComplete="name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="entry-input"
+                    data-autofocus
+                  />
                 </label>
 
-                {error ? <p className="ens-form-error" role="alert">{error}</p> : null}
+                <label className="entry-field">
+                  <span className="entry-field-lbl">{t(c.fldContact)}</span>
+                  <input
+                    type="text"
+                    inputMode="email"
+                    required
+                    autoComplete="username"
+                    value={contact}
+                    onChange={(e) => setContact(e.target.value)}
+                    className="entry-input"
+                    aria-describedby="contact-hint"
+                  />
+                  <span id="contact-hint" className="entry-field-hint">{t(c.fldContactHint)}</span>
+                </label>
 
-                <button type="submit" className="maison-porte-cta" disabled={loading}>
-                  {loading ? c.submitLoading : t(c.submit)}
+                <label className="entry-field">
+                  <span className="entry-field-lbl">{t(c.fldPassword)}</span>
+                  <input
+                    type="password"
+                    required
+                    autoComplete="new-password"
+                    minLength={8}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="entry-input"
+                    aria-describedby="password-hint"
+                  />
+                  <span id="password-hint" className="entry-field-hint">{t(c.fldPasswordHint)}</span>
+                </label>
+
+                {error ? <p className="entry-err" role="alert">{error}</p> : null}
+
+                <button type="submit" className="entry-cta entry-cta-primary" disabled={loading}>
+                  {loading ? t(c.submitLoading) : t(c.submit)}
+                </button>
+
+                <div className="entry-sep" aria-hidden="true"><span>{c.sep}</span></div>
+
+                <button
+                  type="button"
+                  className="entry-cta entry-cta-ghost"
+                  onClick={handleGoogle}
+                  disabled={googleLoading || loading}
+                >
+                  <span className="entry-google-dot" aria-hidden="true" />
+                  {t(c.google)}
                 </button>
               </form>
 
-              <div className="porte-other">
-                <p className="porte-other-lbl">
-                  {t(c.otherLbl)} <em>{t(c.otherEm)}</em>
-                </p>
-                <div className="porte-other-links">
-                  <Link href={`/${locale}/enseignants`} className="maison-link-strong">
-                    {t(c.otherTeacher)}
-                  </Link>
-                  <Link href={`/${locale}/landing`} className="maison-link-strong">
-                    {t(c.otherCenter)}
-                  </Link>
-                </div>
-              </div>
+              <p className="entry-legal">{t(c.legal)}</p>
             </>
           )}
         </div>

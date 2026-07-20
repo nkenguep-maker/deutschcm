@@ -137,7 +137,7 @@ export default function PricingRacinesPage() {
               <ul className="pricing-entry-list">
                 {c.entryFeatures.map((f) => <li key={f}>{t(f)}</li>)}
               </ul>
-              <Link href={`/${locale}/register`} className="pricing-cta pricing-cta-ghost">
+              <Link href={`/${locale}/register?universe=racines`} className="pricing-cta pricing-cta-ghost">
                 {t(c.entryCta)} <span aria-hidden="true">→</span>
               </Link>
             </div>
@@ -175,7 +175,7 @@ export default function PricingRacinesPage() {
                 <ul className="pricing-offer-list">
                   {c.soloIncludes.map((f) => <li key={f}>{t(f)}</li>)}
                 </ul>
-                <Link href={`/${locale}/register?plan=racines-solo`} className="pricing-cta pricing-cta-ghost">
+                <Link href={`/${locale}/register?universe=racines&plan=racines-solo`} className="pricing-cta pricing-cta-ghost">
                   {t(c.soloCta)} <span aria-hidden="true">→</span>
                 </Link>
               </article>
@@ -199,7 +199,7 @@ export default function PricingRacinesPage() {
                 <ul className="pricing-offer-list">
                   {c.familyIncludes.map((f) => <li key={f}>{t(f)}</li>)}
                 </ul>
-                <Link href={`/${locale}/register?plan=racines-famille`} className="pricing-cta pricing-cta-primary">
+                <Link href={`/${locale}/register?universe=racines&plan=racines-famille`} className="pricing-cta pricing-cta-primary">
                   {t(c.familyCta)} <span aria-hidden="true">→</span>
                 </Link>
               </article>
