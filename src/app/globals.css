@@ -249,6 +249,15 @@ button, [role="button"] {
   color: var(--creme);
   overflow-x: hidden;
   position: relative;
+  /* LandingNav est position:fixed top:0 z-index:100 · sans padding-top
+     sur .landing, tout contenu commence sous la nav et le premier
+     bloc reste caché. Desktop nav = ~70px (14 padding + 42 lockup +
+     14 padding) · mobile nav = ~62px (10 + 42 + 10). On garde 6px
+     de marge visible dans les deux cas. */
+  padding-top: 76px;
+}
+@media (max-width: 768px) {
+  .landing { padding-top: 68px; }
 }
 
 /* Subtle warm noise texture — lit une seule fois, réappliquée par tiling */
@@ -11259,7 +11268,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 /* Hero univers · asymétrique · BrandY filigrane haut-droite ────── */
 .pricing-universe-hero {
   position: relative;
-  padding: 56px 0 32px;
+  padding: 32px 0 32px;
   overflow: hidden;
 }
 .pricing-universe-hero-grid {
@@ -11305,10 +11314,8 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .pricing-page {
   position: relative;
   isolation: isolate;
-  /* La LandingNav est position: fixed, top:0, z-index: 100.
-     On pousse le contenu de la page en dessous pour éviter que le
-     topbar (retour + rail) se retrouve caché derrière la nav. */
-  padding-top: 76px;
+  /* Padding-top géré au niveau .landing (76 desktop / 68 mobile) ·
+     s'applique à toutes les pages qui utilisent LandingNav. */
 }
 .pricing-page::before {
   content: "";
