@@ -10522,6 +10522,376 @@ body.foyer-switching .foyer {
   display: none;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   PRICING · REFONTE 2 UNIVERS · écran de choix + /monde + /racines.
+   Deux portes séparées, un rail visible à la fois, jamais de mélange.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── /pricing · écran de choix · 2 portes cliquables ─────────────── */
+.pricing-choice-head {
+  padding: 60px 0 20px;
+  text-align: center;
+}
+.pricing-doors-section {
+  padding: 20px 0 80px;
+}
+.pricing-doors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+@media (max-width: 768px) {
+  .pricing-doors { grid-template-columns: 1fr; }
+}
+.pricing-door {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 40px 32px 32px;
+  border-radius: 20px;
+  text-decoration: none;
+  color: var(--creme);
+  min-height: 320px;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--dur-touch) var(--ease-enter),
+              box-shadow var(--dur-touch) var(--ease-enter),
+              filter var(--dur-touch) var(--ease-enter);
+  border: 1px solid var(--creme-hair);
+}
+.pricing-door:hover { transform: translateY(-2px); filter: brightness(1.05); }
+.pricing-door:focus-visible { outline: 3px solid var(--brass); outline-offset: 4px; }
+.pricing-door-monde {
+  background: linear-gradient(160deg, var(--espresso-2) 0%, var(--espresso) 100%);
+  border-color: var(--brass-edge);
+}
+.pricing-door-monde::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 20% 10%, rgba(240, 206, 139, 0.10), transparent 55%);
+  pointer-events: none;
+}
+.pricing-door-racines {
+  background: linear-gradient(160deg, var(--terre-2) 0%, var(--terre) 100%);
+  border-color: rgba(201, 132, 63, 0.4);
+}
+.pricing-door-racines::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 20% 10%, rgba(201, 132, 63, 0.12), transparent 55%);
+  pointer-events: none;
+}
+.pricing-door-kicker {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: var(--brass);
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+.pricing-door-title {
+  margin: 4px 0 6px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(28px, 3.6vw, 36px);
+  color: var(--creme);
+  line-height: 1.1;
+  position: relative;
+  z-index: 1;
+}
+.pricing-door-sub {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--creme-soft);
+  max-width: 32ch;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+.pricing-door-cta {
+  margin-top: 20px;
+  padding: 12px 22px;
+  border-radius: var(--r-pill);
+  background: var(--brass);
+  color: var(--espresso);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  align-self: flex-start;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── /pricing/monde et /pricing/racines · topbar retour + rail ───── */
+.pricing-universe-topbar {
+  padding: 18px 0 0;
+}
+.pricing-universe-topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.pricing-universe-back {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--creme-soft);
+  text-decoration: none;
+  padding: 6px 0;
+}
+.pricing-universe-back:hover { color: var(--brass); }
+.pricing-universe-back:focus-visible { outline: 2px solid var(--brass); outline-offset: 4px; border-radius: 4px; }
+
+/* Fond terre pour l'univers racines (rappel Transmettre). */
+.pricing-universe-racines .pricing-choice-head { background: transparent; }
+.pricing-universe-racines .landing,
+body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
+
+/* ── Bloc L'entrée · gratuit · en tête des deux univers ──────────── */
+.pricing-entry-free {
+  padding: 20px 0 40px;
+}
+.pricing-entry-free-inner {
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-panel);
+  padding: 32px 32px 28px;
+  background: rgba(244, 235, 220, 0.02);
+}
+.pricing-entry-free-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 640px;
+}
+.pricing-entry-free-title {
+  margin: 4px 0 4px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(28px, 3.4vw, 36px);
+  color: var(--brass);
+  line-height: 1;
+}
+.pricing-entry-free-sub {
+  margin: 0 0 6px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 15px;
+  color: var(--creme-soft);
+}
+.pricing-entry-free-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px 24px;
+}
+.pricing-entry-free-list li {
+  position: relative;
+  padding-left: 16px;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--creme-soft);
+  line-height: 1.5;
+}
+.pricing-entry-free-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 8px;
+  height: 1px;
+  background: var(--brass);
+}
+
+/* ── Univers monde · étapes 1 · Passage · sélecteur niveau ──────── */
+.pricing-step {
+  padding: 20px 0 40px;
+}
+.pricing-step-h {
+  margin: 8px 0 6px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(24px, 3vw, 32px);
+  color: var(--creme);
+  line-height: 1.15;
+}
+.pricing-step-sub {
+  margin: 0 0 24px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 15px;
+  color: var(--creme-soft);
+  max-width: 640px;
+}
+
+/* Sélecteur de niveau · 5 puces alignées, monospace */
+.pricing-level-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 24px;
+}
+@media (max-width: 640px) {
+  .pricing-level-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.pricing-level {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border: 1px solid var(--creme-hair);
+  border-radius: var(--r-card);
+  background: rgba(244, 235, 220, 0.02);
+  color: var(--creme);
+  cursor: pointer;
+  transition: border-color var(--dur-touch) var(--ease-enter),
+              background var(--dur-touch) var(--ease-enter);
+}
+.pricing-level:hover { border-color: var(--brass-edge); }
+.pricing-level:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.pricing-level.on {
+  border-color: var(--brass);
+  background: var(--brass-glow);
+}
+.pricing-level-code {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--brass);
+}
+.pricing-level-price {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 12px;
+  color: var(--creme-soft);
+  white-space: nowrap;
+}
+.pricing-level-price-unit {
+  font-size: 10px;
+  color: var(--creme-mute);
+  letter-spacing: 0.08em;
+}
+
+/* Carte Passage · hero, badge avec le niveau sélectionné */
+.pricing-passage-card { min-height: auto; }
+.pricing-plan-price-symbol {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 15px;
+  color: var(--creme-soft);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+/* + gros signe entre étapes 1 et 2 */
+.pricing-step-plus {
+  margin: 32px auto 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--brass-edge);
+  background: var(--brass-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 30px;
+  color: var(--brass);
+  line-height: 1;
+}
+
+/* Étape 2 · pack prof · bordure pointillée pour SIGNIFIER supplément */
+.pricing-teacher-kicker {
+  margin-top: 8px;
+}
+.pricing-teacher-lede {
+  margin: 4px 0 20px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--creme);
+  max-width: 640px;
+}
+.pricing-teacher-supplement {
+  position: relative;
+  padding: 28px 26px 24px;
+  border: 2px dashed var(--brass-edge);
+  border-radius: var(--r-panel);
+  background: rgba(240, 206, 139, 0.03);
+  display: flex;
+  flex-direction: column;
+  margin-left: 32px;
+}
+@media (max-width: 640px) {
+  .pricing-teacher-supplement { margin-left: 0; }
+}
+.pricing-teacher-badge {
+  align-self: flex-start;
+  margin: -2px 0 12px;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--brass-edge);
+  background: var(--brass-glow);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--brass);
+  text-transform: uppercase;
+}
+.pricing-teacher-add {
+  color: var(--brass);
+}
+
+/* Univers racines · rappel prof (bloc discret sous les 2 offres) */
+.pricing-prof-reminder {
+  padding: 30px 0 20px;
+}
+.pricing-prof-reminder-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 22px 24px;
+  border-top: 1px solid var(--creme-hair);
+  border-bottom: 1px solid var(--creme-hair);
+  text-align: center;
+}
+.pricing-prof-reminder-sub {
+  margin: 6px 0 12px;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--creme-soft);
+}
+.pricing-prof-reminder-cta {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--brass);
+  text-decoration: none;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--brass-edge);
+}
+.pricing-prof-reminder-cta:hover { color: var(--creme); border-color: var(--creme); }
+
+/* Grille à 2 col (racines · Solo + Famille) */
+.pricing-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+@media (max-width: 768px) {
+  .pricing-grid-2 { grid-template-columns: 1fr; }
+}
+
 /* ── /eleves + /enseignants · Les chemins ────────────────────────
    Sprint 5. Deux portes émotionnelles. */
 .chemin-page {
