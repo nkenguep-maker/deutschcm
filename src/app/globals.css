@@ -14019,6 +14019,15 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   color: #E8B4B7;
   line-height: 1.4;
 }
+.entry-err p { margin: 0; color: inherit; }
+.entry-err-actions { margin-top: 6px; }
+.entry-err-link {
+  color: #F4EBDC;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 600;
+}
+.entry-err-link:hover { text-decoration-thickness: 2px; }
 
 .entry-cta {
   display: inline-flex;

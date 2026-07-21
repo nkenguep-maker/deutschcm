@@ -197,7 +197,11 @@
       "rate_limited": "Too many attempts. Wait a minute and try again.",
       "network": "Can't connect. Check your network.",
       "timeout": "The server is taking too long. Check your network and try again.",
-      "generic": "A connection hiccup. Try again in a moment."
+      "generic": "A connection hiccup. Try again in a moment.",
+      "session_expired": "Your session has expired. Sign in again — your answers are waiting.",
+      "session_expired_action": "Sign in again",
+      "finish_error": "We couldn't save your path. Try again in a moment.",
+      "finish_error_action": "Try again"
     }
   },
   "dashboard": {

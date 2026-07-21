@@ -14,6 +14,7 @@ export type AuthErrorKey =
   | "rate_limited"            // trop de tentatives
   | "network"                 // fetch a échoué, offline, DNS, etc.
   | "timeout"                 // dépasse le timeout que nous imposons
+  | "session_expired"         // 401 pendant un flux authentifié (session invalidée)
   | "generic";                // rien d'identifiable
 
 /** Erreur qui porte une clé structurée. Utilisée pour le timeout et

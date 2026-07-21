@@ -197,7 +197,11 @@
       "rate_limited": "Trop de tentatives. Attendez une minute puis réessayez.",
       "network": "Connexion impossible, vérifiez votre réseau.",
       "timeout": "Le serveur met trop de temps à répondre. Vérifiez votre réseau et réessayez.",
-      "generic": "Un souci de connexion. Réessayez dans un instant."
+      "generic": "Un souci de connexion. Réessayez dans un instant.",
+      "session_expired": "Votre session a expiré. Reconnectez-vous — vos réponses vous attendent.",
+      "session_expired_action": "Se reconnecter",
+      "finish_error": "On n’a pas pu enregistrer votre parcours. Réessayez dans un instant.",
+      "finish_error_action": "Réessayer"
     }
   },
   "dashboard": {

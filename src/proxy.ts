@@ -131,12 +131,22 @@ export async function proxy(request: NextRequest) {
 
   const response = intlResponse
 
+  // Helper · construit /{locale}/login?next=<canonicalPath localisé>
+  // pour que l'utilisateur reprenne où il en était après reconnexion.
+  // Sans ce next, un bounce vers /login = user perdu (retour à l'accueil).
+  function loginRedirect() {
+    const loginUrl = new URL(`/${locale}/login`, request.url)
+    const returnTo = canonicalPath === "/" ? `/${locale}` : `/${locale}${canonicalPath}`
+    loginUrl.searchParams.set("next", returnTo)
+    return NextResponse.redirect(loginUrl)
+  }
+
   const hasSession = request.cookies.getAll().some(c => c.name.startsWith("sb-") && c.name.endsWith("-auth-token"))
   if (!hasSession) {
     if (canonicalPath === "/test-niveau") {
       return NextResponse.redirect(new URL(`/${locale}/register?next=/${locale}/test-niveau`, request.url))
     }
-    return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
+    return loginRedirect()
   }
 
   let user: { user_metadata?: Record<string, unknown> } | null = null
@@ -158,11 +168,11 @@ export async function proxy(request: NextRequest) {
     const { data } = await supabase.auth.getUser()
     user = data.user
   } catch {
-    return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
+    return loginRedirect()
   }
 
   if (!user) {
-    return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
+    return loginRedirect()
   }
 
   // Extract multi-rôles depuis user_metadata (miroir DB synchronisé par /api/*).
