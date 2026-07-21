@@ -743,5 +743,80 @@
       "action": "Close the class",
       "secondary": "Cancel"
     }
+  },
+  "activation": {
+    "titre": {
+      "passage_seul": "Setting up your space",
+      "passage_prof": "Setting up your space",
+      "passage_coach": "Setting up your space",
+      "roots_solo": "Setting up your space",
+      "roots_famille": "Setting up your space",
+      "roots_solo_prof": "Setting up your space",
+      "roots_famille_prof": "Setting up your space",
+      "companion": "Setting up your space",
+      "generique": "Setting up your space"
+    },
+    "sous_titre": {
+      "passage_seul": "Your {niveau} Passage in {langue}.",
+      "passage_prof": "Your {niveau} Passage in {langue} with a teacher.",
+      "passage_coach": "Your {niveau} Passage in {langue} with a career coach.",
+      "roots_solo": "Your {langue} journey.",
+      "roots_famille": "Your family {langue} journey.",
+      "roots_solo_prof": "Your {langue} journey with a mentor.",
+      "roots_famille_prof": "Your family {langue} journey with a mentor.",
+      "companion": "Your seat at the table.",
+      "generique": "Finalizing your access."
+    },
+    "droits": {
+      "paiement": "Payment confirmed",
+      "passage_cours": "Your {langue} {niveau} course",
+      "passage_examens": "Your mock exams and tools",
+      "teacher_salle": "Your teacher and classroom",
+      "teacher_fil": "Your discussion thread",
+      "coach_salle": "Your career coach",
+      "coach_fil": "Your room and thread",
+      "roots_parcours": "Your {langue} journey",
+      "roots_famille": "Your family profiles",
+      "roots_accompagnant": "Your {langue} mentor",
+      "roots_salle_fil": "Your room and thread",
+      "companion_place": "Your seat at the table"
+    },
+    "langues": {
+      "DEUTSCH": "German",
+      "WOLOF": "Wolof",
+      "DOUALA": "Douala",
+      "LINGALA": "Lingala",
+      "BAMBARA": "Bambara",
+      "YORUBA": "Yoruba",
+      "SWAHILI": "Swahili"
+    },
+    "attente": {
+      "ligne_bas": "Please keep this page open · you'll be redirected"
+    },
+    "grace": {
+      "titre": "This is taking a little longer than usual",
+      "body": "Your payment has been confirmed — your access is on its way. You can head to your space, and everything will fall into place.",
+      "cta": "Go to my space",
+      "contact": "Something's off? Contact us"
+    },
+    "echec": {
+      "paiement": {
+        "titre": "The payment didn't go through",
+        "body": "No amount was charged. You can try again, or come back later.",
+        "cta_retry": "Try the payment again",
+        "cta_home": "Back to home"
+      },
+      "cancelled": {
+        "titre": "Order cancelled",
+        "body": "This order was cancelled. No access was activated.",
+        "cta_home": "Back to home"
+      }
+    },
+    "aria": {
+      "confluent": "YEMA sign · the Confluent",
+      "etape_faite": "step completed",
+      "etape_en_cours": "step in progress",
+      "etape_a_venir": "step upcoming"
+    }
   }
 }

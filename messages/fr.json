@@ -743,5 +743,80 @@
       "action": "Fermer la classe",
       "secondary": "Annuler"
     }
+  },
+  "activation": {
+    "titre": {
+      "passage_seul": "On prépare votre espace",
+      "passage_prof": "On prépare votre espace",
+      "passage_coach": "On prépare votre espace",
+      "roots_solo": "On prépare votre espace",
+      "roots_famille": "On prépare votre espace",
+      "roots_solo_prof": "On prépare votre espace",
+      "roots_famille_prof": "On prépare votre espace",
+      "companion": "On prépare votre espace",
+      "generique": "On prépare votre espace"
+    },
+    "sous_titre": {
+      "passage_seul": "Votre Passage {niveau} en {langue}.",
+      "passage_prof": "Votre Passage {niveau} en {langue} avec professeur.",
+      "passage_coach": "Votre Passage {niveau} en {langue} avec coach carrière.",
+      "roots_solo": "Votre parcours {langue}.",
+      "roots_famille": "Votre parcours {langue} pour la famille.",
+      "roots_solo_prof": "Votre parcours {langue} avec accompagnant.",
+      "roots_famille_prof": "Votre parcours famille {langue} avec accompagnant.",
+      "companion": "Votre place à la table.",
+      "generique": "On finalise votre accès."
+    },
+    "droits": {
+      "paiement": "Paiement confirmé",
+      "passage_cours": "Votre cours de {langue} {niveau}",
+      "passage_examens": "Vos examens blancs et outils",
+      "teacher_salle": "Votre professeur et votre salle de classe",
+      "teacher_fil": "Votre fil de discussion",
+      "coach_salle": "Votre coach de carrière",
+      "coach_fil": "Votre salle et votre fil",
+      "roots_parcours": "Votre parcours {langue}",
+      "roots_famille": "Les profils de votre famille",
+      "roots_accompagnant": "Votre accompagnant {langue}",
+      "roots_salle_fil": "Votre salle et votre fil",
+      "companion_place": "Votre place à la table"
+    },
+    "langues": {
+      "DEUTSCH": "allemand",
+      "WOLOF": "wolof",
+      "DOUALA": "douala",
+      "LINGALA": "lingala",
+      "BAMBARA": "bambara",
+      "YORUBA": "yoruba",
+      "SWAHILI": "swahili"
+    },
+    "attente": {
+      "ligne_bas": "Ne fermez pas cette page · redirection automatique"
+    },
+    "grace": {
+      "titre": "C’est un peu plus long que prévu",
+      "body": "Votre paiement est bien confirmé — vos accès arrivent. Vous pouvez rejoindre votre espace, tout se mettra en place à mesure.",
+      "cta": "Aller à mon espace",
+      "contact": "Un souci ? Nous écrire"
+    },
+    "echec": {
+      "paiement": {
+        "titre": "Le paiement n’a pas abouti",
+        "body": "Aucun montant n’a été prélevé. Vous pouvez recommencer, ou revenir plus tard.",
+        "cta_retry": "Réessayer le paiement",
+        "cta_home": "Revenir à l’accueil"
+      },
+      "cancelled": {
+        "titre": "Commande annulée",
+        "body": "Cette commande a été annulée. Aucun accès n’a été activé.",
+        "cta_home": "Revenir à l’accueil"
+      }
+    },
+    "aria": {
+      "confluent": "Signe YEMA · le Confluent",
+      "etape_faite": "étape terminée",
+      "etape_en_cours": "étape en cours",
+      "etape_a_venir": "étape à venir"
+    }
   }
 }

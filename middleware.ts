@@ -18,6 +18,11 @@ const PUBLIC_ROUTES = [
   "/privacy", "/terms", "/landing", "/demo",
   "/goodbye", "/teacher/goodbye",
   "/methode", "/histoires", "/manifeste", "/langues", "/setup-role",
+  // /activation : écran de passage post-paiement. Le page shell est
+  // vide de données ; la sécurité est portée par /api/activation-status
+  // (auth + ownership check). Si un anon arrive ici, la page fetche
+  // l'endpoint, reçoit 401, et redirige vers /login (voir page.tsx).
+  "/activation",
 ]
 
 // Routes protégées → rôle requis pour l'espace parent.

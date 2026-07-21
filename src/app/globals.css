@@ -14145,3 +14145,338 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   }
 }
 
+/* ═══════════════════════════════════════════════
+   ÉCRAN D'ACTIVATION · post-paiement / post-upgrade
+   ═══════════════════════════════════════════════
+   Rôle : montrer que la maison prépare l'espace de la personne. Jamais
+   de spinner générique — le Confluent est la signature. Deux ambiances :
+   territory-world (espresso + laiton) ou territory-sources (terre +
+   cuivre). Voir /[locale]/activation. */
+
+.activation {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+  position: relative;
+  overflow: hidden;
+  background: var(--espresso);
+  color: var(--creme);
+}
+.activation.territory-sources { background: var(--terre); }
+
+/* Grain léger sur le fond — pas une image, un radial très discret. */
+.activation::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(184, 135, 62, 0.06), transparent 55%),
+    radial-gradient(circle at 82% 88%, rgba(184, 135, 62, 0.04), transparent 60%);
+  opacity: 0.9;
+}
+.activation.territory-sources::before {
+  background:
+    radial-gradient(circle at 20% 15%, rgba(201, 132, 63, 0.09), transparent 55%),
+    radial-gradient(circle at 82% 88%, rgba(201, 132, 63, 0.05), transparent 60%);
+}
+
+.activation-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 22px;
+  padding: 40px 24px 32px;
+}
+
+.activation-brand {
+  width: 120px;
+  height: 168px; /* viewBox 100×140 → ratio 1.4 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activation-titre {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(1.5rem, 5.2vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.015em;
+  color: var(--creme);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.activation-sous-titre {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--creme-soft);
+  margin: 0;
+  max-width: 34ch;
+  text-wrap: balance;
+}
+
+/* ── Liste des droits ────────────────────────────────────────── */
+.activation-etapes {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 4px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+  max-width: 380px;
+}
+
+.activation-etape {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: var(--r-card);
+  background: rgba(244, 235, 220, 0.035);
+  border: 1px solid var(--creme-hair);
+  transition: background var(--dur-move) var(--ease-enter),
+              border-color var(--dur-move) var(--ease-enter);
+}
+.activation.territory-sources .activation-etape {
+  background: rgba(244, 235, 220, 0.045);
+}
+.activation-etape.is-fait {
+  background: rgba(184, 135, 62, 0.09);
+  border-color: var(--brass-edge);
+}
+.activation.territory-sources .activation-etape.is-fait {
+  background: rgba(201, 132, 63, 0.11);
+  border-color: rgba(201, 132, 63, 0.35);
+}
+/* Étape en cours (1re non-fait) — même en statique (capture, motion réduit),
+   se lit distinctement grâce à un fond très léger et une border laiton pleine. */
+.activation-etape[data-en-cours="1"] {
+  background: rgba(244, 235, 220, 0.055);
+  border-color: rgba(184, 135, 62, 0.55);
+}
+.activation.territory-sources .activation-etape[data-en-cours="1"] {
+  background: rgba(244, 235, 220, 0.065);
+  border-color: rgba(201, 132, 63, 0.55);
+}
+.activation-etape[data-en-cours="1"] .activation-etape-libelle {
+  color: var(--creme);
+}
+
+/* Le marqueur — cercle éteint / anneau qui tourne (en cours) / coche laiton */
+.activation-etape-mark {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--creme-faint);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brass);
+  position: relative;
+  transition: border-color var(--dur-move) var(--ease-enter),
+              background var(--dur-move) var(--ease-enter);
+}
+.activation-etape.is-fait .activation-etape-mark {
+  background: var(--brass);
+  border-color: var(--brass);
+  color: var(--espresso);
+}
+.activation.territory-sources .activation-etape.is-fait .activation-etape-mark {
+  background: #C9843F;
+  border-color: #C9843F;
+  color: var(--terre);
+}
+
+/* L'étape "en cours" — la 1re non-faite (calculée côté React via
+   data-en-cours="1"). Anneau qui tourne autour du marqueur. Les autres
+   étapes non-faites restent des cercles éteints, sans mouvement. */
+.activation-etape[data-en-cours="1"] .activation-etape-mark::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  border-top-color: var(--brass);
+  border-right-color: rgba(184, 135, 62, 0.35);
+  animation: activation-ring-spin 1400ms linear infinite;
+}
+.activation.territory-sources .activation-etape[data-en-cours="1"] .activation-etape-mark::after {
+  border-top-color: #C9843F;
+  border-right-color: rgba(201, 132, 63, 0.35);
+}
+
+@keyframes activation-ring-spin {
+  to { transform: rotate(360deg); }
+}
+
+.activation-etape-libelle {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 0.94rem;
+  line-height: 1.4;
+  color: var(--creme-soft);
+  transition: color var(--dur-move) var(--ease-enter);
+}
+.activation-etape.is-fait .activation-etape-mark { transform: scale(1); }
+.activation-etape.is-fait .activation-etape-libelle { color: var(--creme); }
+
+/* ── Ligne discrète bas ────────────────────────────────────── */
+.activation-attente {
+  margin: 6px 0 0;
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--creme-mute);
+  text-transform: uppercase;
+}
+
+/* ── Fenêtre de grâce (>20s) ──────────────────────────────── */
+.activation-grace {
+  margin-top: 8px;
+  padding: 18px 16px;
+  border-radius: var(--r-card);
+  border: 1px solid var(--brass-edge);
+  background: rgba(184, 135, 62, 0.06);
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+.activation-grace-titre {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 500;
+  font-size: 1.05rem;
+  color: var(--creme);
+  margin: 0;
+}
+.activation-grace-body {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--creme-soft);
+  margin: 0;
+}
+
+.activation-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  align-items: center;
+  margin-top: 4px;
+}
+.activation-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: var(--r-pill);
+  background: var(--brass);
+  color: var(--espresso);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: 1px solid var(--brass);
+  cursor: pointer;
+  transition: background var(--dur-touch) var(--ease-enter),
+              transform var(--dur-touch) var(--ease-enter);
+}
+.activation-cta:hover { background: var(--brass-deep); border-color: var(--brass-deep); }
+.activation-cta:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+.activation-cta-ghost {
+  background: transparent;
+  color: var(--creme-soft);
+  border-color: var(--creme-hair);
+}
+.activation-cta-ghost:hover {
+  background: rgba(244, 235, 220, 0.04);
+  border-color: var(--creme-faint);
+  color: var(--creme);
+}
+.activation-contact {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 0.82rem;
+  color: var(--creme-mute);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.activation-contact:hover { color: var(--creme-soft); }
+
+/* Écran d'échec — même carte, ton plus grave */
+.activation-echec .activation-card { gap: 18px; }
+.activation-echec .activation-titre { color: var(--creme); }
+.activation-echec .activation-brand { opacity: 0.85; }
+
+/* helper accessibilité */
+.activation .visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Desktop · même écran, carte centrée un peu plus large.
+   On pose la carte sur un fond très légèrement contrasté avec une border
+   discrète : elle devient une pièce ancrée dans l'écran plutôt qu'un
+   contenu qui flotte dans le vide. */
+@media (min-width: 720px) {
+  .activation-card {
+    max-width: 540px;
+    padding: 48px 40px 40px;
+    gap: 22px;
+    background: rgba(244, 235, 220, 0.025);
+    border: 1px solid var(--creme-hair);
+    border-radius: var(--r-panel);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  }
+  .activation.territory-sources .activation-card {
+    background: rgba(244, 235, 220, 0.035);
+  }
+  .activation-brand { width: 132px; height: 184px; }
+  .activation-titre { font-size: 2rem; }
+  .activation-sous-titre { font-size: 1.02rem; max-width: 42ch; }
+  .activation-etapes { max-width: 440px; }
+  .activation-grace { max-width: 440px; padding: 22px 22px; }
+}
+
+/* ── Motion réduite ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .activation-etape,
+  .activation-etape-mark,
+  .activation-etape-libelle,
+  .activation-cta {
+    transition: none !important;
+  }
+  .activation-etape[data-en-cours="1"] .activation-etape-mark::after {
+    animation: none !important;
+    opacity: 0.5 !important;
+  }
+}
+

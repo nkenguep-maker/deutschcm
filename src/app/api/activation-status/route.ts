@@ -1,12 +1,13 @@
 // GET /api/activation-status?orderId=xxx
-// Retourne l'état d'activation d'un order : items + grants créés.
-// Utilisé par l'écran d'attribution (à venir) pour poller après un paiement.
+// Retourne l'état d'activation d'un order — utilisé par /[locale]/activation
+// pour poller après un paiement. Payload enrichi (droits + tout_pret +
+// espace_cible + titre + ambiance) tout en conservant les champs legacy.
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
-import { getOrderActivationStatus } from "@/lib/entitlements";
+import { getActivationStatus } from "@/lib/entitlements/activation";
 
 export async function GET(request: NextRequest) {
   const orderId = request.nextUrl.searchParams.get("orderId");
@@ -16,7 +17,6 @@ export async function GET(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  // Vérifie que l'order appartient bien à cet user (par supabaseId → users.id)
   const dbUser = await prisma.user.findUnique({ where: { supabaseId: user.id } });
   if (!dbUser) return NextResponse.json({ error: "user profile not found" }, { status: 404 });
 
@@ -24,8 +24,10 @@ export async function GET(request: NextRequest) {
   if (!order) return NextResponse.json({ error: "order not found" }, { status: 404 });
   if (order.userId !== dbUser.id) return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
-  const status = await getOrderActivationStatus(orderId);
+  const status = await getActivationStatus(orderId);
   if (!status) return NextResponse.json({ error: "order not found" }, { status: 404 });
 
-  return NextResponse.json(status);
+  return NextResponse.json(status, {
+    headers: { "Cache-Control": "no-store, must-revalidate" },
+  });
 }
