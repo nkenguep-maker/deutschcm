@@ -80,6 +80,39 @@ export async function revokeRole(params: {
   return { ok: true };
 }
 
+// Guard côté serveur · vérifie qu'un user a un rôle ACTIF ET l'a onboardé.
+// Utilisé par les endpoints qui basculent d'espace (ex. /api/space/switch)
+// pour confirmer que le rôle cible est réellement autorisé.
+export async function requireRoleOnboarding(params: {
+  userId: string;
+  role: SpaceRole;
+}): Promise<
+  | { ok: true }
+  | { ok: false; reason: "no_role"; redirectTo: string }
+  | { ok: false; reason: "needs_onboarding"; redirectTo: string }
+> {
+  const { userId, role } = params;
+  const row = await prisma.userRole.findUnique({
+    where: { userId_role: { userId, role: role as Role } },
+    select: { onboarded: true, status: true },
+  });
+  if (!row || row.status !== "ACTIVE") {
+    return { ok: false, reason: "no_role", redirectTo: "/setup-role" };
+  }
+  if (!row.onboarded) {
+    // STUDENT → /onboarding est un router SSR qui aiguille vers monde/racines.
+    // TEACHER/CENTER ont leur page dédiée. ADMIN ne s'onboarde pas.
+    const map: Record<SpaceRole, string> = {
+      STUDENT: "/onboarding",
+      TEACHER: "/onboarding/teacher",
+      CENTER: "/onboarding/center",
+      ADMIN: "/dashboard",
+    };
+    return { ok: false, reason: "needs_onboarding", redirectTo: map[role] };
+  }
+  return { ok: true };
+}
+
 // Marque l'onboarding fait pour UN rôle. Ne touche pas les autres.
 // Idempotent : si la ligne UserRole n'existe pas encore (racE condition,
 // user créé hors du chemin normal, etc.), on la CRÉE avec onboarded=true.
@@ -134,34 +167,4 @@ export async function syncUserMetadata(params: {
       active_space: chosenActive,
     },
   });
-}
-
-// Guard côté serveur : vérifie qu'un user a un rôle ET l'a onboardé.
-// Retourne l'action à prendre pour la page appelante.
-export async function requireRoleOnboarding(params: {
-  userId: string;
-  role: SpaceRole;
-}): Promise<
-  | { ok: true }
-  | { ok: false; reason: "no_role"; redirectTo: string }
-  | { ok: false; reason: "needs_onboarding"; redirectTo: string }
-> {
-  const { userId, role } = params;
-  const row = await prisma.userRole.findUnique({
-    where: { userId_role: { userId, role: role as Role } },
-    select: { onboarded: true, status: true },
-  });
-  if (!row || row.status !== "ACTIVE") {
-    return { ok: false, reason: "no_role", redirectTo: "/setup-role" };
-  }
-  if (!row.onboarded) {
-    const map: Record<SpaceRole, string> = {
-      STUDENT: "/onboarding/student",
-      TEACHER: "/onboarding/teacher",
-      CENTER: "/onboarding/center",
-      ADMIN: "/dashboard",
-    };
-    return { ok: false, reason: "needs_onboarding", redirectTo: map[role] };
-  }
-  return { ok: true };
 }

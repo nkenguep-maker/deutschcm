@@ -142,6 +142,35 @@ Toute erreur est loggée serveur avec `code`, `message`, `meta`, `stack` (voir `
 Retourne l'état d'un order : items + grants créés + statut paiement. Utilisé par l'écran
 d'attribution (prochaine étape) pour poller après un paiement Cinetpay.
 
+## Deferred cleanup (à traiter en tâches séparées)
+
+Suite au grand nettoyage de 2026-07-21, deux zones ont été laissées
+volontairement intactes — leur retrait demande d'abord un travail de
+migration :
+
+### Cookies legacy `user_role` / `onboarding_done` / `active_space`
+
+- **Écrits par** : `/register`, `/setup-role`, `/auth/callback`, `/onboarding/{teacher,center}`, `/api/onboarding/complete`
+- **Lus par** : `src/proxy.ts:194` (fallback si `user_metadata.roles` vide), `/api/onboarding/complete:65` (fallback rôle)
+- **Pourquoi pas encore supprimés** : le proxy s'en sert comme filet pour les comptes créés AVANT que `syncUserMetadata()` soit fiable partout. Les supprimer sans migration DB casserait tous ces comptes.
+- **Prérequis suppression** : script Prisma qui peuple `UserRole.onboarded ← User.onboardingDone` pour tous les comptes actifs, puis retire écritures + lecture fallback.
+
+### Ancien endpoint `/api/onboarding/route.ts`
+
+- **Appelé par** : `/onboarding/teacher/page.tsx` et `/onboarding/center/page.tsx` (POST 1 profile → POST 2 `/api/onboarding/complete`)
+- **Pourquoi pas encore supprimé** : refondre les 2 pages pour appeler uniquement `/complete` avec `profileData` complet demande un flux redesign (validation champs, gestion erreur unifié).
+- **`/onboarding/{monde,racines}` déjà migrés** : elles utilisent uniquement `/complete`.
+
+### Assets manquants `public/portraits/*`
+
+Le code (voir composants Portrait, PortraitSpeaking, seuil) référence `kevin.avif`, `fatima.avif`, `aicha.avif`, `jean.avif`, `bintou.avif`, `amina.avif`, `sofia.avif`, `kwame.avif`, `esperanca.avif` — ces fichiers **n'existent pas** dans `public/portraits/`. Soit fournir les images (attente tournage/design), soit retirer les composants qui les cherchent.
+
+### Audit CSS complet de `src/app/globals.css` (14 000+ lignes)
+
+Impossible à faire à la main. Une passe avec un outil (PurgeCSS, unused-css scanner) est nécessaire pour identifier proprement les classes mortes après le nettoyage de composants.
+
+---
+
 ## Refactor à faire (routes ad hoc → getEntitlements)
 
 Fichiers à migrer identifiés :

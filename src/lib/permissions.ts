@@ -208,10 +208,3 @@ export function getDefaultRedirect(role: UserRole): string {
   }
 }
 
-export function getOnboardingRoute(role: UserRole): string {
-  switch (role) {
-    case "TEACHER": return "/onboarding/teacher"
-    case "CENTER": return "/onboarding/center"
-    default: return "/onboarding/student"
-  }
-}
