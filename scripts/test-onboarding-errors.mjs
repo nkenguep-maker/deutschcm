@@ -170,6 +170,56 @@ async function main() {
     await resetUser(email);
   }
 
+  // ── Scénario 5 · état partiel (users row orpheline même email) → auto-répare ──
+  console.log("\n── Scénario 5 · users Prisma orpheline → auto-répare ──");
+  {
+    const email = `orphan-${Date.now()}@yema.test`;
+    const password = "TestPass1234!";
+    await resetUser(email);
+
+    // Injecte une ligne orpheline AVANT de créer le nouveau compte Supabase
+    await fetch(`${BASE}/api/dev/inject-orphan`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    await admin.auth.admin.createUser({
+      email, password, email_confirm: true,
+      user_metadata: { role: "STUDENT", universe: "monde", full_name: "Post-repair" },
+    });
+
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const page = await ctx.newPage();
+    const responses = [];
+    page.on("response", async (res) => {
+      const url = res.url();
+      if (url.includes("/api/learning-paths") || url.includes("/api/onboarding/complete")) {
+        responses.push({ status: res.status(), body: await res.text().catch(() => "") });
+      }
+    });
+
+    await loginViaUI(page, email, password);
+    await page.goto(`${BASE}/fr/onboarding/monde`, { waitUntil: "domcontentloaded" });
+    await page.waitForTimeout(1000);
+    await page.locator('.entry-choice').first().click();
+    await page.locator('.entry-cta-primary').click();
+    await page.waitForTimeout(500);
+    await page.locator('.entry-choice').first().click();
+    await page.locator('.entry-cta-primary').click();
+    await page.waitForTimeout(4000);
+
+    const lp = responses.find(r => r.body.includes("universe"));
+    const oc = responses.find(r => r.body.includes("success"));
+    step("  /api/learning-paths = 200 (auto-répare)", lp?.status === 200, `status=${lp?.status ?? "?"}`);
+    step("  /api/onboarding/complete = 200", oc?.status === 200, `status=${oc?.status ?? "?"}`);
+    step("  URL finale = /dashboard (pas /onboarding)",
+      page.url().endsWith("/dashboard") || page.url().endsWith("/fr/dashboard"),
+      page.url().replace(BASE, ""));
+
+    await ctx.close();
+    await resetUser(email);
+  }
+
   // ── Scénario 4 · racines · session absente ──
   console.log("\n── Scénario 4 · session absente sur /onboarding/racines ──");
   {

@@ -1,14 +1,26 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
+import { markRoleOnboarded, syncUserMetadata, type SpaceRole } from "@/lib/roles"
+import { reconcileDbUser } from "@/lib/reconcileDbUser"
 import { prisma } from "@/lib/prisma"
-import { grantRole, markRoleOnboarded, syncUserMetadata, type SpaceRole } from "@/lib/roles"
 
-// Fin d'onboarding — marque UserRole.onboarded=true pour CE rôle uniquement,
-// sans toucher aux autres rôles. Sync user_metadata pour que le middleware
-// arrête de rediriger vers l'onboarding.
+// Fin d'onboarding — reconcile la ligne Prisma (idempotent, tolérant à
+// un état partiel : mauvais supabaseId, users row orpheline avec même
+// email, absence de UserRole, etc.), marque UserRole.onboarded=true, et
+// sync user_metadata pour que le proxy arrête de rediriger vers /onboarding.
+//
+// Réponses :
+//   200  { success, userId, redirectTo }
+//   400  { error, code: "VALIDATION_ERROR" }
+//   401  { error, code: "UNAUTHORIZED" }
+//   500  { error, code: "DB_CONFLICT" | "INTERNAL" }
 
 const VALID: SpaceRole[] = ["STUDENT", "TEACHER", "CENTER", "ADMIN"]
+
+function err(code: string, message: string, status: number, detail?: unknown) {
+  return NextResponse.json({ error: message, code, ...(detail ? { detail } : {}) }, { status });
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,7 +37,7 @@ export async function POST(req: NextRequest) {
     )
 
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 })
+    if (!user) return err("UNAUTHORIZED", "Not signed in", 401)
 
     let role: SpaceRole | undefined
     let profileData: Record<string, string | null | undefined> = {}
@@ -54,57 +66,48 @@ export async function POST(req: NextRequest) {
       (user.user_metadata?.role as SpaceRole | undefined) ||
       "STUDENT"
 
-    const updated = await prisma.user.upsert({
-      where: { supabaseId: user.id },
-      update: {
-        onboardingDone: true, // legacy flag conservé pour compat
-        ...(profileData.fullName ? { fullName: profileData.fullName } : {}),
-        phone: profileData.phone ?? undefined,
-        city: profileData.city ?? undefined,
-        country: profileData.country ?? undefined,
-        bio: profileData.bio ?? undefined,
-        dateOfBirth: profileData.dateOfBirth ? new Date(profileData.dateOfBirth) : undefined,
-        germanLevel: profileData.germanLevel ?? undefined,
-        learningGoal: profileData.learningGoal ?? undefined,
-        availability: profileData.availability ?? undefined,
-        qualifications: profileData.qualifications ?? undefined,
-        teachingLevels: profileData.teachingLevels ?? undefined,
-        centerName: profileData.centerName ?? undefined,
-        centerAddress: profileData.centerAddress ?? undefined,
-        centerCity: profileData.centerCity ?? undefined,
-        centerWebsite: profileData.centerWebsite ?? undefined,
-        updatedAt: new Date(),
-      },
-      create: {
-        supabaseId: user.id,
-        email: user.email!,
-        role: effectiveRole,
+    // 1) Réconcilie la ligne users Prisma (crée / adopte l'orpheline / met à jour).
+    //    reconcileDbUser gère aussi la création idempotente du UserRole.
+    const { user: dbUser, path: reconcilePath } = await reconcileDbUser({
+      authUser: user,
+      defaultRole: effectiveRole,
+      patch: {
         onboardingDone: true,
-        fullName: profileData.fullName || user.user_metadata?.full_name || "",
-        phone: profileData.phone ?? null,
-        city: profileData.city ?? null,
-        country: profileData.country ?? "Cameroun",
-        bio: profileData.bio ?? null,
-        dateOfBirth: profileData.dateOfBirth ? new Date(profileData.dateOfBirth) : null,
-        germanLevel: profileData.germanLevel ?? null,
-        learningGoal: profileData.learningGoal ?? null,
-        availability: profileData.availability ?? null,
-        qualifications: profileData.qualifications ?? null,
-        teachingLevels: profileData.teachingLevels ?? null,
-        centerName: profileData.centerName ?? null,
-        centerAddress: profileData.centerAddress ?? null,
-        centerCity: profileData.centerCity ?? null,
-        centerWebsite: profileData.centerWebsite ?? null,
-      }
-    })
+        fullName: profileData.fullName ?? undefined,
+      },
+    });
+    if (reconcilePath !== "matched_supabase_id") {
+      console.info(`[onboarding/complete] reconcile path=${reconcilePath} for supabaseId=${user.id}`);
+    }
 
-    // Multi-rôles : s'assurer que UserRole existe (idempotent), puis marquer onboarded=true.
-    await grantRole({ userId: updated.id, role: effectiveRole })
-    await markRoleOnboarded(updated.id, effectiveRole)
+    // 2) Applique le patch profil complet (le reconcile ne fait qu'un patch minimal)
+    if (Object.keys(profileData).length > 0) {
+      await prisma.user.update({
+        where: { id: dbUser.id },
+        data: {
+          phone: profileData.phone ?? undefined,
+          city: profileData.city ?? undefined,
+          country: profileData.country ?? undefined,
+          bio: profileData.bio ?? undefined,
+          dateOfBirth: profileData.dateOfBirth ? new Date(profileData.dateOfBirth) : undefined,
+          germanLevel: profileData.germanLevel ?? undefined,
+          learningGoal: profileData.learningGoal ?? undefined,
+          availability: profileData.availability ?? undefined,
+          qualifications: profileData.qualifications ?? undefined,
+          teachingLevels: profileData.teachingLevels ?? undefined,
+          centerName: profileData.centerName ?? undefined,
+          centerAddress: profileData.centerAddress ?? undefined,
+          centerCity: profileData.centerCity ?? undefined,
+          centerWebsite: profileData.centerWebsite ?? undefined,
+          updatedAt: new Date(),
+        }
+      })
+    }
 
-    // Cap · langue · but perso · disponibilité → user_metadata direct.
-    // Ces champs sont utilisés par le dashboard et /pricing pour
-    // adapter l'expérience sans requête DB à chaque page.
+    // 3) Marque onboarded=true pour ce rôle (upsert · idempotent).
+    await markRoleOnboarded(dbUser.id, effectiveRole)
+
+    // 4) Cap · langue · but perso · disponibilité → user_metadata direct.
     if (cap || activeLanguage || personalGoal || availability) {
       const { createClient: createAdminClient } = await import("@supabase/supabase-js")
       const SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -128,12 +131,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Sync user_metadata pour le middleware (roles + onboarded)
+    // 5) Sync user_metadata pour le proxy (roles + onboarded)
     await syncUserMetadata({ supabaseId: user.id, activeSpace: effectiveRole })
 
-    // Après onboarding STUDENT → dashboard direct. Le cap et la
-    // langue pilotent l'affichage. Le test-niveau reste accessible
-    // depuis le dashboard pour affiner le point de départ.
+    // Après onboarding STUDENT → dashboard direct.
     const redirectTo = effectiveRole === "TEACHER"
       ? "/teacher"
       : effectiveRole === "CENTER"
@@ -142,7 +143,7 @@ export async function POST(req: NextRequest) {
 
     const response = NextResponse.json({
       success: true,
-      userId: updated.id,
+      userId: dbUser.id,
       redirectTo,
     })
     // Cookie legacy conservé pour compat
@@ -150,8 +151,17 @@ export async function POST(req: NextRequest) {
     response.cookies.set("active_space", effectiveRole, { path: "/", maxAge: 2592000 })
     return response
 
-  } catch (err) {
-    console.error("Onboarding complete error:", err)
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+  } catch (e) {
+    const errObj = e as { code?: string; message?: string; meta?: unknown };
+    console.error("[onboarding/complete] FAIL", {
+      code: errObj.code,
+      message: errObj.message,
+      meta: errObj.meta,
+      stack: e instanceof Error ? e.stack : undefined,
+    });
+    if (errObj.code === "P2002") {
+      return err("DB_CONFLICT", "unique constraint violation", 500, { meta: errObj.meta });
+    }
+    return err("INTERNAL", errObj.message ?? "internal error", 500)
   }
 }

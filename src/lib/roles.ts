@@ -81,10 +81,20 @@ export async function revokeRole(params: {
 }
 
 // Marque l'onboarding fait pour UN rôle. Ne touche pas les autres.
+// Idempotent : si la ligne UserRole n'existe pas encore (racE condition,
+// user créé hors du chemin normal, etc.), on la CRÉE avec onboarded=true.
+// Sans ce upsert, un update sur une ligne inexistante throw P2025 et
+// bloque tout le flow d'onboarding.
 export async function markRoleOnboarded(userId: string, role: SpaceRole): Promise<void> {
-  await prisma.userRole.update({
+  await prisma.userRole.upsert({
     where: { userId_role: { userId, role: role as Role } },
-    data: { onboarded: true },
+    update: { onboarded: true },
+    create: {
+      userId,
+      role: role as Role,
+      status: "ACTIVE",
+      onboarded: true,
+    },
   });
 }
 

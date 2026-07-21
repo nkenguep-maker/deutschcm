@@ -83,6 +83,47 @@ for (const item of order.items) {
 
 **Interdit** : `prisma.accessGrant.create(...)` en dehors des flux payment/promo.
 
+## Comment créer / réconcilier la ligne `users` Prisma
+
+**LE mécanisme unique et idempotent :** `src/lib/reconcileDbUser.ts`.
+
+```ts
+import { reconcileDbUser } from "@/lib/reconcileDbUser";
+
+const { user: dbUser, path } = await reconcileDbUser({
+  authUser,               // User Supabase (obtenu via supabase.auth.getUser())
+  defaultRole: "STUDENT", // rôle par défaut si UserRole absent
+  patch: { onboardingDone: true }, // optionnel
+});
+```
+
+Il gère 3 cas dans cet ordre :
+1. `matched_supabase_id` — la ligne existe et son `supabaseId` correspond → renvoie tel quel (+ patch)
+2. `adopted_orphan_email` — une ligne existe avec le même `email` mais un autre `supabaseId` (compte Supabase supprimé/recréé pendant des tests) → **adopte** le nouveau `supabaseId` sur la ligne existante
+3. `created_fresh` — aucune ligne, création propre
+
+Dans les 3 cas, un `UserRole` correspondant au `defaultRole` est créé si absent (via `grantRole`, idempotent).
+
+**Interdit désormais** : `prisma.user.upsert({ where: { supabaseId }, ... })` direct dans une route. Cela crashera P2002 sur `email` si une ligne orpheline existe. Toujours passer par `reconcileDbUser`.
+
+Routes qui l'utilisent : `/api/learning-paths`, `/api/onboarding/complete`, `/auth/callback`.
+
+## Codes d'erreur des routes API
+
+Les routes qui font des mutations DB renvoient un body structuré :
+
+```json
+{ "error": "unique constraint violation", "code": "DB_CONFLICT", "detail": {...} }
+```
+
+Codes stables (à consommer côté client sans parser le message) :
+- `UNAUTHORIZED` (401) · session absente/invalide
+- `VALIDATION_ERROR` (400) · champ hors enum, format invalide (`detail.field`, `detail.got`)
+- `DB_CONFLICT` (500) · contrainte unique · souvent résolu par `reconcileDbUser` mais garde le code pour audit
+- `INTERNAL` (500) · toute autre erreur non identifiée
+
+Toute erreur est loggée serveur avec `code`, `message`, `meta`, `stack` (voir `console.error("[route-name] FAIL", …)`).
+
 ## Règles serveur absolues (jamais contournées)
 
 - **Univers racines → deny(AI_TEXT, AI_VOICE)** — même si l'user a un Passage allemand actif.

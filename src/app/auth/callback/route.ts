@@ -1,9 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
-import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
-import { grantRole, syncUserMetadata, type SpaceRole } from "@/lib/roles";
+import { syncUserMetadata, type SpaceRole } from "@/lib/roles";
+import { reconcileDbUser } from "@/lib/reconcileDbUser";
 
 const ROLE_MAP: Record<string, Role> = {
   STUDENT: Role.STUDENT,
@@ -47,29 +47,30 @@ export async function GET(request: NextRequest) {
       const metaRole = user.user_metadata?.role as string | undefined;
       const dbRole: Role = (metaRole && ROLE_MAP[metaRole]) ? ROLE_MAP[metaRole] : Role.STUDENT;
 
-      // Find or create DB user
-      let dbUser = await prisma.user.findUnique({ where: { supabaseId: user.id } });
-      if (!dbUser) {
-        try {
-          dbUser = await prisma.user.create({
-            data: {
-              supabaseId: user.id,
-              email: user.email!,
-              fullName: user.user_metadata?.full_name || "Nouvel utilisateur",
-              role: dbRole,
-              onboardingDone: false,
-            },
-          });
-        } catch {
-          // If creation fails (race condition), try fetching again
-          dbUser = await prisma.user.findUnique({ where: { supabaseId: user.id } });
+      // Réconcilie via le mécanisme unique (idempotent, tolérant orphelines,
+      // race conditions et crée UserRole automatiquement).
+      // Si l'appel throw, on log mais on continue vers /login pour ne pas
+      // bloquer complètement l'utilisateur.
+      let dbUser: Awaited<ReturnType<typeof reconcileDbUser>>["user"] | null = null;
+      try {
+        const res = await reconcileDbUser({
+          authUser: user,
+          defaultRole: dbRole as SpaceRole,
+        });
+        dbUser = res.user;
+        if (res.path !== "matched_supabase_id") {
+          console.info(`[auth/callback] reconcile path=${res.path} for supabaseId=${user.id}`);
         }
+      } catch (e) {
+        console.error("[auth/callback] reconcileDbUser FAIL", e);
       }
 
-      // Multi-rôles : s'assurer que UserRole existe pour le rôle de base
       if (dbUser) {
-        await grantRole({ userId: dbUser.id, role: dbRole as SpaceRole });
-        await syncUserMetadata({ supabaseId: user.id, activeSpace: dbRole as SpaceRole });
+        try {
+          await syncUserMetadata({ supabaseId: user.id, activeSpace: dbRole as SpaceRole });
+        } catch (e) {
+          console.error("[auth/callback] syncUserMetadata FAIL", e);
+        }
       }
 
       const onboardingDone = dbUser?.onboardingDone ?? false;
