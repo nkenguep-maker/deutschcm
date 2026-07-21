@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- Confluent · variante sources (terre-latérite). -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="YEMA Confluent · sources">
-  <path d="M26 12 C33 30 41 46 50 58" stroke="#C9843F" stroke-width="13" stroke-linecap="round" fill="none"/>
-  <path d="M77 14 C71 20 69 28 65 36 C61 44 56 52 50 58" stroke="#C9843F" stroke-width="13" stroke-linecap="round" fill="none"/>
-  <path d="M50 58 L50 103" stroke="#C9843F" stroke-width="14" stroke-linecap="round" fill="none"/>
-  <circle cx="50" cy="58" r="10" fill="rgba(184, 135, 62, 0.22)"/>
-  <circle cx="50" cy="58" r="6.5" fill="#EBC07A"/>
-</svg>
