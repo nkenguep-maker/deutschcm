@@ -1,12 +1,18 @@
 import createMiddleware from "next-intl/middleware"
-import { routing } from "./src/i18n/routing"
+import { routing } from "./i18n/routing"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 
-// Multi-rôles YEMA — le middleware lit user_metadata.roles (miroir DB).
-// Source de vérité = table user_roles (Prisma). Le middleware n'interroge
+// Multi-rôles YEMA — le proxy lit user_metadata.roles (miroir DB).
+// Source de vérité = table user_roles (Prisma). Le proxy n'interroge
 // pas la DB pour rester rapide sur les routes protégées.
+//
+// ⚠️ Next 16 · Ce fichier DOIT s'appeler proxy.ts (pas middleware.ts) ET
+// vivre dans src/ (à côté de app/). Un middleware.ts à la racine ou un
+// proxy.ts à la racine avec layout src/app/ sont SILENCIEUSEMENT ignorés
+// → tous les gardes d'auth tombent sans erreur visible.
+// Voir mémoire ~/.claude/projects/-Users-paulnkengue/memory/lesson_nextjs_src_middleware.md
 
 type SpaceRole = "STUDENT" | "TEACHER" | "CENTER" | "ADMIN"
 
@@ -78,12 +84,16 @@ function getDefaultRedirect(roles: SpaceRole[], activeSpace: SpaceRole | undefin
 function getOnboardingRoute(role: SpaceRole, locale: string): string {
   if (role === "TEACHER") return `/${locale}/onboarding/teacher`
   if (role === "CENTER") return `/${locale}/onboarding/center`
-  return `/${locale}/onboarding/student`
+  // STUDENT et ADMIN : /onboarding est un router qui aiguille selon
+  // user_metadata.universe (ou learning_paths existants) vers /monde
+  // ou /racines. La route /onboarding/student n'existe pas ; l'ancien
+  // fallback envoyait sur un 404.
+  return `/${locale}/onboarding`
 }
 
 const intlMiddleware = createMiddleware(routing)
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Garde-fou · empêche /fr/fr/..., /fr/en/..., /en/fr/..., /en/en/...

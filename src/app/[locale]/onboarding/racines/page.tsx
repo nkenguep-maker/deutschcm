@@ -141,6 +141,16 @@ export default function OnboardingRacinesPage() {
           onboardingAnswers: { link, startPoint },
         }),
       });
+      // Finalise l'onboarding côté serveur : écrit onboarded_map[STUDENT]=true
+      // dans user_metadata pour que le middleware laisse passer /dashboard.
+      await fetch("/api/onboarding/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: "STUDENT",
+          activeLanguage: "wolof",
+        }),
+      });
     } catch { /* on continue même si l'update échoue */ }
     // Chemin NU · router de @/navigation ajoute la locale
     router.push("/dashboard");

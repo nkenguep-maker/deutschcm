@@ -14480,3 +14480,108 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   }
 }
 
+/* ═══════════════════════════════════════════════
+   /onboarding · router (2 portes) — écran de secours si aucun signal
+   ═══════════════════════════════════════════════ */
+.onboarding-router {
+  min-height: 100dvh;
+  background: var(--espresso);
+  color: var(--creme);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px calc(32px + env(safe-area-inset-bottom));
+  gap: 32px;
+}
+.onboarding-router-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  max-width: 420px;
+}
+.onboarding-router-titre {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(1.6rem, 5.5vw, 2rem);
+  letter-spacing: -0.015em;
+  color: var(--creme);
+  margin: 0;
+}
+.onboarding-router-sous {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--creme-soft);
+  margin: 0;
+}
+.onboarding-router-portes {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 420px;
+}
+.onboarding-router-porte {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 22px;
+  border-radius: var(--r-card);
+  background: rgba(244, 235, 220, 0.03);
+  border: 1px solid var(--creme-hair);
+  text-decoration: none;
+  transition: background var(--dur-touch) var(--ease-enter),
+              border-color var(--dur-touch) var(--ease-enter),
+              transform var(--dur-touch) var(--ease-enter);
+}
+.onboarding-router-porte:hover {
+  background: rgba(184, 135, 62, 0.06);
+  border-color: var(--brass-edge);
+}
+.onboarding-router-porte:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+.onboarding-router-porte-eyebrow {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.onboarding-router-porte-titre {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--creme);
+  line-height: 1.25;
+}
+.onboarding-router-porte-body {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--creme-soft);
+}
+.onboarding-router-porte-sources {
+  background: rgba(201, 132, 63, 0.05);
+}
+.onboarding-router-porte-sources:hover {
+  background: rgba(201, 132, 63, 0.10);
+  border-color: rgba(201, 132, 63, 0.45);
+}
+.onboarding-router-porte-sources .onboarding-router-porte-eyebrow { color: #C9843F; }
+
+@media (min-width: 720px) {
+  .onboarding-router-portes {
+    flex-direction: row;
+    max-width: 720px;
+  }
+  .onboarding-router-porte { flex: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-router-porte { transition: none !important; }
+}
+

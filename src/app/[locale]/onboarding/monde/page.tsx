@@ -148,6 +148,18 @@ export default function OnboardingMondePage() {
           onboardingAnswers: { why, startPoint },
         }),
       });
+      // Finalise l'onboarding côté serveur : markRoleOnboarded + syncUserMetadata.
+      // C'est CET appel qui écrit onboarded_map[STUDENT]=true dans user_metadata,
+      // ce que le middleware lit pour laisser passer /dashboard.
+      // Sans cet appel, l'user boucle vers un onboarding router (ou pire, 404).
+      await fetch("/api/onboarding/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: "STUDENT",
+          activeLanguage: "deutsch",
+        }),
+      });
     } catch { /* on continue même si l'update échoue */ }
     // Chemin NU pour @/navigation router · évite /fr/fr/…
     const dest = startPoint === "test" ? "/test-niveau" : "/dashboard";

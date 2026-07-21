@@ -75,22 +75,27 @@ export async function GET(request: NextRequest) {
       const onboardingDone = dbUser?.onboardingDone ?? false;
       const cookieRole = metaRole || "STUDENT";
 
-      // Determine redirect destination
+      // Determine redirect destination.
+      // Règle : le param `next` fourni par le tunnel de signup est
+      // TOUJOURS respecté s'il pointe vers une route interne (préfixée /),
+      // qu'on soit onboardé ou pas. C'est le tunnel qui sait où il veut
+      // remettre l'utilisateur — le callback ne doit pas court-circuiter.
+      // Le fallback s'applique uniquement si `next` est absent ou pointe
+      // vers /dashboard (valeur par défaut historique = pas de contexte).
       let redirectUrl: string;
-      if (onboardingDone) {
-        if (next && next !== "/dashboard") {
-          redirectUrl = next;
-        } else {
-          redirectUrl = dbRole === Role.ADMIN ? "/admin"
-            : dbRole === Role.TEACHER ? "/teacher"
-            : dbRole === Role.CENTER ? "/center"
-            : "/dashboard";
-        }
+      const nextIsMeaningful = !!next && next !== "/dashboard" && next.startsWith("/");
+      if (nextIsMeaningful) {
+        redirectUrl = next;
+      } else if (onboardingDone) {
+        redirectUrl = dbRole === Role.ADMIN ? "/admin"
+          : dbRole === Role.TEACHER ? "/teacher"
+          : dbRole === Role.CENTER ? "/center"
+          : "/dashboard";
       } else {
         redirectUrl = dbRole === Role.ADMIN ? "/admin"
           : dbRole === Role.TEACHER ? "/onboarding/teacher"
           : dbRole === Role.CENTER ? "/onboarding/center"
-          : "/pricing";
+          : "/onboarding";
       }
 
       const redirectResponse = NextResponse.redirect(`${origin}${redirectUrl}`);

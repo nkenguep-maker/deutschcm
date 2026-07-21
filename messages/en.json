@@ -744,6 +744,19 @@
       "secondary": "Cancel"
     }
   },
+  "onboarding": {
+    "router": {
+      "brand_aria": "YEMA sign · the Confluent",
+      "titre": "Which door will you enter through?",
+      "sous_titre": "Two doors, one home. You'll be able to add the other one later.",
+      "porte_monde_eyebrow": "The Journey",
+      "porte_monde_titre": "Learn a world language",
+      "porte_monde_body": "German, more languages coming. CEFR, exams, a teacher.",
+      "porte_racines_eyebrow": "The Sources",
+      "porte_racines_titre": "Reclaim an African language",
+      "porte_racines_body": "Wolof, Douala, Lingala, Bambara… evening tales, stories, transmission."
+    }
+  },
   "activation": {
     "titre": {
       "passage_seul": "Setting up your space",

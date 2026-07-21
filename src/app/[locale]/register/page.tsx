@@ -143,13 +143,15 @@ export default function RegisterPage() {
     el?.focus();
   }, []);
 
-  // Fallback si l'utilisateur arrive sans univers · on le renvoie
-  // vers /pricing pour choisir une porte avant de continuer.
+  // Après signup, on va TOUJOURS dans le tunnel d'onboarding.
+  // - Si univers connu (register?universe=monde|racines) : direct vers la bonne page.
+  // - Sinon : /onboarding est un router qui demande l'univers puis dirige.
+  //   (Ancien comportement : /pricing → boucle publique, l'user perdait le fil.)
   const onboardingRoute = universe === "racines"
     ? "/onboarding/racines"
     : universe === "monde"
       ? "/onboarding/monde"
-      : "/pricing";
+      : "/onboarding";
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();

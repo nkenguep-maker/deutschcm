@@ -744,6 +744,19 @@
       "secondary": "Annuler"
     }
   },
+  "onboarding": {
+    "router": {
+      "brand_aria": "Signe YEMA · le Confluent",
+      "titre": "Par où voulez-vous entrer ?",
+      "sous_titre": "Deux portes, une même maison. Vous pourrez ajouter l’autre plus tard.",
+      "porte_monde_eyebrow": "Le Voyage",
+      "porte_monde_titre": "Apprendre une langue du monde",
+      "porte_monde_body": "Allemand, autres langues à venir. CECRL, examens, professeur.",
+      "porte_racines_eyebrow": "Les Sources",
+      "porte_racines_titre": "Retrouver une langue africaine",
+      "porte_racines_body": "Wolof, douala, lingala, bambara… Veillées, récits, transmission."
+    }
+  },
   "activation": {
     "titre": {
       "passage_seul": "On prépare votre espace",

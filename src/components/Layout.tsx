@@ -190,27 +190,11 @@ export default function Layout({ children, title }: LayoutProps) {
       if (typeof d.germanLevel === "string" || d.germanLevel === null) setGermanLevel(d.germanLevel ?? null);
       setHasClassroom(Boolean(d.hasClassroom));
       setPaidPlan(typeof d.plan === "string" && d.plan !== "FREE");
-      const skipOnboarding =
-        pathname.startsWith("/onboarding") ||
-        pathname.startsWith("/test-niveau") ||
-        pathname.startsWith("/teacher") ||
-        pathname.startsWith("/center") ||
-        pathname.startsWith("/admin") ||
-        pathname.startsWith("/discover") ||
-        pathname.startsWith("/notifications");
-      if (!skipOnboarding) {
-        if (d.germanLevel) return;
-        if (d.onboardingDone === false) {
-          const dest = d.role === "TEACHER" ? "/onboarding/teacher"
-            : d.role === "CENTER" ? "/onboarding/center"
-            : "/pricing";
-          router.replace(dest);
-          return;
-        }
-        if (d.role === "STUDENT") {
-          router.replace("/test-niveau");
-        }
-      }
+      // NB · l'ancien redirect client (onboardingDone→/pricing, STUDENT
+      // sans germanLevel→/test-niveau) a été retiré. Le proxy (src/proxy.ts)
+      // est désormais la seule source de vérité pour le garde onboarding.
+      // Le passage par /test-niveau reste offert DEPUIS l'onboarding (par
+      // startPoint="test") ou depuis le dashboard, mais n'est plus forcé.
     }).catch(() => {});
   }, [pathname, router, tl.userFallback]);
 
