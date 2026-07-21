@@ -21,9 +21,10 @@ const PUBLIC_ROUTES = [
   "/discover", "/auth",
   "/hoeren/demo", "/schreiben/demo",
   "/quiz/demo", "/video/preview",
-  "/privacy", "/terms", "/landing", "/demo",
+  "/privacy", "/terms", "/landing",
   "/goodbye", "/teacher/goodbye",
   "/methode", "/histoires", "/manifeste", "/langues", "/setup-role",
+  // Note : "/demo" retiré ici (page supprimée), "/eleves" idem.
   // /activation : écran de passage post-paiement. Le page shell est
   // vide de données ; la sécurité est portée par /api/activation-status
   // (auth + ownership check). Si un anon arrive ici, la page fetche

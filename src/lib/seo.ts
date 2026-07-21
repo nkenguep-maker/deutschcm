@@ -67,13 +67,6 @@ export const SITE_META: SiteMeta = {
       twitterTitle: "Langues africaines · YEMA",
       ogImageAlt: "YEMA — langues africaines, Solo ou Famille",
     },
-    eleves: {
-      title: "Pour les apprenants — YEMA",
-      description: "Ce que YEMA change pour un élève : un cap, une échelle, un foyer. La preuve de compétence, pas la course aux points.",
-      ogTitle: "YEMA pour les élèves — un cap, une échelle",
-      twitterTitle: "YEMA pour les élèves",
-      ogImageAlt: "YEMA — l'espace apprenant",
-    },
     enseignants: {
       title: "Enseignants — YEMA",
       description: "Le prof au centre. Un rôle payé, valorisé, garanti par la maison. Rejoindre les enseignants YEMA — allemand, anglais, natales.",
@@ -166,13 +159,6 @@ export const SITE_META: SiteMeta = {
       ogTitle: "African languages — Solo or Family",
       twitterTitle: "African languages · YEMA",
       ogImageAlt: "YEMA — African languages, Solo or Family",
-    },
-    eleves: {
-      title: "For learners — YEMA",
-      description: "What YEMA changes for a learner: a cap, a scale, a home. Proof of skill, not the points race.",
-      ogTitle: "YEMA for learners — a cap, a scale",
-      twitterTitle: "YEMA for learners",
-      ogImageAlt: "YEMA — the learner space",
     },
     enseignants: {
       title: "Teachers — YEMA",
