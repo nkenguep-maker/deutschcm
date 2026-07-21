@@ -1,8 +1,13 @@
 "use client"
-import { useState, useRef, useEffect } from "react"
+import { useRef, useEffect } from "react"
+
+// Fonction TTS supprimée (AUDIT.md §11). Le composant ne déclenche plus
+// aucun appel réseau. Il joue une source audio statique si `src` est
+// fourni, sinon il ne rend rien (contrôle masqué proprement).
 
 interface AudioPlayerProps {
   text: string
+  src?: string
   gender?: "male" | "female"
   accent?: "de" | "at" | "ch"
   rate?: string
@@ -15,127 +20,67 @@ interface AudioPlayerProps {
 
 export default function AudioPlayer({
   text,
-  gender = "female",
-  accent = "de",
-  rate = "0.85",
+  src,
   autoPlay = false,
   onPlay,
   onEnd,
   showText = false,
   label,
 }: AudioPlayerProps) {
-  const [loading, setLoading] = useState(false)
-  const [playing, setPlaying] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [audioUrl, setAudioUrl] = useState<string | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  const generateAudio = async () => {
-    if (audioUrl) return audioUrl
-
-    setLoading(true)
-    setError(null)
-
-    try {
-      const res = await fetch("/api/tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, gender, accent, rate }),
-      })
-
-      const data = await res.json()
-
-      if (!data.success) throw new Error(data.error || "Erreur TTS")
-
-      const blob = new Blob(
-        [Uint8Array.from(atob(data.audio), c => c.charCodeAt(0))],
-        { type: "audio/mpeg" }
-      )
-      const url = URL.createObjectURL(blob)
-      setAudioUrl(url)
-      return url
-
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Erreur audio"
-      setError(msg)
-      return null
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handlePlay = async () => {
-    const url = await generateAudio()
-    if (!url) return
-
-    if (audioRef.current) {
-      audioRef.current.pause()
+  useEffect(() => {
+    if (!src || !autoPlay) return
+    const audio = new Audio(src)
+    audioRef.current = audio
+    audio.onplay = () => onPlay?.()
+    audio.onended = () => onEnd?.()
+    audio.play().catch(() => {})
+    return () => {
+      audio.pause()
       audioRef.current = null
     }
+  }, [src, autoPlay, onPlay, onEnd])
 
-    const audio = new Audio(url)
-    audioRef.current = audio
+  if (!src) return null
 
-    audio.onplay = () => { setPlaying(true); onPlay?.() }
-    audio.onended = () => { setPlaying(false); onEnd?.() }
-    audio.onerror = () => { setPlaying(false); setError("Erreur lecture") }
-
-    await audio.play()
+  const handleToggle = async () => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio(src)
+      audioRef.current.onplay = () => onPlay?.()
+      audioRef.current.onended = () => onEnd?.()
+    }
+    const el = audioRef.current
+    if (el.paused) {
+      await el.play().catch(() => {})
+    } else {
+      el.pause()
+      el.currentTime = 0
+    }
   }
-
-  const handleStop = () => {
-    audioRef.current?.pause()
-    if (audioRef.current) audioRef.current.currentTime = 0
-    setPlaying(false)
-  }
-
-  useEffect(() => {
-    if (autoPlay) handlePlay()
-    return () => { audioRef.current?.pause() }
-  }, [])
-
-  useEffect(() => {
-    return () => { if (audioUrl) URL.revokeObjectURL(audioUrl) }
-  }, [audioUrl])
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
       <button
-        onClick={playing ? handleStop : handlePlay}
-        disabled={loading}
-        title={playing ? "Arrêter" : `Écouter${label ? " : " + label : ""}`}
+        onClick={handleToggle}
+        title={label ?? text}
         style={{
           width: 36, height: 36,
           borderRadius: "50%",
           border: "1px solid rgba(16,185,129,0.3)",
-          background: playing
-            ? "rgba(239,68,68,0.15)"
-            : loading
-            ? "rgba(255,255,255,0.05)"
-            : "rgba(16,185,129,0.12)",
-          color: playing ? "#ef4444" : loading ? "rgba(255,255,255,0.3)" : "#10b981",
-          cursor: loading ? "not-allowed" : "pointer",
+          background: "rgba(16,185,129,0.12)",
+          color: "#10b981",
+          cursor: "pointer",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 14, flexShrink: 0,
           transition: "all var(--dur-move)",
         }}
       >
-        {loading ? "⏳" : playing ? "⏹" : "▶"}
+        {"▶"}
       </button>
-
       {showText && (
-        <span style={{
-          fontSize: 13,
-          color: "rgba(255,255,255,0.7)",
-          fontStyle: "italic"
-        }}>
+        <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", fontStyle: "italic" }}>
           {text}
-        </span>
-      )}
-
-      {error && (
-        <span style={{ fontSize: 11, color: "#ef4444" }}>
-          ⚠️ {error}
         </span>
       )}
     </div>

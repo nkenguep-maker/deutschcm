@@ -1002,9 +1002,6 @@ export default function ModulePage() {
                     level={module.level}
                     exerciseType="expression_libre"
                     placeholder={locale === "en" ? "Click the mic and speak German…" : "Cliquez sur le micro et parlez en allemand…"}
-                    onResult={(analysis) => {
-                      if (analysis?.score_global >= 6) handleComplete(analysis.score_global * 10)
-                    }}
                   />
                 </div>
               )}
@@ -1207,10 +1204,6 @@ export default function ModulePage() {
                   )}
                   <a href={`/${locale}/courses`} style={{ color: "rgba(255,255,255,0.58)", fontSize: 13, textDecoration: "none" }}>
                     {labels.backToCourses}
-                  </a>
-                  <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}>·</span>
-                  <a href={`/${locale}/simulateur`} style={{ color: "rgba(255,255,255,0.58)", fontSize: 13, textDecoration: "none" }}>
-                    {labels.practiceSimulator}
                   </a>
                 </div>
               </div>

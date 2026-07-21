@@ -194,13 +194,11 @@ export const COPY_FR: FoyerCopy = {
     title: "Vos outils",
     tools: {
       franchir: [
-        { key: "sim",       title: "Le simulateur",     desc: "Ambassade, entretien, guichet — les scènes de l'examen.", href: `/${urlLocale}/simulateur` },
         { key: "quiz",      title: "Quiz",              desc: "Points de grammaire, révisions ciblées.",                 href: `/${urlLocale}/quiz` },
         { key: "examen",    title: "Examen blanc",      desc: "Une répétition complète, corrigée.",                      href: `/${urlLocale}/test-niveau` },
         { key: "historique",title: "Mon historique",    desc: "Les modules déjà traversés.",                             href: `/${urlLocale}/progress` },
       ],
       grandir: [
-        { key: "sim",       title: "Le simulateur",     desc: "Situations réelles — appartement, banque, mairie.",       href: `/${urlLocale}/simulateur` },
         { key: "ecrit",     title: "Écrit relu",        desc: "Vos lettres, vos formulaires — correction humaine.",      href: `/${urlLocale}/schreiben` },
         { key: "procedure", title: "Ma procédure",      desc: "Le dossier qui vous concerne, une étape à la fois.",      href: `/${urlLocale}/settings` },
         { key: "veillee",   title: "La Veillée",        desc: "Une pause chaleureuse dans la semaine.",                  href: `/${urlLocale}/hoeren` },
@@ -212,13 +210,11 @@ export const COPY_FR: FoyerCopy = {
         { key: "nosmots",  title: "Nos mots",     desc: "Le lexique familial qu'on veut transmettre.",   href: `/${urlLocale}/schreiben` },
       ],
       moi: [
-        { key: "sim",       title: "Le simulateur",     desc: "Des scénarios réels. Voix, correction, encouragement.",   href: `/${urlLocale}/simulateur` },
         { key: "quiz",      title: "Quiz",              desc: "Grammaire, vocabulaire — au fil de l'envie.",             href: `/${urlLocale}/quiz` },
         { key: "veillee",   title: "La Veillée",        desc: "Vos récits natals, portés à l'oral.",                     href: `/${urlLocale}/hoeren` },
         { key: "historique",title: "Mon historique",    desc: "Les modules déjà traversés.",                             href: `/${urlLocale}/progress` },
       ],
       default: [
-        { key: "sim",       title: "Le simulateur",     desc: "Des scénarios réels. Voix, correction, encouragement.",   href: `/${urlLocale}/simulateur` },
         { key: "quiz",      title: "Quiz",              desc: "Points de grammaire, révisions ciblées.",                 href: `/${urlLocale}/quiz` },
         { key: "veillee",   title: "La Veillée",        desc: "Vos récits natals, portés à l'oral.",                     href: `/${urlLocale}/hoeren` },
         { key: "historique",title: "Mon historique",    desc: "Les modules déjà traversés.",                             href: `/${urlLocale}/progress` },
@@ -319,13 +315,11 @@ export const COPY_EN: FoyerCopy = {
     title: "Your tools",
     tools: {
       franchir: [
-        { key: "sim",       title: "The simulator", desc: "Embassy, interview, counter — the exam scenes.",  href: `/${urlLocale}/simulateur` },
         { key: "quiz",      title: "Quiz",          desc: "Grammar points, targeted review.",                href: `/${urlLocale}/quiz` },
         { key: "mock",      title: "Mock exam",     desc: "A full rehearsal, corrected.",                    href: `/${urlLocale}/test-niveau` },
         { key: "history",   title: "My history",    desc: "Modules already crossed.",                        href: `/${urlLocale}/progress` },
       ],
       grandir: [
-        { key: "sim",       title: "The simulator", desc: "Real situations — apartment, bank, town hall.",   href: `/${urlLocale}/simulateur` },
         { key: "writing",   title: "Reviewed writing", desc: "Your letters, your forms — human review.",     href: `/${urlLocale}/schreiben` },
         { key: "procedure", title: "My procedure",  desc: "The file that concerns you, one step at a time.", href: `/${urlLocale}/settings` },
         { key: "veillee",   title: "The Veillée",   desc: "A warm pause in the week.",                       href: `/${urlLocale}/hoeren` },
@@ -337,13 +331,11 @@ export const COPY_EN: FoyerCopy = {
         { key: "ourwords",title: "Our words", desc: "The family lexicon to pass on.",        href: `/${urlLocale}/schreiben` },
       ],
       moi: [
-        { key: "sim",       title: "The simulator", desc: "Real scenarios. Voice, correction, encouragement.", href: `/${urlLocale}/simulateur` },
         { key: "quiz",      title: "Quiz",          desc: "Grammar, vocabulary — as you please.",              href: `/${urlLocale}/quiz` },
         { key: "veillee",   title: "The Veillée",   desc: "Your native stories, carried aloud.",               href: `/${urlLocale}/hoeren` },
         { key: "history",   title: "My history",    desc: "Modules already crossed.",                          href: `/${urlLocale}/progress` },
       ],
       default: [
-        { key: "sim",       title: "The simulator", desc: "Real scenarios. Voice, correction, encouragement.", href: `/${urlLocale}/simulateur` },
         { key: "quiz",      title: "Quiz",          desc: "Grammar, targeted review.",                         href: `/${urlLocale}/quiz` },
         { key: "veillee",   title: "The Veillée",   desc: "Your native stories, carried aloud.",               href: `/${urlLocale}/hoeren` },
         { key: "history",   title: "My history",    desc: "Modules already crossed.",                          href: `/${urlLocale}/progress` },

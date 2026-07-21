@@ -18,7 +18,6 @@ import {
   IconBook,
   IconClasse,
   IconContext,
-  IconMic,
   IconChart,
   IconSettings,
   IconGroup,
@@ -67,7 +66,6 @@ export default function Layout({ children, title }: LayoutProps) {
     ]},
     { label: locale === "en" ? "Practice" : "Pratiquer",
       items: [
-        { Icon: IconMic,    label: tn.practice,      href: "/simulateur" },
         { Icon: IconClasse, label: tn.myClass,       href: "/classroom"  },
     ]},
     { label: locale === "en" ? "Belong" : "Se relier",
