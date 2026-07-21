@@ -141,7 +141,16 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  const hasSession = request.cookies.getAll().some(c => c.name.startsWith("sb-") && c.name.endsWith("-auth-token"))
+  // Détection de la session Supabase. Le cookie sb-<ref>-auth-token peut
+  // être CHUNKÉ (`.0`, `.1`, `.N`) quand le JWT dépasse ~4KB, ce qui
+  // arrive dès que user_metadata contient plusieurs champs (onboarded_map,
+  // onboarding{...}, roles[], etc.). Sans matcher les chunks, le proxy
+  // croit qu'il n'y a pas de session et redirige tout le monde vers /login,
+  // même immédiatement après un signInWithPassword réussi.
+  // Historique : bug prod Vercel, Paul bloqué en boucle /login → /dashboard.
+  const hasSession = request.cookies.getAll().some(c =>
+    /^sb-.+-auth-token(\.\d+)?$/.test(c.name),
+  )
   if (!hasSession) {
     if (canonicalPath === "/test-niveau") {
       return NextResponse.redirect(new URL(`/${locale}/register?next=/${locale}/test-niveau`, request.url))
