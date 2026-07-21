@@ -12576,6 +12576,31 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-manrope), sans-serif;
   font-size: 14px;
 }
+.ens-form-error p { margin: 0; color: inherit; line-height: 1.45; }
+.ens-form-error-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.ens-form-error-link {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--oxblood);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  font: inherit;
+}
+.ens-form-error-link:hover { text-decoration-thickness: 2px; }
+.ens-form-error-link:disabled { opacity: 0.6; cursor: default; }
+.ens-form-error-hint {
+  font-size: 0.85em;
+  opacity: 0.85;
+}
 .ens-form-sent {
   max-width: 640px;
   margin: 40px auto 0;

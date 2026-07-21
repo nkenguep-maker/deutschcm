@@ -11,12 +11,13 @@
 
 import Link from "next/link";
 import { useRouter } from "@/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
 import { BrandY } from "@/components/brand/BrandY";
+import { classifyAuthError, withTimeout, type AuthErrorKey } from "@/lib/authErrors";
 
 type Universe = "monde" | "racines";
 
@@ -136,6 +137,9 @@ export default function RegisterPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const tErr = useTranslations("auth.errors");
+  /** Renvoie le libellé i18n pour une clé d'erreur classifiée. */
+  const errorFromKey = (key: AuthErrorKey): string => t(tErr(key));
 
   // Auto-focus premier champ visible au mount (accessibilité)
   useEffect(() => {
@@ -169,58 +173,58 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
-    const supabase = createClient();
-    const options = {
-      data: {
-        full_name: fullName || null,
-        role: "STUDENT" as const,
-        universe: universe ?? null,
-        plan: plan || null,
-        prof,
-      },
-      // Callback URL est ABSOLU (pas next-intl) · on passe le chemin
-      // complet avec locale pour que le handler redirige correctement.
-      emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/${locale}${onboardingRoute}`)}`,
-    };
-
-    const credentials = usePhone
-      ? { phone: trimmed.replace(/[\s-]/g, ""), password, options }
-      : { email: trimmed, password, options };
-
-    const { data, error: signUpError } = await supabase.auth.signUp(credentials);
-
-    if (signUpError) {
-      const msg = signUpError.message?.toLowerCase() ?? "";
-      if (msg.includes("already") || msg.includes("exists") || msg.includes("registered")) {
-        setError(c.errExists);
-      } else if (msg.includes("email")) {
-        setError(c.errEmailInvalid);
-      } else if (msg.includes("phone")) {
-        setError(c.errContactInvalid);
-      } else {
-        setError(c.errGeneric);
-      }
-      setLoading(false);
-      return;
-    }
-
-    // Cookie rôle pour le middleware (ne bloque pas si échec)
     try {
-      document.cookie = `user_role=STUDENT;path=/;max-age=2592000`;
-      document.cookie = `active_space=STUDENT;path=/;max-age=2592000`;
-    } catch { /* ok */ }
+      const supabase = createClient();
+      const options = {
+        data: {
+          full_name: fullName || null,
+          role: "STUDENT" as const,
+          universe: universe ?? null,
+          plan: plan || null,
+          prof,
+        },
+        // Callback URL est ABSOLU (pas next-intl) · on passe le chemin
+        // complet avec locale pour que le handler redirige correctement.
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/${locale}${onboardingRoute}`)}`,
+      };
 
-    if (data.session) {
-      // Session immédiate (téléphone confirmation sms, ou email confirmé).
-      // Router de @/navigation AJOUTE déjà la locale · on passe un
-      // chemin NU pour éviter /fr/fr/onboarding/…
-      router.push(onboardingRoute);
-      router.refresh();
-      return;
+      const credentials = usePhone
+        ? { phone: trimmed.replace(/[\s-]/g, ""), password, options }
+        : { email: trimmed, password, options };
+
+      const { data, error: signUpError } = await withTimeout(
+        supabase.auth.signUp(credentials),
+      );
+
+      if (signUpError) {
+        setError(errorFromKey(classifyAuthError(signUpError)));
+        return;
+      }
+
+      // Cookie rôle pour le middleware (ne bloque pas si échec)
+      try {
+        document.cookie = `user_role=STUDENT;path=/;max-age=2592000`;
+        document.cookie = `active_space=STUDENT;path=/;max-age=2592000`;
+      } catch { /* ok */ }
+
+      if (data.session) {
+        // Session immédiate (téléphone confirmation sms, ou email confirmé).
+        // Router de @/navigation AJOUTE déjà la locale · on passe un
+        // chemin NU pour éviter /fr/fr/onboarding/…
+        router.push(onboardingRoute);
+        router.refresh();
+        return; // navigating away — loading reste on exprès (page part)
+      }
+      // Sinon on montre l'écran « vérifiez votre boîte »
+      setSuccess(true);
+    } catch (err) {
+      // Réseau, timeout, exception JS : chemin unique de classification.
+      setError(errorFromKey(classifyAuthError(err)));
+    } finally {
+      // GARANTIE : le bouton se déverrouille TOUJOURS (sauf navigation
+      // réussie où la page se démonte de toute façon).
+      setLoading(false);
     }
-    // Sinon on montre l'écran « vérifiez votre boîte »
-    setSuccess(true);
-    setLoading(false);
   }
 
   async function handleGoogle() {
@@ -233,20 +237,30 @@ export default function RegisterPage() {
       if (universe) params.set("universe", universe);
       if (plan) params.set("plan", plan);
       if (prof) params.set("prof", "1");
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${redirectTo}${params.toString() ? `&${params.toString()}` : ""}`,
-          queryParams: { access_type: "offline", prompt: "consent" },
-        },
-      });
+      const { error: oauthError } = await withTimeout(
+        supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: `${redirectTo}${params.toString() ? `&${params.toString()}` : ""}`,
+            queryParams: { access_type: "offline", prompt: "consent" },
+          },
+        }),
+      );
       if (oauthError) {
+        // Erreur OAuth explicite (provider non configuré, redirect_uri invalide, etc.)
+        // → message spécifique Google, pas le parseur générique.
         setError(c.googleUnavailable);
-        setGoogleLoading(false);
       }
-      // Redirect handled by supabase · loading stays true
-    } catch {
-      setError(c.googleUnavailable);
+      // Redirect géré par Supabase · loading reste on jusqu'à la navigation
+    } catch (err) {
+      // Réseau/timeout → message contextuel réseau (pas googleUnavailable
+      // qui laisse penser à un défaut de config)
+      const key = classifyAuthError(err);
+      setError(key === "network" || key === "timeout" ? errorFromKey(key) : c.googleUnavailable);
+    } finally {
+      // Google OAuth : si l'appel a réussi, la page va rediriger → le
+      // finally exécute quand même setGoogleLoading(false) mais la page
+      // se démonte peu après. Si l'appel a échoué, on récupère la main.
       setGoogleLoading(false);
     }
   }

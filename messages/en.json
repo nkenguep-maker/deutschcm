@@ -183,7 +183,22 @@
     "consentAfter": ". I am at least 16 years old.",
     "consentRequired": "You must accept the terms to continue.",
     "ageConsentLabel": "I confirm that I am at least 16 years old or have permission from a parent or legal guardian.",
-    "ageConsentRequired": "You must confirm this condition to create an account."
+    "ageConsentRequired": "You must confirm this condition to create an account.",
+    "errors": {
+      "invalid_credentials": "Wrong email or password.",
+      "email_not_confirmed": "Your email hasn't been confirmed yet.",
+      "email_not_confirmed_action": "Resend the link",
+      "email_not_confirmed_sent": "Link sent. Check your inbox.",
+      "email_not_confirmed_error": "Couldn't resend the link. Try again in a moment.",
+      "already_exists": "This email already has an account. Sign in?",
+      "invalid_email": "This email doesn't look valid.",
+      "invalid_phone": "This phone number doesn't look complete.",
+      "weak_password": "Password · at least eight characters.",
+      "rate_limited": "Too many attempts. Wait a minute and try again.",
+      "network": "Can't connect. Check your network.",
+      "timeout": "The server is taking too long. Check your network and try again.",
+      "generic": "A connection hiccup. Try again in a moment."
+    }
   },
   "dashboard": {
     "xpLabel": "XP earned",

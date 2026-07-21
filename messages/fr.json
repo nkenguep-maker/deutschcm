@@ -183,7 +183,22 @@
     "consentAfter": ". Je confirme avoir au moins 16 ans.",
     "consentRequired": "Vous devez accepter les conditions pour continuer.",
     "ageConsentLabel": "Je confirme avoir au moins 16 ans ou disposer de l'autorisation d'un parent ou tuteur légal.",
-    "ageConsentRequired": "Vous devez confirmer cette condition pour créer un compte."
+    "ageConsentRequired": "Vous devez confirmer cette condition pour créer un compte.",
+    "errors": {
+      "invalid_credentials": "E-mail ou mot de passe incorrect.",
+      "email_not_confirmed": "Votre e-mail n’est pas encore confirmé.",
+      "email_not_confirmed_action": "Renvoyer le lien",
+      "email_not_confirmed_sent": "Lien renvoyé. Vérifiez votre boîte.",
+      "email_not_confirmed_error": "Impossible de renvoyer le lien. Réessayez dans un instant.",
+      "already_exists": "Cet e-mail a déjà un compte. Se connecter ?",
+      "invalid_email": "Cet e-mail n’a pas l’air valide.",
+      "invalid_phone": "Ce numéro n’a pas l’air complet.",
+      "weak_password": "Mot de passe · au moins huit caractères.",
+      "rate_limited": "Trop de tentatives. Attendez une minute puis réessayez.",
+      "network": "Connexion impossible, vérifiez votre réseau.",
+      "timeout": "Le serveur met trop de temps à répondre. Vérifiez votre réseau et réessayez.",
+      "generic": "Un souci de connexion. Réessayez dans un instant."
+    }
   },
   "dashboard": {
     "xpLabel": "Points XP",
