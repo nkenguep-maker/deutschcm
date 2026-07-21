@@ -2,7 +2,7 @@
 
 import { useLocale } from "next-intl";
 import { Link } from "@/navigation";
-import BrandLogo from "@/components/BrandLogo";
+import { BrandLockup } from "@/components/brand/BrandLockup";
 
 const COPY = {
   fr: {
@@ -105,7 +105,7 @@ export default function TeacherGoodbyePage() {
         {/* Logo */}
         <div className="fade-up d1" style={{ marginBottom: 52 }}>
           <Link href="/" style={{ textDecoration: "none" }}>
-            <BrandLogo variant="auth" />
+            <BrandLockup orientation="vertical" variant="world" state="static" size={52} />
           </Link>
         </div>
 
