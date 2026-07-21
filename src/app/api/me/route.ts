@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
-import { grantRole, syncUserMetadata, type SpaceRole } from "@/lib/roles";
+import { reconcileDbUser, ReconcileError } from "@/lib/reconcileDbUser";
+import { syncUserMetadata, type SpaceRole } from "@/lib/roles";
 
 const ROLE_MAP: Record<string, Role> = {
   STUDENT: Role.STUDENT,
@@ -13,35 +13,25 @@ const ROLE_MAP: Record<string, Role> = {
 };
 
 export async function GET() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (list) => list.forEach(({ name, value, options }) => cookieStore.set(name, value, options)),
-      },
-    }
-  );
+  const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ role: "STUDENT", onboardingDone: false });
 
-  // Auto-create the DB user on first visit — include role from Supabase metadata
   const metaRole = user.user_metadata?.role as string | undefined;
   const dbRole: Role = (metaRole && ROLE_MAP[metaRole]) ? ROLE_MAP[metaRole] : Role.STUDENT;
 
-  const dbUser = await prisma.user.upsert({
+  try {
+    await reconcileDbUser({ authUser: user, defaultRole: dbRole });
+  } catch (e) {
+    if (e instanceof ReconcileError) {
+      return NextResponse.json({ error: e.message, code: e.code }, { status: 400 });
+    }
+    throw e;
+  }
+
+  const dbUser = await prisma.user.findUnique({
     where: { supabaseId: user.id },
-    create: {
-      supabaseId: user.id,
-      email: user.email!,
-      fullName: user.user_metadata?.full_name ?? user.email?.split("@")[0] ?? "Utilisateur",
-      role: dbRole,
-      onboardingDone: false,
-    },
-    update: {},
     select: {
       id: true, role: true, fullName: true, email: true, onboardingDone: true,
       germanLevel: true, city: true, xpTotal: true, streakDays: true,
@@ -64,12 +54,6 @@ export async function GET() {
     },
   });
 
-  // Backfill : si aucun UserRole (compte legacy), en créer un basé sur User.role
-  if (dbUser && dbUser.userRoles.length === 0) {
-    await grantRole({ userId: dbUser.id, role: dbUser.role as SpaceRole });
-    await syncUserMetadata({ supabaseId: user.id, activeSpace: dbUser.role as SpaceRole });
-  }
-
   // Backfill user_metadata.role from DB if it's missing (old accounts)
   if (!metaRole && dbUser?.role && dbUser.role !== "STUDENT") {
     await supabase.auth.updateUser({
@@ -77,17 +61,20 @@ export async function GET() {
     });
   }
 
+  // Si le backfill vient d'attacher un premier UserRole via reconcile,
+  // synchroniser user_metadata pour que le middleware voie l'état DB.
+  if (dbUser && dbUser.userRoles.length > 0 && !user.user_metadata?.roles) {
+    await syncUserMetadata({ supabaseId: user.id, activeSpace: dbUser.role as SpaceRole });
+  }
+
   const roles = (dbUser?.userRoles ?? []).map(r => r.role);
   const activeSpace = (user.user_metadata?.active_space as SpaceRole | undefined)
     ?? (roles[0] ?? "STUDENT");
 
-  // Langue active (multi-langues). Fallback deutsch pour la migration
-  // douce. supportedLanguages sera géré côté data model plus tard.
   const activeLanguage = (user.user_metadata?.activeLanguage as string | undefined) ?? "deutsch";
   const supportedLanguages = Array.isArray(user.user_metadata?.supportedLanguages)
     ? (user.user_metadata.supportedLanguages as string[])
     : [activeLanguage];
-  // Cap · but perso · disponibilité (Sprint « Le Cap »)
   const cap = (user.user_metadata?.cap as string | undefined) ?? null;
   const personalGoal = (user.user_metadata?.personalGoal as string | undefined) ?? null;
   const availability = (user.user_metadata?.availability as string | undefined) ?? null;

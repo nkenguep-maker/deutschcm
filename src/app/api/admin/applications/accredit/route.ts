@@ -4,28 +4,15 @@
 // ACCREDITED, envoie un email de bienvenue.
 
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@/lib/supabase/server";
 import { createClient as createAdminClient } from "@supabase/supabase-js";
 import prisma from "@/lib/prisma";
 import { grantRole, syncUserMetadata } from "@/lib/roles";
+import { reconcileDbUser, ReconcileError } from "@/lib/reconcileDbUser";
 import { sendEmail, emailRoleGranted } from "@/lib/resend";
 
 async function requireAdmin() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (list) =>
-          list.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options),
-          ),
-      },
-    },
-  );
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
   const admin = await prisma.user.findUnique({
@@ -68,29 +55,34 @@ export async function POST(request: Request) {
     },
   });
 
-  let supabaseId: string | null = null;
-  if (createErr) {
+  let authUser = created?.user ?? null;
+  if (createErr || !authUser) {
     // L'user existe peut-être déjà — récupérer par email.
     const { data: list } = await supabaseAdmin.auth.admin.listUsers();
     const existing = list.users.find((u) => u.email?.toLowerCase() === app.email.toLowerCase());
     if (!existing) {
       return NextResponse.json({ error: "cannot_create_user" }, { status: 500 });
     }
-    supabaseId = existing.id;
-  } else {
-    supabaseId = created.user?.id ?? null;
+    authUser = existing;
   }
-  if (!supabaseId) return NextResponse.json({ error: "no_supabase_id" }, { status: 500 });
 
-  // User DB
-  const dbUser = await prisma.user.upsert({
-    where: { supabaseId },
-    create: { supabaseId, email: app.email, fullName: app.fullName, role: "TEACHER" },
-    update: { fullName: app.fullName },
-  });
+  let dbUserId: string;
+  try {
+    const { user: dbUser } = await reconcileDbUser({
+      authUser,
+      defaultRole: "TEACHER",
+      patch: { fullName: app.fullName },
+    });
+    dbUserId = dbUser.id;
+  } catch (e) {
+    if (e instanceof ReconcileError) {
+      return NextResponse.json({ error: e.message, code: e.code }, { status: 400 });
+    }
+    throw e;
+  }
 
-  await grantRole({ userId: dbUser.id, role: "TEACHER", grantedBy: admin.id });
-  await syncUserMetadata({ supabaseId });
+  await grantRole({ userId: dbUserId, role: "TEACHER", grantedBy: admin.id });
+  await syncUserMetadata({ supabaseId: authUser.id });
 
   await prisma.teacherApplication.update({
     where: { id },
@@ -108,5 +100,5 @@ export async function POST(request: Request) {
     }).catch(() => {});
   }
 
-  return NextResponse.json({ ok: true, supabaseId, tempPassword });
+  return NextResponse.json({ ok: true, supabaseId: authUser.id, tempPassword });
 }
