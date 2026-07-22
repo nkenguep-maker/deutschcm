@@ -121,7 +121,7 @@ export default function AdminUsersPage() {
           </div>
         </header>
 
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+        <div className="filter-row">
           <input
             type="search"
             aria-label={t.searchPh}
@@ -130,13 +130,13 @@ export default function AdminUsersPage() {
             onKeyDown={(e) => { if (e.key === "Enter") void load(q); }}
             placeholder={t.searchPh}
             className="modal-input"
-            style={{ flex: 1, minWidth: 260 }}
           />
           <button
             type="button"
             className="subpage-cta"
             onClick={() => load(q)}
             disabled={loading}
+            style={{ flex: "0 0 auto" }}
           >
             {loading ? "…" : t.searchBtn}
           </button>
@@ -166,49 +166,82 @@ export default function AdminUsersPage() {
         )}
 
         {rows.length > 0 && (
-          <div className="data-table-wrap">
-            <div className="data-table-scroll">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    {t.cols.map((c, i) => <th key={i}>{c}</th>)}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((u) => (
-                    <tr key={u.id}>
-                      <td>
-                        <span className="mono-cell-name" style={{ fontSize: 13.5 }}>
-                          {u.fullName}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="mono-cell-mail">{u.email}</span>
-                      </td>
-                      <td>
-                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                          {u.userRoles.length === 0 ? (
-                            <span style={{ color: "var(--creme-mute)", fontSize: 12 }}>—</span>
-                          ) : (
-                            u.userRoles.map((r) => (
-                              <span key={r.role} className={`status-pill ${r.onboarded ? "active" : "pending"}`}>
-                                {L[r.role]}
-                              </span>
-                            ))
-                          )}
-                        </div>
-                      </td>
-                      <td>
-                        <Link href="/admin/roles" className="row-btn">
-                          {t.rolesEdit}
-                        </Link>
-                      </td>
+          <>
+            <div className="data-table-wrap desktop-only">
+              <div className="data-table-scroll">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      {t.cols.map((c, i) => <th key={i}>{c}</th>)}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {rows.map((u) => (
+                      <tr key={u.id}>
+                        <td>
+                          <span className="mono-cell-name" style={{ fontSize: 13.5 }}>
+                            {u.fullName}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="mono-cell-mail text-wrap-anywhere">{u.email}</span>
+                        </td>
+                        <td>
+                          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                            {u.userRoles.length === 0 ? (
+                              <span style={{ color: "var(--creme-mute)", fontSize: 12 }}>—</span>
+                            ) : (
+                              u.userRoles.map((r) => (
+                                <span key={r.role} className={`status-pill ${r.onboarded ? "active" : "pending"}`}>
+                                  {L[r.role]}
+                                </span>
+                              ))
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <Link href="/admin/roles" className="row-btn">
+                            {t.rolesEdit}
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+
+            {/* Mobile · une carte par compte, mêmes données */}
+            <ul className="data-list mobile-only" aria-label={t.h}>
+              {rows.map((u) => (
+                <li key={u.id} className="data-card">
+                  <div className="data-card-head">
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p className="data-card-title">{u.fullName}</p>
+                      <p className="data-card-sub">{u.email}</p>
+                    </div>
+                  </div>
+                  <dl className="data-card-rows">
+                    <dt>{t.cols[2]}</dt>
+                    <dd>
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                        {u.userRoles.length === 0 ? "—" : u.userRoles.map((r) => (
+                          <span key={r.role} className={`status-pill ${r.onboarded ? "active" : "pending"}`}>
+                            {L[r.role]}
+                          </span>
+                        ))}
+                      </div>
+                    </dd>
+                  </dl>
+                  <div className="data-card-actions">
+                    <Link href="/admin/roles" className="row-btn">
+                      {t.rolesEdit}
+                    </Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </section>
     </Layout>
