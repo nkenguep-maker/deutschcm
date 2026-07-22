@@ -37,12 +37,9 @@ export default async function OnboardingRouterPage({ params }: Props) {
     return null; // narrow type — redirect() ne retourne pas mais TS ne le sait pas
   }
 
-  // 1) Signal user_metadata.universe (posé par /register?universe=...)
-  const metaUniverse = (user.user_metadata?.universe as string | undefined)?.toLowerCase();
-  if (metaUniverse === "monde") redirect({ href: "/onboarding/monde", locale });
-  if (metaUniverse === "racines") redirect({ href: "/onboarding/racines", locale });
-
-  // 2) Signal learning_paths (source de vérité v1) + état complet du funnel P1.
+  // 1) Signal learning_paths (source de vérité) + état complet du funnel P1.
+  //    Doit être évalué AVANT le fallback metadata pour ne pas court-circuiter
+  //    la reprise · un user avec un LP a passé le stade « choix univers ».
   const dbUser = await prisma.user.findUnique({
     where: { supabaseId: user.id },
     select: { id: true },
@@ -93,6 +90,12 @@ export default async function OnboardingRouterPage({ params }: Props) {
       return null;
     }
   }
+  // 2) Aucun LP · fallback sur user_metadata.universe (écrit par
+  //    /register?universe=...) puis, à défaut, sur l'écran de choix.
+  const metaUniverse = (user.user_metadata?.universe as string | undefined)?.toLowerCase();
+  if (metaUniverse === "monde") { redirect({ href: "/onboarding/monde", locale }); return null; }
+  if (metaUniverse === "racines") { redirect({ href: "/onboarding/racines", locale }); return null; }
+
   // Empêche l'accès aux variables non utilisées côté TS
   void readAnswers;
 

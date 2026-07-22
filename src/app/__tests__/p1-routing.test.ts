@@ -8,15 +8,22 @@ function read(rel: string) {
   return readFileSync(join(process.cwd(), rel), "utf8");
 }
 
-describe("proxy · funnel P1 accessible uniquement STUDENT + ADMIN", () => {
+describe("proxy · funnel P1 réservé STUDENT strict (hardening §6)", () => {
   const src = read("src/proxy.ts");
-  it("/decouverte protégé STUDENT + ADMIN", () => {
-    expect(src).toMatch(/["']\/decouverte["']\s*:\s*\[\s*["']STUDENT["'],\s*["']ADMIN["']\s*\]/);
+  it("/decouverte protégé STUDENT uniquement · ADMIN exclu", () => {
+    expect(src).toMatch(/["']\/decouverte["']\s*:\s*\[\s*["']STUDENT["']\s*\]/);
   });
-  it("/activation-intent protégé STUDENT + ADMIN", () => {
-    expect(src).toMatch(/["']\/activation-intent["']\s*:\s*\[\s*["']STUDENT["'],\s*["']ADMIN["']\s*\]/);
+  it("/activation-intent protégé STUDENT uniquement · ADMIN exclu", () => {
+    expect(src).toMatch(/["']\/activation-intent["']\s*:\s*\[\s*["']STUDENT["']\s*\]/);
   });
-  it("les deux routes rattachées à l'espace STUDENT côté spaceForPath", () => {
+  it("/onboarding protégé STUDENT uniquement", () => {
+    expect(src).toMatch(/["']\/onboarding["']\s*:\s*\[\s*["']STUDENT["']\s*\]/);
+  });
+  it("/onboarding/teacher et /onboarding/center gardent leurs rôles pro", () => {
+    expect(src).toMatch(/["']\/onboarding\/teacher["']\s*:\s*\[\s*["']TEACHER["'],\s*["']ADMIN["']\s*\]/);
+    expect(src).toMatch(/["']\/onboarding\/center["']\s*:\s*\[\s*["']CENTER["'],\s*["']ADMIN["']\s*\]/);
+  });
+  it("les routes du funnel rattachées à l'espace STUDENT côté spaceForPath", () => {
     expect(src).toMatch(/pathname\.startsWith\(["']\/decouverte["']\)/);
     expect(src).toMatch(/pathname\.startsWith\(["']\/activation-intent["']\)/);
   });

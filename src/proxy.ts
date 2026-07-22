@@ -38,6 +38,14 @@ const PUBLIC_ROUTES = [
 
 // Routes protégées → rôle requis pour l'espace parent.
 const PROTECTED_ROUTES: Record<string, SpaceRole[]> = {
+  // Onboarding pro · doit rester ouvert au rôle concerné · placé AVANT
+  // /onboarding pour que Object.keys.find() matche le préfixe le plus
+  // spécifique en premier (comportement ES2020+ · ordre d'insertion).
+  "/onboarding/teacher": ["TEACHER", "ADMIN"],
+  "/onboarding/center": ["CENTER", "ADMIN"],
+  // Funnel P1 étudiant · STUDENT strict (hardening §6). Les rôles pro ont
+  // leur propre onboarding et ne doivent pas être aiguillés ici.
+  "/onboarding": ["STUDENT"],
   "/admin": ["ADMIN"],
   "/admin/courses/generate": ["ADMIN"],
   "/admin/roles": ["ADMIN"],
@@ -56,10 +64,12 @@ const PROTECTED_ROUTES: Record<string, SpaceRole[]> = {
   // y accéder par défaut — un multi-rôle explicite STUDENT + TEACHER
   // fonctionnera toujours puisque canAccessRoute() OR sur roles.
   "/famille": ["STUDENT", "ADMIN"],
-  // Funnel P1 · découverte + activation. Réservé STUDENT (les rôles pro
-  // ont leur propre onboarding et n'ont pas à passer par le funnel étudiant).
-  "/decouverte": ["STUDENT", "ADMIN"],
-  "/activation-intent": ["STUDENT", "ADMIN"],
+  // Funnel P1 · découverte + activation · réservé STUDENT strict
+  // (hardening §6). ADMIN n'est PAS un contournement générique — il a
+  // son propre espace et n'a pas à passer par un funnel d'apprenant.
+  // TEACHER et CENTER ont leur onboarding pro dédié.
+  "/decouverte": ["STUDENT"],
+  "/activation-intent": ["STUDENT"],
 }
 
 // À quel espace appartient un pathname donné ? (pour déterminer le rôle
