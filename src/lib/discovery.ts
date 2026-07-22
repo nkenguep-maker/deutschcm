@@ -291,7 +291,10 @@ export interface MondeLevelAvailability {
 }
 
 export const MONDE_LEVEL_AVAILABILITY: Record<MondeLevel, MondeLevelAvailability> = {
-  A1: { priced: true, discoveryReady: true,  courseReady: false, purchasable: false },
+  // A1 · P2 hardening · courseReady=true (5 leçons × 5 modules dans
+  // src/data/a1-beta-modules.ts, contenu original relu et validé).
+  // purchasable=false tant que P5 n'a pas branché le paiement réel.
+  A1: { priced: true, discoveryReady: true,  courseReady: true,  purchasable: false },
   A2: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },
   B1: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },
   B2: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },

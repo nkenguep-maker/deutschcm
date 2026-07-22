@@ -113,8 +113,11 @@ describe("Disponibilité Monde par niveau · prix ≠ contenu (hardening §4)", 
       expect(MONDE_LEVEL_AVAILABILITY[lv].purchasable).toBe(false);
     }
   });
-  it("aucun niveau n'a courseReady tant que le programme complet n'existe pas", () => {
-    for (const lv of ["A1", "A2", "B1", "B2", "C1"] as const) {
+  it("A1 est courseReady (P2 · 5 leçons × 5 modules dans src/data/a1-beta-modules.ts)", () => {
+    expect(MONDE_LEVEL_AVAILABILITY.A1.courseReady).toBe(true);
+  });
+  it("A2-C1 restent non courseReady tant que le programme complet n'existe pas", () => {
+    for (const lv of ["A2", "B1", "B2", "C1"] as const) {
       expect(MONDE_LEVEL_AVAILABILITY[lv].courseReady).toBe(false);
     }
   });
