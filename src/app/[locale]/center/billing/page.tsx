@@ -411,7 +411,7 @@ export default function CenterBillingPage() {
         <section>
           <p className="dash-eye">{t.historyEye}</p>
           <h2 className="dash-block-h">{t.historyH}</h2>
-          <div className="data-table-wrap">
+          <div className="data-table-wrap desktop-only">
             <div className="data-table-scroll">
               <table className="data-table">
                 <thead>
@@ -450,6 +450,33 @@ export default function CenterBillingPage() {
               </table>
             </div>
           </div>
+
+          {/* Mobile · un paiement par carte */}
+          <ul className="data-list mobile-only" aria-label={t.historyH}>
+            {HISTORY.map((p) => (
+              <li key={p.id} className="data-card">
+                <div className="data-card-head">
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p className="data-card-title">{p.amount.toLocaleString(dateLocale)} XAF</p>
+                    <p className="data-card-sub">
+                      {new Date(p.date).toLocaleDateString(dateLocale, { day: "2-digit", month: "long", year: "numeric" })}
+                    </p>
+                  </div>
+                  <span className={`status-pill ${p.status === "SUCCESS" ? "active" : p.status === "FAILED" ? "warning" : "pending"}`} style={{ flexShrink: 0 }}>
+                    {t.statusLbl[p.status]}
+                  </span>
+                </div>
+                <dl className="data-card-rows">
+                  <dt>{t.historyCols[2]}</dt>
+                  <dd>{p.method}</dd>
+                  <dt>{t.historyCols[3]}</dt>
+                  <dd className="text-wrap-anywhere">{p.phone}</dd>
+                  <dt>{t.historyCols[4]}</dt>
+                  <dd><code className="text-wrap-anywhere" style={{ fontFamily: "var(--font-jetbrains, monospace)", fontSize: 11 }}>{p.ref}</code></dd>
+                </dl>
+              </li>
+            ))}
+          </ul>
         </section>
       </section>
 

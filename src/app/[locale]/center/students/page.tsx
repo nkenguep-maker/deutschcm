@@ -261,7 +261,7 @@ export default function CenterStudentsPage() {
           )
         ) : (
           <>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div className="filter-row">
               <input
                 type="search"
                 aria-label={t.searchPh}
@@ -269,14 +269,12 @@ export default function CenterStudentsPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t.searchPh}
                 className="modal-input"
-                style={{ flex: 1, minWidth: 220 }}
               />
               <select
                 aria-label={t.fAllTeacher}
                 value={teacher}
                 onChange={(e) => setTeacher(e.target.value)}
                 className="modal-select"
-                style={{ width: 200 }}
               >
                 <option value="">{t.fAllTeacher}</option>
                 {teachers.map((x) => <option key={x} value={x}>{x}</option>)}
@@ -286,7 +284,6 @@ export default function CenterStudentsPage() {
                 value={level}
                 onChange={(e) => setLevel(e.target.value)}
                 className="modal-select"
-                style={{ width: 150 }}
               >
                 <option value="">{t.fAllLevel}</option>
                 {levels.map((x) => <option key={x} value={x}>{x}</option>)}
@@ -296,7 +293,6 @@ export default function CenterStudentsPage() {
                 value={sub}
                 onChange={(e) => setSub(e.target.value)}
                 className="modal-select"
-                style={{ width: 170 }}
               >
                 <option value="">{t.fAllSub}</option>
                 <option value="FREE">{t.subFree}</option>
@@ -315,69 +311,116 @@ export default function CenterStudentsPage() {
                 <p className="empty-state-sub">{t.emptySub}</p>
               </div>
             ) : (
-              <div className="data-table-wrap">
-                <div className="data-table-scroll">
-                  <table className="data-table">
-                    <thead>
-                      <tr>
-                        {t.cols.map((c, i) => (
-                          <th key={c || i} className={i === 2 || i === 3 || i === 4 ? "center" : ""}>{c}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filtered.map((s) => {
-                        const scoreClass = s.avgScore >= 7 ? "high" : s.avgScore >= 5 ? "mid" : "low";
-                        return (
-                          <tr key={s.id}>
-                            <td>
-                              <div className="mono-cell">
-                                <span className="mono-avatar" style={{ width: 32, height: 32, fontSize: 12 }} aria-hidden="true">
-                                  {initials(s.name)}
-                                </span>
-                                <div>
-                                  <p className="mono-cell-name" style={{ fontSize: 13 }}>{s.name}</p>
-                                  <p className="mono-cell-mail">{s.email}</p>
+              <>
+                <div className="data-table-wrap desktop-only">
+                  <div className="data-table-scroll">
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          {t.cols.map((c, i) => (
+                            <th key={c || i} className={i === 2 || i === 3 || i === 4 ? "center" : ""}>{c}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filtered.map((s) => {
+                          const scoreClass = s.avgScore >= 7 ? "high" : s.avgScore >= 5 ? "mid" : "low";
+                          return (
+                            <tr key={s.id}>
+                              <td>
+                                <div className="mono-cell">
+                                  <span className="mono-avatar" style={{ width: 32, height: 32, fontSize: 12 }} aria-hidden="true">
+                                    {initials(s.name)}
+                                  </span>
+                                  <div style={{ minWidth: 0 }}>
+                                    <p className="mono-cell-name" style={{ fontSize: 13 }}>{s.name}</p>
+                                    <p className="mono-cell-mail text-wrap-anywhere">{s.email}</p>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td>
-                              <div style={{ color: "var(--creme-soft)" }}>{s.teacher}</div>
-                              <div style={{ color: "var(--creme-mute)", fontSize: 11, marginTop: 2 }}>{s.classroom}</div>
-                            </td>
-                            <td className="center">
-                              <span className="status-pill active">{s.level}</span>
-                            </td>
-                            <td className="center" style={{ fontFamily: "var(--font-jetbrains, monospace)" }}>
-                              {s.xp.toLocaleString()}
-                            </td>
-                            <td className="center">
-                              <span className={`score-cell ${scoreClass}`}>{s.avgScore}/10</span>
-                            </td>
-                            <td style={{ minWidth: 140 }}>
-                              <div className="card-progress" style={{ marginBottom: 4 }}>
-                                <div className="card-progress-bar" style={{ width: `${s.progress}%` }} />
-                              </div>
-                              <span style={{ color: "var(--creme-mute)", fontSize: 11, fontFamily: "var(--font-jetbrains, monospace)" }}>
-                                {s.progress}%
-                              </span>
-                            </td>
-                            <td>
-                              <span className="status-pill pending">{s.subscription}</span>
-                            </td>
-                            <td style={{ color: "var(--creme-mute)", fontFamily: "var(--font-jetbrains, monospace)", fontSize: 11 }}>
-                              {new Date(s.lastActive).toLocaleDateString(dateLocale, { day: "2-digit", month: "short" })}
-                            </td>
-                            <td>
-                              <Link href={`/teacher/students/${s.id}`} className="row-btn">{t.profile}</Link>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                              </td>
+                              <td>
+                                <div style={{ color: "var(--creme-soft)" }}>{s.teacher}</div>
+                                <div style={{ color: "var(--creme-mute)", fontSize: 11, marginTop: 2 }}>{s.classroom}</div>
+                              </td>
+                              <td className="center">
+                                <span className="status-pill active">{s.level}</span>
+                              </td>
+                              <td className="center" style={{ fontFamily: "var(--font-jetbrains, monospace)" }}>
+                                {s.xp.toLocaleString()}
+                              </td>
+                              <td className="center">
+                                <span className={`score-cell ${scoreClass}`}>{s.avgScore}/10</span>
+                              </td>
+                              <td>
+                                <div className="card-progress" style={{ marginBottom: 4 }}>
+                                  <div className="card-progress-bar" style={{ width: `${s.progress}%` }} />
+                                </div>
+                                <span style={{ color: "var(--creme-mute)", fontSize: 11, fontFamily: "var(--font-jetbrains, monospace)" }}>
+                                  {s.progress}%
+                                </span>
+                              </td>
+                              <td>
+                                <span className="status-pill pending">{s.subscription}</span>
+                              </td>
+                              <td style={{ color: "var(--creme-mute)", fontFamily: "var(--font-jetbrains, monospace)", fontSize: 11 }}>
+                                {new Date(s.lastActive).toLocaleDateString(dateLocale, { day: "2-digit", month: "short" })}
+                              </td>
+                              <td>
+                                <Link href={`/teacher/students/${s.id}`} className="row-btn">{t.profile}</Link>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
+
+                {/* Mobile · même source, une carte par apprenant·e */}
+                <ul className="data-list mobile-only" aria-label={t.eye}>
+                  {filtered.map((s) => {
+                    const scoreClass = s.avgScore >= 7 ? "high" : s.avgScore >= 5 ? "mid" : "low";
+                    return (
+                      <li key={s.id} className="data-card">
+                        <div className="data-card-head">
+                          <span className="mono-avatar" style={{ width: 36, height: 36 }} aria-hidden="true">
+                            {initials(s.name)}
+                          </span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p className="data-card-title">{s.name}</p>
+                            <p className="data-card-sub">{s.email}</p>
+                          </div>
+                          <span className="status-pill active" style={{ flexShrink: 0 }}>{s.level}</span>
+                        </div>
+                        <dl className="data-card-rows">
+                          <dt>{t.cols[1]}</dt>
+                          <dd>{s.teacher} · {s.classroom}</dd>
+                          <dt>{t.cols[3]}</dt>
+                          <dd>{s.xp.toLocaleString()} XP</dd>
+                          <dt>{t.cols[4]}</dt>
+                          <dd><span className={`score-cell ${scoreClass}`}>{s.avgScore}/10</span></dd>
+                          <dt>{t.cols[5]}</dt>
+                          <dd>
+                            <div className="card-progress" style={{ marginBottom: 4 }}>
+                              <div className="card-progress-bar" style={{ width: `${s.progress}%` }} />
+                            </div>
+                            <span style={{ color: "var(--creme-mute)", fontSize: 11, fontFamily: "var(--font-jetbrains, monospace)" }}>
+                              {s.progress}%
+                            </span>
+                          </dd>
+                          <dt>{t.cols[6]}</dt>
+                          <dd><span className="status-pill pending">{s.subscription}</span></dd>
+                          <dt>{t.cols[7]}</dt>
+                          <dd>{new Date(s.lastActive).toLocaleDateString(dateLocale, { day: "2-digit", month: "short" })}</dd>
+                        </dl>
+                        <div className="data-card-actions">
+                          <Link href={`/teacher/students/${s.id}`} className="row-btn">{t.profile}</Link>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
             )}
           </>
         )}

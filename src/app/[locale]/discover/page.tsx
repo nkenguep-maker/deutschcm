@@ -1361,7 +1361,7 @@ export default function DiscoverPage() {
             {/* Community coming soon */}
             <div style={{ background: "rgba(99,102,241,0.04)", border: "1px solid rgba(99,102,241,0.12)", borderRadius: 14, padding: "20px 22px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
-                <div style={{ flex: 1, minWidth: 200 }}>
+                <div style={{ flex: "1 1 200px", minWidth: 0 }}>
                   <div className="syne" style={{ color: "#a5b4fc", fontWeight: 700, fontSize: 14, marginBottom: 6 }}>{t.communityTitle}</div>
                   <div style={{ color: "var(--creme-soft)", fontSize: 13, lineHeight: 1.6 }}>{t.communityText}</div>
                 </div>

@@ -80,14 +80,14 @@ export default function GroupPage() {
 
       {/* Header */}
       <div style={{ background: "rgba(13,17,23,0.85)", border: `1px solid ${lc}20`, borderTop: `3px solid ${lc}`, borderRadius: 16, padding: "24px 28px", marginBottom: 24 }}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
-          <div>
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
+          <div style={{ flex: "1 1 240px", minWidth: 0 }}>
             <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
               {group.level && <span style={{ background: `${lc}20`, color: lc, border: `1px solid ${lc}40`, borderRadius: 6, padding: "2px 9px", fontSize: 11, fontWeight: 800 }}>{group.level}</span>}
               {isCreator && <span style={{ background: "rgba(99,102,241,0.15)", color: "#a5b4fc", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 6, padding: "2px 9px", fontSize: 11, fontWeight: 700 }}>👑 Chef de groupe</span>}
             </div>
-            <h1 style={{ margin: "0 0 6px", color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 22 }}>{group.name}</h1>
-            <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}>
+            <h1 style={{ margin: "0 0 6px", color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 22, overflowWrap: "anywhere" }}>{group.name}</h1>
+            <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, overflowWrap: "anywhere" }}>
               {members.length} / {group.maxMembers} membres · Créé par {group.creator.fullName}
             </div>
           </div>
@@ -126,11 +126,11 @@ export default function GroupPage() {
               <div style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981", fontWeight: 700, fontSize: 13 }}>
                 {m.fullName.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()}
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ color: "#f1f5f9", fontWeight: 600, fontSize: 14 }}>{m.fullName} {i === 0 && isCreator ? <span style={{ fontSize: 11, color: "#f59e0b" }}>👑</span> : ""}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ color: "#f1f5f9", fontWeight: 600, fontSize: 14, overflowWrap: "anywhere" }}>{m.fullName} {i === 0 && isCreator ? <span style={{ fontSize: 11, color: "#f59e0b" }}>👑</span> : ""}</div>
                 <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 2 }}>{m.germanLevel ?? "?"} · {m.streakDays}🔥</div>
               </div>
-              <div style={{ color: "#10b981", fontWeight: 700, fontSize: 13 }}>{m.xpTotal.toLocaleString()} XP</div>
+              <div style={{ color: "#10b981", fontWeight: 700, fontSize: 13, flexShrink: 0 }}>{m.xpTotal.toLocaleString()} XP</div>
             </div>
           ))}
           {members.length < (group.maxMembers) && isCreator && (

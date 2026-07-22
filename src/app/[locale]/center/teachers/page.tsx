@@ -183,68 +183,114 @@ export default function CenterTeachersPage() {
             <p className="empty-state-sub">{t.emptySub}</p>
           </div>
         ) : (
-          <div className="data-table-wrap">
-            <div className="data-table-scroll">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    {t.cols.map((c, i) => (
-                      <th key={c} className={i === 2 || i === 3 || i === 4 ? "center" : ""}>{c}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((teacher) => {
-                    const scoreClass = teacher.avgScore >= 8 ? "high" : teacher.avgScore >= 7 ? "mid" : "low";
-                    return (
-                      <tr key={teacher.id}>
-                        <td>
-                          <div className="mono-cell">
-                            <span className="mono-avatar" aria-hidden="true">{initials(teacher.name)}</span>
-                            <div>
-                              <p className="mono-cell-name">
-                                {teacher.name}
-                                {teacher.verified && (
-                                  <svg className="mono-cell-check" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Vérifié">
-                                    <path d="M2 6l3 3 5-6" />
-                                  </svg>
-                                )}
-                              </p>
-                              <p className="mono-cell-mail">{teacher.email}</p>
+          <>
+            <div className="data-table-wrap desktop-only">
+              <div className="data-table-scroll">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      {t.cols.map((c, i) => (
+                        <th key={c} className={i === 2 || i === 3 || i === 4 ? "center" : ""}>{c}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((teacher) => {
+                      const scoreClass = teacher.avgScore >= 8 ? "high" : teacher.avgScore >= 7 ? "mid" : "low";
+                      return (
+                        <tr key={teacher.id}>
+                          <td>
+                            <div className="mono-cell">
+                              <span className="mono-avatar" aria-hidden="true">{initials(teacher.name)}</span>
+                              <div style={{ minWidth: 0 }}>
+                                <p className="mono-cell-name">
+                                  {teacher.name}
+                                  {teacher.verified && (
+                                    <svg className="mono-cell-check" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Vérifié">
+                                      <path d="M2 6l3 3 5-6" />
+                                    </svg>
+                                  )}
+                                </p>
+                                <p className="mono-cell-mail text-wrap-anywhere">{teacher.email}</p>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td>{teacher.specialty || "—"}</td>
-                        <td className="center">{teacher.classes}</td>
-                        <td className="center">{teacher.students}</td>
-                        <td className="center">
-                          {teacher.avgScore > 0 ? (
-                            <span className={`score-cell ${scoreClass}`}>{teacher.avgScore}/10</span>
-                          ) : (
-                            <span style={{ color: "var(--creme-mute)" }}>—</span>
-                          )}
-                        </td>
-                        <td>{new Date(teacher.joinedAt).toLocaleDateString(dateLocale, { day: "2-digit", month: "short", year: "numeric" })}</td>
-                        <td>
-                          <span className={`status-pill ${teacher.status}`}>{t.statusLbl[teacher.status]}</span>
-                        </td>
-                        <td>
-                          <div className="row-actions">
-                            <Link href={`/teacher/students/${teacher.id}`} className="row-btn">
-                              {t.profile}
-                            </Link>
-                            {teacher.status === "active" && (
-                              <button type="button" className="row-btn danger">{t.suspend}</button>
+                          </td>
+                          <td className="text-wrap-anywhere">{teacher.specialty || "—"}</td>
+                          <td className="center">{teacher.classes}</td>
+                          <td className="center">{teacher.students}</td>
+                          <td className="center">
+                            {teacher.avgScore > 0 ? (
+                              <span className={`score-cell ${scoreClass}`}>{teacher.avgScore}/10</span>
+                            ) : (
+                              <span style={{ color: "var(--creme-mute)" }}>—</span>
                             )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          </td>
+                          <td>{new Date(teacher.joinedAt).toLocaleDateString(dateLocale, { day: "2-digit", month: "short", year: "numeric" })}</td>
+                          <td>
+                            <span className={`status-pill ${teacher.status}`}>{t.statusLbl[teacher.status]}</span>
+                          </td>
+                          <td>
+                            <div className="row-actions">
+                              <Link href={`/teacher/students/${teacher.id}`} className="row-btn">
+                                {t.profile}
+                              </Link>
+                              {teacher.status === "active" && (
+                                <button type="button" className="row-btn danger">{t.suspend}</button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+
+            {/* Mobile · même source, une carte par enseignant·e */}
+            <ul className="data-list mobile-only" aria-label={t.eye}>
+              {filtered.map((teacher) => {
+                const scoreClass = teacher.avgScore >= 8 ? "high" : teacher.avgScore >= 7 ? "mid" : "low";
+                return (
+                  <li key={teacher.id} className="data-card">
+                    <div className="data-card-head">
+                      <span className="mono-avatar" aria-hidden="true">{initials(teacher.name)}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p className="data-card-title">
+                          {teacher.name}
+                          {teacher.verified && (
+                            <svg className="mono-cell-check" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Vérifié" style={{ marginLeft: 6, display: "inline" }}>
+                              <path d="M2 6l3 3 5-6" />
+                            </svg>
+                          )}
+                        </p>
+                        <p className="data-card-sub">{teacher.email}</p>
+                      </div>
+                      <span className={`status-pill ${teacher.status}`} style={{ flexShrink: 0 }}>{t.statusLbl[teacher.status]}</span>
+                    </div>
+                    <dl className="data-card-rows">
+                      <dt>{t.cols[1]}</dt>
+                      <dd>{teacher.specialty || "—"}</dd>
+                      <dt>{t.cols[2]} · {t.cols[3]}</dt>
+                      <dd>{teacher.classes} · {teacher.students}</dd>
+                      <dt>{t.cols[4]}</dt>
+                      <dd>{teacher.avgScore > 0 ? <span className={`score-cell ${scoreClass}`}>{teacher.avgScore}/10</span> : "—"}</dd>
+                      <dt>{t.cols[5]}</dt>
+                      <dd>{new Date(teacher.joinedAt).toLocaleDateString(dateLocale, { day: "2-digit", month: "short", year: "numeric" })}</dd>
+                    </dl>
+                    <div className="data-card-actions">
+                      <Link href={`/teacher/students/${teacher.id}`} className="row-btn">
+                        {t.profile}
+                      </Link>
+                      {teacher.status === "active" && (
+                        <button type="button" className="row-btn danger">{t.suspend}</button>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
         )}
       </section>
 

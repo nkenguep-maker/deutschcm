@@ -168,7 +168,7 @@ export default function CenterClassesPage() {
           </button>
         </header>
 
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+        <div className="filter-row">
           <input
             type="search"
             value={search}
@@ -176,7 +176,6 @@ export default function CenterClassesPage() {
             placeholder={t.searchPh}
             aria-label={t.searchPh}
             className="modal-input"
-            style={{ flex: 1, minWidth: 260 }}
           />
           <div className="subpage-filters" role="tablist" aria-label={t.filters.all}>
             {(Object.keys(t.filters) as Filter[]).map((k) => (
@@ -226,6 +225,7 @@ export default function CenterClassesPage() {
                           color: "var(--creme)",
                           margin: 0,
                           fontWeight: 400,
+                          overflowWrap: "anywhere",
                         }}>{cls.name}</h3>
                         <span className="status-pill active">{cls.level}</span>
                         <span className={`status-pill ${cls.isActive ? "active" : "inactive"}`}>

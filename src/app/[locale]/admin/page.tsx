@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useT } from "@/hooks/useT"
 import { BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 
@@ -36,6 +36,21 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<"overview"|"users"|"courses"|"validations"|"system">("overview")
   const [searchUser, setSearchUser] = useState("")
   const [filterRole, setFilterRole] = useState("ALL")
+  // Drawer mobile · fermé par défaut, ré-ouvrable via hamburger. Le
+  // hamburger ref sert à restaurer le focus quand on ferme via Escape.
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const hamburgerRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (!drawerOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setDrawerOpen(false)
+        hamburgerRef.current?.focus()
+      }
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [drawerOpen])
   const [stats, setStats] = useState<AdminStats>({
     users: { total: 0, students: 0, teachers: 0, centers: 0, growth: "" },
     courses: { total: 0, published: 0, draft: 0, modules: 0 },
@@ -81,7 +96,7 @@ export default function AdminDashboard() {
 
   return (
     <div style={{
-      minHeight: "100vh", background: "var(--espresso)",
+      background: "var(--espresso)",
       fontFamily: "var(--font-jetbrains, monospace),monospace", color: "white"
     }}>
       <style>{`
@@ -89,15 +104,34 @@ export default function AdminDashboard() {
         ::-webkit-scrollbar { display: none; }
       `}</style>
 
-      <div style={{ display: "flex", height: "100vh" }}>
+      <button
+        ref={hamburgerRef}
+        type="button"
+        className="admin-hamburger"
+        aria-label="Menu admin"
+        aria-expanded={drawerOpen}
+        aria-controls="admin-sidebar-nav"
+        onClick={() => setDrawerOpen(true)}
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+          <path d="M3 5h14M3 10h14M3 15h14" />
+        </svg>
+      </button>
+
+      <div
+        className={`admin-scrim ${drawerOpen ? "open" : ""}`}
+        onClick={() => setDrawerOpen(false)}
+        aria-hidden="true"
+      />
+
+      <div className="admin-shell">
 
         {/* ── Sidebar ── */}
-        <div style={{
-          width: 240, flexShrink: 0,
-          borderRight: "1px solid var(--creme-hair)",
-          background: "rgba(244, 235, 220, 0.02)",
-          padding: "24px 16px", overflowY: "auto"
-        }}>
+        <nav
+          id="admin-sidebar-nav"
+          className={`admin-sidebar ${drawerOpen ? "open" : ""}`}
+          aria-label="Navigation admin"
+        >
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28 }}>
             <span style={{ fontSize: 20 }}></span>
             <span style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 16, fontWeight: 800 }}>
@@ -107,14 +141,15 @@ export default function AdminDashboard() {
           </div>
 
           {navItems.map(item => (
-            <button key={item.key} onClick={() => setActiveTab(item.key as any)}
+            <button key={item.key} onClick={() => { setActiveTab(item.key as any); setDrawerOpen(false); }}
               style={{
                 width: "100%", display: "flex", alignItems: "center", gap: 10,
                 padding: "10px 12px", borderRadius: 10, marginBottom: 4, border: "none",
                 background: activeTab === item.key ? "var(--brass-glow)" : "transparent",
                 color: activeTab === item.key ? "var(--brass)" : "var(--creme-mute)",
                 cursor: "pointer", textAlign: "left", fontSize: 13,
-                outline: activeTab === item.key ? "1px solid var(--brass-edge)" : "none"
+                outline: activeTab === item.key ? "1px solid var(--brass-edge)" : "none",
+                minHeight: 44,
               }}>
               <span>{item.icon}</span>
               <span style={{ flex: 1, fontFamily: "var(--font-fraunces),sans-serif", fontWeight: activeTab === item.key ? 700 : 400 }}>
@@ -129,14 +164,14 @@ export default function AdminDashboard() {
           ))}
 
           <div style={{ paddingTop: 20, borderTop: "1px solid var(--creme-hair)", marginTop: 24 }}>
-            <a href="/" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 10, color: "var(--creme-mute)", fontSize: 12, textDecoration: "none" }}>
+            <a href="/" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 10, color: "var(--creme-mute)", fontSize: 12, textDecoration: "none", minHeight: 44 }}>
               {tA.backToSite}
             </a>
           </div>
-        </div>
+        </nav>
 
         {/* ── Content ── */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "32px 36px" }}>
+        <div className="admin-content">
 
           {/* ════ OVERVIEW ════ */}
           {activeTab === "overview" && (
@@ -150,8 +185,8 @@ export default function AdminDashboard() {
                 </p>
               </div>
 
-              {/* KPIs */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginBottom: 24 }}>
+              {/* KPIs — responsive : 5 colonnes desktop, 1-2 en mobile. */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 24 }}>
                 {[
                   { label: tA.kpiTotal, value: stats.users.total.toLocaleString(), icon: "👥", color: "var(--brass)", sub: tA.kpiTotalSub },
                   { label: tA.kpiStudents, value: stats.users.students.toLocaleString(), icon: "🎓", color: "#34d399", sub: tA.kpiStudentsSub },
@@ -168,8 +203,8 @@ export default function AdminDashboard() {
                 ))}
               </div>
 
-              {/* Charts */}
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16, marginBottom: 20 }}>
+              {/* Charts · empile en mobile pour éviter que le pie chart ne se coince à côté d'un area réduit. */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginBottom: 20 }}>
 
                 <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)" }}>
                   <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 14, margin: "0 0 20px" }}>{tA.chartMonthly}</h3>
@@ -229,7 +264,7 @@ export default function AdminDashboard() {
                 </ResponsiveContainer>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
                 <div style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)" }}>
                   <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.recentActivity}</h3>
                   <div style={{ textAlign: "center", padding: "20px 0" }}>
@@ -252,14 +287,14 @@ export default function AdminDashboard() {
           {/* ════ USERS ════ */}
           {activeTab === "users" && (
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 24 }}>
                 <h1 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 22, fontWeight: 800, margin: 0 }}>{tA.usersTitle}</h1>
-                <div style={{ display: "flex", gap: 8 }}>
+                <div className="filter-row" style={{ flex: "1 1 auto" }}>
                   <input
                     value={searchUser}
                     onChange={e => setSearchUser(e.target.value)}
                     placeholder={tA.searchPlaceholder}
-                    style={{ padding: "8px 14px", borderRadius: 10, background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "white", fontSize: 12, outline: "none", width: 220 }}
+                    style={{ padding: "8px 14px", borderRadius: 10, background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "white", fontSize: 12, outline: "none" }}
                   />
                   <select value={filterRole} onChange={e => setFilterRole(e.target.value)}
                     style={{ padding: "8px 12px", borderRadius: 10, background: "var(--creme-hair)", border: "1px solid var(--creme-hair)", color: "white", fontSize: 12, outline: "none" }}>
@@ -271,7 +306,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 20 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10, marginBottom: 20 }}>
                 {[
                   { label: tA.filterStudents, value: stats.users.students, color: "var(--brass)" },
                   { label: tA.filterTeachers, value: stats.users.teachers, color: "#60a5fa" },
@@ -286,7 +321,8 @@ export default function AdminDashboard() {
               </div>
 
               <div style={{ borderRadius: 14, overflow: "hidden", border: "1px solid var(--creme-hair)" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, minWidth: 560 }}>
                   <thead>
                     <tr style={{ background: "rgba(244, 235, 220, 0.04)" }}>
                       {[tA.tableUser, tA.tableRole, tA.tableLevel, tA.tableCity, tA.tableDate, tA.tableStatus, tA.tableActions].map(h => (
@@ -337,6 +373,7 @@ export default function AdminDashboard() {
                       ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             </div>
           )}
@@ -449,7 +486,7 @@ export default function AdminDashboard() {
             <div>
               <h1 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 24 }}>{tA.systemTitle}</h1>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
 
                 <div style={{ padding: "20px 24px", borderRadius: 14, background: "rgba(244, 235, 220, 0.03)", border: "1px solid var(--creme-hair)" }}>
                   <h3 style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 14, margin: "0 0 16px" }}>{tA.apisTitle}</h3>

@@ -1,6 +1,16 @@
+import type { Viewport } from "next"
 import { Fraunces, JetBrains_Mono, Manrope } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/contexts/ThemeContext"
+
+// Next 16 metadata · viewport-fit=cover libère env(safe-area-inset-*)
+// pour les shells authentifiés (dashboards, layouts fixes). N'affecte
+// pas la landing qui gère ses propres marges d'ambiance.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+}
 
 // Kaffeehaus — Fraunces (display, contrast serif), Manrope (humanist body),
 // JetBrains Mono (utility, CEFR numerals).

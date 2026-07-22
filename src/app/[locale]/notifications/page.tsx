@@ -62,15 +62,23 @@ const ACTION_TYPES = ["join_request", "group_join_request", "group_invite"];
 export default function NotificationsPage() {
   const [notifs, setNotifs] = useState<Notif[]>([]);
   const [loading, setLoading] = useState(true);
+  const [offline, setOffline] = useState(false);
   const [filter, setFilter] = useState("all");
   const [responding, setResponding] = useState<string | null>(null);
 
-  useEffect(() => {
+  const load = () => {
+    setOffline(false);
+    setLoading(true);
     fetch("/api/social?action=notifications")
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d?.notifications) setNotifs(d.notifications); })
-      .catch(() => {})
+      .catch(() => setOffline(true))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    load();
   }, []);
 
   const markAllRead = async () => {
@@ -151,6 +159,14 @@ export default function NotificationsPage() {
             Array.from({ length: 5 }).map((_, i) => (
               <div key={i} style={{ height: 72, background: "rgba(255,255,255,0.02)", borderRadius: 14, border: "1px solid rgba(255,255,255,0.05)", animation: "pulse 2s infinite" }} />
             ))
+          ) : offline ? (
+            <StateBlock
+              kind="offline"
+              centered
+              soul="La maison attend le réseau. *Ta progression est sauvegardée.*"
+              body="Impossible de récupérer tes notifications pour l'instant. Reconnecte-toi pour charger les dernières données — rien n'est perdu."
+              action={{ label: "Réessayer", onClick: load }}
+            />
           ) : filtered.length === 0 ? (
             <StateBlock
               kind="empty"
@@ -186,7 +202,7 @@ export default function NotificationsPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 4 }}>
                       <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                        <span style={{ color: "white", fontSize: 13, fontWeight: n.isRead ? 500 : 700 }}>{n.title}</span>
+                        <span style={{ color: "white", fontSize: 13, fontWeight: n.isRead ? 500 : 700, overflowWrap: "anywhere" }}>{n.title}</span>
                         <span style={{
                           background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)",
                           borderRadius: 5, padding: "1px 6px", fontSize: 10, fontWeight: 600,
@@ -196,7 +212,7 @@ export default function NotificationsPage() {
                       </div>
                       <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11, flexShrink: 0, marginTop: 2 }}>{timeAgo(n.createdAt)}</span>
                     </div>
-                    <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, lineHeight: 1.5, margin: "0 0 10px" }}>{n.body}</p>
+                    <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, lineHeight: 1.5, margin: "0 0 10px", overflowWrap: "anywhere" }}>{n.body}</p>
 
                     {isActionable && !isDone && (
                       <div style={{ display: "flex", gap: 8 }}>
