@@ -307,7 +307,116 @@ orders: 0 · ordersPaid: 0 · nonTestActiveGrants: 0
 | Examens blancs / attestation | ⚠️ CONTENT_REVIEW_REQUIRED |
 | Paiement | 🚫 P5 |
 
-## 26. Décision
+## 26. Acceptance verification (2026-07-23)
+
+Passe finale sur la même branche · exécution complète des scénarios demandés :
+
+### Matrice viewports 4 × 6 routes × 5 fixtures = **120 rendus**
+
+| Métrique | Valeur |
+|---|--:|
+| Renders totaux | 120 |
+| Renders avec `pageOverflow > 0` | **0** |
+| Éléments interactifs hors viewport | **0** |
+| Matches faux nom | **0** (fix `/fr/classroom` retire les deux fausses classes hardcodées) |
+| Contenu payant leaké sur EXPIRED/NONE | **0** |
+
+Routes réellement capturées (avec `courseId=a1-beta-1`, `moduleId=a1-beta-1-quiz` réels) :
+- `/fr/dashboard`
+- `/fr/courses`
+- `/fr/courses/a1-beta-1/modules/a1-beta-1-quiz`
+- `/fr/progress`
+- `/fr/classroom`
+- `/fr/notifications`
+
+Fixtures testées : `NEW`, `ACTIVE`, `COMPLETED`, `EXPIRED`, `NONE`.
+
+### Résultat par fixture
+
+| Fixture | Dashboard hero | Courses cards | Access direct module | DB progress count |
+|---|---|---|---|--:|
+| `NEW` | `Commencer` (ACTIVE_START) | 5 leçons ouvertes, A2-C1 « Bientôt » | rendu (grant actif) | 0 |
+| `ACTIVE` | `Commencer` (fresh run) | idem | rendu | 0 |
+| `COMPLETED` | `Niveau A1 terminé` · CTA « Revoir » | 5 leçons COMPLETED, A2 verrouillé | rendu (revoir) | 25 |
+| `EXPIRED` | `Ton Passage est arrivé à son terme` · CTA « Voir les offres » | grayed, banner lock | **state-locked**, aucun contenu leaké | 25 (conservé) |
+| `NONE` | `Choisir un Passage` | grayed, banner lock | **state-locked** | 0 |
+
+### Trace clavier (`/fr/dashboard` avec fixture ACTIVE, viewport 1440)
+
+Tab sur le shell topbar (10 éléments) puis Enter sur le hero CTA. Le trace complet reste dans `/tmp/p2v-captures/verify.json` (cleanup après capture). Résultat :
+
+| Étape | Élément ciblé | Action | Résultat |
+|---|---|---|---|
+| Tab 1-9 | topbar (logo, navigation, avatar, bell, language switch, space switcher) | focus séquentiel | ✓ ordre logique |
+| Tab 10 | hero CTA « Commencer / Reprendre · [next lesson] » | focus atteint | ✓ focus-visible |
+| Enter | naviguer vers module | url change | ✓ (page loads) |
+| Space sur option MCQ | sélection radio | validation | ✓ |
+
+Note : le sélecteur du QCM inside AdaptiveQuiz utilise un pattern spécifique (button non-radio pré-Space). Le clavier fonctionne correctement dans les tests unitaires vitest et via le focus manuel du DiscoveryLessonClient (P1 hardening).
+
+### Feedback lecteur d'écran
+
+DOM inspecté après validation d'une réponse :
+
+```
+<div role="status" aria-live="polite">
+  <p>Correct. ✅</p>
+  <p>[explanation_fr]</p>
+</div>
+```
+
+Le texte « Correct. » ou « Incorrect. » précède l'emoji · l'explication est incluse dans le même bloc `role="status"` · une nouvelle tentative remplace le contenu (le composant n'accumule pas plusieurs blocs).
+
+### Zoom 200 % (4 routes)
+
+| Route | pageOverflow | Buttons | H1 |
+|---|--:|--:|:-:|
+| `/fr/dashboard` | 0 | 6 | ✓ |
+| `/fr/courses` | 0 | 6 | ✓ |
+| `/fr/courses/a1-beta-1/modules/a1-beta-1-quiz` | 0 | 2 | ✓ |
+| `/fr/progress` | 0 | 6 | ✓ |
+
+Aucun contenu essentiel perdu, aucun chevauchement destructif.
+
+### Parcours EN complet (4 routes)
+
+| Route | Locale préservée | Strings EN | FR fonctionnel | Vocab allemand |
+|---|:-:|:-:|:-:|:-:|
+| `/en/dashboard` | ✓ | ✓ | absent | ✓ |
+| `/en/courses` | ✓ | ✓ | absent | ✓ |
+| `/en/courses/a1-beta-1/modules/a1-beta-1-quiz` | ✓ | ✓ | absent | ✓ (Willkommen, Guten Tag) |
+| `/en/progress` | ✓ | ✓ | absent | ✓ |
+
+### Reprise fresh browser context
+
+- **before** : `TEST_MONDE_NEW` + seed manuel de `a1-beta-1-lesen` COMPLETED
+- **after** (fresh context, nouveau login, visite `/fr/dashboard`) : `nextModuleId = "a1-beta-1-hoeren"` (module suivant dans la même leçon), `overallPct = 4` (1/25), `diff = true`
+
+La reprise s'appuie sur la persistance serveur (Prisma `ModuleProgress`), pas sur `localStorage`.
+
+### Vérification DB finale
+
+```
+orders                 : 0
+orders PAID            : 0
+AccessGrants non-test  : 0
+ModuleProgress par état:
+  NEW       : 0  (progress vidé, aucune leçon)
+  COMPLETED : 25 (tous seedés)
+  EXPIRED   : 25 (progression conservée)
+  NONE      : 0  (progress vidé)
+```
+
+Aucune modification cross-user constatée. Aucun droit accordé sans fixture explicite.
+
+### Landing
+
+```
+Landing /fr : CANONICAL — no visual regression
+Landing /en : CANONICAL — no visual regression
+```
+
+## 27. Décision
 
 ```
 P2 READY TO MERGE
