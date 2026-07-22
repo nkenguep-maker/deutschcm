@@ -173,3 +173,65 @@ Ce lot n'a pas :
 - modifié les prix, entitlements, Prisma, ni la landing.
 
 Les primitives ci-dessus sont conçues pour être réutilisées par P1 (funnel), P2 (dashboards), P3 (Racines) et P4 (messagerie) sans réécriture.
+
+## 15. Vérification visuelle post-merge P0.B
+
+Vérification exécutée sur baseline P-1 réauthentifiée (2026-07-22) — Playwright
+authentifié × 3 rôles × 12 routes × 4 viewports = **48 rendus**. Critère
+principal : `document.documentElement.scrollWidth <= clientWidth`.
+
+| Route | 360 | 390 | 768 | 1440 | Page overflow | Local overflow | Résultat |
+|---|--:|--:|--:|--:|--:|--:|---|
+| `/center/students` | 3 | 0 | 46 | 0 | 0 sur 4 vp | table > 768 dans `.data-table-scroll` | ✓ |
+| `/center/teachers` | 3 | 0 | 37 | 0 | 0 sur 4 vp | table > 768 dans `.data-table-scroll` | ✓ |
+| `/center/classes` | 3 | 0 | 0 | 0 | 0 sur 4 vp | — | ✓ |
+| `/center/billing` | 3 | 0 | 0 | 0 | 0 sur 4 vp | — | ✓ |
+| `/admin` | 63 | 61 | 0 | 0 | 0 sur 4 vp | sidebar 240 px hardcodée (hors scope P0.B) | ⚠ |
+| `/admin/users` | 3 | 0 | 0 | 0 | 0 sur 4 vp | — | ✓ |
+| `/admin/centers` | 3 | 0 | 0 | 0 | 0 sur 4 vp | — | ✓ |
+| `/admin/applications` | 0 | 0 | 0 | 0 | 0 sur 4 vp | — | ✓ |
+| `/admin/system` | 3 | 0 | 0 | 0 | 0 sur 4 vp | — | ✓ |
+| `/notifications` | 3 | 0 | 0 | 0 | 0 sur 4 vp | — | ✓ |
+| `/group` | 3 | 0 | 0 | 0 | 0 sur 4 vp | — | ✓ |
+| `/discover` | 4 | 1 | 1 | 0 | 0 sur 4 vp | .seuil-brasier animation | ✓ |
+
+- Le « 3 » qui apparaît sur presque toutes les pages à 360 px correspond aux
+  actions du shell `.app-header-actions` (LanguageChooser + SpaceSwitcher +
+  LanguageSwitcher + NotificationBell = 295 px de largeur alors qu'il ne reste
+  que ~296 px après hamburger + padding). Cette contrainte est portée par le
+  Layout partagé, existait avant P0.B, et est contenue par
+  `body { overflow-x: hidden }`. À traiter dans une passe Layout dédiée.
+- `/admin` conserve sa propre shell interne (sidebar 240 px inline, ne suit pas
+  `.app-shell`). Le fix P0.B a rendu la grille KPI fluide (auto-fit minmax 140)
+  mais la sidebar hardcodée reste. Refactor complet planifié pour P2/P3.
+- Sur les tables desktop à 768 px (`center/students`, `center/teachers`), la
+  table dépasse la largeur du viewport tablette et scrolle horizontalement DANS
+  `.data-table-scroll` — comportement voulu par la doctrine §5 (« scroll
+  horizontal local uniquement si réellement nécessaire »).
+
+**Landing `/fr` et `/en`** (3 viewports × 2 routes = 6 rendus) : 0 leak de
+classe P0.B, 0 page-overflow, seul l'élément canonique `.seuil-brasier`
+(animation braise) déborde de son container en 360/390 comme avant P0.B.
+
+**Lint objectif** (diff main vs branche sur 11 fichiers modifiés partagés) :
+0 nouveau error, 0 nouveau warning. Total identique 45 errors + 14 warnings
+tous pré-existants (`any`, `unused-vars`, `no-html-link-for-pages`,
+`no-unescaped-entities`). Le nouveau fichier
+`src/app/__tests__/responsive-foundations.test.ts` produit 0 finding.
+
+**Données mock encore visibles** (non introduites par P0.B, à traiter par un lot
+de branchement DB ultérieur) :
+
+| Route | Mock names visibles | Fichier source |
+|---|---|---|
+| `/center/students` | 14 (Marie Nguemo, Sophie Tanda, …) | `src/app/[locale]/center/students/page.tsx` const `STUDENTS` |
+| `/center/teachers` | 7 (Dr. Beatrice Momo, …) | `src/app/[locale]/center/teachers/page.tsx` const `MOCK_TEACHERS` |
+| `/center/classes` | 1 (Jean Mbarga) | `src/app/[locale]/center/classes/page.tsx` const `CLASSES` |
+| `/center/stats` | 15 | idem `/center/students` référencé pour stats |
+| `/center/billing` | 0 | — |
+
+Ces valeurs proviennent des constantes hardcodées de démonstration qui
+existent depuis avant P0.B (voir `docs/YEMA_AUTHENTICATED_BASELINE.md` §110).
+Elles seront remplacées par des queries Prisma réelles quand le branchement
+back-office centre sera priorisé — hors scope P0.A/P0.B/P1.
+
