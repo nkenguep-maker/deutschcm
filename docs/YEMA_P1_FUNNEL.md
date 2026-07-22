@@ -235,8 +235,113 @@ Landing FR/EN : **0 régression**, 0 leak de classe P1.
 | Tests | ✅ DONE | 154/154 passent. |
 | Landing | ✅ DONE | 0 régression. |
 
-## 15. Décision produit à trancher plus tard
+## 15. Hardening P1 (2026-07-22)
 
-- Faut-il un vrai écran d'auto-évaluation 5 options (CECR complet) ou garder les 3 options actuelles ?
-- Le mapping `beginner→A1`, `some_basics→A2` est-il assez granulaire ?
-- Faut-il seeder Wolof (ou une autre langue Racines) avant de retirer l'écran waitlist ?
+Second passage sur la même branche · résolutions :
+
+### Auto-évaluation vraiment 5 options
+- Nouveaux écrans `/onboarding/monde/niveau` et `/onboarding/racines/niveau`
+  (server component + `NiveauForm` client partagé).
+- 5 phrases déclaratives par univers (fichier unique `src/lib/self-assessment.ts`)
+- Persistance triple : `selfAssessmentAnswer` (1-5), `declaredLevel` (CECR ou É1-É5),
+  `recommendedLevel`. `currentLevel` mirroré côté LP pour Monde.
+- Wording explicite « Cette recommandation est indicative. Tu pourras ajuster… »
+- Les formulaires Monde/Racines existants **ne dérivent plus** de niveau du
+  `startPoint` — c'est l'écran niveau qui produit l'évaluation.
+
+### Disponibilité indépendante des prix
+- Nouveau `MONDE_LEVEL_AVAILABILITY` (src/lib/discovery.ts) avec 4 dimensions :
+  `priced`, `discoveryReady`, `courseReady`, `purchasable`.
+- État actuel : A1 seul `discoveryReady=true`. A2-C1 `priced=true` (affichage
+  des prix P0.A conservé) mais `discoveryReady=false` et `purchasable=false`.
+- `/activation-intent` verrouille visuellement A2-C1 avec badge « Bientôt
+  disponible », `disabled + aria-disabled`, curseur `not-allowed`. Un
+  contrôle serveur secondaire bloque tout PATCH d'intention sur niveau non
+  disponible (ceinture).
+- Racines : `RACINES_OFFERS_AVAILABLE = false` → l'écran `/activation-intent`
+  rend un `StateBlock kind="empty"` d'entrée honnête plutôt qu'une grille
+  d'offres inutile.
+
+### Permissions strictes STUDENT
+- Proxy `PROTECTED_ROUTES` : `/decouverte` et `/activation-intent` passent de
+  `STUDENT + ADMIN` à `STUDENT` seul (hardening §6 : ADMIN n'est pas un
+  contournement).
+- Nouveau `/onboarding` protégé STUDENT (placé APRÈS `/onboarding/teacher` et
+  `/onboarding/center` dans l'objet pour que le prefix match spécifique
+  précède le générique).
+- API `/api/funnel` : nouveau garde `FORBIDDEN_NOT_STUDENT` (403) qui
+  vérifie l'existence d'un `UserRole { role: STUDENT, status: ACTIVE }`.
+
+### Routing router post-formulaire
+- Le router `/onboarding` évalue désormais l'état DB en PREMIER. La
+  fallback `user_metadata.universe` n'est utilisée que si aucun LP existe
+  encore. Correction du bug qui court-circuitait la reprise de découverte
+  quand `user_metadata.universe` était présent depuis l'inscription.
+
+### E2E complet post-hardening (2026-07-22, P-1 baseline)
+
+**Monde FR complet** (Playwright headless, 390 x 844) :
+- `/fr/onboarding` → `/fr/onboarding/monde` (form) ou `/fr/onboarding/monde/niveau` selon état
+- `/fr/decouverte/1..4` rendus, complétion via API `PATCH { discoveryProgress }` → 200
+- `/fr/activation-intent` : `Choisir un Passage` + badge « Bientôt disponible » sur A2-C1
+- pageOverflow = 0
+
+**Monde EN** (`/en`) :
+- Zéro chaîne française sur les écrans functionnels (`Continue`, `Coming soon`, `Check`)
+- `/en/decouverte/1|bilan|activation-intent` : rendus 100% EN
+
+**Racines FR** :
+- `/fr/activation-intent` : rend `StateBlock kind=empty` avec « arrivent bientôt »
+- Aucune offre Solo/Famille sélectionnable
+
+**Resume (fresh browser context)** :
+- Setup : progress `[1, 2]` via API
+- Fresh login → `/fr/onboarding` redirige vers `/fr/decouverte/3` (première leçon non-complétée) ✓
+
+**Exclusion des rôles pro** :
+
+| Rôle | `/fr/onboarding` | `/fr/decouverte/1` | `/fr/activation-intent` | API GET | API PATCH |
+|---|---|---|---|---|---|
+| Teacher | `/fr/teacher` (302) | `/fr/teacher` | `/fr/teacher` | 403 | 403 |
+| Center | `/fr/center` | `/fr/center` | `/fr/center` | 403 | 403 |
+| Admin | `/fr/admin` | `/fr/admin` | `/fr/admin` | 403 | 403 |
+| Anonymous | — | — | — | 401 | 401 |
+
+**Ownership** :
+- Body fields `userId`, `learningPathId`, `supabaseId` fournis par le client → **ignorés**
+- Le PATCH n'affecte QUE le LP de l'utilisateur authentifié (server load via session)
+
+**Viewport sweep 4×6 = 24 rendus** :
+- 360/390/768/1440 × `/onboarding`, `/onboarding/monde`, `/onboarding/monde/niveau`, `/decouverte/1`, `/decouverte/bilan`, `/activation-intent`
+- **`pageOverflow=0` sur 24/24**. `overflowCount=0` partout.
+
+**Zoom 200%** (3 routes) : `pageOverflow=0` maintenu, boutons interactifs présents (6/8/4).
+
+**DB post-parcours** :
+```
+orders total: 0
+orders PAID: 0
+AccessGrant ACTIVE: 0
+```
+Aucune commande, aucun paiement, aucun entitlement créé.
+
+### Statut d'implémentation post-hardening
+
+| Point | Statut |
+|---|---|
+| Choix univers | ✅ DONE |
+| Choix langue (active + soon honnête) | ✅ DONE |
+| Auto-évaluation Monde 5 options CECR | ✅ DONE |
+| Auto-évaluation Racines 5 options É1-É5 | ✅ DONE (testable même sans langue active) |
+| 4 leçons deutsch A1 | ✅ DONE |
+| A2-C1 verrouillés (`discoveryReady=false`) | ✅ DONE |
+| Racines waitlist honnête · pas d'impasse | ✅ DONE |
+| Coach Racines `Bientôt disponible` | ✅ DONE |
+| Exclusion TEACHER/CENTER/ADMIN | ✅ DONE (proxy + API) |
+| Ownership cross-user | ✅ DONE (session-based) |
+| Reprise post-logout | ✅ DONE (bug router résolu) |
+| Locales FR/EN | ✅ DONE (E2E confirme) |
+| Mobile 360/390/768/1440 | ✅ DONE (24/24 pageOverflow=0) |
+| Zoom 200% | ✅ DONE (3 routes) |
+| Paiement · aucun ordre/entitlement | ✅ DONE (DB check post-parcours) |
+| Langue Racines active | 🚫 BLOCKED — CONTENT MISSING (aucune langue Racines seedée) |

@@ -252,13 +252,16 @@ Estimation : **S** (< 4h), **M** (4-8h), **L** (1-2 jours), **XL** (3-5 jours).
 
 # Lot P1 — Funnel
 
-> **Statut d'implémentation** (branche `feat/yema-p1-funnel`, 2026-07-22) :
-> - P1-1 (portes) : ✅ DONE — routeur `/onboarding` avec dérivation d'état.
-> - P1-2 (choix langue) : ✅ DONE — `LANGUAGES` unique source, écran `/decouverte/attente` honnête pour langues `soon`.
-> - P1-3 (auto-évaluation) : ⚠️ PARTIAL — dérivée du `startPoint` (3 options) au lieu d'une vraie sélection 5 options CECR. À trancher avant P2.
-> - P1-4 (4 leçons découverte) : ✅ DONE deutsch · 🚫 BLOCKED Racines (aucun contenu seedé).
-> - P1-5 (bilan + activation) : ✅ DONE — `/decouverte/bilan` + `/activation-intent` avec grille P0.A, coach Racines toujours « Bientôt disponible ».
-> - Détail complet : voir `docs/YEMA_P1_FUNNEL.md`.
+> **Statut d'implémentation** (branche `feat/yema-p1-funnel`, hardening 2026-07-22) :
+> - P1-1 (portes) : ✅ DONE — routeur `/onboarding` avec dérivation d'état DB-first.
+> - P1-2 (choix langue) : ✅ DONE — `LANGUAGES` unique source, `/decouverte/attente` honnête, disponibilité `MONDE_LEVEL_AVAILABILITY` indépendante des prix.
+> - P1-3 (auto-évaluation) : ✅ DONE — vrais écrans `/onboarding/{monde,racines}/niveau` avec 5 options par univers, persistance `selfAssessmentAnswer` + `declaredLevel` + `recommendedLevel`, wording indicatif.
+> - P1-4 (4 leçons découverte) : ✅ DONE deutsch A1 · 🚫 BLOCKED — CONTENT MISSING pour Racines (aucun contenu seedé), A2-C1 Monde verrouillés (`discoveryReady=false`).
+> - P1-5 (bilan + activation) : ✅ DONE — verrouillage A2-C1 avec badge « Bientôt disponible », Racines `RACINES_OFFERS_AVAILABLE=false` → StateBlock empty.
+> - Sécurité : ✅ DONE — proxy `/decouverte`/`/activation-intent`/`/onboarding` = STUDENT strict (ADMIN exclu), API `/api/funnel` refuse non-STUDENT (403 FORBIDDEN_NOT_STUDENT), ownership session-based.
+> - Reprise : ✅ DONE — fresh browser context → next non-completed lesson.
+> - Vérifications 2026-07-22 : 24/24 rendus avec `pageOverflow=0` (360/390/768/1440 × 6 routes), 0 order/entitlement en DB post-parcours, landing FR/EN CANONICAL sans régression.
+> - Détail complet : voir `docs/YEMA_P1_FUNNEL.md` §15.
 
 **Objectif utilisateur** : permettre à un nouvel inscrit d'aller de "compte créé" à "premier cours de découverte terminé" sans friction, en respectant les 6 étapes doctrinales.
 
