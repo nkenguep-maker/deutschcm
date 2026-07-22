@@ -39,7 +39,7 @@ export function useAmbassade(locale: "fr" | "en" = "fr") {
     sessionResult,
     scenario,
     niveau,
-    sendMessage: async (_text: string) => { gone(); },
+    sendMessage: async (_text: string) => { void _text; gone(); },
     resetSession: () => {},
     setScenario: (s: ScenarioType) => setScenarioState(s),
     setNiveau: (n: NiveauType) => setNiveauState(n),

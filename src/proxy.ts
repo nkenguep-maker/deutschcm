@@ -24,6 +24,10 @@ const PUBLIC_ROUTES = [
   "/privacy", "/terms", "/landing",
   "/goodbye", "/teacher/goodbye",
   "/methode", "/histoires", "/manifeste", "/langues", "/setup-role",
+  // /simulateur : feature IA supprimée (AUDIT.md §11). La page renvoie
+  // notFound() ; on la place en public pour qu'anonymes ET connectés
+  // reçoivent le même 404 canonique au lieu d'un 307 → login.
+  "/simulateur",
   // Note : "/demo" retiré ici (page supprimée), "/eleves" idem.
   // /activation : écran de passage post-paiement. Le page shell est
   // vide de données ; la sécurité est portée par /api/activation-status
@@ -46,7 +50,6 @@ const PROTECTED_ROUTES: Record<string, SpaceRole[]> = {
   "/center/billing": ["CENTER", "ADMIN"],
   "/dashboard": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
   "/courses": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
-  "/simulateur": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
   "/progress": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
 }
 
@@ -59,7 +62,6 @@ function spaceForPath(pathname: string): SpaceRole | null {
   if (
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/courses") ||
-    pathname.startsWith("/simulateur") ||
     pathname.startsWith("/progress")
   ) return "STUDENT"
   return null

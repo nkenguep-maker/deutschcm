@@ -49,4 +49,24 @@ describe("/api/test-niveau/questions — banque statique déterministe", () => {
     await GET(req("http://localhost/api/test-niveau/questions?locale=fr"));
     expect(fetchSpy).not.toHaveBeenCalled();
   });
+
+  it.each(["fr", "en"])("[%s] ids uniques sur les 30 questions", async (loc) => {
+    const res = await GET(req(`http://localhost/api/test-niveau/questions?locale=${loc}`));
+    const body = await res.json();
+    const ids = body.questions.map((q: { id: string }) => q.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it.each(["fr", "en"])("[%s] chaque question possède les champs client requis", async (loc) => {
+    const res = await GET(req(`http://localhost/api/test-niveau/questions?locale=${loc}`));
+    const body = await res.json();
+    const required = ["id", "level", "type", "question_fr", "options", "correct", "correct_index", "explanation_fr", "points"] as const;
+    const supported = new Set(["A1", "A2", "B1", "B2", "C1"]);
+    for (const q of body.questions) {
+      for (const k of required) expect(q, `${q.id} manque ${k}`).toHaveProperty(k);
+      expect(supported.has(q.level), `${q.id} niveau non supporté ${q.level}`).toBe(true);
+      expect(Array.isArray(q.options) && q.options.length >= 2).toBe(true);
+      expect(q.options).toContain(q.correct);
+    }
+  });
 });

@@ -2,7 +2,7 @@
 // Confirme que le mécanisme est idempotent et évite P2002 quand la ligne
 // Prisma existe déjà avec le même email mais un supabaseId différent ou nul.
 
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { reconcileDbUser, ReconcileError } from "@/lib/reconcileDbUser";
