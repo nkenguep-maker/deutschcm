@@ -10,11 +10,13 @@ Base de comparaison : commit `2776fab` (Phase A.1 mergée sur main). Branche cou
 
 ## Convention de statut visuel
 
-Les pages authentifiées ne sont pas atteignables sans session Supabase. Playwright a capturé leur **redirection vers `/login`** (HTTP 200, H1 « Rentrez. On vous attendait. », body ≈ 178 chars), **pas** leur rendu authentifié réel. En conséquence :
+**Mise à jour post-P-1 (2026-07-22)** : le lot P-1 (baseline authentifiée) a été exécuté sur le projet Supabase dédié `yema-p1-baseline`. Voir `docs/YEMA_AUTHENTICATED_BASELINE.md` pour le détail. La majorité des marqueurs `CODE_AUDITED_VISUAL_PENDING` sont désormais `RENDERED_AUTHENTICATED` (avec preuves Playwright réelles à 4 breakpoints).
 
-- Les pages ci-dessous portent le marqueur **`CODE_AUDITED_VISUAL_PENDING`** : leur source TypeScript / TSX a été lue et raisonnée, mais leur rendu final (données réelles, densité, empty states, focus clavier, responsive) n'a pas été vérifié en runtime authentifié.
-- Toute recommandation concernant ces pages est **provisoire** jusqu'à la création de comptes de test (voir roadmap P-1).
-- Le rendu visuel de ces pages **n'est pas présenté comme vérifié** dans le présent document.
+Convention en vigueur :
+
+- **`RENDERED_AUTHENTICATED`** : rendu vérifié avec session Supabase réelle (cookies chunkés `sb-<ref>-auth-token`) sur au moins un compte de test, à 360/390/768/1440.
+- **`CODE_AUDITED_VISUAL_PENDING`** (résiduel) : source lue mais non observé en runtime authentifié — soit id dynamique non ciblé par le sweep (`/famille/enfant/[id]`, `/classroom/[id]/assignment/[aid]`, `/discover/{center,class,group}/[id]`, `/test-niveau/results`, `/activation`), soit onboarding partiel (`/onboarding/{monde,racines,teacher,center}` derrière le router `/onboarding`).
+- Le rendu visuel non vérifié **reste explicitement noté**.
 
 Périmètre `CODE_AUDITED_VISUAL_PENDING` :
 

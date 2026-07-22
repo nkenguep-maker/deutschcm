@@ -49,3 +49,11 @@ deutschcm2/
 # Audit local (screenshots §8, tsc-lint touch)
 screenshots/
 .tsc-lint-passed
+
+# P-1 Baseline authentifiée — jamais commité
+.env.p1-baseline
+.env.p1-baseline.local
+scripts/test-baseline/.credentials.json
+scripts/test-baseline/storage-state/
+scripts/test-baseline/captures/
+/tmp/yema-p1-*
