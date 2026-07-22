@@ -10,9 +10,9 @@ function read(rel: string) {
 
 describe("/dashboard · aiguillage par univers (P2)", () => {
   const src = read("src/app/[locale]/dashboard/page.tsx");
-  it("route Monde → DashboardMonde et Racines → FoyerClient", () => {
+  it("route Monde → DashboardMonde et Racines → DashboardRacines (P3)", () => {
     expect(src).toMatch(/DashboardMonde/);
-    expect(src).toMatch(/FoyerClient/);
+    expect(src).toMatch(/DashboardRacines/);
     expect(src).toMatch(/lp\.universe === "MONDE"/);
   });
   it("redirige vers /onboarding si aucun LP", () => {
