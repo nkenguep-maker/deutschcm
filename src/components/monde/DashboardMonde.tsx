@@ -31,12 +31,22 @@ const COPY = {
     accessNone: "Aucun accès",
     daysRemaining: (n: number) => n === 1 ? "1 jour restant" : `${n} jours restants`,
     hero: "Continuer ta prochaine leçon",
-    heroSubStart: "Reprends là où tu t'étais arrêté.",
+    heroStart: "Commencer ta première leçon",
+    heroSubStart: "Ta prochaine étape en allemand A1.",
+    heroResume: "Reprendre ta prochaine leçon",
+    heroSubResume: "Reprends là où tu t'étais arrêté.",
+    heroDone: "Niveau A1 terminé.",
     heroSubDone: "Tu as terminé le programme A1. Bravo.",
+    heroNoAccess: "Ton Passage n'est pas encore actif.",
     heroSubNoAccess: "Ton parcours de découverte est terminé — active ton Passage pour continuer.",
-    heroSubExpired: "Ton Passage est arrivé à son terme. Tu retrouves ta progression, la reprise se prépare.",
+    heroExpired: "Ton Passage est arrivé à son terme.",
+    heroSubExpired: "Ta progression reste conservée. Le renouvellement s'ouvrira quand le paiement sera prêt.",
+    start: "Commencer",
     resume: "Reprendre",
     activate: "Choisir un Passage",
+    renewalSoon: "Renouvellement bientôt disponible",
+    seeOffers: "Voir les offres",
+    reviewJourney: "Revoir mon parcours",
     dashboardCoursesTitle: "Ton parcours",
     dashboardCoursesSub: "Cinq leçons A1 pour poser les bases.",
     courseLocked: "Verrouillé",
@@ -70,12 +80,22 @@ const COPY = {
     accessNone: "No access",
     daysRemaining: (n: number) => n === 1 ? "1 day left" : `${n} days left`,
     hero: "Continue your next lesson",
-    heroSubStart: "Pick up where you left off.",
+    heroStart: "Start your first lesson",
+    heroSubStart: "Your first step into German A1.",
+    heroResume: "Resume your next lesson",
+    heroSubResume: "Pick up where you left off.",
+    heroDone: "A1 level completed.",
     heroSubDone: "You completed the A1 programme. Well done.",
+    heroNoAccess: "Your Passage is not active yet.",
     heroSubNoAccess: "Your discovery journey is complete — activate your Passage to continue.",
-    heroSubExpired: "Your Passage ended. Your progress is saved, the resumption is being prepared.",
+    heroExpired: "Your Passage has ended.",
+    heroSubExpired: "Your progress is saved. Renewal opens once payment is ready.",
+    start: "Start",
     resume: "Resume",
     activate: "Choose a Passage",
+    renewalSoon: "Renewal coming soon",
+    seeOffers: "See offers",
+    reviewJourney: "Review my journey",
     dashboardCoursesTitle: "Your journey",
     dashboardCoursesSub: "Five A1 lessons to lay the foundations.",
     courseLocked: "Locked",
@@ -159,9 +179,28 @@ export function DashboardMonde({ locale }: { locale: "fr" | "en" }) {
   }
 
   const greeting = data.greetingName?.split(" ")[0] ?? c.greetingFallback;
-  const heroSub = active
-    ? (data.nextModule ? c.heroSubStart : c.heroSubDone)
-    : (expired ? c.heroSubExpired : c.heroSubNoAccess);
+  // Hero state · 5 branches distinctes selon accès + progression.
+  // Doctrine P2 hardening §2, §4, §5, §14.
+  const isDone = data.overallPct >= 100;
+  const isFresh = data.overallPct === 0;
+  type HeroState = "ACTIVE_START" | "ACTIVE_RESUME" | "ACTIVE_DONE" | "EXPIRED" | "NO_ACCESS";
+  const heroState: HeroState =
+    !active
+      ? (expired ? "EXPIRED" : "NO_ACCESS")
+      : (isDone ? "ACTIVE_DONE" : (isFresh ? "ACTIVE_START" : "ACTIVE_RESUME"));
+
+  const heroTitle =
+    heroState === "ACTIVE_START"  ? c.heroStart :
+    heroState === "ACTIVE_RESUME" ? c.heroResume :
+    heroState === "ACTIVE_DONE"   ? c.heroDone :
+    heroState === "EXPIRED"       ? c.heroExpired :
+    /* NO_ACCESS */                 c.heroNoAccess;
+  const heroSub =
+    heroState === "ACTIVE_START"  ? c.heroSubStart :
+    heroState === "ACTIVE_RESUME" ? c.heroSubResume :
+    heroState === "ACTIVE_DONE"   ? c.heroSubDone :
+    heroState === "EXPIRED"       ? c.heroSubExpired :
+    /* NO_ACCESS */                 c.heroSubNoAccess;
 
   return (
     <main className="monde-dash" style={{ maxWidth: 960, margin: "0 auto", padding: "32px 16px 96px" }}>
@@ -196,10 +235,19 @@ export function DashboardMonde({ locale }: { locale: "fr" | "en" }) {
           <div style={{ height: 6, width: `${data.overallPct}%`, background: "var(--brass)", borderRadius: 3 }} />
         </div>
         <h2 style={{ fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: 20, color: "var(--creme)", margin: "0 0 4px" }}>
-          {c.hero}
+          {heroTitle}
         </h2>
         <p style={{ color: "var(--creme-soft)", fontSize: 13, margin: "0 0 14px" }}>{heroSub}</p>
-        {active && data.nextModule ? (
+        {heroState === "ACTIVE_START" && data.nextModule && (
+          <Link
+            href={`/courses/${data.nextModule.courseId}/modules/${data.nextModule.moduleId}`}
+            className="entry-cta entry-cta-primary"
+            style={{ minHeight: 44, display: "inline-flex", alignItems: "center" }}
+          >
+            {c.start} · {data.nextModule.label}
+          </Link>
+        )}
+        {heroState === "ACTIVE_RESUME" && data.nextModule && (
           <Link
             href={`/courses/${data.nextModule.courseId}/modules/${data.nextModule.moduleId}`}
             className="entry-cta entry-cta-primary"
@@ -207,13 +255,23 @@ export function DashboardMonde({ locale }: { locale: "fr" | "en" }) {
           >
             {c.resume} · {data.nextModule.label}
           </Link>
-        ) : (
+        )}
+        {heroState === "ACTIVE_DONE" && (
           <Link
-            href={active ? "/progress" : "/activation-intent"}
+            href="/progress"
             className="entry-cta entry-cta-primary"
             style={{ minHeight: 44, display: "inline-flex", alignItems: "center" }}
           >
-            {active ? c.progressTitle : c.activate}
+            {c.reviewJourney}
+          </Link>
+        )}
+        {(heroState === "EXPIRED" || heroState === "NO_ACCESS") && (
+          <Link
+            href="/activation-intent"
+            className="entry-cta entry-cta-primary"
+            style={{ minHeight: 44, display: "inline-flex", alignItems: "center" }}
+          >
+            {heroState === "EXPIRED" ? c.seeOffers : c.activate}
           </Link>
         )}
       </section>
@@ -228,7 +286,10 @@ export function DashboardMonde({ locale }: { locale: "fr" | "en" }) {
         </header>
         <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }}>
           {data.courses.map((cs) => {
-            const locked = cs.status === "LOCKED" || (noAccess && !active);
+            // Contenu payant · verrouillé si le cours est LOCKED (séquentiel)
+            // OU si l'utilisateur n'a pas d'accès actif (NONE ou EXPIRED).
+            // §14 · un utilisateur COMPLETED reste ACTIVE et peut revoir.
+            const locked = cs.status === "LOCKED" || !active;
             const statusLbl =
               cs.status === "COMPLETED" ? c.courseCompleted :
               cs.status === "IN_PROGRESS" ? c.courseInProgress :
