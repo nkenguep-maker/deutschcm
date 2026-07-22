@@ -209,7 +209,105 @@ Landing /en : CANONICAL — no visual regression
 - **Attestation** : critères produit à finaliser avec la doctrine avant de générer un PDF
 - **Paiement** : `AccessGrant` créés uniquement via fixtures P-1 (P5 branchera CinetPay/Stripe)
 
-## 25. Décision
+## 25. Hardening P2 (2026-07-22)
+
+Second passage sur la même branche · résolutions du prompt hardening :
+
+### État EXPIRED corrigé
+
+Le dashboard exposait un CTA « Reprendre » même quand l'accès était expiré. Refactor du hero en 5 branches distinctes :
+
+| État hero | Détecté quand | CTA principal |
+|---|---|---|
+| `ACTIVE_START` | grant ACTIVE + progression 0 % | `Commencer · [lesson label]` |
+| `ACTIVE_RESUME` | grant ACTIVE + progression partielle | `Reprendre · [next lesson]` |
+| `ACTIVE_DONE` | grant ACTIVE + progression 100 % | `Revoir mon parcours` (→ /progress) |
+| `EXPIRED` | grant présent, `endsAt <= now` | `Voir les offres` (→ /activation-intent) |
+| `NO_ACCESS` | aucun grant | `Choisir un Passage` (→ /activation-intent) |
+
+Les cartes de cours sont grayed out (`opacity: 0.55`) dès que `!active` (EXPIRED ou NO_ACCESS), pas seulement quand l'accès est absent.
+
+### Fixtures étendues à 5 modes
+
+`scripts/test-baseline/p2-access-fixtures.mjs` :
+
+```bash
+node scripts/test-baseline/p2-access-fixtures.mjs active     # grant +90j, progress inchangé
+node scripts/test-baseline/p2-access-fixtures.mjs new        # grant +90j, TOUS ModuleProgress a1-beta-* effacés
+node scripts/test-baseline/p2-access-fixtures.mjs completed  # grant +90j, 25 ModuleProgress COMPLETED seedés
+node scripts/test-baseline/p2-access-fixtures.mjs expired    # grant endsAt hier
+node scripts/test-baseline/p2-access-fixtures.mjs none       # aucun grant, progress cleared
+```
+
+`completed` crée aussi (si absent) le `Course TEST_A1_BETA` + 25 `Module` avec `id = a1-beta-{n}-{type}` pour que les FK `ModuleProgress.moduleId` matchent. Idempotent.
+
+### Feedback exercice accessible
+
+- `AdaptiveQuiz.tsx` : wrapper `role="status" aria-live="polite"` sur le bloc feedback. Texte « Correct. ✅ » / « Incorrect. ❌ » avant l'emoji pour ne pas dépendre uniquement de la couleur.
+- `DiscoveryLessonClient.tsx` (P1) : idem sur les feedbacks du QCM discovery.
+
+### E2E hardening (2026-07-22, P-1)
+
+**Matrice 5 états × 3 routes** :
+
+| État | dashboard hero | courses lock | progress | offers CTA |
+|---|---|---|---|---|
+| `new` | ACTIVE_START | A2-C1 « Bientôt » | 0 % | non |
+| `active` | ACTIVE_START/RESUME (dépend progress) | A2-C1 « Bientôt » | réel | non |
+| `completed` | ACTIVE_DONE (« Niveau A1 terminé ») | A2-C1 « Bientôt » | 100 % | non |
+| `expired` | EXPIRED (« Ton Passage est arrivé à son terme ») | A2-C1 « Bientôt » + banner lock | réel conservé | **oui** |
+| `none` | NO_ACCESS | A2-C1 + banner lock | vide/réel | **oui** |
+
+15/15 rendus · `pageOverflow=0` partout · `hasFakeName=false` partout.
+
+**Accès direct au module** (utilisateur EXPIRED ou NONE tentant `/fr/courses/a1-beta-1/modules/a1-beta-1-lesen`) :
+- HTTP 200 avec `state-locked` StateBlock rendu
+- **Aucun contenu Willkommen/Guten Tag exposé** ✓
+- CTA vers `/activation-intent` présent
+
+**E2E EN** (`/en`) :
+- `/en/dashboard`, `/en/courses`, `/en/progress` rendent en anglais
+- Zéro chaîne française fonctionnelle détectée (`Reprendre`, `Ma progression`, `Bientôt disponible`, `Modules terminés`)
+- Locale préservée à chaque redirection
+
+**Reprise fresh browser** :
+- Setup · fixture `new` + un seul ModuleProgress `a1-beta-1-lesen` COMPLETED via ORM
+- Fresh context → login → `/fr/dashboard` → **hasNextHoeren=true** (le hero pointe sur la prochaine leçon non-complétée) ✓
+
+**Ownership + cross-role** :
+- anon `GET /api/me/monde-dashboard` → **401**
+- racines · `GET /api/me/monde-dashboard` → **200** avec `hasLP: false`
+- teacher · `GET /api/me/monde-dashboard` → **403 FORBIDDEN_NOT_STUDENT**
+- racines tentant `/fr/courses/a1-beta-1/modules/a1-beta-1-lesen` → HTTP 200 avec state-locked, aucun contenu Willkommen leaké
+
+**DB post-parcours** :
+```
+orders: 0 · ordersPaid: 0 · nonTestActiveGrants: 0
+```
+
+### Tests · 249/249
+
+- `src/app/__tests__/p2-hardening.test.ts` — 15 assertions (5 hero states, EXPIRED sans Reprendre, fixtures 5 modes, feedback role=status, régression IA/fake prof/paiement)
+- Suite complète : 20 fichiers, **249 tests**
+
+### Statut post-hardening
+
+| Point | Statut |
+|---|---|
+| État EXPIRED (CTA correct) | ✅ DONE |
+| État COMPLETED (revoir parcours) | ✅ DONE |
+| Fixtures new + completed | ✅ DONE |
+| Accès direct module refusé | ✅ DONE (server layout) |
+| Feedback exercice accessible | ✅ DONE (aria-live polite + texte distinct de la couleur) |
+| E2E FR/EN + reprise | ✅ DONE |
+| Ownership cross-role | ✅ DONE |
+| Landing intacte | ✅ DONE |
+| Suivi professeur | ⏳ HONEST STATE (Bientôt disponible) |
+| Devoirs, messagerie, notifs backend | 🚫 P4_DEPENDENCY |
+| Examens blancs / attestation | ⚠️ CONTENT_REVIEW_REQUIRED |
+| Paiement | 🚫 P5 |
+
+## 26. Décision
 
 ```
 P2 READY TO MERGE
