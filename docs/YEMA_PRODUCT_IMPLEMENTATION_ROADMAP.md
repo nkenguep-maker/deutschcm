@@ -252,6 +252,14 @@ Estimation : **S** (< 4h), **M** (4-8h), **L** (1-2 jours), **XL** (3-5 jours).
 
 # Lot P1 — Funnel
 
+> **Statut d'implémentation** (branche `feat/yema-p1-funnel`, 2026-07-22) :
+> - P1-1 (portes) : ✅ DONE — routeur `/onboarding` avec dérivation d'état.
+> - P1-2 (choix langue) : ✅ DONE — `LANGUAGES` unique source, écran `/decouverte/attente` honnête pour langues `soon`.
+> - P1-3 (auto-évaluation) : ⚠️ PARTIAL — dérivée du `startPoint` (3 options) au lieu d'une vraie sélection 5 options CECR. À trancher avant P2.
+> - P1-4 (4 leçons découverte) : ✅ DONE deutsch · 🚫 BLOCKED Racines (aucun contenu seedé).
+> - P1-5 (bilan + activation) : ✅ DONE — `/decouverte/bilan` + `/activation-intent` avec grille P0.A, coach Racines toujours « Bientôt disponible ».
+> - Détail complet : voir `docs/YEMA_P1_FUNNEL.md`.
+
 **Objectif utilisateur** : permettre à un nouvel inscrit d'aller de "compte créé" à "premier cours de découverte terminé" sans friction, en respectant les 6 étapes doctrinales.
 
 **Pages concernées** : `/setup-role`, `/entree` (nouveau), `/onboarding/*`, `/decouverte/*` (nouveau), `/activation`.
