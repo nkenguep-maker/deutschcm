@@ -2306,3 +2306,419 @@ Coach carrière Europe
 Les capabilities, pages, commandes et contrats doivent rester séparés.
 
 Le coach carrière ne doit jamais accéder aux données pédagogiques ou familiales sans consentement explicite et nécessité fonctionnelle.
+
+---
+
+# Amendement A — Stratégie mobile YEMA
+
+## A.1 Mobile-first
+
+YEMA est conçu **mobile-first**. La bêta doit proposer une application web responsive complète qui fonctionne prioritairement à **360 × 800 px** et **390 × 844 px**, en gardant desktop et tablette comme surfaces également valides mais secondaires dans la hiérarchie de conception.
+
+Exigences bêta pour chaque parcours utilisateur :
+
+* application web responsive complète ;
+* fonctionnement prioritaire à 360 × 800 et 390 × 844 ;
+* navigation tactile ;
+* formulaires adaptés aux claviers mobiles ;
+* audios fonctionnels sur Android et iOS ;
+* dashboards sans scroll horizontal ;
+* tableaux transformés en listes ou cartes lorsque nécessaire ;
+* actions principales accessibles au pouce ;
+* reprise de progression ;
+* gestion correcte des réseaux lents ;
+* états hors connexion explicites ;
+* compatibilité future PWA.
+
+La bêta ne nécessite pas encore une application native. Le web mobile doit d'abord prouver sa robustesse.
+
+## A.2 PWA
+
+La PWA doit être prévue **après stabilisation du cœur produit**, pas avant. Elle pourra inclure :
+
+* installation sur l'écran d'accueil ;
+* mode standalone ;
+* cache de l'interface essentielle ;
+* accès aux dernières leçons ;
+* téléchargement explicite de certains audios ;
+* écran hors connexion ;
+* notification de mise à jour ;
+* reprise de progression avant synchronisation.
+
+**Ne pas mettre en cache sans protection appropriée** :
+
+* profils enfants ;
+* messages privés ;
+* corrections humaines ;
+* données de paiement ;
+* sessions expirées ;
+* contenus soumis à des restrictions de droits.
+
+## A.3 Application native future — lot P7
+
+Un lot futur est réservé :
+
+```text
+P7 — Application mobile YEMA
+```
+
+Il **ne commence qu'après** :
+
+* stabilisation du web mobile ;
+* validation de la rétention ;
+* mesure de l'usage mobile ;
+* stabilité de l'authentification ;
+* stabilité des paiements ;
+* stabilité des cours ;
+* fonctionnement réel des coachs et professeurs ;
+* validation des règles de protection des enfants.
+
+Fonctionnalités prioritaires dans l'app native :
+
+1. connexion et onboarding ;
+2. choix Monde/Racines ;
+3. cours et exercices ;
+4. lecture audio ;
+5. progression ;
+6. mode hors ligne limité ;
+7. notifications ;
+8. envoi de productions ;
+9. réception des corrections ;
+10. espace foyer ;
+11. profils enfants ;
+12. rendez-vous professeur ou coach.
+
+Les outils complexes centre, admin et création de contenu peuvent rester sur le web desktop.
+
+## A.4 Critères mobiles obligatoires
+
+Chaque parcours utilisateur doit :
+
+* fonctionner à 360 et 390 px ;
+* ne pas avoir de scroll horizontal ;
+* avoir des cibles tactiles de 44 × 44 px minimum ;
+* ne pas être masqué par le clavier ;
+* gérer les safe areas iOS ;
+* utiliser des unités viewport modernes ;
+* préserver la progression ;
+* gérer le retour arrière ;
+* fonctionner sur réseau lent ;
+* respecter `prefers-reduced-motion` ;
+* ne pas imposer le desktop pour terminer une leçon.
+
+Le breakpoint 360 px sert à vérifier la robustesse mobile (voir §7.1). Le web mobile n'est jamais un mode dégradé.
+
+---
+
+# Amendement B — Messagerie de suivi — professeur ou coach ↔ élèves
+
+## B.1 Décision produit
+
+La messagerie de suivi est :
+
+* liée au suivi humain ;
+* privée ;
+* fermée ;
+* contextualisée ;
+* limitée à **une classe Monde** ou **un cercle Racines** ;
+* 100 % humaine ;
+* sans IA.
+
+Pour la bêta :
+
+```text
+une classe Monde fermée
+ou
+un cercle Racines fermé
+```
+
+**Aucun espace communautaire transversal** entre plusieurs classes ou cercles.
+
+## B.2 Fil unique
+
+Chaque classe ou cercle possède un **fil chronologique unique**.
+
+Le fil regroupe :
+
+* annonces ;
+* devoirs ;
+* invitations orales ;
+* notes vocales ;
+* corrections ;
+* messages texte ;
+* réactions ;
+* encouragements entre pairs.
+
+**Ne pas créer pendant la bêta** :
+
+* canaux multiples ;
+* salons publics ;
+* messages privés entre élèves ;
+* messagerie générale ;
+* espace transversal.
+
+## B.3 Composition visuelle
+
+### Professeur ou coach
+
+* messages à gauche ;
+* avatar réel ;
+* nom ;
+* rôle ;
+* correction officielle identifiable.
+
+### Utilisateur actuel
+
+* messages à droite ;
+* accent du territoire ;
+* heure ;
+* statut de remise ou de partage.
+
+### Pairs
+
+* messages à gauche ;
+* nom visible ;
+* avatar distinct ;
+* couleur contrôlée et accessible.
+
+**La position seule ne doit jamais identifier l'auteur pour l'accessibilité** — nom, avatar et rôle sont obligatoires.
+
+## B.4 La voix comme cœur du suivi
+
+Les notes vocales sont **l'interaction principale**.
+
+Chaque note doit afficher :
+
+* lecture/pause ;
+* durée ;
+* progression ;
+* forme d'onde réelle ou dérivée du fichier ;
+* auteur ;
+* heure ;
+* loading ;
+* erreur ;
+* réécoute.
+
+**Ne pas afficher une fausse waveform décorative.**
+
+Composer mobile — hiérarchie visuelle :
+
+```text
+bouton joindre
+champ texte
+grand bouton micro    ← visuellement prioritaire, accessible au pouce
+bouton envoyer
+```
+
+Le bouton micro doit être **le plus grand** et le plus proche du pouce.
+
+Limites bêta :
+
+* note vocale élève : **3 minutes maximum** ;
+* correction vocale : **5 minutes maximum** ;
+* réécoute avant envoi ;
+* annulation possible ;
+* consentement explicite pour le microphone ;
+* aucun traitement IA ;
+* aucune analyse automatique ;
+* aucun entraînement de modèle.
+
+## B.5 Types de messages
+
+Prévoir :
+
+* annonce ;
+* devoir ou invitation orale ;
+* production vocale ;
+* production écrite ;
+* correction humaine vocale et textuelle ;
+* message d'un pair ;
+* réaction ;
+* réponse contextualisée.
+
+**La correction doit référencer la production concernée** (lien parent-enfant explicite).
+
+## B.6 Variante Monde
+
+Territoire :
+
+```text
+espresso
+brass #C9A34E
+```
+
+Exemple d'en-tête :
+
+```text
+Klasse A1 · Deutsch
+Herr Kwessi · 8 élèves
+```
+
+Registre :
+
+* « à la classe » ;
+* « Devoir oral » ;
+* « remis » ;
+* « correction » ;
+* « prochaine étape ».
+
+Exemple de message coach :
+
+> Sehr gut ! Juste le *ch* de *ich* — plus doux.
+
+## B.7 Variante Racines
+
+Territoire :
+
+```text
+terre
+terracotta #C77B54
+```
+
+Exemple d'en-tête :
+
+```text
+Ton cercle · Lingala
+Coach Mokili · 5 proches
+```
+
+Registre :
+
+* « au cercle » ;
+* « Fais entendre ta voix » ;
+* « partagé » ;
+* « ton cercle » ;
+* « écouter ensemble ».
+
+Exemple de message coach :
+
+> Malamu ! Ta grand-mère te comprendrait. Juste *ndeko* — appuie sur la deuxième syllabe.
+
+**Le registre affectif ne doit pas remplacer la précision linguistique.**
+
+## B.8 Mobile-first
+
+La messagerie doit être conçue **prioritairement pour** :
+
+```text
+360 × 800
+390 × 844
+```
+
+Exigences :
+
+* composer toujours visible au-dessus du clavier ;
+* safe areas iOS ;
+* aucun scroll horizontal ;
+* notes vocales accessibles ;
+* upload résilient ;
+* brouillon conservé lorsque possible ;
+* reprise après mise en arrière-plan ;
+* état hors ligne ;
+* compatibilité PWA et application native future.
+
+## B.9 Permissions
+
+### Professeur ou coach
+
+Peut :
+
+* annoncer ;
+* créer un devoir ;
+* corriger ;
+* répondre ;
+* épingler ;
+* modérer ;
+* voir les remises ;
+* clôturer une activité.
+
+### Élève adulte
+
+Peut :
+
+* publier ;
+* répondre ;
+* remettre une production ;
+* réagir ;
+* signaler ;
+* supprimer son propre contenu selon une règle définie.
+
+### Profil enfant
+
+Prévoir :
+
+* contrôle parental ;
+* interdiction des messages privés ;
+* accès au groupe autorisé uniquement ;
+* restrictions de pièces jointes ;
+* possibilité de désactiver la participation sociale ;
+* visibilité parentale lorsque nécessaire.
+
+### Admin ou centre
+
+**Aucun accès automatique à toutes les conversations.**
+
+Tout accès exceptionnel doit être :
+
+* limité ;
+* justifié ;
+* journalisé ;
+* réservé aux incidents, signalements ou obligations légales.
+
+## B.10 Sécurité
+
+Prévoir :
+
+* stockage privé ;
+* URLs temporaires ;
+* contrôle serveur des permissions ;
+* limitation de débit ;
+* contrôle des fichiers ;
+* taille maximale ;
+* signalement ;
+* audit log ;
+* conservation et suppression ;
+* export ;
+* séparation stricte des groupes.
+
+**Aucun message ou audio ne doit être accessible publiquement.**
+
+## B.11 Modèle fonctionnel indicatif
+
+Prévoir au minimum :
+
+```text
+Conversation
+ConversationMember
+Message
+MessageAttachment
+VoiceMessage
+AssignmentMessage
+SubmissionReference
+CorrectionReference
+MessageReaction
+MessageReadState
+MessageReport
+```
+
+**Ne pas implémenter ces modèles dans une tâche documentaire.** Les mapper à l'existant (`Thread`, `Message`, `ClassAssignment`, `Submission`, `ClassFeedback`) et compléter ce qui manque au moment de l'implémentation P4.
+
+## B.12 Critères d'acceptation futurs
+
+La messagerie ne sera pas terminée tant que :
+
+* un fil fermé existe par classe ou cercle ;
+* les permissions sont testées ;
+* une annonce peut être publiée ;
+* un devoir oral peut être créé ;
+* une note vocale peut être remise ;
+* une correction audio + texte peut être envoyée ;
+* les statuts remis/partagé sont visibles ;
+* les messages non lus fonctionnent ;
+* les fichiers sont privés ;
+* le mobile 360/390 est validé ;
+* le clavier ne masque pas le composer ;
+* loading, empty, error et offline existent ;
+* aucune IA n'est utilisée ;
+* les profils enfants sont protégés ;
+* les tests cross-classe et cross-cercle passent.

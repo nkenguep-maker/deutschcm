@@ -637,3 +637,215 @@ Landing /en : CANONICAL — aucun lot ne la touche
 ```
 
 Cette feuille de route est un plan. Aucun code produit n'a été modifié pendant sa rédaction. Aucune tâche n'a été exécutée. Aucun commit n'a été créé.
+
+---
+
+# Amendements roadmap — mobile et messagerie
+
+Ces amendements intègrent les Amendements A (mobile-first + PWA + app native) et B (messagerie de suivi) de la doctrine. Ils étendent les lots existants et ajoutent le lot P7.
+
+## Ajouts au lot P-1 — Baseline authentifiée
+
+### P-1.7 · Sweep mobile authentifiée 360/390
+
+Ajoute aux 4 breakpoints P-1.3 déjà planifiés (360/390/768/1440) les scénarios spécifiques mobiles :
+
+- capturer les écrans mobiles réels de chaque dashboard authentifié avec chaque compte ;
+- identifier les problèmes de clavier virtuel (composer masqué, formulaire register, PATCH famille, envoi message) ;
+- identifier les problèmes de safe area iOS (encoche, home indicator) ;
+- capturer le fil Monde s'il existe (`/classroom/[id]`) avec compte teacher et compte student ;
+- capturer le cercle Racines s'il existe (probable MISSING per MSG-01, à confirmer) ;
+- tester rôles professeur, coach, élève et parent sur mobile 360 ;
+- tester cross-classe et cross-cercle (fuite d'ownership sur messagerie) ;
+- inventorier placeholders messagerie (fake « Prof. Sophie Tanda », « Marie N. » de `ClassroomChat`) ;
+- lever les marqueurs visuels uniquement après vraie capture 360.
+
+**Livrable** : rapport tabulaire équivalent à la sweep publique + tableau spécifique mobile keyboard/safe-area.
+**Estimation** : **L**.
+
+## Ajouts au lot P0.A — Corrections fonctionnelles
+
+### P0.A-7 · Retirer les fake messages de `ClassroomChat`
+
+- **Fichier** : `src/components/ClassroomChat.tsx`.
+- **Change** : supprimer `INITIAL_MESSAGES` hardcodés (« Prof. Sophie Tanda », « Marie N. ») ; brancher sur état vide canonique `<StateBlock kind="empty">` jusqu'à ce que l'API messagerie soit prête (P4).
+- **Doctrine** : §33.3 « aucune donnée fictive présentée comme réelle ».
+- **Estimation** : **S**.
+
+## Ajouts au lot P0.B — Fondations UI communes
+
+### P0.B-8 · Safe area iOS sur les shells de dashboard
+
+- **Fichiers** : `src/app/globals.css`, `src/components/Layout.tsx`, `src/components/TeacherLayout.tsx`, `src/components/CenterLayout.tsx`, `src/components/foyer/FoyerSidebar.tsx`.
+- **Change** : ajouter `padding-top: env(safe-area-inset-top)`, `padding-bottom: env(safe-area-inset-bottom)` sur les shells + `<meta viewport-fit="cover">` dans le root layout.
+- **Test** : Playwright avec context `hasTouch: true` sur 390×844.
+- **Estimation** : **S**.
+
+### P0.B-9 · `StateBlock` variante `offline`
+
+- **Fichier** : `src/components/StateBlock.tsx`.
+- **Ajout** : nouveau `kind: "offline"` avec soul « La maison attend le réseau. *Ta progression est sauvegardée.* »
+- **Estimation** : **S**.
+
+## Ajouts au lot P2 — Étudiant Monde
+
+### P2-7 · Messagerie de classe Monde (fil unique, mobile-first)
+
+- **Doctrine** : §B (Monde variante §B.6).
+- **Fichiers** :
+  - `src/app/[locale]/classroom/[classroomId]/page.tsx` : intégrer le fil.
+  - `src/components/messaging/ClassThread.tsx` (nouveau).
+  - `src/components/messaging/VoiceComposer.tsx` (nouveau, mobile-first, bouton micro prioritaire).
+  - `src/components/messaging/MessageBubble.tsx` (nouveau, variantes teacher/self/peer + territory).
+- **API** : `GET/POST /api/threads/[classId]/messages`, `POST /api/threads/[classId]/voice-notes`, `POST /api/messages/[id]/reactions`, `PATCH /api/messages/[id]/read`.
+- **Réutilise** : `AudioPlayer` enrichi P0.B-4, `StateBlock`, `Portrait`.
+- **Fonctionnalités** :
+  - fil chronologique ;
+  - réception d'annonces ;
+  - devoir oral rendu comme entrée de fil ;
+  - remise vocale (`VoiceRecorder` réel, cf. MSG-03) ;
+  - correction vocale reçue ;
+  - statuts remis/partagé ;
+  - notifications new-message.
+- **Estimation** : **XL**.
+
+## Ajouts au lot P3 — Racines
+
+### P3-6 · Cercle Racines fermé (équivalent classe Monde)
+
+- **Doctrine** : §B (Racines variante §B.7).
+- **Fichiers** :
+  - Prisma : nouvelle enum `ClassType.RACINES_CIRCLE` OU nouvelle entité `Circle` distincte (décision produit à fermer, MSG-01).
+  - `src/app/[locale]/racines/cercle/[circleId]/page.tsx` (nouveau).
+  - Réutilise `ClassThread`, `VoiceComposer`, `MessageBubble` créés en P2-7 avec `territory="racines"`.
+- **Fonctionnalités** :
+  - invitation « Fais entendre ta voix » comme entrée éditoriale du cercle ;
+  - partage vocal ;
+  - correction linguistique et affective coach ;
+  - échanges entre proches ;
+  - contrôle parental (bloquer messages privés pour profils enfants — MSG-10).
+- **Estimation** : **XL**.
+
+## Ajouts au lot P4 — Professeur et coach
+
+### P4-6 · Console messagerie côté professeur/coach
+
+- **Doctrine** : §B.9 permissions professeur/coach.
+- **Fonctionnalités** :
+  - publication (annonce, devoir oral, invitation orale) ;
+  - liste des remises avec statut (remise/en attente) ;
+  - correction audio + texte (implique amendement Prisma MSG-04 : `ClassFeedback.audioUrl`) ;
+  - modération (épingler, retirer un message, cloturer une activité) ;
+  - compteur messages non lus (implique MSG-05 : `MessageReadState`) ;
+  - capacité de suivi (nombre de conversations actives par coach, ratio corrections/mois).
+- **Estimation** : **XL**.
+
+### P4-7 · Amendement Prisma messagerie
+
+- **Nouvelle migration** : `20260723_messaging_enrich.sql` (nom indicatif).
+- **Changes additifs** :
+  - `ClassFeedback` : `+ audioUrl String?` ;
+  - nouvelle table `MessageReaction` (messageId, userId, emoji) ;
+  - nouvelle table `MessageReadState` (messageId, userId, readAt) ;
+  - nouvelle table `MessageReport` (messageId, reporterId, reason, status, resolvedBy, resolvedAt) ;
+  - décision `Circle` vs enum `RACINES_CIRCLE` (MSG-01) à trancher avant écriture.
+- **Estimation** : **L**.
+
+## Ajouts au lot P6 — Premium et QA
+
+### P6-9 · PWA — installation, mode standalone, cache prudent
+
+- **Doctrine** : §A.2 (PWA après stabilisation cœur produit).
+- **Fichiers** :
+  - `src/app/manifest.ts` (existant, à enrichir) : icônes 192/512, theme_color espresso, background_color seuil, display standalone, start_url `/{locale}`.
+  - `public/sw.js` (nouveau, service worker minimal) : cache CSS/fonts/images, PAS de messagerie/paiement/enfants.
+  - `src/app/[locale]/offline/page.tsx` (nouveau) : écran offline canonique.
+- **Estimation** : **L**.
+
+### P6-10 · QA réseau lent + microphone + uploads interrompus + Android/iOS
+
+- **Cibles** :
+  - simuler 3G lent (Playwright throttle) sur `/dashboard`, `/classroom/[id]`, upload de note vocale ;
+  - tester consentement microphone Chrome Android + Safari iOS ;
+  - tester upload interrompu (offline pendant envoi) → brouillon préservé ;
+  - tester permissions (`Permissions API` `microphone`) ;
+  - tester stockage privé (URLs signées, pas d'accès public) ;
+  - vérifier accessibilité axe-core avec messagerie ;
+  - vérifier protection mineurs (profil enfant ne peut pas envoyer message privé).
+- **Estimation** : **XL**.
+
+### P6-11 · Tests E2E messagerie
+
+- Playwright : parcours prof → publie devoir → étudiant → reçoit → enregistre voix → envoie → prof → écoute → corrige (audio+texte) → étudiant → reçoit correction. Idem cercle Racines.
+- Tests cross-classe : élève A n'accède pas au fil de la classe B.
+- Tests cross-cercle : membre cercle X n'accède pas au fil du cercle Y.
+- **Estimation** : **L**.
+
+## Nouveau lot P7 — Application mobile YEMA
+
+**Objectif utilisateur** : offrir une application mobile native (iOS + Android) une fois le web mobile stabilisé.
+
+**Conditions de démarrage** (voir doctrine §A.3) :
+
+* stabilisation du web mobile (P0-P6 terminés) ;
+* validation de la rétention ;
+* mesure de l'usage mobile ;
+* stabilité de l'authentification ;
+* stabilité des paiements ;
+* stabilité des cours ;
+* fonctionnement réel des coachs et professeurs ;
+* validation des règles de protection des enfants.
+
+**Approche recommandée à trancher** :
+
+- Option A : React Native + Expo (partage code avec web via Next.js Router V13 App Directory limité).
+- Option B : Capacitor (wrapper natif autour de la PWA existante — chemin le plus rapide).
+- Option C : Flutter (rewrite complet, non recommandé).
+
+**Fonctionnalités prioritaires** (doctrine §A.3) :
+
+1. connexion et onboarding (Supabase Auth + biométrie iOS/Android) ;
+2. choix Monde/Racines ;
+3. cours et exercices ;
+4. lecture audio (AVAudioSession + ExoPlayer) ;
+5. progression (sync avec API) ;
+6. mode hors ligne limité (SQLite local, sync deferred) ;
+7. notifications push (APNs + FCM) ;
+8. envoi de productions (upload résilient) ;
+9. réception des corrections ;
+10. espace foyer ;
+11. profils enfants (contrôle parental natif) ;
+12. rendez-vous professeur ou coach (calendar intent).
+
+**Hors périmètre P7** : outils complexes centre, admin, création de contenu → restent sur web desktop.
+
+**Estimation** : hors bêta. **XXL** (chantier autonome, minimum 3 mois avec équipe dédiée).
+
+---
+
+# Priorisation amendée
+
+Nouvelle chronologie recommandée :
+
+**Semaine 0 (préparation)** : P-1 Baseline authentifiée avec P-1.7 mobile sweep intégré.
+
+**Semaine 1** : P0.A (avec P0.A-7 fake ClassroomChat cleanup) + P0.B (avec P0.B-8 safe area et P0.B-9 offline state).
+
+**Semaine 2-3** : P1 Funnel (mobile-first appliqué systématiquement dès §11-§16).
+
+**Semaine 4-5** : P2 Étudiant Monde (avec P2-7 messagerie classe Monde).
+
+**Semaine 5-7** : P3 Racines (avec P3-6 cercle Racines fermé) + démarrer P4.
+
+**Semaine 7-9** : P4 Pros (P4-6 console messagerie + P4-7 amendement Prisma messagerie).
+
+**Semaine 9-11** : P5 (paiement, password recovery).
+
+**Semaine 12+** : P6 QA/PWA (P6-9 PWA, P6-10 QA mobile, P6-11 E2E messagerie).
+
+**Post-bêta** : P7 Application mobile native (uniquement après conditions §A.3).
+
+**Nouveaux bloqueurs transverses** :
+4. MSG-01 (décision `Circle` vs enum `RACINES_CIRCLE`) à fermer avant P3-6 et P4-7.
+5. MSG-02 (retrait fake data ClassroomChat) à faire en P0.A-7 pour ne pas contaminer P-1 baseline.
+6. Doctrine amendée §A.4 impose critères mobiles obligatoires — chaque page de P1-P4 doit passer la checklist 360/44px/safe-area/keyboard/offline avant validation.

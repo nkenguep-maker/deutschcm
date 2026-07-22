@@ -466,3 +466,118 @@ Landing /en : CANONICAL — aucun fichier modifié
 ```
 
 Aucun fichier produit modifié. `AUDIT.md` non tracké préservé. Seuls les 3 fichiers `docs/*.md` sont ajoutés dans cette passe.
+
+---
+
+# Annexe B — Amendements produit (mobile + messagerie)
+
+Cette annexe complète l'analyse d'écarts avec les deux décisions produit prises après le commit initial de doctrine, désormais formalisées dans les Amendements A et B de `YEMA_PRODUCT_DESIGN_DOCTRINE.md`.
+
+## B.1 Écarts mobile
+
+Doctrine amendée §A pose YEMA comme **mobile-first**. Constats sur le produit actuel :
+
+| ID | Finding | Route(s) | Preuve | Priorité | Recommandation limitée |
+|---|---|---|---|---|---|
+| MOB-01 | Sweep publique révèle overflow horizontal à 360/390 px sur `/fr/discover` et `/fr/goodbye` (1 élément chacun) | `/fr/discover`, `/fr/goodbye` | Sweep Playwright §8 tableau | P2 | Enquêter sur l'élément coupable (probable grid non `min-w-0`). |
+| MOB-02 | Anomalie landing `/fr` et `/en` à 360/390 (1 élément overflow) | `/fr`, `/en` | Sweep annexe A | — | Non modifiable (landing CANONICAL). Documentée. |
+| MOB-03 | Toutes les pages authentifiées `CODE_AUDITED_VISUAL_PENDING` — aucun rendu 360/390 vérifié | dashboards, foyer, teacher, center, admin | 19 marqueurs §4 | P0 | À couvrir par P-1 (baseline authentifiée) avec sweep 360/390/768/1440 sur session réelle. |
+| MOB-04 | Manifest PWA existe mais non validé pour installation | `src/app/manifest.ts` | fichier présent, à auditer | P3 | Vérifier icônes, theme_color, start_url, display standalone. |
+| MOB-05 | Aucun service worker détecté (pas de cache offline) | racine app | grep `serviceWorker` = 0 hit | P3 | Prévoir en P6 QA/PWA. |
+| MOB-06 | Aucune stratégie explicite pour clavier iOS/Android sur formulaires longs (register, onboarding, composer messagerie) | `/register`, `/onboarding/monde`, `/onboarding/racines` | audit statique + `CODE_AUDITED_VISUAL_PENDING` | P1 | Vérifier `inputMode`, `autocomplete`, positionnement du composer sur clavier ouvert. |
+| MOB-07 | Aucune gestion safe area iOS observée dans les composants globaux (`Layout.tsx`, `FoyerSidebar.tsx`) | tous dashboards | grep `env(safe-area-` = 0 hit dans `globals.css` visible | P1 | Ajouter `padding: env(safe-area-inset-*)` sur les shells de dashboard. |
+| MOB-08 | Aucun état hors connexion explicite | tous | grep `offline\|navigator.onLine` = 0 hit runtime | P3 | Prévoir en P6 QA/PWA (composant `StateBlock kind="offline"` à créer). |
+| MOB-09 | Actions principales pas toujours accessibles au pouce (à confirmer P-1) | dashboards, pricing, checkout | non observable sans session | P1 | À vérifier dans la baseline authentifiée. |
+| MOB-10 | Aucun test Playwright configuré pour 360×800 en régression | CI | pas de CI, pas de baseline | P3 | Prévoir en P6 QA. |
+
+## B.2 État de la messagerie existante dans le code
+
+Grep exhaustif sur `message`, `messages`, `conversation`, `chat`, `thread`, `classroom`, `group`, `assignment`, `submission`, `voice`, `audio`, `reaction`, `notification`.
+
+### Modèles Prisma existants (`prisma/schema.prisma`)
+
+Structure V2 (yema_v1_core) :
+
+| Modèle | @@map | Champs clés | Statut vs doctrine §B.11 |
+|---|---|---|---|
+| `Thread` (l.726) | `threads` | `classId`, `threadType` (MAIN/ANNOUNCEMENT/ASSIGNMENT/ONE_TO_ONE), `title` | GOOD_BUT_INCOMPLETE — `threadType` couvre 4 usages, mais aucun fil « cercle Racines » explicite (les cercles Racines n'existent pas encore comme entité — voir MSG-01). |
+| `Message` (l.740) | `messages` | `threadId`, `authorUserId`, `messageType` (TEXT/AUDIO), `body`, `audioUrl` | GOOD_BUT_INCOMPLETE — supporte texte et audio via `audioUrl`, mais **pas de `VoiceMessage` séparé** (pas de duration, pas de waveform stockée, pas de statut lecture). Manque : `MessageReaction`, `MessageReadState`, `MessageReport`, `MessageAttachment`. |
+| `ClassAssignment` (l.755) | `class_assignments` | `classId`, `title`, `description`, `dueAt` | GOOD_BUT_INCOMPLETE — pas de type « invitation orale » explicite. Doctrine §B.5 exige types annonce/devoir/invitation. |
+| `Submission` (l.770) | `submissions` | `assignmentId`, `userId`, `body`, `audioUrl` | GOOD_BUT_INCOMPLETE — supporte remise texte ou audio, mais pas de durée, waveform, ni référence croisée bidirectionnelle. Contrainte `@@unique([assignmentId, userId])` : un seul submission par user par assignment (règle métier à valider). |
+| `ClassFeedback` (l.786) | `class_feedback` | `submissionId`, `authorUserId`, `score`, `body` | GOOD_BUT_INCOMPLETE — feedback texte seulement, **pas de champ `audioUrl`** → correction vocale coach impossible sans amendement schéma. Doctrine §B.4 exige correction vocale 5 min max. |
+| `Class` (l.688) | `classes` | `classType` (TEACHER/CAREER_COACH/CENTER), `providerUserId`, `language`, `level` | GOOD_BUT_INCOMPLETE — pas d'entité « cercle Racines » (`classType` n'inclut pas `RACINES_CIRCLE` ou équivalent). |
+| `ClassMembership` (l.708) | `class_memberships` | `classId`, `userId`, `learningPathId`, `role` (LEARNER/TEACHER/COACH), `status` | GOOD_BUT_INCOMPLETE — `role` couvre partiellement les besoins doctrine §B.9, manque distinction « profil enfant » pour contrôle parental. |
+| `Notification` | `notifications` (existe) | — | À auditer. |
+
+Structure V1 legacy encore présente : `Classroom`, `ClassroomEnrollment`, `Assignment`, `AssignmentSubmission`, `StudentGroup`, `StudentGroupMember`, `ClassJoinRequest`, `StudyGroupInvite`. **Coexistence V1/V2 à clarifier** avant P4 messagerie (risque de duplication).
+
+### Composants messagerie existants (`src/components/`)
+
+| Composant | Fichier | Statut | Preuve |
+|---|---|---|---|
+| `ClassroomChat.tsx` | 251 lignes | **PLACEHOLDER** | Données hardcodées : `INITIAL_MESSAGES` contient « Prof. Sophie Tanda » + « Marie N. » fake. Utilise `subscribeToClassroom` / `broadcastMessage` de `@/lib/supabase/realtime`. Réactions frontend uniquement `["👍","🎯","💪","🔥"]`, pas persistées Prisma. Violation doctrine §33.3 « aucune donnée fictive présentée comme réelle ». |
+| `NotificationBell.tsx` | 173 lignes | GOOD_BUT_INCOMPLETE | Icône notif avec badge count, ne charge pas de vraies notifications messagerie. |
+| `AudioPlayer.tsx` (post-A.1 slim) | ~90 lignes | GOOD_BUT_INCOMPLETE | Joue une `src` audio statique. Manque support notes vocales : waveform, durée dynamique, badge « auteur », statut lu/non-lu, loading spécifique. |
+| `VoiceRecorder.tsx` (post-A.1 slim) | ~75 lignes | **PLACEHOLDER** | Coming-soon banner + textarea fallback. **Aucun enregistrement microphone réel.** Doctrine §B.4 exige note vocale 3 min max avec réécoute et annulation. |
+
+### API existantes (`src/app/api/`)
+
+| Route | Statut | Preuve |
+|---|---|---|
+| `GET/POST /api/classroom` | GOOD_BUT_INCOMPLETE | Liste enrolled classrooms + `POST` supporte « join or send message ». Le send message ne semble pas produire de `Message` Prisma via `Thread`. |
+| `POST /api/classroom/join` | GOOD_BUT_INCOMPLETE | Rejoint via code, crée enrollment pending. |
+| `GET /api/classroom/check-code/[code]` | GOOD_BUT_INCOMPLETE | Preview classroom avant join. |
+| `GET/POST /api/teacher` | GOOD_BUT_INCOMPLETE | GET profil + classrooms, POST crée classroom ou assignment. |
+| **Pas de route** `/api/messages`, `/api/threads`, `/api/conversations`, `/api/voice`, `/api/reactions`, `/api/read-states`, `/api/reports` | **MISSING** | Grep confirme leur absence. |
+
+### Realtime existant (`src/lib/supabase/realtime`)
+
+| Fonction | Statut | Preuve |
+|---|---|---|
+| `subscribeToClassroom` | GOOD_BUT_INCOMPLETE | Utilisé uniquement par `ClassroomChat` avec fake data. Pas de persistance backend. |
+| `broadcastMessage` | GOOD_BUT_INCOMPLETE | Idem. |
+| `ChatMessage` type | GOOD_BUT_INCOMPLETE | Type frontend uniquement, pas de mapping Prisma explicite. |
+
+### Écrans manquants (par rapport à la doctrine §B)
+
+| Nom doctrinal | Route probable | Classification |
+|---|---|---|
+| Fil unique classe Monde §B.2 (annonces + devoirs + notes vocales + corrections chronologiques) | à intégrer dans `/classroom/[id]` avec architecture Thread/Message | **MISSING** (le chat actuel ne joue pas ce rôle) |
+| Cercle Racines fermé §B.7 (équivalent Racines) | à créer, ex. `/racines/cercle/[id]` | **MISSING** — aucune entité `Circle` n'existe |
+| Composer mobile avec micro prioritaire §B.4 | à créer `<VoiceComposer>` | **MISSING** |
+| Correction vocale coach + texte §B.4 | à créer `<CorrectionVocaleEditor>` + amendement `ClassFeedback.audioUrl` | **MISSING** (feedback texte seulement) |
+| Contrôle parental profil enfant sur messagerie §B.9 | à créer, blocage messages privés | **MISSING** |
+| Signalement §B.10 (`MessageReport`) | à créer | **MISSING** |
+| Modération admin/centre avec audit log §B.9 | à créer | **MISSING** |
+| Statuts lu/non-lu §B.12 (`MessageReadState`) | à créer | **MISSING** |
+| Réactions persistées Prisma §B.5 (`MessageReaction`) | à créer (existe seulement en frontend fake) | **MISSING** |
+
+### Findings messagerie synthétiques
+
+| ID | Finding | Route/Fichier | Preuve | Priorité | Recommandation limitée |
+|---|---|---|---|---|---|
+| MSG-01 | Aucune entité « cercle Racines » (Class limitée à TEACHER/CAREER_COACH/CENTER) | `prisma/schema.prisma` enum `ClassType` | grep confirme | P0 | Amender le schéma pour distinguer classe Monde et cercle Racines (soit nouvelle enum `RACINES_CIRCLE`, soit nouvelle entité `Circle` distincte). Décision produit à fermer. |
+| MSG-02 | `ClassroomChat` contient de fausses données présentées comme réelles | `src/components/ClassroomChat.tsx` | INITIAL_MESSAGES hardcoded « Prof. Sophie Tanda », « Marie N. » | P0 | Retirer les fake messages, brancher sur `Thread`/`Message` réels via `/api/messages` (à créer). |
+| MSG-03 | `VoiceRecorder` est coming-soon sans enregistrement réel | `src/components/VoiceRecorder.tsx` | code lu post-A.1 | P0 | Implémenter enregistrement microphone (MediaRecorder API), consentement, réécoute, annulation, envoi. |
+| MSG-04 | `ClassFeedback` n'a pas de champ `audioUrl` → correction vocale coach impossible | `prisma/schema.prisma` l.786 | schéma lu | P0 | Ajouter `audioUrl String?` sur `ClassFeedback` (nouvelle migration additive). |
+| MSG-05 | Aucun `MessageReaction`, `MessageReadState`, `MessageReport` Prisma | schéma | grep confirme | P1 | Créer les 3 modèles avec relations `Message` + `User`. |
+| MSG-06 | Aucun `VoiceMessage` séparé (durée, waveform, statut) | schéma | `Message.audioUrl` seul | P1 | Soit enrichir `Message` (`durationMs`, `waveform`), soit créer `VoiceMessage`. |
+| MSG-07 | Aucune API messagerie (`/api/messages`, `/api/threads`, `/api/voice`, `/api/reactions`, `/api/read-states`, `/api/reports`) | `src/app/api/` | absents | P0 | Créer les routes en P4. |
+| MSG-08 | Coexistence V1 (`Classroom`, `Assignment`, `AssignmentSubmission`) et V2 (`Class`, `ClassAssignment`, `Submission`) | `prisma/schema.prisma` | grep confirme les 2 séries | P1 | Clarifier la migration V1→V2, choisir la structure canonique, migrer les données legacy (nouvelle passe DATA-003 si nécessaire). |
+| MSG-09 | Realtime Supabase branché sur fake data | `src/lib/supabase/realtime` | `subscribeToClassroom` utilisé uniquement par ClassroomChat placeholder | P1 | Cabler sur inserts réels de `Message` via Supabase Realtime avec ownership check. |
+| MSG-10 | Aucune protection profil enfant sur messagerie | permissions | grep confirme | P0 | Bloquer messages privés pour enfants (déjà interdits par §B.9), permettre uniquement les échanges dans le groupe classe/cercle autorisé. |
+| MSG-11 | Aucune séparation Monde/Racines dans le rendu chat | `ClassroomChat.tsx` | pas de `territory` prop | P1 | Variantes visuelles espresso/brass (Monde) vs terre/terracotta (Racines) par territoire. |
+| MSG-12 | `Notification` model existe mais non utilisée pour messagerie | schéma | `NotificationBell` ne charge rien | P1 | Câbler notifications new-message, correction-received, mention. |
+
+**Classification globale messagerie** : **PLACEHOLDER** (chat frontend fake) + **FUNCTIONALLY_INCOMPLETE** (fondations Prisma partielles) + **MISSING** (cercle Racines, correction vocale, réactions persistées, statuts, signalement, contrôle parental).
+
+---
+
+## Confirmation amendée
+
+```
+Landing /fr : CANONICAL — aucun fichier modifié
+Landing /en : CANONICAL — aucun fichier modifié
+```
+
+Aucun fichier produit modifié pendant l'ajout de l'annexe B. Seuls les 3 fichiers `docs/*.md` sont concernés.
