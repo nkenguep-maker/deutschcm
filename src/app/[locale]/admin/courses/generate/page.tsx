@@ -97,11 +97,6 @@ const PROGRESS_MESSAGES = [
   "✅ Finalisation du cours..."
 ];
 
-const SAVED_COURSES = [
-  { manuel: "Netzwerk neu A1", lektion: "L1 — Guten Tag!", level: "A1", competences: ["Lesen","Hören","Sprechen","Schreiben"], date: "09/05/2026", status: "publié" },
-  { manuel: "Netzwerk neu A1", lektion: "L2 — Meine Familie", level: "A1", competences: ["Lesen","Hören"], date: "09/05/2026", status: "brouillon" },
-];
-
 type ManuelKey = keyof typeof MANUELS;
 type CompetenceKey = "lesen" | "hoeren" | "sprechen" | "schreiben";
 
@@ -114,6 +109,11 @@ interface SavedCourse {
   status: string;
   courseId?: string;
 }
+
+// Aucun cours pré-existant en base au démarrage. On ne fabrique pas
+// d'entrées bidons — la table démarre vide et se remplit uniquement quand
+// un admin sauvegarde réellement un brouillon.
+const SAVED_COURSES: SavedCourse[] = [];
 
 export default function AdminGenerateCourse() {
   const [selectedManuel, setSelectedManuel] = useState<ManuelKey>("Netzwerk neu A1");
@@ -720,6 +720,11 @@ export default function AdminGenerateCourse() {
         {/* Tableau cours sauvegardés */}
         <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 24, padding: 28 }}>
           <h2 style={{ color: "white", fontFamily: "'Syne',sans-serif", fontSize: 18, marginBottom: 16 }}>📋 Cours générés</h2>
+          {savedCourses.length === 0 ? (
+            <div style={{ padding: "20px 4px", color: "rgba(255,255,255,0.5)", fontSize: 13 }}>
+              Aucun brouillon enregistré pour l&apos;instant. Vos cours sauvegardés apparaîtront ici.
+            </div>
+          ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
               <thead>
@@ -776,6 +781,7 @@ export default function AdminGenerateCourse() {
               </tbody>
             </table>
           </div>
+          )}
         </div>
 
       </div>
