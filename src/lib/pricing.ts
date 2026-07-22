@@ -12,12 +12,13 @@ export type LevelId = "A1" | "A2" | "B1" | "B2" | "C1";
 export const LEVELS: readonly LevelId[] = ["A1", "A2", "B1", "B2", "C1"];
 
 // ── Univers 1 · Langues du monde · Le Passage par niveau ──────────
+// Grille doctrinale §17 · docs/YEMA_PRODUCT_DESIGN_DOCTRINE.md
 export const WORLD_PASSAGE_PRICES: Record<LevelId, Record<Rail, number>> = {
   A1: { fcfa: 49000, eur: 75 },
-  A2: { fcfa: 54000, eur: 78 },
-  B1: { fcfa: 58000, eur: 85 },
-  B2: { fcfa: 64000, eur: 99 },
-  C1: { fcfa: 72000, eur: 119 },
+  A2: { fcfa: 55000, eur: 79 },
+  B1: { fcfa: 59000, eur: 89 },
+  B2: { fcfa: 69000, eur: 109 },
+  C1: { fcfa: 79000, eur: 129 },
 };
 
 // Supplément « pack professeur » · s'AJOUTE au Passage, jamais un
@@ -47,6 +48,22 @@ export const AFRICAN_FAMILY: AfricanOffer = {
   fcfa: { month: 9900, year: 99000 },
   eur:  { month: 19.90, year: 149 },
 };
+
+// ── Add-on · Suivi coach de langue Racines · prix unique ─────────
+// Doctrine « Suivi humain Racines » §1-2 : 30 000 XAF / 45 € par mois,
+// prix identique de É1 à É5, par personne accompagnée. Renouvellement
+// mensuel. Aucune IA, correction humaine réelle. Distinct du prof Monde
+// et du coach carrière Europe.
+// Ne pas rattacher aux niveaux A1–C1 (règle stratégique doctrine).
+export const RACINES_COACH_ADDON: Record<Rail, number> = {
+  fcfa: 30000,
+  eur: 45,
+};
+// Statut opérationnel : la messagerie et la correction humaine ne sont
+// pas encore branchées en runtime (P4 messagerie). Tant que RACINES_COACH_OPERATIONAL
+// est false, le produit doit afficher « Bientôt disponible » ou
+// « Liste d'attente » plutôt que permettre un paiement.
+export const RACINES_COACH_OPERATIONAL = false;
 
 export type Period = "month" | "year";
 /** Périodicité par défaut adaptée au rail · mensuel accessible en
