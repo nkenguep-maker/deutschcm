@@ -23,7 +23,7 @@ const PUBLIC_ROUTES = [
   "/quiz/demo", "/video/preview",
   "/privacy", "/terms", "/landing",
   "/goodbye", "/teacher/goodbye",
-  "/methode", "/histoires", "/manifeste", "/langues", "/setup-role",
+  "/methode", "/histoires", "/manifeste", "/langues", "/enseignants", "/setup-role",
   // /simulateur : feature IA supprimée (AUDIT.md §11). La page renvoie
   // notFound() ; on la place en public pour qu'anonymes ET connectés
   // reçoivent le même 404 canonique au lieu d'un 307 → login.
@@ -51,6 +51,11 @@ const PROTECTED_ROUTES: Record<string, SpaceRole[]> = {
   "/dashboard": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
   "/courses": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
   "/progress": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
+  // /famille = espace foyer parent, réservé aux rôles STUDENT (qui peut
+  // être parent) et ADMIN (opération). TEACHER et CENTER ne doivent pas
+  // y accéder par défaut — un multi-rôle explicite STUDENT + TEACHER
+  // fonctionnera toujours puisque canAccessRoute() OR sur roles.
+  "/famille": ["STUDENT", "ADMIN"],
 }
 
 // À quel espace appartient un pathname donné ? (pour déterminer le rôle
@@ -62,6 +67,7 @@ function spaceForPath(pathname: string): SpaceRole | null {
   if (
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/courses") ||
+    pathname.startsWith("/famille") ||
     pathname.startsWith("/progress")
   ) return "STUDENT"
   return null
