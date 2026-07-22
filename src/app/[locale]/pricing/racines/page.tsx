@@ -15,12 +15,51 @@ import {
   PRICING_COPY,
   AFRICAN_SOLO,
   AFRICAN_FAMILY,
+  RACINES_COACH_ADDON,
+  RACINES_COACH_OPERATIONAL,
   detectDefaultRail,
   defaultPeriodFor,
   fmtPrice,
   type Rail,
   type Period,
 } from "@/lib/pricing";
+
+const COACH_COPY = {
+  fr: {
+    kicker: "Add-on humain",
+    title: "Suivi coach de langue Racines",
+    priceUnit: "par mois",
+    subUnit: "par personne accompagnée · prix identique de É1 à É5",
+    body: "Une personne réelle écoute ta voix, corrige tes productions et t'aide à faire vivre la langue dans ton quotidien.",
+    bullets: [
+      "Jusqu'à 8 corrections humaines par mois (max 2 par semaine)",
+      "Production orale de 3 minutes maximum ou écrit de 250 mots",
+      "1 session individuelle de 30 minutes par mois",
+      "Réponse indicative sous 48 heures ouvrées",
+      "Renouvellement mensuel · résiliable pour le mois suivant",
+    ],
+    honest: "Aucune IA. Un humain formé, sélectionné, rémunéré.",
+    ctaWait: "Rejoindre la liste d'attente",
+    statusSoon: "Bientôt disponible — le suivi ouvre en même temps que la messagerie de classe/cercle.",
+  },
+  en: {
+    kicker: "Human add-on",
+    title: "Racines language coach",
+    priceUnit: "per month",
+    subUnit: "per person · identical price from É1 to É5",
+    body: "A real person listens to your voice, corrects your submissions and helps the language live in your everyday.",
+    bullets: [
+      "Up to 8 human corrections per month (max 2 per week)",
+      "Voice up to 3 minutes or writing up to 250 words",
+      "One 30-minute individual session per month",
+      "Indicative reply within 48 business hours",
+      "Monthly renewal · cancel any time for next month",
+    ],
+    honest: "No AI. A trained, selected, fairly-paid human.",
+    ctaWait: "Join the waitlist",
+    statusSoon: "Coming soon — the coach opens together with class/cercle messaging.",
+  },
+} as const;
 
 const FOOTER_FR = {
   tagline: "L’Afrique parle. Toutes ses langues, enfin un lieu.",
@@ -203,6 +242,32 @@ export default function PricingRacinesPage() {
                   {t(c.familyCta)} <span aria-hidden="true">→</span>
                 </Link>
               </article>
+            </div>
+          </div>
+        </section>
+
+        {/* Suivi coach de langue Racines · add-on humain à prix unique */}
+        <section className="pricing-prof-reminder" aria-labelledby="racines-coach-h">
+          <div className="maison-container">
+            <div className="pricing-prof-reminder-inner">
+              <p className="pricing-eyebrow">{COACH_COPY[loc].kicker.toUpperCase()}</p>
+              <h3 id="racines-coach-h" className="pricing-prof-reminder-h">{t(COACH_COPY[loc].title)}</h3>
+              <div className="pricing-offer-price" style={{ marginTop: 8 }}>
+                <span className="pricing-price-num">{fmtPrice(RACINES_COACH_ADDON[rail], rail)}</span>
+                <span className="pricing-price-cur">{railSymbol}</span>
+                <span className="pricing-price-per">{t(COACH_COPY[loc].priceUnit)}</span>
+              </div>
+              <p className="pricing-prof-reminder-sub">{t(COACH_COPY[loc].subUnit)}</p>
+              <p className="pricing-prof-reminder-sub" style={{ marginTop: 12 }}>{t(COACH_COPY[loc].body)}</p>
+              <ul className="pricing-offer-list" style={{ marginTop: 12 }}>
+                {COACH_COPY[loc].bullets.map((b) => <li key={b}>{t(b)}</li>)}
+              </ul>
+              <p className="pricing-founders" style={{ marginTop: 12 }}>{t(COACH_COPY[loc].honest)}</p>
+              {!RACINES_COACH_OPERATIONAL && (
+                <p className="pricing-prof-reminder-sub" style={{ marginTop: 12, fontStyle: "italic" }}>
+                  {t(COACH_COPY[loc].statusSoon)}
+                </p>
+              )}
             </div>
           </div>
         </section>
