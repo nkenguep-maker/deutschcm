@@ -223,9 +223,13 @@ export function OnboardingMondeForm() {
       if (ocRes.status === 401) { showError("session_expired"); return; }
       if (!ocRes.ok) { showError("finish_error"); return; }
 
-      // Succès : on peut effacer le draft et rediriger direct.
+      // Succès · aucun niveau CECR dérivé du startPoint (hardening §2).
+      // L'auto-évaluation réelle 5 options se joue sur /onboarding/monde/niveau,
+      // vers lequel le router /onboarding envoie automatiquement quand
+      // LANGUAGE_SELECTED. « test » reste un raccourci vers /test-niveau qui
+      // fixera le niveau et écrira selfAssessmentAnswer côté niveau screen.
       clearDraft();
-      const dest = startPoint === "test" ? "/test-niveau" : "/dashboard";
+      const dest = startPoint === "test" ? "/test-niveau" : "/onboarding";
       router.push(dest);
       router.refresh();
     } catch (err) {

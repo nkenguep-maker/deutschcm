@@ -214,8 +214,11 @@ export function OnboardingRacinesForm() {
       if (ocRes.status === 401) { showError("session_expired"); return; }
       if (!ocRes.ok) { showError("finish_error"); return; }
 
+      // Racines · aucun racinesStep dérivé du startPoint (hardening §3).
+      // La vraie auto-évaluation se joue sur /onboarding/racines/niveau,
+      // vers lequel le router envoie automatiquement quand LANGUAGE_SELECTED.
       clearDraft();
-      router.push("/dashboard");
+      router.push("/onboarding");
       router.refresh();
     } catch (err) {
       showError(classifyAuthError(err));
