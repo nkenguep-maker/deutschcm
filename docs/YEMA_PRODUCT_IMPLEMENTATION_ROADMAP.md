@@ -464,6 +464,31 @@ Déplacé dans le lot P0.B pour la même raison : P1-4 et P2-2 (parcours écoute
 - **Composant** : `CenterMembersTable` (enseignants, étudiants).
 - **Estimation** : **L**.
 
+### P4-3a · Connexion des pages centre aux données Prisma réelles
+
+- **Contexte** : depuis P0.B, les tables/cartes centre sont responsive mais les données proviennent encore de constantes hardcodées (`STUDENTS`, `MOCK_TEACHERS`, `CLASSES`) — 14 mock students, 7 mock teachers, 1 mock class visibles sur `/center/students`, `/center/teachers`, `/center/classes`, `/center/stats`. Voir `docs/YEMA_UI_FOUNDATIONS.md` §15 tableau final.
+- **Suppression stricte** :
+  - `STUDENTS` dans `src/app/[locale]/center/students/page.tsx`
+  - `MOCK_TEACHERS` dans `src/app/[locale]/center/teachers/page.tsx`
+  - `CLASSES` dans `src/app/[locale]/center/classes/page.tsx`
+  - `PENDING` (demandes de rattachement mock)
+- **APIs à créer** (data-layer via `lib/data/*.ts`, jamais Supabase direct dans les pages) :
+  - `getCenterStudents(centerId)` → filtre par `users.centerId = centerId`, join `learning_paths` pour niveau/XP/streak
+  - `getCenterTeachers(centerId)` → filtre par `teachers.centerId = centerId`, join `Classroom` pour compte classes/étudiants
+  - `getCenterClasses(centerId)` → filtre `Classroom.centerId = centerId`
+  - `getCenterPendingEnrollments(centerId)` → demandes `class_join_requests` où la classe appartient au centre
+- **États alimentés par les APIs réelles** :
+  - `loading` via `StateBlock kind="loading"` pendant le fetch
+  - `empty` via `StateBlock kind="empty"` quand `rows.length === 0` (aucun étudiant/enseignant/classe rattaché·e)
+  - `error` via `StateBlock kind="error"` sur échec réseau ou 403
+- **Critères d'acceptation stricts** :
+  - Aucun faux nom présenté comme réel (grep-based test `test(product)` bloque toute réintroduction de "Sophie Tanda", "Marie Nguemo", etc.)
+  - Aucun faux étudiant, faux enseignant, faux chiffre centre visible sur un compte centre réel
+  - Toutes les queries filtrées par `centerId` provenant de la session (`api/me`) — un centre A ne peut jamais voir les étudiants d'un centre B
+  - Test cross-centre : compte centre A tente `GET /api/center/students?centerId=B` → 403
+  - Test P-1 baseline mis à jour : compte `center` (TEST_CENTRE_YEMA_DEV) doit voir 0 enseignant + 0 étudiant tant qu'aucun rattachement réel n'est créé — état empty honnête
+- **Estimation supplémentaire** : **L** (au-dessus de P4-3).
+
 ## P4-4 · Espace admin §25.5
 
 - **Routes** : `/admin/users`, `/admin/applications`, `/admin/courses`, `/admin/roles`, `/admin/system`, `/admin/centers`.
