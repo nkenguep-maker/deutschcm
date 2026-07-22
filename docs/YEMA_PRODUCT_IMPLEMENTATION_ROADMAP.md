@@ -417,6 +417,20 @@ Déplacé dans le lot P0.B pour la même raison : P1-4 et P2-2 (parcours écoute
 
 # Lot P3 — Racines
 
+> **Statut d'implémentation** (branche `feat/yema-p3-roots-family`, 2026-07-23) :
+> - Dashboard Racines (Solo + Family) : ✅ DONE — server aiguillage `/dashboard`, `<DashboardRacines>` consommant `/api/me/racines-dashboard`
+> - Seam `src/lib/racines.ts` (É1-É5 doctrinal + statut par langue) : ✅ DONE
+> - Foyer + profils enfants (`/famille`, `/famille/enfant/[id]`) : ✅ KEEP (existant P1, ownership serveur confirmé)
+> - API `/api/me/racines-dashboard` : ✅ DONE (401 anon, 403 non-STUDENT, ChildProfile filtré par parentUserId)
+> - Ownership cross-household : ✅ DONE (PATCH/DELETE d'un enfant étranger → 404, page → 200 sans leak)
+> - Décision cercle A vs B : ✅ DONE (`docs/YEMA_P3_CIRCLE_DECISION.md` recommande Option A)
+> - **Contenu langue Racines : 🚫 CONTENT_REQUIRED + RIGHTS_REVIEW_REQUIRED** (les 4 langues restent MISSING, `anyRacinesLanguageReady === false`, doctrine §6-7 respectée)
+> - Récits, veillées, audios : 🚫 CONTENT_REQUIRED (aucun contenu inventé)
+> - Coach console : 🚫 P4 (état sobre « Bientôt disponible »)
+> - Vraie messagerie / cercle : 🚫 P4 (décision structurelle Option A prête à appliquer)
+> - Paiement Racines : 🚫 P5
+> - Détail complet : voir `docs/YEMA_P3_ROOTS_FAMILY.md`.
+
 **Objectif utilisateur** : offrir un dashboard Racines vivant, une échelle É1-É5 lisible, des veillées éditoriales et un espace foyer distinct.
 
 **Pages concernées** : `/dashboard` (variant Racines existant), `/famille`, `/famille/enfant/[id]`, `/racines/veillees` (nouveau), `/racines/recits` (nouveau).
