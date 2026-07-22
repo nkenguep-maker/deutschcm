@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useT } from "@/hooks/useT"
 import { BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 
@@ -36,6 +36,21 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<"overview"|"users"|"courses"|"validations"|"system">("overview")
   const [searchUser, setSearchUser] = useState("")
   const [filterRole, setFilterRole] = useState("ALL")
+  // Drawer mobile · fermé par défaut, ré-ouvrable via hamburger. Le
+  // hamburger ref sert à restaurer le focus quand on ferme via Escape.
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const hamburgerRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (!drawerOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setDrawerOpen(false)
+        hamburgerRef.current?.focus()
+      }
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [drawerOpen])
   const [stats, setStats] = useState<AdminStats>({
     users: { total: 0, students: 0, teachers: 0, centers: 0, growth: "" },
     courses: { total: 0, published: 0, draft: 0, modules: 0 },
@@ -81,7 +96,7 @@ export default function AdminDashboard() {
 
   return (
     <div style={{
-      minHeight: "100vh", background: "var(--espresso)",
+      background: "var(--espresso)",
       fontFamily: "var(--font-jetbrains, monospace),monospace", color: "white"
     }}>
       <style>{`
@@ -89,15 +104,34 @@ export default function AdminDashboard() {
         ::-webkit-scrollbar { display: none; }
       `}</style>
 
-      <div style={{ display: "flex", height: "100vh" }}>
+      <button
+        ref={hamburgerRef}
+        type="button"
+        className="admin-hamburger"
+        aria-label="Menu admin"
+        aria-expanded={drawerOpen}
+        aria-controls="admin-sidebar-nav"
+        onClick={() => setDrawerOpen(true)}
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+          <path d="M3 5h14M3 10h14M3 15h14" />
+        </svg>
+      </button>
+
+      <div
+        className={`admin-scrim ${drawerOpen ? "open" : ""}`}
+        onClick={() => setDrawerOpen(false)}
+        aria-hidden="true"
+      />
+
+      <div className="admin-shell">
 
         {/* ── Sidebar ── */}
-        <div style={{
-          width: 240, flexShrink: 0,
-          borderRight: "1px solid var(--creme-hair)",
-          background: "rgba(244, 235, 220, 0.02)",
-          padding: "24px 16px", overflowY: "auto"
-        }}>
+        <nav
+          id="admin-sidebar-nav"
+          className={`admin-sidebar ${drawerOpen ? "open" : ""}`}
+          aria-label="Navigation admin"
+        >
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28 }}>
             <span style={{ fontSize: 20 }}></span>
             <span style={{ fontFamily: "var(--font-fraunces),sans-serif", fontSize: 16, fontWeight: 800 }}>
@@ -107,14 +141,15 @@ export default function AdminDashboard() {
           </div>
 
           {navItems.map(item => (
-            <button key={item.key} onClick={() => setActiveTab(item.key as any)}
+            <button key={item.key} onClick={() => { setActiveTab(item.key as any); setDrawerOpen(false); }}
               style={{
                 width: "100%", display: "flex", alignItems: "center", gap: 10,
                 padding: "10px 12px", borderRadius: 10, marginBottom: 4, border: "none",
                 background: activeTab === item.key ? "var(--brass-glow)" : "transparent",
                 color: activeTab === item.key ? "var(--brass)" : "var(--creme-mute)",
                 cursor: "pointer", textAlign: "left", fontSize: 13,
-                outline: activeTab === item.key ? "1px solid var(--brass-edge)" : "none"
+                outline: activeTab === item.key ? "1px solid var(--brass-edge)" : "none",
+                minHeight: 44,
               }}>
               <span>{item.icon}</span>
               <span style={{ flex: 1, fontFamily: "var(--font-fraunces),sans-serif", fontWeight: activeTab === item.key ? 700 : 400 }}>
@@ -129,14 +164,14 @@ export default function AdminDashboard() {
           ))}
 
           <div style={{ paddingTop: 20, borderTop: "1px solid var(--creme-hair)", marginTop: 24 }}>
-            <a href="/" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 10, color: "var(--creme-mute)", fontSize: 12, textDecoration: "none" }}>
+            <a href="/" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 10, color: "var(--creme-mute)", fontSize: 12, textDecoration: "none", minHeight: 44 }}>
               {tA.backToSite}
             </a>
           </div>
-        </div>
+        </nav>
 
         {/* ── Content ── */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "32px 36px" }}>
+        <div className="admin-content">
 
           {/* ════ OVERVIEW ════ */}
           {activeTab === "overview" && (

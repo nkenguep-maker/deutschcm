@@ -4889,6 +4889,102 @@ button, [role="button"] {
 .app-header-actions {
   display: flex; align-items: center; gap: 10px;
   flex-shrink: 0;
+  min-width: 0;
+}
+
+/* ── Shell admin · reprise responsive sans refonte ────────────────
+   Le shell d'admin/page.tsx vit dans son propre DOM (pas app-shell).
+   Sur desktop, la sidebar reste inline 240 px. Sur mobile, elle
+   devient un drawer glissant + scrim, ouvert via .admin-hamburger.
+   Le focus est renvoyé sur le hamburger à la fermeture (géré par le
+   composant React). */
+.admin-shell {
+  min-height: 100dvh;
+  background: var(--espresso);
+  display: flex;
+}
+.admin-hamburger {
+  display: none;
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 12px);
+  left: calc(env(safe-area-inset-left) + 12px);
+  z-index: 60;
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: rgba(27, 18, 10, 0.92);
+  border: 1px solid var(--creme-hair);
+  color: var(--creme);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+.admin-hamburger:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.admin-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--creme-hair);
+  background: rgba(244, 235, 220, 0.02);
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+.admin-scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: rgba(0, 0, 0, 0.55);
+}
+.admin-content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 32px 36px;
+}
+
+@media (max-width: 767px) {
+  .admin-hamburger { display: inline-flex; }
+  .admin-sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 50;
+    width: min(84vw, 300px);
+    transform: translateX(-100%);
+    transition: transform var(--dur-move) var(--ease-enter);
+    padding-top: calc(env(safe-area-inset-top) + 64px);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: max(16px, env(safe-area-inset-left));
+    box-shadow: 12px 0 32px rgba(0, 0, 0, 0.35);
+  }
+  .admin-sidebar.open { transform: translateX(0); }
+  .admin-scrim.open { display: block; }
+  .admin-content {
+    padding: 68px 16px 24px;
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-sidebar { transition: none; }
+}
+/* Shell mobile · compresse les triggers du header sans supprimer d'action.
+   ≤ 480 px : cache les labels textuels mais garde le badge/dot/flag
+   comme indicateur visuel ; l'aria-label reste sur le bouton, donc la
+   fonction reste annoncée au screen reader. Cible tactile ≥ 44x44
+   via padding vertical préservé. */
+@media (max-width: 480px) {
+  .app-header { padding: 0 14px; padding-top: env(safe-area-inset-top); padding-right: max(14px, env(safe-area-inset-right)); }
+  .app-header-actions { gap: 6px; }
+  .lang-chooser-name,
+  .space-switcher-lbl { display: none; }
+  .lang-chooser-trigger,
+  .space-switcher-trigger { padding: 8px; min-width: 44px; min-height: 44px; justify-content: center; }
+  /* Le switcher FR/EN reste utile mais compact : cache le label "FR"/"EN"
+     et garde le drapeau (screen reader lit le title="Français"/"English"). */
+  .app-header-actions [title="Français"] > span:last-child,
+  .app-header-actions [title="English"] > span:last-child { display: none; }
+  .app-header-actions [title="Français"],
+  .app-header-actions [title="English"] { min-width: 40px; min-height: 40px; padding: 6px 10px; justify-content: center; }
 }
 .app-content {
   flex: 1;

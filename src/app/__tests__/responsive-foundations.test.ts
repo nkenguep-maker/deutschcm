@@ -107,6 +107,49 @@ describe("Safe-area et viewport", () => {
   });
 });
 
+describe("Shell mobile · header et admin drawer", () => {
+  const css = read("src/app/globals.css");
+  const admin = read("src/app/[locale]/admin/page.tsx");
+
+  it("compression header actions sous 480px", () => {
+    expect(css).toMatch(/@media \(max-width: 480px\)[\s\S]*?\.lang-chooser-name[\s\S]*?display: none/);
+    expect(css).toMatch(/@media \(max-width: 480px\)[\s\S]*?\.space-switcher-lbl[\s\S]*?display: none/);
+    expect(css).toMatch(/@media \(max-width: 480px\)[\s\S]*?\.lang-chooser-trigger[\s\S]*?min-width: 44px[\s\S]*?min-height: 44px/);
+  });
+
+  it("admin shell utilise les classes drawer, pas 240px hardcodé sur mobile", () => {
+    // Le shell n'utilise plus flex height:100vh + sidebar width:240 inline.
+    expect(admin).not.toMatch(/display:\s*["']flex["'],\s*height:\s*["']100vh["']/);
+    expect(admin).toMatch(/className="admin-shell"/);
+    expect(admin).toMatch(/className=\{`admin-sidebar \$\{drawerOpen \? "open" : ""\}`\}/);
+    expect(admin).toMatch(/className="admin-content"/);
+  });
+
+  it("admin hamburger visible mobile uniquement, cache-desktop via CSS media", () => {
+    expect(css).toMatch(/\.admin-hamburger\s*\{[\s\S]*?display: none/);
+    expect(css).toMatch(/@media \(max-width: 767px\)[\s\S]*?\.admin-hamburger\s*\{\s*display: inline-flex/);
+  });
+
+  it("admin drawer fermé par défaut (useState(false))", () => {
+    expect(admin).toMatch(/const \[drawerOpen, setDrawerOpen\] = useState\(false\)/);
+  });
+
+  it("admin drawer se ferme sur Escape et rend focus au hamburger", () => {
+    expect(admin).toMatch(/if \(e\.key === "Escape"\)/);
+    expect(admin).toMatch(/hamburgerRef\.current\?\.focus\(\)/);
+  });
+
+  it("admin drawer se ferme après click sur un nav item", () => {
+    expect(admin).toMatch(/setActiveTab\(item\.key as any\); setDrawerOpen\(false\);/);
+  });
+
+  it("admin hamburger a un label accessible et aria-expanded", () => {
+    expect(admin).toMatch(/aria-label="Menu admin"/);
+    expect(admin).toMatch(/aria-expanded=\{drawerOpen\}/);
+    expect(admin).toMatch(/aria-controls="admin-sidebar-nav"/);
+  });
+});
+
 describe("StateBlock · variantes offline et locked", () => {
   const src = read("src/components/StateBlock.tsx");
   it("type Kind inclut offline et locked", () => {
