@@ -21,7 +21,7 @@ import { BrandY } from "@/components/brand/BrandY";
 //
 // Rien d'ad hoc : dashboards, pages, modales — tout état passe par ici.
 
-type Kind = "error" | "empty" | "loading" | "success" | "confirm";
+type Kind = "error" | "empty" | "loading" | "success" | "confirm" | "offline" | "locked";
 
 interface ActionSpec {
   label: string;
@@ -77,7 +77,8 @@ export function StateBlock({
   const bodyRendered = body ? applyTypo(body) : undefined;
 
   const isLoading = kind === "loading";
-  const ariaLive = kind === "error" ? "polite" : undefined;
+  const ariaLive = kind === "error" || kind === "offline" ? "polite" : undefined;
+  const role = kind === "error" ? "alert" : kind === "offline" ? "status" : undefined;
 
   const renderAction = (spec: ActionSpec, isPrimary: boolean) => {
     const cls = `state-cta ${isPrimary ? "" : "ghost"}`;
@@ -108,7 +109,7 @@ export function StateBlock({
   return (
     <section
       className={`state-block state-${kind} ${centered ? "centered" : ""} ${compact ? "compact" : ""}`}
-      role={kind === "error" ? "alert" : undefined}
+      role={role}
       aria-live={ariaLive}
     >
       {isLoading && (

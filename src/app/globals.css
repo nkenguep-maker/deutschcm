@@ -4705,6 +4705,9 @@ button, [role="button"] {
   flex-direction: column;
   background: var(--espresso-2);
   border-right: 1px solid var(--creme-hair);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
 }
 .app-sidebar-brand {
   display: flex; align-items: center; gap: 12px;
@@ -4859,11 +4862,13 @@ button, [role="button"] {
   position: sticky;
   top: 0;
   z-index: 30;
-  height: 64px;
+  min-height: 64px;
   display: flex;
   align-items: center;
   gap: 16px;
   padding: 0 32px;
+  padding-top: env(safe-area-inset-top);
+  padding-right: max(32px, env(safe-area-inset-right));
   background: rgba(27, 18, 10, 0.92);
   border-bottom: 1px solid var(--creme-hair);
   backdrop-filter: blur(20px);
@@ -5402,6 +5407,161 @@ button, [role="button"] {
 .data-table td.right { text-align: right; }
 .data-table td.center { text-align: center; }
 .data-table-scroll { overflow-x: auto; }
+
+/* ─── Fondations responsive UI · P0.B ──────────────────────────────
+   Toutes ces primitives ne s'appliquent qu'aux zones qui les
+   demandent explicitement. Aucun impact sur la landing (elle
+   n'utilise ni .data-list ni .safe-area-*). Voir docs/YEMA_UI_FOUNDATIONS.md.
+   ────────────────────────────────────────────────────────────────── */
+
+/* Bascule desktop/mobile pour tableaux → cartes.
+   Usage : on garde la table dans .data-table-wrap.desktop-only et on rend
+   la même donnée en .data-list.mobile-only. Chaque paire consomme la
+   même source pour ne pas dupliquer les états. */
+.desktop-only { display: block; }
+.mobile-only { display: none; }
+@media (max-width: 767px) {
+  .desktop-only { display: none; }
+  .mobile-only { display: block; }
+}
+
+/* Liste de cartes (mobile) — un enregistrement par carte, alignée avec le
+   tableau desktop pour éviter deux graphs distincts. */
+.data-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.data-card {
+  background: var(--espresso-2);
+  border: 1px solid var(--creme-hair);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.data-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+.data-card-head > * { min-width: 0; }
+.data-card-title {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 15px;
+  color: var(--creme);
+  font-weight: 500;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.data-card-sub {
+  color: var(--creme-mute);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.data-card-rows {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: 6px 12px;
+  font-size: 12.5px;
+}
+.data-card-rows dt {
+  color: var(--creme-mute);
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  align-self: center;
+}
+.data-card-rows dd {
+  color: var(--creme-soft);
+  margin: 0;
+  overflow-wrap: anywhere;
+  align-self: center;
+}
+.data-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* Anti-overflow universel — à appliquer uniquement là où c'est utile
+   (email, url, code long). N'ajoute PAS aux textes libres. */
+.text-wrap-anywhere { overflow-wrap: anywhere; word-break: break-word; }
+
+/* Row (filtres, headers) qui ne casse pas en mobile.
+   Remplace un `flex` avec largeurs fixes 150/170/200 px. */
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.filter-row > * { min-width: 0; }
+.filter-row > input,
+.filter-row > select {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+@media (max-width: 480px) {
+  .filter-row > input,
+  .filter-row > select { flex-basis: 100%; }
+}
+
+/* Cible tactile minimale 44×44 — pour icônes/liens de ligne. L'icône
+   visible peut rester plus petite ; on élargit uniquement la zone
+   cliquable. À appliquer sur boutons icônes ou chevrons. */
+.tap-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Focus visible unifié — outline brass, ne pas retirer sans remplacer. */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Safe-area utilities. Utiliser sur shells fixes (Layout, TeacherLayout,
+   CenterLayout, futures modals plein écran, futures barres d'action). */
+.safe-area-top { padding-top: env(safe-area-inset-top); }
+.safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.safe-area-x {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+.safe-area-inset {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Bloc technique (identifiants longs, JSON, tokens) — scrolle en local
+   sans provoquer d'overflow de page. Utilisé par /admin/system quand
+   il rend un long identifiant. */
+.tech-block {
+  background: rgba(244, 235, 220, 0.02);
+  border: 1px solid var(--creme-hair);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 11.5px;
+  color: var(--creme-soft);
+  overflow-x: auto;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
 
 /* Monogram avatar (reusable) */
 .mono-avatar {
@@ -6114,6 +6274,20 @@ button, [role="button"] {
 .state-confirm {
   border-color: rgba(122, 40, 48, 0.35);
   background: var(--espresso-2);
+}
+/* Offline · réseau indisponible, la maison attend. Utilisé par les
+   dashboards lorsqu'un fetch tombe pour cause réseau. */
+.state-offline {
+  border-style: dashed;
+  border-color: var(--creme-hair);
+  background: rgba(244, 235, 220, 0.02);
+}
+/* Locked · fonctionnalité non encore débloquée pour ce compte
+   (ex. dashboard Racines pour un compte Monde). */
+.state-locked {
+  border-color: var(--creme-hair);
+  background: var(--espresso-2);
+  opacity: 0.92;
 }
 
 /* Le pulse en tête pour les chargements */
@@ -9742,6 +9916,7 @@ body.foyer-switching .foyer {
   font-style: italic;
   font-size: 20px;
   color: var(--creme);
+  overflow-wrap: anywhere;
 }
 .admin-app-meta {
   margin: 4px 0 0;
@@ -9749,6 +9924,7 @@ body.foyer-switching .foyer {
   font-size: 10.5px;
   letter-spacing: 0.08em;
   color: var(--creme-mute);
+  overflow-wrap: anywhere;
 }
 .admin-app-status {
   padding: 6px 10px;
