@@ -220,12 +220,15 @@ export function DiscoveryLessonClient({ lesson, alreadyDone, progress, locale }:
                   >
                     {c.check}
                   </button>
-                  {fb === true && (
-                    <p style={{ margin: 0, color: "var(--brass)", fontSize: 12 }}>✓ {c.correct}</p>
-                  )}
-                  {fb === false && (
-                    <p style={{ margin: 0, color: "var(--oxblood)", fontSize: 12 }}>· {c.incorrect}</p>
-                  )}
+                  {/* aria-live pour lecteur d'écran (P2 hardening §12) */}
+                  <span role="status" aria-live="polite" style={{ display: "inline-flex", gap: 6 }}>
+                    {fb === true && (
+                      <span style={{ color: "var(--brass)", fontSize: 12 }}>✓ {c.correct}</span>
+                    )}
+                    {fb === false && (
+                      <span style={{ color: "var(--oxblood)", fontSize: 12 }}>· {c.incorrect}</span>
+                    )}
+                  </span>
                 </div>
                 {fb !== null && fb !== undefined && (
                   <p style={{ margin: "8px 0 0", color: "var(--creme-mute)", fontSize: 12, lineHeight: 1.5 }}>

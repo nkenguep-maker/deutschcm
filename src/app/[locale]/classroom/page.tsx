@@ -102,71 +102,12 @@ interface Classroom {
   isDemo?: boolean;
 }
 
-function getMockClassrooms(locale: Locale): Classroom[] {
-  if (locale === "en") {
-    return [
-      {
-        id: "cls-1",
-        name: "German A1 — Beginners",
-        teacher: "Prof. Sophie Tanda",
-        level: "A1",
-        code: "DEUTSCH-A1-2024",
-        students: 24,
-        progress: 68,
-        color: "var(--brass)",
-        isDemo: true,
-        nextAssignments: [
-          { id: "a1", title: "Vocabulary: Introducing yourself", dueDate: "2025-05-15", submitted: false },
-          { id: "a2", title: "Grammar: Der/Die/Das",            dueDate: "2025-05-22", submitted: true  },
-        ],
-      },
-      {
-        id: "cls-2",
-        name: "A2 exam preparation",
-        teacher: "Prof. Jean-Pierre Nkolo",
-        level: "A2",
-        code: "DEUTSCH-A2-EXAM",
-        students: 18,
-        progress: 45,
-        color: "var(--brass)",
-        isDemo: true,
-        nextAssignments: [
-          { id: "a3", title: "Reading exercises", dueDate: "2025-05-18", submitted: false },
-        ],
-      },
-    ];
-  }
-  return [
-    {
-      id: "cls-1",
-      name: "Allemand A1 — Débutants",
-      teacher: "Prof. Sophie Tanda",
-      level: "A1",
-      code: "DEUTSCH-A1-2024",
-      students: 24,
-      progress: 68,
-      color: "var(--brass)",
-      isDemo: true,
-      nextAssignments: [
-        { id: "a1", title: "Vocabulaire : se présenter", dueDate: "2025-05-15", submitted: false },
-        { id: "a2", title: "Grammaire : Der/Die/Das",    dueDate: "2025-05-22", submitted: true  },
-      ],
-    },
-    {
-      id: "cls-2",
-      name: "Préparation examen A2",
-      teacher: "Prof. Jean-Pierre Nkolo",
-      level: "A2",
-      code: "DEUTSCH-A2-EXAM",
-      students: 18,
-      progress: 45,
-      color: "var(--brass)",
-      isDemo: true,
-      nextAssignments: [
-        { id: "a3", title: "Exercices de lecture", dueDate: "2025-05-18", submitted: false },
-      ],
-    },
-  ];
+// P2 hardening · aucune classe fictive présentée comme réelle (§22).
+// Doctrine · tant qu'aucune API classroom réelle n'existe (P4), on rend
+// l'état vide honnête. La signature est simplifiée (plus de param locale)
+// pour éliminer une warning eslint · aucun faux professeur.
+function getMockClassrooms(): Classroom[] {
+  return [];
 }
 
 const LEVEL_COLORS: Record<string, string> = {
@@ -293,7 +234,7 @@ export default function ClassroomListPage() {
   const locale: Locale = pathname.startsWith("/en") ? "en" : "fr";
   const t = T[locale] as TT;
 
-  const classrooms = getMockClassrooms(locale);
+  const classrooms = getMockClassrooms();
 
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [code, setCode] = useState("");

@@ -378,15 +378,19 @@ export default function AdaptiveQuiz({
         </div>
       )}
 
-      {/* Feedback */}
+      {/* Feedback · aria-live pour annunciation lecteur d'écran (P2 hardening §12) */}
       {showResult && (
-        <div style={{
-          padding: "12px 16px", borderRadius: 12, marginBottom: 14,
-          background: isCorrect ? "rgba(16,185,129,0.08)" : "rgba(239,68,68,0.08)",
-          border: isCorrect ? "1px solid rgba(16,185,129,0.2)" : "1px solid rgba(239,68,68,0.2)"
-        }}>
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            padding: "12px 16px", borderRadius: 12, marginBottom: 14,
+            background: isCorrect ? "rgba(16,185,129,0.08)" : "rgba(239,68,68,0.08)",
+            border: isCorrect ? "1px solid rgba(16,185,129,0.2)" : "1px solid rgba(239,68,68,0.2)"
+          }}>
           <p style={{ color: isCorrect ? "#10b981" : "#ef4444", fontSize: 13, fontWeight: 700, margin: "0 0 4px" }}>
-            {isCorrect ? "✅ Correct !" : `❌ Incorrect — Réponse : ${q.correct}`}
+            {/* Texte explicite avant l'emoji · ne dépend pas uniquement de la couleur */}
+            {isCorrect ? "Correct. ✅" : `Incorrect. ❌ Réponse : ${q.correct}`}
           </p>
           <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, margin: 0 }}>
             {q.explanation_fr}
