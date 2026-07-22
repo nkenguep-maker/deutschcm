@@ -340,6 +340,19 @@ Déplacé dans le lot P0.B pour la même raison : P1-4 et P2-2 (parcours écoute
 
 # Lot P2 — Étudiant Monde
 
+> **Statut d'implémentation** (branche `feat/yema-p2-world-student`, 2026-07-22) :
+> - Dashboard Monde (`/dashboard` aiguillage univers) : ✅ DONE
+> - Catalogue (`/courses`) : ✅ DONE — 5 leçons A1 réelles, A2-C1 « Bientôt disponible »
+> - Progression (`/progress`) : ✅ DONE — ModuleProgress réels, aucun graphique fictif
+> - Layout modules avec AccessGrant server-side : ✅ DONE
+> - API `/api/me/monde-dashboard` : ✅ DONE (401 anon, 403 non-STUDENT)
+> - Fixtures P-1 active/expired/none : ✅ DONE
+> - A1 courseReady=true (5 leçons × 5 modules dans `src/data/a1-beta-modules.ts`)
+> - Suivi professeur, devoirs, messagerie, notifications backend : 🚫 P4_DEPENDENCY
+> - Examens blancs, attestation : ⚠️ CONTENT_REVIEW_REQUIRED (pas de faux examen exposé)
+> - Paiement : 🚫 P5 (aucun grant hors fixture)
+> - Détail complet : voir `docs/YEMA_P2_WORLD_STUDENT.md`.
+
 **Objectif utilisateur** : offrir à un étudiant Monde un dashboard clair, un parcours complet et un accès humain quand suivi actif.
 
 **Pages concernées** : `/dashboard` (variant Monde à créer ici), `/courses`, `/courses/[id]/modules/[mid]`, `/monde/ecoute` (nouveau), `/monde/examens` (nouveau), `/monde/attestation` (nouveau), `/progress`.
