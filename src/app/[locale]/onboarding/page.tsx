@@ -18,6 +18,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { BrandY } from "@/components/brand/BrandY";
 import { getTranslations } from "next-intl/server";
+import { deriveFunnelStep, nextFunnelHref, readAnswers } from "@/lib/funnel-state";
+import { isLanguageActive, prismaLangToId } from "@/lib/discovery";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -40,7 +42,7 @@ export default async function OnboardingRouterPage({ params }: Props) {
   if (metaUniverse === "monde") redirect({ href: "/onboarding/monde", locale });
   if (metaUniverse === "racines") redirect({ href: "/onboarding/racines", locale });
 
-  // 2) Signal learning_paths (source de vérité v1)
+  // 2) Signal learning_paths (source de vérité v1) + état complet du funnel P1.
   const dbUser = await prisma.user.findUnique({
     where: { supabaseId: user.id },
     select: { id: true },
@@ -49,11 +51,50 @@ export default async function OnboardingRouterPage({ params }: Props) {
     const path = await prisma.learningPath.findFirst({
       where: { userId: dbUser.id, status: "ACTIVE" },
       orderBy: { createdAt: "desc" },
-      select: { universe: true },
     });
-    if (path?.universe === "MONDE") redirect({ href: "/onboarding/monde", locale });
-    if (path?.universe === "RACINES") redirect({ href: "/onboarding/racines", locale });
+    // Grant actif = activation payée (bénéficiaire = user ou learning path).
+    // Aucun grant accordé par le funnel P1 lui-même.
+    const grantCount = await prisma.accessGrant.count({
+      where: {
+        status: "ACTIVE",
+        OR: [
+          { beneficiaryType: "USER", beneficiaryId: dbUser.id },
+          ...(path ? [{ beneficiaryType: "LEARNING_PATH" as const, beneficiaryId: path.id }] : []),
+        ],
+      },
+    });
+    const step = deriveFunnelStep({
+      hasSupabaseUser: true,
+      learningPath: path,
+      hasActiveAccessGrant: grantCount > 0,
+    });
+    // Cas particulier · si la langue choisie n'est pas encore active (pas de
+    // contenu de découverte), on l'envoie sur l'écran d'attente honnête plutôt
+    // que sur une leçon vide.
+    if (path && (step === "SELF_ASSESSED" || step === "DISCOVERY_STARTED")) {
+      const langId = prismaLangToId(path.language);
+      if (!langId || !isLanguageActive(langId)) {
+        redirect({ href: "/decouverte/attente", locale });
+        return null;
+      }
+    }
+    // Onboarding form pas fini · on repointe sur le formulaire d'univers.
+    if (step === "ACCOUNT_READY" || step === "UNIVERSE_SELECTED" || step === "LANGUAGE_SELECTED") {
+      if (path?.universe === "MONDE") redirect({ href: "/onboarding/monde", locale });
+      if (path?.universe === "RACINES") redirect({ href: "/onboarding/racines", locale });
+    } else {
+      // SELF_ASSESSED / DISCOVERY_STARTED / DISCOVERY_COMPLETED / ACTIVATION_SELECTED / ACTIVATED
+      const dest = nextFunnelHref(step, {
+        hasSupabaseUser: true,
+        learningPath: path,
+        hasActiveAccessGrant: grantCount > 0,
+      });
+      redirect({ href: dest, locale });
+      return null;
+    }
   }
+  // Empêche l'accès aux variables non utilisées côté TS
+  void readAnswers;
 
   // 3) Rien de connu → écran de choix minimal (deux portes du seuil).
   //    Volontairement sobre : pas de tarifs, pas de baratin — c'est un

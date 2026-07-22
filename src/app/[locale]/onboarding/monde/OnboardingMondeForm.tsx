@@ -223,9 +223,20 @@ export function OnboardingMondeForm() {
       if (ocRes.status === 401) { showError("session_expired"); return; }
       if (!ocRes.ok) { showError("finish_error"); return; }
 
-      // Succès : on peut effacer le draft et rediriger direct.
+      // Succès · on écrit un niveau CECR provisoire dérivé du startPoint
+      // (beginner→A1, some_basics→A2). Le user peut le corriger plus tard.
+      // Pour « test », on garde le renvoi vers /test-niveau qui fixera le niveau.
+      if (startPoint !== "test") {
+        const level = startPoint === "beginner" ? "A1" : "A2";
+        await fetch("/api/funnel", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ patch: { cefrSelfAssessed: level } }),
+        }).catch(() => {});
+      }
       clearDraft();
-      const dest = startPoint === "test" ? "/test-niveau" : "/dashboard";
+      // Le router /onboarding décide la prochaine étape (découverte ou activation).
+      const dest = startPoint === "test" ? "/test-niveau" : "/onboarding";
       router.push(dest);
       router.refresh();
     } catch (err) {

@@ -56,6 +56,10 @@ const PROTECTED_ROUTES: Record<string, SpaceRole[]> = {
   // y accéder par défaut — un multi-rôle explicite STUDENT + TEACHER
   // fonctionnera toujours puisque canAccessRoute() OR sur roles.
   "/famille": ["STUDENT", "ADMIN"],
+  // Funnel P1 · découverte + activation. Réservé STUDENT (les rôles pro
+  // ont leur propre onboarding et n'ont pas à passer par le funnel étudiant).
+  "/decouverte": ["STUDENT", "ADMIN"],
+  "/activation-intent": ["STUDENT", "ADMIN"],
 }
 
 // À quel espace appartient un pathname donné ? (pour déterminer le rôle
@@ -68,6 +72,8 @@ function spaceForPath(pathname: string): SpaceRole | null {
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/courses") ||
     pathname.startsWith("/famille") ||
+    pathname.startsWith("/decouverte") ||
+    pathname.startsWith("/activation-intent") ||
     pathname.startsWith("/progress")
   ) return "STUDENT"
   return null
