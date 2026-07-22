@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
+import { reconcileDbUser, ReconcileError } from "@/lib/reconcileDbUser";
 
 function generateCenterCode(city: string): string {
   const prefix = (city ?? "CM").replace(/[^a-zA-Z]/g, "").slice(0, 3).toUpperCase().padEnd(3, "X");
@@ -11,17 +11,7 @@ function generateCenterCode(city: string): string {
 }
 
 async function getAuthUser() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (list) => list.forEach(({ name, value, options }) => cookieStore.set(name, value, options)),
-      },
-    }
-  );
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   return user;
 }
@@ -30,16 +20,16 @@ export async function POST(request: NextRequest) {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Auto-create the DB user if missing (handles first-time sign-ups)
-  const dbUser = await prisma.user.upsert({
-    where: { supabaseId: authUser.id },
-    create: {
-      supabaseId: authUser.id,
-      email: authUser.email!,
-      fullName: authUser.user_metadata?.full_name ?? authUser.email?.split("@")[0] ?? "Utilisateur",
-    },
-    update: {},
-  });
+  let dbUser;
+  try {
+    const { user } = await reconcileDbUser({ authUser });
+    dbUser = user;
+  } catch (e) {
+    if (e instanceof ReconcileError) {
+      return NextResponse.json({ error: e.message, code: e.code }, { status: 400 });
+    }
+    throw e;
+  }
 
   const body = await request.json();
   const { type } = body;

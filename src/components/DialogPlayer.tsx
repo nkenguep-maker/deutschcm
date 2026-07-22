@@ -2,10 +2,15 @@
 import { useState } from "react"
 import AudioPlayer from "./AudioPlayer"
 
+// Génération audio dynamique retirée (AUDIT.md §11).
+// Le composant préserve dialogue, transcript, traductions et vocabulaire.
+// Il joue une source audio préenregistrée si `line.src` est fourni.
+
 export interface DialogLine {
   sprecher: string
   text: string
   translation?: string
+  src?: string
   gender?: "male" | "female"
   accent?: "de" | "at" | "ch"
   pause_after_ms?: number
@@ -32,6 +37,7 @@ export default function DialogPlayer({
   const [showTranslations, setShowTranslations] = useState(false)
   const [completed, setCompleted] = useState(false)
   const isPlaying = currentLine !== null
+  const hasAnyAudio = lines.some((l) => Boolean(l.src))
 
   const handleLineEnd = (index: number) => {
     if (index < lines.length - 1) {
@@ -98,23 +104,25 @@ export default function DialogPlayer({
           >
             🇫🇷 Traduction
           </button>
-          <button
-            onClick={handlePlayAll}
-            style={{
-              padding: "5px 12px", borderRadius: 8, fontSize: 10,
-              fontWeight: 700,
-              background: isPlaying
-                ? "rgba(239,68,68,0.15)"
-                : "linear-gradient(135deg,#10b981,#059669)",
-              border: isPlaying ? "1px solid rgba(239,68,68,0.3)" : "none",
-              color: "white", cursor: "pointer",
-              transition: "all var(--dur-move)",
-            }}
-          >
-            {isPlaying
-              ? (locale === "en" ? "⏹ Stop" : "⏹ Arrêter")
-              : (locale === "en" ? "▶ Listen all" : "▶ Tout écouter")}
-          </button>
+          {hasAnyAudio && (
+            <button
+              onClick={handlePlayAll}
+              style={{
+                padding: "5px 12px", borderRadius: 8, fontSize: 10,
+                fontWeight: 700,
+                background: isPlaying
+                  ? "rgba(239,68,68,0.15)"
+                  : "linear-gradient(135deg,#10b981,#059669)",
+                border: isPlaying ? "1px solid rgba(239,68,68,0.3)" : "none",
+                color: "white", cursor: "pointer",
+                transition: "all var(--dur-move)",
+              }}
+            >
+              {isPlaying
+                ? (locale === "en" ? "⏹ Stop" : "⏹ Arrêter")
+                : (locale === "en" ? "▶ Listen all" : "▶ Tout écouter")}
+            </button>
+          )}
         </div>
       </div>
 
@@ -133,6 +141,7 @@ export default function DialogPlayer({
           }}>
             <AudioPlayer
               text={line.text}
+              src={line.src}
               gender={line.gender || (i % 2 === 0 ? "female" : "male")}
               accent={line.accent || "de"}
               rate="0.85"
@@ -148,7 +157,7 @@ export default function DialogPlayer({
                 }}>
                   {line.sprecher}
                 </span>
-                {currentLine === i && (
+                {currentLine === i && line.src && (
                   <span style={{ fontSize: 9, color: "#10b981" }}>
                     ● diffusion...
                   </span>

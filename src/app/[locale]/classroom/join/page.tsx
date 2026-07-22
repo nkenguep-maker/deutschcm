@@ -195,9 +195,6 @@ function ClassroomJoinContent() {
               <Link href="/dashboard" style={{ background: "#10b981", color: "#fff", borderRadius: 12, padding: "14px 24px", fontWeight: 700, fontSize: 14, textDecoration: "none", textAlign: "center", display: "block" }}>
                 {labels.successBackBtn}
               </Link>
-              <Link href="/simulateur" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.70)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "13px 24px", fontWeight: 600, fontSize: 13, textDecoration: "none", textAlign: "center", display: "block" }}>
-                {labels.successPracticeBtn}
-              </Link>
             </div>
           </div>
         ) : (

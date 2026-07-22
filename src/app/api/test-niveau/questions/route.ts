@@ -1,74 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
-import { callAI } from "@/lib/ai/provider"
-import { getCached, setCached, cacheKey } from "@/lib/geminiCache"
 
-const SYSTEM_PROMPT = "Tu es un expert en tests de niveau CEFR allemand. Tu retournes UNIQUEMENT du JSON valide."
-
-const USER_PROMPT: Record<string, string> = {
-  fr: `Génère exactement 30 questions de test de niveau allemand CEFR pour apprenants francophones.
-Distribution : A1(6) A2(6) B1(6) B2(6) C1(6)
-
-Retourne UNIQUEMENT ce JSON :
-{
-  "questions": [
-    {
-      "id": "q1",
-      "level": "A1",
-      "type": "qcm",
-      "question_fr": "Question en français",
-      "options": ["A","B","C","D"],
-      "correct": "bonne réponse",
-      "correct_index": 0,
-      "explanation_fr": "explication courte",
-      "points": 1
-    }
-  ]
-}`,
-  en: `Generate exactly 30 CEFR German level test questions for English-speaking learners.
-Distribution: A1(6) A2(6) B1(6) B2(6) C1(6)
-
-Return ONLY this JSON:
-{
-  "questions": [
-    {
-      "id": "q1",
-      "level": "A1",
-      "type": "qcm",
-      "question_fr": "Question in English",
-      "options": ["A","B","C","D"],
-      "correct": "correct answer",
-      "correct_index": 0,
-      "explanation_fr": "short explanation in English",
-      "points": 1
-    }
-  ]
-}`,
-}
+// Banque de questions statique déterministe (zéro IA). Voir AUDIT.md §11.
+// Contrat client inchangé : { success: true, questions: [...] }.
+// Distribution : A1(6) A2(6) B1(6) B2(6) C1(6) = 30 questions.
 
 export async function GET(request: NextRequest) {
   const locale = new URL(request.url).searchParams.get("locale") === "en" ? "en" : "fr"
-  const key = cacheKey("test-niveau", "questions", `v1-${locale}`)
-  const cached = getCached(key)
-  if (cached) return NextResponse.json({ success: true, questions: cached, fromCache: true })
-
-  try {
-    const result = await callAI({
-      feature: "level-test",
-      systemPrompt: SYSTEM_PROMPT,
-      userMessage: USER_PROMPT[locale],
-      temperature: 0.2,
-      maxTokens: 4000,
-    })
-    const parsed = JSON.parse(result.text.replace(/```json|```/g, "").trim())
-    setCached(key, parsed.questions)
-    return NextResponse.json({ success: true, questions: parsed.questions })
-  } catch {
-    const fallback = locale === "en" ? FALLBACK_QUESTIONS_EN : FALLBACK_QUESTIONS_FR
-    return NextResponse.json({ success: true, questions: fallback, fromCache: false })
-  }
+  const questions = locale === "en" ? QUESTIONS_EN : QUESTIONS_FR
+  return NextResponse.json({ success: true, questions })
 }
 
-const FALLBACK_QUESTIONS_FR = [
+const QUESTIONS_FR = [
   // A1
   { id:"q1", level:"A1", type:"qcm", question_fr:"Comment dit-on 'bonjour' formellement?", options:["Hallo","Guten Tag","Tschüss","Danke"], correct:"Guten Tag", correct_index:1, explanation_fr:"Guten Tag = bonjour formel", points:1 },
   { id:"q2", level:"A1", type:"qcm", question_fr:"Complétez : Ich ___ Student.", options:["bin","bist","ist","sind"], correct:"bin", correct_index:0, explanation_fr:"ich → bin", points:1 },
@@ -106,7 +48,7 @@ const FALLBACK_QUESTIONS_FR = [
   { id:"q30", level:"C1", type:"qcm", question_fr:"Que signifie 'etw. unter Beweis stellen'?", options:["Prouver quelque chose","Mettre sous preuve","Douter de quelque chose","Cacher quelque chose"], correct:"Prouver quelque chose", correct_index:0, explanation_fr:"unter Beweis stellen = démontrer/prouver", points:1 },
 ]
 
-const FALLBACK_QUESTIONS_EN = [
+const QUESTIONS_EN = [
   // A1
   { id:"q1", level:"A1", type:"qcm", question_fr:"How do you say 'hello' formally?", options:["Hallo","Guten Tag","Tschüss","Danke"], correct:"Guten Tag", correct_index:1, explanation_fr:"Guten Tag = formal hello", points:1 },
   { id:"q2", level:"A1", type:"qcm", question_fr:"Complete: Ich ___ Student.", options:["bin","bist","ist","sind"], correct:"bin", correct_index:0, explanation_fr:"ich → bin (I am)", points:1 },

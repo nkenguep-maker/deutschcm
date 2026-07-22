@@ -160,12 +160,6 @@ export default function TestResultsPage() {
     router.push("/dashboard");
   };
 
-  const goToSimulator = () => {
-    setAccepting(true);
-    sessionStorage.removeItem("testResult");
-    router.push("/simulateur");
-  };
-
   const retake = () => {
     sessionStorage.removeItem("testResult");
     router.push("/test-niveau");
@@ -445,21 +439,6 @@ export default function TestResultsPage() {
               transition: "all var(--dur-move)",
             }}>
             {accepting ? t.redirecting : `${t.startBtn} →`}
-          </button>
-
-          <button
-            onClick={goToSimulator}
-            disabled={accepting}
-            style={{
-              background: "rgba(255,255,255,0.05)",
-              color: "rgba(255,255,255,0.75)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: 12, padding: "13px 24px",
-              fontWeight: 600, fontSize: 14,
-              cursor: accepting ? "default" : "pointer",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
-            }}>
-            🏛️ {t.simulatorBtn}
           </button>
 
           {canRetake && (

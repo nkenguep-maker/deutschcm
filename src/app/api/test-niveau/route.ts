@@ -1,21 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma";
-import { callAI } from "@/lib/ai/provider";
+import { reconcileDbUser, ReconcileError } from "@/lib/reconcileDbUser";
 
 async function getAuthUser() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (list) => list.forEach(({ name, value, options }) => cookieStore.set(name, value, options)),
-      },
-    }
-  );
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   return user;
 }
@@ -96,56 +85,11 @@ const FALLBACK_QUESTIONS_EN = [
   { id:"q30", level:"C1", type:"fill",      question:"Complete with the correct form: «Es ___ wichtig, dass alle Beteiligten informiert werden.»", options:["ist","sei","wäre","würde sein"], correct:1, explanation:"«es sei wichtig, dass...» = formal reported speech (Konjunktiv I). Introduces a clause with an indirect citation nuance." },
 ];
 
-const LEVEL_TEST_SYSTEM_PROMPT: Record<string, string> = {
-  fr: `Tu es un générateur de questions de test de niveau CEFR d'allemand.
-Distribution OBLIGATOIRE : 6 questions A1 + 6 A2 + 6 B1 + 6 B2 + 6 C1 = 30 questions au total.
-Types à varier : "qcm" (choix multiple), "fill" (compléter la phrase), "translate" (choisir bonne traduction), "error" (identifier erreur grammaticale), "article" (choisir der/die/das).
-Chaque question a exactement 4 options.
-Les explications sont en français, claires, 1-2 phrases.
-Les questions sont progressives et variées dans chaque niveau.
-
-Retourne UNIQUEMENT ce JSON valide :
-{ "questions": [ { "id": "q01", "level": "A1", "type": "qcm", "question": "...", "options": ["...", "...", "...", "..."], "correct": 0, "explanation": "..." }, ... ] }`,
-  en: `You are a CEFR German level test question generator.
-REQUIRED distribution: 6 A1 + 6 A2 + 6 B1 + 6 B2 + 6 C1 = 30 questions total.
-Types to vary: "qcm" (multiple choice), "fill" (fill in the blank), "translate" (choose correct translation), "error" (identify grammar error), "article" (choose der/die/das).
-Each question has exactly 4 options.
-Explanations are in English, clear, 1-2 sentences.
-Questions are progressive and varied within each level.
-
-Return ONLY this valid JSON:
-{ "questions": [ { "id": "q01", "level": "A1", "type": "qcm", "question": "...", "options": ["...", "...", "...", "..."], "correct": 0, "explanation": "..." }, ... ] }`,
-};
-
-const LEVEL_TEST_USER_MESSAGE: Record<string, string> = {
-  fr: "Génère maintenant les 30 questions de test CEFR d'allemand.",
-  en: "Generate the 30 CEFR German level test questions now.",
-};
-
-// GET /api/test-niveau?locale=fr|en — returns 30 CEFR questions
+// GET /api/test-niveau?locale=fr|en — 30 CEFR questions, banque statique (zéro IA).
 export async function GET(request: NextRequest) {
   const locale = new URL(request.url).searchParams.get("locale") === "en" ? "en" : "fr";
-  const fallback = locale === "en" ? FALLBACK_QUESTIONS_EN : FALLBACK_QUESTIONS_FR;
-
-  try {
-    const result = await callAI({
-      feature: "level-test",
-      systemPrompt: LEVEL_TEST_SYSTEM_PROMPT[locale],
-      userMessage: LEVEL_TEST_USER_MESSAGE[locale],
-      temperature: 0.6,
-      maxTokens: 4096,
-    });
-    const raw = result.text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-    const parsed = JSON.parse(raw);
-    const questions = Array.isArray(parsed) ? parsed : parsed.questions;
-    if (Array.isArray(questions) && questions.length >= 25) {
-      return NextResponse.json({ questions });
-    }
-  } catch {
-    // Fall through to static questions
-  }
-
-  return NextResponse.json({ questions: fallback });
+  const questions = locale === "en" ? FALLBACK_QUESTIONS_EN : FALLBACK_QUESTIONS_FR;
+  return NextResponse.json({ questions });
 }
 
 // POST /api/test-niveau — save level + increment testAttempts
@@ -153,21 +97,24 @@ export async function POST(request: NextRequest) {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const dbUser = await prisma.user.upsert({
-    where: { supabaseId: authUser.id },
-    create: {
-      supabaseId: authUser.id,
-      email: authUser.email!,
-      fullName: authUser.user_metadata?.full_name ?? authUser.email?.split("@")[0] ?? "Utilisateur",
-      onboardingDone: true,
-    },
-    update: {},
-  });
+  let dbUserId: string;
+  try {
+    const { user } = await reconcileDbUser({
+      authUser,
+      patch: { onboardingDone: true },
+    });
+    dbUserId = user.id;
+  } catch (e) {
+    if (e instanceof ReconcileError) {
+      return NextResponse.json({ error: e.message, code: e.code }, { status: 400 });
+    }
+    throw e;
+  }
 
   const { level, score } = await request.json();
 
   await prisma.user.update({
-    where: { id: dbUser.id },
+    where: { id: dbUserId },
     data: {
       germanLevel: level,
       testScore: score,

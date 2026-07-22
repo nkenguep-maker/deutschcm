@@ -35,21 +35,18 @@ interface AdaptiveQuizProps {
   questionCount?: number
   adaptive?: boolean
   previousScores?: number[]
+  questions?: Question[]
   onComplete?: (result: QuizResult) => void
   onClose?: () => void
 }
 
 export default function AdaptiveQuiz({
-  level, topic, moduleId,
-  questionCount = 10,
   adaptive = true,
-  previousScores = [],
+  questions: providedQuestions,
   onComplete,
   onClose
 }: AdaptiveQuizProps) {
-  const [questions, setQuestions] = useState<Question[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [questions, setQuestions] = useState<Question[]>(providedQuestions ?? [])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [userInput, setUserInput] = useState("")
@@ -64,8 +61,12 @@ export default function AdaptiveQuiz({
   const [timerActive, setTimerActive] = useState(false)
 
   useEffect(() => {
-    generateQuestions()
-  }, [])
+    if (providedQuestions && providedQuestions.length > 0) {
+      setQuestions(providedQuestions)
+      setTimerActive(true)
+      setTimer(30)
+    }
+  }, [providedQuestions])
 
   useEffect(() => {
     if (!timerActive || showResult) return
@@ -76,27 +77,6 @@ export default function AdaptiveQuiz({
     const t = setTimeout(() => setTimer(prev => prev - 1), 1000)
     return () => clearTimeout(t)
   }, [timer, timerActive, showResult])
-
-  const generateQuestions = async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await fetch("/api/quiz/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ level, topic, moduleId, count: questionCount, adaptive, previousScores })
-      })
-      const data = await res.json()
-      if (!data.success) throw new Error(data.error)
-      setQuestions(data.quiz.questions)
-      setTimerActive(true)
-      setTimer(30)
-    } catch (err) {
-      setError("Impossible de générer le quiz. Vérifiez votre connexion.")
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleAnswer = useCallback((answer: string | null) => {
     if (showResult) return
@@ -142,31 +122,6 @@ export default function AdaptiveQuiz({
   }, [currentIndex, questions, answers, quizStartTime, onComplete])
 
   const scoreColor = (s: number) => s >= 80 ? "#10b981" : s >= 60 ? "#f59e0b" : "#ef4444"
-
-  if (loading) return (
-    <div style={{ textAlign: "center", padding: 60, fontFamily: "'DM Mono',monospace" }}>
-      <div style={{ fontSize: 36, marginBottom: 12 }}>⚙️</div>
-      <p style={{ color: "#10b981", fontSize: 13 }}>
-        {adaptive ? "Adaptation du niveau en cours..." : "Génération du quiz..."}
-      </p>
-      <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 4 }}>
-        IA adaptative
-      </p>
-    </div>
-  )
-
-  if (error) return (
-    <div style={{ textAlign: "center", padding: 40 }}>
-      <p style={{ color: "#ef4444", fontSize: 13, marginBottom: 12 }}>⚠️ {error}</p>
-      <button onClick={generateQuestions} style={{
-        padding: "10px 20px", borderRadius: 12,
-        background: "linear-gradient(135deg,#10b981,#059669)",
-        border: "none", color: "white", cursor: "pointer", fontSize: 13
-      }}>
-        🔄 Réessayer
-      </button>
-    </div>
-  )
 
   if (quizComplete && finalResult) return (
     <div style={{ fontFamily: "'DM Mono',monospace", padding: 24 }}>
@@ -217,7 +172,8 @@ export default function AdaptiveQuiz({
           setSelectedAnswer(null)
           setUserInput("")
           setShowResult(false)
-          generateQuestions()
+          setTimer(30)
+          setTimerActive(questions.length > 0)
         }} style={{
           flex: 1, padding: "12px", borderRadius: 12,
           background: "linear-gradient(135deg,#10b981,#059669)",
@@ -240,7 +196,24 @@ export default function AdaptiveQuiz({
   )
 
   const q = questions[currentIndex]
-  if (!q) return null
+  if (!q) return (
+    <div style={{ textAlign: "center", padding: 40, fontFamily: "'DM Mono',monospace" }}>
+      <div style={{ fontSize: 36, marginBottom: 12 }}>📭</div>
+      <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, margin: 0 }}>
+        Aucune question disponible pour le moment.
+      </p>
+      {onClose && (
+        <button onClick={onClose} style={{
+          marginTop: 16, padding: "10px 20px", borderRadius: 12,
+          background: "rgba(255,255,255,0.05)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer"
+        }}>
+          ← Retour
+        </button>
+      )}
+    </div>
+  )
 
   const isCorrect = selectedAnswer?.toLowerCase().trim() === q.correct.toLowerCase().trim()
   const progress = ((currentIndex + 1) / questions.length) * 100

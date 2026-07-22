@@ -149,30 +149,10 @@ export default function AdminGenerateCourse() {
       await new Promise(r => setTimeout(r, 800));
     }
 
-    try {
-      const response = await fetch('/api/courses/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lektion_number: lektion.num,
-          lektion_title: lektion.title,
-          level: manuel.level,
-          theme: lektion.theme,
-          manuel: selectedManuel,
-          competences: (Object.entries(competences) as [CompetenceKey, boolean][]).filter(([, v]) => v).map(([k]) => k),
-          save_to_db: false
-        })
-      });
-
-      const result = await response.json();
-      setGeneratedData(result.data);
-      setProgress(100);
-      setStatusMsg("✅ Cours généré avec succès !");
-    } catch {
-      setStatusMsg("La génération a échoué. Réessayez dans un instant.");
-    } finally {
-      setLoading(false);
-    }
+    // Route IA supprimée (AUDIT.md §11). On informe l'admin sans tenter d'appel.
+    setProgress(0);
+    setStatusMsg("La génération automatique de cours a été supprimée.");
+    setLoading(false);
   };
 
   const handleSave = async () => {

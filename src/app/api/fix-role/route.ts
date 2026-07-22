@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import prisma from "@/lib/prisma";
+import { createClient } from "@/lib/supabase/server";
 import { grantRole, syncUserMetadata, type SpaceRole } from "@/lib/roles";
+import { reconcileDbUser, ReconcileError } from "@/lib/reconcileDbUser";
+import type { Role } from "@prisma/client";
 
-// Rôle de base au register : crée le User + une ligne UserRole ACTIVE
-// (onboarded=false — l'onboarding se déclenche à l'entrée dans l'espace).
+// Rôle de base au register : réconcilie la ligne User + attache un UserRole
+// ACTIVE (onboarded=false — l'onboarding se déclenche à l'entrée dans l'espace).
 
 const VALID: SpaceRole[] = ["STUDENT", "TEACHER", "CENTER", "ADMIN"];
 
@@ -15,20 +15,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid role" }, { status: 400 });
   }
 
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (list) =>
-          list.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options),
-          ),
-      },
-    },
-  );
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -37,22 +24,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const dbUser = await prisma.user.upsert({
-    where: { supabaseId: user.id },
-    create: {
-      supabaseId: user.id,
-      email: user.email!,
-      fullName:
-        user.user_metadata?.full_name ??
-        user.email?.split("@")[0] ??
-        "Utilisateur",
-      role: role as SpaceRole,
-    },
-    update: {},
-    select: { id: true },
-  });
+  let dbUserId: string;
+  try {
+    const { user: dbUser } = await reconcileDbUser({
+      authUser: user,
+      defaultRole: role as Role,
+    });
+    dbUserId = dbUser.id;
+  } catch (e) {
+    if (e instanceof ReconcileError) {
+      return NextResponse.json({ error: e.message, code: e.code }, { status: 400 });
+    }
+    throw e;
+  }
 
-  await grantRole({ userId: dbUser.id, role: role as SpaceRole });
+  await grantRole({ userId: dbUserId, role: role as SpaceRole });
   await syncUserMetadata({ supabaseId: user.id, activeSpace: role as SpaceRole });
 
   return NextResponse.json({ ok: true });

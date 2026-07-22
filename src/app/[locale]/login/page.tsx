@@ -84,7 +84,7 @@ export default function LoginPage() {
         setErrorKey(classifyAuthError(signInError));
         return;
       }
-      router.push(next ?? `/${locale}/dashboard`);
+      router.push(next ?? "/dashboard");
       router.refresh();
     } catch (err) {
       setErrorKey(classifyAuthError(err));
