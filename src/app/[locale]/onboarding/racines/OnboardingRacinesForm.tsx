@@ -214,18 +214,10 @@ export function OnboardingRacinesForm() {
       if (ocRes.status === 401) { showError("session_expired"); return; }
       if (!ocRes.ok) { showError("finish_error"); return; }
 
-      // Racines · aucun contenu de découverte n'est encore actif (§14-15).
-      // On persiste néanmoins le point de départ Racines (É1-É5) dérivé du
-      // startPoint pour préparer le futur : beginner→E1, some_basics→E2, test→E3.
-      const racinesStep = startPoint === "beginner" ? "E1" : startPoint === "some_basics" ? "E2" : "E3";
-      await fetch("/api/funnel", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ patch: { racinesStep } }),
-      }).catch(() => {});
+      // Racines · aucun racinesStep dérivé du startPoint (hardening §3).
+      // La vraie auto-évaluation se joue sur /onboarding/racines/niveau,
+      // vers lequel le router envoie automatiquement quand LANGUAGE_SELECTED.
       clearDraft();
-      // Le router /onboarding décide la prochaine étape · en Racines pour
-      // l'instant : /decouverte/attente (langue soon).
       router.push("/onboarding");
       router.refresh();
     } catch (err) {

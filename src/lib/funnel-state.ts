@@ -50,8 +50,13 @@ export interface ActivationIntent {
 export interface FunnelAnswers {
   why?: string;
   startPoint?: string;
+  // Legacy (P1 initial · dérivé de startPoint). Toujours lu pour rétro-compat.
   cefrSelfAssessed?: CefrLevel;
   racinesStep?: RacinesStep;
+  // Nouveau (P1 hardening §2-3) · vraie sélection 5 options.
+  selfAssessmentAnswer?: 1 | 2 | 3 | 4 | 5;
+  declaredLevel?: CefrLevel | RacinesStep;
+  recommendedLevel?: CefrLevel | RacinesStep;
   discoveryProgress?: number[];
   activationIntent?: ActivationIntent;
 }
@@ -86,9 +91,15 @@ export function deriveFunnelStep(input: FunnelInput): FunnelStep {
   if (!lp.language) return "UNIVERSE_SELECTED";
 
   const isMonde = lp.universe === "MONDE";
-  const selfAssessed = isMonde
-    ? Boolean(lp.currentLevel || answers.cefrSelfAssessed)
-    : Boolean(answers.racinesStep);
+  // Nouveau (P1 hardening) : selfAssessmentAnswer + declaredLevel priment
+  // sur les clés legacy cefrSelfAssessed / racinesStep pour marquer une
+  // vraie évaluation. Le formulaire d'univers pré-remplit les legacy
+  // dérivées de startPoint, mais l'utilisateur DOIT passer par l'écran
+  // niveau 5 options pour être considéré « self-assessed ».
+  const hasNewAnswer = Boolean(answers.selfAssessmentAnswer && answers.declaredLevel);
+  const hasLegacyMonde = isMonde && (lp.currentLevel || answers.cefrSelfAssessed);
+  const hasLegacyRacines = !isMonde && answers.racinesStep;
+  const selfAssessed = hasNewAnswer || Boolean(hasLegacyMonde) || Boolean(hasLegacyRacines);
   if (!selfAssessed) return "LANGUAGE_SELECTED";
 
   const progress = Array.isArray(answers.discoveryProgress) ? answers.discoveryProgress : [];
@@ -109,11 +120,13 @@ export function nextFunnelHref(step: FunnelStep, input: FunnelInput): string {
         ? "/onboarding/racines"
         : "/onboarding/monde";
     case "LANGUAGE_SELECTED":
-      // Le formulaire couvre déjà langue+self-assessment · si absent, on repointe vers lui.
+      // Le formulaire d'univers est fini (LP + language présents), il manque
+      // la vraie auto-évaluation 5 options (§2-3 hardening).
       return input.learningPath?.universe === "RACINES"
-        ? "/onboarding/racines"
-        : "/onboarding/monde";
+        ? "/onboarding/racines/niveau"
+        : "/onboarding/monde/niveau";
     case "SELF_ASSESSED":
+      // Racines n'a pas encore de contenu → attente (voir router /decouverte).
       return "/decouverte/1";
     case "DISCOVERY_STARTED": {
       const answers = readAnswers(input.learningPath);
@@ -135,4 +148,3 @@ export function nextFunnelHref(step: FunnelStep, input: FunnelInput): string {
 export function canPlayLanguage(langId: string): boolean {
   return isLanguageActive(langId);
 }
-

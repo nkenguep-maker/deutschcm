@@ -15,6 +15,7 @@ import {
   type Rail,
   type LevelId,
 } from "@/lib/pricing";
+import { MONDE_LEVEL_AVAILABILITY, RACINES_OFFERS_AVAILABLE } from "@/lib/discovery";
 import type { ActivationIntent, CefrLevel } from "@/lib/funnel-state";
 
 interface Props {
@@ -55,6 +56,10 @@ const COPY = {
     perNiveau: "par niveau · 4 mois",
     perMonth: "par mois",
     perYear: "par an",
+    lockedBadge: "Bientôt disponible",
+    lockedNote: "Ce niveau ouvre plus tard. Tu peux le pré-noter — aucun paiement.",
+    racinesLockedSoul: "Les offres Racines *arrivent bientôt.*",
+    racinesLockedBody: "Le programme Racines est en préparation. On te prévient dès qu'il ouvre, avec ton choix conservé.",
   },
   en: {
     eye: "Offer selection",
@@ -86,6 +91,10 @@ const COPY = {
     perNiveau: "per level · 4 months",
     perMonth: "per month",
     perYear: "per year",
+    lockedBadge: "Coming soon",
+    lockedNote: "This level opens later. You can note your interest — no payment.",
+    racinesLockedSoul: "Racines offers *are coming soon.*",
+    racinesLockedBody: "The Racines programme is in preparation. We'll let you know as soon as it opens, with your choice saved.",
   },
 } as const;
 
@@ -102,7 +111,10 @@ export function ActivationIntentClient({ locale, universe, suggestedLevel, exist
   }, [existingIntent]);
 
   const [rail, setRail] = useState<Rail>(defaultRail);
-  const [level, setLevel] = useState<LevelId>((suggestedLevel as LevelId) ?? "A1");
+  // Force le niveau à un niveau réellement disponible en découverte (§4).
+  const initialLevel: LevelId = (suggestedLevel as LevelId) ?? "A1";
+  const initialLevelIsAvailable = MONDE_LEVEL_AVAILABILITY[initialLevel]?.discoveryReady === true;
+  const [level, setLevel] = useState<LevelId>(initialLevelIsAvailable ? initialLevel : "A1");
   const [withTeacher] = useState(false); // suivi pro pas encore opérationnel — verrouillé
   const [racinesOffer, setRacinesOffer] = useState<"SOLO" | "FAMILLE">((existingIntent?.racinesOffer as "SOLO" | "FAMILLE") ?? "SOLO");
   const [racinesPeriod, setRacinesPeriod] = useState<"MONTH" | "YEAR">((existingIntent?.racinesPeriod as "MONTH" | "YEAR") ?? "MONTH");
@@ -116,6 +128,15 @@ export function ActivationIntentClient({ locale, universe, suggestedLevel, exist
     setError(false);
     setSaving(true);
     try {
+      // Ceinture · même si l'UI verrouille A2-C1, on empêche une écriture
+      // client-side sur un niveau qui ne serait pas discoveryReady. Le
+      // serveur valide déjà la structure ; le check UI reste sur la
+      // disponibilité contenu (courseReady/purchasable ouvriront en P2/P5).
+      if (universe === "MONDE" && !MONDE_LEVEL_AVAILABILITY[level as keyof typeof MONDE_LEVEL_AVAILABILITY]?.discoveryReady) {
+        setError(true);
+        setSaving(false);
+        return;
+      }
       const intent: ActivationIntent =
         universe === "MONDE"
           ? {
@@ -144,6 +165,22 @@ export function ActivationIntentClient({ locale, universe, suggestedLevel, exist
       setSaving(false);
     }
   };
+
+  // Racines · offres pas encore ouvertes (aucun contenu réel).
+  // §5 : pas d'impasse technique · on renvoie sur un état honnête.
+  if (universe === "RACINES" && !RACINES_OFFERS_AVAILABLE) {
+    return (
+      <main style={{ maxWidth: 620, margin: "0 auto", padding: "80px 16px" }}>
+        <StateBlock
+          kind="empty"
+          centered
+          soul={c.racinesLockedSoul}
+          body={c.racinesLockedBody}
+          action={{ label: c.savedCta, href: "/dashboard" }}
+        />
+      </main>
+    );
+  }
 
   if (saved) {
     return (
@@ -205,18 +242,23 @@ export function ActivationIntentClient({ locale, universe, suggestedLevel, exist
             <div className="filter-row" role="radiogroup" aria-label={c.levelLabel}>
               {LEVELS.map((lv) => {
                 const price = WORLD_PASSAGE_PRICES[lv][rail];
+                const avail = MONDE_LEVEL_AVAILABILITY[lv];
+                const locked = !avail.discoveryReady;
                 return (
                   <button
                     key={lv}
                     type="button"
                     role="radio"
                     aria-checked={level === lv}
-                    onClick={() => setLevel(lv)}
+                    aria-disabled={locked}
+                    disabled={locked}
+                    onClick={() => { if (!locked) setLevel(lv); }}
                     className="data-card"
                     style={{
                       minHeight: 88,
-                      cursor: "pointer",
+                      cursor: locked ? "not-allowed" : "pointer",
                       textAlign: "left",
+                      opacity: locked ? 0.55 : 1,
                       background: level === lv ? "var(--brass-glow)" : "var(--espresso-2)",
                       borderColor: level === lv ? "var(--brass)" : "var(--creme-hair)",
                     }}
@@ -224,10 +266,18 @@ export function ActivationIntentClient({ locale, universe, suggestedLevel, exist
                     <div style={{ fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: 18, color: level === lv ? "var(--brass)" : "var(--creme)" }}>{lv}</div>
                     <div style={{ color: "var(--creme-soft)", fontSize: 13 }}>{fmtPriceUnit(price, rail)}</div>
                     <div style={{ color: "var(--creme-mute)", fontSize: 11 }}>{c.perNiveau}</div>
+                    {locked && (
+                      <div style={{ marginTop: 6, fontSize: 10, padding: "2px 8px", background: "rgba(184, 135, 62, 0.1)", color: "var(--brass)", border: "1px solid var(--brass-edge)", borderRadius: 99, fontFamily: "var(--font-jetbrains, monospace)", display: "inline-block", whiteSpace: "nowrap" }}>
+                        {c.lockedBadge}
+                      </div>
+                    )}
                   </button>
                 );
               })}
             </div>
+            <p style={{ margin: "10px 2px 0", color: "var(--creme-mute)", fontSize: 11, lineHeight: 1.5 }}>
+              {c.lockedNote}
+            </p>
           </fieldset>
 
           {/* Suivi prof · verrouillé tant que la messagerie n'est pas ouverte */}

@@ -25,7 +25,18 @@ import {
 } from "@/lib/funnel-state";
 import { DISCOVERY_TOTAL } from "@/lib/discovery";
 
-const ALLOWED_KEYS = new Set(["cefrSelfAssessed", "racinesStep", "discoveryProgress", "activationIntent"]);
+const ALLOWED_KEYS = new Set([
+  // legacy P1 initial · gardés pour rétro-compat
+  "cefrSelfAssessed",
+  "racinesStep",
+  // Nouveaux P1 hardening · vraie auto-évaluation 5 options
+  "selfAssessmentAnswer",
+  "declaredLevel",
+  "recommendedLevel",
+  // parcours découverte + activation
+  "discoveryProgress",
+  "activationIntent",
+]);
 const CEFR: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1"];
 const RACINES: RacinesStep[] = ["E1", "E2", "E3", "E4", "E5"];
 
@@ -36,12 +47,19 @@ function err(code: string, message: string, status: number) {
 async function loadContext() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { user: null, dbUser: null, lp: null, grant: false };
+  if (!user) return { user: null, dbUser: null, lp: null, grant: false, isStudent: false };
   const dbUser = await prisma.user.findUnique({
     where: { supabaseId: user.id },
     select: { id: true },
   });
-  if (!dbUser) return { user, dbUser: null, lp: null, grant: false };
+  if (!dbUser) return { user, dbUser: null, lp: null, grant: false, isStudent: false };
+  // Rôle STUDENT requis pour toucher le funnel étudiant (hardening §6).
+  // Un user multirôle STUDENT + TEACHER peut passer ; un TEACHER pur ne peut pas.
+  const studentRole = await prisma.userRole.findFirst({
+    where: { userId: dbUser.id, role: "STUDENT", status: "ACTIVE" },
+    select: { id: true },
+  });
+  const isStudent = Boolean(studentRole);
   const lp = await prisma.learningPath.findFirst({
     where: { userId: dbUser.id, status: "ACTIVE" },
     orderBy: { createdAt: "desc" },
@@ -56,13 +74,14 @@ async function loadContext() {
       ],
     },
   });
-  return { user, dbUser, lp, grant: grantCount > 0 };
+  return { user, dbUser, lp, grant: grantCount > 0, isStudent };
 }
 
 export async function GET() {
   try {
-    const { user, lp, grant } = await loadContext();
+    const { user, lp, grant, isStudent } = await loadContext();
     if (!user) return err("UNAUTHORIZED", "Not signed in", 401);
+    if (!isStudent) return err("FORBIDDEN_NOT_STUDENT", "funnel étudiant réservé au rôle STUDENT", 403);
     const step = deriveFunnelStep({
       hasSupabaseUser: true,
       learningPath: lp,
@@ -89,8 +108,9 @@ export async function GET() {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { user, lp } = await loadContext();
+    const { user, lp, isStudent } = await loadContext();
     if (!user) return err("UNAUTHORIZED", "Not signed in", 401);
+    if (!isStudent) return err("FORBIDDEN_NOT_STUDENT", "funnel étudiant réservé au rôle STUDENT", 403);
     if (!lp) return err("NO_LEARNING_PATH", "aucun parcours actif à mettre à jour", 400);
 
     const body = await request.json().catch(() => ({}));
@@ -112,6 +132,29 @@ export async function PATCH(request: NextRequest) {
       if (!RACINES.includes(patch.racinesStep as RacinesStep)) {
         return err("VALIDATION_ERROR", "racinesStep invalide", 400);
       }
+    }
+    if (patch.selfAssessmentAnswer !== undefined) {
+      const n = patch.selfAssessmentAnswer as number;
+      if (typeof n !== "number" || n < 1 || n > 5) {
+        return err("VALIDATION_ERROR", "selfAssessmentAnswer must be 1..5", 400);
+      }
+    }
+    if (patch.declaredLevel !== undefined) {
+      const v = patch.declaredLevel as string;
+      const ok = CEFR.includes(v as CefrLevel) || RACINES.includes(v as RacinesStep);
+      if (!ok) return err("VALIDATION_ERROR", "declaredLevel must be CEFR or E1..E5", 400);
+      // Cohérence univers · Monde n'accepte que CECR, Racines que É1-É5.
+      if (lp.universe === "MONDE" && !CEFR.includes(v as CefrLevel)) {
+        return err("VALIDATION_ERROR", "Monde: declaredLevel must be CEFR", 400);
+      }
+      if (lp.universe === "RACINES" && !RACINES.includes(v as RacinesStep)) {
+        return err("VALIDATION_ERROR", "Racines: declaredLevel must be E1..E5", 400);
+      }
+    }
+    if (patch.recommendedLevel !== undefined) {
+      const v = patch.recommendedLevel as string;
+      const ok = CEFR.includes(v as CefrLevel) || RACINES.includes(v as RacinesStep);
+      if (!ok) return err("VALIDATION_ERROR", "recommendedLevel invalide", 400);
     }
     if (patch.discoveryProgress !== undefined) {
       if (!Array.isArray(patch.discoveryProgress)) {
@@ -159,9 +202,13 @@ export async function PATCH(request: NextRequest) {
     }
 
     // currentLevel column mirror pour Monde (permet des queries DB directes).
+    // Prend en priorité declaredLevel (hardening), fallback cefrSelfAssessed (legacy).
     let currentLevelUpdate = {};
-    if (patch.cefrSelfAssessed && lp.universe === "MONDE") {
-      currentLevelUpdate = { currentLevel: patch.cefrSelfAssessed as CefrLevel };
+    if (lp.universe === "MONDE") {
+      const mirror = (patch.declaredLevel ?? patch.cefrSelfAssessed) as CefrLevel | undefined;
+      if (mirror && CEFR.includes(mirror)) {
+        currentLevelUpdate = { currentLevel: mirror };
+      }
     }
 
     const updated = await prisma.learningPath.update({

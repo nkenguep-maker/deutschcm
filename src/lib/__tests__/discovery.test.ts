@@ -5,10 +5,14 @@ import {
   LANGUAGES,
   DISCOVERY_LESSONS,
   DISCOVERY_TOTAL,
+  MONDE_LEVEL_AVAILABILITY,
+  RACINES_OFFERS_AVAILABLE,
   getDiscoveryLessons,
   getDiscoveryLesson,
   isLanguageActive,
   languagesForUniverse,
+  mondeLevelIsAvailable,
+  mondeLevelIsPurchasable,
   prismaLangToId,
 } from "../discovery";
 
@@ -90,6 +94,43 @@ describe("prismaLangToId · conversion enum → id", () => {
   it("DEUTSCH → deutsch", () => expect(prismaLangToId("DEUTSCH")).toBe("deutsch"));
   it("WOLOF → wolof", () => expect(prismaLangToId("WOLOF")).toBe("wolof"));
   it("null → null", () => expect(prismaLangToId(null)).toBe(null));
+});
+
+describe("Disponibilité Monde par niveau · prix ≠ contenu (hardening §4)", () => {
+  it("les 5 niveaux ont priced=true (prix affichable partout)", () => {
+    for (const lv of ["A1", "A2", "B1", "B2", "C1"] as const) {
+      expect(MONDE_LEVEL_AVAILABILITY[lv].priced).toBe(true);
+    }
+  });
+  it("A1 est le SEUL niveau discoveryReady", () => {
+    expect(MONDE_LEVEL_AVAILABILITY.A1.discoveryReady).toBe(true);
+    for (const lv of ["A2", "B1", "B2", "C1"] as const) {
+      expect(MONDE_LEVEL_AVAILABILITY[lv].discoveryReady).toBe(false);
+    }
+  });
+  it("aucun niveau n'est purchasable dans l'état actuel (P5 non fait)", () => {
+    for (const lv of ["A1", "A2", "B1", "B2", "C1"] as const) {
+      expect(MONDE_LEVEL_AVAILABILITY[lv].purchasable).toBe(false);
+    }
+  });
+  it("aucun niveau n'a courseReady tant que le programme complet n'existe pas", () => {
+    for (const lv of ["A1", "A2", "B1", "B2", "C1"] as const) {
+      expect(MONDE_LEVEL_AVAILABILITY[lv].courseReady).toBe(false);
+    }
+  });
+  it("mondeLevelIsAvailable et mondeLevelIsPurchasable exposent les mêmes règles", () => {
+    expect(mondeLevelIsAvailable("A1")).toBe(true);
+    expect(mondeLevelIsAvailable("A2")).toBe(false);
+    for (const lv of ["A1", "A2", "B1", "B2", "C1"] as const) {
+      expect(mondeLevelIsPurchasable(lv)).toBe(false);
+    }
+  });
+});
+
+describe("Disponibilité Racines · RACINES_OFFERS_AVAILABLE = false (hardening §5)", () => {
+  it("aucune offre Racines n'est achetable tant qu'aucune langue n'a 4 leçons", () => {
+    expect(RACINES_OFFERS_AVAILABLE).toBe(false);
+  });
 });
 
 describe("Contenu · honnêteté pédagogique", () => {

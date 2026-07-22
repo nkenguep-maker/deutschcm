@@ -266,3 +266,46 @@ export function prismaLangToId(code: string | null): string | null {
 }
 
 export const DISCOVERY_TOTAL = 4 as const;
+
+// ─── Disponibilité par niveau Monde · sources séparées prix / contenu ─
+//
+// Doctrine §7 : le prix est UNE DÉCISION commerciale et peut être affiché
+// pour tous les niveaux. La DISPONIBILITÉ dépend du contenu réel dans
+// le repo. Ne PAS confondre :
+//
+//   priced         → le prix officiel P0.A est affichable
+//   discoveryReady → les 4 leçons de découverte existent (§14)
+//   courseReady    → le programme complet du Passage existe (P2+)
+//   purchasable    → l'achat peut être délivré réellement (P5)
+//
+// Aujourd'hui : SEUL A1 a du contenu de découverte. Aucun niveau n'a le
+// programme complet ni un pipeline d'achat opérationnel.
+
+export type MondeLevel = "A1" | "A2" | "B1" | "B2" | "C1";
+
+export interface MondeLevelAvailability {
+  priced: boolean;
+  discoveryReady: boolean;
+  courseReady: boolean;
+  purchasable: boolean;
+}
+
+export const MONDE_LEVEL_AVAILABILITY: Record<MondeLevel, MondeLevelAvailability> = {
+  A1: { priced: true, discoveryReady: true,  courseReady: false, purchasable: false },
+  A2: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },
+  B1: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },
+  B2: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },
+  C1: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },
+};
+
+export function mondeLevelIsAvailable(level: MondeLevel): boolean {
+  return MONDE_LEVEL_AVAILABILITY[level].discoveryReady;
+}
+
+export function mondeLevelIsPurchasable(level: MondeLevel): boolean {
+  return MONDE_LEVEL_AVAILABILITY[level].purchasable;
+}
+
+// Racines : au moins une langue Racines doit exister avec 4 leçons pour
+// qu'un niveau É soit « purchasable ». Aujourd'hui : aucun.
+export const RACINES_OFFERS_AVAILABLE = false as const;
