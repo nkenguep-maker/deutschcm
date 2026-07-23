@@ -1330,6 +1330,12 @@ enum AuditAction {
   COACH_ASSIGNED
   COACH_REMOVED
   MEMBERSHIP_ACCESS_DENIED
+  // P4.3b · Teacher workspace refusals · voir permissions/teacher.ts + migration
+  // 20260723000005_p4_3b_teacher_rls. Emis fire-and-forget sur les refus.
+  TEACHER_ACCESS_DENIED
+  TEACHER_CLASS_ACCESS_DENIED
+  TEACHER_STUDENT_ACCESS_DENIED
+  TEACHER_SCOPE_AMBIGUOUS
 }
 
 // ─── P4.1 · StorageObject · métadonnées uploads privés ───────────
