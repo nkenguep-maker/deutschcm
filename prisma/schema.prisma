@@ -303,6 +303,12 @@ model User {
   invitationsAccepted   CircleInvitation[]   @relation("InvitationAcceptor")
   invitationsRevoked    CircleInvitation[]   @relation("InvitationRevoker")
 
+  // ─── P4.5 · Racines productions Coach/Parent ──────────────────
+  circleAssignmentsCreated  CircleAssignment[]      @relation("CircleAssignmentCoach")
+  circleSubmissionsMade     CircleSubmission[]      @relation("CircleSubmissionSubmitter")
+  circleFeedbacksAuthored   CircleFeedback[]        @relation("CircleFeedbackAuthor")
+  circleReplyAuthored       CircleSubmissionReply[] @relation("CircleSubmissionReplyAuthor")
+
   @@index([email])
   @@index([centerId])
   @@index([supabaseId])
@@ -895,6 +901,9 @@ model Teacher {
   user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   center     LanguageCenter? @relation(fields: [centerId], references: [id])
   classrooms Classroom[]
+  // P4.5 · back-relations Monde assignments/feedback (fondations sous flag).
+  createdAssignments  Assignment[]         @relation("AssignmentCreator")
+  authoredFeedbacks   AssignmentFeedback[] @relation("AssignmentFeedbackAuthor")
 
   @@map("teachers")
 }
@@ -935,35 +944,111 @@ model ClassroomEnrollment {
 }
 
 model Assignment {
-  id          String    @id @default(uuid())
-  classroomId String
-  title       String
-  description String?
-  moduleId    String?
-  dueDate     DateTime?
-  maxScore    Int       @default(100)
-  createdAt   DateTime  @default(now())
+  id                 String            @id @default(uuid())
+  classroomId        String
+  title              String
+  description        String?
+  instructions       String?
+  moduleId           String?
+  dueDate            DateTime?
+  maxScore           Int               @default(100)
+  // P4.5 · lifecycle et type de production attendue.
+  type               AssignmentType    @default(WRITTEN)
+  status             AssignmentStatus  @default(DRAFT)
+  publishedAt        DateTime?
+  closedAt           DateTime?
+  archivedAt         DateTime?
+  createdByTeacherId String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @default(now())
 
-  classroom   Classroom              @relation(fields: [classroomId], references: [id], onDelete: Cascade)
-  module      Module?                @relation(fields: [moduleId], references: [id], onDelete: SetNull)
-  submissions AssignmentSubmission[]
+  classroom       Classroom              @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  module          Module?                @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  createdByTeacher Teacher?              @relation("AssignmentCreator", fields: [createdByTeacherId], references: [id], onDelete: SetNull)
+  submissions     AssignmentSubmission[]
 
+  @@index([classroomId, status])
+  @@index([status, publishedAt])
   @@map("assignments")
 }
 
-model AssignmentSubmission {
-  id           String   @id @default(uuid())
-  assignmentId String
-  userId       String
-  score        Float?
-  feedback     String?
-  submittedAt  DateTime @default(now())
+enum AssignmentType {
+  WRITTEN
+  AUDIO
+  MIXED
+}
 
-  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+enum AssignmentStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+  ARCHIVED
+}
+
+model AssignmentSubmission {
+  id              String              @id @default(uuid())
+  assignmentId    String
+  userId          String
+  score           Float?
+  feedback        String?
+  submittedAt     DateTime            @default(now())
+  // P4.5 · lifecycle + versionnement + association Storage optionnel.
+  status          SubmissionStatus    @default(DRAFT)
+  version         Int                 @default(1)
+  writtenContent  String?
+  storageObjectId String?
+  withdrawnAt     DateTime?
+  updatedAt       DateTime            @default(now())
+
+  assignment  Assignment          @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  storageObject StorageObject?    @relation("AssignmentSubmissionStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
+  feedbacks   AssignmentFeedback[]
 
   @@unique([assignmentId, userId])
+  @@index([assignmentId, status])
   @@map("assignment_submissions")
+}
+
+enum SubmissionStatus {
+  DRAFT
+  SUBMITTED
+  WITHDRAWN
+  SUPERSEDED
+}
+
+// P4.5 · retour Teacher immuable après PUBLISHED (trigger DB).
+model AssignmentFeedback {
+  id                    String            @id @default(cuid())
+  submissionId          String
+  authorTeacherId       String
+  status                FeedbackStatus    @default(DRAFT)
+  version               Int               @default(1)
+  supersedesFeedbackId  String?
+  writtenContent        String?
+  storageObjectId       String?
+  publishedAt           DateTime?
+  retractedAt           DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @default(now())
+
+  submission        AssignmentSubmission  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  authorTeacher     Teacher               @relation("AssignmentFeedbackAuthor", fields: [authorTeacherId], references: [id], onDelete: Restrict)
+  storageObject     StorageObject?        @relation("AssignmentFeedbackStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
+  supersedesFeedback AssignmentFeedback?  @relation("AssignmentFeedbackSupersedes", fields: [supersedesFeedbackId], references: [id], onDelete: SetNull)
+  addenda           AssignmentFeedback[]  @relation("AssignmentFeedbackSupersedes")
+
+  @@index([submissionId])
+  @@index([authorTeacherId, status])
+  @@index([submissionId, version])
+  @@map("assignment_feedbacks")
+}
+
+enum FeedbackStatus {
+  DRAFT
+  PUBLISHED
+  ADDENDUM
+  RETRACTED_BY_ADMIN
 }
 
 model StudentGroup {
@@ -1150,6 +1235,9 @@ model ChildProfile {
   household         Household?         @relation("HouseholdChildren", fields: [householdId], references: [id], onDelete: SetNull)
   circleMemberships CircleMembership[]
   storageObjects    StorageObject[]    @relation("StorageObjectChildOwner")
+  // P4.5 · productions Circle-scoped (ciblage individuel + soumissions).
+  circleAssignmentTargets CircleAssignmentTarget[]
+  circleSubmissions       CircleSubmission[]
 
   @@index([parentUserId])
   @@index([householdId])
@@ -1176,6 +1264,8 @@ model Circle {
   createdBy   User               @relation("CircleCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
   memberships CircleMembership[]
   invitations CircleInvitation[]
+  // P4.5 · activités Coach → Circle.
+  assignments CircleAssignment[]
 
   // Note · l'unicité "un seul Circle non-archivé par (foyer, langue)" est
   // portée par un index partiel PostgreSQL créé dans la migration :
@@ -1344,6 +1434,32 @@ enum AuditAction {
   ROOTS_COACH_CAPACITY_REACHED
   ROOTS_COACH_ASSIGNMENT_REVOKED
   ROOTS_COACH_SCOPE_AMBIGUOUS
+  // P4.5 · Monde (Teacher/Student) assignments + submissions + feedback.
+  ASSIGNMENT_CREATED
+  ASSIGNMENT_PUBLISHED
+  ASSIGNMENT_CLOSED
+  ASSIGNMENT_ACCESS_DENIED
+  SUBMISSION_CREATED
+  SUBMISSION_SUBMITTED
+  SUBMISSION_WITHDRAWN
+  SUBMISSION_ACCESS_DENIED
+  FEEDBACK_DRAFTED
+  FEEDBACK_PUBLISHED
+  FEEDBACK_ADDENDUM_CREATED
+  FEEDBACK_ACCESS_DENIED
+  STORAGE_UPLOAD_DENIED
+  // P4.5 · Racines (Coach/Circle) activités + productions + feedback + fil.
+  CIRCLE_ASSIGNMENT_CREATED
+  CIRCLE_ASSIGNMENT_PUBLISHED
+  CIRCLE_ASSIGNMENT_CLOSED
+  CIRCLE_SUBMISSION_CREATED
+  CIRCLE_SUBMISSION_SUBMITTED
+  CIRCLE_SUBMISSION_WITHDRAWN
+  CIRCLE_FEEDBACK_DRAFTED
+  CIRCLE_FEEDBACK_PUBLISHED
+  CIRCLE_FEEDBACK_ADDENDUM_CREATED
+  PRODUCTION_LIMIT_REACHED
+  PARENT_REPLY_CREATED
 }
 
 // ─── P4.1 · StorageObject · métadonnées uploads privés ───────────
@@ -1368,6 +1484,11 @@ model StorageObject {
 
   owner        User?         @relation("StorageObjectOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
   ownerChild   ChildProfile? @relation("StorageObjectChildOwner", fields: [ownerChildProfileId], references: [id], onDelete: SetNull)
+  // P4.5 · back-relations pour associations submission/feedback (Monde + Racines).
+  assignmentSubmissions AssignmentSubmission[] @relation("AssignmentSubmissionStorage")
+  assignmentFeedbacks   AssignmentFeedback[]   @relation("AssignmentFeedbackStorage")
+  circleSubmissions     CircleSubmission[]     @relation("CircleSubmissionStorage")
+  circleFeedbacks       CircleFeedback[]       @relation("CircleFeedbackStorage")
 
   @@unique([bucket, path])
   @@index([purpose, retentionUntil])
@@ -1383,6 +1504,155 @@ enum StorageObjectPurpose {
   CIRCLE_MESSAGE_AUDIO
   CLASS_MESSAGE_AUDIO
   ATTACHMENT
+}
+
+// ─── P4.5 · Racines · activité, ciblage, production, feedback, reply ──
+// Doctrine · docs/YEMA_P4_5_ASSIGNMENTS_SUBMISSIONS_FEEDBACK.md.
+// Immutabilité feedback PUBLISHED et submission SUBMITTED · triggers DB
+// (voir migration 20260723000010_p4_5_racines_productions_rls).
+
+model CircleAssignment {
+  id                    String                   @id @default(cuid())
+  circleId              String
+  createdByCoachUserId  String
+  title                 String
+  instructions          String?
+  productionType        CircleAssignmentType     @default(WRITTEN)
+  status                CircleAssignmentStatus   @default(DRAFT)
+  publishedAt           DateTime?
+  closedAt              DateTime?
+  archivedAt            DateTime?
+  dueAt                 DateTime?
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @default(now())
+
+  circle                Circle                   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  createdByCoach        User                     @relation("CircleAssignmentCoach", fields: [createdByCoachUserId], references: [id], onDelete: Restrict)
+  targets               CircleAssignmentTarget[]
+  submissions           CircleSubmission[]
+
+  @@index([circleId, status])
+  @@index([createdByCoachUserId, publishedAt])
+  @@index([circleId, publishedAt])
+  @@map("circle_assignments")
+}
+
+enum CircleAssignmentType {
+  WRITTEN
+  AUDIO
+  MIXED
+}
+
+enum CircleAssignmentStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+  ARCHIVED
+}
+
+model CircleAssignmentTarget {
+  id             String            @id @default(cuid())
+  assignmentId   String
+  childProfileId String
+  createdAt      DateTime          @default(now())
+
+  assignment     CircleAssignment  @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  childProfile   ChildProfile      @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, childProfileId])
+  @@index([childProfileId])
+  @@map("circle_assignment_targets")
+}
+
+model CircleSubmission {
+  id                 String                 @id @default(cuid())
+  assignmentId       String
+  childProfileId     String
+  submittedByUserId  String
+  version            Int                    @default(1)
+  status             CircleSubmissionStatus @default(DRAFT)
+  writtenContent     String?
+  storageObjectId    String?
+  submittedAt        DateTime?
+  withdrawnAt        DateTime?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @default(now())
+
+  assignment        CircleAssignment          @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  childProfile      ChildProfile              @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
+  submittedBy       User                      @relation("CircleSubmissionSubmitter", fields: [submittedByUserId], references: [id], onDelete: Restrict)
+  storageObject     StorageObject?            @relation("CircleSubmissionStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
+  feedbacks         CircleFeedback[]
+  replies           CircleSubmissionReply[]
+
+  @@index([assignmentId, status])
+  @@index([childProfileId, status])
+  @@index([assignmentId, childProfileId, version])
+  @@map("circle_submissions")
+}
+
+enum CircleSubmissionStatus {
+  DRAFT
+  SUBMITTED
+  WITHDRAWN
+  SUPERSEDED
+}
+
+model CircleFeedback {
+  id                    String                @id @default(cuid())
+  submissionId          String
+  authorCoachUserId     String
+  status                CircleFeedbackStatus  @default(DRAFT)
+  version               Int                   @default(1)
+  supersedesFeedbackId  String?
+  writtenContent        String?
+  storageObjectId       String?
+  publishedAt           DateTime?
+  retractedAt           DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @default(now())
+
+  submission            CircleSubmission      @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  authorCoach           User                  @relation("CircleFeedbackAuthor", fields: [authorCoachUserId], references: [id], onDelete: Restrict)
+  storageObject         StorageObject?        @relation("CircleFeedbackStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
+  supersedesFeedback    CircleFeedback?       @relation("CircleFeedbackSupersedes", fields: [supersedesFeedbackId], references: [id], onDelete: SetNull)
+  addenda               CircleFeedback[]      @relation("CircleFeedbackSupersedes")
+
+  @@index([submissionId])
+  @@index([authorCoachUserId, status])
+  @@index([submissionId, version])
+  @@map("circle_feedbacks")
+}
+
+enum CircleFeedbackStatus {
+  DRAFT
+  PUBLISHED
+  ADDENDUM
+  RETRACTED_BY_ADMIN
+}
+
+// Q14 · fil structuré parent–Coach sur une production. Aucune messagerie
+// générale. §10 · pas d'audio, pas de pièce jointe, pas de DM.
+model CircleSubmissionReply {
+  id            String                       @id @default(cuid())
+  submissionId  String
+  authorUserId  String
+  authorRole    CircleSubmissionReplyRole
+  body          String
+  createdAt     DateTime                     @default(now())
+  hiddenAt      DateTime?
+
+  submission    CircleSubmission             @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  author        User                         @relation("CircleSubmissionReplyAuthor", fields: [authorUserId], references: [id], onDelete: Restrict)
+
+  @@index([submissionId, createdAt])
+  @@index([authorUserId])
+  @@map("circle_submission_replies")
+}
+
+enum CircleSubmissionReplyRole {
+  PARENT
+  COACH
 }
 
 // ─── Demandes de démo (centres) ──────────────────────────────────
