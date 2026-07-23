@@ -11,6 +11,7 @@ import {
   assertCircleCoachCapacity,
   assertCoachCapacityAvailable,
 } from "@/lib/circles/capacity";
+import { acquireCircleLock } from "@/lib/db/locks";
 
 type TxClient = Omit<
   PrismaClient,
@@ -74,6 +75,7 @@ export async function addChildToCircle(
     throw new MembershipError("child_not_in_household", "child not in household");
   }
 
+  await acquireCircleLock(tx, input.circleId);
   await assertCircleChildCapacity(tx, input.circleId);
 
   // Dédup · pas de duplicate ACTIVE membership pour ce child.
@@ -216,6 +218,7 @@ export async function assignCoach(
   if (!coachRole) {
     throw new MembershipError("forbidden", "target user is not a RACINES_COACH");
   }
+  await acquireCircleLock(tx, input.circleId);
   // 1 seul coach ACTIVE par cercle.
   await assertCircleCoachCapacity(tx, input.circleId);
   // 20 profils + 10 Circles max par coach.

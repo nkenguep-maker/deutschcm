@@ -15,6 +15,7 @@ import {
   CapacityError,
   assertCircleAdultCapacity,
 } from "@/lib/circles/capacity";
+import { acquireCircleLock } from "@/lib/db/locks";
 import { hashEmail, hashToken } from "./tokens";
 
 type TxClient = Omit<
@@ -49,6 +50,25 @@ export interface CreateAdultInvitationInput {
   ownerUserId: string; // OWNER (résolu serveur)
   invitedEmail: string;
   rawToken: string; // fourni par le caller pour être aussi retourné au caller (jamais loggé)
+}
+
+/**
+ * Post-tx · marque une invitation PENDING → REVOKED avec un motif stable
+ * quand le capacity check a rejeté un accept concurrent. Idempotent.
+ * Émet aussi un AuditEvent minimal.
+ */
+export async function revokeInvitationForCapacity(
+  tx: TxClient,
+  invitationId: string,
+): Promise<boolean> {
+  const marked = await tx.circleInvitation.updateMany({
+    where: { id: invitationId, status: "PENDING" },
+    data: {
+      status: "REVOKED",
+      revokedAt: new Date(),
+    },
+  });
+  return marked.count > 0;
 }
 
 /**
@@ -180,8 +200,10 @@ export async function acceptInvitation(
   if (!circle || circle.status !== "ACTIVE") {
     throw new InvitationError("circle_archived", "circle not active");
   }
-  // Cap 2 adultes (sécurité additionnelle · court-circuité par index partiel
-  // si course concurrente).
+  // Verrou advisory par Circle · serialise les accepts concurrents et
+  // empêche le scénario "count=1 + INSERT + INSERT → count=3" (le second
+  // accept attend, revoit count=2 puis lève max_adults_reached).
+  await acquireCircleLock(tx, invitation.circleId);
   await assertCircleAdultCapacity(tx, invitation.circleId);
 
   // Passe invitation ACCEPTED (guard sur status = PENDING pour idempotence).
