@@ -6,6 +6,14 @@
 > **Base** · `main` post-merge audit P4 (`05ed637`)
 > **Portée** · fondations techniques uniquement. **Aucune activation produit** · tous les flags P4 restent `false`. Aucune UI Circle, aucune messagerie, aucun upload, aucun endpoint coach/teacher/center.
 >
+> **Correctifs post-revue (2026-07-23)** ·
+> 1. §2 Circle unique → `WHERE archivedAt IS NULL` (autorise recréation après archivage · Q8/Q9).
+> 2. §3 Ajout `OWNER unique actif` par cercle · confirmation `COACH unique actif` · dédup user/child sans cap ADULT/CHILD au niveau DB (caps applicatifs restent dans `lib/circles/capacity.ts`).
+> 3. §4 RLS fonctionnelle · GRANT SELECT à `authenticated` sur les 4 nouvelles tables · les policies filtrent effectivement · testé par JWT owner A, adult A, coach A, owner B (cross-tenant), membre REMOVED.
+> 4. §5 Grants fonctions · `REVOKE ALL FROM PUBLIC` + `GRANT EXECUTE TO authenticated` (et `anon` pour `current_app_user_id`) sur les 9 helpers.
+> 5. §7 Concurrence réelle · `Promise.all` sur create/archive/coach validé (1 succès, autres rejetés P2002).
+> 6. §8 API flag OFF → 404 vérifié end-to-end.
+>
 > **Sources doctrine** ·
 > - `docs/YEMA_P4_ARCHITECTURE_AUDIT.md`
 > - `docs/YEMA_P4_PERMISSION_MATRIX.md`
@@ -47,9 +55,11 @@ updatedAt       DateTime @updatedAt
 activeAt        DateTime @default(now())
 archivedAt      DateTime?
 
-@@unique([householdId, language])                             -- 1 cercle par (foyer, langue) tous statuts
+@@index([householdId, language])                              -- Prisma-side lookup index
 @@index([householdId, status])
 @@index([language, status])
+-- SQL migration ajoute · CREATE UNIQUE INDEX ... WHERE archivedAt IS NULL
+--                        (permet recréation après archivage · Q8/Q9)
 ```
 
 #### `CircleMembership`
@@ -75,11 +85,12 @@ updatedAt       DateTime @updatedAt
 
 Contrainte DB · `CHECK ((userId IS NULL) <> (childProfileId IS NULL))`.
 
-Index partiels ·
+Index partiels (§3 correctif · 4 indexes exacts) ·
 
-- `UNIQUE (circleId) WHERE role='COACH' AND status='ACTIVE'` → **1 coach actif max**.
-- `UNIQUE (circleId, userId) WHERE userId IS NOT NULL AND status='ACTIVE'` → **pas de doublon adulte actif**.
-- `UNIQUE (circleId, childProfileId) WHERE childProfileId IS NOT NULL AND status='ACTIVE'` → **pas de doublon enfant actif**.
+- `UNIQUE (circleId) WHERE role='OWNER' AND status='ACTIVE'` → **1 OWNER actif max par cercle**.
+- `UNIQUE (circleId) WHERE role='COACH' AND status='ACTIVE'` → **1 COACH actif max par cercle**.
+- `UNIQUE (circleId, userId) WHERE userId IS NOT NULL AND status='ACTIVE'` → **dédup user par cercle** (pas de cap ADULT au niveau DB — le plafond 2 adultes est enforced par `lib/circles/capacity.ts` via garde transactionnelle).
+- `UNIQUE (circleId, childProfileId) WHERE childProfileId IS NOT NULL AND status='ACTIVE'` → **dédup enfant par cercle** (idem pour cap 4 enfants).
 
 #### `AuditEvent`
 
@@ -304,9 +315,28 @@ Politique cible ·
 ## 11. Fixtures et smoke tests
 
 - `scripts/test-baseline/p4-1-fixtures.mjs` · `seed | clean | list`. Crée 2 households (A, B), 4 users (owner A, adult A, owner B, coach A avec `RACINES_COACH`), 2 enfants dans A, 1 Circle A LINGALA ACTIVE avec 5 memberships (OWNER + ADULT + COACH + 2 CHILD), 1 Circle A SWAHILI ARCHIVED, 1 Circle B WOLOF ACTIVE, 1 StorageObject métadonnée.
-- `scripts/test-baseline/p4-1-rls-smoke.mjs` · vérifie CHECK XOR, index partiel coach, unique (household, language), cross-tenant, RLS anon → 0 lignes (erreur 42501), RLS auth via Supabase Auth JWT → 0 lignes également (les tables ne sont pas exposées via PostgREST par grants — défense en profondeur additionnelle).
+- `scripts/test-baseline/p4-1-rls-smoke.mjs` · **19 checks post-revue** vérifient ·
+  1. **Archive + recréation** LINGALA/SWAHILI · nouveau Circle créé après archivage sur même langue.
+  2. Duplicate ACTIVE (foyer, langue) · P2002.
+  3. Second OWNER ACTIVE · P2002.
+  4. Second COACH ACTIVE · P2002.
+  5. Duplicate ADULT même user (ACTIVE) · P2002.
+  6. Second ADULT distinct · autorisé côté DB (cap applicatif dans lib).
+  7. Anon PostgREST · erreur 42501.
+  8. Owner A · voit 1 circle (le sien) + 5 memberships (son cercle uniquement).
+  9. Adult A · voit son cercle.
+  10. Coach A · voit uniquement le cercle assigné (pas B).
+  11. Owner B cross-tenant · ne voit jamais A.
+  12. Membre REMOVED · 0 lignes.
+  13. Non-admin sur `audit_events` · 0 lignes.
+  14. Concurrent create LINGALA · 1 succès / 1 P2002.
+  15. Concurrent archive · idempotent, final ARCHIVED.
+  16. Concurrent second COACH · 0 succès.
+  17. API `GET /api/circles/[id]` flag OFF · 404.
+  18. API `POST /api/circles` flag OFF · 404.
+  19. Diagnostic logs · aucun payload sensible loggé.
 
-Résultats · **6/6 checks OK** au 2026-07-23.
+Résultats · **19/19 checks OK** au 2026-07-23.
 
 ---
 
@@ -318,7 +348,7 @@ Résultats · **6/6 checks OK** au 2026-07-23.
   - `src/lib/__tests__/circle-permissions.test.ts` · 10 tests (structurel + `circleRoleAllows`).
   - `src/app/__tests__/p4-1-circle-security.test.ts` · 25 tests (schema, migration, API, storage, audit).
 - **Intégration** · `scripts/test-baseline/p4-1-rls-smoke.mjs` (RLS + concurrence + cross-tenant).
-- **Total** · **354 tests pass** · `Test Files 27 passed (27)`.
+- **Total** · **358 tests pass** · `Test Files 27 passed (27)`.
 
 ---
 

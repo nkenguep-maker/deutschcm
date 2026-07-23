@@ -128,3 +128,22 @@ Un **futur** ajout de route service-role sans garde d'autorisation devient un **
 ## 5. Décision P4.1
 
 **Aucun blocker service-role ouvert.** Les 7 usages actuels sont justifiés, gardés côté serveur, et hors périmètre client. Les 2 recommandations de refactor (§2.2, §2.4) sont non-bloquantes et suivront en P4.2.
+
+---
+
+## 6. Grants Postgres · état post-revue 2026-07-23
+
+Les 9 fonctions helper (`current_app_user_id`, `is_household_member`, `is_child_parent`, `is_circle_member`, `is_circle_owner`, `is_circle_coach`, `is_class_member`, `is_center_admin`, `is_yema_admin`) suivent le protocole ·
+
+- `REVOKE ALL ... FROM PUBLIC` d'abord.
+- `GRANT EXECUTE ... TO authenticated` pour toutes.
+- `GRANT EXECUTE ... TO anon` uniquement pour `current_app_user_id()` (les autres helpers requièrent une session).
+- `SECURITY DEFINER SET search_path = public, pg_temp` sur chaque fonction · toutes les jointures internes sont qualifiées `public.<table>`.
+- Aucun argument client-supplied · les paramètres `p_user_id` sont fournis par les policies elles-mêmes (via `current_app_user_id()`), pas par l'utilisateur.
+
+Grants tables ·
+
+- `GRANT SELECT ON circles, circle_memberships, storage_objects TO authenticated` · les policies RLS filtrent les lignes.
+- `GRANT SELECT ON audit_events TO authenticated` · seule la policy `is_yema_admin` renvoie des lignes · les autres users voient 0 rows.
+- `REVOKE ALL ON <4 tables> FROM anon` · aucun accès anonyme quelle que soit la RLS.
+- Aucune policy `INSERT/UPDATE/DELETE` côté client · toutes les écritures P4.1 passent par des routes Next avec Prisma en `service_role` (bypass RLS).
