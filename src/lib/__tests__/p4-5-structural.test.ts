@@ -16,6 +16,39 @@ function read(rel: string): string {
   return readFileSync(join(REPO, rel), "utf-8");
 }
 
+// Liste canonique des 24 valeurs AuditAction ajoutées par P4.5-A. Les 4
+// sources (schema.prisma, migrations SQL, docs, tests) doivent citer la
+// MÊME liste. §9 brief.
+export const P4_5_AUDIT_ACTIONS_CANONICAL = [
+  // Monde · 13 valeurs.
+  "ASSIGNMENT_CREATED",
+  "ASSIGNMENT_PUBLISHED",
+  "ASSIGNMENT_CLOSED",
+  "ASSIGNMENT_ACCESS_DENIED",
+  "SUBMISSION_CREATED",
+  "SUBMISSION_SUBMITTED",
+  "SUBMISSION_WITHDRAWN",
+  "SUBMISSION_ACCESS_DENIED",
+  "FEEDBACK_DRAFTED",
+  "FEEDBACK_PUBLISHED",
+  "FEEDBACK_ADDENDUM_CREATED",
+  "FEEDBACK_ACCESS_DENIED",
+  "STORAGE_UPLOAD_DENIED",
+  // Racines · 11 valeurs (dont PRODUCTION_LIMIT_REACHED capacité et
+  // PARENT_REPLY_CREATED fil Q14 · déjà comptés dans Racines).
+  "CIRCLE_ASSIGNMENT_CREATED",
+  "CIRCLE_ASSIGNMENT_PUBLISHED",
+  "CIRCLE_ASSIGNMENT_CLOSED",
+  "CIRCLE_SUBMISSION_CREATED",
+  "CIRCLE_SUBMISSION_SUBMITTED",
+  "CIRCLE_SUBMISSION_WITHDRAWN",
+  "CIRCLE_FEEDBACK_DRAFTED",
+  "CIRCLE_FEEDBACK_PUBLISHED",
+  "CIRCLE_FEEDBACK_ADDENDUM_CREATED",
+  "PRODUCTION_LIMIT_REACHED",
+  "PARENT_REPLY_CREATED",
+] as const;
+
 describe("P4.5-A · migrations SQL présentes et additives", () => {
   const monde = "prisma/migrations/20260723000009_p4_5_assignments_submissions/migration.sql";
   const racines = "prisma/migrations/20260723000010_p4_5_racines_productions_rls/migration.sql";
@@ -103,16 +136,58 @@ describe("P4.5-A · schema Prisma miroir", () => {
     expect(schema).toMatch(/^model AssignmentFeedback /m);
   });
 
-  it("adds AuditAction P4.5 enum values", () => {
-    for (const v of [
-      "ASSIGNMENT_CREATED", "ASSIGNMENT_PUBLISHED", "ASSIGNMENT_CLOSED",
-      "SUBMISSION_CREATED", "SUBMISSION_SUBMITTED", "SUBMISSION_WITHDRAWN",
-      "FEEDBACK_DRAFTED", "FEEDBACK_PUBLISHED", "FEEDBACK_ADDENDUM_CREATED",
-      "CIRCLE_ASSIGNMENT_CREATED", "CIRCLE_SUBMISSION_SUBMITTED",
-      "CIRCLE_FEEDBACK_PUBLISHED", "PRODUCTION_LIMIT_REACHED",
-      "PARENT_REPLY_CREATED", "STORAGE_UPLOAD_DENIED",
-    ]) {
+  it("adds all 24 canonical AuditAction P4.5 enum values", () => {
+    for (const v of P4_5_AUDIT_ACTIONS_CANONICAL) {
       expect(schema).toMatch(new RegExp(`^  ${v}$`, "m"));
+    }
+  });
+});
+
+describe("P4.5-A · AuditAction · 4-sources coherence (§9)", () => {
+  const monde = read("prisma/migrations/20260723000009_p4_5_assignments_submissions/migration.sql");
+  const racines = read("prisma/migrations/20260723000010_p4_5_racines_productions_rls/migration.sql");
+  const doc = read("docs/YEMA_P4_5_ASSIGNMENTS_SUBMISSIONS_FEEDBACK.md");
+  const schema2 = read("prisma/schema.prisma");
+
+  it("has exactly 24 canonical values (13 Monde + 11 Racines)", () => {
+    expect(P4_5_AUDIT_ACTIONS_CANONICAL.length).toBe(24);
+    const mondeCount = P4_5_AUDIT_ACTIONS_CANONICAL.filter(
+      (v) => !v.startsWith("CIRCLE_") && v !== "PRODUCTION_LIMIT_REACHED" && v !== "PARENT_REPLY_CREATED",
+    ).length;
+    const racinesCount = P4_5_AUDIT_ACTIONS_CANONICAL.length - mondeCount;
+    expect(mondeCount).toBe(13);
+    expect(racinesCount).toBe(11);
+  });
+
+  it("all 24 canonical values are declared in exactly ONE migration (Monde or Racines)", () => {
+    for (const v of P4_5_AUDIT_ACTIONS_CANONICAL) {
+      const inMonde = monde.includes(`ADD VALUE '${v}'`);
+      const inRacines = racines.includes(`ADD VALUE '${v}'`);
+      // XOR · doit être dans exactement une des deux migrations.
+      expect(inMonde !== inRacines).toBe(true);
+    }
+  });
+
+  it("all 24 canonical values are declared in schema.prisma AuditAction enum", () => {
+    for (const v of P4_5_AUDIT_ACTIONS_CANONICAL) {
+      expect(schema2).toMatch(new RegExp(`^  ${v}$`, "m"));
+    }
+  });
+
+  it("all 24 canonical values are documented in YEMA_P4_5 with a producer plan", () => {
+    for (const v of P4_5_AUDIT_ACTIONS_CANONICAL) {
+      expect(doc).toContain(v);
+    }
+  });
+
+  it("no value listed in ANY source is absent from the canonical list", () => {
+    // Extrait toutes les ADD VALUE des deux migrations.
+    const declared = new Set<string>();
+    for (const sql of [monde, racines]) {
+      for (const m of sql.matchAll(/ADD VALUE '([A-Z_]+)'/g)) declared.add(m[1]!);
+    }
+    for (const v of declared) {
+      expect(P4_5_AUDIT_ACTIONS_CANONICAL).toContain(v as never);
     }
   });
 });
