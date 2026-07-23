@@ -12,8 +12,10 @@ describe("Prisma schema · P4.1 additions", () => {
   const src = read("prisma/schema.prisma");
   it("adds Circle model with immutable-language contract", () => {
     expect(src).toMatch(/^model Circle \{/m);
-    expect(src).toMatch(/@@unique\(\[householdId, language\]\)/);
-    // status enum limited to ACTIVE|ARCHIVED|SUSPENDED
+    // Prisma ne peut pas exprimer un index partiel · l'unicité "1 Circle
+    // non-archivé par (foyer, langue)" vit dans migration.sql (§2 correctif).
+    expect(src).not.toMatch(/@@unique\(\[householdId, language\]\)/);
+    expect(src).toMatch(/@@index\(\[householdId, language\]\)/);
     expect(src).toMatch(/enum CircleStatus\s*\{[^}]*ACTIVE[^}]*ARCHIVED[^}]*SUSPENDED[^}]*\}/);
   });
   it("adds CircleMembership with role + status enums", () => {
@@ -73,7 +75,27 @@ describe("Migration SQL · P4.1", () => {
     expect(sql).toMatch(/CHECK \(\("userId" IS NULL\) <> \("childProfileId" IS NULL\)\)/);
   });
   it("adds partial unique index limiting active coach to one per circle", () => {
-    expect(sql).toMatch(/CREATE UNIQUE INDEX "circle_memberships_one_active_coach_per_circle_key"[\s\S]*?WHERE "role" = 'COACH' AND "status" = 'ACTIVE'/);
+    expect(sql).toMatch(/CREATE UNIQUE INDEX IF NOT EXISTS "circle_memberships_one_active_coach_per_circle_key"[\s\S]*?WHERE "role" = 'COACH' AND "status" = 'ACTIVE'/);
+  });
+  it("adds partial unique index limiting active owner to one per circle (§3 fix)", () => {
+    expect(sql).toMatch(/CREATE UNIQUE INDEX IF NOT EXISTS "circle_memberships_one_active_owner_per_circle_key"[\s\S]*?WHERE "role" = 'OWNER' AND "status" = 'ACTIVE'/);
+  });
+  it("Circle unicity is partial (WHERE archivedAt IS NULL) not global (§2 fix)", () => {
+    expect(sql).toMatch(/CREATE UNIQUE INDEX IF NOT EXISTS "circles_active_household_language_unique"[\s\S]*?WHERE "archivedAt" IS NULL/);
+    // The old global unique constraint must be dropped by migration
+    expect(sql).toMatch(/DROP INDEX IF EXISTS "circles_householdId_language_key"/);
+  });
+  it("grants EXECUTE on helpers only to explicit roles (§5 fix)", () => {
+    expect(sql).toMatch(/REVOKE ALL ON FUNCTION public\.current_app_user_id\(\) FROM PUBLIC/);
+    expect(sql).toMatch(/GRANT EXECUTE ON FUNCTION public\.current_app_user_id\(\) TO authenticated/);
+    expect(sql).toMatch(/GRANT EXECUTE ON FUNCTION public\.is_circle_member\(TEXT, TEXT\) TO authenticated/);
+  });
+  it("grants SELECT to authenticated on Circle tables (§5 · RLS filters properly)", () => {
+    expect(sql).toMatch(/GRANT SELECT ON "circles" TO authenticated/);
+    expect(sql).toMatch(/GRANT SELECT ON "circle_memberships" TO authenticated/);
+    expect(sql).toMatch(/GRANT SELECT ON "storage_objects" TO authenticated/);
+    // anon has zero grants
+    expect(sql).toMatch(/REVOKE ALL ON "circles" FROM anon/);
   });
   it("enables RLS on all 4 new tables", () => {
     for (const table of ["circles", "circle_memberships", "audit_events", "storage_objects"]) {
