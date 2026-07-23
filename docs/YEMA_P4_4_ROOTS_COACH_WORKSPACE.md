@@ -285,11 +285,37 @@ Six actions déclarées, toutes avec un producteur runtime documenté ·
 | `ROOTS_COACH_ACCESS_DENIED` | `resolveRootsCoachActor` (rôle absent) | ✓ 5 (Career Coach + admin no binding + Teacher + Center + Student) |
 | `ROOTS_COACH_CIRCLE_ACCESS_DENIED` | `assertRootsCoachCircleAccess` (Circle étranger existant) | ✓ 3 (Coach A → Circle B, Circle archivé, ancien coach) |
 | `ROOTS_COACH_PROFILE_ACCESS_DENIED` | `assertRootsCoachChildAccess` (profil étranger existant) | ✓ 1 (Coach A → Child B1) |
-| `ROOTS_COACH_CAPACITY_REACHED` | `assignCoach` catch `coach_capacity_reached` | ✓ 1 (races S1 · 11e Circle avec capacityType=circles) |
+| `ROOTS_COACH_CAPACITY_REACHED` | `assignCoach` catch (`coach_circle_capacity_reached` \| `coach_profile_capacity_reached`) · `addChildToCircle` catch profile-capacity | ✓ 3 (races S1 · 11e Circle circles=10 · S1b · race 19→20/21 children=20 · replacement S2) |
 | `ROOTS_COACH_ASSIGNMENT_REVOKED` | `removeCoach` (Q10 · avant retour) | ✓ 8 (races S2/S3 + admin route) |
-| `ROOTS_COACH_SCOPE_AMBIGUOUS` | `resolveRootsCoachActor` (défensif · schema drift) | ✓ 1 (races S3.5 · observedCount 22 > threshold 20) |
+| `ROOTS_COACH_SCOPE_AMBIGUOUS` | **Réservé (Option A · P4.4 finale)** · ne plus produire depuis un seuil de compte | ✓ 0 (races S3.5 · drift 22 memberships, aucun événement émis) |
 
-Le seuil défensif `SCOPE_AMBIGUOUS` est `MAX_ACTIVE_CIRCLES_PER_COACH × 2 = 20`. En pratique, ce seuil ne peut être atteint que via des inserts SQL bruts contournant `assignCoach` (borne applicative 10). Il agit comme un signal d'alerte anti-drift si le schema évolue ou si des données de test/legacy sont introduites hors-workflow.
+## 15.2 Sémantique capacité et audit · P4.4 finale
+
+Deux évolutions doctrine actées en closure P4.4, intégrées et prouvées runtime.
+
+### 15.2.1 Codes capacité stables (Q15)
+
+`CapacityError` déclinée en deux codes explicites côté throw sites de `assertCoachCapacityAvailable` et du nouveau garde `assertCoachProfileCapacityForChildAdd` ·
+
+- `coach_circle_capacity_reached` · budget circles atteint (`MAX_ACTIVE_CIRCLES_PER_COACH = 10`) · levé au moment où un ADMIN tente une assignation qui porterait le coach à 11 Circles ACTIVE.
+- `coach_profile_capacity_reached` · budget profils enfants atteint (`MAX_ACTIVE_CHILDREN_PER_COACH = 20`) · levé au moment où (a) un ADMIN assigne un coach à un Circle qui porterait le total au-delà de 20 enfants, ou (b) un parent OWNER ajoute un CHILD à un Circle déjà supervisé par un coach saturé.
+
+Statut HTTP · 409 · propagé tel quel côté API (`err(e.code, ...)`) sans réécriture ni fallback.
+
+### 15.2.2 Retry Serializable centralisé + mapping stable
+
+Les workflows `assignCoach`, `removeCoach`, `replaceCoach` et l'expansion profil enfant (`addChildToCircle`) transitent tous par `withSerializableRetry`. Deux nouveaux `errorCode` supportés dans le helper ·
+
+- `concurrent_coach_assignment` · POST `/api/admin/circles/[circleId]/coach`
+- `concurrent_coach_replacement` · DELETE `/api/admin/circles/[circleId]/coach`
+
+Comportement · retry SSI (`40001` / `P2034` / `TransactionWriteConflict`) borné à `MAX_SERIALIZATION_RETRIES = 3`, backoff exponentiel `25 · 50 · 100 ms`. À l'épuisement, `ConcurrentUpdateError` propage `err(code, msg, 409)`. **Aucune string Postgres/Prisma ne peut fuiter en body de réponse** · vérifié par `roots-coach-p4-4-structural.test.ts` (invariant statique).
+
+### 15.2.3 `ROOTS_COACH_SCOPE_AMBIGUOUS` · Option A (clarification)
+
+L'enum est conservé mais **le producteur seuil (> 2× cap) a été retiré du resolver**. Motif · un drift compte n'est pas une ambiguïté binding — c'est une saturation capacité, qui doit remonter via `ROOTS_COACH_CAPACITY_REACHED` par le workflow (`assignCoach` ou `addChildToCircle`). Aucun événement émis en état de drift 22 memberships (attesté S3.5 runtime).
+
+Sémantique future de l'enum · réservé aux **ambiguïtés binding vraies** (fusion identité, mappings professionnels contradictoires). Aucun producteur runtime actuellement.
 
 **PII leak check** · 0 clé interdite (`email`, `phone`, `fullName`, `dateOfBirth`, `body`, `token`, `cookie`) dans toute la metadata émise (attesté runtime `races-audits.json`).
 
