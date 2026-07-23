@@ -1336,6 +1336,14 @@ enum AuditAction {
   TEACHER_CLASS_ACCESS_DENIED
   TEACHER_STUDENT_ACCESS_DENIED
   TEACHER_SCOPE_AMBIGUOUS
+  // P4.4 · Roots Coach workspace refusals · voir permissions/rootsCoach.ts +
+  // migration 20260723000008_p4_4_roots_coach_rls. Emis fire-and-forget.
+  ROOTS_COACH_ACCESS_DENIED
+  ROOTS_COACH_CIRCLE_ACCESS_DENIED
+  ROOTS_COACH_PROFILE_ACCESS_DENIED
+  ROOTS_COACH_CAPACITY_REACHED
+  ROOTS_COACH_ASSIGNMENT_REVOKED
+  ROOTS_COACH_SCOPE_AMBIGUOUS
 }
 
 // ─── P4.1 · StorageObject · métadonnées uploads privés ───────────
