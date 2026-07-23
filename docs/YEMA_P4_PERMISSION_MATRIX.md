@@ -282,3 +282,25 @@ Interdite par défaut. Si un jour un ADMIN doit ouvrir la vue d'un parent (suppo
 - `YEMA_P4_ARCHITECTURE_AUDIT.md §5-7` · pseudo-schéma Circle + contraintes.
 - `YEMA_P4_THREAT_MODEL.md` · menaces qui découlent d'une case `ALLOW` mal appliquée.
 - `YEMA_P4_IMPLEMENTATION_PLAN.md §Décisions ouvertes` · questions Q1, Q6, Q13 référencées ici.
+- `YEMA_P4_2_MEMBERSHIPS_INVITATIONS.md` · matrice appliquée aux 10 endpoints P4.2.
+
+---
+
+## 11. Delta P4.2 (implémenté)
+
+Les 10 endpoints P4.2 appliquent la matrice ci-dessus **verbatim** ·
+
+| Route | Rôle serveur exigé | Rejet | Audit |
+|---|---|---|---|
+| `POST /api/circles/[cid]/invitations/adult` | OWNER ACTIVE | `forbidden` non-owner | ADULT_INVITED |
+| `POST /api/circle-invitations/[token]/accept` | user authentifié · email match | `forbidden` email mismatch · `410` déjà utilisée / expirée / révoquée | ADULT_INVITATION_ACCEPTED |
+| `POST /api/circles/[cid]/invitations/[iid]/revoke` | OWNER | `forbidden` | ADULT_INVITATION_REVOKED |
+| `POST /api/circles/[cid]/children` | OWNER + child dans foyer | `child_not_in_household` | CHILD_ADDED |
+| `DELETE /api/circles/[cid]/children/[cpid]` | OWNER | idem | CHILD_REMOVED |
+| `POST /api/circles/[cid]/leave` | non-OWNER membre | `owner_cannot_leave` | ADULT_LEFT_CIRCLE |
+| `DELETE /api/circles/[cid]/members/[mid]` | OWNER, cible = ADULT | `forbidden` (owner/child) | ADULT_REMOVED |
+| `POST /api/admin/circles/[cid]/coach` | YEMA_ADMIN + cible RACINES_COACH | `forbidden` | COACH_ASSIGNED |
+| `DELETE /api/admin/circles/[cid]/coach` | YEMA_ADMIN | `FORBIDDEN` | COACH_REMOVED |
+| `GET /api/circles/[cid]/members` | membre ACTIVE | 403 non-member · 401 anon | — |
+
+Toute case `ALLOW` mal projetée serait détectée par `p4-2-smoke.mjs` (26 assertions).
