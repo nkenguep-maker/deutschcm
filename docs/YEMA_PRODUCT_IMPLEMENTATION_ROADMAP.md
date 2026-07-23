@@ -483,6 +483,16 @@ Déplacé dans le lot P0.B pour la même raison : P1-4 et P2-2 (parcours écoute
 
 # Lot P4 — Professionnels
 
+> **Statut P4.1** (branche `feat/yema-p4-1-circle-security`, 2026-07-23) :
+> - Circle · CircleMembership · AuditEvent · StorageObject · migration additive appliquée à P-1 (`kzzagbojjkivdzzcrmxn`) — voir `docs/YEMA_P4_1_CIRCLE_SECURITY.md`.
+> - `AppRole = RACINES_COACH` et `ProductCode = ROOTS_COACH_ADDON` ajoutés (valeurs enum additives).
+> - RLS active sur les 4 nouvelles tables · 9 fonctions helper Postgres (`is_household_member`, `is_child_parent`, `is_circle_member`, `is_circle_owner`, `is_circle_coach`, `is_class_member`, `is_center_admin`, `is_yema_admin`, `current_app_user_id`).
+> - 6 buckets Supabase Storage privés créés dans P-1 (`class-audio`, `class-attachment`, `circle-audio`, `circle-attachment`, `submission-audio`, `feedback-audio`). Aucun bucket public pour productions enfants.
+> - `src/lib/flags.ts` · 9 feature flags **tous à `false` par défaut**.
+> - 3 endpoints minimaux `/api/circles*` gated par flag (404 en produit tant que `CIRCLE_ENABLED=false`). Aucune UI Circle. Landing intacte.
+> - Service-role inventory · 7 usages catalogués et gardés (`docs/YEMA_P4_SERVICE_ROLE_INVENTORY.md`) · 0 blocker.
+> - **354 tests pass · TypeScript clean · build vert · 6/6 smoke tests RLS + concurrence + cross-tenant OK**.
+
 > **Statut audit** (branche `feat/yema-p4-professional-spaces`, audit finalisé 2026-07-23) :
 > - Audit d'architecture complet · `docs/YEMA_P4_ARCHITECTURE_AUDIT.md` (inventaire Prisma · routes · mocks · Circle Option A pseudo-schéma · classroom vs circle · Suivi Racines et rôle `RACINES_COACH`)
 > - Matrice permissions · `docs/YEMA_P4_PERMISSION_MATRIX.md` (9 rôles globaux × 20+ actions · rôles locaux Circle/Class/Center · Teacher · Coach avec capacités Q15)
