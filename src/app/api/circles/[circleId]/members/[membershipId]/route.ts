@@ -5,10 +5,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getFlag } from "@/lib/flags";
-import { resolveCircleActor } from "@/lib/permissions/circle";
-import { ownerRemoveAdult } from "@/lib/circles/memberships";
+import { PermissionError, resolveCircleActor } from "@/lib/permissions/circle";
+import { ownerRemoveAdult, MembershipError } from "@/lib/circles/memberships";
 import { writeAuditEvent } from "@/lib/audit/events";
-import { mapErrorToResponse } from "@/lib/api/circleErrors";
+import { mapErrorToResponse, auditAccessDenied } from "@/lib/api/circleErrors";
 
 export async function DELETE(
   _req: Request,
@@ -44,6 +44,19 @@ export async function DELETE(
     );
     return NextResponse.json({ ok: true, removedMembershipId: result.removedMembershipId });
   } catch (e) {
+    if (
+      (e instanceof MembershipError && e.code === "forbidden") ||
+      (e instanceof PermissionError && e.code === "FORBIDDEN")
+    ) {
+      await auditAccessDenied({
+        actorUserId: null,
+        actorRole: "UNKNOWN",
+        circleId,
+        targetType: "CircleMembership",
+        targetId: membershipId,
+        reasonCode: "owner_required_for_member_remove",
+      });
+    }
     return mapErrorToResponse(e);
   }
 }

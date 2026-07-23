@@ -7,10 +7,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getFlag } from "@/lib/flags";
+import { PermissionError } from "@/lib/permissions/circle";
 import { resolveAdminActor } from "@/lib/permissions/admin";
 import { assignCoach, removeCoach } from "@/lib/circles/memberships";
 import { writeAuditEvent } from "@/lib/audit/events";
-import { mapErrorToResponse, err } from "@/lib/api/circleErrors";
+import { mapErrorToResponse, auditAccessDenied, err } from "@/lib/api/circleErrors";
 
 export async function POST(
   request: NextRequest,
@@ -49,6 +50,15 @@ export async function POST(
     );
     return NextResponse.json({ membership: { id: result.id, role: "COACH" } });
   } catch (e) {
+    if (e instanceof PermissionError && e.code === "FORBIDDEN") {
+      await auditAccessDenied({
+        actorUserId: null,
+        actorRole: "UNKNOWN",
+        circleId,
+        targetType: "Coach",
+        reasonCode: "admin_required_for_coach_assign",
+      });
+    }
     return mapErrorToResponse(e);
   }
 }
@@ -89,6 +99,15 @@ export async function DELETE(
       ok: true, removedMembershipId: result.removedMembershipId,
     });
   } catch (e) {
+    if (e instanceof PermissionError && e.code === "FORBIDDEN") {
+      await auditAccessDenied({
+        actorUserId: null,
+        actorRole: "UNKNOWN",
+        circleId,
+        targetType: "Coach",
+        reasonCode: "admin_required_for_coach_remove",
+      });
+    }
     return mapErrorToResponse(e);
   }
 }

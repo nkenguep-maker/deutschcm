@@ -5,10 +5,10 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getFlag } from "@/lib/flags";
-import { resolveCircleActor } from "@/lib/permissions/circle";
-import { addChildToCircle } from "@/lib/circles/memberships";
+import { PermissionError, resolveCircleActor } from "@/lib/permissions/circle";
+import { addChildToCircle, MembershipError } from "@/lib/circles/memberships";
 import { writeAuditEvent } from "@/lib/audit/events";
-import { mapErrorToResponse, err } from "@/lib/api/circleErrors";
+import { mapErrorToResponse, auditAccessDenied, err } from "@/lib/api/circleErrors";
 
 export async function POST(
   request: NextRequest,
@@ -47,6 +47,29 @@ export async function POST(
     );
     return NextResponse.json({ membership: { id: membership.id, role: "CHILD" } });
   } catch (e) {
+    if (
+      e instanceof MembershipError &&
+      (e.code === "child_not_in_household" || e.code === "forbidden")
+    ) {
+      await auditAccessDenied({
+        actorUserId: null,
+        actorRole: "UNKNOWN",
+        circleId,
+        targetType: "ChildProfile",
+        targetId: childProfileId,
+        reasonCode: e.code === "child_not_in_household" ? "foreign_child_add_attempt" : "owner_required_for_child_add",
+      });
+    }
+    if (e instanceof PermissionError && e.code === "FORBIDDEN") {
+      await auditAccessDenied({
+        actorUserId: null,
+        actorRole: "UNKNOWN",
+        circleId,
+        targetType: "ChildProfile",
+        targetId: childProfileId,
+        reasonCode: "owner_required_for_child_add",
+      });
+    }
     return mapErrorToResponse(e);
   }
 }

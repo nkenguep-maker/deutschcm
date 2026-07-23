@@ -8,11 +8,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getFlag } from "@/lib/flags";
-import { resolveCircleActor } from "@/lib/permissions/circle";
-import { createAdultInvitation } from "@/lib/invitations/service";
+import { PermissionError, resolveCircleActor } from "@/lib/permissions/circle";
+import { createAdultInvitation, InvitationError } from "@/lib/invitations/service";
 import { generateRawToken } from "@/lib/invitations/tokens";
 import { writeAuditEvent } from "@/lib/audit/events";
-import { mapErrorToResponse, err } from "@/lib/api/circleErrors";
+import { mapErrorToResponse, auditAccessDenied, err } from "@/lib/api/circleErrors";
 
 export async function POST(
   request: NextRequest,
@@ -65,6 +65,19 @@ export async function POST(
     }
     return res;
   } catch (e) {
+    // Audit refus sensible · non-OWNER tente d'inviter.
+    if (
+      (e instanceof InvitationError && e.code === "forbidden") ||
+      (e instanceof PermissionError && e.code === "FORBIDDEN")
+    ) {
+      await auditAccessDenied({
+        actorUserId: null, // Can't rely on actor resolution here (may be pre-permission-check).
+        actorRole: "UNKNOWN",
+        circleId,
+        targetType: "CircleInvitation",
+        reasonCode: "owner_required_for_invitation",
+      });
+    }
     return mapErrorToResponse(e);
   }
 }

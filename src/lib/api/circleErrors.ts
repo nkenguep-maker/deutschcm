@@ -8,6 +8,8 @@ import { NextResponse } from "next/server";
 import { PermissionError } from "@/lib/permissions/circle";
 import { InvitationError } from "@/lib/invitations/service";
 import { MembershipError, CapacityError } from "@/lib/circles/memberships";
+import { ConcurrentUpdateError } from "@/lib/db/retry";
+import { writeAuditEvent } from "@/lib/audit/events";
 
 export function err(code: string, message: string, status: number, detail?: unknown) {
   return NextResponse.json(
@@ -52,12 +54,55 @@ export function mapErrorToResponse(e: unknown): NextResponse {
   if (e instanceof CapacityError) {
     return err(e.code, e.message, 409, e.detail);
   }
+  if (e instanceof ConcurrentUpdateError) {
+    return err(e.code, e.message, 409);
+  }
   // Prisma unique violation
   if ((e as { code?: string })?.code === "P2002") {
     return err("conflict", "conflict", 409, {
       target: (e as { meta?: { target?: string[] } }).meta?.target,
     });
   }
+  // Postgres 40001 / Prisma P2034 · conflit sérialisation non retry'able
+  // (peut arriver hors withSerializableRetry). Mapping stable.
+  const raw = e as { code?: string; message?: string };
+  if (
+    raw?.code === "40001" ||
+    raw?.code === "P2034" ||
+    /serialization_failure|could not serialize/i.test(raw?.message ?? "")
+  ) {
+    return err("concurrent_membership_update", "concurrent update, please retry", 409);
+  }
   console.error("[api/circles] unhandled error", e);
   return err("INTERNAL", "internal error", 500);
+}
+
+/**
+ * Fire-and-forget · émet un `MEMBERSHIP_ACCESS_DENIED` pour les refus
+ * sensibles (cross-tenant, coach non assigné, action OWNER-only tentée
+ * par un adulte, etc). Metadata limitée aux IDs + reasonCode. Ne bloque
+ * jamais la réponse en cas d'échec d'écriture audit.
+ */
+export async function auditAccessDenied(input: {
+  actorUserId: string | null;
+  actorRole: string | null;
+  circleId?: string | null;
+  targetType: string;
+  targetId?: string | null;
+  reasonCode: string;
+}): Promise<void> {
+  try {
+    await writeAuditEvent({
+      actorUserId: input.actorUserId,
+      actorRole: input.actorRole,
+      action: "MEMBERSHIP_ACCESS_DENIED",
+      targetType: input.targetType,
+      targetId: input.targetId ?? "unknown",
+      scopeType: input.circleId ? "Circle" : null,
+      scopeId: input.circleId ?? null,
+      metadata: { reasonCode: input.reasonCode },
+    });
+  } catch (e) {
+    console.warn("[audit] MEMBERSHIP_ACCESS_DENIED write failed:", (e as Error).message);
+  }
 }
