@@ -20,7 +20,11 @@ export function err(code: string, message: string, status: number, detail?: unkn
 
 export function mapErrorToResponse(e: unknown): NextResponse {
   if (e instanceof PermissionError) {
-    const status = e.code === "UNAUTHORIZED" ? 401 : e.code === "FORBIDDEN" ? 403 : 404;
+    const status =
+      e.code === "UNAUTHORIZED" ? 401 :
+      e.code === "FORBIDDEN" ? 403 :
+      e.code === "CONFLICT" ? 409 :
+      404;
     return err(e.code, e.message, status);
   }
   if (e instanceof InvitationError) {

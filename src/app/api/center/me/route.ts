@@ -2,12 +2,12 @@
 // Retourne le centre géré par l'utilisateur courant (projection minimale).
 
 import { NextResponse } from "next/server";
-import { getFlag } from "@/lib/flags";
+import { isCenterRealDataActive } from "@/lib/flags";
 import { resolveCenterActor } from "@/lib/permissions/center";
 import { mapErrorToResponse } from "@/lib/api/circleErrors";
 
 export async function GET() {
-  if (!getFlag("CENTER_REAL_DATA_ENABLED")) {
+  if (!isCenterRealDataActive()) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
   try {

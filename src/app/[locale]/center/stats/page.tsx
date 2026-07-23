@@ -5,7 +5,7 @@
 // honnêtement les métriques indisponibles. Zéro nom fictif, zéro chiffre inventé.
 
 import { redirect } from "next/navigation";
-import { getFlag } from "@/lib/flags";
+import { isCenterRealDataActive } from "@/lib/flags";
 import { resolveCenterActorOrNull } from "@/lib/permissions/center";
 import { getCenterDashboard } from "@/lib/center/queries";
 import CenterFeaturePlaceholder from "@/components/center/CenterFeaturePlaceholder";
@@ -19,7 +19,7 @@ export default async function Page({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!getFlag("CENTER_REAL_DATA_ENABLED")) {
+  if (!isCenterRealDataActive()) {
     return <CenterFeaturePlaceholder locale={locale} />;
   }
   const actor = await resolveCenterActorOrNull();

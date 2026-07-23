@@ -3,7 +3,7 @@
 // ou Racines. Aucun mock.
 
 import { redirect } from "next/navigation";
-import { getFlag } from "@/lib/flags";
+import { isCenterRealDataActive } from "@/lib/flags";
 import { resolveCenterActorOrNull } from "@/lib/permissions/center";
 import { getCenterStudents, getCenterPendingEnrollments } from "@/lib/center/queries";
 import CenterFeaturePlaceholder from "@/components/center/CenterFeaturePlaceholder";
@@ -19,7 +19,7 @@ export default async function Page({
   searchParams: Promise<{ page?: string; query?: string; classId?: string; tab?: "active" | "pending" }>;
 }) {
   const [{ locale }, sp] = await Promise.all([params, searchParams]);
-  if (!getFlag("CENTER_REAL_DATA_ENABLED")) {
+  if (!isCenterRealDataActive()) {
     return <CenterFeaturePlaceholder locale={locale} />;
   }
   const actor = await resolveCenterActorOrNull();

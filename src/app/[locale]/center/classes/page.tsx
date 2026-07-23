@@ -1,7 +1,7 @@
 // P4.3a · Center classes · SSR · scope strict centerId.
 
 import { redirect } from "next/navigation";
-import { getFlag } from "@/lib/flags";
+import { isCenterRealDataActive } from "@/lib/flags";
 import { resolveCenterActorOrNull } from "@/lib/permissions/center";
 import { getCenterClasses } from "@/lib/center/queries";
 import CenterFeaturePlaceholder from "@/components/center/CenterFeaturePlaceholder";
@@ -17,7 +17,7 @@ export default async function Page({
   searchParams: Promise<{ page?: string; query?: string }>;
 }) {
   const [{ locale }, sp] = await Promise.all([params, searchParams]);
-  if (!getFlag("CENTER_REAL_DATA_ENABLED")) {
+  if (!isCenterRealDataActive()) {
     return <CenterFeaturePlaceholder locale={locale} />;
   }
   const actor = await resolveCenterActorOrNull();
