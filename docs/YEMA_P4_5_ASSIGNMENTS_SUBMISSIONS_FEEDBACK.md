@@ -436,7 +436,166 @@ Reporté vers P4.5-B2 (avec routes API + tests intégration P-1) ·
 - Runtime FR/EN + responsive + landing regressions.
 - Fixtures P-1 protégées + cleanup `BASELINE DATA CLEANED`.
 
-## 11. Chemin restant
+## 11. Statut P4.5-B2a · préflight RLS + 20 routes API + validators
+
+Livré sur `feat/yema-p4-5-b-monde-workflows` @ base P4.5-B1 (`7a83c15`) ·
+
+### 11.1 Préflight RLS WRITE + migration corrective
+
+Inspection §1 sur P-1 · 3 policies UPDATE (assignments / assignment_submissions
+/ assignment_feedbacks) exigeaient `status='DRAFT'` uniquement dans USING
+mais pas dans WITH CHECK · un JWT authenticated pouvait donc muter le
+status directement (bypass des services et de leur audit in-tx).
+
+Migration corrective additive `20260724000003_p4_5_b_monde_rls_write_hardening` ·
+
+- DROP + CREATE des 3 policies UPDATE en ajoutant `AND status = 'DRAFT'`
+  dans USING **et** WITH CHECK.
+- Aucune migration historique modifiée. Aucun bypass admin ajouté.
+
+Après hardening (vérifié sur P-1) · le JWT direct ne peut effectuer QUE
+un `UPDATE contenu` sur une ligne DRAFT qui reste DRAFT. Toutes les
+transitions PUBLISHED/CLOSED/ARCHIVED/SUBMITTED/SUPERSEDED/ADDENDUM sont
+exclusives au seam Prisma via service_role (avec audit in-tx).
+
+### 11.2 Matrice des 20 opérations Monde
+
+| # | Méthode | Path | Service |
+|---:|---|---|---|
+| 1 | GET | `/api/teacher/classes/[classroomId]/assignments` | `listTeacherAssignments` |
+| 2 | POST | `/api/teacher/classes/[classroomId]/assignments` | `createTeacherAssignmentDraft` |
+| 3 | GET | `/api/teacher/assignments/[assignmentId]` | `getTeacherAssignment` |
+| 4 | PATCH | `/api/teacher/assignments/[assignmentId]` | `updateTeacherAssignmentDraft` |
+| 5 | POST | `/api/teacher/assignments/[assignmentId]/publish` | `publishTeacherAssignment` |
+| 6 | POST | `/api/teacher/assignments/[assignmentId]/close` | `closeTeacherAssignment` |
+| 7 | GET | `/api/teacher/assignments/[assignmentId]/submissions` | `listAssignmentSubmissions` |
+| 8 | GET | `/api/teacher/submissions/[submissionId]` | `getTeacherSubmission` |
+| 9 | POST | `/api/teacher/submissions/[submissionId]/feedback` | `createAssignmentFeedbackDraft` |
+| 10 | PATCH | `/api/teacher/feedback/[feedbackId]` | `updateAssignmentFeedbackDraft` |
+| 11 | POST | `/api/teacher/feedback/[feedbackId]/publish` | `publishAssignmentFeedback` |
+| 12 | POST | `/api/teacher/feedback/[feedbackId]/addendum` | `createAssignmentFeedbackAddendum` |
+| 13 | GET | `/api/student/assignments` | `listStudentAssignments` |
+| 14 | GET | `/api/student/assignments/[assignmentId]` | `getStudentAssignment` |
+| 15 | GET | `/api/student/assignments/[assignmentId]/submissions` | inline scoped à `userId=self` |
+| 16 | POST | `/api/student/assignments/[assignmentId]/submissions` | `createStudentSubmissionDraft` |
+| 17 | PATCH | `/api/student/submissions/[submissionId]` | `updateStudentSubmissionDraft` |
+| 18 | POST | `/api/student/submissions/[submissionId]/submit` | `submitStudentSubmission` |
+| 19 | POST | `/api/student/submissions/[submissionId]/versions` | `createStudentSubmissionVersion` |
+| 20 | GET | `/api/student/submissions/[submissionId]/feedback` | `listStudentFeedback` (PUBLISHED/ADDENDUM) |
+
+### 11.3 Feature gate `ASSIGNMENTS_ENABLED`
+
+`src/lib/api/assignmentsGate.ts::assignmentsFlagOr404()` ·
+- Appelé TOUT en début de chaque handler, **avant** résolution de session.
+- Avec `ASSIGNMENTS_ENABLED=false` (défaut), retourne un 404 stable
+  identique à une ressource inexistante · aucun `await` DB ni Supabase
+  auth n'est effectué.
+- Aucun AuditEvent flag-off.
+- Aucun `NEXT_PUBLIC_*` · flag serveur exclusif.
+
+Verrouillé par test structurel · le call `assignmentsFlagOr404()` précède
+`await resolveTeacherActor()` / `await resolveStudentActor()` dans les
+deux helpers.
+
+### 11.4 Anti-injection · body allowlist stricte
+
+`src/lib/assignments/bodyValidators.ts` · 3 validators avec allowlist
+canonique et rejet des clés forbidden :
+
+- **Assignment create** · `title`, `instructions`, `dueAt`, `submissionFormat`.
+  Rejette `status`, `version`, `publishedAt`, `closedAt`, `classroomId`,
+  `teacherId`, `createdBy`, `createdByTeacherId`, `id`. Rejette
+  `submissionFormat != "WRITTEN"` avec `audio_feedback_disabled` (P4.5-B
+  texte uniquement).
+- **Assignment update** · `title`, `instructions`, `dueAt`. Rejette la
+  même liste forbidden que create.
+- **Submission** · `writtenContent` uniquement. Rejette `status`,
+  `version`, `storageObjectId`, `assignmentId`, `userId`, `submittedAt`,
+  `supersedesSubmissionId`, `id`.
+- **Feedback** · `writtenContent` uniquement. Rejette `status`, `version`,
+  `storageObjectId`, `submissionId`, `authorId`, `authorTeacherId`,
+  `publishedAt`, `supersedesFeedbackId`, `id`.
+
+Les routes appellent aussi des guards inline additionnels · rejet de
+`classroomId`/`teacherId`/`assignmentId`/`userId`/`authorId`/`submissionId`/
+`supersedesFeedbackId`/`version` avant validation (défense en profondeur).
+
+### 11.5 Route helpers · pattern uniforme
+
+`src/lib/api/teacherRouteHelper.ts::runTeacherRoute(fn, opts)` et
+`src/lib/api/studentRouteHelper.ts::runStudentRoute(fn, opts)` · pattern
+appliqué aux 20 routes ·
+
+1. `assignmentsFlagOr404()` en premier · avant session.
+2. `resolveTeacherActor()` / `resolveStudentActor()` · rôle + binding.
+3. Pour `writeTx: true` · `withSerializableRetry(() => prisma.$transaction(
+   fn, { isolationLevel: "Serializable" }), { errorCode })`.
+4. Pour lectures · un seul appel de service sur `prisma` (typé
+   `TxClient` par cast contrôlé).
+5. `catch (e)` · `emitAssignmentAuditFromError` (idempotent) puis
+   `mapAssignmentErrorToResponse(e)` (aucun code Prisma exposé).
+
+### 11.6 Concurrence
+
+`ConcurrentUpdateCode` P4.5-B2 utilisé selon domaine ·
+
+- Assignments create/publish/close/update · `concurrent_assignment_update`.
+- Submissions create/update/submit/versions · `concurrent_submission_update`.
+- Feedback create/update/publish/addendum · `concurrent_feedback_update`.
+
+Après retry SSI épuisé (3 tentatives, backoff 25/50/100ms) ·
+`ConcurrentUpdateError` mappé en HTTP 409 stable. Aucun P2034 /
+TransactionWriteConflict / INTERNAL exposé (fallback dernier recours
+mappé vers `concurrent_assignment_update` par `assignmentErrors.ts`).
+
+### 11.7 Codes HTTP (mapper)
+
+Anti-énumération respectée · une ressource étrangère renvoie 404
+indiscernable d'une ressource inexistante · les erreurs de rôle
+retournent 403 sans détail sur le scope réel.
+
+| Code métier | HTTP |
+|---|---:|
+| `assignment_not_found` / `submission_not_found` / `feedback_not_found` | 404 |
+| `assignment_not_owned` / `submission_not_owned` / `feedback_not_owned` | 403 |
+| `student_access_required` / `student_not_enrolled` | 403 |
+| `assignment_immutable` / `submission_immutable` / `feedback_immutable` | 409 |
+| `invalid_*_transition` / `feedback_already_published` / `submission_already_submitted` | 409 |
+| `audio_feedback_disabled` | 409 |
+| `submission_content_required` / `submission_too_long` | 400 |
+| `concurrent_assignment_update` / `_submission_update` / `_feedback_update` | 409 |
+| `UNAUTHORIZED` | 401 |
+| `FORBIDDEN` | 403 |
+| `INTERNAL` (dernier recours) | 500 |
+
+### 11.8 Tests P4.5-B2a
+
+70 nouveaux tests vitest · 42 `monde-body-validators` (allowlist stricte,
+forbidden keys pour les 3 validators, audio_feedback_disabled) + 28
+`p4-5-b2-structural` (migration hardening WITH CHECK status='DRAFT',
+20 routes présentes avec bonnes méthodes, feature gate avant résolution,
+runXRoute pattern, anti-injection body, writeTx + errorCode explicites).
+
+Total **807 tests / 43 files** (contre 737 sur 41 P4.5-B1).
+
+Reporté vers P4.5-B2b (closure B) ·
+- UI Teacher (4 pages) + Student (3 pages) + états 8 requis.
+- Fixtures P-1 `test_p4_5_b_` protégées + cleanup `BASELINE DATA CLEANED`.
+- Tests runtime API réels · Teacher A/B + Student A/B + Center admin +
+  Racines Coach + YEMA_ADMIN sans binding + Anonymous.
+- Tests JWT/PostgREST direct · UPDATE `status` refusé, INSERT feedback
+  cross-tenant refusé, etc.
+- 5 races concurrence · double publish assignment / double submit /
+  version concurrente / double publish feedback / double addendum.
+- Immutabilité DB directe (Prisma + SQL raw).
+- Runtime FR/EN sur `/fr/teacher/*`, `/fr/student/*` + `/en/*`.
+- Responsive 4 viewports + zoom 200 % + a11y clavier.
+- Landing regressions.
+- Flag-off validation · retirer flags, tester 20 routes → 404 stable.
+- Finalisation `docs/YEMA_P4_5_ASSIGNMENTS_SUBMISSIONS_FEEDBACK.md`
+  + mises à jour docs globaux.
+
+## 12. Chemin restant
 
 - **P4.5-B** · services `assignments.ts` + `submissions.ts` + `feedback.ts` Monde · routes Teacher + Student · tests RLS/JWT + immutabilité DB + races
 - **P4.5-C** · services Racines équivalents · routes Coach + Famille · quotas semaine/mois testés sous concurrence · reply parent structuré
