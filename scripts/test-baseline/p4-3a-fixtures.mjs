@@ -33,6 +33,15 @@ const EMAILS = {
   studentA2: "paul+p4_3a_student_a2@example.com",
   studentB1: "paul+p4_3a_student_b1@example.com",
   pendingA:  "paul+p4_3a_pending_a@example.com",
+  // P4.3a hardening · rôle CENTER sans binding Teacher → attend 404.
+  zeroBind:  "paul+p4_3a_zerobind@example.com",
+  // P4.3a hardening · rôle CENTER + Teacher.centerId=A ET User.centerId=B
+  // divergents → attend 409 ambigüité.
+  ambig:     "paul+p4_3a_ambig@example.com",
+  // P4.3a hardening · Teacher sans rôle CENTER → attend 403.
+  teacherOnlyA: "paul+p4_3a_teacher_only_a@example.com",
+  // P4.3a hardening · coach Racines · attend 403 sur endpoints Center.
+  racinesCoach: "paul+p4_3a_racines_coach@example.com",
 };
 
 async function ensureAuth(email, fullName) {
@@ -119,7 +128,8 @@ async function ensurePending(fromUserId, toClassroomId) {
 
 async function seed() {
   console.log("═══ P4.3a · seed ═══");
-  const [adminAAuth, adminBAuth, teacherAAuth, teacherBAuth, sA1Auth, sA2Auth, sB1Auth, pendingAAuth] = await Promise.all([
+  const [adminAAuth, adminBAuth, teacherAAuth, teacherBAuth, sA1Auth, sA2Auth, sB1Auth, pendingAAuth,
+         zeroBindAuth, ambigAuth, teacherOnlyAAuth, racinesCoachAuth] = await Promise.all([
     ensureAuth(EMAILS.adminA, "TEST P4.3a Center A Admin"),
     ensureAuth(EMAILS.adminB, "TEST P4.3a Center B Admin"),
     ensureAuth(EMAILS.teacherA, "TEST P4.3a Teacher A"),
@@ -128,8 +138,13 @@ async function seed() {
     ensureAuth(EMAILS.studentA2, "TEST P4.3a Student A2"),
     ensureAuth(EMAILS.studentB1, "TEST P4.3a Student B1"),
     ensureAuth(EMAILS.pendingA, "TEST P4.3a Pending A"),
+    ensureAuth(EMAILS.zeroBind, "TEST P4.3a Zero Bind"),
+    ensureAuth(EMAILS.ambig, "TEST P4.3a Ambiguous"),
+    ensureAuth(EMAILS.teacherOnlyA, "TEST P4.3a Teacher Only A"),
+    ensureAuth(EMAILS.racinesCoach, "TEST P4.3a Racines Coach"),
   ]);
-  const [adminA, adminB, teacherA, teacherB, sA1, sA2, sB1, pendingA] = await Promise.all([
+  const [adminA, adminB, teacherA, teacherB, sA1, sA2, sB1, pendingA,
+         zeroBind, ambig, teacherOnlyA, racinesCoach] = await Promise.all([
     ensureDbUser(adminAAuth.id, EMAILS.adminA, "TEST P4.3a Center A Admin", "CENTER"),
     ensureDbUser(adminBAuth.id, EMAILS.adminB, "TEST P4.3a Center B Admin", "CENTER"),
     ensureDbUser(teacherAAuth.id, EMAILS.teacherA, "TEST P4.3a Teacher A", "TEACHER"),
@@ -138,6 +153,14 @@ async function seed() {
     ensureDbUser(sA2Auth.id, EMAILS.studentA2, "TEST P4.3a Student A2", "STUDENT"),
     ensureDbUser(sB1Auth.id, EMAILS.studentB1, "TEST P4.3a Student B1", "STUDENT"),
     ensureDbUser(pendingAAuth.id, EMAILS.pendingA, "TEST P4.3a Pending A", "STUDENT"),
+    // Rôle CENTER mais sans Teacher rattaché → attend 404 no membership.
+    ensureDbUser(zeroBindAuth.id, EMAILS.zeroBind, "TEST P4.3a Zero Bind", "CENTER"),
+    // Rôle CENTER · Teacher.centerId=A · User.centerId=B (divergent) → 409.
+    ensureDbUser(ambigAuth.id, EMAILS.ambig, "TEST P4.3a Ambiguous", "CENTER"),
+    // Teacher standard sans rôle CENTER → attend 403 sur endpoints Center.
+    ensureDbUser(teacherOnlyAAuth.id, EMAILS.teacherOnlyA, "TEST P4.3a Teacher Only A", "TEACHER"),
+    // Racines coach → aucun rôle CENTER, attend 403.
+    ensureDbUser(racinesCoachAuth.id, EMAILS.racinesCoach, "TEST P4.3a Racines Coach", "STUDENT"),
   ]);
   await Promise.all([
     ensureAppRole(adminA.id, "CENTER_ADMIN"),
@@ -148,6 +171,10 @@ async function seed() {
     ensureAppRole(sA2.id, "LEARNER"),
     ensureAppRole(sB1.id, "LEARNER"),
     ensureAppRole(pendingA.id, "LEARNER"),
+    ensureAppRole(zeroBind.id, "CENTER_ADMIN"), // rôle OK, binding manquant
+    ensureAppRole(ambig.id, "CENTER_ADMIN"),
+    ensureAppRole(teacherOnlyA.id, "TEACHER"),
+    ensureAppRole(racinesCoach.id, "RACINES_COACH"),
   ]);
 
   const cA = await ensureCenter(CENTER_A, "TEST_CENTER_A", "Yaoundé", "P43A_A");
@@ -156,13 +183,19 @@ async function seed() {
   // Teacher records rattachés aux centres. Le CENTER admin doit avoir un
   // Teacher pour que le resolver le trouve (contrat V1). On rattache les
   // admins aussi.
-  const [teacherAT, teacherBT, adminAT, adminBT] = await Promise.all([
+  const [teacherAT, teacherBT, adminAT, adminBT, teacherOnlyAT, ambigT] = await Promise.all([
     ensureTeacher(teacherA.id, cA.id),
     ensureTeacher(teacherB.id, cB.id),
     ensureTeacher(adminA.id, cA.id),
     ensureTeacher(adminB.id, cB.id),
+    // Teacher standard rattaché à A (mais sans rôle CENTER · attend 403).
+    ensureTeacher(teacherOnlyA.id, cA.id),
+    // Ambigüité forcée · Teacher pointe A, mais legacy `User.centerId` = B.
+    ensureTeacher(ambig.id, cA.id),
   ]);
-  void adminAT; void adminBT;
+  void adminAT; void adminBT; void teacherOnlyAT;
+  await db.user.update({ where: { id: ambig.id }, data: { centerId: cB.id } });
+  void ambigT;
 
   const classA1 = await ensureClassroom("test_p4_3a_class_a1", "TEST_CLASS_A_1", teacherAT.id, cA.id, "A1");
   const classB1 = await ensureClassroom("test_p4_3a_class_b1", "TEST_CLASS_B_1", teacherBT.id, cB.id, "B1");
@@ -177,6 +210,7 @@ async function seed() {
   console.log(`  centers · A=${cA.id} B=${cB.id}`);
   console.log(`  admins · adminA=${adminA.id} adminB=${adminB.id}`);
   console.log(`  classes · A1=${classA1.id} B1=${classB1.id}`);
+  console.log(`  zeroBind=${zeroBind.id} ambig=${ambig.id} teacherOnlyA=${teacherOnlyA.id} racinesCoach=${racinesCoach.id}`);
   await db.$disconnect();
 }
 

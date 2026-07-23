@@ -12,6 +12,9 @@ const EMAILS = {
   adminB:    "paul+p4_3a_admin_b@example.com",
   teacherA:  "paul+p4_3a_teacher_a@example.com",
   studentA1: "paul+p4_3a_student_a1@example.com",
+  zeroBind:  "paul+p4_3a_zerobind@example.com",
+  ambig:     "paul+p4_3a_ambig@example.com",
+  racinesCoach: "paul+p4_3a_racines_coach@example.com",
 };
 const CENTER_A = "test_p4_3a_center_a";
 const CENTER_B = "test_p4_3a_center_b";
@@ -56,6 +59,9 @@ async function main() {
     const adminB = await ctxFor(browser, EMAILS.adminB);
     const teacherA = await ctxFor(browser, EMAILS.teacherA);
     const studentA1 = await ctxFor(browser, EMAILS.studentA1);
+    const zeroBind = await ctxFor(browser, EMAILS.zeroBind);
+    const ambig = await ctxFor(browser, EMAILS.ambig);
+    const racinesCoach = await ctxFor(browser, EMAILS.racinesCoach);
 
     // === /api/center/me ===
     process.stderr.write("\n═══ /api/center/me ═══\n");
@@ -159,7 +165,46 @@ async function main() {
       firstTeacher: injQ.body?.items?.[0]?.fullName,
     });
 
-    await Promise.all([adminA.ctx.close(), adminB.ctx.close(), teacherA.ctx.close(), studentA1.ctx.close()]);
+    // === Header injection ===
+    const injH = await fetch(`${BASE}/api/center/me`, {
+      headers: { cookie: adminA.cookie, "x-center-id": CENTER_B },
+    });
+    log("adminA · me + x-center-id=B header (must be ignored)", {
+      status: injH.status,
+      centerId: (await injH.json()).center?.id,
+    });
+
+    // === ZERO_BINDING ===
+    process.stderr.write("\n═══ Bindings edge cases ═══\n");
+    const zbMe = await get(zeroBind.cookie, "/api/center/me");
+    log("zeroBind · me (expect 404 no membership)", { status: zbMe.status, code: zbMe.body?.code });
+
+    // === AMBIGUOUS_BINDING ===
+    const amMe = await get(ambig.cookie, "/api/center/me");
+    log("ambig · me (expect 409 center_scope_ambiguous)", { status: amMe.status, code: amMe.body?.code });
+
+    // === Racines coach on Center APIs ===
+    const rcMe = await get(racinesCoach.cookie, "/api/center/me");
+    log("racinesCoach · me (expect 403)", { status: rcMe.status, code: rcMe.body?.code });
+
+    // === Legacy endpoints must return 404 deprecated ===
+    process.stderr.write("\n═══ Legacy endpoints · 404 deprecated ═══\n");
+    for (const path of ["/api/center", "/api/center?action=students",
+                        "/api/center?action=stats&centerId=" + CENTER_B]) {
+      const r = await get(adminA.cookie, path);
+      log(`adminA · GET ${path} (expect 404)`, { status: r.status, code: r.body?.code });
+    }
+    const joinR = await fetch(`${BASE}/api/center/join`, {
+      method: "POST", headers: { cookie: studentA1.cookie, "content-type": "application/json" },
+      body: JSON.stringify({ code: "P43A_A" }),
+    });
+    const joinBody = await joinR.json().catch(() => null);
+    log("studentA1 · POST /api/center/join (expect 404 deprecated)", {
+      status: joinR.status, code: joinBody?.code,
+    });
+
+    await Promise.all([adminA.ctx.close(), adminB.ctx.close(), teacherA.ctx.close(), studentA1.ctx.close(),
+                       zeroBind.ctx.close(), ambig.ctx.close(), racinesCoach.ctx.close()]);
   } finally {
     await browser.close();
   }
