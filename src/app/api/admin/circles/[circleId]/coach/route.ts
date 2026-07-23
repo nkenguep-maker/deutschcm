@@ -75,7 +75,7 @@ export async function DELETE(
     const admin = await resolveAdminActor();
     const result = await prisma.$transaction(
       async (tx) => {
-        const removed = await removeCoach(tx, { circleId });
+        const removed = await removeCoach(tx, { circleId, adminUserId: admin.userId });
         if (removed.removedMembershipId) {
           await writeAuditEvent(
             {

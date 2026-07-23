@@ -3,6 +3,12 @@
 // Tous les changements passent par des transactions Serializable et émettent
 // un AuditEvent dans la même transaction. Le profil actif enfant est
 // nettoyé côté user_metadata au niveau route quand un enfant est retiré.
+//
+// P4.4 · émissions Coach Racines · ROOTS_COACH_CAPACITY_REACHED sur capacité
+// atteinte pendant `assignCoach` (Q15) · ROOTS_COACH_ASSIGNMENT_REVOKED sur
+// `removeCoach` avant commit (Q10 · révocation immédiate). Fire-and-forget
+// après commit tx pour éviter de bloquer la réponse. Metadata sanitizée en
+// défense (aucun email/nom/téléphone/DOB).
 
 import type { PrismaClient } from "@prisma/client";
 import {
@@ -12,6 +18,7 @@ import {
   assertCoachCapacityAvailable,
 } from "@/lib/circles/capacity";
 import { acquireCircleLock } from "@/lib/db/locks";
+import { writeAuditEvent } from "@/lib/audit/events";
 
 type TxClient = Omit<
   PrismaClient,
@@ -222,7 +229,38 @@ export async function assignCoach(
   // 1 seul coach ACTIVE par cercle.
   await assertCircleCoachCapacity(tx, input.circleId);
   // 20 profils + 10 Circles max par coach.
-  await assertCoachCapacityAvailable(tx, input.coachUserId, input.circleId);
+  // P4.4 hardening · encapsule pour émettre ROOTS_COACH_CAPACITY_REACHED sur
+  // capacité atteinte (dimension = "circles" ou "children"), tout en
+  // laissant remonter l'erreur pour rollback tx.
+  try {
+    await assertCoachCapacityAvailable(tx, input.coachUserId, input.circleId);
+  } catch (e) {
+    if (e instanceof CapacityError && e.code === "coach_capacity_reached") {
+      const dim = (e.detail?.dimension as string | undefined) ?? null;
+      const limit = (e.detail?.limit as number | undefined) ?? null;
+      const current = (e.detail?.current as number | undefined) ?? null;
+      // Fire-and-forget · hors tx. Pattern doctrine cohérent avec Teacher.
+      void writeAuditEvent({
+        actorUserId: input.adminUserId,
+        actorRole: "YEMA_ADMIN",
+        action: "ROOTS_COACH_CAPACITY_REACHED",
+        targetType: "RootsCoachAssignment",
+        targetId: input.coachUserId,
+        scopeType: "Circle",
+        scopeId: input.circleId,
+        metadata: {
+          reasonCode: "capacity_reached",
+          capacityType: dim,
+          limit,
+          current,
+          routeAction: "assignCoach",
+        },
+      }).catch((err) => {
+        console.warn("[audit] ROOTS_COACH_CAPACITY_REACHED write failed:", (err as Error).message);
+      });
+    }
+    throw e;
+  }
 
   const membership = await tx.circleMembership.create({
     data: {
@@ -241,7 +279,7 @@ export async function assignCoach(
 /** ADMIN retire le coach · ancien coach perd l'accès immédiatement (Q10). */
 export async function removeCoach(
   tx: TxClient,
-  input: { circleId: string },
+  input: { circleId: string; adminUserId?: string; reason?: string },
 ): Promise<{ removedMembershipId: string | null; previousCoachUserId: string | null }> {
   const membership = await tx.circleMembership.findFirst({
     where: { circleId: input.circleId, role: "COACH", status: "ACTIVE" },
@@ -251,6 +289,25 @@ export async function removeCoach(
   await tx.circleMembership.update({
     where: { id: membership.id },
     data: { status: "REMOVED", removedAt: new Date() },
+  });
+  // P4.4 hardening · émet ROOTS_COACH_ASSIGNMENT_REVOKED (Q10). Fire-and-forget
+  // pour ne pas polluer la tx d'assignation. Doctrine · ne pas conserver
+  // d'infos privées inutiles pour le nouveau coach.
+  void writeAuditEvent({
+    actorUserId: input.adminUserId ?? null,
+    actorRole: input.adminUserId ? "YEMA_ADMIN" : null,
+    action: "ROOTS_COACH_ASSIGNMENT_REVOKED",
+    targetType: "CircleMembership",
+    targetId: membership.id,
+    scopeType: "Circle",
+    scopeId: input.circleId,
+    metadata: {
+      previousCoachUserId: membership.userId,
+      reasonCode: input.reason ?? "removed",
+      routeAction: "removeCoach",
+    },
+  }).catch((err) => {
+    console.warn("[audit] ROOTS_COACH_ASSIGNMENT_REVOKED write failed:", (err as Error).message);
   });
   return { removedMembershipId: membership.id, previousCoachUserId: membership.userId };
 }

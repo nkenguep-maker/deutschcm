@@ -31,6 +31,17 @@ import {
   MAX_ACTIVE_CHILDREN_PER_COACH,
 } from "@/lib/circles/capacity";
 
+/**
+ * P4.4 hardening · borne défensive `SCOPE_AMBIGUOUS` · limite de sécurité
+ * anti-drift. En pratique, la partial-unique-index P4.1 empêche > 1 Coach
+ * ACTIVE par cercle et la borne applicative empêche > 10 Circles par coach.
+ * Si ces gardes cassaient (schema drift, seed fautif, migration corrompue),
+ * un coach pourrait avoir un état incohérent. On détecte l'anomalie au
+ * resolver et on émet un audit défensif au-delà du seuil observable (double
+ * MAX_ACTIVE_CIRCLES_PER_COACH).
+ */
+const SCOPE_AMBIGUOUS_THRESHOLD = MAX_ACTIVE_CIRCLES_PER_COACH * 2;
+
 export interface RootsCoachActor extends CircleActor {
   /** UserId applicatif du coach. Pas de `coachId` distinct (Coach = User avec rôle). */
   actorRole: "RACINES_COACH";
@@ -119,14 +130,33 @@ export async function resolveRootsCoachActor(): Promise<RootsCoachActor> {
   }
 
   const [activeCircleCount, activeChildProfileCount] = await Promise.all([
-    prisma.circleMembership.count({
-      where: {
-        userId: dbUser.id,
-        role: "COACH",
-        status: "ACTIVE",
-        circle: { status: "ACTIVE" },
-      },
-    }),
+    (async () => {
+      const count = await prisma.circleMembership.count({
+        where: {
+          userId: dbUser.id,
+          role: "COACH",
+          status: "ACTIVE",
+          circle: { status: "ACTIVE" },
+        },
+      });
+      // Défensif · signal d'anomalie schéma si la borne applicative est
+      // débordée. Ne bloque pas la réponse (l'utilisateur voit son scope).
+      if (count > SCOPE_AMBIGUOUS_THRESHOLD) {
+        await auditRootsCoachRefusal({
+          action: "ROOTS_COACH_SCOPE_AMBIGUOUS",
+          actorUserId: dbUser.id,
+          actorRole: dbUser.role,
+          targetType: "RootsCoachWorkspace",
+          targetId: "resolve",
+          metadata: {
+            reasonCode: "coach_circle_count_over_threshold",
+            observedCount: count,
+            threshold: SCOPE_AMBIGUOUS_THRESHOLD,
+          },
+        });
+      }
+      return count;
+    })(),
     // Compte les CHILD memberships actifs des circles où ce coach est actif.
     // Utilise une jointure Prisma implicite via `circleId in (...)`.
     (async () => {
