@@ -266,7 +266,7 @@ Le champ `metadata` de `AuditEvent` peut porter uniquement des identifiants (`pr
 Aucun sous-lot P4 ne peut être activé en production tant que ses blockers ne sont pas fermés. Chaque check est vérifié **par sous-lot** avant activation du flag correspondant.
 
 - [ ] 0 IDOR sur toutes les routes du sous-lot
-- [ ] 0 cross-center leak (test dédié P4.3a)
+- [x] 0 cross-center leak — smoke Playwright `scripts/test-baseline/p4-3a-smoke.mjs` (fixtures A/B) validé sur P-1. Voir `docs/YEMA_P4_3A_CENTER_REAL_DATA.md` §8.
 - [ ] 0 cross-circle leak (test dédié P4.2+)
 - [ ] 0 cross-household leak (test dédié P4.2+)
 - [ ] 0 DM privé adulte-enfant possible (P4.6 · `ThreadType.ONE_TO_ONE` bloqué côté API sans suppression destructive)

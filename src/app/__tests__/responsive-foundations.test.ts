@@ -15,9 +15,12 @@ function read(rel: string): string {
   return readFileSync(join(process.cwd(), rel), "utf8");
 }
 
+// P4.3a · les pages center/students, center/teachers, center/classes ont
+// été réécrites en Server Components avec un pattern `overflow-x-auto` (voir
+// P4.3a doc). Elles ne sont plus soumises à la contrainte desktop-only /
+// mobile-only puisqu'elles ne rendent qu'une table SSR scroll-x native.
+// La contrainte reste appliquée aux pages non-P4.3a (admin/users).
 const RESPONSIVE_ROUTES = [
-  "src/app/[locale]/center/students/page.tsx",
-  "src/app/[locale]/center/teachers/page.tsx",
   "src/app/[locale]/admin/users/page.tsx",
 ];
 
@@ -39,9 +42,10 @@ describe("Tableaux desktop + mobile · une source, deux rendus", () => {
 });
 
 describe("Filtres · plus de largeurs fixes 150/170/200", () => {
+  // P4.3a · center/students et center/classes ont été réécrits SSR sans
+  // filter-row (search input Tailwind minimal). Seule admin/users garde
+  // le pattern legacy.
   for (const rel of [
-    "src/app/[locale]/center/students/page.tsx",
-    "src/app/[locale]/center/classes/page.tsx",
     "src/app/[locale]/admin/users/page.tsx",
   ]) {
     it(`${rel} · aucun width:200/150/170 sur select/input`, () => {
@@ -58,10 +62,7 @@ describe("Filtres · plus de largeurs fixes 150/170/200", () => {
 });
 
 describe("Texte long · anti-overflow explicite", () => {
-  it("center/students : email dans .text-wrap-anywhere", () => {
-    const src = read("src/app/[locale]/center/students/page.tsx");
-    expect(src).toMatch(/text-wrap-anywhere/);
-  });
+  // P4.3a · center/students n'affiche plus d'email (projection minimale).
   it("admin/users : email dans .text-wrap-anywhere", () => {
     const src = read("src/app/[locale]/admin/users/page.tsx");
     expect(src).toMatch(/text-wrap-anywhere/);

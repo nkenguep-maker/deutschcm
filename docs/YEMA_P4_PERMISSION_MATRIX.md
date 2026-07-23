@@ -68,7 +68,7 @@ Colonnes · rôles globaux. Lignes · actions produit. La condition explicite d'
 - **C1** · l'utilisateur doit avoir une `ClassMembership.userId = user.id AND classId = <target>` avec `status = ACTIVE`.
 - **C2** · `ClassMembership.userId = user.id AND classId = <target> AND role = TEACHER AND status = ACTIVE` **OR** `Class.providerUserId = user.id`.
 - **C3** · `ClassMembership.userId = user.id AND classId = <target> AND role = COACH AND status = ACTIVE`.
-- **C4** · le centre du user (`User.centerId` ou `Teacher.centerId`) doit correspondre à `Class` via `Classroom.centerId = user.centerId` (soft-link à valider en P4.3a).
+- **C4** · le centre du user (`User.centerId` ou `Teacher.centerId`) doit correspondre à `Class` via `Classroom.centerId = user.centerId`. **P4.3a livré** · `resolveCenterActor` (`src/lib/permissions/center.ts`) résout via `User.teacher.centerId` — aucun `centerId` client accepté. Voir `docs/YEMA_P4_3A_CENTER_REAL_DATA.md`.
 - **C5** · `CircleMembership.userId = user.id AND circleId = <target> AND role IN (OWNER, ADULT) AND status = ACTIVE`.
 - **C6** · `CircleMembership.childProfileId = user_metadata.activeChildId AND circleId = <target> AND role = CHILD AND status = ACTIVE`.
 - **C7** · `CircleMembership.userId = user.id AND circleId = <target> AND role = COACH AND status = ACTIVE`. Le coach ne voit que les cercles où il est explicitement assigné.

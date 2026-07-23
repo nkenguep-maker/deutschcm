@@ -17,7 +17,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export class PermissionError extends Error {
   constructor(
-    public readonly code: "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND",
+    public readonly code: "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT",
     message: string,
   ) {
     super(message);
