@@ -23,6 +23,10 @@ Un enseignant Monde est identifié par un `Teacher` row (`Teacher.userId @unique
 
 ---
 
+## 1.1 Règle YEMA_ADMIN (§7 hardening)
+
+Un rôle global `ADMIN` (V1) ou `YEMA_ADMIN` (V2) **ne donne pas** un accès automatique à l'espace Teacher. Le resolver accepte l'utilisateur au niveau du rôle applicatif (étape 1) mais tombe sur `ZERO_BINDING` (404) si aucun `Teacher` row n'est attaché. L'accès Teacher provient donc **du binding, pas du rôle global**. Deux personas fixtures illustrent la règle · `TEST_YEMA_ADMIN_WITHOUT_TEACHER_BINDING` → 404, `TEST_YEMA_ADMIN_WITH_TEACHER_BINDING` → 200 via le Teacher row rattaché à un centre. L'entrée YEMA_ADMIN dans les policies RLS (`is_yema_admin`) reste un bypass distinct destiné au backoffice support · en API applicative, elle ne dispense pas de `resolveTeacherActor`.
+
 ## 2. Résolveur serveur — `resolveTeacherActor`
 
 Fichier · `src/lib/permissions/teacher.ts`.
@@ -197,6 +201,17 @@ Policies ·
 **Aucune** politique WRITE en P4.3b · les écritures classroom/enrollment resteront route serveur + `assertTeacherOwnsClassroom` jusqu'à P4.5 (assignments).
 
 Nouvelles valeurs `AuditAction` idempotent · `TEACHER_ACCESS_DENIED`, `TEACHER_CLASS_ACCESS_DENIED`, `TEACHER_STUDENT_ACCESS_DENIED`, `TEACHER_SCOPE_AMBIGUOUS`.
+
+**Correctif migration** · `20260723000006_p4_3b_teacher_rls_fix` bascule les 3 helpers Teacher de `SECURITY INVOKER` vers `SECURITY DEFINER` (avec `search_path = public, pg_temp` conservé). Motivation · récursion infinie détectée en runtime · `is_teacher_for_classroom` en INVOKER lisait `public.classrooms`, ce qui appliquait à nouveau la policy et rappelait le helper. Pattern identique à `is_circle_member`, `is_class_member`, `is_center_admin` posés en P4.1 §5.
+
+**Émissions AuditEvent** (fire-and-forget · sanitizeMetadata en défense) · voir `src/lib/permissions/teacher.ts` ·
+- `TEACHER_ACCESS_DENIED` sur rôle Teacher absent (Center admin, Student, Coach) · metadata `{reasonCode, appRoles}`.
+- `TEACHER_CLASS_ACCESS_DENIED` sur classroomId existant mais étranger · metadata `{reasonCode, actorTeacherId, targetTeacherId, targetCenterId}`.
+- `TEACHER_STUDENT_ACCESS_DENIED` sur student existant mais hors des classes du Teacher · metadata `{reasonCode, actorTeacherId, targetClassroomTeacherId}`.
+- `TEACHER_SCOPE_AMBIGUOUS` sur multi-Teacher rows · metadata `{reasonCode, teacherRowCount}`.
+- `ZERO_BINDING` · aucun audit (bruit sur onboarding attendu).
+
+Metadata interdits (filtrés par `sanitizeMetadata`) · `body`, `message`, `audioUrl`, `signedUrl`, `token`, `password`, `transcription`. Un événement max par refus.
 
 ---
 
