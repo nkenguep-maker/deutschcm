@@ -1,8 +1,9 @@
 // P3 · GET /api/me/racines-dashboard · état complet du dashboard étudiant Racines.
 // Session · STUDENT strict · retourne 200 même sans contenu (état honnête).
 //
-// Contenu par langue Racines · doctrine P3 §6 · tant que le contenu n'est pas
-// prêt (READY), on ne rend PAS de leçons — l'écran affiche « Bientôt disponible ».
+// Hardening §2 · le mode Solo/Famille vient de l'AccessGrant + Product ou
+// de l'activationIntent, JAMAIS du nombre d'enfants. childrenCount ne
+// devient qu'une info exposée séparément.
 
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -11,7 +12,8 @@ import {
   RACINES_STEP_DEFINITIONS,
   RACINES_LANG_STATUS,
   anyRacinesLanguageReady,
-  inferProfileMode,
+  resolveRacinesAccessMode,
+  summarizeRacinesHousehold,
 } from "@/lib/racines";
 import { readAnswers } from "@/lib/funnel-state";
 import { prismaLangToId } from "@/lib/discovery";
@@ -48,9 +50,29 @@ export async function GET() {
       },
     });
 
-    // Enfants du parent · les ChildProfile sont filtrés par parentUserId
-    // (server-resolved, jamais depuis un id client). Ownership cross-parent
-    // impossible par construction.
+    // AccessGrants actifs pour ce user (Racines · include productVariant.product)
+    const grants = lp
+      ? await prisma.accessGrant.findMany({
+          where: {
+            status: "ACTIVE",
+            OR: [
+              { beneficiaryType: "USER", beneficiaryId: dbUser.id },
+              { beneficiaryType: "LEARNING_PATH", beneficiaryId: lp.id },
+            ],
+          },
+          include: { productVariant: { include: { product: true } } },
+        })
+      : [];
+
+    // Ne considère que les grants Racines (product.universe === RACINES ou
+    // product.code appartient à la famille Racines).
+    const racinesGrants = grants.filter((g) => {
+      const p = g.productVariant?.product;
+      return p && (p.universe === "RACINES" || p.code?.startsWith("ROOTS_"));
+    });
+    const activeGrant = racinesGrants.find((g) => !g.endsAt || new Date(g.endsAt).getTime() > Date.now());
+
+    // Enfants du parent · filtre parentUserId server-resolved
     const children = await prisma.childProfile.findMany({
       where: { parentUserId: dbUser.id },
       select: {
@@ -60,8 +82,25 @@ export async function GET() {
       orderBy: { createdAt: "asc" },
     });
 
-    const mode = inferProfileMode(children.length);
+    // Household existe-t-il ?
+    const household = await prisma.household.findFirst({
+      where: { ownerUserId: dbUser.id, status: "ACTIVE" },
+      select: { id: true },
+    });
+
+    // Activation intent depuis onboardingAnswers (P1)
     const answers = lp ? readAnswers(lp) : {};
+    const activationIntentOffer = answers.activationIntent?.racinesOffer ?? null;
+
+    const mode = resolveRacinesAccessMode({
+      hasActiveGrant: Boolean(activeGrant),
+      grantProductCode: activeGrant?.productVariant?.product?.code ?? null,
+      activationIntentOffer,
+      hasLearningPath: Boolean(lp),
+    });
+
+    const householdSummary = summarizeRacinesHousehold(mode, children.length, Boolean(household));
+
     const langId = prismaLangToId(lp?.language ?? null);
     const langStatus = langId ? RACINES_LANG_STATUS[langId] ?? "MISSING" : null;
     const racinesStep = answers.racinesStep ?? answers.declaredLevel ?? null;
@@ -70,11 +109,12 @@ export async function GET() {
       universe: "RACINES",
       hasLearningPath: Boolean(lp),
       learningPath: lp ? { id: lp.id, language: lp.language, currentLevel: lp.currentLevel } : null,
-      mode,                                        // "SOLO" | "FAMILY"
-      langStatus,                                  // "READY" | "PARTIAL" | "MISSING" | null
-      anyLanguageReady: anyRacinesLanguageReady(), // false tant qu'aucune Racines n'est READY
-      racinesStep,                                 // "E1".."E5" | null
-      steps: RACINES_STEP_DEFINITIONS,             // définitions doctrinales §8
+      mode,                                    // "SOLO" | "FAMILY" | "NO_ACCESS" | "UNKNOWN"
+      household: householdSummary,             // { childrenCount, householdConfigured, incoherent }
+      langStatus,
+      anyLanguageReady: anyRacinesLanguageReady(),
+      racinesStep,
+      steps: RACINES_STEP_DEFINITIONS,
       children: children.map((c) => ({
         id: c.id,
         prenom: c.prenom,
@@ -83,6 +123,9 @@ export async function GET() {
         activeLangue: c.activeLangue,
         langues: Array.isArray(c.langues) ? c.langues : [],
       })),
+      // activeChildId persisté côté user_metadata (P3 hardening §6).
+      // Le front peut le lire directement depuis /api/me si besoin.
+      activeChildId: (user.user_metadata?.activeChildId as string | null) ?? null,
       greetingName: dbUser.fullName ?? null,
     });
   } catch (e) {

@@ -12,7 +12,8 @@ interface DashboardData {
   universe: "RACINES";
   hasLearningPath: boolean;
   learningPath?: { id: string; language: string; currentLevel: string | null };
-  mode: "SOLO" | "FAMILY";
+  mode: "SOLO" | "FAMILY" | "NO_ACCESS" | "UNKNOWN";
+  household: { childrenCount: number; householdConfigured: boolean; incoherent: boolean };
   langStatus: "READY" | "PARTIAL" | "MISSING" | null;
   anyLanguageReady: boolean;
   racinesStep: string | null;
@@ -25,6 +26,7 @@ interface DashboardData {
     activeLangue: string | null;
     langues: unknown[];
   }>;
+  activeChildId: string | null;
   greetingName: string | null;
 }
 
@@ -34,6 +36,15 @@ const COPY = {
     universeLbl: "Racines · la maison",
     modeSolo: "Espace Solo",
     modeFamily: "Espace Famille",
+    modeNoAccess: "Aucun accès",
+    modeUnknown: "Statut à préciser",
+    familyEmptyTitle: "Ton foyer *attend ses profils.*",
+    familyEmptyBody: "Ton offre Famille est enregistrée. Configure les profils de tes proches pour démarrer ensemble.",
+    familyEmptyCta: "Configurer le foyer",
+    noAccessSoul: "Ton parcours Racines *n'est pas encore activé.*",
+    noAccessBody: "Termine la découverte ou active un abonnement Solo/Famille pour ouvrir la maison.",
+    noAccessCta: "Voir les offres",
+    incoherentNotice: "Une incohérence a été détectée dans ton foyer. Notre équipe est prévenue.",
     stepLbl: "Étape actuelle",
     noStep: "À définir",
     contentSoonSoul: "Ta langue Racines *arrive bientôt.*",
@@ -62,6 +73,15 @@ const COPY = {
     universeLbl: "Roots · the home",
     modeSolo: "Solo space",
     modeFamily: "Family space",
+    modeNoAccess: "No access",
+    modeUnknown: "Status pending",
+    familyEmptyTitle: "Your home *waits for its profiles.*",
+    familyEmptyBody: "Your Family offer is registered. Configure your loved ones' profiles to start together.",
+    familyEmptyCta: "Configure the home",
+    noAccessSoul: "Your Roots journey *isn't activated yet.*",
+    noAccessBody: "Finish discovery or activate a Solo/Family subscription to open the home.",
+    noAccessCta: "See offers",
+    incoherentNotice: "An inconsistency was detected in your home. Our team has been notified.",
     stepLbl: "Current step",
     noStep: "To be defined",
     contentSoonSoul: "Your Roots language *is coming soon.*",
@@ -134,6 +154,12 @@ export function DashboardRacines({ locale }: { locale: "fr" | "en" }) {
   const greeting = data.greetingName?.split(" ")[0] ?? c.greetingFallback;
   const currentStep = data.steps.find((s) => s.key === data.racinesStep);
   const stepLabel = currentStep ? (locale === "en" ? currentStep.labelEn : currentStep.labelFr) : c.noStep;
+  const modeLabel =
+    data.mode === "FAMILY" ? c.modeFamily :
+    data.mode === "SOLO" ? c.modeSolo :
+    data.mode === "NO_ACCESS" ? c.modeNoAccess :
+    c.modeUnknown;
+  const isFamilyEmpty = data.mode === "FAMILY" && data.household.childrenCount === 0;
 
   return (
     <main className="racines-dash" style={{ maxWidth: 960, margin: "0 auto", padding: "32px 16px 96px" }}>
@@ -149,14 +175,47 @@ export function DashboardRacines({ locale }: { locale: "fr" | "en" }) {
           color: "var(--creme)", margin: "0 0 6px", overflowWrap: "anywhere",
         }}>{greeting}</h1>
         <p style={{ color: "var(--creme-mute)", fontSize: 14, margin: 0 }}>
-          {data.mode === "FAMILY" ? c.modeFamily : c.modeSolo}
+          {modeLabel}
           {" · "}
           <span style={{ color: "var(--creme-soft)" }}>{c.stepLbl} {data.racinesStep ?? "—"} · {stepLabel}</span>
         </p>
+        {data.household.incoherent && (
+          <p role="alert" style={{
+            marginTop: 8, padding: "6px 10px", borderRadius: 8,
+            background: "rgba(122, 40, 48, 0.08)", color: "var(--oxblood)",
+            border: "1px solid rgba(122, 40, 48, 0.25)", fontSize: 12,
+          }}>{c.incoherentNotice}</p>
+        )}
       </header>
 
+      {/* NO_ACCESS · offre commerciale non activée */}
+      {data.mode === "NO_ACCESS" && (
+        <section style={{ marginBottom: 24 }}>
+          <StateBlock
+            kind="empty"
+            centered
+            soul={c.noAccessSoul}
+            body={c.noAccessBody}
+            action={{ label: c.noAccessCta, href: "/activation-intent" }}
+          />
+        </section>
+      )}
+
+      {/* FAMILY_EMPTY · offre Famille active mais aucun profil configuré */}
+      {isFamilyEmpty && (
+        <section style={{ marginBottom: 24 }}>
+          <StateBlock
+            kind="empty"
+            centered
+            soul={c.familyEmptyTitle}
+            body={c.familyEmptyBody}
+            action={{ label: c.familyEmptyCta, href: "/famille" }}
+          />
+        </section>
+      )}
+
       {/* Contenu langue · état honnête tant que MISSING */}
-      {(!data.anyLanguageReady || data.langStatus !== "READY") && (
+      {(!data.anyLanguageReady || data.langStatus !== "READY") && data.mode !== "NO_ACCESS" && !isFamilyEmpty && (
         <section style={{ marginBottom: 24 }}>
           <StateBlock
             kind="empty"
@@ -168,8 +227,8 @@ export function DashboardRacines({ locale }: { locale: "fr" | "en" }) {
         </section>
       )}
 
-      {/* Foyer · liste des profils enfants réels */}
-      {data.mode === "FAMILY" && (
+      {/* Foyer · liste des profils enfants réels (uniquement en FAMILY non-empty) */}
+      {data.mode === "FAMILY" && data.household.childrenCount > 0 && (
         <section style={{ marginBottom: 24 }}>
           <header style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
             <div>

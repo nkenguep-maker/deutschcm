@@ -8,7 +8,8 @@ import {
   canAccessRacinesContent,
   racinesLanguagesWithStatus,
   anyRacinesLanguageReady,
-  inferProfileMode,
+  resolveRacinesAccessMode,
+  summarizeRacinesHousehold,
 } from "../racines";
 
 describe("Étapes Racines É1-É5", () => {
@@ -63,10 +64,67 @@ describe("Statut opérationnel des langues Racines", () => {
   });
 });
 
-describe("inferProfileMode", () => {
-  it("0 enfant → SOLO", () => expect(inferProfileMode(0)).toBe("SOLO"));
-  it("1+ enfant → FAMILY", () => {
-    expect(inferProfileMode(1)).toBe("FAMILY");
-    expect(inferProfileMode(4)).toBe("FAMILY");
+describe("resolveRacinesAccessMode · source de vérité produit (P3 hardening §2)", () => {
+  it("grant ROOTS_FAMILY actif → FAMILY (peu importe le nombre d'enfants)", () => {
+    expect(resolveRacinesAccessMode({
+      hasActiveGrant: true, grantProductCode: "ROOTS_FAMILY",
+      hasLearningPath: true,
+    })).toBe("FAMILY");
+  });
+  it("grant ROOTS_SOLO actif → SOLO même avec 4 enfants", () => {
+    expect(resolveRacinesAccessMode({
+      hasActiveGrant: true, grantProductCode: "ROOTS_SOLO",
+      hasLearningPath: true,
+    })).toBe("SOLO");
+  });
+  it("grant actif mais code inconnu → UNKNOWN (jamais devine)", () => {
+    expect(resolveRacinesAccessMode({
+      hasActiveGrant: true, grantProductCode: "PASSAGE",
+      hasLearningPath: true,
+    })).toBe("UNKNOWN");
+  });
+  it("activationIntent FAMILLE (P1) sans grant → FAMILY", () => {
+    expect(resolveRacinesAccessMode({
+      hasActiveGrant: false, activationIntentOffer: "FAMILLE",
+      hasLearningPath: true,
+    })).toBe("FAMILY");
+  });
+  it("activationIntent SOLO (P1) sans grant → SOLO", () => {
+    expect(resolveRacinesAccessMode({
+      hasActiveGrant: false, activationIntentOffer: "SOLO",
+      hasLearningPath: true,
+    })).toBe("SOLO");
+  });
+  it("aucun signal → NO_ACCESS (jamais SOLO par défaut)", () => {
+    expect(resolveRacinesAccessMode({
+      hasActiveGrant: false, hasLearningPath: true,
+    })).toBe("NO_ACCESS");
+  });
+  it("le nombre d'enfants n'entre PAS dans la décision de mode", () => {
+    // Aucun paramètre childrenCount dans resolveRacinesAccessMode.
+    // Test structural · signature confirme l'invariant.
+    const sig = resolveRacinesAccessMode.toString();
+    expect(sig).not.toMatch(/childrenCount|children\.count/);
+  });
+});
+
+describe("summarizeRacinesHousehold · détection d'incohérence", () => {
+  it("SOLO + 0 enfants · pas d'incohérence", () => {
+    expect(summarizeRacinesHousehold("SOLO", 0, false)).toEqual({
+      childrenCount: 0, householdConfigured: false, incoherent: false,
+    });
+  });
+  it("SOLO + 1 enfant · incohérence (à signaler, jamais convertir en FAMILY)", () => {
+    const s = summarizeRacinesHousehold("SOLO", 1, false);
+    expect(s.incoherent).toBe(true);
+  });
+  it("FAMILY + 0 enfants · pas d'incohérence (Famille vide autorisée)", () => {
+    expect(summarizeRacinesHousehold("FAMILY", 0, true).incoherent).toBe(false);
+  });
+  it("FAMILY + 2 enfants · cohérent", () => {
+    expect(summarizeRacinesHousehold("FAMILY", 2, true).incoherent).toBe(false);
+  });
+  it("NO_ACCESS + enfants · pas d'incohérence (le mode n'est pas SOLO)", () => {
+    expect(summarizeRacinesHousehold("NO_ACCESS", 3, true).incoherent).toBe(false);
   });
 });

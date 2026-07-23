@@ -103,13 +103,60 @@ export function anyRacinesLanguageReady(): boolean {
   return Object.values(RACINES_LANG_STATUS).some((s) => s === "READY");
 }
 
-// ─── Type de profil actif Racines ──────────────────────────────
+// ─── Source de vérité Solo/Famille · P3 hardening §2 ─────────────
+// L'offre achetée dicte le mode · JAMAIS le nombre d'enfants.
+// Ordre de préférence (le premier match gagne) :
+//   1. AccessGrant ACTIVE lié à un ProductVariant Racines :
+//        - product.code = "ROOTS_FAMILY" → FAMILY
+//        - product.code = "ROOTS_SOLO"   → SOLO
+//   2. activationIntent persistée (fin de funnel P1) :
+//        - racinesOffer = "FAMILLE" → FAMILY
+//        - racinesOffer = "SOLO"    → SOLO
+//   3. UNKNOWN (aucune indication)
+//
+// Le nombre d'enfants EXPOSE seulement childrenCount + householdConfigured.
+// Un compte Solo avec un enfant orphelin = incohérence à signaler, pas à
+// promouvoir en Famille.
 
-export type RacinesProfileMode = "SOLO" | "FAMILY";
+export type RacinesAccessMode = "SOLO" | "FAMILY" | "NO_ACCESS" | "UNKNOWN";
 
-/** Détermine le mode du profil actif : Solo (aucun ChildProfile) ou Family
- *  (au moins un ChildProfile). Le paramètre est le compte du calling user
- *  côté serveur — l'ownership est déjà validé par le caller. */
-export function inferProfileMode(childrenCount: number): RacinesProfileMode {
-  return childrenCount > 0 ? "FAMILY" : "SOLO";
+export interface RacinesAccessSignals {
+  hasActiveGrant: boolean;                // true si un grant ACTIVE Racines
+  grantProductCode?: string | null;       // "ROOTS_SOLO" | "ROOTS_FAMILY" | autre
+  activationIntentOffer?: string | null;  // "SOLO" | "FAMILLE" (extra fallback)
+  hasLearningPath: boolean;               // LP Racines existe (mais pas d'accès)
+}
+
+export function resolveRacinesAccessMode(signals: RacinesAccessSignals): RacinesAccessMode {
+  // 1. AccessGrant actif · source de vérité principale (P5 posera ces grants).
+  if (signals.hasActiveGrant) {
+    if (signals.grantProductCode === "ROOTS_FAMILY") return "FAMILY";
+    if (signals.grantProductCode === "ROOTS_SOLO") return "SOLO";
+    // Grant actif mais code inconnu · on refuse de deviner. UNKNOWN
+    // au lieu de choisir SOLO par défaut pour éviter d'exposer les
+    // features Famille à un compte Solo (ou l'inverse).
+    return "UNKNOWN";
+  }
+  // 2. Intention d'activation persistée (P1) · l'utilisateur a fini le funnel
+  //    mais le paiement n'a pas encore ouvert. Suffisant pour afficher le mode.
+  if (signals.activationIntentOffer === "FAMILLE") return "FAMILY";
+  if (signals.activationIntentOffer === "SOLO") return "SOLO";
+  // 3. LP Racines mais aucun signal offre · commercialement rien décidé.
+  return "NO_ACCESS";
+}
+
+/** Info à afficher séparément du mode · aide à détecter les incohérences
+ *  (Solo avec enfant → warning côté logs, jamais promotion silencieuse). */
+export interface RacinesHouseholdSummary {
+  childrenCount: number;
+  householdConfigured: boolean;
+  incoherent: boolean;  // true si SOLO + childrenCount > 0
+}
+
+export function summarizeRacinesHousehold(mode: RacinesAccessMode, childrenCount: number, householdConfigured: boolean): RacinesHouseholdSummary {
+  return {
+    childrenCount,
+    householdConfigured,
+    incoherent: mode === "SOLO" && childrenCount > 0,
+  };
 }
