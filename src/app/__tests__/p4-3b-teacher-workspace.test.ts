@@ -166,7 +166,7 @@ describe("P4.3b · RLS migration présente", () => {
   const migrationsDir = "prisma/migrations";
   it("Migration p4_3b_teacher_rls existe", () => {
     const dirs = readdirSync(join(process.cwd(), migrationsDir));
-    const match = dirs.find((d) => d.includes("p4_3b_teacher_rls"));
+    const match = dirs.find((d) => d.endsWith("p4_3b_teacher_rls"));
     expect(match, "no migration matching p4_3b_teacher_rls").toBeTruthy();
     const sqlPath = join(migrationsDir, match!, "migration.sql");
     expect(existsSync(join(process.cwd(), sqlPath))).toBe(true);
@@ -186,5 +186,81 @@ describe("P4.3b · RLS migration présente", () => {
     // Auditing enum values
     expect(sql).toMatch(/TEACHER_ACCESS_DENIED/);
     expect(sql).toMatch(/TEACHER_SCOPE_AMBIGUOUS/);
+  });
+  it("Migration p4_3b_teacher_rls_fix existe (helpers SECURITY DEFINER)", () => {
+    const dirs = readdirSync(join(process.cwd(), migrationsDir));
+    const match = dirs.find((d) => d.endsWith("p4_3b_teacher_rls_fix"));
+    expect(match, "no migration matching p4_3b_teacher_rls_fix").toBeTruthy();
+    const sql = read(join(migrationsDir, match!, "migration.sql"));
+    expect(sql).toMatch(/SECURITY DEFINER/);
+    expect(sql).toMatch(/is_teacher_for_classroom/);
+  });
+  it("Migration p4_3b_teacher_rls_admin_fix retire is_yema_admin des 4 policies", () => {
+    const dirs = readdirSync(join(process.cwd(), migrationsDir));
+    const match = dirs.find((d) => d.endsWith("p4_3b_teacher_rls_admin_fix"));
+    expect(match, "no migration matching p4_3b_teacher_rls_admin_fix").toBeTruthy();
+    const sql = read(join(migrationsDir, match!, "migration.sql"));
+    // Les 4 policies doivent être recréées SANS bypass is_yema_admin.
+    expect(sql).toMatch(/DROP POLICY IF EXISTS teachers_select_self/);
+    expect(sql).toMatch(/DROP POLICY IF EXISTS classrooms_select_teacher_scope/);
+    expect(sql).toMatch(/DROP POLICY IF EXISTS enrollments_select_owner_or_teacher/);
+    expect(sql).toMatch(/DROP POLICY IF EXISTS class_join_requests_select_scope/);
+    expect(sql).toMatch(/CREATE POLICY teachers_select_self/);
+    expect(sql).toMatch(/CREATE POLICY classrooms_select_teacher_scope/);
+    expect(sql).toMatch(/CREATE POLICY enrollments_select_owner_or_teacher/);
+    expect(sql).toMatch(/CREATE POLICY class_join_requests_select_scope/);
+    // Aucun bypass is_yema_admin dans les USING clauses des 4 nouvelles
+    // policies · on inspecte chaque bloc CREATE POLICY individuellement.
+    const createBlocks = sql.match(/CREATE POLICY [\s\S]*?USING \([\s\S]*?\);/g) ?? [];
+    expect(createBlocks.length).toBeGreaterThanOrEqual(4);
+    for (const block of createBlocks) {
+      expect(block, `bypass in policy: ${block.slice(0, 100)}`).not.toMatch(/is_yema_admin/);
+    }
+    // Student self-view et fromUser self-view préservés.
+    expect(sql).toMatch(/"userId" = public\.current_app_user_id\(\)/);
+    expect(sql).toMatch(/"fromUserId" = public\.current_app_user_id\(\)/);
+  });
+});
+
+describe("P4.3b hardening · AuditEvents wiring (permissions/teacher.ts)", () => {
+  const src = read("src/lib/permissions/teacher.ts");
+  it("Émet TEACHER_ACCESS_DENIED sur rôle absent", () => {
+    expect(src).toMatch(/action:\s*"TEACHER_ACCESS_DENIED"/);
+    expect(src).toMatch(/reasonCode:\s*"role_missing"/);
+  });
+  it("Émet TEACHER_SCOPE_AMBIGUOUS sur multi-binding", () => {
+    expect(src).toMatch(/action:\s*"TEACHER_SCOPE_AMBIGUOUS"/);
+    expect(src).toMatch(/reasonCode:\s*"multi_teacher_row"/);
+  });
+  it("Émet TEACHER_CLASS_ACCESS_DENIED sur classroom étranger", () => {
+    expect(src).toMatch(/action:\s*"TEACHER_CLASS_ACCESS_DENIED"/);
+    expect(src).toMatch(/reasonCode:\s*"cross_teacher"/);
+  });
+  it("Émet TEACHER_STUDENT_ACCESS_DENIED sur étudiant hors scope", () => {
+    expect(src).toMatch(/action:\s*"TEACHER_STUDENT_ACCESS_DENIED"/);
+    expect(src).toMatch(/reasonCode:\s*"student_not_in_teacher_class"/);
+  });
+  it("Aucun email/phone/nom complet passé dans metadata", () => {
+    // La lecture inclut les 4 blocs metadata · aucun ne doit exposer un champ
+    // sensible.
+    for (const forbidden of ["email:", "phone:", "fullName:", "dateOfBirth:", "token:", "cookie:"]) {
+      expect(src, `metadata leak: ${forbidden}`).not.toMatch(new RegExp(`\\bmetadata:[^}]*${forbidden}`));
+    }
+  });
+});
+
+describe("P4.3b hardening · YEMA_ADMIN rule", () => {
+  const src = read("src/lib/permissions/teacher.ts");
+  it("Documente la règle · rôle global ne suffit pas", () => {
+    // Le header docstring doit mentionner explicitement le contrat YEMA_ADMIN.
+    expect(src).toMatch(/YEMA_ADMIN/);
+    // "rôle global" peut être scindé sur deux lignes de comment · on cherche
+    // dans le fichier normalisé (retire les préfixes // et compresse les blancs).
+    const normalized = src.replace(/\/\/\s*/g, "").replace(/\s+/g, " ");
+    expect(normalized).toMatch(/rôle global/i);
+    expect(normalized).toMatch(/ZERO_BINDING|zero binding|rôle global.*(?:ne|pas)/i);
+  });
+  it("actorRole retourne YEMA_ADMIN ou TEACHER selon appRoles", () => {
+    expect(src).toMatch(/actorRole:\s*appRoles\.has\("YEMA_ADMIN"\)\s*\?\s*"YEMA_ADMIN"/);
   });
 });
