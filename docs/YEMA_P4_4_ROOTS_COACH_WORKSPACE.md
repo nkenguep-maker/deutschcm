@@ -276,6 +276,23 @@ Sessions API `/api/coach`, `/api/coaches`, `/api/career-coach` · **aucune n'exi
 
 ---
 
+## 15.1 AuditActions Coach · production runtime
+
+Six actions déclarées, toutes avec un producteur runtime documenté ·
+
+| Action | Producteur | Émission observée P-1 (races + smoke) |
+|---|---|:---:|
+| `ROOTS_COACH_ACCESS_DENIED` | `resolveRootsCoachActor` (rôle absent) | ✓ 5 (Career Coach + admin no binding + Teacher + Center + Student) |
+| `ROOTS_COACH_CIRCLE_ACCESS_DENIED` | `assertRootsCoachCircleAccess` (Circle étranger existant) | ✓ 3 (Coach A → Circle B, Circle archivé, ancien coach) |
+| `ROOTS_COACH_PROFILE_ACCESS_DENIED` | `assertRootsCoachChildAccess` (profil étranger existant) | ✓ 1 (Coach A → Child B1) |
+| `ROOTS_COACH_CAPACITY_REACHED` | `assignCoach` catch `coach_capacity_reached` | ✓ 1 (races S1 · 11e Circle avec capacityType=circles) |
+| `ROOTS_COACH_ASSIGNMENT_REVOKED` | `removeCoach` (Q10 · avant retour) | ✓ 8 (races S2/S3 + admin route) |
+| `ROOTS_COACH_SCOPE_AMBIGUOUS` | `resolveRootsCoachActor` (défensif · schema drift) | ✓ 1 (races S3.5 · observedCount 22 > threshold 20) |
+
+Le seuil défensif `SCOPE_AMBIGUOUS` est `MAX_ACTIVE_CIRCLES_PER_COACH × 2 = 20`. En pratique, ce seuil ne peut être atteint que via des inserts SQL bruts contournant `assignCoach` (borne applicative 10). Il agit comme un signal d'alerte anti-drift si le schema évolue ou si des données de test/legacy sont introduites hors-workflow.
+
+**PII leak check** · 0 clé interdite (`email`, `phone`, `fullName`, `dateOfBirth`, `body`, `token`, `cookie`) dans toute la metadata émise (attesté runtime `races-audits.json`).
+
 ## 16. Verdict d'intégration
 
 - Feature flag `COACH_WORKSPACE_ENABLED = false` par défaut → aucun code réel activé sans intervention explicite serveur.
