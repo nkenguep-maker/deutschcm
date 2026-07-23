@@ -417,13 +417,20 @@ Déplacé dans le lot P0.B pour la même raison : P1-4 et P2-2 (parcours écoute
 
 # Lot P3 — Racines
 
-> **Statut d'implémentation** (branche `feat/yema-p3-roots-family`, 2026-07-23) :
-> - Dashboard Racines (Solo + Family) : ✅ DONE — server aiguillage `/dashboard`, `<DashboardRacines>` consommant `/api/me/racines-dashboard`
-> - Seam `src/lib/racines.ts` (É1-É5 doctrinal + statut par langue) : ✅ DONE
+> **Statut d'implémentation** (branche `feat/yema-p3-roots-family`, hardening 2026-07-23) :
+> - Dashboard Racines (Solo + Family + NO_ACCESS + FAMILY_EMPTY) : ✅ DONE — mode dérivé de `AccessGrant.product.code` (ROOTS_SOLO/ROOTS_FAMILY), jamais de `ChildProfile.count`. 4 branches JSX distinctes.
+> - Seam `src/lib/racines.ts` (É1-É5 doctrinal + statut par langue) : ✅ DONE + `resolveRacinesAccessMode()` + `summarizeRacinesHousehold()` avec détection d'incohérence SOLO+enfants
 > - Foyer + profils enfants (`/famille`, `/famille/enfant/[id]`) : ✅ KEEP (existant P1, ownership serveur confirmé)
-> - API `/api/me/racines-dashboard` : ✅ DONE (401 anon, 403 non-STUDENT, ChildProfile filtré par parentUserId)
+> - API `/api/me/racines-dashboard` : ✅ DONE (401 anon, 403 non-STUDENT, `resolveRacinesAccessMode` en source de vérité, expose `mode | household | activeChildId`)
+> - API `/api/me/active-child` : ✅ DONE (POST vérifie ownership avant `user_metadata.activeChildId`, GET 401 anon, POST null reset au parent)
 > - Ownership cross-household : ✅ DONE (PATCH/DELETE d'un enfant étranger → 404, page → 200 sans leak)
-> - Décision cercle A vs B : ✅ DONE (`docs/YEMA_P3_CIRCLE_DECISION.md` recommande Option A)
+> - MAX_CHILDREN=4 · ✅ ENFORCED (409 `max_children_reached` avec `{limit,current}` — testé E2E)
+> - Limite adultes 2 / coachs 1 / cercles 1-par-langue · ⚠️ **NOT_IMPLEMENTED** honnête (modèles pas encore instanciés en P3, décision structurelle documentée `YEMA_P3_CIRCLE_DECISION.md` §RECOMMANDÉES)
+> - Décision cercle A vs B : ✅ DONE (`docs/YEMA_P3_CIRCLE_DECISION.md` recommande Option A + règles capacité)
+> - Sweep viewports 360/390/768/1440 · ✅ 0 overflow sur `/dashboard`, `/famille`, `/progress`
+> - Trace clavier · ✅ 12 tab stops, tous avec focus ring visible
+> - Zoom 200% · ✅ 0 overflow
+> - Parcours EN complet · ✅ /en/dashboard /en/famille /en/progress /en/classroom /en/notifications tous 200 sans fuite FR ni CECR
 > - **Contenu langue Racines : 🚫 CONTENT_REQUIRED + RIGHTS_REVIEW_REQUIRED** (les 4 langues restent MISSING, `anyRacinesLanguageReady === false`, doctrine §6-7 respectée)
 > - Récits, veillées, audios : 🚫 CONTENT_REQUIRED (aucun contenu inventé)
 > - Coach console : 🚫 P4 (état sobre « Bientôt disponible »)

@@ -127,6 +127,30 @@ Justifications principales :
 - Un `Circle` peut-il changer de langue ? — probablement non, chaque `Household` a un `Circle` par langue s'il y en a plusieurs
 - Le coach a-t-il un dashboard partagé pour ses cercles ? — probablement oui, à cadrer avec P4-6 (console coach)
 
+## Règles de capacité RECOMMANDÉES (P3 hardening §17)
+
+À enforcer côté modèle en P4 (contraintes DB) et côté API dès la création du foyer :
+
+| Ressource                         | Plafond  | Enforcement actuel                                | À faire en P4                              |
+|-----------------------------------|----------|---------------------------------------------------|--------------------------------------------|
+| Enfants par foyer / cercle        | **4**    | ✅ `src/app/api/family/children/route.ts` (409 `max_children_reached`) | Ajouter contrainte DB `CircleMembership` `role=CHILD` COUNT ≤ 4 |
+| Adultes par foyer / cercle        | **2**    | ⚠️ `HouseholdMembership` existe mais pas de garde-fou runtime | Ajouter garde API dès la création du 3ᵉ adulte |
+| Coachs actifs par cercle          | **1**    | ⚠️ Pas encore de coach en P3 (rôle absent) | Contrainte `Circle.coachUserId` unique + garde API |
+| Langues actives par enfant        | **4**    | ✅ `src/app/api/family/children/route.ts` (400 `too_many_langues`) | Rester runtime, pas besoin de DB |
+| Cercles actifs par foyer          | **1 par langue** | ⚠️ Non implémenté (pas de messagerie P3) | Contrainte `(Household, language)` unique sur `Circle` |
+
+### Justification des plafonds
+
+- **4 enfants** · aligné avec le pricing offre Famille P5 (déjà annoncé) et avec la taille moyenne d'un foyer camerounais/afrodescendant (source : recensements 2020s, moyenne 3-5 enfants). Au-delà, on quitte le cas d'usage « foyer » pour tomber dans « institution » — domaine d'un lot Centre (P8).
+- **2 adultes** · un foyer YEMA correspond aux deux personnes principales responsables des enfants. Une communauté élargie (grands-parents, oncles) reste possible via des **invités lecteurs**, pas via des membres administrateurs. Cela protège la surface d'attaque : plus il y a d'adultes admins, plus le risque de compromission d'un compte enfant augmente.
+- **1 coach** · un cercle a une voix pédagogique unique pour cohérence. Un changement de coach nécessite un handoff explicite (à cadrer P4) plutôt qu'une co-animation.
+- **4 langues par enfant** · limite douce de lisibilité UI. Un enfant qui apprend > 4 langues simultanément a besoin d'un accompagnement individualisé qui sort du produit self-serve.
+- **1 cercle par (foyer, langue)** · un foyer bilingue kikongo + swahili peut avoir 2 cercles distincts (correction vocale par langue), mais pas 2 cercles kikongo — cela créerait des flux dupliqués et une confusion pédagogique.
+
+### État d'implémentation P3
+
+Les gardes runtime **4 enfants** et **4 langues** sont actives et testées (voir `scripts/test-baseline/p3-hardening-e2e.mjs` §4). Les gardes **2 adultes**, **1 coach**, **1 cercle par langue** sont **NOT_IMPLEMENTED** en P3 (marqué honnêtement dans le code et les tests) car les modèles correspondants (`HouseholdMembership` adultes, `Circle`) ne sont pas encore instanciés dans le parcours utilisateur. Ils seront ajoutés en P4 avec les contraintes DB associées.
+
 ## Impact sur les autres lots
 
 - **P4-6** (messagerie coach/prof) · construire `CircleMessage` + endpoints dédiés au lieu de réutiliser les endpoints Classe
