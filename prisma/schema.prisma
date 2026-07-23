@@ -1171,8 +1171,13 @@ model Circle {
   createdBy   User               @relation("CircleCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
   memberships CircleMembership[]
 
-  // Contrainte forte · un seul Circle par (foyer, langue), tous statuts confondus (Q9 · nouveau Circle par changement de langue).
-  @@unique([householdId, language])
+  // Note · l'unicité "un seul Circle non-archivé par (foyer, langue)" est
+  // portée par un index partiel PostgreSQL créé dans la migration :
+  //   CREATE UNIQUE INDEX ... ON circles (household_id, language) WHERE archived_at IS NULL;
+  // Prisma ne sait pas exprimer un index partiel · on déclare uniquement un
+  // index composite non-unique ici pour la lisibilité. Un Circle ARCHIVED
+  // permet de recréer un nouveau Circle sur la même langue (Q8/Q9 validées).
+  @@index([householdId, language])
   @@index([householdId, status])
   @@index([language, status])
   @@map("circles")

@@ -127,17 +127,26 @@ async function seed() {
   });
 
   // Circle A · KIKONGO ACTIVE
-  const cA = await db.circle.upsert({
-    where: { householdId_language: { householdId: hA.id, language: "LINGALA" } },
-    update: { status: "ACTIVE", createdByUserId: aOwner.id },
-    create: {
-      id: "test_p4_1_circle_a_lingala",
-      householdId: hA.id,
-      language: "LINGALA",
-      status: "ACTIVE",
-      createdByUserId: aOwner.id,
-    },
-  });
+  const cA = await (async () => {
+    const existing = await db.circle.findFirst({
+      where: { id: "test_p4_1_circle_a_lingala" },
+    });
+    if (existing) {
+      return db.circle.update({
+        where: { id: existing.id },
+        data: { status: "ACTIVE", createdByUserId: aOwner.id, archivedAt: null },
+      });
+    }
+    return db.circle.create({
+      data: {
+        id: "test_p4_1_circle_a_lingala",
+        householdId: hA.id,
+        language: "LINGALA",
+        status: "ACTIVE",
+        createdByUserId: aOwner.id,
+      },
+    });
+  })();
 
   // Memberships Circle A (idempotent via findFirst puis create)
   for (const [key, role, userId, childProfileId] of [
@@ -168,32 +177,50 @@ async function seed() {
     void where;
   }
 
-  // Circle A · KIKONGO ARCHIVED (test archivage) · différent language pour respecter unique
-  await db.circle.upsert({
-    where: { householdId_language: { householdId: hA.id, language: "SWAHILI" } },
-    update: { status: "ARCHIVED", archivedAt: new Date() },
-    create: {
-      id: "test_p4_1_circle_a_swahili_archived",
-      householdId: hA.id,
-      language: "SWAHILI",
-      status: "ARCHIVED",
-      createdByUserId: aOwner.id,
-      archivedAt: new Date(),
-    },
-  });
+  // Circle A · SWAHILI ARCHIVED (test archivage · doit permettre recréation même langue).
+  await (async () => {
+    const existing = await db.circle.findFirst({
+      where: { id: "test_p4_1_circle_a_swahili_archived" },
+    });
+    if (existing) {
+      return db.circle.update({
+        where: { id: existing.id },
+        data: { status: "ARCHIVED", archivedAt: new Date() },
+      });
+    }
+    return db.circle.create({
+      data: {
+        id: "test_p4_1_circle_a_swahili_archived",
+        householdId: hA.id,
+        language: "SWAHILI",
+        status: "ARCHIVED",
+        createdByUserId: aOwner.id,
+        archivedAt: new Date(),
+      },
+    });
+  })();
 
   // Circle B · WOLOF ACTIVE (cross-tenant)
-  const cB = await db.circle.upsert({
-    where: { householdId_language: { householdId: hB.id, language: "WOLOF" } },
-    update: { status: "ACTIVE", createdByUserId: bOwner.id },
-    create: {
-      id: "test_p4_1_circle_b_wolof",
-      householdId: hB.id,
-      language: "WOLOF",
-      status: "ACTIVE",
-      createdByUserId: bOwner.id,
-    },
-  });
+  const cB = await (async () => {
+    const existing = await db.circle.findFirst({
+      where: { id: "test_p4_1_circle_b_wolof" },
+    });
+    if (existing) {
+      return db.circle.update({
+        where: { id: existing.id },
+        data: { status: "ACTIVE", createdByUserId: bOwner.id, archivedAt: null },
+      });
+    }
+    return db.circle.create({
+      data: {
+        id: "test_p4_1_circle_b_wolof",
+        householdId: hB.id,
+        language: "WOLOF",
+        status: "ACTIVE",
+        createdByUserId: bOwner.id,
+      },
+    });
+  })();
   const bOwnerMembership = await db.circleMembership.findFirst({
     where: { circleId: cB.id, userId: bOwner.id, status: "ACTIVE" },
   });
@@ -234,19 +261,42 @@ async function seed() {
 
 async function clean() {
   console.log("═══ P4.1 · clean fixtures ═══");
-  // Order matters : memberships (cascade with circle) · circles · storage · households · child_profiles
+  const emails = Object.values(EMAILS);
+  // Storage metadata first
   await db.storageObject.deleteMany({ where: { path: { startsWith: "test/p4_1/" } } });
+  // Circles cascade memberships
   await db.circle.deleteMany({ where: { id: { startsWith: "test_p4_1_" } } });
-  await db.childProfile.deleteMany({ where: { id: { startsWith: "test_p4_1_" } } });
+  // Children rattachés au household ou par prefix
+  await db.childProfile.deleteMany({
+    where: { OR: [{ id: { startsWith: "test_p4_1_" } }, { prenom: { startsWith: "TEST_" } }] },
+  });
+  // Household memberships + households
   await db.householdMembership.deleteMany({ where: { householdId: { startsWith: "test_p4_1_" } } });
   await db.household.deleteMany({ where: { id: { startsWith: "test_p4_1_" } } });
-  await db.auditEvent.deleteMany({ where: { targetId: { startsWith: "test_p4_1_" } } });
+  // AuditEvent lié aux fixtures (targetId ou scopeId)
+  await db.auditEvent.deleteMany({
+    where: {
+      OR: [
+        { targetId: { startsWith: "test_p4_1_" } },
+        { scopeId: { startsWith: "test_p4_1_" } },
+      ],
+    },
+  });
+  // Prisma User rows par email (avant Supabase delete pour éviter les orphelins)
+  const dbUsers = await db.user.findMany({ where: { email: { in: emails } }, select: { id: true } });
+  const ids = dbUsers.map((u) => u.id);
+  if (ids.length) {
+    await db.userAppRole.deleteMany({ where: { userId: { in: ids } } });
+    await db.userRole.deleteMany({ where: { userId: { in: ids } } });
+    await db.user.deleteMany({ where: { id: { in: ids } } });
+  }
+  // Supabase Auth
   const { data: list } = await admin.auth.admin.listUsers({ perPage: 200 });
-  for (const email of Object.values(EMAILS)) {
+  for (const email of emails) {
     const u = list.users.find((x) => x.email?.toLowerCase() === email.toLowerCase());
     if (u) await admin.auth.admin.deleteUser(u.id);
   }
-  console.log("  cleaned users + circles + household + storage + audit");
+  console.log(`  cleaned · ${ids.length} db users · ${emails.length} auth users · circles/household/storage/audit`);
   await db.$disconnect();
 }
 
