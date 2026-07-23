@@ -165,3 +165,71 @@ describe("Audit sanitization · P4.2", () => {
     }
   });
 });
+
+describe("P4.2 hardening · concurrent invitation + errors", () => {
+  it("acceptInvitation acquires an advisory Circle lock before capacity check", () => {
+    const src = read("src/lib/invitations/service.ts");
+    expect(src).toMatch(/acquireCircleLock\(tx,\s*invitation\.circleId\)/);
+  });
+  it("addChildToCircle acquires an advisory Circle lock before capacity check", () => {
+    const src = read("src/lib/circles/memberships.ts");
+    expect(src).toMatch(/acquireCircleLock\(tx,\s*input\.circleId\)[\s\S]*?assertCircleChildCapacity/);
+  });
+  it("assignCoach acquires an advisory Circle lock before coach capacity check", () => {
+    const src = read("src/lib/circles/memberships.ts");
+    expect(src).toMatch(/acquireCircleLock\(tx,\s*input\.circleId\)[\s\S]*?assertCircleCoachCapacity/);
+  });
+  it("accept route wraps in withSerializableRetry with concurrent_invitation_update code", () => {
+    const src = read("src/app/api/circle-invitations/[token]/accept/route.ts");
+    expect(src).toMatch(/withSerializableRetry/);
+    expect(src).toMatch(/errorCode:\s*"concurrent_invitation_update"/);
+  });
+  it("accept route revokes losing invitation with reasonCode=adult_capacity_reached on CapacityError", () => {
+    const src = read("src/app/api/circle-invitations/[token]/accept/route.ts");
+    expect(src).toMatch(/CapacityError[\s\S]*?max_adults_reached/);
+    expect(src).toMatch(/revokeInvitationForCapacity/);
+    expect(src).toMatch(/reasonCode:\s*"adult_capacity_reached"/);
+  });
+  it("error mapper maps Postgres 40001 / Prisma P2034 to concurrent_membership_update (never INTERNAL)", () => {
+    const src = read("src/lib/api/circleErrors.ts");
+    expect(src).toMatch(/40001/);
+    expect(src).toMatch(/P2034/);
+    expect(src).toMatch(/concurrent_membership_update/);
+    expect(src).toMatch(/ConcurrentUpdateError/);
+  });
+  it("auditAccessDenied helper exists and blacklists PII in metadata", () => {
+    const src = read("src/lib/api/circleErrors.ts");
+    expect(src).toMatch(/MEMBERSHIP_ACCESS_DENIED/);
+    expect(src).toMatch(/reasonCode/);
+  });
+  it("4 sensitive routes call auditAccessDenied on 403", () => {
+    const routes = [
+      "src/app/api/circles/[circleId]/invitations/adult/route.ts",
+      "src/app/api/circles/[circleId]/children/route.ts",
+      "src/app/api/admin/circles/[circleId]/coach/route.ts",
+      "src/app/api/circles/[circleId]/members/[membershipId]/route.ts",
+    ];
+    for (const r of routes) {
+      const s = read(r);
+      expect(s, `${r} · auditAccessDenied wiring`).toMatch(/auditAccessDenied\(/);
+    }
+  });
+});
+
+describe("P4.2 hardening · GET /members projection · no PII leak", () => {
+  const src = read("src/app/api/circles/[circleId]/members/route.ts");
+  it("never selects tokenHash", () => {
+    expect(src).not.toMatch(/tokenHash/);
+  });
+  it("never selects invitedEmailHash", () => {
+    expect(src).not.toMatch(/invitedEmailHash/);
+  });
+  it("never selects User.email nor User.phone nor User.dateOfBirth", () => {
+    expect(src).not.toMatch(/email:\s*true/);
+    expect(src).not.toMatch(/phone:\s*true/);
+    expect(src).not.toMatch(/dateOfBirth/);
+  });
+  it("scopes to circleId param · no other Circle data leak", () => {
+    expect(src).toMatch(/where:\s*\{\s*circleId,\s*status:\s*"ACTIVE"/);
+  });
+});

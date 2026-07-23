@@ -281,6 +281,141 @@ async function main() {
       "DELETE FROM circle_invitations WHERE \"invitedEmailHash\" IN (encode(sha256('race+p42a@example.com'::bytea), 'hex'), encode(sha256('race+p42b@example.com'::bytea), 'hex'))",
     );
 
+    // === Hardening §2 · Deux invitations distinctes acceptées simultanément ===
+    process.stderr.write("\n═══ Hardening §2 · 2 tokens différents ═══\n");
+    // Rebalance · retire l'invitedAdult ajouté ci-dessus + adultA pour repartir OWNER seul (1 adulte).
+    const invitedMembership = await dbClient.query(
+      "SELECT id FROM circle_memberships WHERE \"circleId\" = $1 AND status = 'ACTIVE' AND role = 'ADULT'",
+      [CIRCLE_A],
+    );
+    for (const row of invitedMembership.rows) {
+      await dbClient.query(
+        "UPDATE circle_memberships SET status = 'REMOVED', \"removedAt\" = NOW() WHERE id = $1",
+        [row.id],
+      );
+    }
+    // Créer deux users distincts + auth
+    const ADULT_A_EMAIL = "paul+p4_2_race_adult_x@example.com";
+    const ADULT_B_EMAIL = "paul+p4_2_race_adult_y@example.com";
+    const { createClient: createSbClient } = await import("@supabase/supabase-js");
+    const raceAdmin = createSbClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { autoRefreshToken: false, persistSession: false } });
+    async function ensureRaceUser(email) {
+      const { data: list } = await raceAdmin.auth.admin.listUsers({ perPage: 200 });
+      let a = list.users.find((u) => u.email === email);
+      if (!a) {
+        const { data } = await raceAdmin.auth.admin.createUser({ email, password: PW, email_confirm: true });
+        a = data.user;
+      }
+      const ex = await dbClient.query("SELECT id FROM users WHERE \"supabaseId\" = $1", [a.id]);
+      if (ex.rows.length === 0) {
+        await dbClient.query(
+          "INSERT INTO users(id, \"supabaseId\", email, \"fullName\", role, \"preferredLang\", country, \"updatedAt\") VALUES (gen_random_uuid()::text, $1, $2, 'race', 'STUDENT', 'fr', 'CM', NOW())",
+          [a.id, email],
+        );
+      }
+      return a;
+    }
+    const authX = await ensureRaceUser(ADULT_A_EMAIL);
+    const authY = await ensureRaceUser(ADULT_B_EMAIL);
+
+    // Owner crée 2 invitations séparées
+    const invX = await req(owner.cookie, "POST", `/api/circles/${CIRCLE_A}/invitations/adult`, { email: ADULT_A_EMAIL });
+    const invY = await req(owner.cookie, "POST", `/api/circles/${CIRCLE_A}/invitations/adult`, { email: ADULT_B_EMAIL });
+    const tokenX = invX.headers?.get("x-p4-test-token");
+    const tokenY = invY.headers?.get("x-p4-test-token");
+    log("hardening · 2 fresh invitations", { statusX: invX.status, statusY: invY.status });
+
+    // Login des deux personas
+    async function loginPersona(email) {
+      const ctxNew = await browser.newContext();
+      const p = await ctxNew.newPage();
+      await login(p, email);
+      const c = await ctxNew.cookies();
+      return { ctx: ctxNew, cookie: c.map((x) => `${x.name}=${x.value}`).join("; ") };
+    }
+    const raceX = await loginPersona(ADULT_A_EMAIL);
+    const raceY = await loginPersona(ADULT_B_EMAIL);
+
+    if (tokenX && tokenY) {
+      const [rx, ry] = await Promise.all([
+        req(raceX.cookie, "POST", `/api/circle-invitations/${encodeURIComponent(tokenX)}/accept`),
+        req(raceY.cookie, "POST", `/api/circle-invitations/${encodeURIComponent(tokenY)}/accept`),
+      ]);
+      const succ = [rx, ry].filter((r) => r.status === 200).length;
+      const fail = [rx, ry].filter((r) => r.status !== 200);
+      log("hardening · 2 accepts distincts en parallèle", {
+        successes: succ,
+        failures: fail.length,
+        failureCodes: fail.map((r) => r.body?.code ?? r.status),
+        ok: succ === 1,
+      });
+      const adultsCount = await dbClient.query(
+        "SELECT COUNT(*)::int as n FROM circle_memberships WHERE \"circleId\" = $1 AND status = 'ACTIVE' AND role IN ('OWNER','ADULT')",
+        [CIRCLE_A],
+      );
+      log("hardening · final active adults (must be 2)", { count: adultsCount.rows[0].n, ok: adultsCount.rows[0].n === 2 });
+      // Vérifie que l'invitation perdante est REVOKED avec reasonCode adult_capacity_reached
+      const revokedCount = await dbClient.query(
+        "SELECT COUNT(*)::int as n FROM circle_invitations WHERE status = 'REVOKED' AND \"invitedEmailHash\" IN (encode(sha256(lower($1)::bytea), 'hex'), encode(sha256(lower($2)::bytea), 'hex'))",
+        [ADULT_A_EMAIL, ADULT_B_EMAIL],
+      );
+      log("hardening · losing invitation REVOKED", { revokedCount: revokedCount.rows[0].n, expect: 1 });
+      const revokeAudit = await dbClient.query(
+        "SELECT metadata FROM audit_events WHERE action = 'ADULT_INVITATION_REVOKED' AND metadata::text ILIKE '%adult_capacity_reached%' ORDER BY \"createdAt\" DESC LIMIT 1",
+      );
+      log("hardening · REVOKED audit with reasonCode", {
+        present: revokeAudit.rows.length > 0,
+        metadata: revokeAudit.rows[0]?.metadata ?? null,
+      });
+    }
+    // Cleanup race users
+    await raceX.ctx.close();
+    await raceY.ctx.close();
+    await dbClient.query("DELETE FROM circle_memberships WHERE \"userId\" IN (SELECT id FROM users WHERE email IN ($1, $2))", [ADULT_A_EMAIL, ADULT_B_EMAIL]);
+    await dbClient.query("DELETE FROM circle_invitations WHERE \"invitedEmailHash\" IN (encode(sha256(lower($1)::bytea), 'hex'), encode(sha256(lower($2)::bytea), 'hex'))", [ADULT_A_EMAIL, ADULT_B_EMAIL]);
+    await dbClient.query("DELETE FROM users WHERE email IN ($1, $2)", [ADULT_A_EMAIL, ADULT_B_EMAIL]);
+    for (const email of [ADULT_A_EMAIL, ADULT_B_EMAIL]) {
+      const authUser = (await raceAdmin.auth.admin.listUsers({ perPage: 200 })).data.users.find((u) => u.email === email);
+      if (authUser) await raceAdmin.auth.admin.deleteUser(authUser.id);
+    }
+
+    // === Hardening §3 · Accept vs revoke concurrents ===
+    process.stderr.write("\n═══ Hardening §3 · accept vs revoke ═══\n");
+    await dbClient.query(
+      "DELETE FROM circle_invitations WHERE \"invitedEmailHash\" = encode(sha256(lower($1)::bytea), 'hex')",
+      [EMAILS.invitedAdult],
+    );
+    const invAR = await req(owner.cookie, "POST", `/api/circles/${CIRCLE_A}/invitations/adult`, { email: EMAILS.invitedAdult });
+    const tokenAR = invAR.headers?.get("x-p4-test-token");
+    const invIdAR = invAR.body?.invitation?.id;
+    if (tokenAR && invIdAR) {
+      const [rAccept, rRevoke] = await Promise.all([
+        req(invited.cookie, "POST", `/api/circle-invitations/${encodeURIComponent(tokenAR)}/accept`),
+        req(owner.cookie, "POST", `/api/circles/${CIRCLE_A}/invitations/${invIdAR}/revoke`),
+      ]);
+      const finalRow = await dbClient.query("SELECT status FROM circle_invitations WHERE id = $1", [invIdAR]);
+      const membership = await dbClient.query(
+        "SELECT COUNT(*)::int as n FROM circle_memberships WHERE \"circleId\" = $1 AND \"userId\" = (SELECT id FROM users WHERE email = $2) AND status = 'ACTIVE'",
+        [CIRCLE_A, EMAILS.invitedAdult],
+      );
+      log("hardening · accept vs revoke terminal state", {
+        acceptStatus: rAccept.status, revokeStatus: rRevoke.status,
+        invitationFinalStatus: finalRow.rows[0]?.status,
+        activeMembership: membership.rows[0].n,
+        // Autorisé · ACCEPTED + membership=1 OU REVOKED + membership=0
+        // Interdit · REVOKED + membership=1
+        coherent: (
+          (finalRow.rows[0]?.status === "ACCEPTED" && membership.rows[0].n === 1) ||
+          (finalRow.rows[0]?.status === "REVOKED" && membership.rows[0].n === 0)
+        ),
+      });
+      // Cleanup
+      await dbClient.query(
+        "UPDATE circle_memberships SET status = 'REMOVED', \"removedAt\" = NOW() WHERE \"circleId\" = $1 AND \"userId\" = (SELECT id FROM users WHERE email = $2) AND status = 'ACTIVE'",
+        [CIRCLE_A, EMAILS.invitedAdult],
+      );
+    }
+
     // === AuditEvent check ===
     process.stderr.write("\n═══ AuditEvent check ═══\n");
     const auditRows = await dbClient.query(
