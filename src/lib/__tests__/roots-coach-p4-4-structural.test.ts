@@ -71,7 +71,24 @@ describe("P4.4 · structural invariants", () => {
   it("addChildToCircle enforces coach profile capacity when a coach is present", () => {
     const src = read("src/lib/circles/memberships.ts");
     expect(src).toMatch(/assertCoachProfileCapacityForChildAdd/);
-    // Le fire-and-forget d'audit doit citer `capacityType: "children"`.
+  });
+
+  it("admin coach POST route calls emitCoachCapacityAudit after retry failure", () => {
+    const src = read("src/app/api/admin/circles/[circleId]/coach/route.ts");
+    expect(src).toMatch(/emitCoachCapacityAudit/);
+    expect(src).toMatch(/routeAction:\s*"assignCoach"/);
+  });
+
+  it("add child route calls emitCoachCapacityAudit after retry failure", () => {
+    const src = read("src/app/api/circles/[circleId]/children/route.ts");
+    expect(src).toMatch(/emitCoachCapacityAudit/);
     expect(src).toMatch(/routeAction:\s*"addChildToCircle"/);
+  });
+
+  it("capacity audit helper renames current → attemptedCount", () => {
+    const src = read("src/lib/audit/rootsCoachCapacity.ts");
+    expect(src).toMatch(/attemptedCount/);
+    // Aucune référence à `current:` dans la metadata émise.
+    expect(src).not.toMatch(/current:\s*current/);
   });
 });

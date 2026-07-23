@@ -120,62 +120,65 @@ async function withRetryInline(fn, errorCode) {
   throw err;
 }
 
+// P4.4 closure · émission unique post-échec de ROOTS_COACH_CAPACITY_REACHED.
+// Reproduit `src/lib/audit/rootsCoachCapacity.ts` inline (metadata `attemptedCount`).
+async function emitCoachCapacityAuditInline({ error, actorUserId, actorRole, circleId, coachUserId, routeAction }) {
+  if (!error || (error.code !== "coach_circle_capacity_reached" && error.code !== "coach_profile_capacity_reached")) return;
+  try {
+    await db.auditEvent.create({
+      data: {
+        actorUserId, actorRole,
+        action: "ROOTS_COACH_CAPACITY_REACHED",
+        targetType: "RootsCoachAssignment", targetId: coachUserId,
+        scopeType: "Circle", scopeId: circleId,
+        metadata: {
+          reasonCode: "capacity_reached",
+          capacityType: error.dimension ?? null,
+          limit: error.limit ?? null,
+          attemptedCount: error.attemptedCount ?? null,
+          routeAction,
+        },
+      },
+    });
+  } catch (e) {
+    process.stderr.write(`[audit] CAPACITY_REACHED write failed: ${e.message}\n`);
+  }
+}
+
 // Reproduit inline la logique assignCoach de src/lib/circles/memberships.ts
+// Contrat closure P4.4 · N'ÉMET AUCUN audit CAPACITY_REACHED depuis la tx métier
+// (les retries SSI produiraient des doublons). L'audit est émis une seule fois
+// par le caller après échec définitif via `emitCoachCapacityAuditInline`.
 async function assignCoachInline(circleId, coachUserId, adminUserId) {
   return db.$transaction(async (tx) => {
     const circle = await tx.circle.findUnique({ where: { id: circleId }, select: { status: true } });
     if (!circle || circle.status !== "ACTIVE") throw new Error("circle_not_found_or_archived");
-    // Vérifie le rôle du coach
     const cr = await tx.userAppRole.findFirst({ where: { userId: coachUserId, role: "RACINES_COACH" } });
     if (!cr) throw new Error("target_not_racines_coach");
-    // Verrouille le Circle · $executeRaw car pg_advisory_xact_lock retourne void.
     await tx.$executeRawUnsafe(`SELECT pg_advisory_xact_lock(hashtext($1)::bigint)`, circleId);
-    // Capacité coach existante · 1 seul ACTIVE par cercle
     const existing = await tx.circleMembership.findFirst({
       where: { circleId, status: "ACTIVE", role: "COACH" },
     });
     if (existing) throw Object.assign(new Error("coach_already_assigned"), { code: "coach_already_assigned" });
-    // Capacité globale coach (10 circles / 20 children)
     const activeCircles = await tx.circleMembership.findMany({
       where: { userId: coachUserId, role: "COACH", status: "ACTIVE" },
       select: { circleId: true },
     });
     if (activeCircles.length >= MAX_CIRCLES) {
-      // Émit ROOTS_COACH_CAPACITY_REACHED avant throw
-      await db.auditEvent.create({
-        data: {
-          actorUserId: adminUserId, actorRole: "YEMA_ADMIN",
-          action: "ROOTS_COACH_CAPACITY_REACHED",
-          targetType: "RootsCoachAssignment", targetId: coachUserId,
-          scopeType: "Circle", scopeId: circleId,
-          metadata: {
-            reasonCode: "capacity_reached", capacityType: "circles",
-            limit: MAX_CIRCLES, current: activeCircles.length,
-            routeAction: "assignCoach",
-          },
-        },
-      }).catch(() => {});
-      throw Object.assign(new Error("coach_circle_capacity_reached"), { code: "coach_circle_capacity_reached", dimension: "circles" });
+      throw Object.assign(new Error("coach_circle_capacity_reached"), {
+        code: "coach_circle_capacity_reached", dimension: "circles",
+        limit: MAX_CIRCLES, attemptedCount: activeCircles.length + 1,
+      });
     }
     const circleIds = [...activeCircles.map(c => c.circleId), circleId];
     const activeChildren = await tx.circleMembership.count({
       where: { circleId: { in: circleIds }, role: "CHILD", status: "ACTIVE" },
     });
     if (activeChildren > MAX_CHILDREN) {
-      await db.auditEvent.create({
-        data: {
-          actorUserId: adminUserId, actorRole: "YEMA_ADMIN",
-          action: "ROOTS_COACH_CAPACITY_REACHED",
-          targetType: "RootsCoachAssignment", targetId: coachUserId,
-          scopeType: "Circle", scopeId: circleId,
-          metadata: {
-            reasonCode: "capacity_reached", capacityType: "children",
-            limit: MAX_CHILDREN, current: activeChildren,
-            routeAction: "assignCoach",
-          },
-        },
-      }).catch(() => {});
-      throw Object.assign(new Error("coach_profile_capacity_reached"), { code: "coach_profile_capacity_reached", dimension: "children" });
+      throw Object.assign(new Error("coach_profile_capacity_reached"), {
+        code: "coach_profile_capacity_reached", dimension: "children",
+        limit: MAX_CHILDREN, attemptedCount: activeChildren,
+      });
     }
     const m = await tx.circleMembership.create({
       data: {
@@ -188,7 +191,9 @@ async function assignCoachInline(circleId, coachUserId, adminUserId) {
   }, { isolationLevel: "Serializable" });
 }
 
-// Reproduit inline removeCoach avec émission ROOTS_COACH_ASSIGNMENT_REVOKED
+// Reproduit inline removeCoach · ROOTS_COACH_ASSIGNMENT_REVOKED est écrit
+// DANS la même tx que l'update de statut · sur SSI rollback / retry, l'audit
+// disparaît · exactement 1 audit par commit effectif.
 async function removeCoachInline(circleId, adminUserId) {
   return db.$transaction(async (tx) => {
     const m = await tx.circleMembership.findFirst({
@@ -199,8 +204,8 @@ async function removeCoachInline(circleId, adminUserId) {
     await tx.circleMembership.update({
       where: { id: m.id }, data: { status: "REMOVED", removedAt: new Date() },
     });
-    // Émit ROOTS_COACH_ASSIGNMENT_REVOKED (fire-and-forget hors tx dans code prod, ici inline)
-    await db.auditEvent.create({
+    // In-tx · idempotence transactionnelle.
+    await tx.auditEvent.create({
       data: {
         actorUserId: adminUserId, actorRole: "YEMA_ADMIN",
         action: "ROOTS_COACH_ASSIGNMENT_REVOKED",
@@ -211,7 +216,7 @@ async function removeCoachInline(circleId, adminUserId) {
           reasonCode: "removed", routeAction: "removeCoach",
         },
       },
-    }).catch(() => {});
+    });
     return { removedMembershipId: m.id, previousCoachUserId: m.userId };
   }, { isolationLevel: "Serializable" });
 }
@@ -263,11 +268,24 @@ async function main() {
   await ensureAdultMembership(circle11.id, parentX.id, "OWNER");
 
   // Concurrence · deux assignations en parallèle (avec retry Serializable
-  // pour refléter le contrat prod des routes admin coach).
+  // pour refléter le contrat prod des routes admin coach). Post-échec ·
+  // émission unique CAPACITY_REACHED depuis le "route" inline.
+  const capBeforeS1 = await db.auditEvent.count({
+    where: { action: "ROOTS_COACH_CAPACITY_REACHED", targetId: coachA.id },
+  });
   const [r10, r11] = await Promise.allSettled([
     withRetryInline(() => assignCoachInline(circle10.id, coachA.id, admin.id), "concurrent_coach_assignment"),
     withRetryInline(() => assignCoachInline(circle11.id, coachA.id, admin.id), "concurrent_coach_assignment"),
   ]);
+  for (const r of [r10, r11]) {
+    if (r.status === "rejected") {
+      await emitCoachCapacityAuditInline({
+        error: r.reason, actorUserId: admin.id, actorRole: "YEMA_ADMIN",
+        circleId: r === r10 ? circle10.id : circle11.id,
+        coachUserId: coachA.id, routeAction: "assignCoach",
+      });
+    }
+  }
   const successes = [r10, r11].filter(r => r.status === "fulfilled").length;
   const errs = [r10, r11].filter(r => r.status === "rejected").map(r => r.reason?.code ?? r.reason?.message?.slice(0, 40));
   log("S1 · race result", { successes, errs });
@@ -278,11 +296,21 @@ async function main() {
   log("S1 · final active circles (max 10)", { count: finalActive });
 
   // Bonus · une fois qu'on est à 10, tenter le 11e Circle · doit émettre
-  // ROOTS_COACH_CAPACITY_REACHED.
+  // ROOTS_COACH_CAPACITY_REACHED (2ème requête refusée, indépendante de la
+  // race S1 · +1 audit acceptable).
   const hh12 = await ensureHousehold("test_p4_4_race_household_c1_target12", parentX.id);
   const circle12 = await ensureCircle("test_p4_4_race_c1_target12", hh12.id, "LINGALA", parentX.id, "ACTIVE");
   await ensureAdultMembership(circle12.id, parentX.id, "OWNER");
-  const r12 = await assignCoachInline(circle12.id, coachA.id, admin.id).catch(e => ({ err: e.code ?? e.message }));
+  const r12 = await withRetryInline(
+    () => assignCoachInline(circle12.id, coachA.id, admin.id),
+    "concurrent_coach_assignment",
+  ).catch(async (e) => {
+    await emitCoachCapacityAuditInline({
+      error: e, actorUserId: admin.id, actorRole: "YEMA_ADMIN",
+      circleId: circle12.id, coachUserId: coachA.id, routeAction: "assignCoach",
+    });
+    return { err: e.code ?? e.message };
+  });
   log("S1 · 11e Circle attempt (expect capacity)", { result: r12 });
   const cnt10 = await db.circleMembership.count({
     where: { userId: coachA.id, role: "COACH", status: "ACTIVE" },
@@ -294,8 +322,11 @@ async function main() {
     select: { metadata: true, createdAt: true },
     orderBy: { createdAt: "desc" }, take: 5,
   });
-  log("S1 · ROOTS_COACH_CAPACITY_REACHED events", {
-    count: capacityAudits.length,
+  // Delta attendu · 1 (loser de la race) + 1 (11e attempt post-race) = 2 audits
+  // distincts, chacun pour une requête refusée réelle. §4 doc doctrine.
+  log("S1 · ROOTS_COACH_CAPACITY_REACHED events (post-idempotence)", {
+    totalTargetingCoachA: capacityAudits.length,
+    deltaFromRace: capacityAudits.length - capBeforeS1,
     firstMetadata: capacityAudits[0]?.metadata,
   });
 
@@ -355,13 +386,22 @@ async function main() {
     where: { action: "ROOTS_COACH_CAPACITY_REACHED", targetId: coachD.id },
   });
   // Utilise withRetryInline pour reproduire le contrat exact des routes admin
-  // coach POST · le loser SSI retry, voit current=20 après commit du gagnant,
-  // et déclenche assertCoachCapacityAvailable → coach_profile_capacity_reached
-  // + AuditEvent ROOTS_COACH_CAPACITY_REACHED.
+  // coach POST · le loser SSI retry, voit attemptedCount=21 après commit du
+  // gagnant, et déclenche coach_profile_capacity_reached. L'audit est émis
+  // UNE FOIS par le "route" caller après l'échec définitif (retry épuisé).
   const [rZ1, rZ2] = await Promise.allSettled([
     withRetryInline(() => assignCoachInline(circleZ1.id, coachD.id, admin.id), "concurrent_coach_assignment"),
     withRetryInline(() => assignCoachInline(circleZ2.id, coachD.id, admin.id), "concurrent_coach_assignment"),
   ]);
+  for (const r of [rZ1, rZ2]) {
+    if (r.status === "rejected") {
+      await emitCoachCapacityAuditInline({
+        error: r.reason, actorUserId: admin.id, actorRole: "YEMA_ADMIN",
+        circleId: r === rZ1 ? circleZ1.id : circleZ2.id,
+        coachUserId: coachD.id, routeAction: "assignCoach",
+      });
+    }
+  }
   const s1bSuccesses = [rZ1, rZ2].filter((r) => r.status === "fulfilled").length;
   const s1bErrs = [rZ1, rZ2].filter((r) => r.status === "rejected").map((r) => r.reason?.code ?? r.reason?.message?.slice(0, 60));
   log("S1b · race result (expect 1 success max)", { successes: s1bSuccesses, errs: s1bErrs });
@@ -391,11 +431,17 @@ async function main() {
     select: { metadata: true, createdAt: true },
     orderBy: { createdAt: "desc" },
   });
-  log("S1b · ROOTS_COACH_CAPACITY_REACHED delta + firstMetadata", {
+  log("S1b · ROOTS_COACH_CAPACITY_REACHED delta + firstMetadata (attemptedCount)", {
     before: capBeforeS1b,
     afterTotal: capAfterS1b.length,
     delta: capAfterS1b.length - capBeforeS1b,
     firstMetadata: capAfterS1b[0]?.metadata,
+    metadataUsesAttemptedCount: capAfterS1b[0]?.metadata &&
+      typeof capAfterS1b[0].metadata === "object" &&
+      "attemptedCount" in capAfterS1b[0].metadata,
+    metadataStillHasCurrent: capAfterS1b[0]?.metadata &&
+      typeof capAfterS1b[0].metadata === "object" &&
+      "current" in capAfterS1b[0].metadata,
   });
   // Structural check · l'unique événement doit avoir capacityType="children"
   const s1bChildrenEvents = capAfterS1b.filter(
@@ -414,6 +460,9 @@ async function main() {
   });
   log("S2 · pre-race active coaches", { circleId: targetCircle, current: preState.map(m => m.userId.slice(0,8)) });
 
+  const revokeBeforeS2 = await db.auditEvent.count({
+    where: { action: "ROOTS_COACH_ASSIGNMENT_REVOKED", scopeId: targetCircle },
+  });
   const [rB, rC] = await Promise.allSettled([
     (async () => {
       await withRetryInline(() => removeCoachInline(targetCircle, admin.id), "concurrent_coach_replacement");
@@ -443,9 +492,21 @@ async function main() {
     where: { action: "ROOTS_COACH_ASSIGNMENT_REVOKED", scopeId: targetCircle },
     orderBy: { createdAt: "desc" }, take: 5,
   });
-  log("S2 · ROOTS_COACH_ASSIGNMENT_REVOKED events", {
-    count: revokeAudits.length,
+  // Idempotence transactionnelle · le loser rollback avec son audit · delta doit
+  // valoir 1 (exactement 1 revoke committé, celui du gagnant).
+  log("S2 · ROOTS_COACH_ASSIGNMENT_REVOKED events (idempotence)", {
+    totalOnCircle: revokeAudits.length,
+    deltaFromRace: revokeAudits.length - revokeBeforeS2,
     firstMetadata: revokeAudits[0]?.metadata,
+  });
+  const loser = [rB, rC].find((r) => r.status === "rejected");
+  const loserCode = loser?.reason?.code ?? null;
+  const loserMsg = loser?.reason?.message ?? "";
+  log("S2 · loser code + no Prisma leak", {
+    code: loserCode,
+    exposedP2034: /P2034/.test(loserMsg),
+    exposedTransactionWriteConflict: /TransactionWriteConflict/.test(loserMsg),
+    exposedINTERNAL: /INTERNAL/.test(loserMsg),
   });
 
   // ── SCENARIO 3 · retrait pendant lecture (frontière) ─────────────────
@@ -543,6 +604,25 @@ async function main() {
 
   // ── Cleanup ─────────────────────────────────────────────────────────
   await purgeTestData();
+  // Vérification zéro fixture résiduelle · guard-rail visible dans les logs.
+  const [fixtureCircles, fixtureChildProfiles, fixtureUsers, fixtureAudits] =
+    await Promise.all([
+      db.circle.count({ where: { id: { startsWith: "test_p4_4_race_" } } }),
+      db.childProfile.count({ where: { id: { startsWith: "test_p4_4_race_" } } }),
+      db.user.count({ where: { email: { contains: "p4_4_race_" } } }),
+      db.auditEvent.count({ where: { targetId: { startsWith: "test_p4_4_race_" } } }),
+    ]);
+  log("cleanup · residual fixtures (all expect 0)", {
+    circles: fixtureCircles,
+    childProfiles: fixtureChildProfiles,
+    users: fixtureUsers,
+    audits: fixtureAudits,
+  });
+  if (fixtureCircles + fixtureChildProfiles + fixtureUsers + fixtureAudits === 0) {
+    process.stderr.write("\nBASELINE DATA CLEANED\n");
+  } else {
+    process.stderr.write("\nBASELINE DATA CLEANUP FAILED · residual fixtures detected\n");
+  }
   await db.$disconnect();
 
   const { writeFile, mkdir } = await import("node:fs/promises");
