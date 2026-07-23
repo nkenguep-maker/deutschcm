@@ -317,7 +317,17 @@ L'enum est conservé mais **le producteur seuil (> 2× cap) a été retiré du r
 
 Sémantique future de l'enum · réservé aux **ambiguïtés binding vraies** (fusion identité, mappings professionnels contradictoires). Aucun producteur runtime actuellement.
 
-**PII leak check** · 0 clé interdite (`email`, `phone`, `fullName`, `dateOfBirth`, `body`, `token`, `cookie`) dans toute la metadata émise (attesté runtime `races-audits.json`).
+### 15.2.4 Idempotence transactionnelle des AuditEvents · closure P4.4
+
+**Événements de changement d'état** (`ROOTS_COACH_ASSIGNMENT_REVOKED`) · écrits **dans la même transaction** Prisma que la mutation qui les cause. Le helper `writeAuditEvent(rec, tx)` accepte un `TxClient` optionnel · `removeCoach` passe désormais `tx` explicitement. Sur SSI rollback ou retry, l'audit disparaît avec le membership · **exactement 1 audit `ASSIGNMENT_REVOKED` par commit effectif**. Attesté S2 runtime · `deltaFromRace = 1` sur race A→B/A→C (le loser rollback avec son audit).
+
+**Événements d'échec** (`ROOTS_COACH_CAPACITY_REACHED`) · émis **une seule fois** par requête refusée, **après épuisement du retry** (`withSerializableRetry`). Helper dédié `src/lib/audit/rootsCoachCapacity.ts` · `emitCoachCapacityAudit({ error, actorUserId, ..., routeAction })` appelé depuis le `catch` du handler POST admin coach et POST children · noop si `error` n'est pas une `CapacityError` coach-scope. Interdit d'écriture depuis les helpers `memberships.ts` · les retries SSI produiraient des fantômes (fire-and-forget hors tx = survit à un rollback).
+
+**Metadata** · la clé `current` a été renommée `attemptedCount` pour éviter la confusion sémantique · elle représente le compte qui aurait été atteint si la requête avait abouti, pas l'état persisté. Attesté S1 runtime `attemptedCount: 11 limit: 10` (circles) et S1b `attemptedCount: 21 limit: 20` (children). Aucune fuite `current` détectée (`metadataStillHasCurrent: false`).
+
+**Sémantique du remplacement concurrent** (S2 doctrine) · lors d'une race `A→B` vs `A→C`, le retry SSI est résolu par retry en une tentative. Le second acteur voit ensuite l'état commité par le premier · son `removeCoach` retourne noop (membership déjà REMOVED) puis son `assignCoach` échoue avec `coach_already_assigned` (409 stable). C'est le comportement **correct** · seul un épuisement complet des retries produirait `concurrent_coach_replacement`. Attesté S2 · `exposedP2034=false`, `exposedTransactionWriteConflict=false`, `exposedINTERNAL=false`, code final 409 `coach_already_assigned`.
+
+**PII leak check** · 0 clé interdite (`email`, `phone`, `fullName`, `dateOfBirth`, `body`, `token`, `cookie`) dans toute la metadata émise (attesté runtime `races-audits.json` · 10 audits examinés, 0 fuite).
 
 ## 16. Verdict d'intégration
 
