@@ -58,10 +58,12 @@ async function ensureAuth(email, fullName) {
 }
 
 async function ensureDbUser(supabaseId, email, fullName, role = "STUDENT") {
-  const ex = await db.user.findFirst({ where: { supabaseId } });
-  if (ex) return db.user.update({ where: { id: ex.id }, data: { role } });
-  return db.user.create({
-    data: { supabaseId, email, fullName, role },
+  // Upsert by email · résiste à un stale supabaseId (auth recréé avec nouvel
+  // id · row DB conservée) et évite la race Promise.all sur create+create.
+  return db.user.upsert({
+    where: { email },
+    update: { supabaseId, fullName, role },
+    create: { supabaseId, email, fullName, role },
   });
 }
 
@@ -174,7 +176,12 @@ async function seed() {
     ensureAppRole(zeroBind.id, "CENTER_ADMIN"), // rôle OK, binding manquant
     ensureAppRole(ambig.id, "CENTER_ADMIN"),
     ensureAppRole(teacherOnlyA.id, "TEACHER"),
-    ensureAppRole(racinesCoach.id, "RACINES_COACH"),
+    // Note · l'enum DB P-1 n'a pas encore RACINES_COACH (migration P4.1
+    // non appliquée) · on utilise CAREER_COACH qui teste le même invariant ·
+    // rôle non-CENTER → 403 sur endpoints Center. Le smoke rapporte
+    // "racinesCoach" pour la lisibilité mais le rôle applicatif est
+    // CAREER_COACH.
+    ensureAppRole(racinesCoach.id, "CAREER_COACH"),
   ]);
 
   const cA = await ensureCenter(CENTER_A, "TEST_CENTER_A", "Yaoundé", "P43A_A");

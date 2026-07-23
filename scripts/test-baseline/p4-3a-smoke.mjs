@@ -31,11 +31,19 @@ async function login(page, email) {
   await page.goto(`${BASE}/fr/login`, { waitUntil: "networkidle", timeout: 30000 });
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', PW);
-  await Promise.all([
-    page.waitForResponse((r) => /supabase\.co\/auth\/v1\/token/.test(r.url()), { timeout: 20000 }).catch(() => null),
-    page.click('button[type="submit"]'),
-  ]);
-  await page.waitForTimeout(1500);
+  const tokenResp = page.waitForResponse(
+    (r) => /supabase\.co\/auth\/v1\/token/.test(r.url()),
+    { timeout: 30000 },
+  ).catch(() => null);
+  await page.click('button[type="submit"]');
+  await tokenResp;
+  // Attendre la pose des cookies sb-*-auth-token par le callback proxy.
+  const deadline = Date.now() + 20000;
+  while (Date.now() < deadline) {
+    const cs = await page.context().cookies();
+    if (cs.some((c) => /^sb-.+-auth-token/.test(c.name))) return;
+    await page.waitForTimeout(300);
+  }
 }
 
 async function ctxFor(browser, email) {
@@ -43,7 +51,10 @@ async function ctxFor(browser, email) {
   const page = await ctx.newPage();
   await login(page, email);
   const cookies = await ctx.cookies();
-  return { ctx, page, cookie: cookies.map((c) => `${c.name}=${c.value}`).join("; ") };
+  const cookie = cookies.map((c) => `${c.name}=${c.value}`).join("; ");
+  const authCookieCount = cookies.filter((c) => /^sb-.+-auth-token/.test(c.name)).length;
+  process.stderr.write(`  · login ${email} · ${authCookieCount} auth cookie(s) set\n`);
+  return { ctx, page, cookie };
 }
 
 async function get(cookie, path) {

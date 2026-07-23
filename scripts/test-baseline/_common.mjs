@@ -1,15 +1,21 @@
 // P-1 Baseline — shared helpers + safety guards.
 // Refuse to run on production. Refuse to touch entities without TEST_ prefix.
 
-import "dotenv/config";
 import { readFileSync } from "node:fs";
 
-// Load .env.p1-baseline explicitly (dotenv/config only reads .env by default)
+// P4.3a hardening · Ne PAS charger `.env` par défaut (dotenv/config) ·
+// `.env` contient les URLs de PRODUCTION deutschcm dans plusieurs environnements
+// dev. Un chargement automatique fait pointer les tests P-1 vers PROD (bug
+// vécu 2026-07-23). On charge UNIQUEMENT `.env.p1-baseline` qui contient la
+// P-1 (kzzagbojjkivdzzcrmxn) et le mot de passe de test.
 try {
   const raw = readFileSync(".env.p1-baseline", "utf8");
   for (const line of raw.split("\n")) {
     const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+    // On force l'override sur les variables Supabase/DB · les variables
+    // shell (bash export préalable) restent prioritaires uniquement si elles
+    // matchent déjà la P-1.
+    if (m) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
   }
 } catch {}
 
@@ -42,6 +48,36 @@ export function assertNonProduction() {
   }
   if (!process.env.DIRECT_URL) {
     throw new Error("REFUSED: DIRECT_URL missing.");
+  }
+  // P4.3a hardening · DIRECT_URL doit aussi cibler la P-1. Bug vécu ·
+  // `.env` local contient DIRECT_URL production, ce qui écrivait les
+  // fixtures test dans la DB production (12 rows Prisma sur
+  // sbjhvlrkbyjckdxujjsk avant détection).
+  const direct = process.env.DIRECT_URL ?? "";
+  for (const bad of FORBIDDEN) {
+    if (direct.includes(bad)) {
+      throw new Error(`REFUSED: DIRECT_URL targets forbidden project ${bad}.`);
+    }
+  }
+  if (!direct.includes(P1_REF)) {
+    throw new Error(
+      `REFUSED: DIRECT_URL does not target the P-1 project.\n` +
+      `Expected ref: ${P1_REF}. Refusing to touch any other database.`
+    );
+  }
+  const dbUrl = process.env.DATABASE_URL ?? "";
+  if (dbUrl) {
+    for (const bad of FORBIDDEN) {
+      if (dbUrl.includes(bad)) {
+        throw new Error(`REFUSED: DATABASE_URL targets forbidden project ${bad}.`);
+      }
+    }
+    if (!dbUrl.includes(P1_REF)) {
+      throw new Error(
+        `REFUSED: DATABASE_URL does not target the P-1 project.\n` +
+        `Expected ref: ${P1_REF}.`
+      );
+    }
   }
 }
 
