@@ -34,15 +34,22 @@ Un utilisateur possédant l'un de ces rôles mais **sans** `Teacher.centerId` re
 
 Fichier · `src/lib/permissions/center.ts`.
 
+**Contrat trois-états** · toute résolution produit exactement `ZERO_BINDING` (404), `ONE_BINDING` (200) ou `AMBIGUOUS_BINDING` (409). Aucun `findFirst`, aucun `orderBy` implicite, aucun tri arbitraire.
+
 Séquence stricte ·
 
 1. `resolveCircleActor()` (P4.1) — lit la session Supabase, mappe `supabaseId → users.id`, throw `401 UNAUTHORIZED` si anonyme.
-2. `prisma.user.findUnique({ id: actor.userId })` en projection minimale — vérifie `role`, `appRoles`, `teacher.center`.
+2. `prisma.user.findUnique({ id: actor.userId })` en projection minimale — vérifie `role`, `appRoles`, `centerId` (legacy Student column).
 3. `403 FORBIDDEN` si aucun rôle centre.
-4. `404 NOT_FOUND` si `teacher` absent, `teacher.centerId` null, `teacher.center` null, ou `teacher.center.name` vide.
-5. Retourne `{ userId, supabaseId, centerId, center, actorRole }` avec `center` projeté à `{ id, name, city, country, plan, isVerified, code }` (aucun secret, aucun champ interne).
+4. `prisma.teacher.findMany({ where: { userId }, take: 2 })` — défense-en-profondeur, permet la détection explicite d'un binding multiple même si `Teacher.userId @unique` cassait.
+5. `404 NOT_FOUND` si `teacherRows.length === 0` ou `centerId` null (ZERO_BINDING).
+6. `409 CONFLICT` si `teacherRows.length > 1` (AMBIGUOUS · schéma cassé) **ou** si `dbUser.centerId` (legacy) diverge de `teacher.centerId` (AMBIGUOUS · rattachement inconsistant).
+7. `404 NOT_FOUND` si `teacher.center.name` vide (centre inactif).
+8. Retourne `{ userId, supabaseId, centerId, center, actorRole }` avec `center` projeté à `{ id, name, city, country, plan, isVerified, code }` (aucun secret, aucun champ interne).
 
 Variante `resolveCenterActorOrNull()` — même contrat, retourne `null` sur toute PermissionError · utilisée par les pages SSR qui redirigent vers `/login` sans révéler la cause.
+
+**Extension mapping erreur** · `PermissionError.code = "CONFLICT"` est mappé à `409 center scope ambiguous` par `mapErrorToResponse` (`src/lib/api/circleErrors.ts`).
 
 ---
 
@@ -123,20 +130,28 @@ Aucun endpoint ne lit `body.centerId`, `query.centerId`, `params.centerId` ou un
 
 ---
 
-## 7. Feature flag
+## 7. Feature flag · double confirmation en production
 
 Registre · `src/lib/flags.ts`.
 
-- `CENTER_REAL_DATA_ENABLED` est déclaré dans `FeatureFlag` et `P4_FLAGS`.
-- Résolu par `getFlag()` qui lit `process.env.YEMA_CENTER_REAL_DATA_ENABLED`. Manquant ou `"false"` → `false`.
-- **Aucun** équivalent `NEXT_PUBLIC_*` n'est déclaré. Un composant client curieux doit passer par `/api/center/me` (lui-même gated).
+Deux flags serveur-only ·
 
-Comportement ·
+- `CENTER_REAL_DATA_ENABLED` (`process.env.YEMA_CENTER_REAL_DATA_ENABLED`).
+- `CENTER_RLS_CONFIRMED` (`process.env.YEMA_CENTER_RLS_CONFIRMED`) · certifie que les policies RLS PostgreSQL ont été posées et validées sur les tables Center.
 
-- **False (défaut prod / défaut CI / défaut dev sans overrides)** · pages Center rendent `<CenterFeaturePlaceholder>` ("Bientôt disponible / Coming soon"). Endpoints répondent `404`. Aucun fallback vers les anciens mocks · aucune fuite Prisma.
-- **True (test P-1 · session locale)** · pages et endpoints servent les données réelles P-1 scopées par centre. Aucun mock, aucune donnée cross-centre.
+L'API publique est `isCenterRealDataActive()` (également dans `src/lib/flags.ts`) · utilisée par **tous** les endpoints Center et **toutes** les pages Center. Comportement ·
 
-Après les tests · `unset YEMA_CENTER_REAL_DATA_ENABLED` · vérifié par le smoke script §8.
+- `CENTER_REAL_DATA_ENABLED = false` → `false`.
+- `CENTER_REAL_DATA_ENABLED = true` **et** `NODE_ENV !== "production"` → `true` (dev/test/P-1).
+- `CENTER_REAL_DATA_ENABLED = true` **et** `NODE_ENV === "production"` **et** `CENTER_RLS_CONFIRMED = false` → `false` (production sans RLS confirmée = données jamais servies).
+- Les deux flags à `true` en production → `true` (activation finale).
+
+Interdits ·
+
+- **Aucun** `NEXT_PUBLIC_YEMA_CENTER_*` n'est jamais lu. Un composant client qui veut connaître l'état passe par `/api/center/me` (lui-même gated).
+- Aucun composant client ne peut activer les flags — le client ne peut pas écrire `process.env`.
+
+Après les tests · `unset YEMA_CENTER_REAL_DATA_ENABLED` **et** `unset YEMA_CENTER_RLS_CONFIRMED` · endpoints retombent à `404`.
 
 ---
 
@@ -156,6 +171,10 @@ Idempotentes (`seed | clean | list`). Refusent la production via `assertNonProdu
 | `paul+p4_3a_student_a2@example.com` | STUDENT + `LEARNER` | via enrollment | Class A1 (active) |
 | `paul+p4_3a_student_b1@example.com` | STUDENT + `LEARNER` | via enrollment | Class B1 (active) |
 | `paul+p4_3a_pending_a@example.com` | STUDENT + `LEARNER` | — | Class A1 (pending) |
+| `paul+p4_3a_zerobind@example.com` | CENTER + `CENTER_ADMIN` (aucun Teacher) | — | attend `404 no membership` |
+| `paul+p4_3a_ambig@example.com` | CENTER + `CENTER_ADMIN` + Teacher(centerId=A) + `User.centerId=B` | A ≠ B | attend `409 center_scope_ambiguous` |
+| `paul+p4_3a_teacher_only_a@example.com` | TEACHER + Teacher(centerId=A) (aucun rôle CENTER) | A | attend `403 forbidden` |
+| `paul+p4_3a_racines_coach@example.com` | `RACINES_COACH` | — | attend `403 forbidden` |
 
 Classes · `test_p4_3a_class_a1` (TEST_CLASS_A_1, A1) · `test_p4_3a_class_b1` (TEST_CLASS_B_1, B1).
 
@@ -165,9 +184,15 @@ Smoke Playwright · `scripts/test-baseline/p4-3a-smoke.mjs` · vérifie ·
 - `teachers` / `classes` / `students` · zéro overlap A ∩ B ;
 - `students?classId=<B>` avec cookies A · `items.length === 0` ;
 - `teachers?centerId=<B>` avec cookies A · scope reste A (query ignorée) ;
+- header `x-center-id: <B>` avec cookies A · ignoré ;
 - teacherA sur `/api/center/me` · `403` ;
 - studentA1 sur `/api/center/me` · `403` ;
-- anonyme sur `/api/center/me` · `401`.
+- racinesCoach sur `/api/center/me` · `403` ;
+- zeroBind sur `/api/center/me` · `404 no center membership resolved` ;
+- ambig sur `/api/center/me` · `409 center_scope_ambiguous` ;
+- anonyme sur `/api/center/me` · `401` ;
+- `GET /api/center` (verbe legacy) · `404 center_endpoint_deprecated` ;
+- `POST /api/center/join` · `404 center_join_deprecated`.
 
 Cleanup · `node scripts/test-baseline/p4-3a-fixtures.mjs clean` · supprime auth Supabase + rows Prisma + centres TEST.
 
@@ -219,7 +244,7 @@ Explicitement **non couverts en P4.3a** ·
 - Interface Circle exposée.
 - Rétention, progression moyenne, top students, revenu mensuel · marqués « Donnée indisponible pour le moment » ou masqués — nécessitent des agrégats non calculables depuis le schéma actuel.
 
-Le legacy `/api/center/route.ts` (GET stats/students/code, POST invite/subscribe) et `/api/center/join/route.ts` **restent en place**, hors périmètre P4.3a. Ils continuent à alimenter les vieux flows (join by code, POST subscribe) et **ne sont pas gated**. Ils sont marqués `P4.3B_DEPENDENCY` — leur retrait ou refactor est prévu au sous-lot Teacher.
+Le legacy `/api/center/route.ts` (GET stats/students/code, POST invite/subscribe) et `/api/center/join/route.ts` sont **définitivement fermés** en P4.3a hardening · ils répondent `404 center_endpoint_deprecated` / `404 center_join_deprecated` pour tous les verbes. Zéro consommateur détecté (grep exhaustif · `docs/YEMA_P4_3A_CENTER_REAL_DATA.md`). Aucun `centerId` client n'est plus lu · aucun tenant selection possible via query/body/header. Le workflow d'attachement Student ↔ Center reste à concevoir en P4.3b (invitations signées + validation admin + TTL).
 
 ---
 
