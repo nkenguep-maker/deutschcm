@@ -574,6 +574,7 @@ Déplacé dans le lot P0.B pour la même raison : P1-4 et P2-2 (parcours écoute
   - Test cross-centre : compte centre A tente `GET /api/center/students?centerId=B` → 403
   - Test P-1 baseline mis à jour : compte `center` (TEST_CENTRE_YEMA_DEV) doit voir 0 enseignant + 0 étudiant tant qu'aucun rattachement réel n'est créé — état empty honnête
 - **Estimation supplémentaire** : **L** (au-dessus de P4-3).
+- **Livraison** · voir `docs/YEMA_P4_3A_CENTER_REAL_DATA.md`. Branche `feat/yema-p4-3a-center-real-data`. Feature flag `CENTER_REAL_DATA_ENABLED` = `false` par défaut. Six endpoints `/api/center/{me,dashboard,teachers,classes,students,enrollments}`, cinq pages SSR (`/center`, `/center/teachers`, `/center/classes`, `/center/students`, `/center/stats`), resolver `resolveCenterActor`, seam `src/lib/center/queries.ts`. Aucun `centerId` client accepté. `classId` étranger retourne `{ items: [], total: 0 }`. Aucune migration Prisma. Aucun endpoint P4.3b (invitations, paiement, Circle) exposé.
 
 ## P4-4 · Espace admin §25.5
 
