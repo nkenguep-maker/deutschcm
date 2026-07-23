@@ -178,7 +178,9 @@ Un seul fichier · `prisma/migrations/20260723_p4_1_circle_security/migration.sq
 
 ### 2.2 Application
 
-Migration appliquée à P-1 (`kzzagbojjkivdzzcrmxn`) via `pg` Node client (une transaction unique).
+- **P-1 (`kzzagbojjkivdzzcrmxn`)** · migration appliquée via `pg` Node client (idempotente).
+- **Base vierge PGlite** · vérifiée via `prisma dev` (PostgreSQL 17.5 WASM) puis `prisma migrate deploy` sur les 14 migrations · toutes appliquées, second `deploy` retourne `No pending migrations`. Bootstrap `/tmp/p4-1-clean-db-bootstrap.sql` recrée le schema `auth` et les rôles `anon` / `authenticated` / `service_role` requis par Supabase avant l'exécution des migrations.
+- **Renommage préalable** · le dossier a été renommé de `20260723_p4_1_circle_security` en **`20260723000003_p4_1_circle_security`** pour respecter l'ordre chronologique numérique (avait été appliqué prématurément avant `20260723000001` / `20260723000002` dans le tri Prisma).
 
 Aucune interaction avec la production Supabase (`sbjhvlrkbyjckdxujjsk`).
 
@@ -337,6 +339,38 @@ Politique cible ·
   19. Diagnostic logs · aucun payload sensible loggé.
 
 Résultats · **19/19 checks OK** au 2026-07-23.
+
+### 11.b Concurrence capacité (`scripts/test-baseline/p4-1-capacity-race.mjs`)
+
+Exécuté avec Promise.all sur des transactions Serializable ·
+
+- **3ᵉ adulte** · état initial = 2 adultes actifs (OWNER + ADULT) · 2 requêtes parallèles ADULT → **0 succès, 2 rejects `max_adults_reached`** · état final = 2 ✓
+- **5ᵉ enfant** · état initial = 4 enfants actifs · 2 requêtes parallèles CHILD → **0 succès, 2 rejects `max_children_reached`** · état final = 4 ✓
+
+### 11.c API E2E flag ON (`scripts/test-baseline/p4-1-api-e2e.mjs`)
+
+23 checks Playwright + cookies SSR réels ·
+
+| Endpoint | Acteur | Résultat |
+|---|---|---|
+| GET /api/circles/[cid] | Owner A | 200 avec `role=OWNER` |
+| GET | Adult A | 200 avec `role=ADULT` |
+| GET | Coach A assigné | 200 avec `role=COACH` (données minimales) |
+| GET | Owner B (cross-tenant) | 403 `not a member` |
+| GET | Coach A sur Circle B (non assigné) | 403 |
+| GET | Anon | 401 `not signed in` |
+| POST /api/circles | Owner (langue fraîche) | 200 |
+| POST | Owner LINGALA duplicate | 409 `circle_language_already_active` |
+| POST | Adult non-owner | 403 `household owner required` |
+| POST | Owner B foreign household | 403 |
+| POST | Anon | 401 |
+| POST | Owner + `body.userId` injecté | 200 · **id ignoré** · circle créé avec vrai actor |
+| POST /api/circles/[cid]/archive | Owner | 200 |
+| POST archive | Owner (2ᵉ appel) | 200 idempotent |
+| POST archive | Adult/Coach/Owner B | 403 |
+| POST /api/circles (même langue après archive) | Owner | **200** ✓ (Q8/Q9) |
+| AuditEvent DOUALA | — | `CIRCLE_CREATED`, `CIRCLE_ARCHIVED` ✓ |
+| Membre REMOVED · GET | Adult A retiré | 403 ✓ |
 
 ---
 

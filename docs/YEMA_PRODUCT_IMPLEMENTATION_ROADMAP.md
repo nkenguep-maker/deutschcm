@@ -493,6 +493,9 @@ Déplacé dans le lot P0.B pour la même raison : P1-4 et P2-2 (parcours écoute
 > - `src/lib/flags.ts` · 9 feature flags **tous à `false` par défaut**. API 404 quand off, vérifié end-to-end.
 > - Service-role inventory · 7 usages catalogués (`docs/YEMA_P4_SERVICE_ROLE_INVENTORY.md`) · 0 blocker.
 > - **358 tests pass · TypeScript clean · build vert · 19/19 smoke tests · concurrence réelle Promise.all validée**.
+> - **Migration base vierge** vérifiée via `prisma dev` PGlite (PostgreSQL 17.5 WASM) · 14 migrations appliquées via `prisma migrate deploy` · second `deploy` retourne `No pending migrations` · tables/index/functions/policies/grants tous présents.
+> - **Concurrence capacité** validée · 3ᵉ adulte simultané → 0 succès, 2 rejects `max_adults_reached` (état final 2). 5ᵉ enfant simultané → 0 succès, 2 rejects `max_children_reached` (état final 4).
+> - **API E2E avec `CIRCLE_ENABLED=true`** · 23 checks Playwright · owner/adult/coach voient leur cercle · cross-tenant rejeté · coach non assigné rejeté · anon 401 · `body.userId` injecté ignoré · archive idempotent · recréation même langue après archive OK · membre REMOVED → 403 · AuditEvent trace CIRCLE_CREATED + CIRCLE_ARCHIVED. Flag restauré à `false` par défaut · vérifié 404 sur /api/circles/*.
 
 > **Statut audit** (branche `feat/yema-p4-professional-spaces`, audit finalisé 2026-07-23) :
 > - Audit d'architecture complet · `docs/YEMA_P4_ARCHITECTURE_AUDIT.md` (inventaire Prisma · routes · mocks · Circle Option A pseudo-schéma · classroom vs circle · Suivi Racines et rôle `RACINES_COACH`)
