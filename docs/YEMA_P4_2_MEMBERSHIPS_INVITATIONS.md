@@ -290,7 +290,28 @@ Attendu · même méthode qu'en P4.1 (script `prisma dev` + bootstrap Supabase-c
 
 ---
 
-## 26. Décision
+## 26. Hardening final (post-revue 2026-07-23)
+
+Cinq corrections apportées après revue ·
+
+1. **Advisory locks** · nouveau module `src/lib/db/locks.ts` · `acquireCircleLock(tx, circleId)` prend un `pg_advisory_xact_lock` (bigint dérivé du cuid) tôt dans chaque transaction critique. Serialise strictement les accepts/child-add/coach-assign concurrents sur le même Circle sans impact entre Circles distincts.
+2. **Retry limité** · `src/lib/db/retry.ts` · `withSerializableRetry(fn, {errorCode})` catche Postgres `40001` et Prisma `P2034`, retry 3× avec backoff 25/50/100 ms, throw `ConcurrentUpdateError` mappée à 409 stable.
+3. **Losing accept auto-revoked** · quand deux accepts concurrents de tokens distincts se battent sur le cap 2 adultes, le perdant reçoit `409 max_adults_reached` **et** son invitation est marquée `REVOKED` avec `metadata.reasonCode = adult_capacity_reached` + `AuditEvent.ADULT_INVITATION_REVOKED` émis. Le lien n'est plus actionnable.
+4. **Mapping erreurs concurrence** · le mapper `mapErrorToResponse` reconnaît `ConcurrentUpdateError`, `40001` et `P2034` et retourne `409 concurrent_membership_update` / `concurrent_invitation_update` (plus jamais `INTERNAL` sur race SSI).
+5. **`MEMBERSHIP_ACCESS_DENIED` audit** · quatre routes sensibles (invite adult non-owner, add child cross-household, admin coach non-admin, remove member non-owner) émettent l'événement d'audit avec `metadata.reasonCode` (jamais token/email/body). Smoke run · **3 événements émis** dans un cycle standard.
+
+Smoke E2E post-hardening · 33 assertions vertes ·
+- Deux accepts distincts en parallèle · 1 succès (avec membership créé), 1 rejet `max_adults_reached`, active adults = 2, losing invitation `REVOKED reasonCode=adult_capacity_reached`.
+- Accept vs revoke concurrent · état terminal cohérent (`ACCEPTED + membership=1` OU `REVOKED + membership=0`, jamais l'état interdit).
+- Concurrent same-token · 1 succès / 1 échec code `invitation_already_used` (plus `INTERNAL`).
+
+Base vierge · `prisma dev` PGlite avec bootstrap Supabase-compat · 15 migrations appliquées séquentiellement · second `migrate deploy` retourne `No pending migrations`. Vérifications DB · table `circle_invitations` + RLS + 6 indexes (partial pending compris) + policy `select_owner` + `GRANT SELECT authenticated` + `REVOKE anon` + enum `InvitationStatus` complet + **11/11** nouvelles valeurs `AuditAction`.
+
+Total tests · **439 passés** (30 → 32 fichiers, +21 assertions retry/lock/hardening).
+
+---
+
+## 27. Décision
 
 **P4.2 READY TO MERGE**
 
