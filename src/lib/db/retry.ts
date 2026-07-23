@@ -23,7 +23,8 @@ export type ConcurrentUpdateCode =
   | "concurrent_coach_assignment"
   | "concurrent_coach_replacement"
   | "concurrent_assignment_update"
-  | "concurrent_submission_update";
+  | "concurrent_submission_update"
+  | "concurrent_feedback_update";
 
 export class ConcurrentUpdateError extends Error {
   constructor(
