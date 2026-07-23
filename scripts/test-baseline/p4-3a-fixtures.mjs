@@ -60,10 +60,12 @@ async function ensureAuth(email, fullName) {
 async function ensureDbUser(supabaseId, email, fullName, role = "STUDENT") {
   // Upsert by email · résiste à un stale supabaseId (auth recréé avec nouvel
   // id · row DB conservée) et évite la race Promise.all sur create+create.
+  // `onboardingDone: true` évite la redirection systématique vers
+  // `/{locale}/onboarding` (bloque le parcours clavier /center).
   return db.user.upsert({
     where: { email },
-    update: { supabaseId, fullName, role },
-    create: { supabaseId, email, fullName, role },
+    update: { supabaseId, fullName, role, onboardingDone: true },
+    create: { supabaseId, email, fullName, role, onboardingDone: true },
   });
 }
 
@@ -72,6 +74,27 @@ async function ensureAppRole(userId, role) {
     where: { userId_role: { userId, role } },
     update: {},
     create: { userId, role },
+  });
+}
+
+/**
+ * Miroir Supabase auth · user_metadata.roles / .active_space. Sans ceci,
+ * le proxy redirige vers /setup-role. Simplifié · on écrit directement
+ * les rôles CENTER pour les admins et STUDENT/TEACHER pour les autres.
+ * Utilisé uniquement par le seed test P4.3a (P-1).
+ */
+async function syncMeta(supabaseId, role) {
+  const rolesList = [role];
+  const onboardedMap = { [role]: true };
+  const { data } = await admin.auth.admin.getUserById(supabaseId);
+  const existing = data?.user?.user_metadata ?? {};
+  await admin.auth.admin.updateUserById(supabaseId, {
+    user_metadata: {
+      ...existing,
+      roles: rolesList,
+      onboarded_map: onboardedMap,
+      active_space: role,
+    },
   });
 }
 
@@ -182,6 +205,24 @@ async function seed() {
     // "racinesCoach" pour la lisibilité mais le rôle applicatif est
     // CAREER_COACH.
     ensureAppRole(racinesCoach.id, "CAREER_COACH"),
+  ]);
+
+  // Sync user_metadata Supabase auth · sans ceci, le proxy redirige vers
+  // /setup-role car il lit `user_metadata.roles`. Nécessaire pour le
+  // parcours clavier automatisé (§5 incident closure).
+  await Promise.all([
+    syncMeta(adminAAuth.id, "CENTER"),
+    syncMeta(adminBAuth.id, "CENTER"),
+    syncMeta(teacherAAuth.id, "TEACHER"),
+    syncMeta(teacherBAuth.id, "TEACHER"),
+    syncMeta(sA1Auth.id, "STUDENT"),
+    syncMeta(sA2Auth.id, "STUDENT"),
+    syncMeta(sB1Auth.id, "STUDENT"),
+    syncMeta(pendingAAuth.id, "STUDENT"),
+    syncMeta(zeroBindAuth.id, "CENTER"),
+    syncMeta(ambigAuth.id, "CENTER"),
+    syncMeta(teacherOnlyAAuth.id, "TEACHER"),
+    syncMeta(racinesCoachAuth.id, "STUDENT"),
   ]);
 
   const cA = await ensureCenter(CENTER_A, "TEST_CENTER_A", "Yaoundé", "P43A_A");
