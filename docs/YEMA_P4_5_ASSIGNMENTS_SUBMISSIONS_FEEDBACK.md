@@ -294,7 +294,149 @@ Metadata autorisée · `actorUserId`, `teacherId`, `coachUserId`, `classroomId`,
 complet enfant, email, phone, dateOfBirth, audioUrl, signedUrl, token,
 cookie, body complet.
 
-## 10. Chemin restant
+## 10. Statut P4.5-B1 · services Monde + resolvers + RLS WRITE
+
+Livré sur `feat/yema-p4-5-b-monde-workflows` @ base `2c8c27f` (post-P4.5-A closure) ·
+
+### 10.1 Namespace canonique Student
+
+Choisi · **`/api/student/*`** (§10 brief). Aucun namespace `learner` préexistant
+dans le repo — aucun conflit. Symétrique à `/api/teacher/*` P4.3b actif.
+
+### 10.2 Domaine V2 confirmé
+
+Services Monde P4.5-B utilisent exclusivement la famille V2 ·
+
+- `Classroom` (P4.3b)
+- `ClassroomEnrollment` (P4.3b)
+- `Assignment` (colonnes P4.5 additives)
+- `AssignmentSubmission` (colonnes P4.5 additives)
+- `AssignmentFeedback` (nouveau P4.5-A)
+
+Les modèles V1 (`Class`, `ClassAssignment`, `Submission`, `ClassFeedback`)
+restent **gelés** · aucun nouveau consommateur.
+
+### 10.3 Resolvers
+
+- `src/lib/permissions/student.ts` · `resolveStudentActor()` +
+  `resolveStudentActorOrNull()` + `assertStudentCanAccessAssignment()` +
+  `assertStudentOwnsSubmission()`. Rôles acceptés · V1 `User.role = "STUDENT"`
+  ou V2 `UserAppRole.role = "LEARNER"`. Aucun autre rôle (TEACHER, YEMA_ADMIN,
+  CENTER_ADMIN, RACINES_COACH, CAREER_COACH) n'ouvre l'espace Student.
+- `resolveTeacherActor()` (P4.3b, réutilisé sans modification).
+- Aucun `studentId`/`userId`/`classroomId` client accepté comme autorité.
+
+Table de décision resolver Student §3 brief · 7 situations couvertes (anonyme,
+rôle non étudiant, enrollment vide, enrollment actif, enrollment retiré,
+classroom inactive, YEMA admin sans binding).
+
+### 10.4 Services métier
+
+- `src/lib/assignments/transitions.ts` · pures functions ·
+  `assertAssignmentTransition`, `assertSubmissionTransition`,
+  `assertFeedbackTransition`, `assertMondeTextOnlyProductionType`,
+  `assertMondeTextOnlyFeedback`, `assertMondeSubmissionWordLimit`,
+  `countMondeSubmissionWords`.
+- `src/lib/assignments/teacher.ts` · 12 fonctions Teacher ·
+  `listTeacherAssignments`, `getTeacherAssignment`,
+  `createTeacherAssignmentDraft`, `updateTeacherAssignmentDraft`,
+  `publishTeacherAssignment`, `closeTeacherAssignment`,
+  `listAssignmentSubmissions`, `getTeacherSubmission`,
+  `createAssignmentFeedbackDraft`, `updateAssignmentFeedbackDraft`,
+  `publishAssignmentFeedback`, `createAssignmentFeedbackAddendum`.
+- `src/lib/assignments/student.ts` · 8 fonctions Student ·
+  `listStudentAssignments`, `getStudentAssignment`, `getStudentSubmission`,
+  `createStudentSubmissionDraft`, `updateStudentSubmissionDraft`,
+  `submitStudentSubmission`, `createStudentSubmissionVersion`,
+  `listStudentFeedback`.
+
+Chaque service prend un `TxClient` explicite. Les changements d'état
+écrivent leur `AuditEvent` **DANS la même tx** via `writeAuditEvent(rec, tx)`
+(pattern P4.4 closure). Aucun `void writeAuditEvent` fire-and-forget dans
+les services.
+
+### 10.5 Limite Monde texte · 1000 mots
+
+`MAX_MONDE_SUBMISSION_WORDS = 1000` (§6 brief). Distinct de la limite Racines
+(250 mots). Convention `split(/\s+/u)` trimmed identique à P4.5-A Racines.
+Émission `submission_too_long` avec `detail.limit=1000, detail.attemptedCount=<mots>`.
+
+### 10.6 Texte uniquement (§5, §7 brief)
+
+- `assertMondeTextOnlyProductionType` rejette AUDIO/MIXED en création
+  d'assignment · code `audio_feedback_disabled` (409).
+- `assertMondeTextOnlyFeedback` rejette tout `storageObjectId` sur
+  feedback · code `feedback_invalid_transition` avec `detail.reason =
+  "audio_feedback_disabled"`.
+- Storage 2-phase reste reporté **P4.5-D**.
+
+### 10.7 Migration RLS WRITE Monde
+
+`prisma/migrations/20260724000002_p4_5_b_monde_rls_writes/migration.sql` ·
+
+Helpers additifs ·
+- `is_teacher_for_classroom_v2(classroomId, userId)` · SECURITY DEFINER
+  search_path pinned · réutilisable par les policies WRITE.
+
+Policies · 5 policies WRITE au total ·
+
+- **assignments** · `p4_5_b_assignments_insert_teacher_own` (INSERT si
+  Teacher owns classroom), `p4_5_b_assignments_update_teacher_own` (UPDATE
+  scoped). Aucune policy INSERT/UPDATE Student · deny-by-default RLS bloque.
+- **assignment_submissions** · `p4_5_b_assignment_submissions_insert_student_own`
+  (INSERT si student enrolled actif ET assignment PUBLISHED ET userId=self),
+  `p4_5_b_assignment_submissions_update_student_draft` (UPDATE contraint
+  `status = 'DRAFT'`, `userId = self`). Aucune policy INSERT/UPDATE Teacher
+  sur submissions · le Teacher ne peut jamais toucher au contenu Student.
+- **assignment_feedbacks** · `p4_5_b_assignment_feedbacks_insert_teacher_own`
+  (INSERT si Teacher owns classroom via submission ET authorTeacherId matche),
+  `p4_5_b_assignment_feedbacks_update_teacher_draft` (UPDATE contraint
+  `status = 'DRAFT'`, auteur matche).
+
+Aucun `is_yema_admin()` global · aucun bypass admin. Aucune policy `FOR
+DELETE` · immutabilité feedback PUBLISHED + submission SUBMITTED reste
+contrainte par les triggers P4.5-A.
+
+### 10.8 Mapping HTTP + audit access denied
+
+- `src/lib/api/assignmentErrors.ts::mapAssignmentErrorToResponse(e)` ·
+  centralise le mapping AssignmentError/SubmissionError/FeedbackError/
+  StorageOwnershipError/WorkspaceAccessError/PermissionError/
+  ConcurrentUpdateError vers HTTP 400/401/403/404/409. Fallback triggers DB
+  immutabilité (`submission_immutable` / `feedback_immutable`) et P2034
+  bruts (`concurrent_assignment_update`). **Aucun leak Prisma** dans le
+  body de réponse · vérifié par test structurel.
+- `src/lib/audit/assignmentEvents.ts::emitAssignmentAuditFromError(...)` ·
+  émission unique post-échec pour `ASSIGNMENT_ACCESS_DENIED` /
+  `SUBMISSION_ACCESS_DENIED` / `FEEDBACK_ACCESS_DENIED`. Miroir de
+  `emitCoachCapacityAudit` (P4.4 closure).
+
+### 10.9 Codes P4.5-B ajoutés
+
+Nouveaux codes stables ajoutés à `P4_5_STABLE_ERROR_CODES` ·
+
+- `assignment_immutable`, `invalid_assignment_transition`, `audio_feedback_disabled`
+- `submission_too_long`, `invalid_submission_transition`, `student_access_required`
+- `invalid_feedback_transition`
+- `concurrent_feedback_update` (extension `ConcurrentUpdateError.code`)
+
+### 10.10 Tests
+
+71 nouveaux tests vitest · 39 `monde-transitions` (graphes autorisés
++ word limit + texte-only + audio guard) + 32 `p4-5-b-structural` (migration
+RLS présente et complète, services structurels, mapper sans leak Prisma,
+resolver rôles restrictifs, audit helper 3 codes distincts). Total **737 tests**
+sur 41 files (contre 666 sur 39 P4.5-A validated).
+
+Reporté vers P4.5-B2 (avec routes API + tests intégration P-1) ·
+- Routes API Teacher (12) + Student (8) selon §9 + §10 brief.
+- Tests intégration RLS/JWT avec 9 personas + 6 races concurrence.
+- Immutabilité API-level (via requêtes HTTP réelles, pas seulement DB).
+- UI Teacher/Student placeholders scoped.
+- Runtime FR/EN + responsive + landing regressions.
+- Fixtures P-1 protégées + cleanup `BASELINE DATA CLEANED`.
+
+## 11. Chemin restant
 
 - **P4.5-B** · services `assignments.ts` + `submissions.ts` + `feedback.ts` Monde · routes Teacher + Student · tests RLS/JWT + immutabilité DB + races
 - **P4.5-C** · services Racines équivalents · routes Coach + Famille · quotas semaine/mois testés sous concurrence · reply parent structuré
