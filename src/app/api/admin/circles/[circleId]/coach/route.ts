@@ -13,6 +13,7 @@ import { assignCoach, removeCoach } from "@/lib/circles/memberships";
 import { writeAuditEvent } from "@/lib/audit/events";
 import { mapErrorToResponse, auditAccessDenied, err } from "@/lib/api/circleErrors";
 import { withSerializableRetry } from "@/lib/db/retry";
+import { emitCoachCapacityAudit } from "@/lib/audit/rootsCoachCapacity";
 
 export async function POST(
   request: NextRequest,
@@ -62,6 +63,20 @@ export async function POST(
         circleId,
         targetType: "Coach",
         reasonCode: "admin_required_for_coach_assign",
+      });
+    }
+    // P4.4 closure · émission idempotente CAPACITY_REACHED · une seule fois
+    // après échec définitif (post-retry). N'existe PAS in-tx pour éviter les
+    // doublons de retry SSI.
+    const adminForAudit = await resolveAdminActor().catch(() => null);
+    if (adminForAudit) {
+      await emitCoachCapacityAudit({
+        error: e,
+        actorUserId: adminForAudit.userId,
+        actorRole: "YEMA_ADMIN",
+        circleId,
+        coachUserId,
+        routeAction: "assignCoach",
       });
     }
     return mapErrorToResponse(e);

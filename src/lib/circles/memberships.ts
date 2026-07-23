@@ -88,34 +88,11 @@ export async function addChildToCircle(
   // P4.4 hardening · si le Circle a un COACH ACTIVE, garantir que ce coach
   // ne dépasse pas son budget profil (20). Sinon `coach_profile_capacity_reached`
   // → 409 mappé côté API, aucun leak de code Prisma.
-  try {
-    await assertCoachProfileCapacityForChildAdd(tx, input.circleId);
-  } catch (e) {
-    if (e instanceof CapacityError && e.code === "coach_profile_capacity_reached") {
-      const limit = (e.detail?.limit as number | undefined) ?? null;
-      const current = (e.detail?.current as number | undefined) ?? null;
-      const coachUserId = (e.detail?.coachUserId as string | undefined) ?? "unknown";
-      void writeAuditEvent({
-        actorUserId: input.ownerUserId,
-        actorRole: "PARENT",
-        action: "ROOTS_COACH_CAPACITY_REACHED",
-        targetType: "RootsCoachAssignment",
-        targetId: coachUserId,
-        scopeType: "Circle",
-        scopeId: input.circleId,
-        metadata: {
-          reasonCode: "capacity_reached",
-          capacityType: "children",
-          limit,
-          current,
-          routeAction: "addChildToCircle",
-        },
-      }).catch((err) => {
-        console.warn("[audit] ROOTS_COACH_CAPACITY_REACHED write failed:", (err as Error).message);
-      });
-    }
-    throw e;
-  }
+  // NOTE · l'audit ROOTS_COACH_CAPACITY_REACHED est émis par la route caller
+  // APRÈS l'échec définitif (post-retry) via `emitCoachCapacityAudit`. On ne
+  // fait AUCUNE écriture d'audit ici · sinon les retries SSI produiraient
+  // des doublons (fire-and-forget hors tx = survit à un rollback).
+  await assertCoachProfileCapacityForChildAdd(tx, input.circleId);
 
   // Dédup · pas de duplicate ACTIVE membership pour ce child.
   const existing = await tx.circleMembership.findFirst({
@@ -261,42 +238,11 @@ export async function assignCoach(
   // 1 seul coach ACTIVE par cercle.
   await assertCircleCoachCapacity(tx, input.circleId);
   // 20 profils + 10 Circles max par coach.
-  // P4.4 hardening · encapsule pour émettre ROOTS_COACH_CAPACITY_REACHED sur
-  // capacité atteinte (dimension = "circles" ou "children"), tout en
-  // laissant remonter l'erreur pour rollback tx.
-  try {
-    await assertCoachCapacityAvailable(tx, input.coachUserId, input.circleId);
-  } catch (e) {
-    if (
-      e instanceof CapacityError &&
-      (e.code === "coach_circle_capacity_reached" ||
-        e.code === "coach_profile_capacity_reached")
-    ) {
-      const dim = (e.detail?.dimension as string | undefined) ?? null;
-      const limit = (e.detail?.limit as number | undefined) ?? null;
-      const current = (e.detail?.current as number | undefined) ?? null;
-      // Fire-and-forget · hors tx. Pattern doctrine cohérent avec Teacher.
-      void writeAuditEvent({
-        actorUserId: input.adminUserId,
-        actorRole: "YEMA_ADMIN",
-        action: "ROOTS_COACH_CAPACITY_REACHED",
-        targetType: "RootsCoachAssignment",
-        targetId: input.coachUserId,
-        scopeType: "Circle",
-        scopeId: input.circleId,
-        metadata: {
-          reasonCode: "capacity_reached",
-          capacityType: dim,
-          limit,
-          current,
-          routeAction: "assignCoach",
-        },
-      }).catch((err) => {
-        console.warn("[audit] ROOTS_COACH_CAPACITY_REACHED write failed:", (err as Error).message);
-      });
-    }
-    throw e;
-  }
+  // NOTE · l'audit ROOTS_COACH_CAPACITY_REACHED est émis par la route caller
+  // APRÈS l'échec définitif (post-retry) via `emitCoachCapacityAudit`. On ne
+  // fait AUCUNE écriture d'audit ici · sinon les retries SSI produiraient
+  // des doublons (fire-and-forget hors tx = survit à un rollback).
+  await assertCoachCapacityAvailable(tx, input.coachUserId, input.circleId);
 
   const membership = await tx.circleMembership.create({
     data: {
@@ -326,25 +272,26 @@ export async function removeCoach(
     where: { id: membership.id },
     data: { status: "REMOVED", removedAt: new Date() },
   });
-  // P4.4 hardening · émet ROOTS_COACH_ASSIGNMENT_REVOKED (Q10). Fire-and-forget
-  // pour ne pas polluer la tx d'assignation. Doctrine · ne pas conserver
-  // d'infos privées inutiles pour le nouveau coach.
-  void writeAuditEvent({
-    actorUserId: input.adminUserId ?? null,
-    actorRole: input.adminUserId ? "YEMA_ADMIN" : null,
-    action: "ROOTS_COACH_ASSIGNMENT_REVOKED",
-    targetType: "CircleMembership",
-    targetId: membership.id,
-    scopeType: "Circle",
-    scopeId: input.circleId,
-    metadata: {
-      previousCoachUserId: membership.userId,
-      reasonCode: input.reason ?? "removed",
-      routeAction: "removeCoach",
+  // P4.4 closure · idempotence transactionnelle · l'audit est écrit DANS la
+  // même tx que l'update de statut. Sur SSI rollback ou retry, l'audit est
+  // rollback avec le membership · exactement 1 audit par commit effectif.
+  await writeAuditEvent(
+    {
+      actorUserId: input.adminUserId ?? null,
+      actorRole: input.adminUserId ? "YEMA_ADMIN" : null,
+      action: "ROOTS_COACH_ASSIGNMENT_REVOKED",
+      targetType: "CircleMembership",
+      targetId: membership.id,
+      scopeType: "Circle",
+      scopeId: input.circleId,
+      metadata: {
+        previousCoachUserId: membership.userId,
+        reasonCode: input.reason ?? "removed",
+        routeAction: "removeCoach",
+      },
     },
-  }).catch((err) => {
-    console.warn("[audit] ROOTS_COACH_ASSIGNMENT_REVOKED write failed:", (err as Error).message);
-  });
+    tx,
+  );
   return { removedMembershipId: membership.id, previousCoachUserId: membership.userId };
 }
 

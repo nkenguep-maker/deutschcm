@@ -9,6 +9,8 @@ import { PermissionError, resolveCircleActor } from "@/lib/permissions/circle";
 import { addChildToCircle, MembershipError } from "@/lib/circles/memberships";
 import { writeAuditEvent } from "@/lib/audit/events";
 import { mapErrorToResponse, auditAccessDenied, err } from "@/lib/api/circleErrors";
+import { emitCoachCapacityAudit } from "@/lib/audit/rootsCoachCapacity";
+import { CapacityError } from "@/lib/circles/capacity";
 
 export async function POST(
   request: NextRequest,
@@ -68,6 +70,21 @@ export async function POST(
         targetType: "ChildProfile",
         targetId: childProfileId,
         reasonCode: "owner_required_for_child_add",
+      });
+    }
+    // P4.4 closure · idempotence CAPACITY_REACHED · émission unique après
+    // échec définitif. Le coachUserId est extrait du detail de CapacityError
+    // (rempli par assertCoachProfileCapacityForChildAdd).
+    if (e instanceof CapacityError && e.code === "coach_profile_capacity_reached") {
+      const actor = await resolveCircleActor().catch(() => null);
+      const coachUserId = (e.detail?.coachUserId as string | undefined) ?? "unknown";
+      await emitCoachCapacityAudit({
+        error: e,
+        actorUserId: actor?.userId ?? null,
+        actorRole: "PARENT",
+        circleId,
+        coachUserId,
+        routeAction: "addChildToCircle",
       });
     }
     return mapErrorToResponse(e);
