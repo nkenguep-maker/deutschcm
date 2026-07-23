@@ -15,6 +15,7 @@ export type FeatureFlag =
   | "CENTER_REAL_DATA_ENABLED"
   | "CENTER_RLS_CONFIRMED"
   | "TEACHER_WORKSPACE_ENABLED"
+  | "TEACHER_RLS_CONFIRMED"
   | "COACH_WORKSPACE_ENABLED"
   | "ASSIGNMENTS_ENABLED"
   | "AUDIO_FEEDBACK_ENABLED"
@@ -27,6 +28,7 @@ const P4_FLAGS: readonly FeatureFlag[] = [
   "CENTER_REAL_DATA_ENABLED",
   "CENTER_RLS_CONFIRMED",
   "TEACHER_WORKSPACE_ENABLED",
+  "TEACHER_RLS_CONFIRMED",
   "COACH_WORKSPACE_ENABLED",
   "ASSIGNMENTS_ENABLED",
   "AUDIO_FEEDBACK_ENABLED",
@@ -54,6 +56,20 @@ export function getFlag(name: FeatureFlag): boolean {
 export function isCenterRealDataActive(): boolean {
   if (!getFlag("CENTER_REAL_DATA_ENABLED")) return false;
   if (process.env.NODE_ENV === "production" && !getFlag("CENTER_RLS_CONFIRMED")) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * P4.3b · même contrat double-confirmation que Center · en production,
+ * `TEACHER_WORKSPACE_ENABLED = true` ne suffit pas · il faut aussi
+ * `TEACHER_RLS_CONFIRMED = true` (policies RLS Teacher posées et validées).
+ * En dev/test, seul le flag principal est requis.
+ */
+export function isTeacherWorkspaceActive(): boolean {
+  if (!getFlag("TEACHER_WORKSPACE_ENABLED")) return false;
+  if (process.env.NODE_ENV === "production" && !getFlag("TEACHER_RLS_CONFIRMED")) {
     return false;
   }
   return true;
