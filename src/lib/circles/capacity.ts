@@ -30,6 +30,7 @@ export class CapacityError extends Error {
       | "max_adults_reached"
       | "max_children_reached"
       | "coach_already_assigned"
+      | "coach_capacity_reached"
       | "circle_language_already_active",
     message: string,
     public readonly detail?: Record<string, unknown>,
@@ -41,6 +42,9 @@ export class CapacityError extends Error {
 
 export const MAX_ADULTS_PER_CIRCLE = 2;
 export const MAX_CHILDREN_PER_CIRCLE = 4;
+// P4.2 · Q15 · capacité coach initiale (20 profils enfants actifs, 10 Circles).
+export const MAX_ACTIVE_CIRCLES_PER_COACH = 10;
+export const MAX_ACTIVE_CHILDREN_PER_COACH = 20;
 
 /** Vérifie qu'on peut ajouter un adulte (OWNER ou ADULT ACTIVE). */
 export async function assertCircleAdultCapacity(
@@ -114,5 +118,44 @@ export async function assertUniqueActiveHouseholdLanguageCircle(
       "an active circle already exists for this household and language",
       { existingCircleId: existing.id },
     );
+  }
+}
+
+/**
+ * P4.2 · Vérifie qu'assigner ce coach à un Circle supplémentaire n'excède
+ * pas MAX_ACTIVE_CIRCLES_PER_COACH (10) et que le total d'enfants dans
+ * ses cercles reste ≤ MAX_ACTIVE_CHILDREN_PER_COACH (20).
+ * À appeler dans la même transaction que la création du membership COACH.
+ */
+export async function assertCoachCapacityAvailable(
+  tx: TxClient,
+  coachUserId: string,
+  additionalCircleId: string,
+): Promise<void> {
+  const activeCircles = await tx.circleMembership.findMany({
+    where: { userId: coachUserId, role: "COACH", status: "ACTIVE" },
+    select: { circleId: true },
+  });
+  if (activeCircles.length >= MAX_ACTIVE_CIRCLES_PER_COACH) {
+    throw new CapacityError("coach_capacity_reached", "coach circle capacity reached", {
+      dimension: "circles",
+      limit: MAX_ACTIVE_CIRCLES_PER_COACH,
+      current: activeCircles.length,
+    });
+  }
+  const circleIds = [...activeCircles.map((c) => c.circleId), additionalCircleId];
+  const activeChildren = await tx.circleMembership.count({
+    where: {
+      circleId: { in: circleIds },
+      role: "CHILD",
+      status: "ACTIVE",
+    },
+  });
+  if (activeChildren > MAX_ACTIVE_CHILDREN_PER_COACH) {
+    throw new CapacityError("coach_capacity_reached", "coach children capacity reached", {
+      dimension: "children",
+      limit: MAX_ACTIVE_CHILDREN_PER_COACH,
+      current: activeChildren,
+    });
   }
 }

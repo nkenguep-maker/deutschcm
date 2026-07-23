@@ -298,6 +298,11 @@ model User {
   auditEventsAsActor    AuditEvent[]         @relation("AuditActor")
   storageObjectsOwned   StorageObject[]      @relation("StorageObjectOwner")
 
+  // ─── P4.2 · invitations Circle ─────────────────────────────────
+  invitationsIssued     CircleInvitation[]   @relation("InvitationInviter")
+  invitationsAccepted   CircleInvitation[]   @relation("InvitationAcceptor")
+  invitationsRevoked    CircleInvitation[]   @relation("InvitationRevoker")
+
   @@index([email])
   @@index([centerId])
   @@index([supabaseId])
@@ -1170,6 +1175,7 @@ model Circle {
   household   Household          @relation("HouseholdCircles", fields: [householdId], references: [id], onDelete: Cascade)
   createdBy   User               @relation("CircleCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
   memberships CircleMembership[]
+  invitations CircleInvitation[]
 
   // Note · l'unicité "un seul Circle non-archivé par (foyer, langue)" est
   // portée par un index partiel PostgreSQL créé dans la migration :
@@ -1231,6 +1237,45 @@ enum CircleMembershipStatus {
   REMOVED
 }
 
+// ─── P4.2 · CircleInvitation · workflow invitation adulte ───────
+// Un OWNER invite un deuxième adulte par email (le hash de l'email est stocké
+// pour éviter l'énumération). Le token brut n'est jamais stocké ni journalisé,
+// seul son hash SHA-256. Expiration 72h. Usage unique.
+model CircleInvitation {
+  id                String            @id @default(cuid())
+  circleId          String
+  role              CircleRole
+  status            InvitationStatus  @default(PENDING)
+  invitedEmailHash  String
+  invitedByUserId   String
+  tokenHash         String
+  expiresAt         DateTime
+  acceptedAt        DateTime?
+  acceptedByUserId  String?
+  revokedAt         DateTime?
+  revokedByUserId   String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  circle       Circle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  invitedBy    User   @relation("InvitationInviter", fields: [invitedByUserId], references: [id], onDelete: Cascade)
+  acceptedBy   User?  @relation("InvitationAcceptor", fields: [acceptedByUserId], references: [id], onDelete: SetNull)
+  revokedBy    User?  @relation("InvitationRevoker", fields: [revokedByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([tokenHash])
+  @@index([circleId, status])
+  @@index([invitedEmailHash, status])
+  @@index([expiresAt, status])
+  @@map("circle_invitations")
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+
 // ─── P4.1 · AuditEvent · trace des actions sensibles ─────────────
 // Ajouté dès P4.1 (avant P4.2 memberships) pour tracer immédiatement
 // invitations, retraits, assignations coach, accès refusés, break-glass.
@@ -1273,6 +1318,18 @@ enum AuditAction {
   CROSS_TENANT_ACCESS_DENIED
   STORAGE_ACCESS_DENIED
   ADMIN_BREAK_GLASS_USED
+  // P4.2 · workflow membership Circle
+  ADULT_INVITED
+  ADULT_INVITATION_REVOKED
+  ADULT_INVITATION_ACCEPTED
+  ADULT_LEFT_CIRCLE
+  ADULT_REMOVED
+  CHILD_ADDED
+  CHILD_REMOVED
+  COACH_ASSIGNMENT_REQUESTED
+  COACH_ASSIGNED
+  COACH_REMOVED
+  MEMBERSHIP_ACCESS_DENIED
 }
 
 // ─── P4.1 · StorageObject · métadonnées uploads privés ───────────
