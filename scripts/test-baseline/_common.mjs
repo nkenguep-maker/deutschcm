@@ -3,21 +3,91 @@
 
 import { readFileSync } from "node:fs";
 
-// P4.3a hardening · Ne PAS charger `.env` par défaut (dotenv/config) ·
-// `.env` contient les URLs de PRODUCTION deutschcm dans plusieurs environnements
-// dev. Un chargement automatique fait pointer les tests P-1 vers PROD (bug
-// vécu 2026-07-23). On charge UNIQUEMENT `.env.p1-baseline` qui contient la
-// P-1 (kzzagbojjkivdzzcrmxn) et le mot de passe de test.
+// P4.3a hardening · **AUCUN** chargement automatique de `.env`. Historique ·
+// 2026-07-23, `dotenv/config` chargeait `.env` puis `.env.p1-baseline` en
+// override conditionnel (`if (!process.env[m[1]])`). Sur poste dev où `.env`
+// contient `DIRECT_URL` de PRODUCTION, cela faisait pointer les scripts test
+// vers la DB production. Résultat · 12 fixtures Prisma écrites sur
+// `sbjhvlrkbyjckdxujjsk` (voir docs/incidents/2026-07-23-p4-3a-production-fixture-write.md).
+//
+// Correction · on charge UNIQUEMENT `.env.p1-baseline` **avec override
+// total** (les variables shell préalables sont écrasées si `.env.p1-baseline`
+// les définit). Aucune autre source d'env vars n'est autorisée. Toute
+// tentative de contournement par override permanent est explicitement
+// interdite par les gardes de `assertNonProduction`.
+
+// The dedicated P-1 project ref (nkengue.p@gmail.com org).
+const P1_REF = "kzzagbojjkivdzzcrmxn";
+// Explicit blacklist of known non-P1 projects (deutschcm prod + prior dev).
+const FORBIDDEN_REFS = ["sbjhvlrkbyjckdxujjsk", "mamofhrurksyuuolucea", "qggwvonfumuimjfsgpdz"];
+
+// Charge `.env.p1-baseline` avec override total. Toutes les variables
+// définies dans ce fichier écrasent l'environnement processus. Aucune
+// autre source n'est lue.
 try {
   const raw = readFileSync(".env.p1-baseline", "utf8");
   for (const line of raw.split("\n")) {
     const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    // On force l'override sur les variables Supabase/DB · les variables
-    // shell (bash export préalable) restent prioritaires uniquement si elles
-    // matchent déjà la P-1.
     if (m) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
   }
 } catch {}
+
+/**
+ * Extrait le project ref d'une URL Supabase ou d'une connection string
+ * PostgreSQL du pooler Supabase. Refuse toute forme non reconnue.
+ *
+ * Formats acceptés ·
+ *   - https://<ref>.supabase.co
+ *   - postgresql://postgres.<ref>:<pwd>@aws-N-<region>.pooler.supabase.com:<port>/postgres
+ *   - postgres://... (idem)
+ *
+ * Retourne · { ref, kind: "https" | "postgres" }
+ * Throw · si l'URL ne peut pas être analysée ou si le format ne correspond
+ * à aucun template Supabase attendu.
+ */
+function parseSupabaseRef(rawUrl, label) {
+  if (!rawUrl || typeof rawUrl !== "string") {
+    throw new Error(`REFUSED: ${label} missing or invalid.`);
+  }
+  let url;
+  try {
+    url = new URL(rawUrl);
+  } catch {
+    throw new Error(`REFUSED: ${label} is not a parseable URL.`);
+  }
+  // Supabase HTTP endpoint
+  if (url.protocol === "https:") {
+    const m = url.hostname.match(/^([a-z0-9]{20})\.supabase\.co$/i);
+    if (!m) throw new Error(`REFUSED: ${label} is not a supabase.co URL (${url.hostname}).`);
+    return { ref: m[1].toLowerCase(), kind: "https" };
+  }
+  // PostgreSQL pooler
+  if (url.protocol === "postgresql:" || url.protocol === "postgres:") {
+    if (!url.hostname.endsWith(".pooler.supabase.com")) {
+      throw new Error(`REFUSED: ${label} is not a supabase pooler host (${url.hostname}).`);
+    }
+    // Username is `postgres.<ref>` (transaction pooler).
+    const userMatch = decodeURIComponent(url.username).match(/^postgres\.([a-z0-9]{20})$/i);
+    if (!userMatch) {
+      throw new Error(`REFUSED: ${label} username does not encode a supabase project ref.`);
+    }
+    return { ref: userMatch[1].toLowerCase(), kind: "postgres" };
+  }
+  throw new Error(`REFUSED: ${label} protocol ${url.protocol} is not recognized.`);
+}
+
+function assertRefIsP1(rawUrl, label) {
+  const { ref, kind } = parseSupabaseRef(rawUrl, label);
+  if (FORBIDDEN_REFS.includes(ref)) {
+    throw new Error(`REFUSED: ${label} targets forbidden project ref ${ref} (kind=${kind}).`);
+  }
+  if (ref !== P1_REF) {
+    throw new Error(
+      `REFUSED: ${label} project ref (${ref}) does not match P-1 (${P1_REF}). ` +
+      `Refusing to connect. kind=${kind}.`
+    );
+  }
+}
 
 export function assertNonProduction() {
   if (process.env.P1_BASELINE_CONFIRMED_NOT_PRODUCTION !== "true") {
@@ -27,58 +97,21 @@ export function assertNonProduction() {
       "See .env.p1-baseline and scripts/test-baseline/README.md."
     );
   }
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  // The dedicated P-1 project ref (nkengue.p@gmail.com org)
-  const P1_REF = "kzzagbojjkivdzzcrmxn";
-  // Explicit blacklist of known non-P1 projects
-  const FORBIDDEN = ["sbjhvlrkbyjckdxujjsk", "mamofhrurksyuuolucea", "qggwvonfumuimjfsgpdz"];
-  for (const bad of FORBIDDEN) {
-    if (url.includes(bad)) {
-      throw new Error(`REFUSED: NEXT_PUBLIC_SUPABASE_URL targets forbidden project ${bad}.`);
-    }
-  }
-  if (!url.includes(P1_REF)) {
-    throw new Error(
-      `REFUSED: NEXT_PUBLIC_SUPABASE_URL (${url}) does not target the P-1 project.\n` +
-      `Expected ref: ${P1_REF}. Refusing to touch any other Supabase project.`
-    );
-  }
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error("REFUSED: SUPABASE_SERVICE_ROLE_KEY missing.");
   }
-  if (!process.env.DIRECT_URL) {
-    throw new Error("REFUSED: DIRECT_URL missing.");
+  // Toute variable URL vers Supabase doit cibler P-1 exclusivement · l'échec
+  // d'une seule d'entre elles bloque l'exécution avant toute connexion.
+  assertRefIsP1(process.env.NEXT_PUBLIC_SUPABASE_URL, "NEXT_PUBLIC_SUPABASE_URL");
+  assertRefIsP1(process.env.DIRECT_URL, "DIRECT_URL");
+  if (process.env.DATABASE_URL) {
+    assertRefIsP1(process.env.DATABASE_URL, "DATABASE_URL");
   }
-  // P4.3a hardening · DIRECT_URL doit aussi cibler la P-1. Bug vécu ·
-  // `.env` local contient DIRECT_URL production, ce qui écrivait les
-  // fixtures test dans la DB production (12 rows Prisma sur
-  // sbjhvlrkbyjckdxujjsk avant détection).
-  const direct = process.env.DIRECT_URL ?? "";
-  for (const bad of FORBIDDEN) {
-    if (direct.includes(bad)) {
-      throw new Error(`REFUSED: DIRECT_URL targets forbidden project ${bad}.`);
-    }
+  if (process.env.SUPABASE_URL) {
+    assertRefIsP1(process.env.SUPABASE_URL, "SUPABASE_URL");
   }
-  if (!direct.includes(P1_REF)) {
-    throw new Error(
-      `REFUSED: DIRECT_URL does not target the P-1 project.\n` +
-      `Expected ref: ${P1_REF}. Refusing to touch any other database.`
-    );
-  }
-  const dbUrl = process.env.DATABASE_URL ?? "";
-  if (dbUrl) {
-    for (const bad of FORBIDDEN) {
-      if (dbUrl.includes(bad)) {
-        throw new Error(`REFUSED: DATABASE_URL targets forbidden project ${bad}.`);
-      }
-    }
-    if (!dbUrl.includes(P1_REF)) {
-      throw new Error(
-        `REFUSED: DATABASE_URL does not target the P-1 project.\n` +
-        `Expected ref: ${P1_REF}.`
-      );
-    }
-  }
+  // Aucun mode d'override permettant de cibler la production · si un futur
+  // développeur ajoute une telle variable ici, elle sera reviewée.
 }
 
 export const TEST_PREFIX = "yema_test_";
