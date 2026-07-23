@@ -233,17 +233,59 @@ codes en statuts stables (404/409/403). **Aucun code Prisma** (`P2002`,
 
 ## 9. AuditEvents (§18)
 
-15 nouvelles `AuditAction` · Monde (12) + Racines (11) + capacité (1) + reply (1) — voir enum `AuditAction` dans `prisma/schema.prisma` (comptes P4.4→P4.5).
+**24 nouvelles valeurs** `AuditAction` (13 Monde + 11 Racines · dédupliquées).
+Les 4 sources — `schema.prisma`, migrations SQL (`20260723000009`,
+`20260723000010`), cette documentation, et `P4_5_AUDIT_ACTIONS_CANONICAL`
+dans `src/lib/__tests__/p4-5-structural.test.ts` — citent la MÊME liste.
+Test structurel `P4.5-A · AuditAction · 4-sources coherence` verrouille
+cette parité.
+
+### 9.1 Monde (13 valeurs)
+
+| Valeur | Producteur planifié | Sous-lot |
+|---|---|---|
+| `ASSIGNMENT_CREATED` | POST `/api/teacher/classes/[classroomId]/assignments` | P4.5-B |
+| `ASSIGNMENT_PUBLISHED` | POST `/api/teacher/assignments/[id]/publish` (in-tx) | P4.5-B |
+| `ASSIGNMENT_CLOSED` | POST `/api/teacher/assignments/[id]/close` (in-tx) | P4.5-B |
+| `ASSIGNMENT_ACCESS_DENIED` | resolveTeacherActor cross-class refus (post-échec) | P4.5-B |
+| `SUBMISSION_CREATED` | POST `/api/student/assignments/[id]/submissions` (in-tx) | P4.5-B |
+| `SUBMISSION_SUBMITTED` | POST `/api/student/submissions/[id]/submit` (in-tx) | P4.5-B |
+| `SUBMISSION_WITHDRAWN` | POST `/api/student/submissions/[id]/withdraw` (in-tx) | P4.5-B |
+| `SUBMISSION_ACCESS_DENIED` | Student cross-submission refus (post-échec) | P4.5-B |
+| `FEEDBACK_DRAFTED` | POST `/api/teacher/submissions/[id]/feedback` (in-tx) | P4.5-B |
+| `FEEDBACK_PUBLISHED` | POST `/api/teacher/feedback/[id]/publish` (in-tx) | P4.5-B |
+| `FEEDBACK_ADDENDUM_CREATED` | POST `/api/teacher/feedback/[id]/addendum` (in-tx) | P4.5-B |
+| `FEEDBACK_ACCESS_DENIED` | Student/Teacher cross-feedback refus (post-échec) | P4.5-B |
+| `STORAGE_UPLOAD_DENIED` | POST `/api/storage/finalize` refus MIME/durée/ownership | P4.5-D |
+
+### 9.2 Racines (11 valeurs)
+
+| Valeur | Producteur planifié | Sous-lot |
+|---|---|---|
+| `CIRCLE_ASSIGNMENT_CREATED` | POST `/api/roots-coach/circles/[id]/activities` (in-tx) | P4.5-C |
+| `CIRCLE_ASSIGNMENT_PUBLISHED` | POST `/api/roots-coach/activities/[id]/publish` (in-tx) | P4.5-C |
+| `CIRCLE_ASSIGNMENT_CLOSED` | POST `/api/roots-coach/activities/[id]/close` (in-tx) | P4.5-C |
+| `CIRCLE_SUBMISSION_CREATED` | POST `/api/circles/[id]/activities/[aid]/submissions` (in-tx) | P4.5-C |
+| `CIRCLE_SUBMISSION_SUBMITTED` | POST `/api/circles/[id]/submissions/[sid]/submit` (in-tx) | P4.5-C |
+| `CIRCLE_SUBMISSION_WITHDRAWN` | POST `/api/circles/[id]/submissions/[sid]/withdraw` (in-tx) | P4.5-C |
+| `CIRCLE_FEEDBACK_DRAFTED` | POST `/api/roots-coach/submissions/[id]/feedback` (in-tx) | P4.5-C |
+| `CIRCLE_FEEDBACK_PUBLISHED` | POST `/api/roots-coach/feedback/[id]/publish` (in-tx) | P4.5-C |
+| `CIRCLE_FEEDBACK_ADDENDUM_CREATED` | POST `/api/roots-coach/feedback/[id]/addendum` (in-tx) | P4.5-C |
+| `PRODUCTION_LIMIT_REACHED` | `assertRootsAssignmentWeekly/Monthly` refus (post-échec unique) | P4.5-C |
+| `PARENT_REPLY_CREATED` | POST `/api/circles/[id]/submissions/[sid]/replies` (in-tx) | P4.5-C |
+
+### 9.3 Doctrine émission
 
 **Écriture in-tx** pour les événements de changement d'état (comme P4.4
 `ROOTS_COACH_ASSIGNMENT_REVOKED`) · pattern à appliquer en P4.5-B/C pour
-`ASSIGNMENT_PUBLISHED`, `SUBMISSION_SUBMITTED`, `FEEDBACK_PUBLISHED`,
-`FEEDBACK_ADDENDUM_CREATED`, `PARENT_REPLY_CREATED`.
+`ASSIGNMENT_CREATED/PUBLISHED/CLOSED`, `SUBMISSION_CREATED/SUBMITTED/WITHDRAWN`,
+`FEEDBACK_DRAFTED/PUBLISHED/ADDENDUM_CREATED`, `PARENT_REPLY_CREATED`
+et leurs équivalents `CIRCLE_*`.
 
 **Écriture post-échec unique** pour les événements de refus
-(`ASSIGNMENT_ACCESS_DENIED`, `SUBMISSION_ACCESS_DENIED`, `PRODUCTION_LIMIT_REACHED`,
-`STORAGE_UPLOAD_DENIED`) · via helper dédié semblable à
-`emitCoachCapacityAudit` (P4.4 closure).
+(`ASSIGNMENT_ACCESS_DENIED`, `SUBMISSION_ACCESS_DENIED`, `FEEDBACK_ACCESS_DENIED`,
+`PRODUCTION_LIMIT_REACHED`, `STORAGE_UPLOAD_DENIED`) · via helper dédié
+semblable à `emitCoachCapacityAudit` (P4.4 closure).
 
 Metadata autorisée · `actorUserId`, `teacherId`, `coachUserId`, `classroomId`,
 `circleId`, `assignmentId`, `submissionId`, `feedbackId`, `childProfileId`,
