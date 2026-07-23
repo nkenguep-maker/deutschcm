@@ -269,6 +269,8 @@ Aucun sous-lot P4 ne peut être activé en production tant que ses blockers ne s
 - [x] 0 cross-center leak — smoke Playwright `scripts/test-baseline/p4-3a-smoke.mjs` (fixtures A/B) validé sur P-1. Voir `docs/YEMA_P4_3A_CENTER_REAL_DATA.md` §8.
 - [x] 0 cross-teacher leak (test dédié P4.3b) — smoke Playwright `scripts/test-baseline/p4-3b-smoke.mjs` + fixtures 10 acteurs (Teacher A/B, ambigüité, zero binding, Center admin seul, coach). Voir `docs/YEMA_P4_3B_TEACHER_WORKSPACE.md` §11.
 - [x] RLS Teacher policies versionnées (`prisma/migrations/20260723000005_p4_3b_teacher_rls`) sur `teachers`, `classrooms`, `classroom_enrollments`, `class_join_requests` — activation prod gated par `TEACHER_RLS_CONFIRMED=true`.
+- [x] 0 cross-coach leak (P4.4 · smoke `scripts/test-baseline/p4-4-smoke.mjs`) · Coach A/B disjoints · coach retiré → 404 immédiat (Q10) · Career Coach → 403 · aucun bypass `is_yema_admin` sur les 3 helpers Coach. Voir `docs/YEMA_P4_4_ROOTS_COACH_WORKSPACE.md` §14.
+- [x] Projection minimale ChildProfile (P4.4 · fonction SECURITY DEFINER `get_roots_coach_assigned_profiles` + policy `child_profiles_service_only` conservée) · aucun email/téléphone/DOB/adresse accessible au Coach.
 - [ ] 0 cross-circle leak (test dédié P4.2+)
 - [ ] 0 cross-household leak (test dédié P4.2+)
 - [ ] 0 DM privé adulte-enfant possible (P4.6 · `ThreadType.ONE_TO_ONE` bloqué côté API sans suppression destructive)
