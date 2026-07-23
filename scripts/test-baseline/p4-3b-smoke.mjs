@@ -15,6 +15,8 @@ const EMAILS = {
   centerAdmin:  "paul+p4_3b_center_admin@example.com",
   studentA1:    "paul+p4_3b_student_a1@example.com",
   racinesCoach: "paul+p4_3b_racines_coach@example.com",
+  yemaAdminNoBind: "paul+p4_3b_yema_admin_no_bind@example.com",
+  yemaAdminWithBind: "paul+p4_3b_yema_admin_with_bind@example.com",
 };
 const CLASS_A1 = "test_p4_3b_class_a1";
 const CLASS_B1 = "test_p4_3b_class_b1";
@@ -71,6 +73,8 @@ async function main() {
     const centerAdmin = await ctxFor(browser, EMAILS.centerAdmin);
     const studentA1 = await ctxFor(browser, EMAILS.studentA1);
     const racinesCoach = await ctxFor(browser, EMAILS.racinesCoach);
+    const yemaAdminNoBind = await ctxFor(browser, EMAILS.yemaAdminNoBind);
+    const yemaAdminWithBind = await ctxFor(browser, EMAILS.yemaAdminWithBind);
 
     // === /api/teacher/me ===
     process.stderr.write("\n═══ /api/teacher/me ═══\n");
@@ -82,6 +86,13 @@ async function main() {
       ["centerAdmin (expect 403)", centerAdmin, 403],
       ["studentA1 (expect 403)", studentA1, 403],
       ["racinesCoach (expect 403)", racinesCoach, 403],
+      // P4.3b hardening §7 · YEMA_ADMIN sans Teacher row · rôle global
+      // ne suffit pas · attend 404 (ZERO_BINDING via TEACHER_ACCESS_DENIED path
+      // ou NOT_FOUND · résultat contractuel = 404 sans row Teacher).
+      ["yemaAdminNoBind (expect 404 zero binding)", yemaAdminNoBind, 404],
+      // P4.3b hardening §7 · YEMA_ADMIN AVEC Teacher row · l'accès provient
+      // du binding · attend 200 même si le rôle global est identique au précédent.
+      ["yemaAdminWithBind (expect 200 via binding)", yemaAdminWithBind, 200],
     ]) {
       const r = await get(ctx.cookie, "/api/teacher/me");
       log(label, { status: r.status, expected: expectStatus, code: r.body?.code, teacherId: r.body?.teacher?.id });
@@ -190,6 +201,7 @@ async function main() {
       teacherA.ctx.close(), teacherB.ctx.close(),
       teacherZero.ctx.close(), teacherAmbig.ctx.close(),
       centerAdmin.ctx.close(), studentA1.ctx.close(), racinesCoach.ctx.close(),
+      yemaAdminNoBind.ctx.close(), yemaAdminWithBind.ctx.close(),
     ]);
   } finally {
     await browser.close();

@@ -40,6 +40,12 @@ const EMAILS = {
   studentB1:   "paul+p4_3b_student_b1@example.com",
   studentRemoved: "paul+p4_3b_student_removed@example.com",
   racinesCoach:"paul+p4_3b_racines_coach@example.com",
+  // P4.3b hardening §7 · un YEMA_ADMIN sans Teacher row doit tomber sur
+  // ZERO_BINDING (404). Le rôle global ne suffit jamais.
+  yemaAdminNoBinding: "paul+p4_3b_yema_admin_no_bind@example.com",
+  // YEMA_ADMIN + Teacher row rattaché à Center A · doit accéder Teacher A
+  // via son binding (pas via le rôle global).
+  yemaAdminWithBinding: "paul+p4_3b_yema_admin_with_bind@example.com",
 };
 
 async function ensureAuth(email, fullName) {
@@ -132,7 +138,8 @@ async function ensureEnrollment(classroomId, userId, isActive = true) {
 async function seed() {
   console.log("═══ P4.3b · seed ═══");
   const [teacherAAuth, teacherBAuth, teacherAmbigAuth, teacherZeroAuth,
-         centerAdminAuth, sA1Auth, sA2Auth, sB1Auth, sRemAuth, coachAuth] =
+         centerAdminAuth, sA1Auth, sA2Auth, sB1Auth, sRemAuth, coachAuth,
+         adminNoBindAuth, adminWithBindAuth] =
     await Promise.all([
       ensureAuth(EMAILS.teacherA, "TEST P4.3b Teacher A"),
       ensureAuth(EMAILS.teacherB, "TEST P4.3b Teacher B"),
@@ -144,10 +151,12 @@ async function seed() {
       ensureAuth(EMAILS.studentB1, "TEST P4.3b Student B1"),
       ensureAuth(EMAILS.studentRemoved, "TEST P4.3b Student Removed"),
       ensureAuth(EMAILS.racinesCoach, "TEST P4.3b Racines Coach"),
+      ensureAuth(EMAILS.yemaAdminNoBinding, "TEST P4.3b YEMA Admin No Binding"),
+      ensureAuth(EMAILS.yemaAdminWithBinding, "TEST P4.3b YEMA Admin With Binding"),
     ]);
 
   const [teacherA, teacherB, teacherAmbig, teacherZero, centerAdmin,
-         sA1, sA2, sB1, sRem, coach] = await Promise.all([
+         sA1, sA2, sB1, sRem, coach, adminNoBind, adminWithBind] = await Promise.all([
     ensureDbUser(teacherAAuth.id, EMAILS.teacherA, "TEST P4.3b Teacher A", "TEACHER"),
     ensureDbUser(teacherBAuth.id, EMAILS.teacherB, "TEST P4.3b Teacher B", "TEACHER"),
     ensureDbUser(teacherAmbigAuth.id, EMAILS.teacherAmbig, "TEST P4.3b Teacher Ambig", "TEACHER"),
@@ -160,6 +169,10 @@ async function seed() {
     ensureDbUser(sB1Auth.id, EMAILS.studentB1, "TEST P4.3b Student B1", "STUDENT"),
     ensureDbUser(sRemAuth.id, EMAILS.studentRemoved, "TEST P4.3b Student Removed", "STUDENT"),
     ensureDbUser(coachAuth.id, EMAILS.racinesCoach, "TEST P4.3b Racines Coach", "STUDENT"),
+    // YEMA admin sans Teacher row · attend 404 (rôle global ne suffit pas).
+    ensureDbUser(adminNoBindAuth.id, EMAILS.yemaAdminNoBinding, "TEST P4.3b YEMA Admin No Binding", "ADMIN"),
+    // YEMA admin AVEC Teacher row · doit accéder via son binding (Center A).
+    ensureDbUser(adminWithBindAuth.id, EMAILS.yemaAdminWithBinding, "TEST P4.3b YEMA Admin With Binding", "ADMIN"),
   ]);
 
   await Promise.all([
@@ -175,6 +188,11 @@ async function seed() {
     // L'enum P-1 n'a pas RACINES_COACH (migration P4.1 non appliquée) ·
     // on utilise CAREER_COACH · même invariant (non-Teacher).
     ensureAppRole(coach.id, "CAREER_COACH"),
+    // YEMA admin sans binding · rôle global uniquement.
+    ensureAppRole(adminNoBind.id, "YEMA_ADMIN"),
+    // YEMA admin avec binding · rôle global + rôle Teacher (le binding
+    // apporté par ensureTeacher plus bas est la condition d'accès Teacher).
+    ensureAppRole(adminWithBind.id, "YEMA_ADMIN"),
   ]);
 
   // Sync user_metadata pour que le proxy ne redirige pas vers /setup-role.
@@ -189,6 +207,8 @@ async function seed() {
     syncMeta(sB1Auth.id, "STUDENT"),
     syncMeta(sRemAuth.id, "STUDENT"),
     syncMeta(coachAuth.id, "STUDENT"),
+    syncMeta(adminNoBindAuth.id, "ADMIN"),
+    syncMeta(adminWithBindAuth.id, "ADMIN"),
   ]);
 
   const cA = await ensureCenter(CENTER_A, "TEST_CENTER_A_P43B", "Yaoundé", "P43B_A");
@@ -198,6 +218,9 @@ async function seed() {
     ensureTeacher(teacherA.id, cA.id),
     ensureTeacher(teacherB.id, cB.id),
   ]);
+  // adminWithBinding · Teacher row rattaché à Center A. Le rôle global reste
+  // YEMA_ADMIN, mais l'accès Teacher est explicitement gouverné par ce row.
+  await ensureTeacher(adminWithBind.id, cA.id);
 
   // Ambigüité forcée · un premier Teacher row sur Center A + un second row
   // arbitraire sur Center B ne peut pas exister (contrainte @unique userId).
