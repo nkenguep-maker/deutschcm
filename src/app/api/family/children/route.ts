@@ -119,9 +119,11 @@ export async function POST(req: Request) {
     // Limite douce · 4 langues par enfant suffit pour rester lisible.
     return NextResponse.json({ error: "too_many_langues" }, { status: 400 });
   }
+  // P3 hardening · doctrine §4 · maximum 4 enfants par foyer (offre Famille).
+  const MAX_CHILDREN = 4;
   const count = await prisma.childProfile.count({ where: { parentUserId: guard.parentId } });
-  if (count >= 6) {
-    return NextResponse.json({ error: "max_children_reached" }, { status: 409 });
+  if (count >= MAX_CHILDREN) {
+    return NextResponse.json({ error: "max_children_reached", limit: MAX_CHILDREN, current: count }, { status: 409 });
   }
 
   const created = await prisma.childProfile.create({
