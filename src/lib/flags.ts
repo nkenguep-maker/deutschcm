@@ -95,6 +95,26 @@ export function isRootsCoachWorkspaceActive(): boolean {
   return true;
 }
 
+/**
+ * P4.5 · workflow assignments (Monde + Racines). `ASSIGNMENTS_ENABLED = false`
+ * verrouille TOUTES les nouvelles routes P4.5 en 404/placeholder. En production,
+ * l'exposition effective d'un endpoint reste conditionnée aux guards RLS
+ * existants Teacher (`isTeacherWorkspaceActive`) ou Coach
+ * (`isRootsCoachWorkspaceActive`) selon le contexte · brief §22.
+ */
+export function isAssignmentsActive(): boolean {
+  return getFlag("ASSIGNMENTS_ENABLED");
+}
+
+/**
+ * P4.5 · audio (submission + feedback). Requiert `ASSIGNMENTS_ENABLED` en
+ * plus de `AUDIO_FEEDBACK_ENABLED` · un déploiement peut vouloir garder
+ * l'audio verrouillé pendant que l'écrit est déjà accepté (brief §22).
+ */
+export function isAudioFeedbackActive(): boolean {
+  return isAssignmentsActive() && getFlag("AUDIO_FEEDBACK_ENABLED");
+}
+
 export function assertFlagEnabled(name: FeatureFlag): void {
   if (!getFlag(name)) {
     const err = new Error(`feature_flag_disabled:${name}`);
