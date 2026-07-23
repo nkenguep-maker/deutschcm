@@ -202,7 +202,15 @@ Policies ·
 
 Nouvelles valeurs `AuditAction` idempotent · `TEACHER_ACCESS_DENIED`, `TEACHER_CLASS_ACCESS_DENIED`, `TEACHER_STUDENT_ACCESS_DENIED`, `TEACHER_SCOPE_AMBIGUOUS`.
 
-**Correctif migration** · `20260723000006_p4_3b_teacher_rls_fix` bascule les 3 helpers Teacher de `SECURITY INVOKER` vers `SECURITY DEFINER` (avec `search_path = public, pg_temp` conservé). Motivation · récursion infinie détectée en runtime · `is_teacher_for_classroom` en INVOKER lisait `public.classrooms`, ce qui appliquait à nouveau la policy et rappelait le helper. Pattern identique à `is_circle_member`, `is_class_member`, `is_center_admin` posés en P4.1 §5.
+**Correctif migration `_teacher_rls_fix`** · `20260723000006_p4_3b_teacher_rls_fix` bascule les 3 helpers Teacher de `SECURITY INVOKER` vers `SECURITY DEFINER` (avec `search_path = public, pg_temp` conservé). Motivation · récursion infinie détectée en runtime · `is_teacher_for_classroom` en INVOKER lisait `public.classrooms`, ce qui appliquait à nouveau la policy et rappelait le helper. Pattern identique à `is_circle_member`, `is_class_member`, `is_center_admin` posés en P4.1 §5.
+
+**Correctif migration `_teacher_rls_admin_fix`** · `20260723000007_p4_3b_teacher_rls_admin_fix` retire le bypass `OR is_yema_admin(current_app_user_id())` des 4 policies posées par `_teacher_rls`. Motivation · un `YEMA_ADMIN` sans Teacher row voyait TOUTES les lignes des 4 tables via ce bypass · contraire au principe P4.3b §7 (accès Teacher = binding, jamais rôle global). Nouvelles policies ·
+- `teachers_select_self` · `userId = current_app_user_id()` uniquement.
+- `classrooms_select_teacher_scope` · `is_teacher_for_classroom(id, current)` uniquement.
+- `enrollments_select_owner_or_teacher` · `userId = current OR is_teacher_for_classroom(classroomId, current)` (Student self-view préservé).
+- `class_join_requests_select_scope` · `fromUserId = current OR is_teacher_for_classroom(toClassroomId, current)` (owner self-view préservé).
+
+Un futur endpoint support/backoffice transversal devra reposer sur une autorisation applicative explicite + AuditEvent obligatoire, et non sur les policies métier Teacher.
 
 **Émissions AuditEvent** (fire-and-forget · sanitizeMetadata en défense) · voir `src/lib/permissions/teacher.ts` ·
 - `TEACHER_ACCESS_DENIED` sur rôle Teacher absent (Center admin, Student, Coach) · metadata `{reasonCode, appRoles}`.
