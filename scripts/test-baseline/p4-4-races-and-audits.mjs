@@ -92,6 +92,34 @@ async function ensureChildMembership(circleId, childProfileId) {
   });
 }
 
+// Reproduit inline `withSerializableRetry` de src/lib/db/retry.ts pour
+// refléter fidèlement le contrat des routes admin coach (POST + DELETE
+// enveloppées avec ce helper). Max 3 tentatives, backoff 25/50/100 ms.
+function isSerializationFailure(e) {
+  return (
+    e?.code === "40001" ||
+    e?.code === "P2034" ||
+    /serialization_failure|could not serialize|TransactionWriteConflict/i.test(e?.message ?? "")
+  );
+}
+async function withRetryInline(fn, errorCode) {
+  const max = 3;
+  let lastErr;
+  for (let attempt = 0; attempt < max; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      if (!isSerializationFailure(e)) throw e;
+      lastErr = e;
+      await new Promise((res) => setTimeout(res, 25 * Math.pow(2, attempt)));
+    }
+  }
+  const err = new Error("operation could not complete due to concurrent updates");
+  err.code = errorCode;
+  err.cause = lastErr;
+  throw err;
+}
+
 // Reproduit inline la logique assignCoach de src/lib/circles/memberships.ts
 async function assignCoachInline(circleId, coachUserId, adminUserId) {
   return db.$transaction(async (tx) => {
@@ -127,7 +155,7 @@ async function assignCoachInline(circleId, coachUserId, adminUserId) {
           },
         },
       }).catch(() => {});
-      throw Object.assign(new Error("coach_capacity_reached"), { code: "coach_capacity_reached", dimension: "circles" });
+      throw Object.assign(new Error("coach_circle_capacity_reached"), { code: "coach_circle_capacity_reached", dimension: "circles" });
     }
     const circleIds = [...activeCircles.map(c => c.circleId), circleId];
     const activeChildren = await tx.circleMembership.count({
@@ -147,7 +175,7 @@ async function assignCoachInline(circleId, coachUserId, adminUserId) {
           },
         },
       }).catch(() => {});
-      throw Object.assign(new Error("coach_capacity_reached"), { code: "coach_capacity_reached", dimension: "children" });
+      throw Object.assign(new Error("coach_profile_capacity_reached"), { code: "coach_profile_capacity_reached", dimension: "children" });
     }
     const m = await tx.circleMembership.create({
       data: {
@@ -234,10 +262,11 @@ async function main() {
   await ensureAdultMembership(circle10.id, parentX.id, "OWNER");
   await ensureAdultMembership(circle11.id, parentX.id, "OWNER");
 
-  // Concurrence · deux assignations en parallèle
+  // Concurrence · deux assignations en parallèle (avec retry Serializable
+  // pour refléter le contrat prod des routes admin coach).
   const [r10, r11] = await Promise.allSettled([
-    assignCoachInline(circle10.id, coachA.id, admin.id),
-    assignCoachInline(circle11.id, coachA.id, admin.id),
+    withRetryInline(() => assignCoachInline(circle10.id, coachA.id, admin.id), "concurrent_coach_assignment"),
+    withRetryInline(() => assignCoachInline(circle11.id, coachA.id, admin.id), "concurrent_coach_assignment"),
   ]);
   const successes = [r10, r11].filter(r => r.status === "fulfilled").length;
   const errs = [r10, r11].filter(r => r.status === "rejected").map(r => r.reason?.code ?? r.reason?.message?.slice(0, 40));
@@ -270,6 +299,110 @@ async function main() {
     firstMetadata: capacityAudits[0]?.metadata,
   });
 
+  // ── SCENARIO 1b · concurrence 19→20/21 profils (capacité children) ───
+  // Setup · un Coach D fresh avec 19 CHILD memberships déjà en place dans 4
+  // Circles owned. Deux nouveaux Circles cibles, chacun avec 1 CHILD
+  // (donc chaque assignCoach ajouterait +1 profil au coach). Race : les
+  // deux assignCoach tournent en concurrence Serializable · 1 doit gagner
+  // (final=20), l'autre doit échouer avec `coach_profile_capacity_reached`
+  // et un unique AuditEvent ROOTS_COACH_CAPACITY_REACHED avec
+  // capacityType="children", limit=20, current=20.
+  process.stderr.write("\n─── S1b · 19→20/21 profils race ───\n");
+  const coachD = await ensureUser("test_p4_4_race_coach_d_id", "test_p4_4_race_coach_d@example.com", "STUDENT");
+  await ensureAppRole(coachD.id, "RACINES_COACH");
+  const parentY = await ensureUser("test_p4_4_race_parent_y_id", "test_p4_4_race_parent_y@example.com", "STUDENT");
+  const hhY = await ensureHousehold("test_p4_4_race_household_p_y", parentY.id);
+  // 4 Circles owned par parentY, coachD est COACH ACTIVE sur les 4.
+  // On y répartit 19 CHILD memberships (5 + 5 + 5 + 4).
+  const S1B_LANGS = ["WOLOF", "DOUALA", "LINGALA", "BAMBARA"];
+  const s1bCircles = [];
+  const s1bDist = [5, 5, 5, 4];
+  let childIdx = 0;
+  for (let i = 0; i < 4; i++) {
+    const c = await ensureCircle(`test_p4_4_race_p_c${i}`, hhY.id, S1B_LANGS[i], parentY.id, "ACTIVE");
+    await ensureAdultMembership(c.id, parentY.id, "OWNER");
+    await ensureCoachMembership(c.id, coachD.id);
+    for (let j = 0; j < s1bDist[i]; j++) {
+      const cp = await ensureChildProfile(
+        `test_p4_4_race_p_child_${childIdx}`, parentY.id, hhY.id, `Enf${childIdx}`, 8,
+      );
+      await ensureChildMembership(c.id, cp.id);
+      childIdx++;
+    }
+    s1bCircles.push(c);
+  }
+  const s1bBaseline = await db.circleMembership.count({
+    where: {
+      circleId: { in: s1bCircles.map((c) => c.id) },
+      role: "CHILD", status: "ACTIVE",
+    },
+  });
+  log("S1b · baseline children coached by D (expect 19)", { count: s1bBaseline });
+
+  // Deux Circles cibles fresh (household distincts pour respecter unique-per-language)
+  const hhZ1 = await ensureHousehold("test_p4_4_race_household_p_z1", parentY.id);
+  const hhZ2 = await ensureHousehold("test_p4_4_race_household_p_z2", parentY.id);
+  const circleZ1 = await ensureCircle("test_p4_4_race_p_target_z1", hhZ1.id, "YORUBA", parentY.id, "ACTIVE");
+  const circleZ2 = await ensureCircle("test_p4_4_race_p_target_z2", hhZ2.id, "SWAHILI", parentY.id, "ACTIVE");
+  await ensureAdultMembership(circleZ1.id, parentY.id, "OWNER");
+  await ensureAdultMembership(circleZ2.id, parentY.id, "OWNER");
+  const childZ1 = await ensureChildProfile("test_p4_4_race_p_child_z1", parentY.id, hhZ1.id, "EnfZ1", 8);
+  const childZ2 = await ensureChildProfile("test_p4_4_race_p_child_z2", parentY.id, hhZ2.id, "EnfZ2", 8);
+  await ensureChildMembership(circleZ1.id, childZ1.id);
+  await ensureChildMembership(circleZ2.id, childZ2.id);
+
+  const capBeforeS1b = await db.auditEvent.count({
+    where: { action: "ROOTS_COACH_CAPACITY_REACHED", targetId: coachD.id },
+  });
+  // Utilise withRetryInline pour reproduire le contrat exact des routes admin
+  // coach POST · le loser SSI retry, voit current=20 après commit du gagnant,
+  // et déclenche assertCoachCapacityAvailable → coach_profile_capacity_reached
+  // + AuditEvent ROOTS_COACH_CAPACITY_REACHED.
+  const [rZ1, rZ2] = await Promise.allSettled([
+    withRetryInline(() => assignCoachInline(circleZ1.id, coachD.id, admin.id), "concurrent_coach_assignment"),
+    withRetryInline(() => assignCoachInline(circleZ2.id, coachD.id, admin.id), "concurrent_coach_assignment"),
+  ]);
+  const s1bSuccesses = [rZ1, rZ2].filter((r) => r.status === "fulfilled").length;
+  const s1bErrs = [rZ1, rZ2].filter((r) => r.status === "rejected").map((r) => r.reason?.code ?? r.reason?.message?.slice(0, 60));
+  log("S1b · race result (expect 1 success max)", { successes: s1bSuccesses, errs: s1bErrs });
+
+  // Compte les enfants dans les Circles où Coach D est effectivement ACTIVE
+  // (pas dans les Circles Z où D n'a pas gagné la course).
+  const coachDActiveCircles = await db.circleMembership.findMany({
+    where: { userId: coachD.id, role: "COACH", status: "ACTIVE" },
+    select: { circleId: true },
+  });
+  const s1bFinalChildren = await db.circleMembership.count({
+    where: {
+      circleId: { in: coachDActiveCircles.map((m) => m.circleId) },
+      role: "CHILD", status: "ACTIVE",
+    },
+  });
+  const s1bFinalCoachCircles = coachDActiveCircles.length;
+  log("S1b · final state (expect children<=20, coachCircles<=5)", {
+    finalChildren: s1bFinalChildren, finalCoachCircles: s1bFinalCoachCircles,
+  });
+
+  const capAfterS1b = await db.auditEvent.findMany({
+    where: {
+      action: "ROOTS_COACH_CAPACITY_REACHED",
+      targetId: coachD.id,
+    },
+    select: { metadata: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+  });
+  log("S1b · ROOTS_COACH_CAPACITY_REACHED delta + firstMetadata", {
+    before: capBeforeS1b,
+    afterTotal: capAfterS1b.length,
+    delta: capAfterS1b.length - capBeforeS1b,
+    firstMetadata: capAfterS1b[0]?.metadata,
+  });
+  // Structural check · l'unique événement doit avoir capacityType="children"
+  const s1bChildrenEvents = capAfterS1b.filter(
+    (a) => a.metadata && typeof a.metadata === "object" && a.metadata.capacityType === "children",
+  );
+  log("S1b · CAPACITY_REACHED children-only events", { count: s1bChildrenEvents.length });
+
   // ── SCENARIO 2 · remplacement concurrent · A → B et A → C ────────────
   process.stderr.write("\n─── S2 · remplacement concurrent A→B / A→C ───\n");
   // Utilise circle10 (occupé par coachA après S1) · si S1 a réussi, sinon un des seeded.
@@ -283,12 +416,12 @@ async function main() {
 
   const [rB, rC] = await Promise.allSettled([
     (async () => {
-      await removeCoachInline(targetCircle, admin.id);
-      return assignCoachInline(targetCircle, coachB.id, admin.id);
+      await withRetryInline(() => removeCoachInline(targetCircle, admin.id), "concurrent_coach_replacement");
+      return withRetryInline(() => assignCoachInline(targetCircle, coachB.id, admin.id), "concurrent_coach_assignment");
     })(),
     (async () => {
-      await removeCoachInline(targetCircle, admin.id);
-      return assignCoachInline(targetCircle, coachC.id, admin.id);
+      await withRetryInline(() => removeCoachInline(targetCircle, admin.id), "concurrent_coach_replacement");
+      return withRetryInline(() => assignCoachInline(targetCircle, coachC.id, admin.id), "concurrent_coach_assignment");
     })(),
   ]);
   const replaceSuccesses = [rB, rC].filter(r => r.status === "fulfilled").length;
@@ -337,15 +470,19 @@ async function main() {
   });
   log("S3 · read count · before / after remove", { readBefore, readAfter });
 
-  // ── SCENARIO 3.5 · défensif SCOPE_AMBIGUOUS ─────────────────────────
-  // Reproduit un état de drift · > SCOPE_AMBIGUOUS_THRESHOLD (20) Circle
-  // memberships COACH ACTIVE pour le même coach. Impossible par le workflow
-  // normal (assignCoach borne à 10) mais atteignable via raw insert (défense
-  // en profondeur). On seed 21 memberships raw puis on appelle le compte
-  // resolver inline et on émet SCOPE_AMBIGUOUS si l'anomalie est détectée.
-  process.stderr.write("\n─── S3.5 · défensif SCOPE_AMBIGUOUS (drift schéma) ───\n");
-  // Le compte actuel est ~9 (S3 a retiré une membership de coach A · les
-  // autres restent actives). On ajoute des Circles + memberships jusqu'à > 20.
+  // ── SCENARIO 3.5 · Option A · SCOPE_AMBIGUOUS n'est PLUS producteur du drift ──
+  // Doctrine P4.4 finale · le resolver ne produit plus SCOPE_AMBIGUOUS sur
+  // (count > 20). Ce check reste comme verrou de doctrine · même en état de
+  // drift extrême (> 20 memberships COACH ACTIVE), aucun événement
+  // ROOTS_COACH_SCOPE_AMBIGUOUS ne doit être émis · l'enum reste réservé
+  // à des états futurs d'ambiguïté vraie (fusion identité, mappings pro
+  // contradictoires). Un drift capacité doit être remonté via
+  // CAPACITY_REACHED par les workflows (assignCoach / addChildToCircle),
+  // pas par le resolver.
+  process.stderr.write("\n─── S3.5 · SCOPE_AMBIGUOUS n'est plus producteur drift (Option A) ───\n");
+  const scopeAmbiguousBefore = await db.auditEvent.count({
+    where: { action: "ROOTS_COACH_SCOPE_AMBIGUOUS" },
+  });
   const driftBase = await db.circleMembership.count({
     where: { userId: coachA.id, role: "COACH", status: "ACTIVE" },
   });
@@ -360,23 +497,17 @@ async function main() {
   const observedCount = await db.circleMembership.count({
     where: { userId: coachA.id, role: "COACH", status: "ACTIVE", circle: { status: "ACTIVE" } },
   });
-  log("S3.5 · drift observedCount (>20 attendu)", { count: observedCount });
-  // Reproduit le check défensif du resolver inline · si count > SCOPE_AMBIGUOUS_THRESHOLD (20), émettre.
-  if (observedCount > 20) {
-    await db.auditEvent.create({
-      data: {
-        actorUserId: coachA.id, actorRole: "STUDENT",
-        action: "ROOTS_COACH_SCOPE_AMBIGUOUS",
-        targetType: "RootsCoachWorkspace", targetId: "resolve",
-        scopeType: "RootsCoachWorkspace", scopeId: null,
-        metadata: {
-          reasonCode: "coach_circle_count_over_threshold",
-          observedCount,
-          threshold: 20,
-        },
-      },
-    });
-    log("S3.5 · SCOPE_AMBIGUOUS émis (défensif)", { observedCount, threshold: 20 });
+  const scopeAmbiguousAfter = await db.auditEvent.count({
+    where: { action: "ROOTS_COACH_SCOPE_AMBIGUOUS" },
+  });
+  log("S3.5 · drift observedCount + scope_ambiguous delta", {
+    observedCount,
+    scopeAmbiguousBefore,
+    scopeAmbiguousAfter,
+    delta: scopeAmbiguousAfter - scopeAmbiguousBefore,
+  });
+  if (scopeAmbiguousAfter !== scopeAmbiguousBefore) {
+    throw new Error("S3.5 · FAIL · SCOPE_AMBIGUOUS émis alors que Option A l'interdit");
   }
 
   // ── SCENARIO 4 · verifier les 6 AuditActions ─────────────────────────

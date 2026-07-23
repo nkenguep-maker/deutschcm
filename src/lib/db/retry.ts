@@ -19,7 +19,10 @@ function isSerializationFailure(e: unknown): boolean {
 
 export class ConcurrentUpdateError extends Error {
   constructor(
-    public readonly code: "concurrent_membership_update" | "concurrent_invitation_update",
+    public readonly code: | "concurrent_membership_update"
+    | "concurrent_invitation_update"
+    | "concurrent_coach_assignment"
+    | "concurrent_coach_replacement",
     message: string,
     public readonly cause?: unknown,
   ) {
@@ -30,7 +33,10 @@ export class ConcurrentUpdateError extends Error {
 
 export interface RetryOptions {
   max?: number;
-  errorCode?: "concurrent_membership_update" | "concurrent_invitation_update";
+  errorCode?: | "concurrent_membership_update"
+    | "concurrent_invitation_update"
+    | "concurrent_coach_assignment"
+    | "concurrent_coach_replacement";
 }
 
 /**

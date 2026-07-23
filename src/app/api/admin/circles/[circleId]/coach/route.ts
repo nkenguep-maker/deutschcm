@@ -12,6 +12,7 @@ import { resolveAdminActor } from "@/lib/permissions/admin";
 import { assignCoach, removeCoach } from "@/lib/circles/memberships";
 import { writeAuditEvent } from "@/lib/audit/events";
 import { mapErrorToResponse, auditAccessDenied, err } from "@/lib/api/circleErrors";
+import { withSerializableRetry } from "@/lib/db/retry";
 
 export async function POST(
   request: NextRequest,
@@ -26,27 +27,31 @@ export async function POST(
   if (!coachUserId) return err("validation_error", "coachUserId required", 400);
   try {
     const admin = await resolveAdminActor();
-    const result = await prisma.$transaction(
-      async (tx) => {
-        const m = await assignCoach(tx, {
-          circleId, coachUserId, adminUserId: admin.userId,
-        });
-        await writeAuditEvent(
-          {
-            actorUserId: admin.userId,
-            actorRole: "YEMA_ADMIN",
-            action: "COACH_ASSIGNED",
-            targetType: "CircleMembership",
-            targetId: m.id,
-            scopeType: "Circle",
-            scopeId: circleId,
-            metadata: { coachUserId },
+    const result = await withSerializableRetry(
+      () =>
+        prisma.$transaction(
+          async (tx) => {
+            const m = await assignCoach(tx, {
+              circleId, coachUserId, adminUserId: admin.userId,
+            });
+            await writeAuditEvent(
+              {
+                actorUserId: admin.userId,
+                actorRole: "YEMA_ADMIN",
+                action: "COACH_ASSIGNED",
+                targetType: "CircleMembership",
+                targetId: m.id,
+                scopeType: "Circle",
+                scopeId: circleId,
+                metadata: { coachUserId },
+              },
+              tx,
+            );
+            return m;
           },
-          tx,
-        );
-        return m;
-      },
-      { isolationLevel: "Serializable" },
+          { isolationLevel: "Serializable" },
+        ),
+      { errorCode: "concurrent_coach_assignment" },
     );
     return NextResponse.json({ membership: { id: result.id, role: "COACH" } });
   } catch (e) {
@@ -73,27 +78,31 @@ export async function DELETE(
   const { circleId } = await params;
   try {
     const admin = await resolveAdminActor();
-    const result = await prisma.$transaction(
-      async (tx) => {
-        const removed = await removeCoach(tx, { circleId, adminUserId: admin.userId });
-        if (removed.removedMembershipId) {
-          await writeAuditEvent(
-            {
-              actorUserId: admin.userId,
-              actorRole: "YEMA_ADMIN",
-              action: "COACH_REMOVED",
-              targetType: "CircleMembership",
-              targetId: removed.removedMembershipId,
-              scopeType: "Circle",
-              scopeId: circleId,
-              metadata: { previousCoachUserId: removed.previousCoachUserId },
-            },
-            tx,
-          );
-        }
-        return removed;
-      },
-      { isolationLevel: "Serializable" },
+    const result = await withSerializableRetry(
+      () =>
+        prisma.$transaction(
+          async (tx) => {
+            const removed = await removeCoach(tx, { circleId, adminUserId: admin.userId });
+            if (removed.removedMembershipId) {
+              await writeAuditEvent(
+                {
+                  actorUserId: admin.userId,
+                  actorRole: "YEMA_ADMIN",
+                  action: "COACH_REMOVED",
+                  targetType: "CircleMembership",
+                  targetId: removed.removedMembershipId,
+                  scopeType: "Circle",
+                  scopeId: circleId,
+                  metadata: { previousCoachUserId: removed.previousCoachUserId },
+                },
+                tx,
+              );
+            }
+            return removed;
+          },
+          { isolationLevel: "Serializable" },
+        ),
+      { errorCode: "concurrent_coach_replacement" },
     );
     return NextResponse.json({
       ok: true, removedMembershipId: result.removedMembershipId,

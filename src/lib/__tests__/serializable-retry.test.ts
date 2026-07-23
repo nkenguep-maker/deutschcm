@@ -48,6 +48,32 @@ describe("withSerializableRetry", () => {
     }
   });
 
+  it("uses the supplied errorCode for coach assignment (P4.4)", async () => {
+    const err = Object.assign(new Error("40001"), { code: "40001" });
+    const fn = vi.fn().mockRejectedValue(err);
+    try {
+      await withSerializableRetry(fn, { errorCode: "concurrent_coach_assignment" });
+      throw new Error("should have thrown");
+    } catch (e) {
+      expect(e).toBeInstanceOf(ConcurrentUpdateError);
+      expect((e as ConcurrentUpdateError).code).toBe("concurrent_coach_assignment");
+      expect((e as ConcurrentUpdateError).message).not.toContain("P2034");
+      expect((e as ConcurrentUpdateError).message).not.toContain("TransactionWriteConflict");
+    }
+  });
+
+  it("uses the supplied errorCode for coach replacement (P4.4)", async () => {
+    const err = Object.assign(new Error("TransactionWriteConflict"), { code: "P2034" });
+    const fn = vi.fn().mockRejectedValue(err);
+    try {
+      await withSerializableRetry(fn, { errorCode: "concurrent_coach_replacement" });
+      throw new Error("should have thrown");
+    } catch (e) {
+      expect(e).toBeInstanceOf(ConcurrentUpdateError);
+      expect((e as ConcurrentUpdateError).code).toBe("concurrent_coach_replacement");
+    }
+  });
+
   it("does NOT retry other errors (permission, capacity)", async () => {
     class OtherError extends Error {}
     const fn = vi.fn().mockRejectedValue(new OtherError("nope"));
