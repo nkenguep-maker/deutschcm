@@ -176,6 +176,8 @@ Le `CENTER_ADMIN` opère uniquement sur les entités dont `centerId = user.cente
 
 ## 6. Console Teacher · autorisation détaillée P4.3b
 
+> **P4.3b livré** · `resolveTeacherActor` (`src/lib/permissions/teacher.ts`) résout via `Teacher.userId` (défensif `findMany({take:2})`). Aucun `teacherId`/`centerId`/`classroomId` client accepté. Migration RLS `20260723000005_p4_3b_teacher_rls` (helpers `is_teacher`, `is_teacher_for_classroom`, `is_active_student_in_classroom` + policies teachers/classrooms/enrollments/join_requests). Voir `docs/YEMA_P4_3B_TEACHER_WORKSPACE.md`.
+
 | Ressource | Read | Write |
 |---|---|---|
 | `Class` où je suis TEACHER ou provider | oui | oui (métadonnées, archivage) |

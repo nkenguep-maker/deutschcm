@@ -267,6 +267,8 @@ Aucun sous-lot P4 ne peut être activé en production tant que ses blockers ne s
 
 - [ ] 0 IDOR sur toutes les routes du sous-lot
 - [x] 0 cross-center leak — smoke Playwright `scripts/test-baseline/p4-3a-smoke.mjs` (fixtures A/B) validé sur P-1. Voir `docs/YEMA_P4_3A_CENTER_REAL_DATA.md` §8.
+- [x] 0 cross-teacher leak (test dédié P4.3b) — smoke Playwright `scripts/test-baseline/p4-3b-smoke.mjs` + fixtures 10 acteurs (Teacher A/B, ambigüité, zero binding, Center admin seul, coach). Voir `docs/YEMA_P4_3B_TEACHER_WORKSPACE.md` §11.
+- [x] RLS Teacher policies versionnées (`prisma/migrations/20260723000005_p4_3b_teacher_rls`) sur `teachers`, `classrooms`, `classroom_enrollments`, `class_join_requests` — activation prod gated par `TEACHER_RLS_CONFIRMED=true`.
 - [ ] 0 cross-circle leak (test dédié P4.2+)
 - [ ] 0 cross-household leak (test dédié P4.2+)
 - [ ] 0 DM privé adulte-enfant possible (P4.6 · `ThreadType.ONE_TO_ONE` bloqué côté API sans suppression destructive)

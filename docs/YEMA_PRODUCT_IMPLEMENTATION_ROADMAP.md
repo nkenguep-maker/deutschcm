@@ -576,6 +576,10 @@ Déplacé dans le lot P0.B pour la même raison : P1-4 et P2-2 (parcours écoute
 - **Estimation supplémentaire** : **L** (au-dessus de P4-3).
 - **Livraison** · voir `docs/YEMA_P4_3A_CENTER_REAL_DATA.md`. Branche `feat/yema-p4-3a-center-real-data`. Feature flag `CENTER_REAL_DATA_ENABLED` = `false` par défaut. Six endpoints `/api/center/{me,dashboard,teachers,classes,students,enrollments}`, cinq pages SSR (`/center`, `/center/teachers`, `/center/classes`, `/center/students`, `/center/stats`), resolver `resolveCenterActor`, seam `src/lib/center/queries.ts`. Aucun `centerId` client accepté. `classId` étranger retourne `{ items: [], total: 0 }`. Aucune migration Prisma. Aucun endpoint P4.3b (invitations, paiement, Circle) exposé.
 
+### P4-3b · Teacher workspace sécurisé (livré)
+
+- **Livraison** · voir `docs/YEMA_P4_3B_TEACHER_WORKSPACE.md`. Branche `feat/yema-p4-3b-teacher-workspace`. Feature flag `TEACHER_WORKSPACE_ENABLED` = `false` par défaut. Sept endpoints `/api/teacher/{me,dashboard,classes,classes/[id],classes/[id]/students,students,schedule}`, cinq pages SSR (`/teacher`, `/teacher/classes`, `/teacher/classes/[id]`, `/teacher/students`, `/teacher/schedule`) + deux LOCK (`/teacher/assignments`, `/teacher/activities`) + trois redirections (`/classrooms`, `/classroom/[id]`, `/students/[id]`, `/stats`), resolver `resolveTeacherActor` (ZERO/ONE/AMBIGUOUS), seam `src/lib/teacher/queries.ts`. Aucun `teacherId`/`centerId`/`classroomId` client accepté. Legacy `/api/teacher` fermé à `404 teacher_endpoint_deprecated`. Migration RLS additive `20260723000005_p4_3b_teacher_rls` (helpers `is_teacher`, `is_teacher_for_classroom`, `is_active_student_in_classroom` + policies sur `teachers`/`classrooms`/`classroom_enrollments`/`class_join_requests`). Production activation exige aussi `TEACHER_RLS_CONFIRMED=true`.
+
 ## P4-4 · Espace admin §25.5
 
 - **Routes** : `/admin/users`, `/admin/applications`, `/admin/courses`, `/admin/roles`, `/admin/system`, `/admin/centers`.
