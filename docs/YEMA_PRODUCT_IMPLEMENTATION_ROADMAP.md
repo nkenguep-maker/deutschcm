@@ -483,11 +483,22 @@ Déplacé dans le lot P0.B pour la même raison : P1-4 et P2-2 (parcours écoute
 
 # Lot P4 — Professionnels
 
+> **Statut audit** (branche `feat/yema-p4-professional-spaces`, audit 2026-07-23) :
+> - Audit d'architecture complet publié · `docs/YEMA_P4_ARCHITECTURE_AUDIT.md` (inventaire Prisma · routes · mocks · Circle Option A pseudo-schéma · classroom vs circle)
+> - Matrice permissions détaillée · `docs/YEMA_P4_PERMISSION_MATRIX.md` (9 rôles globaux × 20 actions + rôles locaux Circle + Class + Center + Teacher + Coach)
+> - Threat model mineurs + storage + RLS · `docs/YEMA_P4_THREAT_MODEL.md` (13 menaces classées CRITICAL/HIGH/MEDIUM/LOW · politique buckets · rétention audios · audit trail)
+> - Plan d'implémentation · `docs/YEMA_P4_IMPLEMENTATION_PLAN.md` (migrations M1-M6 · 9 feature flags · sous-lots P4.1 → P4.7 · 15 décisions produit ouvertes · plan de tests unit/intégration/concurrence/E2E/sécurité · blockers de lancement)
+> - Ordre P4 confirmé · P4.1 → P4.2 → P4.3a → P4.3b → P4.4 → P4.5 → P4.6 → P4.7 → M6 (RLS activation)
+> - Aucun code, aucune migration, aucun schéma Prisma modifié pendant l'audit
+> - **Décision** · `P4 AUDIT READY FOR REVIEW`
+
 **Objectif utilisateur** : offrir aux professeurs, coachs, centres et admins un espace opérationnel qui priorise l'action, pas les statistiques.
 
-**Pages concernées** : `/teacher/*`, `/center/*`, `/admin/*`.
+**Pages concernées** : `/teacher/*`, `/coach/*` (nouveau), `/center/*`, `/admin/*`, `/classroom/*` (câblage réel), `/famille/*` (extensions Circle).
 **Composants réutilisés** : `TeacherLayout`, `CenterLayout`, `Layout` (pour admin), `StateBlock`, `Portrait`.
-**Composants à créer** : `TeacherDashboardHero`, `CorrectionsQueue`, `CorrectionEditor`, `CenterMembersTable`, `AdminUsersTable`.
+**Composants à créer** : `TeacherDashboardHero`, `CorrectionsQueue`, `CorrectionEditor`, `CenterMembersTable`, `AdminUsersTable`, `CoachDashboard`, `CircleFeed`, `CircleFeedback`.
+
+**Décision structurelle** · Circle Option A confirmé (nouvelle entité vs enum `RACINES_CIRCLE` sur `Class`). Voir `docs/YEMA_P3_CIRCLE_DECISION.md` §Recommandation.
 
 ## P4-1 · Dashboard professeur §25.1
 
