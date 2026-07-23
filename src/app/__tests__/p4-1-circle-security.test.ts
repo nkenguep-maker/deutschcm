@@ -66,7 +66,7 @@ describe("Prisma schema · P4.1 additions", () => {
 });
 
 describe("Migration SQL · P4.1", () => {
-  const sql = read("prisma/migrations/20260723_p4_1_circle_security/migration.sql");
+  const sql = read("prisma/migrations/20260723000003_p4_1_circle_security/migration.sql");
   it("uses ADD VALUE IF NOT EXISTS for enum extensions (idempotent)", () => {
     expect(sql).toMatch(/ALTER TYPE "AppRole" ADD VALUE IF NOT EXISTS 'RACINES_COACH'/);
     expect(sql).toMatch(/ALTER TYPE "ProductCode" ADD VALUE IF NOT EXISTS 'ROOTS_COACH_ADDON'/);
