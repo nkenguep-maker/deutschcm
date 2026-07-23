@@ -483,6 +483,18 @@ Déplacé dans le lot P0.B pour la même raison : P1-4 et P2-2 (parcours écoute
 
 # Lot P4 — Professionnels
 
+> **Statut P4.2** (branche `feat/yema-p4-2-memberships-invitations`, 2026-07-23) :
+> - `CircleInvitation` model + `InvitationStatus` enum · migration additive `20260723000004_p4_2_invitations` appliquée à P-1 uniquement.
+> - 11 nouvelles valeurs `AuditAction` (`ADULT_INVITED`, `ADULT_INVITATION_ACCEPTED`, `ADULT_INVITATION_REVOKED`, `ADULT_LEFT_CIRCLE`, `ADULT_REMOVED`, `CHILD_ADDED`, `CHILD_REMOVED`, `COACH_ASSIGNMENT_REQUESTED`, `COACH_ASSIGNED`, `COACH_REMOVED`, `MEMBERSHIP_ACCESS_DENIED`).
+> - Token invitation · `crypto.randomBytes(32) base64url` · SHA-256 stocké · **jamais** de raw en base/logs/AuditEvent · exposé uniquement via `X-P4-Test-Token` en dev (`YEMA_ALLOW_TEST_TOKENS=true`).
+> - **10 endpoints P4.2** · `/api/circles/[cid]/{members,children,leave,members/[mid],invitations/adult,invitations/[iid]/revoke,children/[cpid]}` + `/api/circle-invitations/[token]/accept` + `/api/admin/circles/[cid]/coach` (POST + DELETE). Tous flag-gated (404 quand `CIRCLE_ENABLED=false`), tous en transaction Serializable.
+> - **Décisions produit intégrées** · Q1 (2ᵉ adulte lecture + accompagnement, jamais delete enfant/membership sensible) · Q2 (OWNER seul invite) · Q3 (OWNER retire + adulte se retire self, `owner_cannot_leave`) · Q10 (coach remplacé perd l'accès immédiatement, historique attribué conservé) · Q15 (capacité coach 20 profils / 10 Circles enforced via `assertCoachCapacityAvailable`).
+> - RLS · policy `circle_invitations_select_owner` · grant SELECT authenticated · revoke anon.
+> - **Hardening finalisé** · advisory locks per Circle (`pg_advisory_xact_lock`) sur tout accept/child-add/coach-assign · retry limité 3× sur 40001/P2034 avec `withSerializableRetry` · mapping `ConcurrentUpdateError → 409 concurrent_{membership,invitation}_update` (plus jamais INTERNAL) · losing accept auto-marquée REVOKED avec `reasonCode=adult_capacity_reached` + AuditEvent · `MEMBERSHIP_ACCESS_DENIED` audit sur 4 routes sensibles (invite/child/coach/member remove).
+> - **Migration base vierge** vérifiée `prisma dev` PGlite · 15 migrations séquentielles OK · 2ᵉ `deploy` → "No pending migrations" · circle_invitations RLS + policy select_owner + 11/11 nouvelles AuditAction.
+> - **439 tests pass · TypeScript clean · build vert · 33/33 assertions smoke E2E** couvrant workflow complet + hardening (2 tokens distincts race, accept vs revoke, membership_access_denied audit).
+> - Landing intacte · flag restauré `false` par défaut vérifié 404.
+>
 > **Statut P4.1** (branche `feat/yema-p4-1-circle-security`, hardening finalisé 2026-07-23) :
 > - Circle · CircleMembership · AuditEvent · StorageObject · migration additive **idempotente** appliquée à P-1 (`kzzagbojjkivdzzcrmxn`) — voir `docs/YEMA_P4_1_CIRCLE_SECURITY.md`.
 > - `AppRole = RACINES_COACH` et `ProductCode = ROOTS_COACH_ADDON` ajoutés.
