@@ -59,6 +59,8 @@ enum AppRole {
   CAREER_COACH
   CENTER_ADMIN
   YEMA_ADMIN
+  // P4.1 — nouveau rôle dédié coach Racines, distinct de CAREER_COACH.
+  RACINES_COACH
 }
 
 enum ProductCode {
@@ -69,6 +71,8 @@ enum ProductCode {
   ROOTS_FAMILY
   ROOTS_FOLLOWUP_ADDON
   COMPANION
+  // P4.1 — offre "Suivi Racines" 30 000 XAF / 45 € (Q7/Q15 validées).
+  ROOTS_COACH_ADDON
 }
 
 enum BillingType {
@@ -287,7 +291,15 @@ model User {
   feedbackAuthored      ClassFeedback[]      @relation("feedbackAuthor")
   providerProfile       ProviderProfile?
 
+  // ─── P4.1 · relations Circle + Audit + Storage ────────────────
+  circlesCreated        Circle[]             @relation("CircleCreator")
+  circleMemberships     CircleMembership[]   @relation("CircleUserMembership")
+  circleInvitationsSent CircleMembership[]   @relation("CircleInviter")
+  auditEventsAsActor    AuditEvent[]         @relation("AuditActor")
+  storageObjectsOwned   StorageObject[]      @relation("StorageObjectOwner")
+
   @@index([email])
+  @@index([centerId])
   @@index([supabaseId])
   @@map("users")
 }
@@ -648,6 +660,9 @@ model Household {
   memberships  HouseholdMembership[]
   dependents   DependentProfile[]
   grants       AccessGrant[]         @relation("grantsAsHousehold")
+  // P4.1
+  circles      Circle[]              @relation("HouseholdCircles")
+  children     ChildProfile[]        @relation("HouseholdChildren")
 
   @@index([ownerUserId])
   @@map("households")
@@ -1121,13 +1136,177 @@ model ChildProfile {
   age          Int
   langues      Json     @default("[]")
   activeLangue String?
+  // P4.1 · rattachement explicite au foyer (opt-in, SetNull préserve enfant en cas de suppression foyer).
+  householdId  String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  parent User @relation(fields: [parentUserId], references: [id], onDelete: Cascade)
+  parent            User               @relation(fields: [parentUserId], references: [id], onDelete: Cascade)
+  household         Household?         @relation("HouseholdChildren", fields: [householdId], references: [id], onDelete: SetNull)
+  circleMemberships CircleMembership[]
+  storageObjects    StorageObject[]    @relation("StorageObjectChildOwner")
 
   @@index([parentUserId])
+  @@index([householdId])
   @@map("child_profiles")
+}
+
+// ─── P4.1 · Circle · unité privée Racines (Option A) ─────────────
+// Un Circle représente le foyer en tant que groupe pédagogique privé
+// pour une langue donnée. Un Household peut avoir plusieurs Circles s'il
+// apprend plusieurs langues (kikongo + swahili → 2 Circles).
+// Doctrine · docs/YEMA_P3_CIRCLE_DECISION.md + docs/YEMA_P4_ARCHITECTURE_AUDIT.md §5.
+model Circle {
+  id              String       @id @default(cuid())
+  householdId     String
+  language        LanguageCode
+  status          CircleStatus @default(ACTIVE)
+  createdByUserId String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  activeAt        DateTime     @default(now())
+  archivedAt      DateTime?
+
+  household   Household          @relation("HouseholdCircles", fields: [householdId], references: [id], onDelete: Cascade)
+  createdBy   User               @relation("CircleCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  memberships CircleMembership[]
+
+  // Contrainte forte · un seul Circle par (foyer, langue), tous statuts confondus (Q9 · nouveau Circle par changement de langue).
+  @@unique([householdId, language])
+  @@index([householdId, status])
+  @@index([language, status])
+  @@map("circles")
+}
+
+enum CircleStatus {
+  ACTIVE
+  ARCHIVED
+  SUSPENDED
+}
+
+// ─── P4.1 · CircleMembership · appartenance typée ───────────────
+// Un membership rattache soit un User adulte (OWNER, ADULT, COACH),
+// soit un ChildProfile (CHILD). Contrainte XOR au niveau DB.
+model CircleMembership {
+  id              String                   @id @default(cuid())
+  circleId        String
+  role            CircleRole
+  status          CircleMembershipStatus   @default(INVITED)
+  userId          String?
+  childProfileId  String?
+  invitedByUserId String?
+  joinedAt        DateTime?
+  removedAt       DateTime?
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  circle       Circle        @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  user         User?         @relation("CircleUserMembership", fields: [userId], references: [id], onDelete: Cascade)
+  childProfile ChildProfile? @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
+  invitedBy    User?         @relation("CircleInviter", fields: [invitedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([circleId, role, status])
+  @@index([circleId, status])
+  @@index([userId, status])
+  @@index([childProfileId, status])
+  @@map("circle_memberships")
+}
+
+enum CircleRole {
+  OWNER
+  ADULT
+  CHILD
+  COACH
+}
+
+enum CircleMembershipStatus {
+  INVITED
+  ACTIVE
+  SUSPENDED
+  REMOVED
+}
+
+// ─── P4.1 · AuditEvent · trace des actions sensibles ─────────────
+// Ajouté dès P4.1 (avant P4.2 memberships) pour tracer immédiatement
+// invitations, retraits, assignations coach, accès refusés, break-glass.
+// Ne JAMAIS stocker corps de message, transcription audio, secret.
+model AuditEvent {
+  id           String       @id @default(cuid())
+  actorUserId  String?
+  actorRole    String?
+  action       AuditAction
+  targetType   String
+  targetId     String
+  scopeType    String?
+  scopeId      String?
+  metadata     Json?
+  createdAt    DateTime     @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([targetType, targetId, createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_events")
+}
+
+enum AuditAction {
+  CIRCLE_CREATED
+  CIRCLE_ARCHIVED
+  CIRCLE_SUSPENDED
+  CIRCLE_MEMBERSHIP_INVITED
+  CIRCLE_MEMBERSHIP_ACCEPTED
+  CIRCLE_MEMBERSHIP_REVOKED
+  CIRCLE_MEMBERSHIP_ROLE_CHANGED
+  CIRCLE_COACH_ASSIGNED
+  CIRCLE_COACH_UNASSIGNED
+  HOUSEHOLD_MEMBERSHIP_INVITED
+  HOUSEHOLD_MEMBERSHIP_ACCEPTED
+  HOUSEHOLD_MEMBERSHIP_REVOKED
+  CHILD_PROFILE_UPDATED
+  CHILD_ACCESS_DENIED
+  CROSS_TENANT_ACCESS_DENIED
+  STORAGE_ACCESS_DENIED
+  ADMIN_BREAK_GLASS_USED
+}
+
+// ─── P4.1 · StorageObject · métadonnées uploads privés ───────────
+// Aucun upload UI en P4.1. Le modèle est posé pour que P4.5/P4.6 puissent
+// s'y appuyer sans migration supplémentaire. Aucun bucket public pour
+// productions enfants (Q7 rétention 90 j Circle / 12 mois productions).
+model StorageObject {
+  id                  String                @id @default(cuid())
+  bucket              String
+  path                String
+  ownerUserId         String?
+  ownerChildProfileId String?
+  circleId            String?
+  classId             String?
+  purpose             StorageObjectPurpose
+  mimeType            String
+  sizeBytes           Int
+  durationSeconds     Int?
+  retentionUntil      DateTime?
+  createdAt           DateTime              @default(now())
+  deletedAt           DateTime?
+
+  owner        User?         @relation("StorageObjectOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerChild   ChildProfile? @relation("StorageObjectChildOwner", fields: [ownerChildProfileId], references: [id], onDelete: SetNull)
+
+  @@unique([bucket, path])
+  @@index([purpose, retentionUntil])
+  @@index([ownerUserId, createdAt])
+  @@index([circleId])
+  @@index([classId])
+  @@map("storage_objects")
+}
+
+enum StorageObjectPurpose {
+  SUBMISSION_AUDIO
+  FEEDBACK_AUDIO
+  CIRCLE_MESSAGE_AUDIO
+  CLASS_MESSAGE_AUDIO
+  ATTACHMENT
 }
 
 // ─── Demandes de démo (centres) ──────────────────────────────────
