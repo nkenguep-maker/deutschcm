@@ -24,7 +24,7 @@ describe("assertCoachCapacityAvailable · Q15", () => {
     }));
     const tx = makeTx(circles, 0);
     await expect(assertCoachCapacityAvailable(tx, "coach1", "cnew")).rejects.toMatchObject({
-      code: "coach_capacity_reached",
+      code: "coach_circle_capacity_reached",
       detail: { dimension: "circles", limit: 10 },
     });
   });
@@ -35,7 +35,7 @@ describe("assertCoachCapacityAvailable · Q15", () => {
   it("refuse au-delà de 20 enfants totaux", async () => {
     const tx = makeTx([{ circleId: "c1" }, { circleId: "c2" }], MAX_ACTIVE_CHILDREN_PER_COACH + 1);
     await expect(assertCoachCapacityAvailable(tx, "coach1", "cnew")).rejects.toMatchObject({
-      code: "coach_capacity_reached",
+      code: "coach_profile_capacity_reached",
       detail: { dimension: "children", limit: 20 },
     });
   });

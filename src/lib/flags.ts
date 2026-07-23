@@ -17,6 +17,7 @@ export type FeatureFlag =
   | "TEACHER_WORKSPACE_ENABLED"
   | "TEACHER_RLS_CONFIRMED"
   | "COACH_WORKSPACE_ENABLED"
+  | "ROOTS_COACH_RLS_CONFIRMED"
   | "ASSIGNMENTS_ENABLED"
   | "AUDIO_FEEDBACK_ENABLED"
   | "CLOSED_MESSAGING_ENABLED"
@@ -30,6 +31,7 @@ const P4_FLAGS: readonly FeatureFlag[] = [
   "TEACHER_WORKSPACE_ENABLED",
   "TEACHER_RLS_CONFIRMED",
   "COACH_WORKSPACE_ENABLED",
+  "ROOTS_COACH_RLS_CONFIRMED",
   "ASSIGNMENTS_ENABLED",
   "AUDIO_FEEDBACK_ENABLED",
   "CLOSED_MESSAGING_ENABLED",
@@ -70,6 +72,24 @@ export function isCenterRealDataActive(): boolean {
 export function isTeacherWorkspaceActive(): boolean {
   if (!getFlag("TEACHER_WORKSPACE_ENABLED")) return false;
   if (process.env.NODE_ENV === "production" && !getFlag("TEACHER_RLS_CONFIRMED")) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * P4.4 · workspace Coach Racines · même pattern double confirmation.
+ * `COACH_WORKSPACE_ENABLED` seul en dev · en prod, requiert aussi
+ * `ROOTS_COACH_RLS_CONFIRMED=true` (policies RLS + projection function
+ * posées et validées).
+ *
+ * Note · `RACINES_COACH_OPERATIONAL` reste indépendant · il gouverne
+ * l'opérationnalité commerciale (paiement, réservation session, etc.),
+ * pas l'exposition du workspace en lecture.
+ */
+export function isRootsCoachWorkspaceActive(): boolean {
+  if (!getFlag("COACH_WORKSPACE_ENABLED")) return false;
+  if (process.env.NODE_ENV === "production" && !getFlag("ROOTS_COACH_RLS_CONFIRMED")) {
     return false;
   }
   return true;
