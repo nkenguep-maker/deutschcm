@@ -32,15 +32,18 @@ import {
 } from "@/lib/circles/capacity";
 
 /**
- * P4.4 hardening · borne défensive `SCOPE_AMBIGUOUS` · limite de sécurité
- * anti-drift. En pratique, la partial-unique-index P4.1 empêche > 1 Coach
- * ACTIVE par cercle et la borne applicative empêche > 10 Circles par coach.
- * Si ces gardes cassaient (schema drift, seed fautif, migration corrompue),
- * un coach pourrait avoir un état incohérent. On détecte l'anomalie au
- * resolver et on émet un audit défensif au-delà du seuil observable (double
- * MAX_ACTIVE_CIRCLES_PER_COACH).
+ * P4.4 closure · `ROOTS_COACH_SCOPE_AMBIGUOUS` est **réservé** à un futur
+ * état de bindings Coach réellement incompatibles (par exemple deux
+ * identités Coach superposées via une identité de fusion, ou plusieurs
+ * mappings professionnels contradictoires). Le producteur "compte de
+ * Circles > threshold" n'est plus utilisé · la borne applicative (10
+ * Circles) est déjà enforced par `assignCoach` et le dépassement produit
+ * `ROOTS_COACH_CAPACITY_REACHED` avec `capacityType`. Voir §16 spec closure
+ * Option A.
+ *
+ * La valeur d'enum reste déclarée · une future itération pourra la câbler
+ * quand un vrai scénario ambigu existe.
  */
-const SCOPE_AMBIGUOUS_THRESHOLD = MAX_ACTIVE_CIRCLES_PER_COACH * 2;
 
 export interface RootsCoachActor extends CircleActor {
   /** UserId applicatif du coach. Pas de `coachId` distinct (Coach = User avec rôle). */
@@ -130,33 +133,14 @@ export async function resolveRootsCoachActor(): Promise<RootsCoachActor> {
   }
 
   const [activeCircleCount, activeChildProfileCount] = await Promise.all([
-    (async () => {
-      const count = await prisma.circleMembership.count({
-        where: {
-          userId: dbUser.id,
-          role: "COACH",
-          status: "ACTIVE",
-          circle: { status: "ACTIVE" },
-        },
-      });
-      // Défensif · signal d'anomalie schéma si la borne applicative est
-      // débordée. Ne bloque pas la réponse (l'utilisateur voit son scope).
-      if (count > SCOPE_AMBIGUOUS_THRESHOLD) {
-        await auditRootsCoachRefusal({
-          action: "ROOTS_COACH_SCOPE_AMBIGUOUS",
-          actorUserId: dbUser.id,
-          actorRole: dbUser.role,
-          targetType: "RootsCoachWorkspace",
-          targetId: "resolve",
-          metadata: {
-            reasonCode: "coach_circle_count_over_threshold",
-            observedCount: count,
-            threshold: SCOPE_AMBIGUOUS_THRESHOLD,
-          },
-        });
-      }
-      return count;
-    })(),
+    prisma.circleMembership.count({
+      where: {
+        userId: dbUser.id,
+        role: "COACH",
+        status: "ACTIVE",
+        circle: { status: "ACTIVE" },
+      },
+    }),
     // Compte les CHILD memberships actifs des circles où ce coach est actif.
     // Utilise une jointure Prisma implicite via `circleId in (...)`.
     (async () => {

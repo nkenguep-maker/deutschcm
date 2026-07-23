@@ -16,6 +16,7 @@ import {
   assertCircleChildCapacity,
   assertCircleCoachCapacity,
   assertCoachCapacityAvailable,
+  assertCoachProfileCapacityForChildAdd,
 } from "@/lib/circles/capacity";
 import { acquireCircleLock } from "@/lib/db/locks";
 import { writeAuditEvent } from "@/lib/audit/events";
@@ -84,6 +85,37 @@ export async function addChildToCircle(
 
   await acquireCircleLock(tx, input.circleId);
   await assertCircleChildCapacity(tx, input.circleId);
+  // P4.4 hardening · si le Circle a un COACH ACTIVE, garantir que ce coach
+  // ne dépasse pas son budget profil (20). Sinon `coach_profile_capacity_reached`
+  // → 409 mappé côté API, aucun leak de code Prisma.
+  try {
+    await assertCoachProfileCapacityForChildAdd(tx, input.circleId);
+  } catch (e) {
+    if (e instanceof CapacityError && e.code === "coach_profile_capacity_reached") {
+      const limit = (e.detail?.limit as number | undefined) ?? null;
+      const current = (e.detail?.current as number | undefined) ?? null;
+      const coachUserId = (e.detail?.coachUserId as string | undefined) ?? "unknown";
+      void writeAuditEvent({
+        actorUserId: input.ownerUserId,
+        actorRole: "PARENT",
+        action: "ROOTS_COACH_CAPACITY_REACHED",
+        targetType: "RootsCoachAssignment",
+        targetId: coachUserId,
+        scopeType: "Circle",
+        scopeId: input.circleId,
+        metadata: {
+          reasonCode: "capacity_reached",
+          capacityType: "children",
+          limit,
+          current,
+          routeAction: "addChildToCircle",
+        },
+      }).catch((err) => {
+        console.warn("[audit] ROOTS_COACH_CAPACITY_REACHED write failed:", (err as Error).message);
+      });
+    }
+    throw e;
+  }
 
   // Dédup · pas de duplicate ACTIVE membership pour ce child.
   const existing = await tx.circleMembership.findFirst({
@@ -235,7 +267,11 @@ export async function assignCoach(
   try {
     await assertCoachCapacityAvailable(tx, input.coachUserId, input.circleId);
   } catch (e) {
-    if (e instanceof CapacityError && e.code === "coach_capacity_reached") {
+    if (
+      e instanceof CapacityError &&
+      (e.code === "coach_circle_capacity_reached" ||
+        e.code === "coach_profile_capacity_reached")
+    ) {
       const dim = (e.detail?.dimension as string | undefined) ?? null;
       const limit = (e.detail?.limit as number | undefined) ?? null;
       const current = (e.detail?.current as number | undefined) ?? null;
