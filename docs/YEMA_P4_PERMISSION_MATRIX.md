@@ -19,7 +19,7 @@ Chaque case est classée · `ALLOW` · `DENY` · `CONDITIONAL` (avec condition s
 | `PARENT_RACINES` | `UserAppRole.role = PARENT` **OR** propriétaire d'un `Household` **OR** au moins 1 `ChildProfile` où `parentUserId = user.id` | `me/racines-dashboard`, `family/*` |
 | `CHILD_PROFILE` | `ChildProfile` sélectionné en `user_metadata.activeChildId` (jamais un `User` authentifié) | `me/active-child` |
 | `TEACHER` | `UserAppRole.role = TEACHER` **AND** `Teacher` row existant | `teacher/*` |
-| `COACH` (Racines) | `UserAppRole.role = CAREER_COACH` (ou nouveau `RACINES_COACH` à trancher) **AND** au moins 1 `CircleMembership.role = COACH ACTIVE` | `coach/*` (P4.4) |
+| `COACH` (Racines) | **`UserAppRole.role = RACINES_COACH`** (nouveau, ajouté à l'enum en P4.4 · jamais `CAREER_COACH`) **AND** au moins 1 `CircleMembership.role = COACH ACTIVE` | `coach/*` (P4.4) |
 | `CENTER_ADMIN` | `UserAppRole.role = CENTER_ADMIN` **AND** `User.centerId != null` | `center/*` |
 | `ADMIN` | `UserAppRole.role = YEMA_ADMIN` | `admin/*` |
 | `ANONYMOUS` | `supabase.auth.getUser() → null` | landing, `/pricing/*`, `/login` |
@@ -114,8 +114,8 @@ Colonnes · rôles CircleMembership. Lignes · actions.
 
 ### Conditions locales Circle
 
-- **D1** · le deuxième adulte peut modifier / supprimer les profils enfants **uniquement** si la décision produit Q1 (`IMPLEMENTATION_PLAN.md`) est `YES`. Par défaut recommandé : `NO` (seul OWNER gère les enfants).
-- **D2** · CHILD envoie audio uniquement si Q6 est `YES` avec quota. Recommandation par défaut : `YES avec 3 min max / message` (aligné doctrine Suivi humain §3).
+- **D1** · Q1 **validée · NON**. Le deuxième adulte voit et accompagne les profils enfants, mais **ne les modifie pas** et **ne les supprime pas**. Seul l'OWNER (parent principal) gère les profils enfants. RLS `child_profiles` restreint `UPDATE`/`DELETE` à `parent_user_id = auth.uid()`.
+- **D2** · Q6 **validée · OUI avec quota 3 minutes max**. Le CHILD peut envoyer une note vocale dans le Circle (jamais hors Circle) · durée ≤ 180 s validée serveur à l'upload · visible par OWNER, ADULT, COACH et CHILD concerné.
 
 ---
 
@@ -165,6 +165,9 @@ Le `CENTER_ADMIN` opère uniquement sur les entités dont `centerId = user.cente
 | Modérer un message dans une `Class` du centre | ALLOW |
 | Voir un `Circle` Racines | DENY (les cercles n'appartiennent pas au centre) |
 | Voir un `ChildProfile` | DENY |
+| Lire messages classe (Q12) | DENY par défaut · CONDITIONAL[E3] si rôle safeguarding P5 + audit |
+
+- **E3** · Q12 validée. Le Center ne lit pas les conversations de classe par défaut. Un accès exceptionnel est réservé à un rôle `SAFEGUARDING` (à créer en P5) avec audit obligatoire. En P4, `has_safeguarding_role` retourne toujours `false` — donc aucun Center admin ne lit un message pendant tout P4.
 
 - **E1** · uniquement si `AccessGrant.sourceType = CENTER_SEAT` et `AccessGrant.sourceId = <center>`.
 - **E2** · uniquement si le center admin est aussi `ClassMembership.TEACHER` de cette Class.
@@ -197,7 +200,7 @@ Le `CENTER_ADMIN` opère uniquement sur les entités dont `centerId = user.cente
 
 ## 7. Console Coach Racines · autorisation détaillée P4.4
 
-Feature flag associé · `COACH_WORKSPACE_ENABLED = false` par défaut.
+Feature flag associé · `COACH_WORKSPACE_ENABLED = false` par défaut. Rôle applicatif · `AppRole = RACINES_COACH` (nouveau, jamais `CAREER_COACH`).
 
 Toutes les tables sensibles sont scopées via `CircleMembership.role = COACH AND status = ACTIVE`.
 
@@ -207,19 +210,21 @@ Toutes les tables sensibles sont scopées via `CircleMembership.role = COACH AND
 | `Circle` sans moi | non | non |
 | `CircleMembership` de mes cercles | oui (limité : rôle + prénom / animal pour CHILD) | non |
 | `CircleMembership` hors mes cercles | non | non |
-| `ChildProfile` d'un enfant de mes cercles | oui (limité : prénom, animal, âge, langue active, étape É actuelle) | non |
+| `ChildProfile` d'un enfant de mes cercles (Q4) | oui (limité : prénom / nom d'affichage, animal, âge, langue active, étape É actuelle) | non |
 | `ChildProfile` global | non | non |
 | `CircleAssignment` de mes cercles (P4.5) | oui | oui (créer/publier) |
 | `CircleSubmission` de mes cercles | oui | non |
-| `CircleFeedback` que j'écris | oui | oui (créer, non éditable) |
-| `CircleMessage` de mes cercles | oui | oui (TEXT + AUDIO + ANNOUNCEMENT) |
+| `CircleFeedback` que j'écris (Q13) | oui | oui (créer uniquement · immutable · addendum = nouvelle ligne) |
+| `CircleMessage` de mes cercles (Q5) | oui | oui (TEXT + AUDIO + ANNOUNCEMENT · toujours visible parent OWNER + ADULT) |
+| `MessageReport` (signaler un message · Q11) | ses propres reports | oui (créer report `PENDING`) |
 | `Class` Monde | non | non |
 | `LanguageCenter` | non | non |
 | `AccessGrant` (autre) | non | non |
 | `Order`, `Payment` | non | non |
 | Quotas propres (mois / semaine) | oui | non (calculés serveur) |
+| Capacité coach (Q15 : 20 profils / 10 Circles) | oui | non (compteur serveur · 409 `coach_capacity_reached` à l'assignation) |
 
-Note doctrinal · le coach n'a **jamais** accès à un enfant hors cercle assigné, ne peut **jamais** le contacter en dehors du fil du cercle, et ne voit **jamais** l'email/téléphone/adresse du parent.
+Note doctrinal · le coach n'a **jamais** accès à un enfant hors cercle assigné (Q5), ne peut **jamais** le contacter en dehors du fil du cercle (Q5 · aucun DM), ne voit **jamais** l'email/téléphone/adresse du parent, ne voit que le nom d'affichage + données pédagogiques minimales (Q4). Un retrait de coach est immédiatement effectif (Q10) · l'historique reste attribué et audité.
 
 ---
 

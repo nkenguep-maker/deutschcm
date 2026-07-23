@@ -21,13 +21,14 @@ Les documents compagnons couvrent les autres axes : `YEMA_P4_PERMISSION_MATRIX.m
 ## 1. Résumé exécutif
 
 - **Réutilisable P4** · `User`, `AccessGrant`, `LearningPath`, `Product/ProductVariant`, `Household`, `HouseholdMembership`, `ChildProfile`, `Class`, `ClassMembership`, `Thread`, `Message` (texte + audio), `ClassAssignment`, `Submission`.
-- **À créer (Option A, migrations additives)** · `Circle`, `CircleMembership`, `CircleMessage` (option de réutilisation `Thread` via `classId` nullable + `circleId` : **écartée** — voir §7).
-- **À corriger sur modèles existants** · `ClassFeedback` ne porte pas de `audioUrl` alors que la doctrine §Suivi humain l.2003-2005 impose feedback vocal. Migration additive `+ audioUrl String?` requise en P4.5.
-- **Absents à ce jour** · aucun modèle `Coach`, `CoachAssignment`, `CircleInvitation`, `MessageReadState`, `MessageReport`, `AuditEvent`, `StorageObject`. La plupart sont proposés en additif ; certains restent optionnels.
-- **RLS quasi-absente** · **1 seule table** (`child_profiles`) porte une policy Postgres. Les 50+ autres tables reposent uniquement sur les gardes applicatives Next.js / Prisma. Cela est structurellement acceptable tant que le client anon n'attaque pas la DB directement, mais un plan RLS doit accompagner P4 (voir threat model §RLS).
+- **À créer (Option A, migrations additives)** · `Circle`, `CircleMembership`, `CircleMessage`, `AuditEvent`, `StorageObject` — tous posés dès **P4.1** avec RLS activée immédiatement.
+- **À corriger sur modèles existants** · `ClassFeedback` ne porte pas de `audioUrl` alors que la doctrine §Suivi humain l.2003-2005 impose feedback vocal. Migration additive `+ audioUrl String?` requise en P4.3b (M3). Immutable après publication (Q13 validée) · corrections successives via nouvelle ligne (`addendumOfFeedbackId`).
+- **Absents à ce jour** · aucun modèle `Coach`, `CoachAssignment`, `CircleInvitation`, `MessageReadState`, `MessageReport`, `AuditEvent`, `StorageObject`. Tous proposés en additif dans le plan.
+- **RLS activée dès P4.1** · les fonctions helper Postgres (`is_class_member`, `is_circle_member`, `is_circle_owner`, `is_circle_coach`, `is_center_admin`, `is_household_member`, `is_child_parent`) sont posées en M1. Les policies Circle/CircleMembership/AuditEvent/StorageObject activées immédiatement · Class/ClassMembership/Household/ChildProfile en M2 · assignments/submissions/feedback/threads/messages en M3 · CircleAssignment/CircleMessage en M4. **`P4.RLS`** en fin de séquence est une **revue de consolidation**, plus la première implémentation.
 - **Mocks résiduels** · les pages `/center/*`, `/teacher/students/*`, `/classroom/[id]`, `/discover/*` rendent des constantes JS comme données réelles. À remplacer en P4.3a par des getters `lib/data/*` scopés serveur.
-- **Nomenclature à harmoniser** · la doctrine parle de `COACH_RACINES_ADDON` (marketing) mais `ProductCode` Prisma expose `ROOTS_FOLLOWUP_ADDON` **et** `CAREER_COACH_ADDON`. Décision produit à figer en P4.1 (voir `IMPLEMENTATION_PLAN.md` §Décisions ouvertes).
-- **Blocage réel bêta** · sans RLS, sans URLs signées pour les productions enfants, sans policy audio, et sans messagerie coach opérationnelle, `RACINES_COACH_OPERATIONAL` reste `false` (comme cadré en P3).
+- **Nomenclature figée** · `ProductCode = ROOTS_COACH_ADDON` (à créer en migration additive P4.4) · nom commercial · **« Suivi Racines »** · `AppRole = RACINES_COACH` (nouveau, jamais réutiliser `CAREER_COACH`). `DependentProfile` audité et **déprécié** en P4 (aucune suppression destructive) · `ChildProfile` reste canonique.
+- **`ThreadType.ONE_TO_ONE`** · déprécié · nouvelles créations bloquées côté API en P4.6 · aucune suppression destructive de l'enum en P4 · retrait effectif planifié P5+.
+- **Blocage réel bêta** · sans RLS activée par table, sans URLs signées pour les productions enfants, sans policy audio, sans messagerie coach opérationnelle, `RACINES_COACH_OPERATIONAL` reste `false` (comme cadré en P3).
 
 ---
 
@@ -73,10 +74,10 @@ Chaque ligne cite le nom exact du modèle Prisma, jamais un nom fantôme.
 | `UserRole` (legacy) | ⚠ toujours lu | `me/racines-dashboard` (`role=STUDENT`) | `[userId, role]` unique | | **oui — read-only** | à retirer après P4 |
 | `AccessGrant` | ✓ source d'autorité entitlements | `me/racines-dashboard`, `me/monde-dashboard`, seams `lib/entitlements/*` | `[beneficiaryType, beneficiaryId, status]` index | FKs `NoAction` sur bénéficiaire | **oui** | à filtrer aussi sur `productVariant.product.code IN (COACH_RACINES_ADDON, TEACHER_ADDON…)` en P4.3b/4.4 |
 | `LearningPath` | ✓ | `me/racines-dashboard`, `me/monde-dashboard` | `[userId, status]` index | | **oui** | doctrine · beneficiary type possible mais rarement utilisé |
-| `Product` / `ProductVariant` / `ProductEntitlementRule` | ✓ | seed + pricing | `code` unique | | **oui** | ajouter product code `COACH_RACINES_ADDON` **ou** utiliser `ROOTS_FOLLOWUP_ADDON` (décision ouverte) |
+| `Product` / `ProductVariant` / `ProductEntitlementRule` | ✓ | seed + pricing | `code` unique | | **oui** | ajouter `ProductCode = ROOTS_COACH_ADDON` (validé · migration additive légère P4.4) · nom commercial « Suivi Racines » |
 | `Household` | ✓ | `me/foyer`, `family/*` | `ownerUserId` FK | 1 owner | **oui** | pas de champ `name` explicite |
 | `HouseholdMembership` | ✓ | `family/*` | `[householdId, userId]` unique | rôle `HouseholdRole = OWNER | ADULT` | **oui** | **enum manque `CHILD`** — les enfants vivent dans `ChildProfile` ou `DependentProfile` (deux modèles parallèles) |
-| `DependentProfile` | présent, peu utilisé | (aucun endpoint direct) | `[householdId]`, `[managedByUserId]` | | ⚠ redondant avec `ChildProfile` | **à trancher P4.2** : garder un des deux, ou clarifier rôles |
+| `DependentProfile` | présent, peu utilisé | (aucun endpoint direct) | `[householdId]`, `[managedByUserId]` | | ⚠ redondant avec `ChildProfile` | **déprécié P4** (RLS lecture seule, aucune écriture applicative, aucune suppression destructive · retrait effectif P5+) |
 | `ChildProfile` | ✓ Racines Famille | `family/children`, `me/racines-dashboard`, `me/active-child` | `parentUserId` FK | | **oui** | pas de `householdId` → un enfant existe hors foyer aujourd'hui |
 | `Class` | ✓ V2 unifiée | `me/racines-dashboard` (rare), `discover/class`, back-office | `providerUserId` FK, `[language, level]` index | `classType = TEACHER | CAREER_COACH | CENTER` | **oui** | conflit sémantique avec `Classroom` legacy — voir §12 |
 | `ClassMembership` | ✓ | idem | `[classId, userId]` unique | rôle `ClassMemberRole = LEARNER | TEACHER | COACH` | **oui** | pas de champ `centerId` — un centre ne peut pas hériter d'appartenance |
@@ -101,6 +102,8 @@ Chaque ligne cite le nom exact du modèle Prisma, jamais un nom fantôme.
 - `AuditEvent` (§24)
 - `StorageObject` (métadonnées upload, MIME, taille, TTL)
 - Enum `ClassMemberRole` n'inclut pas `CENTER_ADMIN` — cette permission passe par `AppRole = CENTER_ADMIN` + `User.centerId`.
+- Enum `AppRole` n'inclut pas encore `RACINES_COACH` — à ajouter en migration additive P4.4 (aucune suppression, ajout de valeur uniquement).
+- Enum `ProductCode` n'inclut pas encore `ROOTS_COACH_ADDON` — à ajouter en migration additive P4.4 (nom commercial · « Suivi Racines »).
 
 ### Cascades sensibles à surveiller
 
@@ -429,26 +432,30 @@ Basé sur `YEMA_PRODUCT_DESIGN_DOCTRINE.md §Suivi humain Racines §3` et `YEMA_
 Console **totalement séparée** de la console Teacher :
 
 - Routes distinctes `/coach/*` (jamais `/teacher/*`).
-- Rôle applicatif `AppRole = CAREER_COACH` (ou nouveau `RACINES_COACH` à trancher §Décisions).
-- Le coach voit uniquement ses `Circle` (`Circle.coachUserId = coach.userId`).
-- Feedback texte + audio (`CircleFeedback` P4.5 avec `audioObjectId`).
-- Vue quotas : `productionsThisMonth / 8`, `productionsThisWeek / 2`, `sessionsThisMonth / 1`.
-- Planification session 30 min · à cadrer P5.
+- Rôle applicatif **`AppRole = RACINES_COACH`** (nouveau, jamais `CAREER_COACH`). Ajout de valeur d'enum en migration additive P4.4.
+- Le coach voit uniquement ses `Circle` (via `CircleMembership.role = COACH AND status = ACTIVE`).
+- Le coach voit uniquement · prénom / nom d'affichage + données pédagogiques minimales (langue active, étape É, productions du cercle). Jamais nom de famille, email, téléphone, adresse, école (Q4 validée).
+- Tous les échanges coach-enfant restent visibles au parent OWNER + ADULT du même Circle (Q5 validée).
+- Feedback texte + audio (`CircleFeedback` P4.5 avec `storageObjectId`, immutable · Q13).
+- Vue quotas · `productionsThisMonth / 8`, `productionsThisWeek / 2`, `sessionsThisMonth / 1`.
+- Vue capacité coach · `activeProfiles / 20` + `activeCircles / 10` (Q15 validée).
+- Retrait coach = accès immédiatement révoqué · historique conservé attribué (Q10 validée).
 
 Le coach NE DOIT PAS :
 
 - Voir tous les foyers.
-- Rechercher librement `ChildProfile`.
-- Écrire dans un DM privé.
+- Rechercher librement `ChildProfile` (aucun endpoint `/api/children/search`).
+- Écrire dans un DM privé (Q5 · aucun sous-fil coach-enfant).
 - Modifier `HouseholdMembership`.
 - Voir un `AccessGrant`.
-- Changer `Circle.language`.
-- S'auto-assigner à un `Circle` (seul un admin ou l'OWNER via workflow d'acceptation le permet).
+- Changer `Circle.language` (Q8 · immutable).
+- S'auto-assigner à un `Circle` (seul un admin ou l'OWNER via workflow d'acceptation).
 
-**Compatibilité avec la doctrine COACH_RACINES_ADDON** (30 000 XAF / 45 € · 8 productions / mois · 2 / semaine · oral 3 min · écrit 250 mots · session 30 min / mois · délai cible 48 h ouvrées) :
+**Compatibilité avec la doctrine « Suivi Racines »** (produit `ROOTS_COACH_ADDON` · 30 000 XAF / 45 € · 8 productions / mois · 2 / semaine · oral 3 min · écrit 250 mots · session 30 min / mois · délai cible 48 h ouvrées · capacité coach 20 profils / 10 Circles) :
 
-- Quotas enforced applicatif en P4.4 · non par la DB (nécessiterait des fenêtres glissantes).
-- Feature flag `RACINES_COACH_OPERATIONAL = false` par défaut jusqu'à P4.4 + validation contenus + rétention audio.
+- Quotas enforced applicatif en P4.4 · non par la DB (fenêtres glissantes).
+- Capacité coach Q15 enforced applicatif · 409 `coach_capacity_reached` avec dimension `profiles` ou `circles`.
+- Feature flag `RACINES_COACH_OPERATIONAL = false` par défaut jusqu'à P4.4 + validation contenus + rétention audio Q7 (validation juridique).
 
 La matrice complète est dans `YEMA_P4_PERMISSION_MATRIX.md §Coach`.
 
@@ -495,10 +502,11 @@ Aucune donnée hors du centre ne doit jamais apparaître.
 
 ### Ce qui manque pour P4.5
 
-- **Statut** sur `Submission` : `SubmissionStatus = ASSIGNED | SUBMITTED | IN_REVIEW | FEEDBACK_READY | REVISION_REQUESTED | COMPLETED`. Ajouter en migration additive `+ status SubmissionStatus @default(ASSIGNED)`.
-- **`audioUrl` sur `ClassFeedback`** · migration P4-M3 (`ALTER TABLE class_feedback ADD COLUMN audio_url TEXT`).
+- **Statut** sur `Submission` · `SubmissionStatus = ASSIGNED | SUBMITTED | IN_REVIEW | FEEDBACK_READY | REVISION_REQUESTED | COMPLETED`. Ajouter en migration additive `+ status SubmissionStatus @default(ASSIGNED)`.
+- **`audioUrl` sur `ClassFeedback`** · migration M3 (`ALTER TABLE class_feedback ADD COLUMN audio_url TEXT`, `+ storage_object_id TEXT?`).
 - **`type` sur `ClassAssignment`** · optionnel · `ClassAssignmentType = HOMEWORK | ANNOUNCEMENT | ORAL_INVITATION`.
-- **Version / historique** · un modèle `ClassFeedbackRevision` optionnel si on veut permettre l'édition (voir Décisions ouvertes Q13).
+- **Immutabilité feedback** (Q13 validée) · aucune route `PATCH /api/feedback/[id]`. Correction complémentaire = **nouvelle ligne** `class_feedback` / `circle_feedback` avec `addendumOfFeedbackId?` pointant sur la version précédente. UI affiche la version la plus récente + badge.
+- **Discussion parent-coach** (Q14 validée) · le parent répond dans le **fil du Circle**, jamais en DM. `CircleFeedback.discussionThreadId?` optionnel · à la publication du feedback, un `CircleMessage` d'introduction est posté dans le fil général du Circle.
 - **Visibilité parent** · pour les élèves mineurs, `Submission.userId` peut pointer sur un User adulte-parent OU un dispositif Circle plus tard. Pour Monde public, non applicable ; pour Racines, séparer via `CircleSubmission` (voir §12.3).
 
 ### Peut-on unifier Monde et Racines ?
@@ -534,7 +542,13 @@ ASSIGNED
 - **Classe Monde** · fil `Thread` déjà en place, à câbler côté produit en P4.6. Types : `MAIN` (fil général), `ANNOUNCEMENT` (annonces professeur), `ASSIGNMENT` (fil autour d'un devoir).
 - **Circle Racines** · `CircleMessage` (à créer P4.6). Types : `TEXT`, `AUDIO`, `ANNOUNCEMENT`.
 
-Le type `ONE_TO_ONE` déjà présent dans `ThreadType` est un risque · il pourrait ouvrir une messagerie privée prof↔élève. **Recommandation P4.6** : ne jamais l'exposer côté produit, ou le retirer par migration additive.
+Le type `ONE_TO_ONE` déjà présent dans `ThreadType` est un risque · il pourrait ouvrir une messagerie privée prof↔élève. **Traitement P4.6 (aucune suppression destructive en P4)** ·
+
+- Enum `ThreadType.ONE_TO_ONE` **déprécié** (commentaire `@deprecated` dans schema).
+- Nouvelles créations **interdites** côté API · toute `POST /api/*/threads` avec `threadType = "ONE_TO_ONE"` retourne 400 `thread_type_deprecated`.
+- Routes correspondantes désactivées · aucun `/api/*/threads/one-to-one/*` créé, aucun composant produit ne l'utilise.
+- Données historiques auditées via `SELECT COUNT(*) FROM threads WHERE thread_type = 'ONE_TO_ONE'` (metrics uniquement, migration M5).
+- Suppression destructive de la valeur d'enum reportée à une migration ultérieure P5+.
 
 ### Tables minimales nécessaires
 
@@ -547,11 +561,22 @@ Déjà en place · `Thread`, `Message`.
 - `ClassMessageReadState` similaire pour Monde (P4.6, optionnel selon besoin produit).
 - `MessageReport { targetType: CLASS|CIRCLE, targetId, reporterUserId, reason, status, resolvedByUserId, resolvedAt }` · pour modération de contenu (P4.7).
 
-### Édition, suppression, modération
+### Édition, suppression, modération (Q11 validée)
 
-- Édition · possible dans les 15 minutes, sinon interdit. Ajouter `Message.editedAt?` (déjà partiellement modélisable).
-- Suppression · soft-delete (contenu vidé, enveloppe conservée avec `deletedAt` + `deletedByUserId`).
-- Modération · un `OWNER` (parent) peut supprimer tout message d'un cercle. Un `TEACHER` peut supprimer tout message de sa classe. Aucun `CHILD` ne peut supprimer un message d'un autre.
+Workflow à 4 niveaux ·
+
+- **Auteur** · rétractation sous **15 minutes** post-envoi (soft-delete contenu · endpoint `DELETE /api/circles/[cid]/messages/[mid]`).
+- **OWNER** · peut **masquer** un message à tout moment sur son Circle (soft-hide réversible sur 24 h · endpoint `POST /api/circles/[cid]/messages/[mid]/hide`).
+- **Coach** · peut **signaler** un message inapproprié (`MessageReport` avec `reason`, `status = PENDING` · endpoint `POST /api/messages/[mid]/report`).
+- **Admin** · peut **supprimer exceptionnellement** avec audit obligatoire (endpoint `DELETE /api/admin/messages/[mid]`, requiert `reason`, `AuditEvent.MESSAGE_DELETED`).
+- Édition · possible dans les 15 minutes post-envoi, sinon interdit. Ajouter `Message.editedAt?` (déjà partiellement modélisable).
+- Soft-delete · contenu vidé physiquement, enveloppe conservée avec `deletedAt` + `deletedByMembershipId` pour audit.
+
+### Lecture messages par le Center (Q12 validée)
+
+- Par défaut · le Center **ne lit pas** les conversations de classe.
+- Accès exceptionnel · réservé au **rôle safeguarding** (à créer P5) **avec audit obligatoire**.
+- Implémentation P4 · RLS `messages` `SELECT` conditionné à `is_class_member(...) OR (is_center_admin(center_id, auth.uid()) AND has_safeguarding_role(auth.uid()))`. En P4, `has_safeguarding_role` retourne toujours `false` (rôle non créé) → aucun Center admin ne lit de message pendant tout P4.
 
 ### Rate limiting
 
@@ -575,15 +600,18 @@ Aucune infrastructure de rate limit n'existe côté API. À câbler en P4.7 avec
 
 ## 15. Sécurité storage · audio et fichiers
 
-Détail complet dans `YEMA_P4_THREAT_MODEL.md §Storage`. Résumé :
+Détail complet dans `YEMA_P4_THREAT_MODEL.md §Storage`. Résumé (posé dès P4.1 · aucune ouverture d'endpoint fichier tant que ces éléments ne sont pas en place) :
 
 - **Buckets séparés** · `class-audio`, `class-attachment`, `circle-audio`, `circle-attachment`, `submission-audio`, `feedback-audio`. Un bucket pour productions enfants Racines **n'est jamais public**.
 - **URLs signées** · `createSignedUrl(objectKey, ttl=600)` pour lecture, `createSignedUploadUrl` pour écriture. TTL court (10 minutes lecture, 5 minutes écriture).
-- **MIME allow-list** · `audio/webm, audio/ogg, audio/mpeg` pour audio · `image/jpeg, image/png, application/pdf` pour pièces jointes. Rejet server-side.
+- **MIME allow-list** · `audio/webm, audio/ogg, audio/mpeg, audio/mp4` pour audio · `image/jpeg, image/png, application/pdf` pour pièces jointes. Rejet server-side via MIME sniff.
 - **Taille max** · audio 5 MB (couvre 3 min à 224 kb/s), pièce jointe 10 MB.
-- **Durée audio** · 3 min pour production coach Racines · 60 s pour note vocale classe.
-- **Métadonnées** · à stocker dans un modèle `StorageObject` proposé (`id, bucket, key, mimeType, sizeBytes, uploadedByUserId, sha256?, retentionUntil?, deletedAt?`).
-- **Rétention** · productions enfants purgées automatiquement 90 jours après retrait du membership.
+- **Durée audio** · 3 min pour production coach Racines · 3 min pour note vocale enfant Circle (Q6 validée) · 60 s pour note vocale classe Monde.
+- **Métadonnées** · stockées dans le modèle `StorageObject` (créé en M1) · `id, bucket, key, mimeType, sizeBytes, uploadedByUserId, uploadedByMembershipId?, purpose, sha256?, retentionUntil, deletedAt?`.
+- **Rétention** (Q7 validée · validation juridique requise avant activation `AUDIO_FEEDBACK_ENABLED = true`) ·
+  - **90 jours** pour messages audio Circle post-retrait membership ou `archivedAt`.
+  - **12 mois** pour productions (`Submission` / `CircleSubmission`) et feedbacks (`ClassFeedback` / `CircleFeedback`).
+  - `StorageObject.retention_until` calculé automatiquement à l'upload · worker de purge quotidien à câbler P5.
 - **Bucket actuel `course-videos`** · public — cohérent (vidéos de cours), mais aucune donnée user-generated ne doit y aller.
 
 ---

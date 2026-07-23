@@ -74,16 +74,16 @@ Toute déviation de ce séquencement = **CRITICAL blocker de mise en prod P4**.
 
 ## 4. Sécurité fichiers et audios
 
-### Politique proposée (à figer en P4.5)
+### Politique validée · posée dès P4.1 (Q7 validée · validation juridique requise avant activation `AUDIO_FEEDBACK_ENABLED = true` en production)
 
 | Bucket | Public | Contenu | TTL upload | TTL lecture | Rétention | Antivirus |
 |---|---|---|---|---|---|---|
 | `class-audio` | privé | messages audio classe (LEARNER + TEACHER) | 5 min | 10 min | 12 mois post-`Class.archivedAt` | P5 |
 | `class-attachment` | privé | pièces jointes classe (PDF, image) | 5 min | 10 min | 12 mois | P5 |
-| `circle-audio` | privé | messages audio cercle (CHILD, ADULT, OWNER, COACH) | 5 min | 10 min | 90 jours post-retrait membership | P5 |
+| `circle-audio` | privé | messages audio cercle (CHILD, ADULT, OWNER, COACH) | 5 min | 10 min | **90 jours** post-retrait membership OU `archivedAt` | P5 |
 | `circle-attachment` | privé | pièces jointes cercle | 5 min | 10 min | 90 jours post-retrait | P5 |
-| `submission-audio` | privé | audio devoirs (LEARNER Monde) | 5 min | 10 min | conservation légale devoir (12 mois) | P5 |
-| `feedback-audio` | privé | feedback vocal (TEACHER / COACH) | 5 min | 10 min | 12 mois | P5 |
+| `submission-audio` | privé | audio devoirs (LEARNER Monde ou CHILD Circle) | 5 min | 10 min | **12 mois** post-`submittedAt` | P5 |
+| `feedback-audio` | privé | feedback vocal (TEACHER / COACH · immutable Q13) | 5 min | 10 min | **12 mois** post-création | P5 |
 | `course-videos` (existant) | public | vidéos de cours pédagogiques | – | – | – | non nécessaire (validé produit) |
 
 ### MIME / taille
@@ -150,7 +150,9 @@ Toute écriture d'audio / attachment passe par ce modèle · aucun `audioUrl` st
   - Un contournement de proxy expose une route SQL.
   - Un attacker s'authentifie et utilise la clé anon avec `postgrest` directement.
 
-### Plan RLS additive (à préparer P4.1 · à activer P4.7)
+### Plan RLS · activée **par migration** (M1-M5), consolidation revue en P4.RLS
+
+**Correctif post-revue** · la RLS n'est plus reportée à une migration terminale. Chaque migration M1-M5 pose et teste ses policies au moment de créer les tables associées. Le sous-lot `P4.RLS` en fin de séquence n'est plus une première implémentation · c'est une revue exhaustive.
 
 | Table | RLS | Lecture | Écriture | Service admin | Risque si RLS OFF |
 |---|---|---|---|---|---|
@@ -184,7 +186,9 @@ Toute écriture d'audio / attachment passe par ce modèle · aucun `audioUrl` st
   - `INSERT` autorisé si `auth.uid()` fournit un token upload signé (déjà géré par Supabase).
   - `DELETE` restreint au service_role (audit trail obligatoire).
 
-**Ne pas activer RLS globale avant d'avoir écrit et testé les policies.** Un `ENABLE ROW LEVEL SECURITY` sans policy bloque tous les accès et casse la production immédiatement.
+**Règle d'activation** · pour chaque table de la matrice ci-dessus, l'activation `ENABLE ROW LEVEL SECURITY` est effectuée dans la **même migration** que la création des policies correspondantes. Chaque PR de migration inclut son test de smoke (`scripts/test-baseline/p4-rls-smoke.mjs`) qui vérifie ALLOW/DENY par rôle simulé. **Aucune fonctionnalité P4 n'est activée en production avant la présence effective des policies pour les tables qu'elle consomme.**
+
+Le sous-lot terminal `P4.RLS` (renommé « Consolidation finale · revue des policies ») vérifie l'exhaustivité de la matrice, corrige les manques éventuels via `ALTER POLICY`, et exécute `scripts/test-baseline/p4-rls-consolidation.mjs` pour un audit CRUD × rôle × table complet.
 
 ---
 
@@ -210,20 +214,25 @@ Toute écriture d'audio / attachment passe par ce modèle · aucun `audioUrl` st
 
 ## 7. Audit trail obligatoire (§24 mission P4)
 
-Actions générant obligatoirement un `AuditEvent` :
+Le modèle `AuditEvent` est posé en **P4.1** (M1). Les câblages progressifs suivent chaque migration :
 
-- Invitation adulte (`CIRCLE_MEMBERSHIP_INVITED`)
-- Acceptation invitation (`CIRCLE_MEMBERSHIP_ACCEPTED`)
-- Retrait membership (`CIRCLE_MEMBERSHIP_REVOKED`)
-- Assignation coach (`CIRCLE_COACH_ASSIGNED` / `_UNASSIGNED`)
-- Assignation teacher (`CLASS_TEACHER_ASSIGNED` / `_UNASSIGNED`)
-- Création `ClassAssignment` / `CircleAssignment` (`ASSIGNMENT_CREATED`)
-- Publication (`ASSIGNMENT_PUBLISHED`)
-- Écriture `ClassFeedback` / `CircleFeedback` (`FEEDBACK_CREATED`)
-- Suppression message (`MESSAGE_DELETED`)
-- Suppression attachment (`ATTACHMENT_DELETED`)
-- Changement langue Circle (`CIRCLE_LANGUAGE_CHANGED`) — action rare, à interdire par défaut
-- Retrait membre (`CIRCLE_MEMBERSHIP_REVOKED` / `CLASS_MEMBERSHIP_REVOKED`)
+- Invitation household adulte (`HOUSEHOLD_MEMBERSHIP_INVITED` · P4.2)
+- Acceptation invitation household (`HOUSEHOLD_MEMBERSHIP_ACCEPTED` · P4.2)
+- Retrait household (`HOUSEHOLD_MEMBERSHIP_REVOKED` avec `metadata.revokedByRole = OWNER | SELF` · P4.2)
+- Invitation adulte Circle (`CIRCLE_MEMBERSHIP_INVITED` · P4.2)
+- Acceptation Circle (`CIRCLE_MEMBERSHIP_ACCEPTED` · P4.2)
+- Retrait membership Circle (`CIRCLE_MEMBERSHIP_REVOKED` · P4.2)
+- Assignation coach (`CIRCLE_COACH_ASSIGNED` / `_UNASSIGNED` · P4.4)
+- Assignation teacher (`CLASS_TEACHER_ASSIGNED` / `_UNASSIGNED` · P4.3b)
+- Modification profil enfant (`CHILD_PROFILE_UPDATED` · P4.2 · OWNER seulement, Q1)
+- Création `ClassAssignment` / `CircleAssignment` (`ASSIGNMENT_CREATED` · P4.5)
+- Publication (`ASSIGNMENT_PUBLISHED` · P4.5)
+- Écriture `ClassFeedback` / `CircleFeedback` (`FEEDBACK_CREATED` · P4.5) · toute addition/addendum génère aussi un événement
+- Suppression message (`MESSAGE_DELETED` avec `metadata.reason` obligatoire pour ADMIN · P4.6, Q11)
+- Masquage message par OWNER (`MESSAGE_HIDDEN` · P4.6, Q11)
+- Signalement message (`MESSAGE_REPORTED` · P4.6, Q11)
+- Suppression attachment (`ATTACHMENT_DELETED` · P4.5)
+- Changement langue Circle (`CIRCLE_LANGUAGE_CHANGED`) — **interdit en P4** (Q8), événement conservé dans l'enum pour audit historique éventuel uniquement
 - Impersonation admin (`ADMIN_IMPERSONATION_STARTED` / `_ENDED`)
 
 Ne **jamais** journaliser :
@@ -252,21 +261,24 @@ Le champ `metadata` de `AuditEvent` peut porter uniquement des identifiants (`pr
 
 ---
 
-## 9. Blockers sécurité de lancement P4 (bloc `IMPLEMENTATION_PLAN.md §31`)
+## 9. Blockers sécurité de lancement P4 (bloc `IMPLEMENTATION_PLAN.md §7`)
 
-Aucun sous-lot P4 ne peut être activé en production tant que :
+Aucun sous-lot P4 ne peut être activé en production tant que ses blockers ne sont pas fermés. Chaque check est vérifié **par sous-lot** avant activation du flag correspondant.
 
-- [ ] 0 IDOR sur `/api/circles/*`, `/api/coach/*`, `/api/classrooms/*`, `/api/family/*`
+- [ ] 0 IDOR sur toutes les routes du sous-lot
 - [ ] 0 cross-center leak (test dédié P4.3a)
-- [ ] 0 cross-circle leak (test dédié P4.2)
-- [ ] 0 cross-household leak (test dédié P4.2)
-- [ ] 0 DM privé adulte-enfant possible (test dédié P4.6)
-- [ ] Policies RLS écrites et testées pour les 10+ tables critiques (§5)
-- [ ] Storage buckets privés créés avec policies (§4)
-- [ ] URLs signées TTL courts systématiques (§4)
-- [ ] Rate limiting actif sur `/api/circles/[id]/messages` (§2)
-- [ ] `AuditEvent` capture toutes les actions sensibles (§7)
-- [ ] Feature flags à `false` par défaut (§26 IMPLEMENTATION_PLAN)
-- [ ] Tests ownership complets par sous-lot (§30 IMPLEMENTATION_PLAN)
+- [ ] 0 cross-circle leak (test dédié P4.2+)
+- [ ] 0 cross-household leak (test dédié P4.2+)
+- [ ] 0 DM privé adulte-enfant possible (P4.6 · `ThreadType.ONE_TO_ONE` bloqué côté API sans suppression destructive)
+- [ ] Policies RLS posées et testées **au moment de la migration** (M1-M5 · pas reportées à P4.RLS)
+- [ ] Storage buckets privés créés avec policies (posés P4.1)
+- [ ] URLs signées TTL courts systématiques (§4 · 5 min upload · 10 min lecture)
+- [ ] MIME allowlist + validation server-side sur tout upload (posé P4.1 avant toute route acceptant fichier)
+- [ ] Rate limiting actif sur `/api/circles/[id]/messages` (P4.7)
+- [ ] `AuditEvent` capture toutes les actions sensibles (§7 · socle P4.1, câblages progressifs)
+- [ ] Feature flags à `false` par défaut jusqu'à validation du sous-lot
+- [ ] Tests ownership complets par sous-lot (100 % pass rate)
+- [ ] Décisions produit Q1-Q15 intégrées et testées (toutes validées 2026-07-23)
+- [ ] Validation juridique Q7 (rétention audios) obtenue avant `AUDIO_FEEDBACK_ENABLED = true`
 
 Un blocker ouvert = mise en production interdite. Aucun contournement de feature flag n'est autorisé sans validation de tous les items ci-dessus pour le sous-lot concerné.

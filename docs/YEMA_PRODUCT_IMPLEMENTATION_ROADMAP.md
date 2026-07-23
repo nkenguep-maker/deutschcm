@@ -483,14 +483,17 @@ Déplacé dans le lot P0.B pour la même raison : P1-4 et P2-2 (parcours écoute
 
 # Lot P4 — Professionnels
 
-> **Statut audit** (branche `feat/yema-p4-professional-spaces`, audit 2026-07-23) :
-> - Audit d'architecture complet publié · `docs/YEMA_P4_ARCHITECTURE_AUDIT.md` (inventaire Prisma · routes · mocks · Circle Option A pseudo-schéma · classroom vs circle)
-> - Matrice permissions détaillée · `docs/YEMA_P4_PERMISSION_MATRIX.md` (9 rôles globaux × 20 actions + rôles locaux Circle + Class + Center + Teacher + Coach)
-> - Threat model mineurs + storage + RLS · `docs/YEMA_P4_THREAT_MODEL.md` (13 menaces classées CRITICAL/HIGH/MEDIUM/LOW · politique buckets · rétention audios · audit trail)
-> - Plan d'implémentation · `docs/YEMA_P4_IMPLEMENTATION_PLAN.md` (migrations M1-M6 · 9 feature flags · sous-lots P4.1 → P4.7 · 15 décisions produit ouvertes · plan de tests unit/intégration/concurrence/E2E/sécurité · blockers de lancement)
-> - Ordre P4 confirmé · P4.1 → P4.2 → P4.3a → P4.3b → P4.4 → P4.5 → P4.6 → P4.7 → M6 (RLS activation)
+> **Statut audit** (branche `feat/yema-p4-professional-spaces`, audit finalisé 2026-07-23) :
+> - Audit d'architecture complet · `docs/YEMA_P4_ARCHITECTURE_AUDIT.md` (inventaire Prisma · routes · mocks · Circle Option A pseudo-schéma · classroom vs circle · Suivi Racines et rôle `RACINES_COACH`)
+> - Matrice permissions · `docs/YEMA_P4_PERMISSION_MATRIX.md` (9 rôles globaux × 20+ actions · rôles locaux Circle/Class/Center · Teacher · Coach avec capacités Q15)
+> - Threat model · `docs/YEMA_P4_THREAT_MODEL.md` (menaces classées CRITICAL/HIGH/MEDIUM/LOW · RLS activée dès P4.1 par migration · buckets privés · rétention Q7 · audit trail)
+> - Plan d'implémentation · `docs/YEMA_P4_IMPLEMENTATION_PLAN.md` (migrations M1-M5 avec RLS intégrée · 9 feature flags · sous-lots P4.1 → P4.7 + P4.RLS revue finale · décisions Q1-Q15 **validées** · plan de tests · blockers par sous-lot)
+> - **Ordre P4 final** · `P4.1 (Circle + permissions + RLS + Storage + AuditEvent + flags) → P4.2 (Memberships + invitations) → P4.3a (Center real data) → P4.3b (Teacher workspace) → P4.4 (Coach Racines workspace) → P4.5 (Assignments + submissions + feedback) → P4.6 (Closed messaging + audio) → P4.7 (Notifications + rate limiting + hardening) → P4.RLS (Final consolidation review)`
+> - Codes définitifs · `ProductCode = ROOTS_COACH_ADDON` · Nom commercial « Suivi Racines » · `AppRole = RACINES_COACH` (jamais `CAREER_COACH`)
+> - `ChildProfile` = représentation canonique enfants · `DependentProfile` audité et déprécié P4, aucune suppression destructive
+> - `ThreadType.ONE_TO_ONE` déprécié · nouvelles créations interdites · routes désactivées · aucune suppression destructive en P4
 > - Aucun code, aucune migration, aucun schéma Prisma modifié pendant l'audit
-> - **Décision** · `P4 AUDIT READY FOR REVIEW`
+> - **Décision** · `P4 AUDIT READY TO MERGE`
 
 **Objectif utilisateur** : offrir aux professeurs, coachs, centres et admins un espace opérationnel qui priorise l'action, pas les statistiques.
 
