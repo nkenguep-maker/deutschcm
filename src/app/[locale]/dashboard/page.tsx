@@ -1,8 +1,9 @@
-// /dashboard · aiguillage par univers (P2).
+// /dashboard · aiguillage par univers (P2, étendu P3).
 // Server component qui charge le LearningPath actif de l'utilisateur et
 // route :
-//   Monde   → <DashboardMonde /> (nouveau, P2)
-//   Racines → <FoyerClient />    (existant, P3 le refinera)
+//   Monde   → <DashboardMonde />   (P2)
+//   Racines → <DashboardRacines /> (P3 · nouvel espace, remplace le Foyer
+//                                    universel qui restait un fallback)
 //   sinon   → /onboarding (fallback funnel)
 //
 // Le middleware garantit que seul un rôle STUDENT arrive ici.
@@ -12,7 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import Layout from "@/components/Layout";
 import { DashboardMonde } from "@/components/monde/DashboardMonde";
-import { FoyerClient } from "./FoyerClient";
+import { DashboardRacines } from "@/components/racines/DashboardRacines";
 
 interface Props { params: Promise<{ locale: string }> }
 
@@ -46,10 +47,10 @@ export default async function DashboardPage({ params }: Props) {
     );
   }
 
-  // Racines · P3 refinera. Pour l'instant on garde le Foyer existant.
+  // Racines (P3)
   return (
-    <Layout title="Foyer">
-      <FoyerClient />
+    <Layout title={loc === "en" ? "Roots" : "Racines"}>
+      <DashboardRacines locale={loc} />
     </Layout>
   );
 }
