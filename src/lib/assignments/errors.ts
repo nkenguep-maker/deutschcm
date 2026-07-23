@@ -12,7 +12,10 @@ export class AssignmentError extends Error {
       | "assignment_not_published"
       | "assignment_closed"
       | "assignment_archived"
-      | "assignment_invalid_transition",
+      | "assignment_immutable"
+      | "assignment_invalid_transition"
+      | "invalid_assignment_transition"
+      | "audio_feedback_disabled",
     message: string,
     public readonly detail?: Record<string, unknown>,
   ) {
@@ -27,9 +30,12 @@ export class SubmissionError extends Error {
       | "submission_not_found"
       | "submission_already_submitted"
       | "submission_content_required"
+      | "submission_too_long"
       | "submission_not_owned"
       | "submission_immutable"
       | "submission_invalid_transition"
+      | "invalid_submission_transition"
+      | "student_access_required"
       | "student_not_enrolled"
       | "child_not_in_circle"
       | "parent_not_authorized",
@@ -49,7 +55,8 @@ export class FeedbackError extends Error {
       | "feedback_immutable"
       | "feedback_addendum_required"
       | "feedback_not_owned"
-      | "feedback_invalid_transition",
+      | "feedback_invalid_transition"
+      | "invalid_feedback_transition",
     message: string,
     public readonly detail?: Record<string, unknown>,
   ) {
@@ -96,14 +103,20 @@ export const P4_5_STABLE_ERROR_CODES = [
   "assignment_not_published",
   "assignment_closed",
   "assignment_archived",
+  "assignment_immutable",
   "assignment_invalid_transition",
+  "invalid_assignment_transition",
+  "audio_feedback_disabled",
   // Submission
   "submission_not_found",
   "submission_already_submitted",
   "submission_content_required",
+  "submission_too_long",
   "submission_not_owned",
   "submission_immutable",
   "submission_invalid_transition",
+  "invalid_submission_transition",
+  "student_access_required",
   "student_not_enrolled",
   "child_not_in_circle",
   "parent_not_authorized",
@@ -114,6 +127,7 @@ export const P4_5_STABLE_ERROR_CODES = [
   "feedback_addendum_required",
   "feedback_not_owned",
   "feedback_invalid_transition",
+  "invalid_feedback_transition",
   // Storage
   "storage_object_not_owned",
   "storage_object_invalid",
@@ -129,6 +143,7 @@ export const P4_5_STABLE_ERROR_CODES = [
   // Concurrency (via ConcurrentUpdateError)
   "concurrent_assignment_update",
   "concurrent_submission_update",
+  "concurrent_feedback_update",
 ] as const;
 
 export type P4_5StableErrorCode = (typeof P4_5_STABLE_ERROR_CODES)[number];
