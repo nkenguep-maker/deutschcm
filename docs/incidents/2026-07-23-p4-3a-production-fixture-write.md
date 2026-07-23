@@ -57,28 +57,51 @@ Résultat · les appels Supabase Auth Admin ciblaient bien P-1 (via `SUPABASE_SE
 
 ---
 
-## 5. Étendue exacte
+## 5. Étendue exacte · par environnement
 
-Fixtures créées sur PROD (`sbjhvlrkbyjckdxujjsk`), toutes de type isolé (préfixes `test_p4_3a_` ou emails `paul+p4_3a_*@example.com`) ·
+La fixture instancie un unique client Supabase Auth avec `NEXT_PUBLIC_SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY`. Ces deux variables n'existaient que dans `.env.p1-baseline` (le fichier `.env` du repo ne les contient pas — vérifié `grep -E "^(NEXT_PUBLIC_SUPABASE_URL|SUPABASE_SERVICE_ROLE_KEY)=" .env` → aucune ligne). En conséquence, **tous les appels `admin.auth.admin.createUser` sont partis sur P-1**. Le seul chemin polué est Prisma (via `DIRECT_URL` dérivé de `.env` en production).
 
-* **12 rows** `public.users` avec emails `paul+p4_3a_*@example.com`.
-* **12 rows** `auth.users` (Supabase Auth Admin API · adresses de test P4.3a).
-* **2 rows** `public.language_centers` (ids `test_p4_3a_center_a`, `test_p4_3a_center_b`).
-* **4 rows** `public.teachers` (adminA, adminB, teacherA, teacherB rattachés aux centres A/B).
-* **2 rows** `public.classrooms` (`test_p4_3a_class_a1`, `test_p4_3a_class_b1`).
-* **3 rows** `public.classroom_enrollments` (studentA1, studentA2 → classroom A · studentB1 → classroom B).
-* **1 row** `public.class_join_requests` (pendingA → classroom A, `status = pending`).
-* **12 rows** `public.user_app_roles` (rôles `CENTER_ADMIN`/`TEACHER`/`LEARNER`/`CAREER_COACH`).
+Étendue effective par projet · préfixes `test_p4_3a_` ou emails `paul+p4_3a_*@example.com`.
 
-Aucun fichier Storage, aucun webhook, aucun email transactionnel déclenchés (les fixtures créent uniquement des rows, pas de flux applicatif). Aucun soft-delete résiduel — les modèles `User`/`Teacher`/`Classroom`/etc. ne pratiquent pas de soft-delete.
+### 5.1 Production (`sbjhvlrkbyjckdxujjsk`) · **pollution incidentelle**
 
-Durée totale d'existence en production · environ **17 minutes** (création ~15 h 00 · purge ~15 h 16). Aucun user réel n'a pu voir ou interagir avec ces fixtures (préfixes tests, emails `paul+p4_3a_*`, jamais liés à des sessions Supabase de utilisateurs réels).
+| Table | Rows créées | Détail |
+|---|:---:|---|
+| `public.users` | 12 | emails `paul+p4_3a_*` |
+| `public.language_centers` | 2 | `test_p4_3a_center_a`, `test_p4_3a_center_b` |
+| `public.teachers` | 4 | adminA, adminB, teacherA, teacherB |
+| `public.classrooms` | 2 | `test_p4_3a_class_a1`, `test_p4_3a_class_b1` |
+| `public.classroom_enrollments` | 3 | studentA1, studentA2 → classroom A · studentB1 → classroom B |
+| `public.class_join_requests` | 1 | pendingA → classroom A, `status = pending` |
+| `public.user_app_roles` | 12 | rôles CENTER_ADMIN / TEACHER / LEARNER / CAREER_COACH |
+| **`auth.users`** | **0** | **Aucun auth user créé sur production** · le client Auth était P-1. |
+| Storage | 0 | Les fixtures ne créent aucun objet Storage. |
+
+### 5.2 P-1 (`kzzagbojjkivdzzcrmxn`) · **opérations attendues + désynchronisation temporaire**
+
+| Ressource | Rows créées | Détail |
+|---|:---:|---|
+| `auth.users` | 12 | Comptes de test P4.3a créés normalement — c'est le comportement attendu du seed. |
+| `public.users` et suivants | 0 (au moment de l'incident) | Les écritures Prisma partaient sur PROD à cause du bug. La table `public.users` de P-1 restait vide pour les fixtures. |
+
+Cette asymétrie explique le symptôme runtime · les smoke tests logaient bien sur P-1 (auth OK), obtenaient un cookie de session valide, mais le proxy/API ne trouvait aucun `User` Prisma sur P-1 pour la résolution → 404 systématique au lieu des 200 attendus.
+
+Autres impacts ·
+
+- Aucun objet Storage, aucun webhook, aucun email transactionnel déclenchés (les fixtures créent uniquement des rows, pas de flux applicatif).
+- Aucun soft-delete résiduel — les modèles `User`/`Teacher`/`Classroom`/etc. ne pratiquent pas de soft-delete.
+- Durée totale d'existence en production · environ **17 minutes** (création ~15 h 00 · purge Prisma ~15 h 16).
+- Aucun user réel n'a pu voir ou interagir avec ces fixtures (préfixes tests, emails `paul+p4_3a_*`, jamais liés à des sessions Supabase de utilisateurs réels).
 
 ---
 
 ## 6. Confinement immédiat
 
-Séquence de purge exécutée depuis un shell **avec les variables de production actives** (`.env` chargé, non `.env.p1-baseline`), Prisma pointant sur `sbjhvlrkbyjckdxujjsk` ·
+Deux purges distinctes, sur les deux environnements affectés.
+
+### 6.1 Production (`sbjhvlrkbyjckdxujjsk`) · Prisma uniquement
+
+Shell chargeant `.env` (sans `.env.p1-baseline`). `DIRECT_URL` → PROD, aucun client Supabase Auth Admin instancié (les auth users n'existaient pas ici).
 
 1. `db.classroomEnrollment.deleteMany({ where: { userId: { in: <fixture ids> } } })`
 2. `db.classJoinRequest.deleteMany({ where: { fromUserId: { in: <fixture ids> } } })`
@@ -88,37 +111,62 @@ Séquence de purge exécutée depuis un shell **avec les variables de production
 6. `db.user.deleteMany({ where: { id: { in: <fixture ids> } } })`
 7. `db.classroom.deleteMany({ where: { id: { startsWith: "test_p4_3a_" } } })`
 8. `db.languageCenter.deleteMany({ where: { id: { startsWith: "test_p4_3a_" } } })`
-9. Supabase Auth Admin · `admin.auth.admin.deleteUser(...)` pour chaque `id` récupéré via `listUsers` en filtrant `email.includes("p4_3a")` — 12 auth users supprimés.
+
+Aucun appel `admin.auth.admin.deleteUser` sur PROD · les auth users n'y ont jamais été créés (voir §5.1 et §7).
+
+### 6.2 P-1 (`kzzagbojjkivdzzcrmxn`) · Supabase Auth + Prisma résiduel
+
+Exécuté via `node scripts/test-baseline/p4-3a-fixtures.mjs clean` (client Supabase Auth pointant sur P-1 via `.env.p1-baseline`, Prisma pointant sur P-1 après hardening `_common.mjs`).
+
+- Suppression Prisma des rows résiduels de tentatives de seed antérieures sur P-1 (structure identique à §6.1 · retire les rows dont l'email/id matche le préfixe fixture).
+- Supabase Auth Admin · `admin.auth.admin.deleteUser(...)` pour chaque `id` retourné par `listUsers` avec `email.includes("p4_3a")` · **12 auth users supprimés sur P-1**.
+
+Log final `═══ P4.3a · clean ═══ · cleaned · 12 db users · 12 auth users · centers + classrooms`.
 
 ---
 
-## 7. Vérifications post-purge
+## 7. Vérifications post-purge · par environnement
 
-Contrôle indépendant sur PROD depuis `.env.local` (sans `.env.p1-baseline`) · 18 sources vérifiées.
+### 7.1 Production (`sbjhvlrkbyjckdxujjsk`)
+
+Contrôle indépendant depuis `.env.local` (sans `.env.p1-baseline`), `dotenv` chargé explicitement · 19 sources vérifiées. Le résidu `auth.users` figure dans le tableau pour prouver que **rien** n'a jamais existé sur PROD à ce niveau.
+
+| Source | Résidu | Note |
+|---|:---:|---|
+| `public.users` (email contient `p4_3a` OU `fullName` commence par `TEST P4.3a`) | 0 | Purgé §6.1 |
+| `auth.users` (email contient `p4_3a`) | 0 | **Jamais créés sur PROD** (client Supabase Auth = P-1) |
+| `public.language_centers` (id commence par `test_p4_3a_`) | 0 | Purgé §6.1 |
+| `public.classrooms` (id commence par `test_p4_3a_`) | 0 | Purgé §6.1 |
+| `public.classroom_enrollments` (userId fixture) | 0 | Purgé §6.1 |
+| `public.class_join_requests` (message = "TEST P4.3a") | 0 | Purgé §6.1 |
+| `public.user_app_roles` (userId fixture) | 0 | Purgé §6.1 |
+| `public.user_roles` (userId fixture) | 0 | Aucune écriture (fixture ne touche pas ce modèle) |
+| `public.access_grants` (userId fixture) | 0 | Aucune écriture |
+| `public.audit_events` (actorUserId fixture) | 0 | Aucune écriture |
+| `public.notifications` (userId fixture) | 0 | Aucune écriture |
+| `public.circle_memberships` (userId fixture) | 0 | Aucune écriture |
+| `public.households` (ownerUserId fixture) | 0 | Aucune écriture |
+| `public.household_memberships` (userId fixture) | 0 | Aucune écriture |
+| `public.child_profiles` (parentUserId fixture) | 0 | Aucune écriture |
+| `public.class_memberships` (userId fixture) | 0 | Aucune écriture |
+| `public.learning_paths` (userId fixture) | 0 | Aucune écriture |
+| `public.orders` (userId fixture) | 0 | Aucune écriture |
+| Supabase Storage (objets contenant `test_p4_3a`) | 0 | Aucune écriture |
+
+**Production · 0 fixture P4.3a résiduelle confirmée le 2026-07-23 ~17 h 30 CEST.**
+
+### 7.2 P-1 (`kzzagbojjkivdzzcrmxn`)
+
+Contrôle après `p4-3a-fixtures.mjs clean` puis relecture ·
 
 | Source | Résidu |
 |---|:---:|
-| `public.users` (email contient `p4_3a` OU `fullName` commence par `TEST P4.3a`) | 0 |
 | `auth.users` (email contient `p4_3a`) | 0 |
+| `public.users` (email contient `p4_3a`) | 0 |
 | `public.language_centers` (id commence par `test_p4_3a_`) | 0 |
 | `public.classrooms` (id commence par `test_p4_3a_`) | 0 |
-| `public.classroom_enrollments` (userId fixture) | 0 |
-| `public.class_join_requests` (message = "TEST P4.3a") | 0 |
-| `public.user_app_roles` (userId fixture) | 0 |
-| `public.user_roles` (userId fixture) | 0 |
-| `public.access_grants` (userId fixture) | 0 |
-| `public.audit_events` (actorUserId fixture) | 0 |
-| `public.notifications` (userId fixture) | 0 |
-| `public.circle_memberships` (userId fixture) | 0 |
-| `public.households` (ownerUserId fixture) | 0 |
-| `public.household_memberships` (userId fixture) | 0 |
-| `public.child_profiles` (parentUserId fixture) | 0 |
-| `public.class_memberships` (userId fixture) | 0 |
-| `public.learning_paths` (userId fixture) | 0 |
-| `public.orders` (userId fixture) | 0 |
-| Supabase Storage (objets contenant `test_p4_3a`) | 0 |
 
-**Résultat production · 0 fixture P4.3a résiduelle confirmée le 2026-07-23 ~17 h 30 CEST.**
+**P-1 · 0 fixture P4.3a résiduelle confirmée.**
 
 ---
 
@@ -162,9 +210,9 @@ Paul Nkengue (`nkengue.p@gmail.com`) · suivi personnel · fixtures P4.3a et har
 
 ## 11. Statut final
 
-* Production résiduel · 0 (vérifié 18 sources, Storage inclus).
-* P-1 résiduel · 0 (cleanup exécuté après validation runtime).
+* Production résiduel · 0 (vérifié 19 sources dont `auth.users`, Storage inclus). Auth users **jamais créés** sur PROD.
+* P-1 résiduel · 0 (cleanup exécuté après validation runtime, 12 auth users + rows Prisma retirés).
 * Protection code · posée, verrouillée par `scripts/test-baseline/p4-3a-env-refusal.mjs` (6/6 scénarios validés).
 * Rotations · non requises.
-* Branche · `feat/yema-p4-3a-center-real-data` (non mergée).
+* Branche · `feat/yema-p4-3a-center-real-data` (non mergée à l'écriture du rapport initial ; le commit correctif documentaire précède le merge planifié).
 * Statut · **CLOSED**.
