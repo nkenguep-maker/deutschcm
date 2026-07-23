@@ -1,4 +1,6 @@
-// P4.3b · Teacher activities · LOCK_HONESTLY (P4.5 dependency, comme assignments).
+// P4.3b · Teacher schedule · SSR · LOCK_HONESTLY.
+//
+// Aucun modèle de planning fiable en base actuelle · pas d'invention d'horaires.
 
 import { redirect } from "next/navigation";
 import { isTeacherWorkspaceActive } from "@/lib/flags";
@@ -10,12 +12,12 @@ export const dynamic = "force-dynamic";
 
 const COPY = {
   fr: {
-    title: "Activités",
-    body: "La création et le suivi des activités seront disponibles dans une prochaine étape.",
+    title: "Planning",
+    body: "Le planning détaillé sera bientôt disponible.",
   },
   en: {
-    title: "Activities",
-    body: "Creating and tracking activities will be available in a later step.",
+    title: "Schedule",
+    body: "The detailed schedule will be available soon.",
   },
 } as const;
 
