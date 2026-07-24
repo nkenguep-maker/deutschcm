@@ -712,7 +712,169 @@ Reporté vers P4.5-B2b2 (UI + landing + flag-off) ·
 - Tests JWT/PostgREST authentifiés (requiert Supabase auth flow réel).
 - Closure documentation finale.
 
-## 13. Chemin restant
+## 13. Statut P4.5-B2b2a · fermeture technique + JWT/PostgREST + base vierge
+
+Livré sur `feat/yema-p4-5-b-monde-workflows` @ base P4.5-B2b1
+(reword hash · `52ab7ec` remplace ancien `d199430`) ·
+
+### 13.1 §2.1 · Base vierge chain 00001-00005 sur PGlite
+
+Fresh PGlite + shims Supabase (rôles anon/authenticated/service_role,
+schema auth + storage stubs) · deploy complet 23 migrations OK · second
+deploy `No pending migrations`. Vérifié post-deploy · 3 fonctions
+`p4_5_b_enforce_*_scope_immutability`, 6 policies WRITE Monde
+hardening, 3 triggers scope_immutable, index versioning
+`assignment_submissions_assignmentId_userId_version_key` (00005). Total
+13 objets P4.5-B présents. PGlite supprimé après vérification.
+
+### 13.2 §2.2 · Tests JWT/PostgREST authenticated
+
+`scripts/test-baseline/p4-5-b2b-jwt-rls.mjs` · signup Teacher A Supabase
+Auth réel · sign-in avec ANON key + password · PostgREST direct
+(`Authorization: Bearer <access_token>`) · 4 tentatives directes ·
+
+| Cible | HTTP | rowUnchanged | Verdict |
+|---|---:|:---:|---|
+| UPDATE `status='PUBLISHED'` (DRAFT→PUBLISHED) | 403 | ✓ | refused (permission denied for table) |
+| UPDATE `classroomId` vers une classroom possédée | 403 | ✓ | refused |
+| UPDATE `createdByTeacherId` vers Teacher B | 403 | ✓ | refused |
+| DELETE assignment | 403 | ✓ | refused (row still exists) |
+| **service_role seam DRAFT→PUBLISHED via Prisma+tx+audit** | — | — | **allowed** (final PUBLISHED) |
+
+Le refus vient du role `authenticated` sans grant explicite (comportement
+Supabase par défaut) · les policies 00002/00003/00004 restent en place
+comme backup. **Aucune mutation directe n'est possible** par un JWT
+authenticated · toutes les transitions passent par le seam Prisma
+service_role avec audit in-tx.
+
+Cleanup complet · `BASELINE DATA CLEANED` · 0 résidu users/classrooms/
+assignments/audits (incluant Auth users P-1 supprimés via
+`admin.auth.admin.deleteUser`).
+
+### 13.3 §2.3 · Compatibilité storage P4.5-D
+
+Test direct trigger 00004 sur `storageObjectId` ·
+
+| Cas | Verdict |
+|---|---|
+| Feedback DRAFT · NULL → valeur | **ALLOWED** (P4.5-D compat, finalize upload) |
+| Feedback DRAFT · valeur → autre valeur | **REFUSED** (immutabilité renforcée) |
+| Submission DRAFT · NULL → valeur | **ALLOWED** (P4.5-D compat) |
+| Submission SUBMITTED · toute mutation | **REFUSED** par trigger P4.5-A `_immutability` |
+
+Aucune migration corrective nécessaire · le trigger 00004 utilise
+`OLD.storageObjectId IS NOT NULL AND NEW.storageObjectId IS DISTINCT
+FROM OLD.storageObjectId` · autorise NULL → valeur (upload finalize)
+et bloque le remplacement une fois set.
+
+### 13.4 §2.4 · SUBMISSION_CREATED in-tx dans createStudentSubmissionVersion
+
+Vérifié dans `src/lib/assignments/student.ts::createStudentSubmissionVersion` ·
+après le `tx.assignmentSubmission.create({ ... version: latest.version + 1 })`,
+`writeAuditEvent({ action: "SUBMISSION_CREATED", ... }, tx)` est appelé
+dans la même transaction. Sur SSI rollback, l'audit disparaît avec
+l'insert. Race 3 runtime B2b1 · 1 seule version N+1 committed, 0 audit
+fantôme (advisory lock `(assignmentId, studentUserId)`).
+
+### 13.5 §2.5 · Code canonique `invalid_submission_transition`
+
+`submission_invalid_transition` supprimé partout, remplacé par
+`invalid_submission_transition` (13 occurrences dans 6 fichiers) ·
+`errors.ts` union type + `P4_5_STABLE_ERROR_CODES` list · `transitions.ts`
+throw sites · `student.ts` service · `bodyValidators.ts` allowlist ·
+`assignmentErrors.ts` mapper switch · `student/submissions/route.ts`
+inline guard · `p4-5-b2b-runtime.mjs` inline. Aucune ambiguïté de code
+possible.
+
+### 13.6 Renommage commit B2b1
+
+`d199430 test(assignments): validate monde runtime isolation and
+concurrency` (trop large) renommé via `git rebase -i` en
+**`52ab7ec test(assignments): validate monde service concurrency and
+immutability [no-push]`** · reflète le scope réel (service-side +
+concurrency + immutabilité DB via service_role) sans prétendre couvrir
+JWT/PostgREST ni HTTP end-to-end. La branche n'étant pas poussée, la
+réécriture d'historique est sûre.
+
+### 13.7 Gate 0 · fermeture JWT/PostgREST authenticated étendu
+
+Après acceptation partielle B2b2a, un Gate 0 additionnel a été livré
+avant B2b3 · le harness `p4-5-b2b-jwt-rls.mjs` étendu couvre désormais
+les 3 tables Monde sur toutes les colonnes de scope + DELETE +
+cross-tenant A/B + rôles négatifs · totalise 26+ assertions.
+
+**§1 Assignment (Teacher A own row)** · 4/4 refus HTTP 403 ·
+UPDATE `status='PUBLISHED'`, `classroomId`, `createdByTeacherId`, DELETE.
+
+**§2 AssignmentSubmission (Student A own row)** · 6/6 refus HTTP 403 ·
+UPDATE `status='SUBMITTED'`, `assignmentId`, `userId`, `version`,
+`storageObjectId (NULL → valeur)` **REFUSED** (invariant §3 brief B2b
+Gate 0 satisfait), DELETE.
+
+**§3 AssignmentFeedback (Teacher A own row)** · 7/7 refus HTTP 403 ·
+UPDATE `status='PUBLISHED'`, `submissionId`, `authorTeacherId`,
+`version`, `supersedesFeedbackId`, `storageObjectId (NULL → valeur)`
+**REFUSED**, DELETE.
+
+**§4 Cross-tenant Teacher B on A** · Teacher B ne voit pas Assignment A
+(0 rows retournés) · UPDATE title/content sur Assignment A/Submission A
+refusé 403.
+
+**§5 Cross-tenant Student B on A** · Student B ne voit pas Submission A
+(0 rows) · UPDATE content refusé 403.
+
+**§6 Rôles négatifs** · Center admin, Racines Coach, YEMA_ADMIN sans
+binding, Anonymous · tous refusés 403 (401 pour Anonymous sur UPDATE)
+sur SELECT et UPDATE assignments.
+
+**§7 Nouvelle version + audit** ·
+- §7a séquentiel · 1 call `nextVersion` → **exactement 1
+  `SUBMISSION_CREATED` committed** (delta=1, createdVersion=2).
+- §7b race concurrente · advisory lock + Serializable · versions
+  strictement monotones sans doublon [v1 SUPERSEDED, v2 SUPERSEDED, v3
+  DRAFT] · loser rejette avec `P2034` (SSI, mappable via
+  `withSerializableRetry` en prod à `concurrent_submission_update`) ·
+  audit strictement lié au commit (`noPhantomAudit: true`, delta=1
+  audit pour 1 succès).
+
+**§8 service_role seam** · DRAFT → PUBLISHED via Prisma+tx+audit
+autorisé (contrôle positif · le seul chemin autorisé).
+
+**Aucune migration corrective `20260724000006` n'est requise** · le
+`permission denied for table` couvre implicitement tous les cas de
+`storageObjectId NULL → valeur` pour authenticated · le trigger 00004
+et policies 00003 restent en défense en profondeur si un grant devait
+être ajouté un jour.
+
+Cleanup complet · `BASELINE DATA CLEANED` · 0 résidu users/teachers/
+classrooms/submissions/feedbacks/storage/audits · Auth users P-1
+supprimés via `admin.auth.admin.deleteUser` (loop défensif inclut la
+liste complète des users avec `PREFIX` dans email).
+
+### 13.8 Chemin restant P4.5-B2b3 (UI + runtime end-to-end + flag-off + closure)
+
+- **B2b3** · UI Teacher (`/[locale]/teacher/assignments/*`) 4 pages avec
+  les 8 états loading/empty/error/forbidden/feature-disabled/draft/
+  published/closed.
+- **B2b3** · UI Student (`/[locale]/student/*`) 3 pages avec 8 états +
+  submitted + compteur 1000 mots + versions + feedback publié/addenda
+  (jamais DRAFT).
+- **B2b3** · runtime API réels avec cookies Supabase P-1 · Teacher A/B
+  cross-tenant · Student A/B cross-tenant · Center admin / Racines Coach
+  / YEMA_ADMIN sans binding refusés · anti-injection body/query/headers.
+- **B2b3** · runtime FR/EN sur toutes les pages · aucune clé i18n brute
+  · aucun mélange · dates localisées.
+- **B2b3** · responsive 4 viewports (360/390/768/1440) + zoom 200 % +
+  a11y clavier + focus visible + labels + navigation Tab + cibles
+  tactiles ≥ 44×44.
+- **B2b3** · flag-off validation · retirer `ASSIGNMENTS_ENABLED` → tester
+  les 20 routes → 404 stable partout, pages en `feature-disabled`.
+- **B2b3** · landing regressions `/fr` et `/en` @ 360/390/1440 · HTTP 200,
+  overflow 0, aucune modification landing.
+- **B2b3** · verdict `P4.5-B VALIDATED — READY FOR P4.5-C` après tous
+  les checks §14.
+
+## 14. Chemin restant
 
 - **P4.5-B** · services `assignments.ts` + `submissions.ts` + `feedback.ts` Monde · routes Teacher + Student · tests RLS/JWT + immutabilité DB + races
 - **P4.5-C** · services Racines équivalents · routes Coach + Famille · quotas semaine/mois testés sous concurrence · reply parent structuré
