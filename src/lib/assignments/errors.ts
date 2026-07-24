@@ -33,7 +33,6 @@ export class SubmissionError extends Error {
       | "submission_too_long"
       | "submission_not_owned"
       | "submission_immutable"
-      | "submission_invalid_transition"
       | "invalid_submission_transition"
       | "student_access_required"
       | "student_not_enrolled"
@@ -114,7 +113,6 @@ export const P4_5_STABLE_ERROR_CODES = [
   "submission_too_long",
   "submission_not_owned",
   "submission_immutable",
-  "submission_invalid_transition",
   "invalid_submission_transition",
   "student_access_required",
   "student_not_enrolled",

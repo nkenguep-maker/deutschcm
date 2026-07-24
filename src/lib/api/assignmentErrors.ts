@@ -117,7 +117,6 @@ function statusForSubmissionCode(code: SubmissionError["code"]): number {
       return 403;
     case "submission_already_submitted":
     case "submission_immutable":
-    case "submission_invalid_transition":
     case "invalid_submission_transition":
       return 409;
     case "submission_content_required":

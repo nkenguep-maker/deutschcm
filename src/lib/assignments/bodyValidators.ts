@@ -189,13 +189,13 @@ export function validateSubmissionBody(body: unknown): SubmissionContentBody {
   const picked = pickKeys(body, SUBMISSION_ALLOWED_KEYS, (k) => {
     if (SUBMISSION_FORBIDDEN_KEYS.has(k)) {
       throw new SubmissionError(
-        "submission_invalid_transition",
+        "invalid_submission_transition",
         `forbidden body field: ${k}`,
         { forbiddenKey: k },
       );
     }
     throw new SubmissionError(
-      "submission_invalid_transition",
+      "invalid_submission_transition",
       `unknown body field: ${k}`,
       { unknownKey: k },
     );

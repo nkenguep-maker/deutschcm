@@ -345,7 +345,7 @@ async function main() {
         orderBy: { version: "desc" }, select: { id: true, status: true, version: true },
       });
       if (latest.status !== "SUBMITTED") {
-        const err = new Error("submission_invalid_transition"); err.code = "submission_invalid_transition";
+        const err = new Error("invalid_submission_transition"); err.code = "invalid_submission_transition";
         throw err;
       }
       await tx.assignmentSubmission.update({

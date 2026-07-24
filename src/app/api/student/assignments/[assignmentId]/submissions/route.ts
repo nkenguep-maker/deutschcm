@@ -44,7 +44,7 @@ export async function POST(
         && ("assignmentId" in raw || "userId" in raw)
       ) {
         throw new SubmissionError(
-          "submission_invalid_transition",
+          "invalid_submission_transition",
           "assignmentId/userId must come from path/session, not body",
         );
       }

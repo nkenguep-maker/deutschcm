@@ -281,7 +281,7 @@ export async function createStudentSubmissionVersion(
   });
   if (!latest) {
     throw new SubmissionError(
-      "submission_invalid_transition",
+      "invalid_submission_transition",
       "no previous submission to base a new version on",
     );
   }
@@ -294,7 +294,7 @@ export async function createStudentSubmissionVersion(
   }
   if (latest.status !== "SUBMITTED") {
     throw new SubmissionError(
-      "submission_invalid_transition",
+      "invalid_submission_transition",
       "new version can only follow a SUBMITTED submission",
       { currentStatus: latest.status },
     );
