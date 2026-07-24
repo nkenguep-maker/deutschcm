@@ -105,11 +105,18 @@ export async function POST(request: NextRequest) {
   }
 
   if (type === "submit") {
+    // Legacy V1 branch · pré-P4.5 · score+feedback columns sur submission.
+    // Doit passer par le workflow P4.5-B `/api/student/submissions/*`
+    // pour les nouveaux clients. Ici on maintient la compat V1 en
+    // ciblant la version 1 par défaut (le workflow historique n'utilise
+    // pas le versioning P4.5-B).
     const { assignmentId, score, feedback } = body;
     const submission = await prisma.assignmentSubmission.upsert({
-      where: { assignmentId_userId: { assignmentId, userId: dbUser.id } },
+      where: {
+        assignmentId_userId_version: { assignmentId, userId: dbUser.id, version: 1 },
+      },
       update: { score, feedback },
-      create: { assignmentId, userId: dbUser.id, score, feedback },
+      create: { assignmentId, userId: dbUser.id, score, feedback, version: 1 },
     });
     return NextResponse.json({ submission });
   }

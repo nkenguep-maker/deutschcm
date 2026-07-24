@@ -1005,7 +1005,7 @@ model AssignmentSubmission {
   storageObject StorageObject?    @relation("AssignmentSubmissionStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
   feedbacks   AssignmentFeedback[]
 
-  @@unique([assignmentId, userId])
+  @@unique([assignmentId, userId, version])
   @@index([assignmentId, status])
   @@map("assignment_submissions")
 }
