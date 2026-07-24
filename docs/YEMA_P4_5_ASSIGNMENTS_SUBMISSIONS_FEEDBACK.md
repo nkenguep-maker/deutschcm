@@ -595,7 +595,124 @@ Reporté vers P4.5-B2b (closure B) ·
 - Finalisation `docs/YEMA_P4_5_ASSIGNMENTS_SUBMISSIONS_FEEDBACK.md`
   + mises à jour docs globaux.
 
-## 12. Chemin restant
+## 12. Statut P4.5-B2b1 · immutabilité columnar + fixtures + runtime backend
+
+Livré sur `feat/yema-p4-5-b-monde-workflows` @ base P4.5-B2a (`6a5d4a4`) ·
+
+### 12.1 Préflight columnar + migration `20260724000004`
+
+§2.2 brief B2b · les policies WITH CHECK `20260724000003` verrouillaient
+`status='DRAFT'` mais laissaient un JWT Teacher/Student muter les
+colonnes de scope (`classroomId`, `userId`, `authorTeacherId`,
+`version`, `submissionId`, `supersedesFeedbackId`, `storageObjectId`).
+
+Migration additive `20260724000004_p4_5_b_monde_rls_column_hardening` ·
+3 triggers `BEFORE UPDATE` `SECURITY DEFINER search_path pinned` ·
+
+- `assignments_scope_immutable` · bloque mutation `classroomId` et
+  `createdByTeacherId`.
+- `assignment_submissions_scope_immutable` · bloque `assignmentId`,
+  `userId`, `version`.
+- `assignment_feedbacks_scope_immutable` · bloque `submissionId`,
+  `authorTeacherId`, `version`, `supersedesFeedbackId`, remplacement de
+  `storageObjectId` une fois set.
+
+Les triggers s'appliquent à TOUS les writes (service_role inclus). Les
+services légitimes ne mutent JAMAIS ces colonnes sur une ligne existante ·
+les nouvelles versions/addenda sont des INSERTs de nouvelles lignes.
+
+### 12.2 Migration `20260724000005` · versioning submissions
+
+Découvert en écrivant les fixtures · la contrainte legacy V2
+`assignment_submissions_assignmentId_userId_key` (héritée de
+`20260509170326_add_teacher_classroom_center`) empêchait plusieurs
+versions par (assignment, student), ce qui rendait le workflow
+versioning §6 brief impossible.
+
+Migration additive `20260724000005_p4_5_b_monde_submission_versioning` ·
+
+- DROP INDEX `assignment_submissions_assignmentId_userId_key`.
+- CREATE UNIQUE INDEX `assignment_submissions_assignmentId_userId_version_key`
+  sur `(assignmentId, userId, version)` · plusieurs versions autorisées
+  tant qu'elles portent des numéros distincts.
+- Le partial unique `assignment_submissions_active_draft_uniq` posé
+  P4.5-A reste inchangé · toujours un seul DRAFT actif par
+  (assignmentId, userId).
+
+Miroir Prisma · `@@unique([assignmentId, userId])` → `@@unique([assignmentId, userId, version])`.
+
+### 12.3 Fixtures P-1 protected
+
+`scripts/test-baseline/p4-5-b-fixtures.mjs` (idempotent) et
+`scripts/test-baseline/p4-5-b-cleanup.mjs` (BASELINE DATA CLEANED) ·
+
+- Préfixe strict `test_p4_5_b_` · refuse cible autre que P-1 via
+  `_common.mjs::assertNonProduction`.
+- 10 personas · Teacher A/B + sans binding, Student A/B + sans enrollment
+  + REMOVED, Center admin, Racines Coach, YEMA_ADMIN sans binding.
+  Anonymous n'a pas de User row (session absente uniquement).
+- Données strictement séparées A/B · Classroom A/B, Assignment A
+  DRAFT/PUBLISHED/CLOSED, Assignment B PUBLISHED, Submission A v1
+  SUPERSEDED + v2 DRAFT + v1 SUBMITTED (sur asm CLOSED),
+  Feedback A DRAFT+PUBLISHED+ADDENDUM (sur submission SUBMITTED).
+- Prisma writes via `connect: { id }` (v7 mode strict). `submittedAt`
+  omis via spread conditionnel (default `@default(now())`).
+
+### 12.4 Runtime backend · immutabilité DB + 5 races
+
+`scripts/test-baseline/p4-5-b2b-runtime.mjs` · harness Prisma
+service_role, setup/cleanup automatique, sortie JSON `/tmp/p4-5-b-captures/`.
+
+**§10 immutabilité columnar (7 refus)** · les 3 triggers bloquent
+correctement toute mutation des colonnes scope, même via Prisma
+service_role. Vérifié · UPDATE classroomId refused, UPDATE
+createdByTeacherId refused, UPDATE assignmentId sub refused, UPDATE
+userId sub refused, UPDATE version sub refused, UPDATE authorTeacherId
+fb refused, UPDATE version fb refused.
+
+**§11 5 races** ·
+
+| Race | successes | errs | finalState | audits | exposedP2034 |
+|---|---:|---|---|---:|:---:|
+| 1 · double publish assignment | 1 | `invalid_assignment_transition` | PUBLISHED | 1 | false |
+| 2 · double submit | 1 | `invalid_submission_transition` | SUBMITTED | 1 | false |
+| 3 · double new version | 1 | `submission_invalid_transition` | v1 SUPERSEDED + v2 DRAFT | — | false |
+| 4 · double publish feedback | 1 | `feedback_already_published` | PUBLISHED | 1 | false |
+| 5 · double addendum (advisory lock (submissionId, authorId)) | 2 | — | v3 + v4 ADDENDUM (sérialisé) | 2 | false |
+
+Race 5 · advisory lock sérialise les 2 tentatives · chacune voit un
+state différent (première crée v3, deuxième voit v3 et crée v4).
+Comportement souhaité pour l'UX · un caller qui appuie 2× sur "Add
+Addendum" obtient 2 addenda distincts, versions strictement monotones,
+originaux inchangés. Aucun doublon de version numbers, un audit par
+addendum commité.
+
+Aucun `P2034` / `TransactionWriteConflict` / `INTERNAL` exposé dans
+aucune race. Tous les codes métier stables (`invalid_*_transition`,
+`feedback_already_published`) ou `concurrent_*_update` si retry épuisé.
+
+### 12.5 Cleanup
+
+`BASELINE DATA CLEANED` · 0 résidu users/teachers/classrooms/
+enrollments/assignments/submissions/feedbacks/audits/appRoles après
+runtime + après cleanup script isolé.
+
+### 12.6 Tests unitaires
+
+807 tests / 43 files verts (inchangé par rapport à B2a · le harness
+runtime est un script Node séparé, hors vitest).
+
+Reporté vers P4.5-B2b2 (UI + landing + flag-off) ·
+- UI Teacher (`/[locale]/teacher/assignments/*`) 4 pages avec les 8 états.
+- UI Student (`/[locale]/student/*`) 3 pages avec les 8 états + submitted.
+- FR/EN strict, aucune clé i18n brute.
+- Responsive 4 viewports + zoom 200 % + a11y clavier.
+- Flag-off validation · retirer `ASSIGNMENTS_ENABLED`, tester 20 routes → 404 stable, pages en `feature-disabled`.
+- Landing regression tests.
+- Tests JWT/PostgREST authentifiés (requiert Supabase auth flow réel).
+- Closure documentation finale.
+
+## 13. Chemin restant
 
 - **P4.5-B** · services `assignments.ts` + `submissions.ts` + `feedback.ts` Monde · routes Teacher + Student · tests RLS/JWT + immutabilité DB + races
 - **P4.5-C** · services Racines équivalents · routes Coach + Famille · quotas semaine/mois testés sous concurrence · reply parent structuré
