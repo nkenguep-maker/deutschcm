@@ -1,10 +1,51 @@
-// P4.5-B2b3b-b2 · flag-off UI (§17).
+// P4.5-B2b3b-b2 · flag-off UI + API (§17).
 // SERVEUR REDÉMARRÉ SÉPARÉMENT avec `PW_FLAG=off` (voir npm script
-// test:e2e:b2:flag-off). Vérifie · 7 pages rendent le placeholder
-// feature_disabled sans données cache · 20 routes API Monde répondent 404.
+// test:e2e:b2:flag-off). Vérifie ·
+//
+//   1. 7 pages Student/Teacher rendent le placeholder feature_disabled
+//      sans données cache.
+//   2. Manifeste des 20 opérations API Monde canoniques (méthode + chemin)
+//      répond 404 stable.
+//   3. Aucune mutation DB (Assignment, AssignmentSubmission,
+//      AssignmentFeedback, ClassroomEnrollment) et aucun AuditEvent créé
+//      pendant la volée des 20 appels · deltas comptés au préfixe fixtures
+//      `test_p4_5_b_`.
 
 import { test, expect } from "playwright/test";
-import { PERSONAS, FIXTURE_IDS } from "./personas";
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PERSONAS, FIXTURE_IDS, PREFIX } from "./personas";
+import { MONDE_API_OPERATIONS } from "./monde-api-manifest";
+
+// ── DB helper · service_role via .env.p1-baseline (chargé par wrapper) ──
+
+function newDb() {
+  return new PrismaClient({
+    adapter: new PrismaPg({ connectionString: process.env.DIRECT_URL }),
+    log: ["error"],
+  });
+}
+
+async function snapshotCounts(db: PrismaClient) {
+  const [assignments, submissions, feedbacks, audits, enrollments] = await Promise.all([
+    db.assignment.count({ where: { id: { startsWith: PREFIX } } }),
+    db.assignmentSubmission.count({ where: { id: { startsWith: PREFIX } } }),
+    db.assignmentFeedback.count({ where: { id: { startsWith: PREFIX } } }),
+    db.auditEvent.count({
+      where: {
+        OR: [
+          { targetId: { startsWith: PREFIX } },
+          { scopeId: { startsWith: PREFIX } },
+          { actorUserId: { startsWith: PREFIX } },
+        ],
+      },
+    }),
+    db.classroomEnrollment.count({ where: { classroomId: { startsWith: PREFIX } } }),
+  ]);
+  return { assignments, submissions, feedbacks, audits, enrollments };
+}
+
+// ── §17.a · 7 pages placeholder feature_disabled + anti-leak cache ──────
 
 const PAGES = [
   { name: "teacher/classes",              path: "/fr/teacher/classes",                                    storage: PERSONAS.teacherA.storageStateFile },
@@ -22,12 +63,13 @@ test.describe("flag-off · 7 pages → feature_disabled placeholder", () => {
       const context = await browser.newContext({ storageState: p.storage });
       const page = await context.newPage();
       await page.goto(p.path);
-      // Placeholder distinct · contient "Bientôt disponible" (FR) ou
-      // "Coming soon" (EN).
       await expect(page.getByText(/Bientôt disponible|Coming soon/i)).toBeVisible();
-      // Aucune donnée métier fixture ne doit apparaître (sanity anti-cache).
       const html = await page.content();
-      for (const forbidden of ["Devoir A", "Réponse A", "Bien !", "Précision : travaille les articles"]) {
+      for (const forbidden of [
+        "Devoir A · brouillon", "Devoir A · publié", "Devoir A · fermé",
+        "Brouillon A · v2", "Réponse A · v1 finalisée",
+        "Bien !", "Précision : travaille les articles",
+      ]) {
         expect(html, `${p.name} feature-off must not leak ${forbidden}`).not.toContain(forbidden);
       }
       await context.close();
@@ -35,52 +77,50 @@ test.describe("flag-off · 7 pages → feature_disabled placeholder", () => {
   }
 });
 
-// Routes API Monde · uniquement les méthodes qui existent réellement
-// sur chaque endpoint (source · `src/app/api/{student,teacher}/**`).
-// Une méthode non exposée retourne 405 et non 404 · on ne la teste pas ici.
-const MONDE_API_ROUTES = [
-  // Student
-  "GET /api/student/assignments",
-  `GET /api/student/assignments/${FIXTURE_IDS.asmPubA}`,
-  `POST /api/student/assignments/${FIXTURE_IDS.asmPubA}/submissions`,
-  `PATCH /api/student/submissions/${FIXTURE_IDS.subDraftA}`,
-  `POST /api/student/submissions/${FIXTURE_IDS.subDraftA}/submit`,
-  `POST /api/student/submissions/${FIXTURE_IDS.subSubmittedA}/versions`,
-  `GET /api/student/submissions/${FIXTURE_IDS.subSubmittedA}/feedback`,
-  // Teacher
-  `GET /api/teacher/classes/${FIXTURE_IDS.classroomA}/assignments`,
-  `POST /api/teacher/classes/${FIXTURE_IDS.classroomA}/assignments`,
-  `GET /api/teacher/assignments/${FIXTURE_IDS.asmPubA}`,
-  `PATCH /api/teacher/assignments/${FIXTURE_IDS.asmPubA}`,
-  `POST /api/teacher/assignments/${FIXTURE_IDS.asmDraftA}/publish`,
-  `POST /api/teacher/assignments/${FIXTURE_IDS.asmPubA}/close`,
-  `GET /api/teacher/assignments/${FIXTURE_IDS.asmPubA}/submissions`,
-  `GET /api/teacher/submissions/${FIXTURE_IDS.subSubmittedA}`,
-  `POST /api/teacher/submissions/${FIXTURE_IDS.subSubmittedA}/feedback`,
-  `PATCH /api/teacher/feedback/tf_dummy`,
-  `POST /api/teacher/feedback/tf_dummy/publish`,
-  `POST /api/teacher/feedback/tf_dummy/addendum`,
-  // Complément pour atteindre 20 routes protégées par le flag ·
-  // le GET sur submission n'existe pas · on ajoute PATCH sur un id
-  // inexistant pour un cas 404 stable (transitions guard 405 exclue).
-  `GET /api/teacher/assignments/${FIXTURE_IDS.asmDraftA}/submissions`,
-];
+// ── §17.b · 20 routes API Monde canoniques → 404 stable + 0 mutation ────
 
-test.describe("flag-off · 20 routes API Monde → 404 stable", () => {
-  for (const spec of MONDE_API_ROUTES) {
-    test(`${spec} → 404`, async ({ browser }) => {
-      const [method, path] = spec.split(" ");
+test.describe("flag-off · 20 routes API Monde · 404 + 0 mutation + 0 AuditEvent", () => {
+  test.describe.configure({ mode: "serial" });
+
+  let db: PrismaClient;
+  let baseline: Awaited<ReturnType<typeof snapshotCounts>>;
+
+  test.beforeAll(async () => {
+    db = newDb();
+    baseline = await snapshotCounts(db);
+  });
+
+  test.afterAll(async () => {
+    if (db) await db.$disconnect();
+  });
+
+  // Volée séquentielle des 20 opérations · assertion 404 par opération.
+  for (const op of MONDE_API_OPERATIONS) {
+    test(`${op.method} ${op.path} · ${op.label} → 404`, async ({ browser }) => {
       const context = await browser.newContext({
+        // Le persona utilisé n'a aucun impact sur la 404 : le gate
+        // `assignmentsFlagOr404` court-circuite AVANT tout resolveActor.
         storageState: PERSONAS.studentA.storageStateFile,
       });
       const req = context.request;
       let res;
-      if (method === "GET") res = await req.get(path, { failOnStatusCode: false });
-      else if (method === "POST") res = await req.post(path, { data: {}, failOnStatusCode: false });
-      else if (method === "PATCH") res = await req.patch(path, { data: {}, failOnStatusCode: false });
-      else throw new Error(`unhandled method ${method}`);
-      expect(res.status(), `${spec} must be 404 with flag off`).toBe(404);
+      if (op.method === "GET") res = await req.get(op.path, { failOnStatusCode: false });
+      else if (op.method === "POST") res = await req.post(op.path, { data: {}, failOnStatusCode: false });
+      else res = await req.patch(op.path, { data: {}, failOnStatusCode: false });
+      expect(res.status(), `${op.method} ${op.path} must be 404 with flag off`).toBe(404);
+      // Réponse stable · JSON `{ error: "Not found" }` (assignmentsGate.ts).
+      const body = await res.json().catch(() => null);
+      expect(body).toMatchObject({ error: "Not found" });
       await context.close();
     });
   }
+
+  test("bilan · 0 mutation DB, 0 AuditEvent après les 20 appels", async () => {
+    const after = await snapshotCounts(db);
+    expect(after.assignments, "no Assignment created/deleted").toBe(baseline.assignments);
+    expect(after.submissions, "no AssignmentSubmission created/deleted").toBe(baseline.submissions);
+    expect(after.feedbacks, "no AssignmentFeedback created/deleted").toBe(baseline.feedbacks);
+    expect(after.audits, "no AuditEvent created (delta must be 0)").toBe(baseline.audits);
+    expect(after.enrollments, "no ClassroomEnrollment mutation").toBe(baseline.enrollments);
+  });
 });
