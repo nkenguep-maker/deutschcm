@@ -60,21 +60,26 @@ export default function QaConsoleView({
     timeStyle: "short", dateStyle: "medium",
   });
 
-  async function impersonate(persona: QaPersonaId) {
+  async function impersonate(persona: QaPersonaId, destination: string) {
     setError(null);
     startTransition(async () => {
+      // `redirect: "manual"` empêche fetch de suivre le 303 côté fetch ·
+      // le browser voit `res.type === "opaqueredirect"` (status = 0). Le
+      // server a écrit les cookies session Supabase avant le 303 · aucun
+      // secret n'est dans le JSON, l'URL ou une prop React. Le client
+      // navigue vers la destination déjà connue via la spec persona (pas
+      // besoin de lire une valeur retournée par le server).
       const res = await fetch("/api/qa/impersonate", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ persona }),
+        redirect: "manual",
       });
-      if (!res.ok) {
-        setError(c.error);
-        return;
-      }
-      const data = await res.json().catch(() => ({}));
-      if (typeof data?.redirectUrl === "string") {
-        window.location.href = data.redirectUrl;
+      const ok = res.type === "opaqueredirect" || res.status === 0
+        || (res.status >= 300 && res.status < 400)
+        || res.status === 200;
+      if (ok) {
+        window.location.href = destination;
       } else {
         setError(c.error);
       }
@@ -114,7 +119,7 @@ export default function QaConsoleView({
                 <button
                   type="button"
                   disabled={pending}
-                  onClick={() => impersonate(p.id)}
+                  onClick={() => impersonate(p.id, p.destination)}
                   className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-lg px-5 py-2 text-sm font-medium focus:outline-none focus:ring-2 disabled:opacity-60"
                   style={{ background: "var(--brass)", color: "var(--espresso)" }}
                 >

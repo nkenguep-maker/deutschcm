@@ -1,49 +1,49 @@
-// P4.5-QA · POST /api/qa/logout
+// QA-b1 Gate · POST /api/qa/logout
 //
 // Déconnecte la session Supabase courante + supprime le cookie QA +
-// redirige vers /[locale]/goodbye. Idempotent · si aucune session, renvoie
-// juste 204.
+// redirige vers /[locale]/goodbye. Idempotent. Protection CSRF ·
+// mêmes contrôles que /api/qa/impersonate (POST + Content-Type JSON +
+// Origin match + Sec-Fetch-Site).
 
-import { NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { NextResponse, type NextRequest } from "next/server";
+import { createClient as createSsrClient } from "@/lib/supabase/server";
 import { resolveQaConfig } from "@/lib/qa/config";
 import { clearQaCookie } from "@/lib/qa/cookie";
+import { checkCsrf } from "@/lib/qa/csrf";
+import { normalizeHost } from "@/lib/qa/host";
 import { qaLog } from "@/lib/qa/log";
 
 function notFound() {
   return NextResponse.json({ error: "Not found" }, { status: 404 });
 }
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   const status = resolveQaConfig();
   if (!status.active) return notFound();
 
-  // Déconnecte la session Supabase.
+  const csrf = checkCsrf(request);
+  if (!csrf.ok) {
+    qaLog("QA_ACCESS_DENIED", {
+      deploymentHost: normalizeHost(request.headers.get("host") || ""),
+      projectRef: status.projectRef,
+      reasonCode: csrf.reason,
+    });
+    return notFound();
+  }
+
+  // Déconnecte la session Supabase via le client SSR canonique.
   try {
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll: () => cookieStore.getAll(),
-          setAll: (list) => {
-            try { list.forEach(({ name, value, options }) => cookieStore.set(name, value, options)); }
-            catch { /* server component read-only · ignore */ }
-          },
-        },
-      },
-    );
+    const supabase = await createSsrClient();
     await supabase.auth.signOut();
   } catch {
-    // silencieux · même si signOut échoue on veut retirer le cookie QA.
+    // silencieux · même si signOut échoue on retire le cookie QA.
   }
 
   await clearQaCookie();
   qaLog("QA_IMPERSONATION_ENDED", { projectRef: status.projectRef });
 
-  return NextResponse.json({ redirectUrl: "/fr/goodbye" }, { status: 200 });
+  const url = new URL(request.url);
+  return NextResponse.redirect(new URL("/fr/goodbye", url.origin), { status: 303 });
 }
 
 export async function GET() { return notFound(); }

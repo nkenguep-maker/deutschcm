@@ -39,7 +39,16 @@ export default function QaBanner({
     timeStyle: "short", dateStyle: "short",
   });
   async function exitQa() {
-    await fetch("/api/qa/logout", { method: "POST" });
+    // POST JSON body vide · satisfait le CSRF check (content-type +
+    // Origin + Sec-Fetch-Site same-origin). Server retourne 303 vers
+    // /fr/goodbye · fetch en `redirect: manual` ne suit pas · le client
+    // navigate à la destination localisée.
+    await fetch("/api/qa/logout", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "{}",
+      redirect: "manual",
+    });
     window.location.href = `/${locale}/goodbye`;
   }
   return (
