@@ -57,3 +57,8 @@ scripts/test-baseline/.credentials.json
 scripts/test-baseline/storage-state/
 scripts/test-baseline/captures/
 /tmp/yema-p1-*
+
+# Playwright — artefacts jamais commité
+.playwright/
+playwright-report/
+test-results/

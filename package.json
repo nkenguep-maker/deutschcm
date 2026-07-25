@@ -9,6 +9,9 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e:b2:build": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag on -- npm run build",
+    "test:e2e:b2": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag on -- env PW_FLAG=on PW_TESTMATCH='**/tests/e2e/p4-5-b2b3-b2/!(flag-off).spec.ts' PLAYWRIGHT_PORT=3105 npx playwright test --config=playwright.p4-5-b2.config.ts",
+    "test:e2e:b2:flag-off": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag off -- env PW_FLAG=off PW_TESTMATCH='**/tests/e2e/p4-5-b2b3-b2/flag-off.spec.ts' PLAYWRIGHT_PORT=3106 npx playwright test --config=playwright.p4-5-b2.config.ts",
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
