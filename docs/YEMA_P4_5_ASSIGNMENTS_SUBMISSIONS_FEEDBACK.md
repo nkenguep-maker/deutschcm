@@ -874,6 +874,83 @@ liste complète des users avec `PREFIX` dans email).
 - **B2b3** · verdict `P4.5-B VALIDATED — READY FOR P4.5-C` après tous
   les checks §14.
 
+### 13.8 Statut P4.5-B2b3a · runtime HTTP end-to-end + races + flag-off + landing
+
+Livré sur `feat/yema-p4-5-b-monde-workflows` @ Gate 0 (`9034a55`).
+
+**Harness `scripts/test-baseline/p4-5-b2b3-runtime-http.mjs`** ·
+- Setup fixtures P-1 · 7 personas Supabase Auth + Prisma rows (Teacher
+  A/B, Student A/B, Center admin, Racines Coach, YEMA_ADMIN sans binding).
+- Start Next dev server programmatique port 3579 avec
+  `YEMA_ASSIGNMENTS_ENABLED=true`.
+- Sign-in programmatique via `@supabase/ssr` avec custom cookie storage
+  (Map in-memory) · capture des cookies SSR pour injection dans `fetch`.
+- 42 assertions runtime totales · cleanup complet
+  `BASELINE DATA CLEANED` avec Auth users P-1 purgés.
+
+**§6.1 Teacher A · 7 routes clés (12 opérations)** · list/create/get/
+update/publish/close assignment + list submissions retournent toutes
+HTTP 200/OK avec projections attendues.
+
+**§6.2 Student A · 7 routes (8 opérations)** · list/get assignments +
+list/create/update/submit submission + feedback (vide au moment du test)
+retournent toutes HTTP 200/OK.
+
+**§7.1 Cross-tenant Teacher B on A** · 3/3 refus HTTP 404
+`assignment_not_found` (anti-énumération respectée).
+
+**§7.2 Cross-tenant Student B on A** · 2/2 refus HTTP 404
+`assignment_not_found` / `submission_not_found`.
+
+**§7.3 Rôles négatifs** · 6 personas · Anonymous 401 · Center admin
+404 · Racines Coach 403 · YEMA_ADMIN sans binding 404 · Teacher A on
+`/api/student/*` 403 (student role required) · Student A on
+`/api/teacher/*` 403 (teacher access required).
+
+**§8 Anti-injection** · body `status`/`classroomId`/`teacherId`/unknown
+key rejetés 409 avec `detail.forbiddenKey` · headers `x-classroom-id`/
+`x-teacher-id` ignorés (auth session wins) · body Student
+`assignmentId`/`userId` rejetés 409.
+
+**§9 Races HTTP** ·
+- §9.1 double publish assignment · statuses [200, 409] · codes [null,
+  `invalid_assignment_transition`] · finalStatus PUBLISHED · **audits =
+  1** (exactement 1 ASSIGNMENT_PUBLISHED committed) · 0 P2034 exposé.
+- §9.2 double submit · statuses [409, 200] · codes
+  [`invalid_submission_transition`, null] · finalStatus SUBMITTED ·
+  audits = 1 · 0 P2034 exposé.
+
+**Correction cardinale · transitions non idempotentes** · retrait des
+auto-transitions (`DRAFT→DRAFT`, `PUBLISHED→PUBLISHED`,
+`SUBMITTED→SUBMITTED`, `ADDENDUM→ADDENDUM`, etc.) dans
+`ASSIGNMENT_TRANSITIONS`, `SUBMISSION_TRANSITIONS`, `FEEDBACK_TRANSITIONS`.
+Sans ce fix, une double `publish` produisait 2 audits fantômes. Après
+fix, seule la première mutation réussit · les suivantes retournent
+409 stable.
+
+**§14.2 Flag-off** · restart serveur avec
+`YEMA_ASSIGNMENTS_ENABLED=false` · 5 routes échantillon Teacher/Student
+retournent toutes **HTTP 404 stable** avec `{ "error": "Not found" }` ·
+aucune fuite indiquant que la feature existe · aucun AuditEvent flag-off.
+
+**§15 Landing regression** · `/fr` et `/en` retournent 200 · aucune
+modification landing dans B.
+
+**Cleanup** · `BASELINE DATA CLEANED` · 0 résidu 9 tables + Auth users
+P-1 purgés via `admin.auth.admin.deleteUser` (loop défensif).
+
+### 13.9 UI 7 pages Monde + FR/EN + responsive + a11y · reportées P4.5-B2b3b
+
+Ce cycle a fermé le backend end-to-end HTTP (20 routes fonctionnelles,
+RLS/JWT verrouillé, races idempotentes, flag-off stable, landing
+intacte). Les 7 pages UI Monde (`/[locale]/teacher/assignments*` × 4
++ `/[locale]/student/*` × 3) avec les 8+ états UI + FR/EN + responsive
+4 viewports + zoom 200 % + a11y clavier sont reportées à un **cycle
+B2b3b** dédié.
+
+Le verdict global `P4.5-B VALIDATED — READY FOR P4.5-C` reste
+**subordonné à la livraison B2b3b** (UI + FR/EN + responsive + a11y).
+
 ## 14. Chemin restant
 
 - **P4.5-B** · services `assignments.ts` + `submissions.ts` + `feedback.ts` Monde · routes Teacher + Student · tests RLS/JWT + immutabilité DB + races
