@@ -1030,6 +1030,54 @@ autorisé. Le verdict global `P4.5-B VALIDATED — READY FOR P4.5-C`
 reste subordonné à B2b3b (UI 7 pages Monde + FR/EN + responsive +
 a11y clavier + zoom 200% + closure).
 
+### 13.11 Gate 1.1 · micro-closure runtime backend
+
+Deux fixes ciblés avant B2b3b UI ·
+
+**§1 · Mapper P2034 fallback** · le mapper
+`src/lib/api/assignmentErrors.ts` hardcodait un fallback P2034 →
+`concurrent_assignment_update` pour tout raw P2034/40001 non emballé.
+C'est trop générique · un P2034 sur la route addendum retournait
+`concurrent_assignment_update` au lieu de `concurrent_feedback_update`.
+Fix · retrait du hardcode · log `console.warn` et fallback vers
+`INTERNAL 500` (le retry `withSerializableRetry` est censé toujours
+capturer · si un P2034 échappe c'est un bug applicatif à corriger,
+pas à masquer avec un code métier trompeur).
+
+**§2 · Advisory lock addendum** · `createAssignmentFeedbackAddendum`
+n'avait pas de lock · les 2 tx concurrentes lisaient le même prev
+v1, calculaient nextVersion=v2, insertaient v2 chacune → doublon
+[v2 ADDENDUM, v2 ADDENDUM]. Fix · advisory lock
+`pg_advisory_xact_lock(hashtext(submissionId:authorTeacherId))` +
+ré-lecture `latest` post-lock pour voir le state à jour · la 2ème
+tx voit v2 comme latest et crée v3. Résultat vérifié runtime · versions
+[v1 PUBLISHED, v2 ADDENDUM, v3 ADDENDUM] strictement monotones, 2
+audits FEEDBACK_ADDENDUM_CREATED committed, 0 P2034 exposé.
+
+**§3-4 · Cardinalité access-denied 3 niveaux** ·
+- §10a niveau resolver · Racines Coach sur `/api/teacher/*` · delta =
+  1 audit (TEACHER_ACCESS_DENIED workspace-level, pas ASSIGNMENT_*
+  resource-level) · invariantMaxOne = true.
+- §10b niveau ownership assertion · Teacher B sur Assignment A ·
+  refusé HTTP 404 assignment_not_found · delta = 0 audit
+  (l'audit access-denied est fire-and-forget avec targetId="unknown"
+  quand l'assignment n'est pas identifiable · comportement à
+  documenter · `invariantMaxOne = true` toujours respecté).
+- §10c niveau service · Student sans enrollment POST submission ·
+  delta = 1 audit · invariantMaxOne = true.
+
+**§5 · Flag-off · 20 routes complètes** · `all404: true` · aucune
+mutation métier · aucun AuditEvent commité (verify via count global
+sur toutes les tables métier · aucune ligne créée pendant le run).
+
+**§6 · Batterie + cleanup** · `prisma validate` OK · `tsc --noEmit`
+0 erreur · `npm test` 807 tests verts · `npm run build` OK · cleanup
+`BASELINE DATA CLEANED` avec Auth users P-1 purgés.
+
+Le verdict **P4.5-B2b3a VALIDATED — READY FOR P4.5-B2b3b** reste
+inchangé après Gate 1.1 (les fixes renforcent la conformité sans
+introduire de régression · 807 tests).
+
 ## 14. Chemin restant
 
 - **P4.5-B** · services `assignments.ts` + `submissions.ts` + `feedback.ts` Monde · routes Teacher + Student · tests RLS/JWT + immutabilité DB + races

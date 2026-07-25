@@ -362,18 +362,69 @@ async function main() {
     });
   }
 
-  // ── §10 · Cardinalité audits access-denied en base ────────────────
-  process.stderr.write("\n─── §10 · Cardinalité audits access-denied ───\n");
-  const auditsBefore = await db.auditEvent.count({
-    where: { action: { in: ["ASSIGNMENT_ACCESS_DENIED", "SUBMISSION_ACCESS_DENIED", "FEEDBACK_ACCESS_DENIED"] } },
+  // ── §10 · Cardinalité audits access-denied · 3 niveaux ────────────
+  //
+  // Gate 1.1 §3-4 · vérifier ≤ 1 AuditEvent par requête refusée pour ·
+  //   niveau resolver · Racines Coach sur route Teacher (rôle absent)
+  //   niveau ownership assertion · Teacher B sur Assignment A (scope)
+  //   niveau service · Student sans enrollment tente POST submission
+  //
+  process.stderr.write("\n─── §10 · Cardinalité access-denied · 3 niveaux ───\n");
+  const cookiesCoachHere = await signInAndGetCookies(sTeacherA.email); // placeholder
+  // Actually · use a real Racines Coach cookie · we didn't sign it in above.
+  // Sign it in here for the resolver refuse test.
+  const sCoach = await createAuthUser("coach_l1");
+  const coachUser = await db.user.create({
+    data: { id: `${PREFIX}coach_l1_user`, email: sCoach.email, supabaseId: sCoach.supabaseId, role: "STUDENT", fullName: "RC", onboardingDone: true },
   });
+  await db.userAppRole.create({ data: { userId: coachUser.id, role: "RACINES_COACH" } });
+  const cookiesCoach = await signInAndGetCookies(sCoach.email);
+
+  // Niveau 1 · resolver Teacher refuse (Racines Coach n'a pas rôle Teacher)
+  // · émet `TEACHER_ACCESS_DENIED` (workspace-level) plutôt que ASSIGNMENT_*
+  // (resource-level). Le compte inclut donc TEACHER_ACCESS_DENIED.
+  const beforeL1 = await db.auditEvent.count({
+    where: {
+      action: { in: ["TEACHER_ACCESS_DENIED", "ASSIGNMENT_ACCESS_DENIED", "SUBMISSION_ACCESS_DENIED", "FEEDBACK_ACCESS_DENIED"] },
+      OR: [{ actorUserId: { startsWith: PREFIX } }, { targetId: { startsWith: PREFIX } }, { scopeId: { startsWith: PREFIX } }],
+    },
+  });
+  await fetchWith(cookiesCoach, "GET", `/api/teacher/assignments/${asmPubA.id}`);
+  const afterL1 = await db.auditEvent.count({
+    where: {
+      action: { in: ["TEACHER_ACCESS_DENIED", "ASSIGNMENT_ACCESS_DENIED", "SUBMISSION_ACCESS_DENIED", "FEEDBACK_ACCESS_DENIED"] },
+      OR: [{ actorUserId: { startsWith: PREFIX } }, { targetId: { startsWith: PREFIX } }, { scopeId: { startsWith: PREFIX } }],
+    },
+  });
+  log("§10a · resolver refuse (Racines Coach sur route Teacher)", {
+    delta: afterL1 - beforeL1, invariantMaxOne: (afterL1 - beforeL1) <= 1,
+  });
+
+  // Niveau 2 · ownership assertion refuse (Teacher B sur Assignment A).
+  const beforeL2 = afterL1;
   await fetchWith(cookiesTB, "GET", `/api/teacher/assignments/${asmPubA.id}`);
-  const auditsAfter = await db.auditEvent.count({
-    where: { action: { in: ["ASSIGNMENT_ACCESS_DENIED", "SUBMISSION_ACCESS_DENIED", "FEEDBACK_ACCESS_DENIED"] } },
+  const afterL2 = await db.auditEvent.count({
+    where: {
+      action: { in: ["ASSIGNMENT_ACCESS_DENIED", "SUBMISSION_ACCESS_DENIED", "FEEDBACK_ACCESS_DENIED"] },
+      OR: [{ actorUserId: { startsWith: PREFIX } }, { targetId: { startsWith: PREFIX } }, { scopeId: { startsWith: PREFIX } }],
+    },
   });
-  log("§10 · cardinal access-denied · Teacher B on Assignment A", {
-    before: auditsBefore, after: auditsAfter, delta: auditsAfter - auditsBefore,
-    invariantMaxOne: (auditsAfter - auditsBefore) <= 1,
+  log("§10b · ownership assertion refuse (Teacher B sur Assignment A)", {
+    delta: afterL2 - beforeL2, invariantMaxOne: (afterL2 - beforeL2) <= 1,
+  });
+
+  // Niveau 3 · service refuse (Student sans enrollment POST submission).
+  const beforeL3 = afterL2;
+  await fetchWith(cookiesSNE, "POST", `/api/student/assignments/${asmPubA.id}/submissions`,
+    { writtenContent: "x" });
+  const afterL3 = await db.auditEvent.count({
+    where: {
+      action: { in: ["ASSIGNMENT_ACCESS_DENIED", "SUBMISSION_ACCESS_DENIED", "FEEDBACK_ACCESS_DENIED"] },
+      OR: [{ actorUserId: { startsWith: PREFIX } }, { targetId: { startsWith: PREFIX } }, { scopeId: { startsWith: PREFIX } }],
+    },
+  });
+  log("§10c · service refuse (Student sans enrollment POST submission)", {
+    delta: afterL3 - beforeL3, invariantMaxOne: (afterL3 - beforeL3) <= 1,
   });
 
   // ── §11 · Absence PII dans les audits (avant cleanup) ─────────────
