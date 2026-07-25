@@ -219,14 +219,32 @@ existantes (les personas QA n'ont accès qu'aux fixtures QA).
 
 ## 13. Limitations documentées
 
-- **Nonce store in-memory** · le store des nonces à usage unique est
-  local au process. Un cold start Preview réinitialise le store · un
-  token consommé mais non marqué avant restart peut être rejoué. Le TTL
-  10 min du token limite la fenêtre. Une Preview multi-région recevra
-  un store distinct par région.
+- **Nonce store DB durable (QA-b1 Gate)** · le store des nonces à usage
+  unique n'est plus un `Map` process-scoped mais la table Prisma
+  `qa_bootstrap_nonces` (migration `20260726000001`). RLS deny explicite
+  pour anon + authenticated · seul le chemin serveur trusted
+  (service_role) y accède. La consommation se fait via un UPDATE atomique
+  conditionnel (`consumedAt IS NULL AND expiresAt > now AND host/emailHash/
+  projectRef match`) · deux requêtes concurrentes sur le même lien
+  produisent exactement 1 succès + 1 refus, dans une seule requête
+  chacune (aucune séquence SELECT-then-UPDATE). Un cold start Preview
+  ou une Preview multi-région ne réinitialise plus le store · toutes
+  les instances partagent la même source de vérité DB.
 - **Cookie QA path=/** · le cookie couvre tout le site · l'utilisateur
   peut naviguer entre espaces sans le perdre. Il n'est retiré que par
   `POST /api/qa/logout` ou expiration.
+- **Exchange OTP server-side** · le magic link Supabase n'est jamais
+  exposé au navigateur · `admin.generateLink({type:'magiclink'})` est
+  appelé côté serveur, le `hashed_token` est passé directement à
+  `supabase.auth.verifyOtp()` via le client SSR canonique qui écrit
+  les cookies de session dans le cookie store SSR · réponse 303 vers
+  la destination du persona (aucun secret dans le JSON, l'URL, ou une
+  prop React).
+- **Protection CSRF** · les routes `/api/qa/{impersonate,logout}`
+  exigent POST + Content-Type `application/json` + header Origin
+  correspondant au deployment host normalisé + Sec-Fetch-Site non
+  cross-site. Combiné au cookie QA `SameSite=Lax`, les attaques CSRF
+  cross-origin sont bloquées.
 - **Impact des changements de flags métier** · si un feature flag métier
   (par exemple `ASSIGNMENTS_ENABLED`) est désactivé sur la Preview, les
   personas QA voient les placeholders `feature_disabled` normaux · le
