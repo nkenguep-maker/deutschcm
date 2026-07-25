@@ -30,13 +30,22 @@ describe("P4.3b · pages Teacher · aucun mock rendu", () => {
       expect(s, `${file} · leak "${name}"`).not.toContain(name);
     }
   });
-  it.each(pages)("%s · flag-gated via isTeacherWorkspaceActive", (file) => {
+  it.each(pages)("%s · flag-gated via isTeacherWorkspaceActive (direct ou via resolveTeacherPage)", (file) => {
     const s = read(file);
-    expect(s).toMatch(/isTeacherWorkspaceActive\(\)/);
+    // P4.5-B2b3b-a · les pages P4.5 déléguent le flag-gate + resolver à
+    // `resolveTeacherPage()` qui appelle `isTeacherWorkspaceActive()` en
+    // interne · voir src/lib/teacher/pageResolver.ts.
+    const direct = /isTeacherWorkspaceActive\(\)/.test(s);
+    const viaResolver = /resolveTeacherPage\(\)/.test(s);
+    expect(direct || viaResolver, `${file} must gate flag directly or via resolveTeacherPage`).toBe(true);
   });
   it.each(pages)("%s · résout Teacher serveur, aucun teacherId/centerId client", (file) => {
     const s = read(file);
-    expect(s).toMatch(/resolveTeacherActor/);
+    // Autoriser `resolveTeacherActor` direct OU `resolveTeacherPage` (qui
+    // appelle `resolveTeacherActor` en interne · P4.5-B2b3b-a §1).
+    const direct = /resolveTeacherActor/.test(s);
+    const viaResolver = /resolveTeacherPage/.test(s);
+    expect(direct || viaResolver, `${file} must resolve teacher via resolveTeacherActor or resolveTeacherPage`).toBe(true);
     expect(s).not.toMatch(/searchParams\.\s*teacherId/);
     expect(s).not.toMatch(/searchParams\.\s*centerId/);
     expect(s).not.toMatch(/body\.\s*teacherId/);

@@ -8,12 +8,16 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import TeacherLayout from "@/components/TeacherLayout";
-import type { TeacherAssignmentDetail, TeacherSubmissionRow } from "@/lib/teacher/queries";
+import AssignmentStatusBadge from "@/components/teacher/AssignmentStatusBadge";
+import type {
+  TeacherAssignmentDetailShape,
+  TeacherSubmissionListItem,
+} from "@/lib/teacher/assignmentsAdapter";
 
 interface Props {
   locale: string;
-  assignment: TeacherAssignmentDetail;
-  submissions: TeacherSubmissionRow[];
+  assignment: TeacherAssignmentDetailShape;
+  submissions: TeacherSubmissionListItem[];
 }
 
 const COPY = {
@@ -35,11 +39,6 @@ const COPY = {
     open: "Ouvrir",
     version: "Version",
     submitted: "Envoyé",
-    statuses: {
-      DRAFT: "Brouillon", PUBLISHED: "Publié",
-      CLOSED: "Fermé", ARCHIVED: "Archivé",
-      SUBMITTED: "Envoyé", WITHDRAWN: "Retiré", SUPERSEDED: "Ancienne version",
-    },
     saving: "Enregistrement…",
     publishing: "Publication…",
     closing: "Fermeture…",
@@ -63,11 +62,6 @@ const COPY = {
     open: "Open",
     version: "Version",
     submitted: "Submitted",
-    statuses: {
-      DRAFT: "Draft", PUBLISHED: "Published",
-      CLOSED: "Closed", ARCHIVED: "Archived",
-      SUBMITTED: "Submitted", WITHDRAWN: "Withdrawn", SUPERSEDED: "Previous version",
-    },
     saving: "Saving…",
     publishing: "Publishing…",
     closing: "Closing…",
@@ -149,13 +143,13 @@ export default function TeacherAssignmentDetailView({ locale, assignment, submis
       </div>
       <div className="mt-4 rounded-2xl bg-white p-6 shadow-sm">
         {error && (
-          <div role="alert" aria-live="polite" className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+          <div role="alert" aria-live="polite" className="mb-4 rounded-lg p-3 text-sm" style={{ border: "1px solid rgba(122,40,48,0.35)", background: "rgba(122,40,48,0.08)", color: "var(--oxblood)" }}>
             {error}
           </div>
         )}
         <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
           <dt className="text-neutral-500">{c.statusLabel}</dt>
-          <dd className="font-medium text-neutral-900">{c.statuses[assignment.status]}</dd>
+          <dd><AssignmentStatusBadge locale={locale} status={assignment.status} /></dd>
           {assignment.dueDate && (
             <>
               <dt className="text-neutral-500">{c.dueLabel}</dt>
@@ -237,9 +231,10 @@ export default function TeacherAssignmentDetailView({ locale, assignment, submis
                     className="flex flex-col justify-between rounded-lg border border-neutral-200 p-3 text-sm hover:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/30 sm:flex-row sm:items-center"
                   >
                     <span className="font-medium text-neutral-900">{s.studentFullName}</span>
-                    <span className="mt-1 text-xs text-neutral-600 sm:mt-0">
-                      {c.statuses[s.status]} · {c.version} {s.version}
-                      {s.submittedAt ? ` · ${dateFmt.format(new Date(s.submittedAt))}` : ""}
+                    <span className="mt-1 flex items-center gap-2 text-xs text-neutral-600 sm:mt-0">
+                      <AssignmentStatusBadge locale={locale} status={s.status} />
+                      <span>· {c.version} {s.version}
+                      {s.submittedAt ? ` · ${dateFmt.format(new Date(s.submittedAt))}` : ""}</span>
                     </span>
                   </Link>
                 </li>

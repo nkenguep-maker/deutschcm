@@ -1,11 +1,11 @@
-// P4.5-B2b3b-a · Détail submission Teacher · server wrapper.
+// P4.5-B2b3b-a Gate UI Teacher · détail submission.
 
 import { notFound, redirect } from "next/navigation";
-import { isTeacherWorkspaceActive, isAssignmentsActive } from "@/lib/flags";
-import { resolveTeacherActorOrNull } from "@/lib/permissions/teacher";
 import TeacherFeaturePlaceholder from "@/components/teacher/TeacherFeaturePlaceholder";
+import TeacherRoleAbsentPlaceholder from "@/components/teacher/TeacherRoleAbsentPlaceholder";
 import TeacherSubmissionDetailView from "@/components/teacher/TeacherSubmissionDetailView";
-import { getTeacherSubmissionDetail } from "@/lib/teacher/queries";
+import { resolveTeacherPage } from "@/lib/teacher/pageResolver";
+import { loadTeacherSubmissionDetail } from "@/lib/teacher/assignmentsAdapter";
 
 export const dynamic = "force-dynamic";
 
@@ -15,12 +15,12 @@ export default async function Page({
   params: Promise<{ locale: string; submissionId: string }>;
 }) {
   const { locale, submissionId } = await params;
-  if (!isTeacherWorkspaceActive() || !isAssignmentsActive()) {
-    return <TeacherFeaturePlaceholder locale={locale} />;
-  }
-  const actor = await resolveTeacherActorOrNull();
-  if (!actor) redirect(`/${locale}/login`);
-  const submission = await getTeacherSubmissionDetail(actor.teacherId, submissionId);
+  const resolution = await resolveTeacherPage();
+  if (resolution.kind === "feature_off") return <TeacherFeaturePlaceholder locale={locale} />;
+  if (resolution.kind === "anonymous") redirect(`/${locale}/login`);
+  if (resolution.kind === "role_absent") return <TeacherRoleAbsentPlaceholder locale={locale} />;
+
+  const submission = await loadTeacherSubmissionDetail(resolution.actor, submissionId);
   if (!submission) notFound();
   return <TeacherSubmissionDetailView locale={locale} submission={submission} />;
 }

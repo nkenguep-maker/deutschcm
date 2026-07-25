@@ -7,14 +7,15 @@
 import Link from "next/link";
 import { useState } from "react";
 import TeacherLayout from "@/components/TeacherLayout";
+import AssignmentStatusBadge from "@/components/teacher/AssignmentStatusBadge";
 import type { TeacherClassRow } from "@/lib/teacher/queries";
-import type { TeacherAssignmentRow } from "@/lib/teacher/queries";
+import type { TeacherAssignmentListItem } from "@/lib/teacher/assignmentsAdapter";
 
 interface Props {
   locale: string;
   classrooms: TeacherClassRow[];
   selectedClassroomId: string | null;
-  assignments: TeacherAssignmentRow[];
+  assignments: TeacherAssignmentListItem[];
 }
 
 const COPY = {
@@ -28,10 +29,6 @@ const COPY = {
     dueLabel: "Échéance",
     lastUpdated: "Dernière modification",
     open: "Ouvrir",
-    statuses: {
-      DRAFT: "Brouillon", PUBLISHED: "Publié",
-      CLOSED: "Fermé", ARCHIVED: "Archivé",
-    },
   },
   en: {
     title: "Assignments",
@@ -43,10 +40,6 @@ const COPY = {
     dueLabel: "Due",
     lastUpdated: "Last updated",
     open: "Open",
-    statuses: {
-      DRAFT: "Draft", PUBLISHED: "Published",
-      CLOSED: "Closed", ARCHIVED: "Archived",
-    },
   },
 } as const;
 
@@ -108,7 +101,7 @@ export default function TeacherAssignmentsView({
                       <h3 className="font-serif text-lg text-neutral-900">{a.title}</h3>
                       <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-neutral-600">
                         <dt className="text-neutral-500">{c.statusLabel}</dt>
-                        <dd className={statusClass(a.status)}>{c.statuses[a.status]}</dd>
+                        <dd><AssignmentStatusBadge locale={locale} status={a.status} /></dd>
                         {a.dueDate && (
                           <>
                             <dt className="text-neutral-500">{c.dueLabel}</dt>
@@ -128,14 +121,4 @@ export default function TeacherAssignmentsView({
       </div>
     </TeacherLayout>
   );
-}
-
-function statusClass(status: string): string {
-  switch (status) {
-    case "DRAFT": return "font-medium text-amber-700";
-    case "PUBLISHED": return "font-medium text-emerald-700";
-    case "CLOSED": return "font-medium text-neutral-500";
-    case "ARCHIVED": return "font-medium text-neutral-400";
-    default: return "text-neutral-700";
-  }
 }

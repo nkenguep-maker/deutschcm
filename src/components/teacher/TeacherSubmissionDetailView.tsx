@@ -7,11 +7,12 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import TeacherLayout from "@/components/TeacherLayout";
-import type { TeacherSubmissionDetail } from "@/lib/teacher/queries";
+import AssignmentStatusBadge from "@/components/teacher/AssignmentStatusBadge";
+import type { TeacherSubmissionDetailShape } from "@/lib/teacher/assignmentsAdapter";
 
 interface Props {
   locale: string;
-  submission: TeacherSubmissionDetail;
+  submission: TeacherSubmissionDetailShape;
 }
 
 const COPY = {
@@ -36,10 +37,6 @@ const COPY = {
     addendumPlaceholder: "Rédigez un complément…",
     published: "Publié",
     addendumStatus: "Complément",
-    statuses: {
-      DRAFT: "Brouillon", SUBMITTED: "Envoyé",
-      WITHDRAWN: "Retiré", SUPERSEDED: "Ancienne version",
-    },
     errorGeneric: "L'opération a échoué. Réessayez.",
     saving: "Enregistrement…",
     publishing: "Publication…",
@@ -66,10 +63,6 @@ const COPY = {
     addendumPlaceholder: "Write an addendum…",
     published: "Published",
     addendumStatus: "Addendum",
-    statuses: {
-      DRAFT: "Draft", SUBMITTED: "Submitted",
-      WITHDRAWN: "Withdrawn", SUPERSEDED: "Previous version",
-    },
     errorGeneric: "Operation failed. Please retry.",
     saving: "Saving…",
     publishing: "Publishing…",
@@ -152,7 +145,7 @@ export default function TeacherSubmissionDetailView({ locale, submission }: Prop
       </div>
       <div className="mt-4 rounded-2xl bg-white p-6 shadow-sm">
         {error && (
-          <div role="alert" aria-live="polite" className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</div>
+          <div role="alert" aria-live="polite" className="mb-4 rounded-lg p-3 text-sm" style={{ border: "1px solid rgba(122,40,48,0.35)", background: "rgba(122,40,48,0.08)", color: "var(--oxblood)" }}>{error}</div>
         )}
         <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
           <dt className="text-neutral-500">{c.studentLabel}</dt>
@@ -160,7 +153,7 @@ export default function TeacherSubmissionDetailView({ locale, submission }: Prop
           <dt className="text-neutral-500">{c.versionLabel}</dt>
           <dd>{submission.version}</dd>
           <dt className="text-neutral-500">{c.statusLabel}</dt>
-          <dd>{c.statuses[submission.status]}</dd>
+          <dd><AssignmentStatusBadge locale={locale} status={submission.status} /></dd>
           {submission.submittedAt && (
             <>
               <dt className="text-neutral-500">{c.submittedLabel}</dt>
@@ -194,8 +187,11 @@ export default function TeacherSubmissionDetailView({ locale, submission }: Prop
         ))}
 
         {draftFb ? (
-          <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3">
-            <p className="text-xs font-medium uppercase tracking-wide text-amber-800">{c.draftLabel}</p>
+          <div
+            className="mt-4 rounded-lg p-3"
+            style={{ borderWidth: 1, borderStyle: "solid", borderColor: "var(--brass-edge)", background: "var(--brass-glow)" }}
+          >
+            <p className="text-xs font-medium uppercase tracking-wide" style={{ color: "var(--brass-deep)" }}>{c.draftLabel}</p>
             <label className="mt-2 block">
               <span className="text-sm font-medium text-neutral-700">{c.draftContent}</span>
               <textarea

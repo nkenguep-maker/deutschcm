@@ -103,7 +103,7 @@ export default function TeacherAssignmentCreateView({
     <TeacherLayout title={c.title}>
       <form onSubmit={handleSubmit} className="mt-6 max-w-2xl space-y-5 rounded-2xl bg-white p-6 shadow-sm">
         {error && (
-          <div role="alert" aria-live="polite" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+          <div role="alert" aria-live="polite" className="rounded-lg p-3 text-sm" style={{ border: "1px solid rgba(122,40,48,0.35)", background: "rgba(122,40,48,0.08)", color: "var(--oxblood)" }}>
             {error}
           </div>
         )}
