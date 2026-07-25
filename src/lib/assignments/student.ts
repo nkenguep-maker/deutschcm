@@ -99,6 +99,14 @@ async function loadOwnSubmission(
       id: true, assignmentId: true, userId: true, status: true, version: true,
       writtenContent: true, storageObjectId: true, submittedAt: true,
       withdrawnAt: true, updatedAt: true,
+      // P4.5-B2b3b-b1 · projection assignment nécessaire pour l'UI Student
+      // (titre, statut, échéance, classroom). Reste dans le seam B1 ·
+      // aucun accès prisma ad hoc depuis l'adapter UI.
+      assignment: {
+        select: {
+          id: true, title: true, status: true, classroomId: true, dueDate: true,
+        },
+      },
     },
   });
   if (!sub) {
@@ -116,6 +124,28 @@ export async function getStudentSubmission(
   submissionId: string,
 ) {
   return loadOwnSubmission(tx, submissionId, actor.userId);
+}
+
+/**
+ * P4.5-B2b3b-b1 · liste les versions du Student courant pour un assignment
+ * donné. Garantit l'accès (assignment PUBLISHED/CLOSED dans une classroom
+ * où le Student a un enrollment actif) via `assertStudentCanAccessAssignment`.
+ * Utilisé par l'adapter UI · aucune projection sensible.
+ */
+export async function listStudentSubmissionsForAssignment(
+  tx: TxClient,
+  actor: StudentActor,
+  assignmentId: string,
+) {
+  await assertStudentCanAccessAssignment(tx, assignmentId, actor.userId);
+  return tx.assignmentSubmission.findMany({
+    where: { assignmentId, userId: actor.userId },
+    select: {
+      id: true, status: true, version: true, writtenContent: true,
+      submittedAt: true, withdrawnAt: true, updatedAt: true,
+    },
+    orderBy: { version: "asc" },
+  });
 }
 
 export async function createStudentSubmissionDraft(
