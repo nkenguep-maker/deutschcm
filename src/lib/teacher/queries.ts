@@ -285,3 +285,156 @@ export async function getTeacherSchedule(teacherId: string): Promise<TeacherSche
   void teacherId;
   return { available: false };
 }
+
+// ── P4.5-B2b3b-a · Assignments/Submissions/Feedbacks · lectures Teacher ─
+// Doctrine · seam serveur pour les pages · les server components les appellent
+// puis passent le résultat au composant view (client). Aucun appel Prisma
+// direct dans les composants client. Les mutations passent par les routes
+// /api/teacher/* avec cookies session.
+
+export interface TeacherAssignmentRow {
+  id: string;
+  classroomId: string;
+  title: string;
+  type: "WRITTEN" | "AUDIO" | "MIXED";
+  status: "DRAFT" | "PUBLISHED" | "CLOSED" | "ARCHIVED";
+  publishedAt: Date | null;
+  closedAt: Date | null;
+  dueDate: Date | null;
+  updatedAt: Date;
+}
+
+export async function getTeacherAssignmentsByClassroom(
+  teacherId: string,
+  classroomId: string,
+): Promise<TeacherAssignmentRow[]> {
+  const rows = await prisma.assignment.findMany({
+    where: {
+      classroomId,
+      classroom: { teacherId },
+    },
+    select: {
+      id: true, classroomId: true, title: true, type: true, status: true,
+      publishedAt: true, closedAt: true, dueDate: true, updatedAt: true,
+    },
+    orderBy: [{ status: "asc" }, { updatedAt: "desc" }],
+    take: 100,
+  });
+  return rows as TeacherAssignmentRow[];
+}
+
+export interface TeacherAssignmentDetail extends TeacherAssignmentRow {
+  instructions: string | null;
+  createdByTeacherId: string | null;
+  submissionsCount: number;
+}
+
+export async function getTeacherAssignmentDetail(
+  teacherId: string,
+  assignmentId: string,
+): Promise<TeacherAssignmentDetail | null> {
+  const asm = await prisma.assignment.findFirst({
+    where: { id: assignmentId, classroom: { teacherId } },
+    select: {
+      id: true, classroomId: true, title: true, instructions: true, type: true,
+      status: true, publishedAt: true, closedAt: true, dueDate: true,
+      updatedAt: true, createdByTeacherId: true,
+      _count: { select: { submissions: true } },
+    },
+  });
+  if (!asm) return null;
+  return {
+    id: asm.id, classroomId: asm.classroomId, title: asm.title,
+    instructions: asm.instructions, type: asm.type, status: asm.status,
+    publishedAt: asm.publishedAt, closedAt: asm.closedAt, dueDate: asm.dueDate,
+    updatedAt: asm.updatedAt, createdByTeacherId: asm.createdByTeacherId,
+    submissionsCount: asm._count.submissions,
+  };
+}
+
+export interface TeacherSubmissionRow {
+  id: string;
+  userId: string;
+  status: "DRAFT" | "SUBMITTED" | "WITHDRAWN" | "SUPERSEDED";
+  version: number;
+  submittedAt: Date | null;
+  updatedAt: Date;
+  studentFullName: string;
+}
+
+export async function getTeacherAssignmentSubmissions(
+  teacherId: string,
+  assignmentId: string,
+): Promise<TeacherSubmissionRow[]> {
+  const rows = await prisma.assignmentSubmission.findMany({
+    where: {
+      assignmentId,
+      assignment: { classroom: { teacherId } },
+    },
+    select: {
+      id: true, userId: true, status: true, version: true,
+      submittedAt: true, updatedAt: true,
+      user: { select: { fullName: true } },
+    },
+    orderBy: [{ status: "asc" }, { version: "desc" }],
+  });
+  return rows.map((r) => ({
+    id: r.id, userId: r.userId, status: r.status, version: r.version,
+    submittedAt: r.submittedAt, updatedAt: r.updatedAt,
+    studentFullName: r.user.fullName,
+  }));
+}
+
+export interface TeacherSubmissionDetail extends TeacherSubmissionRow {
+  assignmentId: string;
+  writtenContent: string | null;
+  storageObjectId: string | null;
+  assignmentTitle: string;
+  classroomId: string;
+  feedbacks: {
+    id: string;
+    status: "DRAFT" | "PUBLISHED" | "ADDENDUM" | "RETRACTED_BY_ADMIN";
+    version: number;
+    writtenContent: string | null;
+    supersedesFeedbackId: string | null;
+    publishedAt: Date | null;
+    createdAt: Date;
+  }[];
+}
+
+export async function getTeacherSubmissionDetail(
+  teacherId: string,
+  submissionId: string,
+): Promise<TeacherSubmissionDetail | null> {
+  const sub = await prisma.assignmentSubmission.findFirst({
+    where: {
+      id: submissionId,
+      assignment: { classroom: { teacherId } },
+    },
+    select: {
+      id: true, userId: true, assignmentId: true, status: true, version: true,
+      writtenContent: true, storageObjectId: true, submittedAt: true, updatedAt: true,
+      user: { select: { fullName: true } },
+      assignment: { select: { classroomId: true, title: true } },
+      feedbacks: {
+        select: {
+          id: true, status: true, version: true, writtenContent: true,
+          supersedesFeedbackId: true, publishedAt: true, createdAt: true,
+        },
+        orderBy: { version: "asc" },
+      },
+    },
+  });
+  if (!sub) return null;
+  return {
+    id: sub.id, userId: sub.userId, status: sub.status, version: sub.version,
+    submittedAt: sub.submittedAt, updatedAt: sub.updatedAt,
+    studentFullName: sub.user.fullName,
+    assignmentId: sub.assignmentId,
+    writtenContent: sub.writtenContent,
+    storageObjectId: sub.storageObjectId,
+    assignmentTitle: sub.assignment.title,
+    classroomId: sub.assignment.classroomId,
+    feedbacks: sub.feedbacks,
+  };
+}

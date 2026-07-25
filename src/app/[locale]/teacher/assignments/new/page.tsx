@@ -1,14 +1,11 @@
-// P4.5-B2b3b-a · Liste assignments Teacher · server component wrapper.
+// P4.5-B2b3b-a · Formulaire création assignment Teacher · server wrapper.
 
 import { redirect } from "next/navigation";
 import { isTeacherWorkspaceActive, isAssignmentsActive } from "@/lib/flags";
 import { resolveTeacherActorOrNull } from "@/lib/permissions/teacher";
 import TeacherFeaturePlaceholder from "@/components/teacher/TeacherFeaturePlaceholder";
-import TeacherAssignmentsView from "@/components/teacher/TeacherAssignmentsView";
-import {
-  getTeacherClasses,
-  getTeacherAssignmentsByClassroom,
-} from "@/lib/teacher/queries";
+import TeacherAssignmentCreateView from "@/components/teacher/TeacherAssignmentCreateView";
+import { getTeacherClasses } from "@/lib/teacher/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -26,17 +23,11 @@ export default async function Page({
   if (!actor) redirect(`/${locale}/login`);
   const { items: classrooms } = await getTeacherClasses(actor.teacherId, { pageSize: 100 });
   const sp = await searchParams;
-  const selectedClassroomId = sp?.classroomId
-    ?? (classrooms[0]?.id ?? null);
-  const assignments = selectedClassroomId
-    ? await getTeacherAssignmentsByClassroom(actor.teacherId, selectedClassroomId)
-    : [];
   return (
-    <TeacherAssignmentsView
+    <TeacherAssignmentCreateView
       locale={locale}
       classrooms={classrooms}
-      selectedClassroomId={selectedClassroomId}
-      assignments={assignments}
+      presetClassroomId={sp?.classroomId ?? null}
     />
   );
 }
