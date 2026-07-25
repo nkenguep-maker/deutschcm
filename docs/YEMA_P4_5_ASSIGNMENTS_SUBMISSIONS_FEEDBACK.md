@@ -951,6 +951,85 @@ B2b3b** dédié.
 Le verdict global `P4.5-B VALIDATED — READY FOR P4.5-C` reste
 **subordonné à la livraison B2b3b** (UI + FR/EN + responsive + a11y).
 
+### 13.10 Statut P4.5-B2b3a Gate 1 · closure runtime backend
+
+Ferme les 9 items requis avant B2b3b UI ·
+
+**§1 · Trois races HTTP manquantes** ·
+- §9.3 new version HTTP · statuses [409, 200] · codes
+  [`submission_already_submitted`, null] · versions [v1 SUPERSEDED,
+  v2 DRAFT] · **auditDelta = 1** (exactement 1 SUBMISSION_CREATED
+  committed pour v2) · 0 P2034 exposé.
+- §9.4 double publish feedback HTTP · statuses [409, 200] · codes
+  [`invalid_feedback_transition`, null] · finalStatus PUBLISHED ·
+  **auditDelta = 1** · 0 P2034 exposé.
+- §9.5 double addendum HTTP · statuses [409, 200] · codes
+  [`concurrent_assignment_update`, null · retries SSI épuisés
+  acceptable §11] · versions [v1 PUBLISHED, v2 ADDENDUM] ·
+  **auditDelta = 1** · 0 P2034 exposé.
+
+**§2 · Aucun P2034 exposé + cardinalité audits** · les 5 races
+committent exactement 1 audit par mutation effective. Aucune fuite
+Prisma/Postgres dans les réponses HTTP.
+
+**§3 · Flag-off 20 routes complètes (pas échantillon)** ·
+`YEMA_ASSIGNMENTS_ENABLED=false` · les 20 routes Teacher (12) +
+Student (8) retournent toutes HTTP 404 stable · `all404: true` ·
+`any200: false` · verdict PASS.
+
+**§4 · Réconciliation flag naming** · un seul mapping ·
+- Variable d'environnement (source de vérité) · `YEMA_ASSIGNMENTS_ENABLED`.
+- Flag logique (utilisé dans code via `getFlag()`) · `ASSIGNMENTS_ENABLED`.
+- `getFlag(name)` lit `process.env["YEMA_" + name]` uniquement.
+- Aucun autre nom lu dans src/ (vérifié via grep · aucun accès direct
+  `process.env.ASSIGNMENTS_ENABLED` sans préfixe).
+
+**§5 · Teacher sans binding + Student sans enrollment + REMOVED** ·
+- Teacher sans binding · 2/2 refus HTTP 404 NOT_FOUND
+  (no teacher membership resolved).
+- Student sans enrollment · GET assignments 200 avec `[]` · GET
+  assignment/[aid] 404 `assignment_not_accessible`.
+- Student REMOVED · même comportement · liste vide + 404 sur accès
+  direct + 404 sur POST submission (le REMOVED enrollment ne compte
+  plus dans `resolveStudentActor`).
+
+**§6 · Injections query + tous headers** ·
+- Query `?classroomId=B` et `?assignmentId=other` ignorés · réponse
+  conforme au path canonique.
+- Headers `x-user-id`, `x-student-id`, `x-teacher-id`, `x-classroom-id`,
+  `x-assignment-id`, `x-submission-id`, `x-feedback-id` tous ignorés ·
+  auth session wins · réponse conforme au JWT.
+
+**§7 · Cardinalité access-denied en base** · Teacher B GET Assignment A
+· delta AuditEvent = 1 · `invariantMaxOne: true`. Le pattern
+`emitAssignmentAuditFromError` empêche les doublons entre
+resolver/assertion/service/mapper.
+
+**§8 · Absence PII dans les audits** · échantillon 4 audits examinés ·
+0 clé forbidden (`writtenContent`, `instructions`, `email`, `phone`,
+`fullName`, `cookie`, `authorization`, `token`, `body`).
+
+**§9 · Landing overflow horizontal 0** · script Playwright
+`p4-5-b2b3-landing-overflow.mjs` · 6/6 combinaisons (`/fr` et `/en`
+à 360/390/1440 px) · `status: 200` · `overflowPx: 0` partout.
+Aucune modification landing dans B.
+
+**§10 · Reword commits qui déclaraient à tort** ·
+- Ancien `8e17644 test(assignments): validate monde http workflows and
+  accessibility` renommé en `160be84 test(assignments): validate monde
+  http workflows` (portée réelle · runtime HTTP uniquement, sans a11y).
+- Ancien `90c59fa docs(architecture): validate p4-5-b monde workflows`
+  renommé en `58ee0e9 docs(architecture): document p4-5-b2b3a runtime
+  backend status` (le verdict global P4.5-B VALIDATED n'est pas atteint
+  · le doc documente uniquement le status backend runtime).
+
+**Cleanup** · `BASELINE DATA CLEANED` · 0 résidu.
+
+Le verdict **P4.5-B2b3a VALIDATED — READY FOR P4.5-B2b3b** est
+autorisé. Le verdict global `P4.5-B VALIDATED — READY FOR P4.5-C`
+reste subordonné à B2b3b (UI 7 pages Monde + FR/EN + responsive +
+a11y clavier + zoom 200% + closure).
+
 ## 14. Chemin restant
 
 - **P4.5-B** · services `assignments.ts` + `submissions.ts` + `feedback.ts` Monde · routes Teacher + Student · tests RLS/JWT + immutabilité DB + races
