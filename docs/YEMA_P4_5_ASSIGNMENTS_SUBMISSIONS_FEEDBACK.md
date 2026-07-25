@@ -1078,6 +1078,67 @@ Le verdict **P4.5-B2b3a VALIDATED — READY FOR P4.5-B2b3b** reste
 inchangé après Gate 1.1 (les fixes renforcent la conformité sans
 introduire de régression · 807 tests).
 
+### 13.12 Statut P4.5-B2b3b-a · UI Teacher 4 pages fonctionnelles
+
+Livré sur `feat/yema-p4-5-b-monde-workflows` @ Gate 1.1 (`f30eafa`).
+
+4 pages Teacher branchées sur les APIs P4.5-B validées ·
+
+- `/[locale]/teacher/assignments` · liste avec sélecteur de classe
+  (via query `?classroomId=`) · list assignments avec status coloré
+  (DRAFT amber / PUBLISHED emerald / CLOSED neutral) · bouton "Créer
+  un devoir" · état empty · dates localisées via `Intl.DateTimeFormat`.
+- `/[locale]/teacher/assignments/new` · formulaire création avec
+  allowlist client-side (title/instructions/dueAt/submissionFormat) ·
+  radio Audio verrouillé (feature gate visible) · POST via
+  `/api/teacher/classes/[cid]/assignments` · redirection vers detail
+  post-succès · erreurs affichées `role="alert" aria-live="polite"`.
+- `/[locale]/teacher/assignments/[assignmentId]` · détail avec 3 modes ·
+  DRAFT (formulaire éditable + PATCH + publish avec confirm) ·
+  PUBLISHED (readonly + list submissions + close avec confirm) ·
+  CLOSED (readonly + submissions consultables). Utilise
+  `window.confirm` pour publish/close (a11y basique).
+- `/[locale]/teacher/submissions/[submissionId]` · lecture contenu
+  Student · liste feedback publiés + addenda dans ordre chronologique ·
+  bloc DRAFT feedback (edit + save + publish) si existe ·
+  formulaire "Créer feedback draft" si status=SUBMITTED sans DRAFT ·
+  formulaire "Ajouter addendum" sur feedback publié le plus récent.
+
+Data source · `src/lib/teacher/queries.ts` étendu avec 4 helpers ·
+`getTeacherAssignmentsByClassroom`, `getTeacherAssignmentDetail`,
+`getTeacherAssignmentSubmissions`, `getTeacherSubmissionDetail`. Tous
+scopés par `teacherId` via `classroom.teacherId` filter. Aucune fuite
+cross-tenant possible côté server component.
+
+Actions client-side · `fetch` vers `/api/teacher/*` avec cookies
+automatiques (session Next.js SSR). Body allowlist stricte (jamais
+`status`/`classroomId`/`teacherId`/etc.). Après succès `router.refresh()`
+pour re-fetch server data.
+
+États UI couverts ·
+- loading (SSR wait natural)
+- empty (classrooms vides / assignments vides / submissions vides /
+  feedbacks vides · 4 copies FR/EN distinctes)
+- error (aria-live rouge · message API sanitisé)
+- forbidden (redirect `/login` via `resolveTeacherActorOrNull`)
+- feature-disabled (`TeacherFeaturePlaceholder` quand flag off)
+- DRAFT / PUBLISHED / CLOSED (branches conditionnelles selon status)
+- SUBMITTED (feedback creation path enabled)
+
+A11y de base · min-height 44px sur boutons/inputs/select/textarea ·
+labels associés · `role="alert"` sur erreurs · `role="status"` sur
+empty states · focus visible via `focus:ring-2 focus:ring-neutral-900/30`.
+
+FR/EN · dictionary `COPY` par composant · aucune clé i18n brute ·
+dates localisées `en-GB` / `fr-FR` · terminologie brief §8 respectée
+(Devoir/Assignment · Brouillon/Draft · Publié/Published · Fermé/Closed
+· Complément/Addendum · Nombre de mots à ajouter côté Student).
+
+Reste pour B2b3b-b (UI Student 3 pages + Playwright end-to-end +
+responsive matrice + zoom 200% + flag-off UI Playwright + landing +
+verdict global). Le harness runtime backend B2b3a et Gate 1.1 reste
+la base validée. UI Teacher fonctionnelle branchée à la même surface API.
+
 ## 14. Chemin restant
 
 - **P4.5-B** · services `assignments.ts` + `submissions.ts` + `feedback.ts` Monde · routes Teacher + Student · tests RLS/JWT + immutabilité DB + races
