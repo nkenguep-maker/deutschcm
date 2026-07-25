@@ -212,21 +212,46 @@ Routes API `/api/{student,teacher}/**/route.ts` utilisent EXCLUSIVEMENT ·
 - services B1 (`src/lib/assignments/{student,teacher}.ts`)
 - body validators allowlist (`src/lib/assignments/bodyValidators.ts`)
 
+Ces routes ouvrent une transaction Prisma en `service_role` (bypass RLS
+serveur uniquement, hors du chemin JWT client) pour appliquer les
+transitions métier · publish, close, submit, supersede, feedback publish,
+addendum · **exclusivement**. Les mutations DRAFT autorisées côté JWT
+(voir `docs/YEMA_P4_5_ASSIGNMENTS_SUBMISSIONS_FEEDBACK.md` §15.12)
+passent également par ces routes serveur pour bénéficier du même seam
+et de l'écriture d'AuditEvents in-transaction.
+
 Aucune route Monde n'appelle directement `admin.auth.admin.*` (fonction
-`service_role`). L'auth admin API n'est utilisée QUE par les scripts
-fixtures/cleanup (hors runtime prod).
+Supabase Auth admin). L'auth admin API n'est utilisée QUE par les scripts
+fixtures/cleanup P-1 (hors runtime prod).
 
-### 7.6 Raison de la survie de `storageObjectId NULL → valeur` (P4.5-D)
+### 7.6 `storageObjectId` · règles précises par chemin
 
-Le triggeur `feedback_scope_immutable` refuse toute mutation de
-`supersedesFeedbackId` après création · mais autorise `storageObjectId`
-transition NULL → valeur (une seule fois). Justification ·
+Le trigger `feedback_scope_immutable` (migration `20260724000004`) refuse
+toute mutation de `supersedesFeedbackId` après création. Pour
+`storageObjectId`, la règle exacte diffère par chemin d'appel ·
 
-- P4.5-B est texte uniquement (`AUDIO_FEEDBACK_ENABLED = false`).
-- P4.5-D introduira le workflow storage 2-phase (upload intent + finalize
-  serveur). Le finalize mettra à jour `storageObjectId` NULL → id.
-- Une fois `storageObjectId` non-NULL, toute nouvelle mutation refusée
-  (trigger DB).
+**JWT `authenticated`** ·
+
+- initialisation `storageObjectId` de `NULL` vers une valeur · **refusée**
+  (aucune policy WRITE ne couvre cette colonne côté client · les
+  policies `20260724000002` autorisent uniquement les colonnes texte
+  éditables, et `20260724000003` restreint aux rows `status='DRAFT'`)
+- remplacement d'une valeur existante · **refusé** (trigger d'immutabilité
+  `20260724000004`)
+
+**Chemin serveur trusted / `service_role`** ·
+
+- initialisation contrôlée `NULL → valeur` autorisée pour la future
+  finalisation P4.5-D (le trigger `20260724000004` autorise explicitement
+  la transition `OLD.storageObjectId IS NULL AND NEW.storageObjectId IS NOT NULL`)
+- remplacement ultérieur refusé par le trigger d'immutabilité (`OLD.storageObjectId
+  IS NOT NULL AND NEW.storageObjectId IS DISTINCT FROM OLD.storageObjectId
+  → RAISE EXCEPTION`)
+
+**Aucun upload audio n'est implémenté dans P4.5-B**. `AUDIO_FEEDBACK_ENABLED`
+reste `false`. La finalisation storage 2-phase (`service_role` uniquement)
+sera livrée en P4.5-D · aucun handler côté route API Monde n'invoque
+actuellement la transition `NULL → valeur`.
 
 ### 7.7 Interdictions pour JWT `authenticated`
 

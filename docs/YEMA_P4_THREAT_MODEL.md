@@ -367,11 +367,26 @@ runtime ou par verrou structurel documenté.
 
 ### AP4.5-B.9 · Double addendum (race POST /addendum)
 
-- **Menace** · 2 POST /addendum concurrents sur la même lignée.
+- **Menace** · 2 POST /addendum concurrents sur la même lignée
+  génèrent un numéro de version dupliqué ou détruisent le feedback
+  original PUBLISHED.
 - **Contrôle** · `pg_advisory_xact_lock(hashtext(submissionId:teacherId))`
-  sérialise · 2ᵉ tx voit le state committé de la 1ᵉʳ.
-- **Preuve** · `p4-5-b2b3-runtime-http.mjs` §9.5 (double addendum HTTP ·
-  auditDelta = 1 · retries épuisés SSI acceptable).
+  sérialise strictement · la 2ᵉ tx voit le state commité de la 1ᵉʳ
+  (baseline `latest` re-lu sous le lock avant insertion).
+- **Preuve** · `p4-5-b2b3-runtime-http.mjs` §9.5 (double addendum HTTP) ·
+  résultat doctrinal ·
+  * deux requêtes sérialisées
+  * deux succès HTTP
+  * versions N+1 puis N+2
+  * aucun numéro de version dupliqué
+  * original préservé
+  * deux `FEEDBACK_ADDENDUM_CREATED`
+  * zéro P2034 exposé
+
+  La cardinalité `auditDelta = 1` s'applique aux transitions `DRAFT → next`
+  (submit, publish, close) mais **PAS** à la double création d'addendum ·
+  chaque appel commit une nouvelle row ADDENDUM et son AuditEvent
+  correspondant.
 
 ### AP4.5-B.10 · Audit fantôme après rollback
 

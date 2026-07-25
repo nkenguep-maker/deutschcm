@@ -743,9 +743,18 @@ Auth réel · sign-in avec ANON key + password · PostgREST direct
 
 Le refus vient du role `authenticated` sans grant explicite (comportement
 Supabase par défaut) · les policies 00002/00003/00004 restent en place
-comme backup. **Aucune mutation directe n'est possible** par un JWT
-authenticated · toutes les transitions passent par le seam Prisma
-service_role avec audit in-tx.
+comme défense en profondeur. Résultat runtime observé sur P-1 sans
+grant explicite · **aucune mutation directe n'est possible** par un
+JWT `authenticated`.
+
+Note doctrine canonique · les policies WRITE Monde autorisent en principe
+le JWT `authenticated` à créer/modifier ses propres rows DRAFT dans son
+scope (voir §15.12). Sur P-1, le grant `authenticated` sur les tables
+`assignment_*` n'a pas été activé · la seule surface d'écriture
+opérationnelle passe donc actuellement par les services serveur en
+`service_role`. Les transitions publish/close/submit/supersede/publish
+feedback/addendum passent **exclusivement** par les services serveur
+avec AuditEvent in-transaction (indépendamment du grant JWT).
 
 Cleanup complet · `BASELINE DATA CLEANED` · 0 résidu users/classrooms/
 assignments/audits (incluant Auth users P-1 supprimés via
@@ -963,14 +972,24 @@ Ferme les 9 items requis avant B2b3b UI ·
 - §9.4 double publish feedback HTTP · statuses [409, 200] · codes
   [`invalid_feedback_transition`, null] · finalStatus PUBLISHED ·
   **auditDelta = 1** · 0 P2034 exposé.
-- §9.5 double addendum HTTP · statuses [409, 200] · codes
-  [`concurrent_assignment_update`, null · retries SSI épuisés
-  acceptable §11] · versions [v1 PUBLISHED, v2 ADDENDUM] ·
-  **auditDelta = 1** · 0 P2034 exposé.
+- §9.5 double addendum HTTP · l'`advisory_xact_lock` sérialise les 2
+  requêtes concurrentes plutôt que d'en refuser une · statuses [200, 200]
+  · versions [baseline PUBLISHED intact, N+1 ADDENDUM, N+2 ADDENDUM] ·
+  aucun numéro de version dupliqué · **deux `FEEDBACK_ADDENDUM_CREATED`**
+  in-tx · 0 P2034 exposé.
 
-**§2 · Aucun P2034 exposé + cardinalité audits** · les 5 races
-committent exactement 1 audit par mutation effective. Aucune fuite
-Prisma/Postgres dans les réponses HTTP.
+Note · l'historique de ce rapport intermédiaire mentionnait autrefois
+`statuses [409, 200]` sur cette course en cas d'épuisement du budget
+de retry SSI · la formulation canonique est celle ci-dessus (l'advisory
+lock rend la sérialisation stricte, les 2 tx succèdent séquentiellement
+sans conflit puisque chaque addendum lit `latest` sous le lock avant
+d'insérer une nouvelle row).
+
+**§2 · Aucun P2034 exposé + cardinalité audits** · les races de
+transitions `DRAFT → next` committent exactement 1 audit par mutation
+effective (§9.3 new version, §9.4 double publish feedback). La double
+création d'addendum (§9.5) commit 2 audits · voir §15.15 pour la
+doctrine canonique. Aucune fuite Prisma/Postgres dans les réponses HTTP.
 
 **§3 · Flag-off 20 routes complètes (pas échantillon)** ·
 `YEMA_ASSIGNMENTS_ENABLED=false` · les 20 routes Teacher (12) +
@@ -1271,49 +1290,188 @@ SUPERSEDED, insère v_n DRAFT, écrit `SUBMISSION_CREATED` avec
   jointure ; `listStudentSubmissionsForAssignment` est un service B1
   dédié avec `assertStudentCanAccessAssignment` en 1er).
 
-### 15.11 RLS SELECT
+### 15.11 Inventaire des migrations P4.5-A/B
 
-Policies posées et versionnées dans les migrations `00002-00005`. Chaque
-table Monde (assignments, assignment_submissions, assignment_feedbacks)
-a une policy SELECT scopée au `current_app_user_id()` via les helpers
-`is_class_member` / `is_teacher_of_classroom` / etc. RLS activée sur
-toutes les tables.
+Migrations SQL réellement présentes dans `prisma/migrations/` (lecture
+directe des dossiers · aucun nom inventé) ·
+
+| Fichier | Sous-lot | Description |
+|---|---|---|
+| `20260723000009_p4_5_assignments_submissions` | P4.5-A | Modèles Monde V2 · `Classroom` étendue + `Assignment` + `AssignmentSubmission` + `AssignmentFeedback` (nouveau) + enums + FK · triggers d'immutabilité de contenu après SUBMITTED/PUBLISHED |
+| `20260723000010_p4_5_racines_productions_rls` | P4.5-A | Fondations Racines · 5 nouvelles tables + triggers d'immutabilité + RLS `enable` · **hors périmètre B** |
+| `20260724000001_p4_5_a_foundational_rls_policies` | P4.5-A | Policies RLS SELECT posées et testées au moment de la migration |
+| `20260724000002_p4_5_b_monde_rls_writes` | P4.5-B | Policies RLS **WRITE** Monde (INSERT/UPDATE scopées par ownership Teacher/Student · pas de DELETE) |
+| `20260724000003_p4_5_b_monde_rls_write_hardening` | P4.5-B | Verrouillage des updates au statut `DRAFT` uniquement (`WITH CHECK status='DRAFT'`) |
+| `20260724000004_p4_5_b_monde_rls_column_hardening` | P4.5-B | Immutabilité des colonnes de scope (`assignmentId`, `userId`, `version`, `authorTeacherId`, `supersedesFeedbackId`) via triggers `BEFORE UPDATE` · autorise `storageObjectId` NULL → valeur (une fois) pour P4.5-D |
+| `20260724000005_p4_5_b_monde_submission_versioning` | P4.5-B | Unicité `(assignmentId, userId, version)` + transitions v_n · `SUBMITTED → SUPERSEDED` autorisée uniquement au moment de créer v_(n+1) DRAFT |
+
+**Aucune migration historique n'a été modifiée** (rappel §11-§12 doctrine
+P4.3b · les migrations sont append-only). Toute évolution après la
+clôture P4.5-B se fera par nouvelle migration additive.
+
+### 15.11.1 RLS SELECT
+
+Policies versionnées dans `20260724000001` et étendues jusqu'à `00005`.
+Chaque table Monde (`assignments`, `assignment_submissions`,
+`assignment_feedbacks`) a une policy SELECT scopée au
+`current_app_user_id()` via les helpers `is_class_member` /
+`is_teacher_of_classroom` / etc. RLS activée sur toutes les tables.
 
 ### 15.12 RLS WRITE
 
-Aucune policy WRITE côté client · toutes les mutations passent par des
-routes Next.js avec Prisma en `service_role` (bypass RLS). Le hardening
-`storageObjectId NULL → valeur` reste possible pour P4.5-D (voir
-`docs/YEMA_P4_SERVICE_ROLE_INVENTORY.md`).
+**Formulation canonique · doctrine JWT authenticated vs services serveur.**
+
+Les JWT `authenticated` peuvent créer et modifier uniquement leurs
+propres lignes DRAFT dans leur scope RLS. Les transitions publish,
+close, submit, supersede, feedback publish et addendum passent
+exclusivement par les services serveur.
+
+**JWT `authenticated` · autorisé uniquement dans son scope** ·
+
+- création d'un Assignment `DRAFT` par le Teacher autorisé
+  (RLS INSERT `20260724000002` · check `teacherId = current_app_user_id() → teacher.id`)
+- modification des colonnes éditables (`title`, `instructions`, `dueDate`)
+  d'un Assignment restant `DRAFT` (WITH CHECK `status='DRAFT'` ·
+  `20260724000003`)
+- création de sa propre Submission `DRAFT` par le Student (RLS INSERT
+  scopée `userId = current_app_user_id()` + enrollment actif)
+- modification de `writtenContent` tant que la Submission reste `DRAFT`
+- création/modification d'un Feedback `DRAFT` par son auteur Teacher
+
+**JWT `authenticated` · interdit directement** (soit par absence de
+policy WRITE dédiée soit par WITH CHECK/trigger) ·
+
+- publication (`ASSIGNMENT_PUBLISHED`) · transition `DRAFT → PUBLISHED`
+- fermeture (`ASSIGNMENT_CLOSED`) · transition `PUBLISHED → CLOSED`
+- soumission (`SUBMISSION_SUBMITTED`) · transition `DRAFT → SUBMITTED`
+- supersede (`SUBMISSION_SUPERSEDED`) · transition `SUBMITTED → SUPERSEDED`
+- publication de feedback (`FEEDBACK_PUBLISHED`) · `DRAFT → PUBLISHED`
+- création d'addendum (`FEEDBACK_ADDENDUM_CREATED`)
+- suppression (aucune policy DELETE côté client, à aucun niveau)
+- mutation des colonnes de scope (triggers `20260724000004`)
+
+**Services serveur** · les transitions métier passent par les services
+B1 (`src/lib/assignments/{teacher,student}.ts`), les transactions
+sérialisables, les locks (`pg_advisory_xact_lock` pour addendum) et les
+AuditEvents in-transaction (`writeAuditEvent(..., tx)`). Les routes
+API `/api/{student,teacher}/**/route.ts` utilisent Prisma en
+`service_role` (bypass RLS) pour ces transitions et écrivent
+systématiquement l'AuditEvent dans la même transaction que la mutation
+métier.
 
 ### 15.13 Column hardening
 
 Triggers d'immutabilité PostgreSQL sur les colonnes de scope · toute
 mutation de `assignmentId`, `userId`, `version`, `authorTeacherId`,
-`supersedesFeedbackId` après création → refus RAISE EXCEPTION.
+`supersedesFeedbackId` après création → refus `RAISE EXCEPTION`
+(migration `20260724000004`). Le cas particulier de `storageObjectId`
+est détaillé §15.14.5 et dans
+`docs/YEMA_P4_SERVICE_ROLE_INVENTORY.md` §7.6.
 
 ### 15.14 JWT / PostgREST
 
-Les JWT `authenticated` **ne peuvent pas** transitionner directement les
-statuts (RLS + column hardening). Vérifié runtime par
-`scripts/test-baseline/p4-5-b2b-jwt-rls.mjs`. Les transitions passent
-exclusivement par les routes serveur `service_role`.
+Vérifié runtime par `scripts/test-baseline/p4-5-b2b-jwt-rls.mjs`.
+Les transitions passent exclusivement par les services serveur (§15.12).
+
+### 15.14.5 `storageObjectId` · règles précises
+
+Colonne réservée pour la future finalisation P4.5-D (workflow storage
+2-phase). Distinction stricte entre chemin JWT et chemin serveur ·
+
+**JWT `authenticated`** ·
+
+- initialisation `storageObjectId` de `NULL` vers une valeur · **refusée**
+  (aucune policy WRITE ne couvre cette colonne · `20260724000003`
+  restreint aux colonnes de contenu texte, `20260724000004` verrouille
+  ensuite via trigger)
+- remplacement d'une valeur existante · **refusé** (trigger
+  d'immutabilité `20260724000004`)
+
+**Chemin serveur trusted / `service_role`** ·
+
+- initialisation contrôlée `NULL → valeur` autorisée pour la future
+  finalisation P4.5-D (le trigger `20260724000004` autorise
+  explicitement la transition `OLD.storageObjectId IS NULL AND
+  NEW.storageObjectId IS NOT NULL`)
+- remplacement ultérieur d'une valeur non-nulle · **refusé** par le
+  trigger d'immutabilité (`OLD.storageObjectId IS NOT NULL AND
+  NEW.storageObjectId IS DISTINCT FROM OLD.storageObjectId`)
+
+**Aucun upload audio n'est implémenté dans P4.5-B.** `AUDIO_FEEDBACK_ENABLED`
+reste `false`. L'implémentation `service_role` de la finalisation
+storage sera livrée en P4.5-D.
 
 ### 15.15 Concurrence
 
-- Retries sérialisables SSI dans les 3 transitions critiques
-  (publish assignment, publish feedback, addendum feedback) via
-  `advisory_xact_lock` scopé (`submissionId:teacherId`).
-- Assertions runtime · §9.3–9.5 (races HTTP double-tx), auditDelta = 1
-  exactement, 0 P2034 exposé (mapper `concurrent_*_update`).
+- Retries sérialisables SSI (Serializable Snapshot Isolation) sur les
+  transitions critiques (publish assignment, submit submission, publish
+  feedback, new version) · mapper `concurrent_*_update` renvoie 409
+  stable au client (jamais de P2034 exposé).
+- `pg_advisory_xact_lock(hashtext(submissionId:teacherId))` sur la
+  création d'addendum · sérialise strictement les tentatives concurrentes
+  sur la même lignée · les deux transactions voient un état cohérent.
+
+**Résultats runtime des courses** (source · `scripts/test-baseline/p4-5-b2b3-runtime-http.mjs`) ·
+
+- **Double submit** (2 POST /submit concurrents) · statuses [409, 200] ·
+  codes [`invalid_submission_transition` ou `concurrent_submission_update`, null] ·
+  final = SUBMITTED · **auditDelta = 1** exactement (un seul
+  `SUBMISSION_SUBMITTED` commité) · 0 P2034 exposé.
+- **Double new version** (2 POST /versions concurrents) · statuses
+  [409, 200] · versions [v_(n-1) SUPERSEDED, v_n DRAFT] ·
+  **auditDelta = 1** exactement · 0 P2034 exposé.
+- **Double publish feedback** (2 POST /publish concurrents) · statuses
+  [409, 200] · codes [`invalid_feedback_transition`, null] ·
+  finalStatus = PUBLISHED · **auditDelta = 1** exactement · 0 P2034 exposé.
+- **Double addendum** (2 POST /addendum concurrents) · doctrine
+  distincte · l'advisory lock SÉRIALISE au lieu de refuser ·
+  * deux requêtes sérialisées
+  * deux succès HTTP
+  * versions N+1 puis N+2
+  * aucun numéro de version dupliqué
+  * feedback original préservé
+  * **deux `FEEDBACK_ADDENDUM_CREATED`** in-tx
+  * zéro P2034 exposé
+
+Note importante · **la cardinalité `auditDelta = 1` ne s'applique PAS
+à la double création d'addendum**. Contrairement aux transitions
+`DRAFT → next`, l'addendum crée une nouvelle row `ADDENDUM` à chaque
+appel · les deux appels concurrents génèrent donc N+1 et N+2 sans
+conflit (chaque `supersedesFeedbackId` pointe vers le baseline lu sous
+le lock avant insertion).
 
 ### 15.16 AuditEvents
 
-Actions écrites in-transaction · `ASSIGNMENT_PUBLISHED`, `ASSIGNMENT_CLOSED`,
-`SUBMISSION_CREATED`, `SUBMISSION_SUBMITTED`, `FEEDBACK_DRAFTED`,
-`FEEDBACK_PUBLISHED`, `FEEDBACK_ADDENDUM_CREATED`, `ASSIGNMENT_ACCESS_DENIED`,
-`SUBMISSION_ACCESS_DENIED`. Aucune fuite de PII (contenu jamais logué,
-uniquement identifiants + metadata scope).
+Actions Monde canoniques (source unique · enum `AuditAction` dans
+`prisma/schema.prisma`) écrites in-transaction ·
+
+```
+ASSIGNMENT_CREATED
+ASSIGNMENT_PUBLISHED
+ASSIGNMENT_CLOSED
+
+SUBMISSION_CREATED
+SUBMISSION_SUBMITTED
+SUBMISSION_WITHDRAWN
+
+FEEDBACK_DRAFTED
+FEEDBACK_PUBLISHED
+FEEDBACK_ADDENDUM_CREATED
+
+ASSIGNMENT_ACCESS_DENIED
+SUBMISSION_ACCESS_DENIED
+FEEDBACK_ACCESS_DENIED
+```
+
+Action workspace/resolver additionnelle (utilisée hors périmètre Monde
+strict mais présente dans l'enum) · `TEACHER_ACCESS_DENIED`.
+
+Toutes ces valeurs existent dans `prisma/schema.prisma` (enum
+`AuditAction`) · aucune AuditAction n'est inventée dans cette
+documentation.
+
+Aucune fuite de PII (contenu texte jamais logué · uniquement identifiants
++ metadata scope · voir §11 threat model AP4.5-B.11).
 
 ### 15.17 UI Teacher (4 pages)
 
