@@ -18,9 +18,26 @@ const PREFIX = "test_p4_5_b_";
 async function main() {
   process.stderr.write("═══ P4.5-B cleanup P-1 ═══\n\n");
 
-  // Enfants d'abord.
-  await db.assignmentFeedback.deleteMany({ where: { id: { startsWith: PREFIX } } });
-  await db.assignmentSubmission.deleteMany({ where: { id: { startsWith: PREFIX } } });
+  // Enfants d'abord. Doctrine · les rows créées par les tests E2E via l'UI
+  // ont un id AUTO-généré (cuid) hors PREFIX. On les repère par leur scope
+  // parent (submissionId/assignmentId préfixé) et on les supprime AVANT la
+  // suppression des parents pour éviter les triggers d'immutabilité RLS/FK.
+  await db.assignmentFeedback.deleteMany({
+    where: {
+      OR: [
+        { id: { startsWith: PREFIX } },
+        { submissionId: { startsWith: PREFIX } },
+      ],
+    },
+  });
+  await db.assignmentSubmission.deleteMany({
+    where: {
+      OR: [
+        { id: { startsWith: PREFIX } },
+        { assignmentId: { startsWith: PREFIX } },
+      ],
+    },
+  });
   await db.assignment.deleteMany({ where: { id: { startsWith: PREFIX } } });
   await db.classroomEnrollment.deleteMany({
     where: { OR: [{ classroomId: { startsWith: PREFIX } }, { userId: { startsWith: PREFIX } }] },
