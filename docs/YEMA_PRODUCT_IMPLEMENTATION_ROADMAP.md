@@ -969,3 +969,51 @@ Nouvelle chronologie recommandée :
 4. MSG-01 (décision `Circle` vs enum `RACINES_CIRCLE`) à fermer avant P3-6 et P4-7.
 5. MSG-02 (retrait fake data ClassroomChat) à faire en P0.A-7 pour ne pas contaminer P-1 baseline.
 6. Doctrine amendée §A.4 impose critères mobiles obligatoires — chaque page de P1-P4 doit passer la checklist 360/44px/safe-area/keyboard/offline avant validation.
+
+---
+
+## Statut P4.5 sous-lots (état 2026-07-25)
+
+| Sous-lot | Périmètre | Statut |
+|---|---|---|
+| **P4.5-A** | Fondations · migrations, enums, capacity helpers, flags, error codes, audit actions | ✅ **VALIDATED** |
+| **P4.5-B** | Monde · assignments, submissions, feedbacks (Teacher + Student · services B1 + routes B2 + UI B2b3b + tests navigateur) | ✅ **VALIDATED** |
+| **P4.5-C** | Racines · Coach/Family text workflows (activities + submissions + replies structurés) | prochaine phase |
+| **P4.5-D** | Audio sécurisé · workflow storage 2-phase (upload intent + finalize serveur), validation MIME/durée/ownership | future |
+| **P4.6** | Messagerie fermée + audio | future |
+| **P4.7** | Notifications + rate limiting + hardening | future |
+| **P4.8** | Live Sessions · appels vidéo | future documentée uniquement |
+
+**Confirmation explicite** · le lancement et les tests initiaux de YEMA
+ne dépendent pas des appels vidéo. **P4.8 reste uniquement une phase
+future documentée** · aucun code vidéo n'est créé dans P4.5-B ni dans les
+sous-lots antérieurs.
+
+### P4.5-B · closure globale VALIDATED (2026-07-25)
+
+Preuves consolidées dans `docs/YEMA_P4_5_ASSIGNMENTS_SUBMISSIONS_FEEDBACK.md`
+§15 (30 sous-sections · closure). Résumé runtime ·
+
+- Vitest · **960 / 960** verts (dont 93 structurels b1 Student UI)
+- Playwright flag-on · **88 / 88** verts (auth · teacher-a · student-a ·
+  isolation · enrollment-removed · word-counter · states · responsive
+  28 combinaisons · keyboard · zoom · landing · addendum)
+- Playwright Gate ciblé b2 · **19 / 19** verts (sous-ensemble de flag-on)
+- Playwright flag-off · **38 / 38** verts (7 pages placeholder + 20 API
+  → 404 + 1 bilan mutations)
+- Baseline lint canonique inchangée · 203 findings préexistants, 0
+  introduit par P4.5-B
+- `.env.local` byte-identique, wrapper P-1 verrouillé,
+  `AUDIT.md` seul non tracké, aucun push, aucun merge
+
+### Prochaine phase · P4.5-C · Racines Coach/Family text workflows
+
+Périmètre P4.5-C (rappel de §3 architecture) ·
+
+- services Racines équivalents (`src/lib/assignments/racines.ts` · TODO)
+- routes Coach + Famille (`/api/roots-coach/...`, `/api/circles/[cid]/activities`)
+- quotas semaine/mois testés sous concurrence
+- reply parent structuré (fil `CircleSubmissionReply`)
+
+Le workflow storage 2-phase (P4.5-D) reste distinct et postérieur à
+P4.5-C.

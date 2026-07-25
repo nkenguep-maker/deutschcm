@@ -939,17 +939,17 @@ modification landing dans B.
 **Cleanup** · `BASELINE DATA CLEANED` · 0 résidu 9 tables + Auth users
 P-1 purgés via `admin.auth.admin.deleteUser` (loop défensif).
 
-### 13.9 UI 7 pages Monde + FR/EN + responsive + a11y · reportées P4.5-B2b3b
+### 13.9 UI 7 pages Monde + FR/EN + responsive + a11y · livrées P4.5-B2b3b
 
 Ce cycle a fermé le backend end-to-end HTTP (20 routes fonctionnelles,
 RLS/JWT verrouillé, races idempotentes, flag-off stable, landing
 intacte). Les 7 pages UI Monde (`/[locale]/teacher/assignments*` × 4
 + `/[locale]/student/*` × 3) avec les 8+ états UI + FR/EN + responsive
-4 viewports + zoom 200 % + a11y clavier sont reportées à un **cycle
-B2b3b** dédié.
-
-Le verdict global `P4.5-B VALIDATED — READY FOR P4.5-C` reste
-**subordonné à la livraison B2b3b** (UI + FR/EN + responsive + a11y).
+4 viewports + zoom 200 % + a11y clavier ont été livrées ensuite dans
+le cycle B2b3b (b1 · UI + tests structurels · 93 vitest · b2 · runtime
+navigateur Playwright · 88 flag-on + 37 flag-off + Gate 19 ciblés · b3
+· closure globale). Voir §15 (P4.5-B closure globale) pour le
+consolidé final.
 
 ### 13.10 Statut P4.5-B2b3a Gate 1 · closure runtime backend
 
@@ -1026,7 +1026,13 @@ Aucune modification landing dans B.
 **Cleanup** · `BASELINE DATA CLEANED` · 0 résidu.
 
 Le verdict **P4.5-B2b3a VALIDATED — READY FOR P4.5-B2b3b** est
-autorisé. Le verdict global `P4.5-B VALIDATED — READY FOR P4.5-C`
+autorisé (voir §13.10 pour les preuves runtime backend Gate 1).
+
+Note P4.5-B2b3b (b1 + b2 + b3) · voir §15 pour la closure UI + browser
++ documentation qui autorise le verdict global final.
+
+Rappel historique · à la clôture de B2b3a, le verdict global
+`P4.5-B VALIDATED — READY FOR P4.5-C`
 reste subordonné à B2b3b (UI 7 pages Monde + FR/EN + responsive +
 a11y clavier + zoom 200% + closure).
 
@@ -1148,3 +1154,308 @@ la base validée. UI Teacher fonctionnelle branchée à la même surface API.
 - **P4.5-F** · fixtures P-1 protégées + cleanup `BASELINE DATA CLEANED` + landing regressions + validation finale + décision READY-TO-MERGE
 
 Chaque sous-lot suit le même cycle P4.3b/P4.4 · commits atomiques `[no-push]`, tests + validation + rapport intermédiaire.
+
+## 15. P4.5-B closure globale — VALIDATED
+
+Ce chapitre consolide l'ensemble des preuves P4.5-B et supersede toute
+formulation antérieure encore présente dans les §13.x qui indiquerait un
+report partiel. **Verdict** ·
+
+```
+P4.5-B VALIDATED — READY FOR P4.5-C
+```
+
+### 15.1 Objectif P4.5-B (rappel)
+
+Workflow Monde end-to-end · Teacher crée un assignment, publie, corrige
+via feedback (avec addendum), ferme. Student consulte, soumet un draft,
+publie, lit les feedbacks publiés, crée une nouvelle version.
+
+### 15.2 Architecture B1 / B2 · rappel
+
+- **B1** · services purs (`src/lib/assignments/{teacher,student}.ts`),
+  transitions déterministes, AuditEvents in-tx, capacity Racines
+  (hors périmètre B), erreurs stables `P4_5_STABLE_ERROR_CODES`.
+- **B2** · routes HTTP (`/api/{student,teacher}/**`), body validators
+  allowlist stricte, retries sérialisables SSI, JWT/PostgREST verrouillé,
+  RLS SELECT + WRITE avec column hardening.
+- **B2b3b** · UI Teacher (4 pages) + Student (3 pages), resolvers 4 états,
+  adapters `server-only` délégation exclusive B1, FR/EN symétriques,
+  compteur canonique 1000 mots, tokens YEMA.
+
+### 15.3 20 opérations API canoniques
+
+Manifeste unique · `tests/e2e/p4-5-b2b3-b2/monde-api-manifest.ts`,
+verrous statiques (compte = 20, aucun doublon).
+
+**Student (8)** · `GET /api/student/assignments`, `GET /api/student/assignments/[id]`,
+`GET /api/student/assignments/[id]/submissions`, `POST /api/student/assignments/[id]/submissions`,
+`PATCH /api/student/submissions/[id]`, `POST /api/student/submissions/[id]/submit`,
+`POST /api/student/submissions/[id]/versions`, `GET /api/student/submissions/[id]/feedback`.
+
+**Teacher (12)** · `GET /api/teacher/classes/[cid]/assignments`,
+`POST /api/teacher/classes/[cid]/assignments`, `GET /api/teacher/assignments/[id]`,
+`PATCH /api/teacher/assignments/[id]`, `POST /api/teacher/assignments/[id]/publish`,
+`POST /api/teacher/assignments/[id]/close`, `GET /api/teacher/assignments/[id]/submissions`,
+`GET /api/teacher/submissions/[id]`, `POST /api/teacher/submissions/[id]/feedback`,
+`PATCH /api/teacher/feedback/[id]`, `POST /api/teacher/feedback/[id]/publish`,
+`POST /api/teacher/feedback/[id]/addendum`.
+
+### 15.4 Transitions Assignment
+
+```
+DRAFT → PUBLISHED (publish)
+DRAFT → ARCHIVED  (archive)
+PUBLISHED → CLOSED (close)
+PUBLISHED → ARCHIVED
+CLOSED → ARCHIVED
+```
+
+Sans idempotence · re-publish sur PUBLISHED → 409 `invalid_assignment_transition`
+(brief §9.1 · anti-fantômes AuditEvent).
+
+### 15.5 Transitions Submission
+
+```
+DRAFT → SUBMITTED  (submit)
+DRAFT → WITHDRAWN
+SUBMITTED → WITHDRAWN
+SUBMITTED → SUPERSEDED (via création d'une nouvelle version)
+```
+
+Immutabilité contenu après SUBMITTED · trigger DB `sub_content_immutable`.
+
+### 15.6 Transitions Feedback
+
+```
+DRAFT → PUBLISHED
+PUBLISHED → RETRACTED_BY_ADMIN
+ADDENDUM   → RETRACTED_BY_ADMIN
+```
+
+ADDENDUM · toujours créé neuf (jamais transition depuis DRAFT).
+`supersedesFeedbackId` = dernière row PUBLISHED **ou ADDENDUM** (baseline
+= latest par version desc). Trigger `feedback_scope_immutable` empêche
+toute mutation de `supersedesFeedbackId` après création.
+
+### 15.7 Addenda · chronologie et supersedes
+
+Chaque addendum a `version = baseline.version + 1` et
+`supersedesFeedbackId = baseline.id`. L'UI Student affiche PUBLISHED +
+ADDENDUM triés par `version asc` (via `listStudentFeedback`). L'UI
+Teacher permet d'ajouter un addendum tant que `lastPublished` existe
+(dernier PUBLISHED **ou ADDENDUM**).
+
+### 15.8 Versioning submissions
+
+Numérotation stricte croissante `1, 2, 3…` par `(assignmentId, userId)`.
+Création v_n · préalable = v_(n-1) SUBMITTED, transitionne v_(n-1) →
+SUPERSEDED, insère v_n DRAFT, écrit `SUBMISSION_CREATED` avec
+`metadata.supersededSubmissionId = v_(n-1).id`.
+
+### 15.9 Resolvers Teacher + Student
+
+- `src/lib/teacher/pageResolver.ts` · 4 états
+  (`feature_off`/`anonymous`/`role_absent`/`ok`), feature gate EN PREMIER,
+  UNAUTHORIZED → anonymous, autres PermissionError → role_absent.
+- `src/lib/student/pageResolver.ts` · 4 états
+  (`feature_disabled`/`anonymous`/`role_absent`/`enabled`), feature gate
+  EN PREMIER, mêmes règles.
+
+### 15.10 Adapters UI · délégation exclusive B1
+
+- `src/lib/teacher/assignmentsAdapter.ts` (4 fonctions) + `src/lib/student/assignmentsAdapter.ts` (3 fonctions).
+- Adapter Student · **0 requête Prisma ad hoc** (verrouillé par test structurel
+  `p4-5-b2b3b-b1-student-ui-structural.test.ts`). Toute projection sensible
+  passe par un service B1 (`getStudentSubmission` inclut `assignment` par
+  jointure ; `listStudentSubmissionsForAssignment` est un service B1
+  dédié avec `assertStudentCanAccessAssignment` en 1er).
+
+### 15.11 RLS SELECT
+
+Policies posées et versionnées dans les migrations `00002-00005`. Chaque
+table Monde (assignments, assignment_submissions, assignment_feedbacks)
+a une policy SELECT scopée au `current_app_user_id()` via les helpers
+`is_class_member` / `is_teacher_of_classroom` / etc. RLS activée sur
+toutes les tables.
+
+### 15.12 RLS WRITE
+
+Aucune policy WRITE côté client · toutes les mutations passent par des
+routes Next.js avec Prisma en `service_role` (bypass RLS). Le hardening
+`storageObjectId NULL → valeur` reste possible pour P4.5-D (voir
+`docs/YEMA_P4_SERVICE_ROLE_INVENTORY.md`).
+
+### 15.13 Column hardening
+
+Triggers d'immutabilité PostgreSQL sur les colonnes de scope · toute
+mutation de `assignmentId`, `userId`, `version`, `authorTeacherId`,
+`supersedesFeedbackId` après création → refus RAISE EXCEPTION.
+
+### 15.14 JWT / PostgREST
+
+Les JWT `authenticated` **ne peuvent pas** transitionner directement les
+statuts (RLS + column hardening). Vérifié runtime par
+`scripts/test-baseline/p4-5-b2b-jwt-rls.mjs`. Les transitions passent
+exclusivement par les routes serveur `service_role`.
+
+### 15.15 Concurrence
+
+- Retries sérialisables SSI dans les 3 transitions critiques
+  (publish assignment, publish feedback, addendum feedback) via
+  `advisory_xact_lock` scopé (`submissionId:teacherId`).
+- Assertions runtime · §9.3–9.5 (races HTTP double-tx), auditDelta = 1
+  exactement, 0 P2034 exposé (mapper `concurrent_*_update`).
+
+### 15.16 AuditEvents
+
+Actions écrites in-transaction · `ASSIGNMENT_PUBLISHED`, `ASSIGNMENT_CLOSED`,
+`SUBMISSION_CREATED`, `SUBMISSION_SUBMITTED`, `FEEDBACK_DRAFTED`,
+`FEEDBACK_PUBLISHED`, `FEEDBACK_ADDENDUM_CREATED`, `ASSIGNMENT_ACCESS_DENIED`,
+`SUBMISSION_ACCESS_DENIED`. Aucune fuite de PII (contenu jamais logué,
+uniquement identifiants + metadata scope).
+
+### 15.17 UI Teacher (4 pages)
+
+- `/[locale]/teacher/assignments` · liste par classroom
+- `/[locale]/teacher/assignments/new` · création DRAFT
+- `/[locale]/teacher/assignments/[assignmentId]` · détail + edit + publish + close + list submissions
+- `/[locale]/teacher/submissions/[submissionId]` · détail + feedback DRAFT/PUBLISH/ADDENDUM
+
+State-gating strict par status (isDraft/isPublished/isClosed). Boutons
+d'action disparaissent après transition. Tokens YEMA uniquement (aucun
+`amber-/emerald-/indigo-/purple-`).
+
+### 15.18 UI Student (3 pages)
+
+- `/[locale]/student/assignments` · liste PUBLISHED+CLOSED enrollments actifs
+- `/[locale]/student/assignments/[assignmentId]` · détail + versions + start draft / resume / new version
+- `/[locale]/student/submissions/[submissionId]` · draft éditable ou readonly + feedbacks PUBLISHED+ADDENDUM
+
+Filtrage feedback DRAFT masqué au niveau B1 (`listStudentFeedback`
+filtre `status IN [PUBLISHED, ADDENDUM]`). UI ne voit jamais DRAFT.
+
+### 15.19 FR/EN
+
+Dictionnaires `COPY` symétriques par composant (6 blocs · 100 % de
+symétrie · vérifié par tests structurels). Terminologie stricte ·
+Devoir/Assignment · Brouillon/Draft · Envoyé/Submitted · Complément/Addendum
+· Retours du professeur/Teacher feedback · Nombre de mots/Word count ·
+Nouvelle version/New version. Dates localisées via `Intl.DateTimeFormat`.
+
+### 15.20 Compteur 1000 mots
+
+Constante canonique · `MAX_MONDE_SUBMISSION_WORDS = 1000` +
+`countMondeSubmissionWords(text)` dans `src/lib/assignments/transitions.ts`.
+Le WordCounter client importe **exactement ces mêmes fonctions** (aucun
+recount local). `aria-live="polite"`, `role="status"`. Limite dépassée
+→ Save + Submit désactivés côté UI + defense-in-depth serveur PATCH → 4xx
+`submission_too_long`. Testé runtime aux seuils 0/1/999/1000/1001.
+
+### 15.21 Responsive
+
+Matrice 7 pages × 4 viewports (360×800 · 390×844 · 768×1024 · 1440×900)
+= 28 combinaisons runtime Playwright. `overflow horizontal document = 0`
+sur toutes. Matrice sérialisée en
+`playwright-report/p4-5-b2b3-b2/responsive-matrix.json` (gitignoré).
+
+### 15.22 Accessibilité (clavier)
+
+Tests runtime Playwright · ordre Tab logique, focus visible (`focus:ring-2`),
+Enter/Espace fonctionnels, labels associés, `role="alert"` sur toasts
+d'erreur, cibles ≥ 44 × 44 (`min-h-[44px]`). WordCounter aria-live
+`polite`. `window.confirm()` autorisé pour publish/close/submit (comportement
+clavier natif préservé).
+
+### 15.23 Zoom 200 %
+
+Émulation navigateur RÉELLE via Chromium DevTools Protocol ·
+`Emulation.setDeviceMetricsOverride` avec `deviceScaleFactor: 2` +
+viewport halved (720×450) + `Emulation.setPageScaleFactor: 2` (pinch-zoom
+visual viewport natif). Overflow horizontal document = 0 sur 7 pages.
+H1 reste dans le viewport horizontal après zoom. Reset CDP en fin de spec.
+
+### 15.24 Flag-off UI
+
+Serveur redémarré séparément (`test:e2e:b2:flag-off`, port 3106) avec
+`YEMA_ASSIGNMENTS_ENABLED=false` + `YEMA_TEACHER_WORKSPACE_ENABLED=false`
++ `YEMA_TEACHER_RLS_CONFIRMED=false`. Les 7 pages rendent le placeholder
+`feature_disabled` (`TeacherFeaturePlaceholder` / `StudentFeaturePlaceholder`)
+sans fuite de données cache. **20 routes API Monde canoniques → 404 stable**
+avec body `{error: "Not found"}` (`assignmentsFlagOr404()`). Bilan · 0
+mutation DB, 0 AuditEvent créé après les 20 appels (`bilan` test).
+
+### 15.25 Landing
+
+`/fr` et `/en` × 360/390/1440 · HTTP 200, overflow horizontal = 0, aucune
+redirection vers Teacher/Student, aucune erreur console bloquante. Aucune
+modification landing.
+
+### 15.26 Cleanup
+
+Deux scripts protégés (assertNonProduction) ·
+
+- `scripts/test-baseline/p4-5-b-cleanup.mjs` · purge Prisma (tables
+  Monde + AuditEvents + userAppRole + users test) · **prédicat étendu**
+  (b2 Gate final) pour cibler aussi les rows créées par les tests E2E
+  (id auto-cuid) via `submissionId startsWith PREFIX` (feedback) et
+  `assignmentId startsWith PREFIX` (submission).
+- `scripts/test-baseline/p4-5-b-auth-cleanup.mjs` · purge Auth Supabase
+  users prefix `test_p4_5_b_`.
+
+Sortie stable · `BASELINE DATA CLEANED` + `AUTH BASELINE CLEANED`.
+
+### 15.27 Limites restantes
+
+- **P4.5-C** · Racines Coach/Family text workflows (services, routes, UI).
+- **P4.5-D** · Audio sécurisé (storage 2-phase, MIME/durée/ownership).
+- **P4.6** · Messagerie fermée.
+- **P4.7** · Notifications.
+- **P4.8** · Live Sessions (futur documenté, aucun code créé).
+
+Le lancement et les tests initiaux de YEMA ne dépendent pas des appels
+vidéo. P4.8 reste uniquement une phase future documentée.
+
+### 15.28 Rapport consolidé des tests P4.5-B
+
+Comptes runtime (par famille · aucun double comptage) ·
+
+```text
+Vitest                         960 / 960   (dont 93 structurels b1 Student UI)
+Playwright flag-on             88 / 88     (auth 10 · teacher-a 1 · student-a 5 · isolation 9
+                                            · enrollment-removed 3 · word-counter 7 · states 6
+                                            · responsive 28 · keyboard 5 · zoom 7 · landing 6
+                                            · addendum 1)
+Playwright Gate ciblé          19 / 19     (auth 10 · addendum 1 · new-version 1 · zoom 7)
+                                            [sous-ensemble de la suite flag-on]
+Playwright flag-off            38 / 38     (7 pages placeholder · 20 API 404 · 1 bilan mutations)
+```
+
+Baseline lint canonique · **203 findings préexistants**, dont **0 introduit
+par P4.5-B** (mesuré via worktree diff byte-identique entre 0542fd9 et
+HEAD). Formulation correcte ·
+
+```text
+Lint global exécuté avec baseline préexistante inchangée :
+203 findings (129 errors, 74 warnings), dont 0 introduit par P4.5-B.
+```
+
+### 15.29 Contrats de sécurité vérifiés
+
+- Aucun accès direct à `process.env.ASSIGNMENTS_ENABLED` · seul
+  `getFlag("ASSIGNMENTS_ENABLED")` (préfixe canonique `YEMA_`).
+- Aucun flag `NEXT_PUBLIC_*` ne contrôle l'autorisation.
+- Aucun `service_role` importé dans un composant client
+  (`src/components/**` ou `src/app/**/page.tsx`).
+- Aucun mock, cookie fabriqué ou magic-link admin utilisé pour l'auth
+  Playwright · toutes les sessions passent par login UI réel.
+- `.env.local` inchangé byte-for-byte (wrapper P-1 charge `.env.p1-baseline`
+  uniquement et injecte les vars dans le child sans modifier `.env.local`).
+
+### 15.30 État Git à la clôture P4.5-B
+
+- Branche · `feat/yema-p4-5-b-monde-workflows`
+- Base P4.5-A · dernière commit ancêtre commun `main`
+- Backup préservé · `backup-before-reword-b2b1` (non supprimé)
+- Aucun push, aucun merge
+- `AUDIT.md` seul non tracké

@@ -306,3 +306,68 @@ Les 10 endpoints P4.2 appliquent la matrice ci-dessus **verbatim** ·
 | `GET /api/circles/[cid]/members` | membre ACTIVE | 403 non-member · 401 anon | — |
 
 Toute case `ALLOW` mal projetée serait détectée par `p4-2-smoke.mjs` (26 assertions).
+
+---
+
+## 12. Delta P4.5-B Monde (Assignment / Submission / Feedback) · VALIDATED
+
+Statut · **P4.5-B VALIDATED** (b1 UI + b2 browser + b3 closure). 20 opérations
+API canoniques (voir `docs/YEMA_P4_5_ASSIGNMENTS_SUBMISSIONS_FEEDBACK.md` §15.3).
+
+### 12.1 Teacher · accès exact vérifiés runtime
+
+Un Teacher voit et modifie exclusivement ·
+
+| Ressource | Portée | Contrôle serveur | Preuve runtime |
+|---|---|---|---|
+| Ses classrooms | `classroom.teacherId = actor.teacherId` | `assertTeacherOwnsClassroom` | `teacher-a.spec.ts` · liste classes |
+| Ses assignments | `assignment.classroom.teacherId = actor.teacherId` | `listTeacherAssignments` / `getTeacherAssignment` | `teacher-a.spec.ts` · create/publish/close |
+| Submissions de ses assignments | jointure via `assignment.classroom` | `listAssignmentSubmissions` / `getTeacherSubmission` | `isolation.spec.ts` (Teacher B → 404) |
+| Ses feedbacks | `authorTeacherId = actor.teacherId` | services B1 Teacher + policies RLS | `addendum.spec.ts` |
+| Aucun scope automatique `YEMA_ADMIN` | — | résoluteur ne charge PAS `YEMA_ADMIN` comme fallback Teacher | `states.spec.ts` (yema_admin_no_bind visite Teacher → placeholder) |
+
+Refus vérifiés · **Teacher B → ressources A · not-found canonique** (5 URLs
+testées runtime, HTML anti-leak, aucune fuite titre/contenu/feedback).
+
+### 12.2 Student · accès exact vérifiés runtime
+
+Un Student voit et modifie exclusivement ·
+
+| Ressource | Portée | Contrôle serveur | Preuve runtime |
+|---|---|---|---|
+| Assignments PUBLISHED/CLOSED | `enrollment ACTIVE` + `classroom active` + `status ∈ {PUBLISHED, CLOSED}` | `listStudentAssignments` | `student-a.spec.ts` (DRAFT jamais listé) |
+| Ses propres submissions | `submission.userId = actor.userId` | `getStudentSubmission` (findFirst scoped userId) | `isolation.spec.ts` (Student B → submission A → 404) |
+| Feedbacks PUBLISHED + ADDENDUM uniquement | filtre B1 `status IN [PUBLISHED, ADDENDUM]` | `listStudentFeedback` | `student-a.spec.ts` (DRAFT masqué : "Brouillon de retour A" absent) |
+| Révocation immédiate après enrollment REMOVED | `isActive=false` sort du `activeClassroomIds` | `resolveStudentActor` filtre `classroom.isActive AND enrollment.isActive` | `enrollment-removed.spec.ts` (3 tests · liste vide, direct 404) |
+
+### 12.3 Rôles refusés · placeholders / redirects
+
+| Persona | Route Student | Route Teacher |
+|---|---|---|
+| Anonymous | redirect `/{locale}/login` | redirect `/{locale}/login` |
+| Center Admin seul (role ADMIN, appRole CENTER_ADMIN) | `StudentRoleAbsentPlaceholder` | `TeacherRoleAbsentPlaceholder` |
+| Racines Coach seul (role STUDENT, appRole RACINES_COACH · pas d'enrollment Monde) | liste vide (`resolveStudentActor` ok mais 0 activeClassroomIds) | placeholder Teacher (aucun Teacher row) |
+| Teacher sans binding (role TEACHER, aucun `Teacher` row) | placeholder Student si role STUDENT (n/a ici) | `TeacherRoleAbsentPlaceholder` |
+| Student sans enrollment | liste vide | placeholder Teacher (n/a) |
+| YEMA_ADMIN sans binding (role STUDENT + appRole YEMA_ADMIN) | passe résoluteur Student (role STUDENT ok) puis liste vide | placeholder Teacher (aucun `Teacher` row) |
+
+### 12.4 Enrollment REMOVED · révocation immédiate
+
+Le persona `student_removed` (fixture P-1) a un `ClassroomEnrollment` avec
+`isActive=false`. Impact vérifié runtime ·
+
+- `/fr/student/assignments` · liste vide (aucun assignment A visible)
+- `GET /fr/student/assignments/{asmPubA}` → HTTP 404
+- `GET /fr/student/submissions/{subDraftA}` → HTTP 404 (submission appartient à Student A · student_removed n'y a jamais eu accès)
+
+Aucune donnée conservée depuis le cache · le proxy Next + le resolver
+serveur rejouent l'ACL à chaque requête.
+
+### 12.5 Feature flag off · effet sur toute la matrice
+
+`YEMA_ASSIGNMENTS_ENABLED=false` ou `YEMA_TEACHER_WORKSPACE_ENABLED=false`
+neutralise TOUTES les cases `ALLOW` du delta P4.5-B ·
+
+- Pages Teacher/Student → `TeacherFeaturePlaceholder` / `StudentFeaturePlaceholder`
+- Routes API → 404 stable `{error: "Not found"}` via `assignmentsFlagOr404`
+- 0 mutation DB · 0 AuditEvent (vérifié runtime · bilan test flag-off)
