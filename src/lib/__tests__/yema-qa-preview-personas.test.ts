@@ -16,6 +16,7 @@ const CONFIG = "src/lib/qa/config.ts";
 const TOKEN = "src/lib/qa/token.ts";
 const COOKIE = "src/lib/qa/cookie.ts";
 const NONCES = "src/lib/qa/nonces.ts";
+const CSRF = "src/lib/qa/csrf.ts";
 const LOG = "src/lib/qa/log.ts";
 const PERSONAS = "src/lib/qa/personas.ts";
 const RT_BOOTSTRAP = "src/app/api/qa/bootstrap/route.ts";
@@ -28,6 +29,8 @@ const LINK_GEN = "scripts/qa/generate-preview-qa-link.mjs";
 const FIXTURES = "scripts/test-baseline/yema-qa-fixtures.mjs";
 const CLEANUP = "scripts/test-baseline/yema-qa-cleanup.mjs";
 const FLAGS = "src/lib/flags.ts";
+const MIGRATION_SQL = "prisma/migrations/20260726000001_qa_bootstrap_nonce_store/migration.sql";
+const SCHEMA_PRISMA = "prisma/schema.prisma";
 
 const ALL_LIB = [CONFIG, TOKEN, COOKIE, NONCES, LOG, PERSONAS];
 const ALL_ROUTES = [RT_BOOTSTRAP, RT_IMPERSONATE, RT_LOGOUT];
@@ -229,23 +232,53 @@ describe("QA bootstrap token · sign/verify roundtrip", async () => {
   });
 });
 
-// ─── §7 · Nonce store · usage unique ────────────────────────────────────
-describe("QA nonce store · usage unique + TTL", async () => {
-  const mod = await import("@/lib/qa/nonces");
+// ─── QA-b1 Gate · Nonce store DB · verrous structurels ─────────────────
+describe("QA-b1 Gate · nonce store durable (Prisma + atomic UPDATE)", () => {
+  const src = read(NONCES);
 
-  it("mark + reuse détection", () => {
-    mod._resetNonceStoreForTests();
-    const n = "test-nonce-" + Math.random().toString(36).slice(2);
-    expect(mod.isNonceConsumed(n)).toBe(false);
-    mod.markNonceConsumed(n, Math.floor(Date.now() / 1000) + 300);
-    expect(mod.isNonceConsumed(n)).toBe(true);
+  it("est marqué server-only", () => {
+    expect(src).toMatch(/^import\s+"server-only";/m);
   });
 
-  it("nonce expiré · évincé au check suivant", () => {
-    mod._resetNonceStoreForTests();
-    const n = "expired-nonce-" + Math.random().toString(36).slice(2);
-    mod.markNonceConsumed(n, Math.floor(Date.now() / 1000) - 1);
-    expect(mod.isNonceConsumed(n)).toBe(false);
+  it("hashNonce = SHA-256 (jamais le brut)", () => {
+    expect(src).toMatch(/createHash\("sha256"\)\.update\(nonce\)/);
+    // Le nonce brut n'est jamais loggué ni persisté hors du hashage local.
+    expect(src).not.toMatch(/prisma\.qaBootstrapNonce\.create\([^)]*nonce:\s*[a-zA-Z]/);
+  });
+
+  it("atomicConsumeNonce · UPDATE conditions strictes (consumedAt NULL + expiresAt > now + host + emailHash + projectRef)", () => {
+    expect(src).toMatch(/updateMany/);
+    for (const cond of ["nonceHash", "consumedAt: null", "expiresAt", "qaAdminEmailHash", "deploymentHost", "projectRef"]) {
+      expect(src).toContain(cond);
+    }
+  });
+
+  it("atomicConsumeNonce · aucune séquence SELECT-then-UPDATE (une seule opération)", () => {
+    // Assurer qu'aucun findFirst/findUnique n'est fait avant l'UPDATE
+    // dans la fonction atomicConsumeNonce.
+    const fnBlock = src.match(/export async function atomicConsumeNonce[\s\S]*?^\}/m);
+    expect(fnBlock).not.toBeNull();
+    expect(fnBlock![0]).not.toMatch(/findFirst|findUnique|findMany/);
+  });
+
+  it("purgeStaleNonces · deleteMany expired + consumed depuis threshold", () => {
+    expect(src).toMatch(/purgeStaleNonces/);
+    expect(src).toMatch(/deleteMany/);
+    expect(src).toMatch(/expiresAt.*lt/);
+    expect(src).toMatch(/consumedAt.*lt/);
+  });
+});
+
+describe("QA-b1 Gate · nonce · comportement local (hashNonce déterministe)", async () => {
+  const mod = await import("@/lib/qa/nonces");
+
+  it("hashNonce · SHA-256 hex 64 chars", () => {
+    const h = mod.hashNonce("test-nonce-abc");
+    expect(h).toMatch(/^[0-9a-f]{64}$/);
+    // Déterministe · deux appels sur la même entrée donnent le même hash.
+    expect(mod.hashNonce("test-nonce-abc")).toBe(h);
+    // Différent input → différent hash.
+    expect(mod.hashNonce("test-nonce-abd")).not.toBe(h);
   });
 });
 
@@ -304,7 +337,10 @@ describe("QA route impersonate · allowlist body + gate + resolve server-side", 
   });
 
   it("allowlist body · uniquement `persona` acceptée", () => {
-    expect(src).toMatch(/const allowedKeys = Object\.keys\(body\)\.filter\(\(k\) => k !== "persona"\)/);
+    // Le refactor QA-b1 Gate a renommé la variable `allowedKeys` en
+    // `extraKeys` (sémantique inverse · le contrat reste identique · toute
+    // clé autre que `persona` est refusée avec `body_extra_keys`).
+    expect(src).toMatch(/Object\.keys\(body\)\.filter\(\(k\) => k !== "persona"\)/);
     expect(src).toMatch(/body_extra_keys/);
   });
 
@@ -332,11 +368,13 @@ describe("QA route impersonate · allowlist body + gate + resolve server-side", 
     expect(src).toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
   });
 
-  it("aucun email envoyé côté client dans la réponse", () => {
-    // La réponse contient uniquement { redirectUrl } · pas d'email.
-    expect(src).toMatch(/redirectUrl:\s*data\.properties\.action_link/);
-    // Aucun `NextResponse.json.*email` dans le corps.
+  it("aucun email/secret envoyé côté client dans la réponse", () => {
+    // QA-b1 Gate · la réponse est un redirect 303 sans body sensitif.
+    expect(src).toMatch(/NextResponse\.redirect/);
     expect(src).not.toMatch(/NextResponse\.json\([^)]*email/);
+    expect(src).not.toMatch(/NextResponse\.json\([^)]*action_link/);
+    expect(src).not.toMatch(/NextResponse\.json\([^)]*hashed_token/);
+    expect(src).not.toMatch(/NextResponse\.json\([^)]*access_token/);
   });
 
   it("verbes GET/PATCH/PUT/DELETE explicitement 404", () => {
@@ -357,11 +395,13 @@ describe("QA route bootstrap · gate + verify + nonce + cookie", () => {
     expect(idxToken).toBeGreaterThan(idxGate);
   });
 
-  it("nonce vérifié non-consommé AVANT mark", () => {
-    const idxCheck = src.indexOf("isNonceConsumed");
-    const idxMark = src.indexOf("markNonceConsumed");
-    expect(idxCheck).toBeGreaterThan(0);
-    expect(idxMark).toBeGreaterThan(idxCheck);
+  it("nonce consommé atomiquement · UPDATE...RETURNING (obsolete Map API absent)", () => {
+    // QA-b1 Gate · l'API isNonceConsumed/markNonceConsumed a été
+    // supprimée · la consommation passe par atomicConsumeNonce (single
+    // UPDATE avec conditions strictes).
+    expect(src).toMatch(/atomicConsumeNonce/);
+    expect(src).not.toMatch(/isNonceConsumed\(/);
+    expect(src).not.toMatch(/markNonceConsumed\(/);
   });
 
   it("redirect 303 · token retiré de l'URL finale (aucun query string)", () => {
@@ -609,5 +649,298 @@ describe("QA banner · affichage projectRef + expiration, aucun secret", () => {
   it("bouton exit appelle /api/qa/logout POST", () => {
     expect(src).toMatch(/"\/api\/qa\/logout"/);
     expect(src).toMatch(/method:\s*"POST"/);
+  });
+
+  it("logout fetch envoie Content-Type application/json (satisfait CSRF check)", () => {
+    expect(src).toMatch(/"content-type":\s*"application\/json"/);
+  });
+});
+
+// ─── QA-b1 Gate · Migration SQL + RLS deny ──────────────────────────────
+describe("QA-b1 Gate · migration additive QaBootstrapNonce · RLS deny", () => {
+  it("migration existe · timestamp 20260726000001", () => {
+    expect(existsSync(join(REPO, MIGRATION_SQL))).toBe(true);
+  });
+
+  const sql = existsSync(join(REPO, MIGRATION_SQL)) ? read(MIGRATION_SQL) : "";
+
+  it("CREATE TABLE avec les colonnes attendues", () => {
+    for (const col of [
+      "\"id\" TEXT NOT NULL",
+      "\"nonce_hash\" TEXT NOT NULL",
+      "\"qa_admin_email_hash\" TEXT NOT NULL",
+      "\"deployment_host\" TEXT NOT NULL",
+      "\"project_ref\" TEXT NOT NULL",
+      "\"issued_at\" TIMESTAMP",
+      "\"expires_at\" TIMESTAMP",
+      "\"consumed_at\" TIMESTAMP",
+    ]) {
+      expect(sql).toContain(col);
+    }
+  });
+
+  it("UNIQUE index sur nonce_hash", () => {
+    expect(sql).toMatch(/CREATE UNIQUE INDEX "qa_bootstrap_nonces_nonce_hash_key"/);
+  });
+
+  it("CHECK constraint expiresAt > issuedAt", () => {
+    expect(sql).toMatch(/CHECK \("expires_at" > "issued_at"\)/);
+  });
+
+  it("index sur expires_at + consumed_at", () => {
+    expect(sql).toMatch(/CREATE INDEX "qa_bootstrap_nonces_expires_at_idx"/);
+    expect(sql).toMatch(/CREATE INDEX "qa_bootstrap_nonces_consumed_at_idx"/);
+  });
+
+  it("ENABLE ROW LEVEL SECURITY", () => {
+    expect(sql).toMatch(/ALTER TABLE "qa_bootstrap_nonces" ENABLE ROW LEVEL SECURITY/);
+  });
+
+  it("policies deny SELECT/INSERT/UPDATE/DELETE pour anon + authenticated", () => {
+    for (const kind of ["SELECT", "INSERT", "UPDATE", "DELETE"]) {
+      expect(sql).toMatch(new RegExp(`FOR ${kind}.*TO anon`, "s"));
+      expect(sql).toMatch(new RegExp(`FOR ${kind}.*TO authenticated`, "s"));
+    }
+    // Toutes les policies utilisent USING/WITH CHECK false.
+    const policyBlocks = sql.match(/CREATE POLICY "qa_nonces_deny_[^"]+"[\s\S]*?;/g) ?? [];
+    expect(policyBlocks.length).toBeGreaterThanOrEqual(8); // 4 verbs × 2 rôles
+    for (const b of policyBlocks) {
+      expect(b).toMatch(/USING \(false\)|WITH CHECK \(false\)/);
+    }
+  });
+
+  it("REVOKE ALL FROM anon et authenticated", () => {
+    expect(sql).toMatch(/REVOKE ALL ON "qa_bootstrap_nonces" FROM anon/);
+    expect(sql).toMatch(/REVOKE ALL ON "qa_bootstrap_nonces" FROM authenticated/);
+  });
+
+  it("model QaBootstrapNonce présent dans schema.prisma", () => {
+    const schema = read(SCHEMA_PRISMA);
+    expect(schema).toMatch(/model QaBootstrapNonce \{/);
+    expect(schema).toMatch(/@@map\("qa_bootstrap_nonces"\)/);
+    expect(schema).toMatch(/nonceHash\s+String\s+@unique/);
+  });
+});
+
+// ─── QA-b1 Gate · normalisation host ────────────────────────────────────
+describe("QA-b1 Gate · normalizeHost · lowercase/no proto/no port/no query", async () => {
+  const mod = await import("@/lib/qa/host");
+
+  it("lowercase + retire https:// + trailing slash", () => {
+    expect(mod.normalizeHost("HTTPS://Example.COM/")).toBe("example.com");
+  });
+
+  it("retire port 443 (par défaut https)", () => {
+    expect(mod.normalizeHost("example.com:443")).toBe("example.com");
+  });
+
+  it("retire port 80 (par défaut http)", () => {
+    expect(mod.normalizeHost("http://example.com:80/")).toBe("example.com");
+  });
+
+  it("conserve port non-standard (p.ex. 3000)", () => {
+    expect(mod.normalizeHost("localhost:3000")).toBe("localhost:3000");
+  });
+
+  it("retire query et fragment", () => {
+    expect(mod.normalizeHost("example.com?a=1#f")).toBe("example.com");
+  });
+
+  it("retourne '' pour input null/undefined", () => {
+    expect(mod.normalizeHost(null)).toBe("");
+    expect(mod.normalizeHost(undefined)).toBe("");
+  });
+});
+
+// ─── QA-b1 Gate · CSRF check ────────────────────────────────────────────
+describe("QA-b1 Gate · CSRF checkCsrf · Origin + Content-Type + Sec-Fetch-Site", () => {
+  const src = read(CSRF);
+
+  it("est marqué server-only", () => {
+    expect(src).toMatch(/^import\s+"server-only";/m);
+  });
+
+  it("refuse GET / PATCH / PUT / DELETE (uniquement POST)", () => {
+    expect(src).toMatch(/method !== "POST"/);
+    expect(src).toMatch(/"method_not_allowed"/);
+  });
+
+  it("Content-Type doit commencer par application/json", () => {
+    expect(src).toMatch(/startsWith\("application\/json"\)/);
+    expect(src).toMatch(/"content_type_invalid"/);
+  });
+
+  it("Origin header requis + normalisé + match host", () => {
+    expect(src).toMatch(/request\.headers\.get\("origin"\)/);
+    expect(src).toMatch(/normalizeHost\(new URL\(origin\)\.host\)/);
+    expect(src).toMatch(/"origin_missing"/);
+    expect(src).toMatch(/"origin_mismatch"/);
+  });
+
+  it("Sec-Fetch-Site cross-site/cross-origin → refus", () => {
+    expect(src).toMatch(/sec-fetch-site/i);
+    expect(src).toMatch(/"cross-site"/);
+    expect(src).toMatch(/"sec_fetch_site_cross_site"/);
+  });
+});
+
+// ─── QA-b1 Gate · Bootstrap route · atomic consume + host normalize ─────
+describe("QA-b1 Gate · bootstrap route · atomic consume DB (no Map)", () => {
+  const src = read(RT_BOOTSTRAP);
+
+  it("importe atomicConsumeNonce (source de vérité DB)", () => {
+    expect(src).toMatch(/from\s+"@\/lib\/qa\/nonces"/);
+    expect(src).toMatch(/atomicConsumeNonce/);
+  });
+
+  it("aucune trace de Map memory API (isNonceConsumed / markNonceConsumed obsolètes)", () => {
+    expect(src).not.toMatch(/isNonceConsumed\(/);
+    expect(src).not.toMatch(/markNonceConsumed\(/);
+    expect(src).not.toMatch(/NONCE_STORE/);
+  });
+
+  it("normalizeHost appliqué avant verifyBootstrapToken (appel, pas import)", () => {
+    const idxNorm = src.indexOf("normalizeHost(url.host)");
+    const idxVerify = src.indexOf("verifyBootstrapToken(token");
+    expect(idxNorm).toBeGreaterThan(0);
+    expect(idxVerify).toBeGreaterThan(idxNorm);
+  });
+
+  it("consumeResult.ok · sinon 404 (aucune séquence check-then-consume)", () => {
+    expect(src).toMatch(/consumeResult = await atomicConsumeNonce/);
+    expect(src).toMatch(/if \(!consumeResult\.ok\) \{/);
+  });
+});
+
+// ─── QA-b1 Gate · Impersonate route · server-side session (no secrets) ─
+describe("QA-b1 Gate · impersonate route · verifyOtp SSR · aucun secret exposé", () => {
+  const src = read(RT_IMPERSONATE);
+
+  it("CSRF check EN PREMIER après gate", () => {
+    const idxGate = src.indexOf("resolveQaConfig()");
+    const idxCsrf = src.indexOf("checkCsrf(request)");
+    const idxBody = src.indexOf("await request.json()");
+    expect(idxGate).toBeGreaterThan(0);
+    expect(idxCsrf).toBeGreaterThan(idxGate);
+    expect(idxBody).toBeGreaterThan(idxCsrf);
+  });
+
+  it("normalizeHost pour lier au deploymentHost", () => {
+    expect(src).toMatch(/normalizeHost/);
+  });
+
+  it("verifyOtp appelé server-side avec token_hash", () => {
+    expect(src).toMatch(/hashed_token/);
+    expect(src).toMatch(/verifyOtp\(/);
+    expect(src).toMatch(/token_hash:/);
+  });
+
+  it("aucun actionLink / redirectUrl / access_token / refresh_token / OTP dans les réponses JSON", () => {
+    // La réponse route ne DOIT PAS contenir de secret ni de magic link.
+    expect(src).not.toMatch(/redirectUrl:/);
+    expect(src).not.toMatch(/actionLink/);
+    expect(src).not.toMatch(/action_link/);
+    expect(src).not.toMatch(/access_token/);
+    expect(src).not.toMatch(/refresh_token/);
+    expect(src).not.toMatch(/NextResponse\.json\([^)]*hashed_token/);
+    expect(src).not.toMatch(/NextResponse\.json\([^)]*token_hash/);
+  });
+
+  it("réponse finale = 303 Redirect vers destination (aucun body secret)", () => {
+    expect(src).toMatch(/NextResponse\.redirect/);
+    expect(src).toMatch(/status:\s*303/);
+    expect(src).toMatch(/persona\.destination\("fr"\)/);
+  });
+
+  it("client SSR canonique utilisé pour écrire cookies (createSsrClient)", () => {
+    expect(src).toMatch(/createSsrClient|@\/lib\/supabase\/server/);
+  });
+});
+
+// ─── QA-b1 Gate · Logout route · CSRF check + 303 ──────────────────────
+describe("QA-b1 Gate · logout route · CSRF + 303 goodbye", () => {
+  const src = read(RT_LOGOUT);
+
+  it("checkCsrf EN PREMIER après gate", () => {
+    const idxGate = src.indexOf("resolveQaConfig()");
+    const idxCsrf = src.indexOf("checkCsrf(request)");
+    expect(idxGate).toBeGreaterThan(0);
+    expect(idxCsrf).toBeGreaterThan(idxGate);
+  });
+
+  it("SSR client · signOut · clearQaCookie · 303 goodbye", () => {
+    expect(src).toMatch(/createSsrClient/);
+    expect(src).toMatch(/supabase\.auth\.signOut/);
+    expect(src).toMatch(/clearQaCookie/);
+    expect(src).toMatch(/NextResponse\.redirect/);
+    expect(src).toMatch(/status:\s*303/);
+    expect(src).toMatch(/\/fr\/goodbye/);
+  });
+});
+
+// ─── QA-b1 Gate · Client bundles n'exposent AUCUN magic link ────────────
+describe("QA-b1 Gate · client bundles ne référencent aucun action_link / token_hash", () => {
+  it.each(ALL_UI)("%s · aucune référence action_link / token_hash / access_token / refresh_token", (file) => {
+    const src = read(file);
+    expect(src, `${file} must not reference action_link`).not.toMatch(/action_link/);
+    expect(src, `${file} must not reference token_hash`).not.toMatch(/token_hash/);
+    expect(src, `${file} must not reference access_token`).not.toMatch(/access_token/);
+    expect(src, `${file} must not reference refresh_token`).not.toMatch(/refresh_token/);
+    expect(src, `${file} must not reference magiclink`).not.toMatch(/magiclink/);
+    expect(src, `${file} must not reference generateLink`).not.toMatch(/generateLink/);
+  });
+});
+
+// ─── QA-b1 Gate · Link generator · INSERT DB avant signature ────────────
+describe("QA-b1 Gate · link generator · INSERT nonce en DB AVANT signature", () => {
+  const src = read(LINK_GEN);
+
+  it("importe PrismaClient (source de vérité DB)", () => {
+    expect(src).toMatch(/from\s+"@prisma\/client"/);
+  });
+
+  it("crée le nonce cryptographiquement sûr (randomBytes 32 octets)", () => {
+    expect(src).toMatch(/randomBytes\(32\)\.toString\("hex"\)/);
+  });
+
+  it("INSERT dans qaBootstrapNonce AVANT la signature (hashage local du nonce brut)", () => {
+    const idxHash = src.indexOf("nonceHash = createHash");
+    const idxInsert = src.indexOf("db.qaBootstrapNonce.create");
+    const idxSign = src.indexOf("createHmac(");
+    expect(idxHash).toBeGreaterThan(0);
+    expect(idxInsert).toBeGreaterThan(idxHash);
+    expect(idxSign).toBeGreaterThan(idxInsert);
+  });
+
+  it("normalise le host avant utilisation", () => {
+    expect(src).toMatch(/function normalizeHost/);
+    expect(src).toMatch(/const host = normalizeHost\(hostRaw\)/);
+  });
+
+  it("stdout n'affiche jamais le nonce brut ni le secret", () => {
+    // Le nonce apparait dans le payload signé (URL) mais jamais loggué séparément.
+    expect(src).not.toMatch(/stdout\.write\([^)]*nonce\)/);
+    expect(src).not.toMatch(/stderr\.write\([^)]*nonce\b/);
+    expect(src).not.toMatch(/console\.log\([^)]*(?:nonce|linkSecret|adminEmail)/);
+  });
+});
+
+// ─── QA-b1 Gate · Cleanup nonces ────────────────────────────────────────
+describe("QA-b1 Gate · cleanup · purge nonces expirés/consommés/test-scope", () => {
+  const src = read(CLEANUP);
+
+  it("appelle qaBootstrapNonce.deleteMany", () => {
+    expect(src).toMatch(/qaBootstrapNonce\.deleteMany/);
+  });
+
+  it("cible expiresAt < now OR consumedAt IS NOT NULL OR host localhost/127.0.0.1", () => {
+    expect(src).toMatch(/expiresAt:\s*\{\s*lt:\s*new Date\(\)/);
+    expect(src).toMatch(/consumedAt:\s*\{\s*not:\s*null/);
+    expect(src).toMatch(/localhost/);
+    expect(src).toMatch(/127\.0\.0\.1/);
+  });
+
+  it("residuals inclut nonces_active pour observabilité (mais ne bloque pas)", () => {
+    expect(src).toMatch(/nonces_active/);
   });
 });
