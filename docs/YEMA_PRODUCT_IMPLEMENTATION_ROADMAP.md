@@ -1017,3 +1017,31 @@ Périmètre P4.5-C (rappel de §3 architecture) ·
 
 Le workflow storage 2-phase (P4.5-D) reste distinct et postérieur à
 P4.5-C.
+
+---
+
+## Infrastructure QA · Console persona Preview (2026-07-25)
+
+**Infrastructure de test Preview uniquement · pas une fonctionnalité
+utilisateur.** Permet au propriétaire de YEMA de tester chaque espace
+(Super Admin, Teacher, Racines Coach, Center Admin, Student) sans
+ressaisir les identifiants, tout en préservant les permissions réelles
+de chaque rôle.
+
+Statut · **QA-b1 VALIDATED** (code + 95 tests structurels + docs).
+Vercel Preview env writes + smoke Playwright reportés à QA-b2.
+
+Verrous doctrinaux ·
+- Preview uniquement (gate 4 conditions · `VERCEL_ENV=preview` +
+  `YEMA_QA_MODE_ENABLED=true` + projectRef=P-1 + secrets présents)
+- Production interdite (routes 404 stable en Prod)
+- P-1 Supabase uniquement (`kzzagbojjkivdzzcrmxn`)
+- Aucun bypass RLS · aucun resolver métier modifié
+- Aucun `NEXT_PUBLIC_*` QA
+- Aucun `service_role` dans composants client
+- Cookie QA HttpOnly + SameSite=Lax + expiration server-side revérifiée
+- Token bootstrap HMAC-SHA256 · TTL ≤ 10 min · nonce à usage unique
+
+Voir `docs/YEMA_QA_PREVIEW_PERSONAS.md` pour la doctrine complète, la
+procédure de génération de lien, le cleanup, et la procédure de
+révocation.
