@@ -1,16 +1,17 @@
-// P4.5-B2b3b-b2 Gate final · nouvelle version depuis l'UI Student.
-// Fichier préfixé `z-` pour être exécuté APRÈS les autres specs Student
-// (Playwright ordre alphabétique) · ce test transitionne subDraftA
-// (v2 DRAFT) → SUBMITTED puis crée une v3 DRAFT · aucune autre spec ne
-// doit dépendre de subDraftA après.
+// P4.5-B2b3b-b3 · nouvelle version depuis l'UI Student.
+// Spec AUTONOME · utilise la lignée dédiée `test_p4_5_b_e2e_new_version_*`
+// (assignment PUBLISHED + submission v1 SUBMITTED pré-créés par les
+// fixtures). Aucune dépendance à l'ordre alphabétique Playwright ni au
+// succès préalable d'une autre spec.
 //
 // Parcours ·
-//   1. Student A submit sa v2 DRAFT (subDraftA) → SUBMITTED
-//   2. Depuis /student/assignments/asmPubA, cliquer "Rédiger une nouvelle
-//      version", saisir contenu, valider → nouvelle v3 DRAFT
-//   3. Assertions DB · subDraftA (v2) status devient SUPERSEDED, v3 row
-//      créée avec status=DRAFT, AuditEvents SUBMISSION_SUBMITTED +
-//      SUBMISSION_CREATED (supersededSubmissionId=subDraftA)
+//   1. Student A ouvre /fr/student/assignments/{asmE2ENewVersion} · voit
+//      le bouton "Rédiger une nouvelle version" (v1 SUBMITTED, aucun
+//      DRAFT courant).
+//   2. Saisit contenu, valide → POST /versions.
+//   3. Assertions DB · v1 SUBMITTED → SUPERSEDED, v2 DRAFT créée,
+//      AuditEvent SUBMISSION_CREATED avec metadata.supersededSubmissionId
+//      = v1.id et metadata.version = 2.
 
 import { test, expect } from "playwright/test";
 import { PrismaClient } from "@prisma/client";
@@ -27,121 +28,88 @@ function newDb() {
   });
 }
 
-test("Student A · submit puis crée une nouvelle version + assertions DB & audit", async ({ page }) => {
+test("Student A · crée une nouvelle version depuis lignée E2E dédiée + assertions DB & audit", async ({ page }) => {
   const db = newDb();
-  const assignmentId = FIXTURE_IDS.asmPubA;
-  const draftId = FIXTURE_IDS.subDraftA;
+  const assignmentId = FIXTURE_IDS.asmE2ENewVersion;
+  const v1Id = FIXTURE_IDS.subE2ENewVersion;
 
-  // Snapshot état initial · subDraftA v2 DRAFT + AuditEvent counts.
-  const preDraft = await db.assignmentSubmission.findUnique({
-    where: { id: draftId },
+  // Snapshot initial · v1 SUBMITTED, aucune autre version.
+  const preV1 = await db.assignmentSubmission.findUnique({
+    where: { id: v1Id },
     select: { status: true, version: true, userId: true },
   });
-  expect(preDraft, "fixture subDraftA doit exister").not.toBeNull();
-  expect(preDraft!.status, "fixture subDraftA doit être DRAFT").toBe("DRAFT");
+  expect(preV1, "fixture E2E new-version v1 doit exister").not.toBeNull();
+  expect(preV1!.status, "fixture E2E new-version v1 doit être SUBMITTED").toBe("SUBMITTED");
+  expect(preV1!.version).toBe(1);
 
-  const [preSubmittedCount, preCreatedCount, preSubCount] = await Promise.all([
-    db.auditEvent.count({
-      where: { action: "SUBMISSION_SUBMITTED", targetId: draftId },
-    }),
+  const [preCreatedCount, preSubCount] = await Promise.all([
     db.auditEvent.count({
       where: {
         action: "SUBMISSION_CREATED",
         scopeId: assignmentId,
-        actorUserId: preDraft!.userId,
+        actorUserId: preV1!.userId,
       },
     }),
     db.assignmentSubmission.count({
-      where: { assignmentId, userId: preDraft!.userId },
+      where: { assignmentId, userId: preV1!.userId },
     }),
   ]);
+  expect(preSubCount, "1 seule submission au départ").toBe(1);
 
-  // ── Étape 1 · SUBMIT ─────────────────────────────────────────────────
-  await page.goto(`/fr/student/submissions/${draftId}`);
-  const textarea = page.locator("textarea").first();
-  await expect(textarea).toBeVisible();
-  await textarea.fill("Contenu final v2 pour submission E2E Gate.");
-  page.once("dialog", (d) => d.accept());
-  const submitReq = page.waitForRequest(
-    (r) => r.method() === "POST" && r.url().endsWith(`/api/student/submissions/${draftId}/submit`),
-    { timeout: 30_000 },
-  );
-  await page.getByRole("button", { name: /Soumettre|Submit/i }).click();
-  await submitReq;
-  // Poll DB pour la transition SUBMITTED (évite les races Next 16 RSC).
-  let afterSubmit: { status: string; version: number; submittedAt: Date | null } | null = null;
-  const submitDeadline = Date.now() + 20_000;
-  while (Date.now() < submitDeadline) {
-    const row = await db.assignmentSubmission.findUnique({
-      where: { id: draftId },
-      select: { status: true, version: true, submittedAt: true },
-    });
-    if (row && row.status === "SUBMITTED") { afterSubmit = row; break; }
-    await new Promise((r) => setTimeout(r, 250));
-  }
-  expect(afterSubmit, "v2 doit atteindre SUBMITTED").not.toBeNull();
-  expect(afterSubmit!.status).toBe("SUBMITTED");
-  expect(afterSubmit!.version, "version conservée").toBe(2);
-  expect(afterSubmit!.submittedAt, "submittedAt renseigné").not.toBeNull();
-  await page.waitForLoadState("networkidle", { timeout: 15_000 });
-
-  // ── Étape 2 · Nouvelle version ───────────────────────────────────────
+  // ── Nouvelle version depuis /student/assignments/{asmE2ENewVersion} ─
   await page.goto(`/fr/student/assignments/${assignmentId}`);
+  await expect(page.getByRole("heading", { level: 1, name: /Devoir E2E/ })).toBeVisible();
+
   const newVersionTextarea = page.getByPlaceholder(/Écrivez votre nouvelle version|Write your new version/i);
   await expect(newVersionTextarea).toBeVisible();
-  const newContent = `E2E-Gate · v3 draft · ${Date.now()}`;
+  const newContent = `E2E-b3 · v2 draft · ${Date.now()}`;
   await newVersionTextarea.fill(newContent);
 
   const newVersionBtn = page.getByRole("button", { name: /^Rédiger une nouvelle version$|^Write a new version$/i });
   const versionsReq = page.waitForRequest(
-    (r) => r.method() === "POST" && r.url().endsWith(`/api/student/submissions/${draftId}/versions`),
+    (r) => r.method() === "POST" && r.url().endsWith(`/api/student/submissions/${v1Id}/versions`),
     { timeout: 30_000 },
   );
   await newVersionBtn.click();
   await versionsReq;
-  // Poll DB · attendre l'apparition v3 + transition v2 vers SUPERSEDED.
-  const newVerDeadline = Date.now() + 20_000;
-  while (Date.now() < newVerDeadline) {
-    const [v2, count] = await Promise.all([
-      db.assignmentSubmission.findUnique({ where: { id: draftId }, select: { status: true } }),
-      db.assignmentSubmission.count({ where: { assignmentId, userId: preDraft!.userId } }),
+  // Poll DB · attendre transition v1 → SUPERSEDED + apparition v2 DRAFT.
+  const deadline = Date.now() + 20_000;
+  while (Date.now() < deadline) {
+    const [v1, count] = await Promise.all([
+      db.assignmentSubmission.findUnique({ where: { id: v1Id }, select: { status: true } }),
+      db.assignmentSubmission.count({ where: { assignmentId, userId: preV1!.userId } }),
     ]);
-    if (v2?.status === "SUPERSEDED" && count > preSubCount) break;
+    if (v1?.status === "SUPERSEDED" && count > preSubCount) break;
     await new Promise((r) => setTimeout(r, 250));
   }
-  await page.waitForLoadState("networkidle", { timeout: 15_000 });
 
-  // ── Étape 3 · Assertions DB ──────────────────────────────────────────
-  const [afterDraft, allVersions, postSubmittedCount, postCreatedCount] = await Promise.all([
+  // ── Assertions DB finales ────────────────────────────────────────────
+  const [afterV1, allVersions, postCreatedCount] = await Promise.all([
     db.assignmentSubmission.findUnique({
-      where: { id: draftId },
+      where: { id: v1Id },
       select: { status: true, version: true },
     }),
     db.assignmentSubmission.findMany({
-      where: { assignmentId, userId: preDraft!.userId },
+      where: { assignmentId, userId: preV1!.userId },
       orderBy: { version: "asc" },
       select: { id: true, status: true, version: true, writtenContent: true },
-    }),
-    db.auditEvent.count({
-      where: { action: "SUBMISSION_SUBMITTED", targetId: draftId },
     }),
     db.auditEvent.count({
       where: {
         action: "SUBMISSION_CREATED",
         scopeId: assignmentId,
-        actorUserId: preDraft!.userId,
+        actorUserId: preV1!.userId,
       },
     }),
   ]);
 
-  expect(afterDraft!.status, "v2 doit être SUPERSEDED après création v3").toBe("SUPERSEDED");
-  expect(afterDraft!.version, "v2 conservée").toBe(2);
-  expect(allVersions.length, "nouvelle row créée pour v3").toBe(preSubCount + 1);
-  const v3 = allVersions[allVersions.length - 1];
-  expect(v3.version, "v3 = latest + 1").toBe(3);
-  expect(v3.status, "v3 status = DRAFT").toBe("DRAFT");
-  expect(v3.writtenContent, "v3 contenu appliqué").toContain(newContent);
-  expect(postSubmittedCount, "AuditEvent SUBMISSION_SUBMITTED +1").toBe(preSubmittedCount + 1);
+  expect(afterV1!.status, "v1 doit être SUPERSEDED après création v2").toBe("SUPERSEDED");
+  expect(afterV1!.version, "v1 conservée").toBe(1);
+  expect(allVersions.length, "nouvelle row créée pour v2").toBe(preSubCount + 1);
+  const v2 = allVersions[allVersions.length - 1];
+  expect(v2.version, "v2 = latest + 1").toBe(2);
+  expect(v2.status, "v2 status = DRAFT").toBe("DRAFT");
+  expect(v2.writtenContent, "v2 contenu appliqué").toContain(newContent);
   expect(postCreatedCount, "AuditEvent SUBMISSION_CREATED +1 (avec supersededSubmissionId)").toBe(preCreatedCount + 1);
 
   // Vérifier metadata supersededSubmissionId de l'AuditEvent SUBMISSION_CREATED le plus récent.
@@ -149,15 +117,15 @@ test("Student A · submit puis crée une nouvelle version + assertions DB & audi
     where: {
       action: "SUBMISSION_CREATED",
       scopeId: assignmentId,
-      actorUserId: preDraft!.userId,
+      actorUserId: preV1!.userId,
     },
     orderBy: { createdAt: "desc" },
     select: { metadata: true, targetId: true },
   });
-  expect(latestCreatedAudit!.targetId, "audit cible v3").toBe(v3.id);
+  expect(latestCreatedAudit!.targetId, "audit cible v2").toBe(v2.id);
   const meta = latestCreatedAudit!.metadata as Record<string, unknown>;
-  expect(meta.supersededSubmissionId, "metadata.supersededSubmissionId = v2").toBe(draftId);
-  expect(meta.version, "metadata.version = 3").toBe(3);
+  expect(meta.supersededSubmissionId, "metadata.supersededSubmissionId = v1").toBe(v1Id);
+  expect(meta.version, "metadata.version = 2").toBe(2);
 
   await db.$disconnect();
 });

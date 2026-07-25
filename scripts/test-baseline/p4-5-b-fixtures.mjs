@@ -158,6 +158,14 @@ async function main() {
     "Devoir B · publié", "PUBLISHED", now,
   );
 
+  // Assignment + submission dédiés au scénario E2E "nouvelle version".
+  // Isolés de la lignée asm_a_published / sub_a_v2_draft pour rendre la
+  // spec autonome (aucune dépendance à l'ordre d'exécution Playwright).
+  const asmE2ENewVersion = await ensureAssignment(
+    `${PREFIX}e2e_new_version_assignment`, classroomA.id, teacherA.id,
+    "Devoir E2E · nouvelle version", "PUBLISHED", now,
+  );
+
   // ── Submissions A (Student A) · les 4 statuts illustrés ──────────
   //   - Sur asm_a_published · v1 SUPERSEDED (historique) + v2 DRAFT (courant)
   //   - Sur asm_a_closed    · v1 SUBMITTED (indépendant, pré-close)
@@ -174,6 +182,14 @@ async function main() {
     "SUBMITTED", 1, "Réponse A · v1 finalisée", now,
   );
   const subNextA = subDraftA; // alias · exposé comme "version suivante"
+
+  // Lignée E2E "nouvelle version" · Student A a une v1 SUBMITTED (donc
+  // éligible à la création d'une v2 DRAFT). Distincte de sub_a_v2_draft.
+  const subE2ENewVersion = await ensureSubmission(
+    `${PREFIX}e2e_new_version_submission`,
+    asmE2ENewVersion.id, studentAUser.id,
+    "SUBMITTED", 1, "Réponse E2E · v1 (pré-nouvelle-version)", now,
+  );
 
   // ── Feedbacks A (Teacher A → Submission A SUBMITTED) ─────────────
   const fbDraftA = await ensureFeedback(
@@ -208,6 +224,8 @@ async function main() {
       subDraftA: subDraftA.id, subSubmittedA: subSubmittedA.id,
       subSupersededA: subSupersededA.id, subNextA: subNextA.id,
       fbDraftA: fbDraftA.id, fbPublishedA: fbPublishedA.id, fbAddendumA: fbAddendumA.id,
+      asmE2ENewVersion: asmE2ENewVersion.id,
+      subE2ENewVersion: subE2ENewVersion.id,
     },
   };
   process.stderr.write(`\n${JSON.stringify(summary, null, 2)}\n\nFIXTURES READY\n`);

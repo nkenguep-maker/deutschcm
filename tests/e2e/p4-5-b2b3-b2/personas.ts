@@ -98,4 +98,9 @@ export const FIXTURE_IDS = {
   subDraftA: `${PREFIX}submission_a_v2_draft`,
   subSubmittedA: `${PREFIX}submission_a_submitted`,
   subSupersededA: `${PREFIX}submission_a_superseded`,
+  // Lignée E2E dédiée "nouvelle version" · Student A a une v1 SUBMITTED
+  // isolée (aucun DRAFT courant) · rend la spec new-version.spec.ts
+  // autonome (pas de dépendance à l'ordre d'exécution Playwright).
+  asmE2ENewVersion: `${PREFIX}e2e_new_version_assignment`,
+  subE2ENewVersion: `${PREFIX}e2e_new_version_submission`,
 } as const;
