@@ -54,11 +54,15 @@ export function assertMondeSubmissionWordLimit(
 
 // ── Assignment transitions ─────────────────────────────────────────────
 
+// Doctrine P4.5-B closure · pas d'auto-transitions idempotentes. Une
+// route `publish` sur un assignment déjà PUBLISHED doit refuser (409
+// `invalid_assignment_transition`) pour éviter les audits fantômes lors
+// des races HTTP · brief §9.1 exige "1 seul ASSIGNMENT_PUBLISHED".
 const ASSIGNMENT_TRANSITIONS: Record<AssignmentStatus, AssignmentStatus[]> = {
-  DRAFT: ["DRAFT", "PUBLISHED", "ARCHIVED"],
-  PUBLISHED: ["PUBLISHED", "CLOSED", "ARCHIVED"],
-  CLOSED: ["CLOSED", "ARCHIVED"],
-  ARCHIVED: ["ARCHIVED"],
+  DRAFT: ["PUBLISHED", "ARCHIVED"],
+  PUBLISHED: ["CLOSED", "ARCHIVED"],
+  CLOSED: ["ARCHIVED"],
+  ARCHIVED: [],
 };
 
 export function assertAssignmentTransition(
@@ -78,10 +82,10 @@ export function assertAssignmentTransition(
 // ── Submission transitions ─────────────────────────────────────────────
 
 const SUBMISSION_TRANSITIONS: Record<SubmissionStatus, SubmissionStatus[]> = {
-  DRAFT: ["DRAFT", "SUBMITTED", "WITHDRAWN"],
-  SUBMITTED: ["SUBMITTED", "WITHDRAWN", "SUPERSEDED"],
-  WITHDRAWN: ["WITHDRAWN"],
-  SUPERSEDED: ["SUPERSEDED"],
+  DRAFT: ["SUBMITTED", "WITHDRAWN"],
+  SUBMITTED: ["WITHDRAWN", "SUPERSEDED"],
+  WITHDRAWN: [],
+  SUPERSEDED: [],
 };
 
 export function assertSubmissionTransition(
@@ -104,10 +108,10 @@ export function assertSubmissionTransition(
 // YEMA_ADMIN futur. Pas de retour arrière DRAFT.
 
 const FEEDBACK_TRANSITIONS: Record<FeedbackStatus, FeedbackStatus[]> = {
-  DRAFT: ["DRAFT", "PUBLISHED"],
-  PUBLISHED: ["PUBLISHED", "RETRACTED_BY_ADMIN"],
-  ADDENDUM: ["ADDENDUM", "RETRACTED_BY_ADMIN"],
-  RETRACTED_BY_ADMIN: ["RETRACTED_BY_ADMIN"],
+  DRAFT: ["PUBLISHED"],
+  PUBLISHED: ["RETRACTED_BY_ADMIN"],
+  ADDENDUM: ["RETRACTED_BY_ADMIN"],
+  RETRACTED_BY_ADMIN: [],
 };
 
 export function assertFeedbackTransition(
