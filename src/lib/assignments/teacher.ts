@@ -456,12 +456,29 @@ export async function createAssignmentFeedbackAddendum(
   actor: TeacherActor,
   input: { previousFeedbackId: string; writtenContent: string },
 ) {
+  // Advisory lock par (submissionId, authorTeacherId) · sérialise les
+  // addendums concurrents sur la même lignée pour éviter les doublons
+  // de numéro de version. Pattern miroir P4.4 closure addendum Circle.
+  // Note · on lock avant de lire prev pour garantir sérialisation stricte
+  // même si les 2 tx snapshot au même moment.
   const prev = await loadFeedbackForTeacher(tx, input.previousFeedbackId, actor);
-  if (prev.status !== "PUBLISHED") {
+  await tx.$executeRawUnsafe(
+    `SELECT pg_advisory_xact_lock(hashtext($1)::bigint)`,
+    `${prev.submissionId}:${actor.teacherId}`,
+  );
+  // Ré-lire latest après le lock · les 2 tx concurrentes voient un
+  // state cohérent · la deuxième verra la première commit.
+  const latest = await tx.assignmentFeedback.findFirst({
+    where: { submissionId: prev.submissionId, authorTeacherId: actor.teacherId },
+    orderBy: { version: "desc" },
+    select: { id: true, status: true, version: true },
+  });
+  const baseline = latest ?? prev;
+  if (baseline.status !== "PUBLISHED" && baseline.status !== "ADDENDUM") {
     throw new FeedbackError(
       "feedback_addendum_required",
-      "addendum can only be created on PUBLISHED feedback",
-      { currentStatus: prev.status },
+      "addendum can only be created on PUBLISHED/ADDENDUM feedback",
+      { currentStatus: baseline.status },
     );
   }
   const written = input.writtenContent?.trim();
@@ -477,8 +494,8 @@ export async function createAssignmentFeedbackAddendum(
       submissionId: prev.submissionId,
       authorTeacherId: actor.teacherId,
       status: "ADDENDUM",
-      version: prev.version + 1,
-      supersedesFeedbackId: prev.id,
+      version: baseline.version + 1,
+      supersedesFeedbackId: baseline.id,
       writtenContent: written,
       publishedAt: now,
     },

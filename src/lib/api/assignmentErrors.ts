@@ -74,12 +74,22 @@ export function mapAssignmentErrorToResponse(e: unknown): NextResponse {
     return err("feedback_immutable", "feedback is immutable after PUBLISHED", 409);
   }
 
-  // Postgres 40001 / Prisma P2034 non retry'able · mapping stable 409.
+  // Postgres 40001 / Prisma P2034 non emballé · devrait TOUJOURS être
+  // capturé par `withSerializableRetry` avec un `errorCode` domain-specific
+  // (concurrent_assignment_update / _submission_update / _feedback_update).
+  // Si on arrive ici, un chemin d'écriture ne wrappe pas correctement ·
+  // c'est un bug applicatif · log warning + fallback INTERNAL 500 pour
+  // éviter de masquer le problème avec un code métier trompeur (par ex.
+  // exposer `concurrent_assignment_update` sur une route feedback).
   if (
     raw?.code === "40001" || raw?.code === "P2034"
     || /serialization_failure|could not serialize|TransactionWriteConflict/i.test(raw?.message ?? "")
   ) {
-    return err("concurrent_assignment_update", "concurrent update, please retry", 409);
+    console.warn(
+      "[api/assignments] raw P2034/40001 escaped withSerializableRetry · missing wrap · domain code lost",
+      { rawCode: raw?.code, rawMessage: (raw?.message ?? "").slice(0, 100) },
+    );
+    return err("INTERNAL", "internal error", 500);
   }
 
   console.error("[api/assignments] unhandled error", e);
