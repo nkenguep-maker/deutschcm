@@ -1,23 +1,22 @@
 #!/usr/bin/env node
-// P4.5-QA · générateur de lien QA signé à usage unique.
+// QA-b1 Gate · générateur de lien QA signé à usage unique.
 //
-// Usage · pour une Preview donnée, produire un URL de bootstrap
-//   https://<preview-host>/api/qa/bootstrap?t=<signed-token>
-// valable 10 minutes maximum, à envoyer via un canal privé au propriétaire
-// QA.
+// Séquence · valider env → générer nonce cryptographiquement sûr →
+// hasher (SHA-256) → INSERT dans `qa_bootstrap_nonces` AVANT la signature
+// → signer le payload HMAC-SHA256 → imprimer l'URL sur stdout uniquement.
 //
-// Le token contient · email hash + host + expiration + nonce + projectRef.
-// Il est signé HMAC-SHA256 avec `YEMA_QA_LINK_SIGNING_SECRET` (server-only,
-// jamais NEXT_PUBLIC_*).
+// Aucun secret n'est loggué · seul l'URL final (qui contient le token
+// signé) est imprimé sur stdout · à copier une fois et à envoyer via un
+// canal privé. Ne JAMAIS committer ou partager en public.
 //
 // Prérequis · lancer via le wrapper P-1 pour avoir les vars adéquates ·
 //   node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag on -- \
+//     YEMA_QA_ADMIN_EMAIL=... YEMA_QA_LINK_SIGNING_SECRET=... \
 //     node scripts/qa/generate-preview-qa-link.mjs --host <preview-host>
-//
-// Aucun secret n'est loggué · seul l'URL final (qui contient le token) est
-// imprimé sur stdout. Ne JAMAIS le committer ou le partager en public.
 
 import { createHmac, randomBytes, createHash } from "node:crypto";
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 const args = process.argv.slice(2);
 function argOf(name, dflt) {
@@ -25,11 +24,22 @@ function argOf(name, dflt) {
   return i >= 0 && args[i + 1] ? args[i + 1] : dflt;
 }
 
-const host = argOf("host", process.env.YEMA_QA_PREVIEW_HOST);
-if (!host) {
+function normalizeHost(input) {
+  if (!input) return "";
+  let s = String(input).trim().toLowerCase();
+  s = s.replace(/^https?:\/\//, "");
+  s = s.split("?")[0].split("#")[0];
+  s = s.replace(/\/+$/, "");
+  s = s.replace(/:(?:80|443)$/, "");
+  return s;
+}
+
+const hostRaw = argOf("host", process.env.YEMA_QA_PREVIEW_HOST);
+if (!hostRaw) {
   console.error("REFUSED · --host <preview-host> requis (ou YEMA_QA_PREVIEW_HOST env var)");
   process.exit(2);
 }
+const host = normalizeHost(hostRaw);
 const ttlMinutes = Math.min(10, Number.parseInt(argOf("ttl", "10"), 10) || 10);
 
 const P1_REF = "kzzagbojjkivdzzcrmxn";
@@ -53,19 +63,46 @@ if (linkSecret.length < 32) {
   process.exit(2);
 }
 
-// Payload
 const now = Math.floor(Date.now() / 1000);
+const nonce = randomBytes(32).toString("hex");
+const nonceHash = createHash("sha256").update(nonce).digest("hex");
 const emailHash = createHash("sha256")
   .update(`${adminEmail.trim().toLowerCase()}:${P1_REF}`)
   .digest("hex").slice(0, 32);
+
 const payload = {
   emailHash,
   deploymentHost: host,
   projectRef: P1_REF,
   issuedAt: now,
   expiresAt: now + ttlMinutes * 60,
-  nonce: randomBytes(16).toString("hex"),
+  nonce,
 };
+
+// INSERT dans la DB AVANT signature · la row doit exister avant que le
+// token ne puisse être consommé. Le nonce brut ne quitte JAMAIS ce
+// process (seul le hash est persisté · l'URL signée contient le nonce
+// dans le payload signé HMAC).
+const db = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: process.env.DIRECT_URL }),
+  log: ["error"],
+});
+try {
+  await db.qaBootstrapNonce.create({
+    data: {
+      nonceHash,
+      qaAdminEmailHash: emailHash,
+      deploymentHost: host,
+      projectRef: P1_REF,
+      issuedAt: new Date(payload.issuedAt * 1000),
+      expiresAt: new Date(payload.expiresAt * 1000),
+    },
+  });
+} catch (e) {
+  console.error(`REFUSED · nonce INSERT failed: ${e.message}`);
+  await db.$disconnect().catch(() => {});
+  process.exit(3);
+}
 
 function b64url(buf) {
   return buf.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
@@ -75,6 +112,8 @@ const sig = createHmac("sha256", linkSecret).update(payloadBytes).digest();
 const token = `${b64url(payloadBytes)}.${b64url(sig)}`;
 const url = `https://${host}/api/qa/bootstrap?t=${token}`;
 
-// Stdout · URL uniquement (à copier une fois, jamais logger ni committer).
+// Stdout · URL uniquement.
 process.stdout.write(`${url}\n`);
 process.stderr.write(`ttlMinutes=${ttlMinutes} host=${host} projectRef=${P1_REF} · valid for ${ttlMinutes} minutes\n`);
+
+await db.$disconnect();

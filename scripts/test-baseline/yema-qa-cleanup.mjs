@@ -64,6 +64,24 @@ async function main() {
   });
   await db.user.deleteMany({ where: { email: { contains: PREFIX } } });
 
+  // QA-b1 Gate · purge des nonces bootstrap QA · consommés OU expirés
+  // OU test-scope. Le nonce brut n'est jamais persisté (SHA-256 only) ·
+  // on cible via `qaAdminEmailHash` (préfixe "test") + tout row expiré/
+  // consommé pour éviter d'accumuler des rows de test.
+  const noncesDeleted = await db.qaBootstrapNonce.deleteMany({
+    where: {
+      OR: [
+        { expiresAt: { lt: new Date() } },
+        { consumedAt: { not: null } },
+        // Fallback · retire aussi les rows dont le host correspond aux
+        // tests locaux (préfixe "localhost" ou "127.0.0.1" ou "test").
+        { deploymentHost: { startsWith: "localhost" } },
+        { deploymentHost: { startsWith: "127.0.0.1" } },
+      ],
+    },
+  });
+  process.stderr.write(`qa_bootstrap_nonces purged: ${noncesDeleted.count}\n`);
+
   // Auth users QA
   const users = await listAuthMatching(PREFIX);
   let deleted = 0;
@@ -84,6 +102,11 @@ async function main() {
     feedbacks: await db.assignmentFeedback.count({ where: { id: { startsWith: PREFIX } } }),
     audits: await db.auditEvent.count({ where: { targetId: { startsWith: PREFIX } } }),
     appRoles: await db.userAppRole.count({ where: { userId: { startsWith: PREFIX } } }),
+    // Nonces résiduels · rows non consommées et non expirées (usage
+    // légitime en cours). Ne bloque pas la sortie stable.
+    nonces_active: await db.qaBootstrapNonce.count({
+      where: { consumedAt: null, expiresAt: { gt: new Date() } },
+    }),
     authUsersDeleted: deleted,
     authUsersFailed: failures.length,
   };

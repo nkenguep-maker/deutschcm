@@ -1,8 +1,10 @@
-// P4.5-QA · GET /api/qa/bootstrap?t=<signed-token>
+// QA-b1 Gate · GET /api/qa/bootstrap?t=<signed-token>
 //
-// Consomme un lien signé à usage unique · vérifie signature/host/projectRef/
-// nonce · pose le cookie QA · redirige vers /[locale]/qa · retire le token
-// de l'URL finale (redirect 303 sans query string).
+// Consomme atomiquement un lien signé à usage unique · vérifie signature/
+// host normalisé/projectRef/emailHash · consommation via UPDATE atomique
+// sur `qa_bootstrap_nonces` (source de vérité durable, pas de Map mémoire).
+// Pose le cookie QA · redirige 303 vers /[locale]/qa (token retiré de
+// l'URL finale).
 
 import { NextResponse, type NextRequest } from "next/server";
 import { resolveQaConfig } from "@/lib/qa/config";
@@ -12,7 +14,8 @@ import {
   type QaBootstrapPayload,
 } from "@/lib/qa/token";
 import { setQaCookie, hashEmail, QA_COOKIE_MAX_AGE_SECONDS_HARD } from "@/lib/qa/cookie";
-import { isNonceConsumed, markNonceConsumed } from "@/lib/qa/nonces";
+import { atomicConsumeNonce } from "@/lib/qa/nonces";
+import { normalizeHost } from "@/lib/qa/host";
 import { qaLog } from "@/lib/qa/log";
 
 function notFound() {
@@ -20,14 +23,14 @@ function notFound() {
 }
 
 export async function GET(request: NextRequest) {
-  // Gate en 1er · toute condition manquante = 404 stable.
+  // Gate en 1er · toute condition manquante = 404 stable, aucune lecture DB.
   const status = resolveQaConfig();
   if (!status.active) return notFound();
 
   const url = new URL(request.url);
   const token = url.searchParams.get("t") || "";
   const now = Math.floor(Date.now() / 1000);
-  const host = url.host;
+  const host = normalizeHost(url.host);
 
   const secret = process.env.YEMA_QA_LINK_SIGNING_SECRET!;
   const verified = verifyBootstrapToken(token, secret, {
@@ -45,17 +48,10 @@ export async function GET(request: NextRequest) {
   }
 
   const payload: QaBootstrapPayload = verified.payload;
-  if (isNonceConsumed(payload.nonce)) {
-    qaLog("QA_ACCESS_DENIED", {
-      deploymentHost: host,
-      projectRef: status.projectRef,
-      reasonCode: "nonce_replay",
-    });
-    return notFound();
-  }
 
-  // Verify emailHash matches admin email server-side (defense-in-depth ·
-  // the token was signed by an authorized origin using the same secret).
+  // Defense-in-depth · l'emailHash du token doit correspondre à
+  // l'admin email courant (le token pourrait avoir été signé pour un
+  // autre admin autorisé sur la même Preview · on lie strictement).
   const expectedHash = hashEmail(status.adminEmail, status.projectRef);
   if (payload.emailHash !== expectedHash) {
     qaLog("QA_ACCESS_DENIED", {
@@ -66,8 +62,23 @@ export async function GET(request: NextRequest) {
     return notFound();
   }
 
-  // Consume nonce · TTL borné à celui du token + petite marge.
-  markNonceConsumed(payload.nonce, payload.expiresAt + 60);
+  // Le token binde aussi le host normalisé au moment de la signature ·
+  // le comparateur ci-dessus utilise déjà le host normalisé.
+  const consumeResult = await atomicConsumeNonce({
+    nonce: payload.nonce,
+    qaAdminEmailHash: expectedHash,
+    deploymentHost: host,
+    projectRef: status.projectRef,
+    nowSeconds: now,
+  });
+  if (!consumeResult.ok) {
+    qaLog("QA_ACCESS_DENIED", {
+      deploymentHost: host,
+      projectRef: status.projectRef,
+      reasonCode: consumeResult.reason,
+    });
+    return notFound();
+  }
 
   // Session cookie TTL = min(qa session TTL, ttl hard cap).
   const sessionSecondsMax = Math.min(
@@ -96,11 +107,9 @@ export async function GET(request: NextRequest) {
   return NextResponse.redirect(redirectTo, { status: 303 });
 }
 
-// Aucun autre verbe autorisé.
 export async function POST() { return notFound(); }
 export async function PATCH() { return notFound(); }
 export async function PUT() { return notFound(); }
 export async function DELETE() { return notFound(); }
 
-// Sanity constant reference (silence lint if unused elsewhere).
 void QA_BOOTSTRAP_TTL_SECONDS;

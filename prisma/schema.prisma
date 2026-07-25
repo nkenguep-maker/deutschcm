@@ -1672,3 +1672,30 @@ model CenterApplication {
   @@index([createdAt])
   @@map("center_applications")
 }
+
+// ─── QA-b1 · Store durable des nonces bootstrap ─────────────────
+// Preview-only · consommation atomique via UPDATE...RETURNING (voir
+// src/lib/qa/nonces.ts + docs/YEMA_QA_PREVIEW_PERSONAS.md).
+//
+// Le nonce brut n'est JAMAIS persisté · seul son SHA-256 (64 hex).
+// Aucune adresse e-mail complète · uniquement `qaAdminEmailHash`
+// (SHA-256 short) déjà utilisé pour le cookie QA.
+//
+// RLS strictement deny pour anon + authenticated (aucun SELECT/INSERT/
+// UPDATE/DELETE côté client). Les routes QA server-only accèdent via
+// Prisma en service_role (bypass RLS).
+model QaBootstrapNonce {
+  id                String    @id @default(cuid())
+  nonceHash         String    @unique @map("nonce_hash")
+  qaAdminEmailHash  String    @map("qa_admin_email_hash")
+  deploymentHost    String    @map("deployment_host")
+  projectRef        String    @map("project_ref")
+  issuedAt          DateTime  @map("issued_at")
+  expiresAt         DateTime  @map("expires_at")
+  consumedAt        DateTime? @map("consumed_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@index([expiresAt])
+  @@index([consumedAt])
+  @@map("qa_bootstrap_nonces")
+}
