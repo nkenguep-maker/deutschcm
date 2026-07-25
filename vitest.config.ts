@@ -13,6 +13,15 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
+      // Le paquet "server-only" (marqueur React) est fourni par Next.js à
+      // l'exécution mais Vitest tourne hors Next · on l'alias vers le stub
+      // vide Next (empty.js · aucun side-effect · sans quoi tout module
+      // `import "server-only"` fait échouer le test avec `Cannot find
+      // package`).
+      "server-only": path.resolve(
+        __dirname,
+        "node_modules/next/dist/compiled/server-only/empty.js",
+      ),
     },
   },
 });

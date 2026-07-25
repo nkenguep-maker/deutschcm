@@ -22,7 +22,8 @@ export type FeatureFlag =
   | "AUDIO_FEEDBACK_ENABLED"
   | "CLOSED_MESSAGING_ENABLED"
   | "NOTIFICATIONS_ENABLED"
-  | "RACINES_COACH_OPERATIONAL";
+  | "RACINES_COACH_OPERATIONAL"
+  | "QA_MODE_ENABLED";
 
 const P4_FLAGS: readonly FeatureFlag[] = [
   "CIRCLE_ENABLED",
@@ -37,6 +38,7 @@ const P4_FLAGS: readonly FeatureFlag[] = [
   "CLOSED_MESSAGING_ENABLED",
   "NOTIFICATIONS_ENABLED",
   "RACINES_COACH_OPERATIONAL",
+  "QA_MODE_ENABLED",
 ] as const;
 
 export function getFlag(name: FeatureFlag): boolean {
