@@ -33,6 +33,7 @@ export function QaTestBar() {
   const [status, setStatus] = useState<Status | null>(null);
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -66,7 +67,14 @@ export function QaTestBar() {
   async function impersonate(personaId: string) {
     setBusy(true);
     setOpen(false);
+    setErrorMsg(null);
+    const dest = destinationFor(personaId, locale);
     try {
+      // `redirect: "manual"` empêche fetch de suivre le 303 · le browser
+      // voit `res.type === "opaqueredirect"` (status = 0). Les cookies
+      // Set-Cookie du 303 (session Supabase + yema_qa_persona) sont
+      // appliqués au document AVANT que fetch return · c'est pourquoi
+      // window.location.href juste après trouve les bons cookies.
       const res = await fetch("/api/qa/impersonate", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -74,19 +82,28 @@ export function QaTestBar() {
         body: JSON.stringify({ persona: personaId }),
         redirect: "manual",
       });
-      const ok = res.type === "opaqueredirect" || res.status === 0
-        || (res.status >= 200 && res.status < 400);
-      if (!ok) {
+      // Traite le 303 (opaqueredirect avec status 0) comme succès et
+      // affiche l'erreur uniquement si on est sûr d'un refus explicite.
+      if (res.type === "opaqueredirect" || res.status === 0) {
+        // Succès · fallthrough vers nav.
+      } else if (res.status >= 400) {
+        let code = `HTTP ${res.status}`;
+        try {
+          const body = await res.json();
+          if (body?.code) code = body.code;
+        } catch { /* ignore */ }
+        setErrorMsg(`Impersonation refusée · ${code}`);
         setBusy(false);
         return;
       }
-      // Le server a écrit les cookies session Supabase + le cookie
-      // yema_qa_persona · nav vers la destination canonique du persona.
-      const target = status?.personas.find((p) => p.id === personaId);
-      if (!target) { setBusy(false); return; }
-      const dest = destinationFor(personaId, locale);
-      window.location.href = dest;
-    } catch {
+      // Utiliser assign() plutôt que href= · certains navigateurs
+      // (comportement Chrome observé en Preview) ignorent l'assignation
+      // href= pendant qu'une fetch reste "settling". assign force une
+      // vraie navigation avec unload du document courant.
+      window.location.assign(dest);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setErrorMsg(`Erreur réseau · ${msg.slice(0, 60)}`);
       setBusy(false);
     }
   }
@@ -102,7 +119,7 @@ export function QaTestBar() {
         redirect: "manual",
       });
     } catch { /* ignore */ }
-    window.location.href = `/${locale}/goodbye`;
+    window.location.assign(`/${locale}/goodbye`);
   }
 
   const current = status.currentPersona
@@ -119,6 +136,9 @@ export function QaTestBar() {
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div className="qatb" role="region" aria-label={C.regionAria}>
+        {errorMsg && (
+          <div className="qatb-error" role="alert">{errorMsg}</div>
+        )}
         <div className="qatb-inner">
           <div className="qatb-left">
             <span className="qatb-dot" aria-hidden="true" />
@@ -251,6 +271,14 @@ const CSS = `
   padding: 8px clamp(12px, 3vw, 20px);
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   min-height: 44px;
+}
+.qatb-error {
+  padding: 8px 16px;
+  background: rgba(122, 40, 48, 0.35);
+  color: #FBD3D6;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
+  border-bottom: 1px solid rgba(122, 40, 48, 0.55);
+  text-align: center;
 }
 .qatb-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .qatb-dot {
