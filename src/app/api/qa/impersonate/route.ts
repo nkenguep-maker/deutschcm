@@ -26,8 +26,10 @@ import { checkCsrf } from "@/lib/qa/csrf";
 import { normalizeHost } from "@/lib/qa/host";
 import { qaLog } from "@/lib/qa/log";
 
-function notFound() {
-  return NextResponse.json({ error: "Not found" }, { status: 404 });
+function notFound(code?: string) {
+  // En Preview (gate active), on inclut le code · aide le debug sans
+  // rien révéler à un attaquant Production (gate OFF → code absent).
+  return NextResponse.json({ error: "Not found", ...(code ? { code } : {}) }, { status: 404 });
 }
 function badRequest(code: string) {
   return NextResponse.json({ error: "Bad request", code }, { status: 400 });
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
       projectRef: status.projectRef,
       reasonCode: csrf.reason,
     });
-    return notFound();
+    return notFound(`csrf_${csrf.reason}`);
   }
 
   const url = new URL(request.url);
@@ -63,7 +65,7 @@ export async function POST(request: NextRequest) {
       projectRef: status.projectRef,
       reasonCode: cookieCheck.reason,
     });
-    return notFound();
+    return notFound(`cookie_${cookieCheck.reason}`);
   }
 
   // Body allowlist stricte.
@@ -103,7 +105,7 @@ export async function POST(request: NextRequest) {
       projectRef: status.projectRef,
       reasonCode: "generate_link_failed",
     });
-    return notFound();
+    return notFound("generate_link_failed");
   }
   const hashedToken = data.properties.hashed_token as string;
 
@@ -129,7 +131,7 @@ export async function POST(request: NextRequest) {
       projectRef: status.projectRef,
       reasonCode: "verify_otp_failed",
     });
-    return notFound();
+    return notFound("verify_otp_failed");
   }
 
   qaLog("QA_IMPERSONATION_STARTED", {

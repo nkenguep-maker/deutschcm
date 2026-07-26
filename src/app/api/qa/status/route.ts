@@ -13,15 +13,32 @@ import { NextResponse, type NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { createClient as createSsrClient } from "@/lib/supabase/server";
 import { resolveQaConfig } from "@/lib/qa/config";
+import { readQaCookie } from "@/lib/qa/cookie";
+import { normalizeHost } from "@/lib/qa/host";
 import { QA_PERSONAS, isQaPersonaId, getPersona } from "@/lib/qa/personas";
 
-function notFound() {
-  return NextResponse.json({ error: "Not found" }, { status: 404 });
+function notFound(code?: string) {
+  return NextResponse.json(
+    { error: "Not found", ...(code ? { code } : {}) },
+    { status: 404 },
+  );
 }
 
-export async function GET(_req: NextRequest) {
+export async function GET(request: NextRequest) {
   const status = resolveQaConfig();
   if (!status.active) return notFound();
+
+  // Aussi vérifier le cookie yema_qa_session · sans bootstrap valide,
+  // l'user ne doit pas voir la barre (l'impersonate refuserait ensuite
+  // en 404 · autant afficher rien plutôt qu'un menu "cassé").
+  const url = new URL(request.url);
+  const host = normalizeHost(url.host);
+  const cookieCheck = await readQaCookie(process.env.YEMA_QA_SESSION_SECRET!, {
+    deploymentHost: host,
+    projectRef: status.projectRef,
+    nowSeconds: Math.floor(Date.now() / 1000),
+  });
+  if (!cookieCheck.ok) return notFound(`cookie_${cookieCheck.reason}`);
 
   const cookieStore = await cookies();
   const rawPersona = cookieStore.get("yema_qa_persona")?.value ?? null;
