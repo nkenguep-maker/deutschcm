@@ -27,14 +27,19 @@ export async function GET(_req: NextRequest) {
   const rawPersona = cookieStore.get("yema_qa_persona")?.value ?? null;
   const currentPersonaId = rawPersona && isQaPersonaId(rawPersona) ? rawPersona : null;
 
-  // Vérifier user courant · si son email == fixture super_admin, montrer le menu.
+  // Vérifier user courant · l'user est "super admin QA" si son email est
+  //   (a) le fixture super_admin (persona impersonation), OU
+  //   (b) l'admin humain listé dans YEMA_QA_ADMIN_EMAIL (celui qui a
+  //       reçu le bootstrap link) · ce cas permet à Jacob de voir la
+  //       barre depuis son propre compte avant d'impersonate.
   let isSuperAdmin = false;
   try {
     const supabase = await createSsrClient();
     const { data } = await supabase.auth.getUser();
-    const email = data?.user?.email ?? null;
-    const superAdmin = getPersona("super_admin");
-    if (email && superAdmin && email.toLowerCase() === superAdmin.fixtureEmail.toLowerCase()) {
+    const email = (data?.user?.email ?? "").toLowerCase();
+    const fixtureSA = getPersona("super_admin")?.fixtureEmail?.toLowerCase() ?? "";
+    const humanSA = (status.adminEmail || "").toLowerCase();
+    if (email && (email === fixtureSA || email === humanSA)) {
       isSuperAdmin = true;
     }
   } catch {
