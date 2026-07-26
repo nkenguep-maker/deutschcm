@@ -34,6 +34,11 @@ const PUBLIC_ROUTES = [
   // (auth + ownership check). Si un anon arrive ici, la page fetche
   // l'endpoint, reçoit 401, et redirige vers /login (voir page.tsx).
   "/activation",
+  // QA-b2a · console persona-picker QA Preview. La page se protège
+  // elle-même (verify cookie yema_qa_session + gate 4 conditions) et
+  // rend notFound() si KO. Le proxy la laisse passer pour permettre le
+  // bootstrap → /qa sans exiger une session Supabase préalable.
+  "/qa",
 ]
 
 // Routes protégées → rôle requis pour l'espace parent.
