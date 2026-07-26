@@ -214,11 +214,15 @@ export function OnboardingRacinesForm() {
       if (ocRes.status === 401) { showError("session_expired"); return; }
       if (!ocRes.ok) { showError("finish_error"); return; }
 
-      // Racines · aucun racinesStep dérivé du startPoint (hardening §3).
-      // La vraie auto-évaluation se joue sur /onboarding/racines/niveau,
-      // vers lequel le router envoie automatiquement quand LANGUAGE_SELECTED.
+      // Passer directement au dashboard Racines · /dashboard rend
+      // <DashboardRacines /> quand le LP actif est universe=RACINES.
+      // On respecte la destination canonique retournée par l'API et on
+      // utilise router.replace() pour ne pas laisser l'onboarding dans
+      // l'historique (retour arrière = pas de reboucle).
+      const ocBody = await ocRes.json().catch(() => ({} as { redirectTo?: string }));
+      const dest = typeof ocBody?.redirectTo === "string" ? ocBody.redirectTo : "/dashboard";
       clearDraft();
-      router.push("/onboarding");
+      router.replace(dest);
       router.refresh();
     } catch (err) {
       showError(classifyAuthError(err));
