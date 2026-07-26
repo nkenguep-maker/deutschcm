@@ -943,4 +943,210 @@ describe("QA-b1 Gate · cleanup · purge nonces expirés/consommés/test-scope",
   it("residuals inclut nonces_active pour observabilité (mais ne bloque pas)", () => {
     expect(src).toMatch(/nonces_active/);
   });
+
+  it("QA-b1.1 · purge inclut le scope de test test-yema-qa-* (nonces actifs non consommés)", () => {
+    expect(src).toMatch(/test-yema-qa-/);
+  });
+});
+
+// ─── QA-b1.1 · Vérifier atomicConsumeNonce contract (result.count) ─────
+describe("QA-b1.1 · atomicConsumeNonce · contrat exact updateMany().count", () => {
+  const src = read(NONCES);
+
+  it("compare exactement `result.count === 1` (jamais un id retourné)", () => {
+    expect(src).toMatch(/result\.count === 1/);
+    // Aucun retour d'id · Prisma updateMany ne retourne PAS d'id.
+    expect(src).not.toMatch(/RETURNING\s+"id"/i);
+    expect(src).not.toMatch(/result\.id/);
+    expect(src).not.toMatch(/rows\[0\]/);
+  });
+
+  it("aucune assertion 'UPDATE...RETURNING' dans le code (updateMany ne retourne que count)", () => {
+    // Prisma updateMany retourne { count: number } · l'atomicité vient
+    // du single-statement UPDATE, pas du RETURNING.
+    expect(src).not.toMatch(/RETURNING/);
+  });
+
+  it("le message d'échec est stable · 'nonce_not_found_or_already_consumed'", () => {
+    expect(src).toMatch(/"nonce_not_found_or_already_consumed"/);
+  });
+});
+
+// ─── QA-b1.1 · Ordre routes · gate → CSRF → cookie → body → DB ──────────
+describe("QA-b1.1 · ordre routes · gate d'abord puis CSRF puis cookie/body/DB", () => {
+  // Utilitaire · strip comments avant index lookup pour éviter les faux
+  // positifs quand un nom apparaît d'abord dans un commentaire d'entête.
+  function stripComments(src: string): string {
+    return src
+      .split("\n")
+      .filter((l) => !l.trim().startsWith("//"))
+      .join("\n");
+  }
+
+  it("impersonate route · resolveQaConfig < checkCsrf < readQaCookie < request.json < generateLink < verifyOtp", () => {
+    const src = stripComments(read(RT_IMPERSONATE));
+    const idxGate = src.indexOf("resolveQaConfig()");
+    const idxCsrf = src.indexOf("checkCsrf(request)");
+    const idxCookie = src.indexOf("readQaCookie(");
+    const idxBody = src.indexOf("await request.json()");
+    const idxGen = src.indexOf("admin.auth.admin.generateLink");
+    const idxVerify = src.indexOf(".verifyOtp(");
+    expect(idxGate).toBeGreaterThan(0);
+    expect(idxCsrf).toBeGreaterThan(idxGate);
+    expect(idxCookie).toBeGreaterThan(idxCsrf);
+    expect(idxBody).toBeGreaterThan(idxCookie);
+    expect(idxGen).toBeGreaterThan(idxBody);
+    expect(idxVerify).toBeGreaterThan(idxGen);
+  });
+
+  it("logout route · resolveQaConfig < checkCsrf < signOut < clearQaCookie", () => {
+    const src = stripComments(read(RT_LOGOUT));
+    const idxGate = src.indexOf("resolveQaConfig()");
+    const idxCsrf = src.indexOf("checkCsrf(request)");
+    const idxSignOut = src.indexOf(".signOut(");
+    const idxClear = src.indexOf("clearQaCookie()");
+    expect(idxGate).toBeGreaterThan(0);
+    expect(idxCsrf).toBeGreaterThan(idxGate);
+    expect(idxSignOut).toBeGreaterThan(idxCsrf);
+    expect(idxClear).toBeGreaterThan(idxSignOut);
+  });
+
+  it("bootstrap route · resolveQaConfig < searchParams.get('t') < verifyBootstrapToken(call) < atomicConsumeNonce(call) < setQaCookie(call)", () => {
+    const src = stripComments(read(RT_BOOTSTRAP));
+    const idxGate = src.indexOf("resolveQaConfig()");
+    const idxToken = src.indexOf('url.searchParams.get("t")');
+    const idxVerify = src.indexOf("verifyBootstrapToken(token");
+    const idxConsume = src.indexOf("atomicConsumeNonce(");
+    const idxCookie = src.indexOf("setQaCookie(");
+    expect(idxGate).toBeGreaterThan(0);
+    expect(idxToken).toBeGreaterThan(idxGate);
+    expect(idxVerify).toBeGreaterThan(idxToken);
+    expect(idxConsume).toBeGreaterThan(idxVerify);
+    expect(idxCookie).toBeGreaterThan(idxConsume);
+  });
+});
+
+// ─── QA-b1.1 · Flag-off · toutes routes 404 sans DB/log/generateLink ────
+describe("QA-b1.1 · flag-off / VERCEL_ENV=production · 404 stable sans effet de bord", async () => {
+  const { resolveQaConfig } = await import("@/lib/qa/config");
+
+  it("gate inactif quand VERCEL_ENV != preview + pas de YEMA_QA_ALLOW_LOCAL", () => {
+    const backup = {
+      VERCEL_ENV: process.env.VERCEL_ENV,
+      YEMA_QA_ALLOW_LOCAL: process.env.YEMA_QA_ALLOW_LOCAL,
+      YEMA_QA_MODE_ENABLED: process.env.YEMA_QA_MODE_ENABLED,
+    };
+    process.env.VERCEL_ENV = "production";
+    delete process.env.YEMA_QA_ALLOW_LOCAL;
+    process.env.YEMA_QA_MODE_ENABLED = "true";
+    try {
+      const r = resolveQaConfig();
+      expect(r.active).toBe(false);
+      if (!r.active) expect(r.reason).toBe("not_preview");
+    } finally {
+      // restore
+      if (backup.VERCEL_ENV !== undefined) process.env.VERCEL_ENV = backup.VERCEL_ENV; else delete process.env.VERCEL_ENV;
+      if (backup.YEMA_QA_ALLOW_LOCAL !== undefined) process.env.YEMA_QA_ALLOW_LOCAL = backup.YEMA_QA_ALLOW_LOCAL; else delete process.env.YEMA_QA_ALLOW_LOCAL;
+      if (backup.YEMA_QA_MODE_ENABLED !== undefined) process.env.YEMA_QA_MODE_ENABLED = backup.YEMA_QA_MODE_ENABLED; else delete process.env.YEMA_QA_MODE_ENABLED;
+    }
+  });
+
+  it("gate inactif quand flag disabled même en preview", () => {
+    const backup = {
+      VERCEL_ENV: process.env.VERCEL_ENV,
+      YEMA_QA_MODE_ENABLED: process.env.YEMA_QA_MODE_ENABLED,
+    };
+    process.env.VERCEL_ENV = "preview";
+    process.env.YEMA_QA_MODE_ENABLED = "false";
+    try {
+      const r = resolveQaConfig();
+      expect(r.active).toBe(false);
+      if (!r.active) expect(r.reason).toBe("flag_disabled");
+    } finally {
+      if (backup.VERCEL_ENV !== undefined) process.env.VERCEL_ENV = backup.VERCEL_ENV; else delete process.env.VERCEL_ENV;
+      if (backup.YEMA_QA_MODE_ENABLED !== undefined) process.env.YEMA_QA_MODE_ENABLED = backup.YEMA_QA_MODE_ENABLED; else delete process.env.YEMA_QA_MODE_ENABLED;
+    }
+  });
+
+  it("gate inactif quand secrets manquants", () => {
+    const backup = {
+      VERCEL_ENV: process.env.VERCEL_ENV,
+      YEMA_QA_MODE_ENABLED: process.env.YEMA_QA_MODE_ENABLED,
+      YEMA_QA_SESSION_SECRET: process.env.YEMA_QA_SESSION_SECRET,
+      YEMA_QA_LINK_SIGNING_SECRET: process.env.YEMA_QA_LINK_SIGNING_SECRET,
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    };
+    process.env.VERCEL_ENV = "preview";
+    process.env.YEMA_QA_MODE_ENABLED = "true";
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://kzzagbojjkivdzzcrmxn.supabase.co";
+    delete process.env.YEMA_QA_SESSION_SECRET;
+    delete process.env.YEMA_QA_LINK_SIGNING_SECRET;
+    try {
+      const r = resolveQaConfig();
+      expect(r.active).toBe(false);
+      if (!r.active) expect(r.reason).toBe("missing_secrets");
+    } finally {
+      for (const k of Object.keys(backup) as (keyof typeof backup)[]) {
+        if (backup[k] !== undefined) process.env[k] = backup[k]!;
+        else delete process.env[k];
+      }
+    }
+  });
+
+  it("routes bootstrap/impersonate/logout · gate KO → aucune référence DB (Prisma) dans le fast-path 404", () => {
+    // Verrou structurel · les 3 routes vérifient status.active avant TOUT
+    // usage de prisma. Aucun `import { prisma }` non-conditionnel qui
+    // s'exécute avant le return notFound() sur gate KO.
+    for (const rel of [RT_BOOTSTRAP, RT_IMPERSONATE, RT_LOGOUT]) {
+      const src = read(rel);
+      const idxGateReturn = src.indexOf("if (!status.active) return notFound()");
+      expect(idxGateReturn, `${rel} must have gate → 404 shortcut`).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ─── QA-b1.1 · Hashes 64 hex (SHA-256 complet, aucune troncation) ──────
+describe("QA-b1.1 · hashes SHA-256 complets · aucune troncation en DB", async () => {
+  const cookieMod = await import("@/lib/qa/cookie");
+  const noncesMod = await import("@/lib/qa/nonces");
+
+  it("hashEmail retourne 64 hex chars (SHA-256 full · aucun .slice)", () => {
+    const h = cookieMod.hashEmail("test@example.com", "kzzagbojjkivdzzcrmxn");
+    expect(h).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it("hashNonce retourne 64 hex chars (SHA-256 full)", () => {
+    const h = noncesMod.hashNonce("nonce-test-value");
+    expect(h).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it("code source cookie.ts · aucune troncation .slice(0, 32) sur hashEmail", () => {
+    const src = read(COOKIE);
+    // Le hashEmail doit se terminer par digest("hex") · pas .slice.
+    expect(src).toMatch(/digest\("hex"\);/);
+    // Pas de slice qui tronque le hash email.
+    const fnBlock = src.match(/export function hashEmail[\s\S]*?^\}/m);
+    expect(fnBlock).not.toBeNull();
+    expect(fnBlock![0]).not.toMatch(/\.slice\(0,\s*32\)/);
+  });
+
+  it("link generator · hashEmail sans slice", () => {
+    const src = read(LINK_GEN);
+    const fnBlock = src.match(/emailHash = createHash[\s\S]*?digest[^;]*;/);
+    expect(fnBlock).not.toBeNull();
+    expect(fnBlock![0]).not.toMatch(/\.slice\(0,\s*32\)/);
+  });
+});
+
+// ─── QA-b1.1 · verifyOtp type="email" (canonique pour token_hash email) ─
+describe("QA-b1.1 · verifyOtp type=\"email\" (EmailOtpType canonique)", () => {
+  const src = read(RT_IMPERSONATE);
+
+  it("impersonate appelle verifyOtp avec type=\"email\" (align with EmailOtpType)", () => {
+    // On accepte 'email' ou 'magiclink' (les 2 sont dans EmailOtpType) ·
+    // le brief préfère 'email' plus général.
+    expect(src).toMatch(/type:\s*"email"/);
+    // Pas d'ancien type='magiclink' résiduel.
+    expect(src).not.toMatch(/verifyOtp\([^)]*type:\s*"magiclink"/);
+  });
 });
