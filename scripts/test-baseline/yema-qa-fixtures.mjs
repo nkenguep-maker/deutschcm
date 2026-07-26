@@ -62,12 +62,16 @@ async function ensureAuthUser(email, existingMap) {
 }
 
 async function syncMetadata(supabaseId, appRole) {
-  const rolesList = appRole ? [appRole] : ["TEACHER"];
+  // Le proxy filtre roles[] via SpaceRole ∈ {STUDENT, TEACHER, CENTER, ADMIN}.
+  // On mappe appRole (LEARNER/RACINES_COACH/CENTER_ADMIN/YEMA_ADMIN) →
+  // SpaceRole équivalent · sans ce mapping, les personas non-teacher se
+  // retrouvaient tous sur /setup-role.
   const activeSpace = appRole === "CENTER_ADMIN" ? "CENTER"
     : appRole === "YEMA_ADMIN" ? "ADMIN"
     : appRole === "RACINES_COACH" ? "STUDENT"
     : appRole === "LEARNER" ? "STUDENT"
     : "TEACHER";
+  const rolesList = [activeSpace];
   const onboardedMap = { [activeSpace]: true };
   const { data } = await admin.auth.admin.getUserById(supabaseId);
   const existing = data?.user?.user_metadata ?? {};
