@@ -109,9 +109,12 @@ export async function POST(request: NextRequest) {
 
   // Client SSR canonique · écrira les cookies de session Supabase via
   // le cookieStore Next à travers `setAll`.
+  // Type "email" · canonique pour verifyOtp avec un token_hash reçu par
+  // email (magic link Supabase). L'union EmailOtpType inclut "email" et
+  // "magiclink" · "email" est plus général et documente l'intent.
   const ssrClient = await createSsrClient();
   const { error: verifyError } = await ssrClient.auth.verifyOtp({
-    type: "magiclink",
+    type: "email",
     token_hash: hashedToken,
   });
   if (verifyError) {

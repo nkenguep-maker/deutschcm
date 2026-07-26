@@ -19,8 +19,12 @@ export const QA_COOKIE_NAME = "yema_qa_session";
 export const QA_COOKIE_MAX_AGE_SECONDS_HARD = 7200; // 2h maximum absolu
 
 export function hashEmail(email: string, projectRef: string): string {
-  return createHash("sha256").update(`${email.trim().toLowerCase()}:${projectRef}`)
-    .digest("hex").slice(0, 32);
+  // SHA-256 complet · 64 chars hex. Aucune troncation · le hash est
+  // persisté in-clear en DB (`qa_admin_email_hash`) et transporté dans
+  // le cookie signé + token bootstrap.
+  return createHash("sha256")
+    .update(`${email.trim().toLowerCase()}:${projectRef}`)
+    .digest("hex");
 }
 
 /**

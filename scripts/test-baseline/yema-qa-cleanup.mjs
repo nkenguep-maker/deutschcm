@@ -64,19 +64,22 @@ async function main() {
   });
   await db.user.deleteMany({ where: { email: { contains: PREFIX } } });
 
-  // QA-b1 Gate · purge des nonces bootstrap QA · consommés OU expirés
-  // OU test-scope. Le nonce brut n'est jamais persisté (SHA-256 only) ·
-  // on cible via `qaAdminEmailHash` (préfixe "test") + tout row expiré/
-  // consommé pour éviter d'accumuler des rows de test.
+  // QA-b1.1 · purge des nonces bootstrap QA · CRITIQUE · toute row du
+  // scope de test (deploymentHost préfixé `test-yema-qa-`, `localhost`,
+  // `127.0.0.1`) est supprimée MÊME si active/non consommée. Les rows
+  // Preview réelles (host preview.vercel.app) qui sont expirées OU
+  // consommées sont également purgées. Une row Preview active + non
+  // consommée reste (usage légitime en cours).
   const noncesDeleted = await db.qaBootstrapNonce.deleteMany({
     where: {
       OR: [
-        { expiresAt: { lt: new Date() } },
-        { consumedAt: { not: null } },
-        // Fallback · retire aussi les rows dont le host correspond aux
-        // tests locaux (préfixe "localhost" ou "127.0.0.1" ou "test").
+        // Scope de test · purge inconditionnelle (aussi les actives).
+        { deploymentHost: { startsWith: "test-yema-qa-" } },
         { deploymentHost: { startsWith: "localhost" } },
         { deploymentHost: { startsWith: "127.0.0.1" } },
+        // Hors scope de test · purge uniquement expirées ou consommées.
+        { expiresAt: { lt: new Date() } },
+        { consumedAt: { not: null } },
       ],
     },
   });
@@ -107,6 +110,16 @@ async function main() {
     nonces_active: await db.qaBootstrapNonce.count({
       where: { consumedAt: null, expiresAt: { gt: new Date() } },
     }),
+    // Nonces résiduels dans le scope de test (doit être 0 après cleanup).
+    nonces_test_scope: await db.qaBootstrapNonce.count({
+      where: {
+        OR: [
+          { deploymentHost: { startsWith: "test-yema-qa-" } },
+          { deploymentHost: { startsWith: "localhost" } },
+          { deploymentHost: { startsWith: "127.0.0.1" } },
+        ],
+      },
+    }),
     authUsersDeleted: deleted,
     authUsersFailed: failures.length,
   };
@@ -114,7 +127,12 @@ async function main() {
     + residuals.enrollments + residuals.assignments + residuals.submissions
     + residuals.feedbacks + residuals.audits + residuals.appRoles;
   process.stderr.write(`residuals: ${JSON.stringify(residuals)}\n`);
-  if (totalResidualDb === 0 && failures.length === 0) {
+  // QA-b1.1 · la sortie stable n'est autorisée que si le résidu du scope
+  // testé est ZÉRO (y compris les nonces test-scope actifs).
+  const cleanOk = totalResidualDb === 0
+    && failures.length === 0
+    && residuals.nonces_test_scope === 0;
+  if (cleanOk) {
     process.stderr.write("\nYEMA QA BASELINE CLEANED\n");
   } else {
     process.stderr.write("\nCLEANUP FAILED · residual QA data\n");

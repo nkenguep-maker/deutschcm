@@ -66,9 +66,11 @@ if (linkSecret.length < 32) {
 const now = Math.floor(Date.now() / 1000);
 const nonce = randomBytes(32).toString("hex");
 const nonceHash = createHash("sha256").update(nonce).digest("hex");
+// SHA-256 complet · 64 chars hex. Aucune troncation (aligné avec
+// src/lib/qa/cookie.ts hashEmail() côté serveur).
 const emailHash = createHash("sha256")
   .update(`${adminEmail.trim().toLowerCase()}:${P1_REF}`)
-  .digest("hex").slice(0, 32);
+  .digest("hex");
 
 const payload = {
   emailHash,

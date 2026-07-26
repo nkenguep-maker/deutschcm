@@ -2,9 +2,12 @@
 //
 // Doctrine · le Map process-scoped n'est plus l'autorité de consommation ·
 // la table `qa_bootstrap_nonces` (Prisma model `QaBootstrapNonce`) est la
-// source de vérité. La consommation se fait via une seule requête atomique
-// UPDATE ... WHERE consumed_at IS NULL AND expires_at > now() RETURNING id.
-// Deux requêtes concurrentes → exactement 1 succès, exactement 1 refus.
+// source de vérité. La consommation se fait via une seule opération
+// atomique · Prisma `updateMany` conditionnel (WHERE nonceHash + consumedAt
+// NULL + expiresAt > now + host + emailHash + projectRef) · le compteur
+// `result.count` est l'unique preuve (`=== 1` succès, `=== 0` refus).
+// Deux requêtes concurrentes → exactement 1 succès, exactement 1 refus
+// (grâce à l'unicité de nonce_hash + UPDATE single-statement).
 //
 // Un cache mémoire subsiste uniquement comme optimisation (fast-path pour
 // détecter un replay évident sans hit DB · jamais utilisé pour AUTORISER).
