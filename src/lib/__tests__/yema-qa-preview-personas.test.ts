@@ -290,20 +290,23 @@ describe("QA personas · destinations réelles auditées (pas d'invention)", () 
     expect(src).toMatch(/^import\s+"server-only";/m);
   });
 
-  it("exactement 5 personas (super_admin, teacher, coach, center_admin, student)", () => {
-    for (const id of ["super_admin", "teacher", "coach", "center_admin", "student"]) {
+  it("exactement 6 personas (super_admin, teacher, coach, center_admin, student_monde, student_racines)", () => {
+    for (const id of ["super_admin", "teacher", "coach", "center_admin", "student_monde", "student_racines"]) {
       expect(src).toMatch(new RegExp(`id:\\s*"${id}"`));
     }
   });
 
   it("destinations sont des routes RÉELLEMENT présentes dans le repo", () => {
     // Chaque destination doit correspondre à un fichier page.tsx existant.
+    // student_monde et student_racines pointent tous 2 sur /dashboard ·
+    // le dashboard aiguille selon LP.universe (MONDE vs RACINES).
     const destinations = [
-      ["super_admin", "src/app/[locale]/admin/page.tsx"],
-      ["teacher",     "src/app/[locale]/teacher/page.tsx"],
-      ["coach",       "src/app/[locale]/coach/racines/page.tsx"],
-      ["center_admin","src/app/[locale]/center/page.tsx"],
-      ["student",     "src/app/[locale]/student/assignments/page.tsx"],
+      ["super_admin",     "src/app/[locale]/admin/page.tsx"],
+      ["teacher",         "src/app/[locale]/teacher/page.tsx"],
+      ["coach",           "src/app/[locale]/coach/racines/page.tsx"],
+      ["center_admin",    "src/app/[locale]/center/page.tsx"],
+      ["student_monde",   "src/app/[locale]/dashboard/page.tsx"],
+      ["student_racines", "src/app/[locale]/dashboard/page.tsx"],
     ] as const;
     for (const [id, path] of destinations) {
       expect(existsSync(join(REPO, path)), `destination ${id} → ${path} must exist`).toBe(true);
@@ -316,7 +319,7 @@ describe("QA personas · destinations réelles auditées (pas d'invention)", () 
 
   it("isQaPersonaId whitelist stricte (aucun persona arbitraire)", () => {
     expect(src).toMatch(/isQaPersonaId/);
-    expect(src).toMatch(/\["super_admin", "teacher", "coach", "center_admin", "student"\]/);
+    expect(src).toMatch(/\["super_admin", "teacher", "coach", "center_admin", "student_monde", "student_racines"\]/);
   });
 });
 
@@ -572,8 +575,8 @@ describe("QA fixtures · préfixe test_yema_qa_ + assertNonProduction", () => {
     expect(src).toMatch(/^assertNonProduction\(\);/m);
   });
 
-  it("5 personas exacts", () => {
-    for (const label of ["super_admin", "teacher", "coach", "center_admin", "student"]) {
+  it("6 personas exacts (student split en Monde vs Racines)", () => {
+    for (const label of ["super_admin", "teacher", "coach", "center_admin", "student_monde", "student_racines"]) {
       expect(src).toContain(`label: "${label}"`);
     }
   });

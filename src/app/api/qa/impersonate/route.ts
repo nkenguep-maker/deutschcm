@@ -113,6 +113,10 @@ export async function POST(request: NextRequest) {
   // email (magic link Supabase). L'union EmailOtpType inclut "email" et
   // "magiclink" · "email" est plus général et documente l'intent.
   const ssrClient = await createSsrClient();
+  // Reset session · aucun cumul de rôles entre 2 changements. signOut
+  // efface les cookies sb-*-auth-token via le cookieStore Next avant
+  // d'installer la nouvelle session via verifyOtp.
+  await ssrClient.auth.signOut({ scope: "local" }).catch(() => {});
   const { error: verifyError } = await ssrClient.auth.verifyOtp({
     type: "email",
     token_hash: hashedToken,
@@ -139,7 +143,14 @@ export async function POST(request: NextRequest) {
   // token dans l'URL. Le browser suit le redirect avec les cookies SSR
   // Supabase déjà posés par verifyOtp() ci-dessus.
   const destination = persona.destination("fr");
-  return NextResponse.redirect(new URL(destination, url.origin), { status: 303 });
+  const response = NextResponse.redirect(new URL(destination, url.origin), { status: 303 });
+  // Cookie label lisible côté client (barre "MODE TEST · Enseignant").
+  // Pas httpOnly (le composant client doit le lire), pas signé (aucune
+  // décision d'auth basée dessus · purement affichage).
+  response.cookies.set("yema_qa_persona", persona.id, {
+    path: "/", sameSite: "lax", secure: true, maxAge: 7200,
+  });
+  return response;
 }
 
 export async function GET() { return notFound(); }

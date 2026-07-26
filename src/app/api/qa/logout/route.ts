@@ -43,7 +43,10 @@ export async function POST(request: NextRequest) {
   qaLog("QA_IMPERSONATION_ENDED", { projectRef: status.projectRef });
 
   const url = new URL(request.url);
-  return NextResponse.redirect(new URL("/fr/goodbye", url.origin), { status: 303 });
+  const response = NextResponse.redirect(new URL("/fr/goodbye", url.origin), { status: 303 });
+  // Efface le label persona (affichage barre)
+  response.cookies.set("yema_qa_persona", "", { path: "/", maxAge: 0 });
+  return response;
 }
 
 export async function GET() { return notFound(); }

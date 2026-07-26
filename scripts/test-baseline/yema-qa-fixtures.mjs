@@ -26,12 +26,15 @@ const db = new PrismaClient({
 });
 
 const PREFIX = "test_yema_qa_";
+// student_monde et student_racines · profils/parcours distincts (LP MONDE
+// DEUTSCH vs LP RACINES WOLOF onboarded) · aucun mélange.
 const PERSONAS = [
-  { label: "super_admin",  email: `${PREFIX}super_admin@example.com`,  role: "ADMIN",   appRole: "YEMA_ADMIN" },
-  { label: "teacher",      email: `${PREFIX}teacher@example.com`,      role: "TEACHER", appRole: null },
-  { label: "coach",        email: `${PREFIX}coach@example.com`,        role: "STUDENT", appRole: "RACINES_COACH" },
-  { label: "center_admin", email: `${PREFIX}center_admin@example.com`, role: "CENTER",  appRole: "CENTER_ADMIN" },
-  { label: "student",      email: `${PREFIX}student@example.com`,      role: "STUDENT", appRole: "LEARNER" },
+  { label: "super_admin",     email: `${PREFIX}super_admin@example.com`,     role: "ADMIN",   appRole: "YEMA_ADMIN" },
+  { label: "teacher",         email: `${PREFIX}teacher@example.com`,         role: "TEACHER", appRole: null },
+  { label: "coach",           email: `${PREFIX}coach@example.com`,           role: "STUDENT", appRole: "RACINES_COACH" },
+  { label: "center_admin",    email: `${PREFIX}center_admin@example.com`,    role: "CENTER",  appRole: "CENTER_ADMIN" },
+  { label: "student_monde",   email: `${PREFIX}student_monde@example.com`,   role: "STUDENT", appRole: "LEARNER" },
+  { label: "student_racines", email: `${PREFIX}student_racines@example.com`, role: "STUDENT", appRole: "LEARNER" },
 ];
 
 async function listAllAuthMatching(prefix) {
@@ -128,9 +131,9 @@ async function main() {
     },
   });
   await db.classroomEnrollment.upsert({
-    where: { classroomId_userId: { classroomId: classroom.id, userId: created.student.dbId } },
+    where: { classroomId_userId: { classroomId: classroom.id, userId: created.student_monde.dbId } },
     update: { isActive: true },
-    create: { classroomId: classroom.id, userId: created.student.dbId, isActive: true },
+    create: { classroomId: classroom.id, userId: created.student_monde.dbId, isActive: true },
   });
 
   // 1 assignment PUBLISHED.
@@ -154,7 +157,7 @@ async function main() {
     create: {
       id: `${PREFIX}submission_draft`,
       assignment: { connect: { id: asm.id } },
-      user: { connect: { id: created.student.dbId } },
+      user: { connect: { id: created.student_monde.dbId } },
       writtenContent: "QA · brouillon en cours",
       status: "DRAFT", version: 1,
     },
@@ -165,7 +168,7 @@ async function main() {
     create: {
       id: `${PREFIX}submission_submitted`,
       assignment: { connect: { id: asm.id } },
-      user: { connect: { id: created.student.dbId } },
+      user: { connect: { id: created.student_monde.dbId } },
       writtenContent: "QA · travail finalisé",
       status: "SUBMITTED", version: 2, submittedAt: now,
     },
@@ -182,6 +185,49 @@ async function main() {
       status: "PUBLISHED", version: 1, writtenContent: "QA · bien !", publishedAt: now,
     },
   });
+
+  // ─── Learning paths distincts Monde vs Racines ─────────────────────
+  // student_monde · LP MONDE DEUTSCH A1 · rend <DashboardMonde />
+  await db.learningPath.upsert({
+    where: { id: `${PREFIX}lp_monde` },
+    update: {},
+    create: {
+      id: `${PREFIX}lp_monde`,
+      user: { connect: { id: created.student_monde.dbId } },
+      universe: "MONDE", language: "DEUTSCH", currentLevel: "A1",
+      status: "ACTIVE",
+      onboardingAnswers: { why: "study", startPoint: "beginner",
+        selfAssessmentAnswer: 2, declaredLevel: "A1", recommendedLevel: "A1" },
+    },
+  });
+  // Marquer universe côté metadata pour cohérence proxy/pages.
+  {
+    const { data } = await admin.auth.admin.getUserById(created.student_monde.authUuid);
+    const existing = data?.user?.user_metadata ?? {};
+    await admin.auth.admin.updateUserById(created.student_monde.authUuid, {
+      user_metadata: { ...existing, universe: "monde", activeLanguage: "deutsch" },
+    });
+  }
+
+  // student_racines · LP RACINES WOLOF · rend <DashboardRacines />
+  await db.learningPath.upsert({
+    where: { id: `${PREFIX}lp_racines` },
+    update: {},
+    create: {
+      id: `${PREFIX}lp_racines`,
+      user: { connect: { id: created.student_racines.dbId } },
+      universe: "RACINES", language: "WOLOF",
+      status: "ACTIVE",
+      onboardingAnswers: { link: "family_words", startPoint: "some_basics" },
+    },
+  });
+  {
+    const { data } = await admin.auth.admin.getUserById(created.student_racines.authUuid);
+    const existing = data?.user?.user_metadata ?? {};
+    await admin.auth.admin.updateUserById(created.student_racines.authUuid, {
+      user_metadata: { ...existing, universe: "racines", activeLanguage: "wolof", plan: "racines-solo" },
+    });
+  }
 
   const summary = {
     personas: Object.fromEntries(
