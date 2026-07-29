@@ -1,0 +1,102 @@
+/* YEMA · design tokens — scoped to [data-yema-shell] so old dashboards keep
+   the Kaffeehaus palette from globals.css untouched. Additive only. */
+
+[data-yema-shell] {
+  /* ── Fond & surfaces ── */
+  --yema-bg: #16100B;
+  --yema-sidebar: #130E09;
+  --yema-surface: #201811;
+  --yema-surface-2: #191209;
+  --yema-border: #2A2118;
+  --yema-border-strong: #3A2D1F;
+
+  /* ── Or YEMA ── */
+  --yema-gold: #D9A24B;
+  --yema-gold-light: #E7B865;
+  --yema-gold-dark: #C08A34;
+  --yema-gold-glow: rgba(217, 162, 75, 0.14);
+  --yema-gold-edge: rgba(217, 162, 75, 0.28);
+
+  /* ── Texte ── */
+  --yema-text: #F3EADB;
+  --yema-text-muted: #8C7B63;
+  --yema-text-faint: #6E5F4B;
+
+  /* ── Sémantique ── */
+  --yema-success: #8FCB9E;
+  --yema-alert: #E58C72;
+
+  /* ── Univers Racines (surfaces bordeaux) ── */
+  --yema-roots-surface: #2A1017;
+  --yema-roots-surface-2: #331219;
+  --yema-roots-border: #4A2230;
+  --yema-roots-text-muted: #A07A85;
+
+  /* ── Rayons ── */
+  --yema-r-card: 18px;
+  --yema-r-pill: 999px;
+  --yema-r-chip: 12px;
+  --yema-r-input: 12px;
+
+  /* ── Fontes (fournies par YemaFontProvider) ── */
+  --yema-font-sans: var(--yema-font-jakarta, "Plus Jakarta Sans", system-ui, sans-serif);
+  --yema-font-mono: var(--yema-font-mono, "JetBrains Mono", ui-monospace, monospace);
+
+  /* ── Motion (aligné doctrine YEMA existante, valeurs neutres si absentes) ── */
+  --yema-dur-touch: 120ms;
+  --yema-dur-move: 240ms;
+  --yema-dur-moment: 480ms;
+  --yema-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --yema-ease-glide: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Cibles tactiles enfants */
+  --yema-touch-min: 44px;
+
+  background: var(--yema-bg);
+  color: var(--yema-text);
+  font-family: var(--yema-font-sans);
+}
+
+/* Variante universe Racines — appliquée sur un sous-arbre pour changer les
+   surfaces sans dupliquer les composants. */
+[data-yema-shell][data-yema-universe="racines"],
+[data-yema-shell] [data-yema-universe="racines"] {
+  --yema-surface: var(--yema-roots-surface);
+  --yema-surface-2: var(--yema-roots-surface-2);
+  --yema-border: var(--yema-roots-border);
+  --yema-text-muted: var(--yema-roots-text-muted);
+}
+
+/* Base typographique du sous-arbre YEMA — n'affecte rien hors du shell. */
+[data-yema-shell] {
+  font-feature-settings: "ss01", "cv01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[data-yema-shell] .yema-mono {
+  font-family: var(--yema-font-mono);
+  letter-spacing: 0.02em;
+}
+
+/* Le mot-symbole YEMA (JetBrains Mono, tracking large). */
+[data-yema-shell] .yema-wordmark {
+  font-family: var(--yema-font-mono);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Utilitaires de rayon fréquents — évitent de saupoudrer arbitrary values. */
+[data-yema-shell] .yema-r-card { border-radius: var(--yema-r-card); }
+[data-yema-shell] .yema-r-pill { border-radius: var(--yema-r-pill); }
+[data-yema-shell] .yema-r-chip { border-radius: var(--yema-r-chip); }
+
+/* Reduced-motion : accélère la transition sans la supprimer. */
+@media (prefers-reduced-motion: reduce) {
+  [data-yema-shell] {
+    --yema-dur-touch: 0ms;
+    --yema-dur-move: 0ms;
+    --yema-dur-moment: 0ms;
+  }
+}
