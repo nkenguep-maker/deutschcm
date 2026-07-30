@@ -1174,6 +1174,94 @@
         "messages": "Messages",
         "sessionNotes": "Notes"
       }
+    },
+    "family": {
+      "personaLabel": "Famille",
+      "personaSubtitle": "Le foyer et ses apprenants",
+      "sidebarSection": "Ma famille",
+      "greetingFallback": "Bienvenue",
+      "meta": "{count, plural, one {1 enfant lié·e} other {# enfants lié·es}}",
+      "nav": {
+        "overview": "Accueil",
+        "children": "Mes enfants",
+        "progression": "Progression",
+        "sessions": "Séances",
+        "messages": "Messages",
+        "payments": "Paiements",
+        "settings": "Paramètres"
+      },
+      "mobileNav": {
+        "overview": "Accueil",
+        "children": "Enfants",
+        "progression": "Progression",
+        "payments": "Paiements",
+        "messages": "Messages"
+      },
+      "overview": {
+        "title": "Accueil",
+        "kpisChildrenTitle": "Enfants liés",
+        "kpisSeatsTitle": "Places disponibles",
+        "kpisAdultTitle": "Accès adulte",
+        "kpisAdultNone": "Aucun accès adulte activé",
+        "kpisAdultMonde": "Monde",
+        "kpisAdultRacines": "Racines",
+        "noChildrenTitle": "Aucun enfant lié pour l'instant",
+        "noChildrenBody": "Ajoutez un profil enfant pour commencer.",
+        "addChildCta": "Ajouter un enfant",
+        "noSeatCta": "Voir les offres famille",
+        "recentTitle": "Activités récentes",
+        "recentEmpty": "Rien à afficher pour l'instant."
+      },
+      "children": {
+        "title": "Mes enfants",
+        "description": "Profils enfants rattachés à votre foyer.",
+        "empty": "Aucun enfant lié pour l'instant.",
+        "openChild": "Ouvrir le profil",
+        "addChild": "Ajouter un enfant",
+        "noSeat": "Toutes les places enfants sont utilisées.",
+        "seatsUsed": "{used} sur {total} places utilisées",
+        "hasPinYes": "PIN défini",
+        "hasPinNo": "Sans PIN"
+      },
+      "progression": {
+        "title": "Progression",
+        "description": "Progression par enfant selon les données disponibles.",
+        "empty": "Aucune progression à afficher pour l'instant.",
+        "notAvailableYet": "Les données de progression ne sont pas encore branchées pour cet espace."
+      },
+      "sessions": {
+        "title": "Séances",
+        "empty": "Aucune séance planifiée.",
+        "soon": "La planification des séances arrive avec le futur backend Coach."
+      },
+      "messages": {
+        "title": "Messages",
+        "soon": "La messagerie famille arrivera avec les Lots 6 et 7 (backend P4.6)."
+      },
+      "payments": {
+        "title": "Paiements",
+        "planTitle": "Plan actif",
+        "planEmpty": "Aucun plan actif détecté.",
+        "planActive": "Plan {code} actif",
+        "invoicesTitle": "Factures",
+        "invoicesEmpty": "Aucune facture à afficher pour l'instant."
+      },
+      "settings": {
+        "title": "Paramètres",
+        "description": "Responsables, payeur, consentements et sécurité enfant.",
+        "guardiansTitle": "Responsables",
+        "guardiansEmpty": "Vous êtes le seul responsable enregistré.",
+        "payerTitle": "Payeur",
+        "payerEmpty": "Aucun payeur distinct identifié.",
+        "pinTitle": "Sécurité enfant (PIN)",
+        "pinHelp": "Le PIN de chaque enfant permet de sécuriser son accès. Il est stocké haché, jamais en clair.",
+        "consentTitle": "Consentements",
+        "consentEmpty": "Aucun consentement à configurer pour l'instant."
+      },
+      "loading": "Chargement de votre foyer…",
+      "error": "Impossible de charger votre foyer.",
+      "retry": "Réessayer",
+      "permissionDenied": "Cet espace nécessite un compte responsable de famille."
     }
   }
 }

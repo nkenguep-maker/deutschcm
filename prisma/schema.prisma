@@ -1228,6 +1228,11 @@ model ChildProfile {
   activeLangue String?
   // P4.1 · rattachement explicite au foyer (opt-in, SetNull préserve enfant en cas de suppression foyer).
   householdId  String?
+  // P4.6 Lot 4A · PIN enfant hashé (scrypt · Node crypto natif · format
+  // "scrypt$<salt_b64>$<hash_b64>"). Nullable : PIN optionnel jusqu'à ce
+  // que l'enfant en ait un. Jamais retourné par API ni au client.
+  pinHash      String?
+  pinUpdatedAt DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

@@ -290,8 +290,9 @@ describe("QA personas · destinations réelles auditées (pas d'invention)", () 
     expect(src).toMatch(/^import\s+"server-only";/m);
   });
 
-  it("exactement 6 personas (super_admin, teacher, coach, center_admin, student_monde, student_racines)", () => {
-    for (const id of ["super_admin", "teacher", "coach", "center_admin", "student_monde", "student_racines"]) {
+  it("exactement 7 personas (super_admin, teacher, coach, center_admin, student_monde, student_racines, family)", () => {
+    // P4.6 Lot 4A · ajout de "family" (FAMILY_GUARDIAN sémantique via AppRole.PARENT).
+    for (const id of ["super_admin", "teacher", "coach", "center_admin", "student_monde", "student_racines", "family"]) {
       expect(src).toMatch(new RegExp(`id:\\s*"${id}"`));
     }
   });
@@ -307,6 +308,7 @@ describe("QA personas · destinations réelles auditées (pas d'invention)", () 
       ["center_admin",    "src/app/[locale]/center/page.tsx"],
       ["student_monde",   "src/app/[locale]/dashboard/page.tsx"],
       ["student_racines", "src/app/[locale]/dashboard/page.tsx"],
+      ["family",          "src/app/[locale]/family/page.tsx"],
     ] as const;
     for (const [id, path] of destinations) {
       expect(existsSync(join(REPO, path)), `destination ${id} → ${path} must exist`).toBe(true);
@@ -319,7 +321,8 @@ describe("QA personas · destinations réelles auditées (pas d'invention)", () 
 
   it("isQaPersonaId whitelist stricte (aucun persona arbitraire)", () => {
     expect(src).toMatch(/isQaPersonaId/);
-    expect(src).toMatch(/\["super_admin", "teacher", "coach", "center_admin", "student_monde", "student_racines"\]/);
+    // P4.6 Lot 4A · ajout du persona "family" (7e). Whitelist mise à jour.
+    expect(src).toMatch(/\["super_admin", "teacher", "coach", "center_admin", "student_monde", "student_racines", "family"\]/);
   });
 });
 

@@ -1174,6 +1174,94 @@
         "messages": "Messages",
         "sessionNotes": "Notes"
       }
+    },
+    "family": {
+      "personaLabel": "Family",
+      "personaSubtitle": "The home and its learners",
+      "sidebarSection": "My family",
+      "greetingFallback": "Welcome",
+      "meta": "{count, plural, one {1 linked child} other {# linked children}}",
+      "nav": {
+        "overview": "Home",
+        "children": "My children",
+        "progression": "Progress",
+        "sessions": "Sessions",
+        "messages": "Messages",
+        "payments": "Payments",
+        "settings": "Settings"
+      },
+      "mobileNav": {
+        "overview": "Home",
+        "children": "Children",
+        "progression": "Progress",
+        "payments": "Payments",
+        "messages": "Messages"
+      },
+      "overview": {
+        "title": "Home",
+        "kpisChildrenTitle": "Linked children",
+        "kpisSeatsTitle": "Available seats",
+        "kpisAdultTitle": "Adult access",
+        "kpisAdultNone": "No adult access active",
+        "kpisAdultMonde": "World",
+        "kpisAdultRacines": "Roots",
+        "noChildrenTitle": "No child linked yet",
+        "noChildrenBody": "Add a child profile to get started.",
+        "addChildCta": "Add a child",
+        "noSeatCta": "See family plans",
+        "recentTitle": "Recent activity",
+        "recentEmpty": "Nothing to show yet."
+      },
+      "children": {
+        "title": "My children",
+        "description": "Child profiles attached to your home.",
+        "empty": "No child linked yet.",
+        "openChild": "Open profile",
+        "addChild": "Add a child",
+        "noSeat": "All child seats are used.",
+        "seatsUsed": "{used} of {total} seats used",
+        "hasPinYes": "PIN set",
+        "hasPinNo": "No PIN"
+      },
+      "progression": {
+        "title": "Progress",
+        "description": "Progress per child based on available data.",
+        "empty": "No progress to show yet.",
+        "notAvailableYet": "Progress data is not wired to this space yet."
+      },
+      "sessions": {
+        "title": "Sessions",
+        "empty": "No session scheduled.",
+        "soon": "Session scheduling arrives with the future Coach backend."
+      },
+      "messages": {
+        "title": "Messages",
+        "soon": "Family messaging will arrive with Lots 6 and 7 (P4.6 backend)."
+      },
+      "payments": {
+        "title": "Payments",
+        "planTitle": "Active plan",
+        "planEmpty": "No active plan detected.",
+        "planActive": "Plan {code} active",
+        "invoicesTitle": "Invoices",
+        "invoicesEmpty": "No invoice to show yet."
+      },
+      "settings": {
+        "title": "Settings",
+        "description": "Guardians, payer, consents and child security.",
+        "guardiansTitle": "Guardians",
+        "guardiansEmpty": "You are the only registered guardian.",
+        "payerTitle": "Payer",
+        "payerEmpty": "No distinct payer identified.",
+        "pinTitle": "Child security (PIN)",
+        "pinHelp": "Each child's PIN secures their access. Stored hashed, never in cleartext.",
+        "consentTitle": "Consents",
+        "consentEmpty": "No consent to configure yet."
+      },
+      "loading": "Loading your home…",
+      "error": "Cannot load your home.",
+      "retry": "Retry",
+      "permissionDenied": "This space requires a family guardian account."
     }
   }
 }

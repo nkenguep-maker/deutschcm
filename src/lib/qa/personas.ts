@@ -12,7 +12,8 @@ export type QaPersonaId =
   | "coach"
   | "center_admin"
   | "student_monde"
-  | "student_racines";
+  | "student_racines"
+  | "family";
 
 export interface QaPersonaSpec {
   id: QaPersonaId;
@@ -80,6 +81,19 @@ export const QA_PERSONAS: readonly QaPersonaSpec[] = [
     destination: (locale) => `/${locale}/dashboard`,
     available: true,
   },
+  {
+    // P4.6 Lot 4A · persona Famille (FAMILY_GUARDIAN sémantique).
+    // Rôle applicatif = AppRole.PARENT existant (audit confirmé). La fixture
+    // porte un enfant Monde + un enfant Racines + un grant ROOTS_FAMILY
+    // (jusqu'à 4 sièges) — voir seed dédié. AUCUN Passage Monde adulte par
+    // défaut : le sélecteur "Mon parcours" n'apparait pas sans grant explicit.
+    id: "family",
+    label: { fr: "Famille", en: "Family" },
+    role: "PARENT",
+    fixtureEmail: `${PREFIX}family@example.com`,
+    destination: (locale) => `/${locale}/family`,
+    available: true,
+  },
 ] as const;
 
 export function getPersona(id: QaPersonaId): QaPersonaSpec | null {
@@ -88,7 +102,7 @@ export function getPersona(id: QaPersonaId): QaPersonaSpec | null {
 
 export function isQaPersonaId(x: unknown): x is QaPersonaId {
   return typeof x === "string"
-    && ["super_admin", "teacher", "coach", "center_admin", "student_monde", "student_racines"].includes(x);
+    && ["super_admin", "teacher", "coach", "center_admin", "student_monde", "student_racines", "family"].includes(x);
 }
 
 /** Label pour affichage cookie/barre (fr par défaut). */
