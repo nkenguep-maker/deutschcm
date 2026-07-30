@@ -850,5 +850,172 @@
       "etape_en_cours": "étape en cours",
       "etape_a_venir": "étape à venir"
     }
+  },
+  "yemaDashboards": {
+    "common": {
+      "loading": "Chargement…",
+      "error": "Impossible d'afficher ce contenu",
+      "retry": "Réessayer",
+      "messagesSoon": "Messagerie bientôt disponible",
+      "messagesSoonHelp": "Le module de messagerie ouvre au prochain lot.",
+      "previewBadge": "Preview P-1 · maquette en cours"
+    },
+    "studentMonde": {
+      "personaLabel": "Élève Monde",
+      "personaSubtitle": "Le voyage extérieur",
+      "sidebarSection": "Mon espace",
+      "nav": {
+        "overview": "Mon tableau de bord",
+        "course": "Mon cours",
+        "assignments": "Mes devoirs",
+        "journey": "Mon parcours",
+        "class": "Ma classe",
+        "messages": "Messages"
+      },
+      "greetingFallback": "Bienvenue",
+      "metaLanguageLevel": "Allemand · Niveau {level}",
+      "metaLanguageLevelUnknown": "Allemand",
+      "overview": {
+        "title": "Mon tableau de bord",
+        "continueEyebrow": "Reprendre",
+        "continueTitle": "Continuer le cours",
+        "continueSubStart": "Ta prochaine étape en allemand A1.",
+        "continueSubResume": "Reprends là où tu t'étais arrêté.",
+        "continueSubDone": "Tu as terminé le programme A1.",
+        "continueSubNoAccess": "Ton parcours de découverte est terminé — active ton Passage pour continuer.",
+        "continueSubExpired": "Ta progression reste conservée.",
+        "start": "Commencer",
+        "resume": "Reprendre",
+        "review": "Revoir mon parcours",
+        "activate": "Choisir un Passage",
+        "seeOffers": "Voir les offres",
+        "progressLabel": "Progression du niveau",
+        "progressPct": "{pct} %",
+        "nextAssignmentsTitle": "Prochains devoirs",
+        "nextAssignmentsEmpty": "Aucun devoir publié pour l'instant.",
+        "nextAssignmentsUnavailable": "La rubrique devoirs n'est pas encore active.",
+        "recentActivityTitle": "Activités récentes",
+        "recentActivityEmpty": "Rien à afficher pour l'instant."
+      },
+      "course": {
+        "title": "Mon cours",
+        "description": "Cinq leçons A1 pour poser les bases.",
+        "empty": "Aucune leçon accessible pour l'instant.",
+        "seeLesson": "Voir la leçon",
+        "modulesOf": "{done} sur {total} modules",
+        "status": {
+          "completed": "Terminé",
+          "inProgress": "En cours",
+          "open": "À commencer",
+          "locked": "Verrouillé"
+        }
+      },
+      "assignments": {
+        "title": "Mes devoirs",
+        "description": "Devoirs publiés par tes enseignant·es.",
+        "empty": "Aucun devoir publié.",
+        "unavailable": "Les devoirs P4.5-B ne sont pas encore actifs.",
+        "open": "Ouvrir",
+        "status": {
+          "published": "Publié",
+          "closed": "Clos"
+        },
+        "due": "Échéance {date}",
+        "noDue": "Pas d'échéance"
+      },
+      "journey": {
+        "title": "Mon parcours",
+        "description": "Ton chemin A1 → C2 s'ouvre au fil des niveaux.",
+        "empty": "Ton parcours s'ouvrira dès que ton Learning Path sera actif.",
+        "current": "En cours",
+        "levels": {
+          "A1": "Se présenter",
+          "A2": "S'exprimer",
+          "B1": "Argumenter",
+          "B2": "Nuancer",
+          "C1": "Débattre",
+          "C2": "Transmettre"
+        }
+      },
+      "classSection": {
+        "title": "Ma classe",
+        "empty": "Tu n'es rattaché·e à aucune classe pour l'instant.",
+        "unavailable": "Ta classe n'est pas encore visible depuis cet espace.",
+        "classroomsSoon": "Les informations de votre classe seront bientôt disponibles."
+      },
+      "access": {
+        "active": "Accès actif",
+        "expired": "Accès expiré",
+        "none": "Aucun accès",
+        "daysRemaining": "{days, plural, one {1 jour restant} other {# jours restants}}"
+      }
+    },
+    "studentRacines": {
+      "personaLabel": "Élève Racines",
+      "personaSubtitle": "Le retour intérieur",
+      "sidebarSection": "Ma maison",
+      "nav": {
+        "overview": "Mon tableau de bord",
+        "steps": "Mes étapes",
+        "listens": "Écoutes",
+        "coach": "Mon coach",
+        "circle": "Cercle de palabre",
+        "messages": "Messages"
+      },
+      "greetingFallback": "Bienvenue",
+      "metaLanguageStep": "Racines · Étape {step}",
+      "metaLanguageOnly": "Racines",
+      "mode": {
+        "solo": "Espace Solo",
+        "family": "Espace Famille",
+        "noAccess": "Aucun accès",
+        "unknown": "Statut à préciser"
+      },
+      "overview": {
+        "title": "Mon tableau de bord",
+        "sequenceTitle": "Séquence orale",
+        "sequenceEmpty": "Aucune séquence orale n'est active. Elle ouvrira avec les premiers contenus.",
+        "coachNextTitle": "Prochaine séance coach",
+        "coachNextEmpty": "Aucune séance planifiée pour l'instant.",
+        "circleTitle": "Cercle de palabre",
+        "circleSoon": "Ton cercle s'ouvrira prochainement.",
+        "familyEmptyTitle": "Ton foyer attend ses profils",
+        "familyEmptyBody": "Configure les profils de tes proches pour démarrer ensemble.",
+        "familyEmptyCta": "Configurer le foyer",
+        "noAccessTitle": "Ton parcours Racines n'est pas encore activé",
+        "noAccessBody": "Termine la découverte ou active un abonnement Solo/Famille pour ouvrir la maison.",
+        "noAccessCta": "Voir les offres",
+        "contentSoonTitle": "Ta langue Racines arrive bientôt",
+        "contentSoonBody": "Nous préparons les récits, les écoutes et les activités avec des voix réelles."
+      },
+      "steps": {
+        "title": "Mes étapes",
+        "description": "Cinq étapes pour habiter la langue, pas pour la certifier.",
+        "empty": "Aucune étape définie."
+      },
+      "listens": {
+        "title": "Écoutes",
+        "description": "Réécoutes, séquences et voix de la maison.",
+        "empty": "Aucune écoute disponible pour l'instant.",
+        "soon": "Les écoutes ouvriront avec les premiers contenus Racines."
+      },
+      "coach": {
+        "title": "Mon coach",
+        "soon": "Le suivi humain ouvrira avec les premiers contenus.",
+        "empty": "Aucun coach affecté pour l'instant."
+      },
+      "circleSection": {
+        "title": "Cercle de palabre",
+        "soon": "Le cercle de ta maison sera disponible prochainement.",
+        "empty": "Aucun cercle actif pour l'instant."
+      },
+      "children": {
+        "title": "Le foyer",
+        "description": "Chaque profil a sa langue et son étape.",
+        "manage": "Gérer les profils",
+        "open": "Ouvrir le profil",
+        "ageYears": "{age} ans"
+      }
+    }
   }
 }

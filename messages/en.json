@@ -850,5 +850,172 @@
       "etape_en_cours": "step in progress",
       "etape_a_venir": "step upcoming"
     }
+  },
+  "yemaDashboards": {
+    "common": {
+      "loading": "Loading…",
+      "error": "Can't display this content",
+      "retry": "Retry",
+      "messagesSoon": "Messaging coming soon",
+      "messagesSoonHelp": "The messaging module opens in the next batch.",
+      "previewBadge": "Preview P-1 · work in progress"
+    },
+    "studentMonde": {
+      "personaLabel": "World learner",
+      "personaSubtitle": "The outward journey",
+      "sidebarSection": "My space",
+      "nav": {
+        "overview": "My dashboard",
+        "course": "My course",
+        "assignments": "My assignments",
+        "journey": "My journey",
+        "class": "My class",
+        "messages": "Messages"
+      },
+      "greetingFallback": "Welcome",
+      "metaLanguageLevel": "German · Level {level}",
+      "metaLanguageLevelUnknown": "German",
+      "overview": {
+        "title": "My dashboard",
+        "continueEyebrow": "Continue",
+        "continueTitle": "Continue the course",
+        "continueSubStart": "Your first step into German A1.",
+        "continueSubResume": "Pick up where you left off.",
+        "continueSubDone": "You completed the A1 programme.",
+        "continueSubNoAccess": "Your discovery journey is complete — activate your Passage to continue.",
+        "continueSubExpired": "Your progress is saved.",
+        "start": "Start",
+        "resume": "Resume",
+        "review": "Review my journey",
+        "activate": "Choose a Passage",
+        "seeOffers": "See offers",
+        "progressLabel": "Level progress",
+        "progressPct": "{pct}%",
+        "nextAssignmentsTitle": "Upcoming assignments",
+        "nextAssignmentsEmpty": "No assignments published yet.",
+        "nextAssignmentsUnavailable": "The assignments section isn't active yet.",
+        "recentActivityTitle": "Recent activity",
+        "recentActivityEmpty": "Nothing to show yet."
+      },
+      "course": {
+        "title": "My course",
+        "description": "Five A1 lessons to lay the foundations.",
+        "empty": "No lesson accessible yet.",
+        "seeLesson": "See lesson",
+        "modulesOf": "{done} of {total} modules",
+        "status": {
+          "completed": "Completed",
+          "inProgress": "In progress",
+          "open": "Start",
+          "locked": "Locked"
+        }
+      },
+      "assignments": {
+        "title": "My assignments",
+        "description": "Assignments published by your teachers.",
+        "empty": "No assignments published.",
+        "unavailable": "P4.5-B assignments aren't active yet.",
+        "open": "Open",
+        "status": {
+          "published": "Published",
+          "closed": "Closed"
+        },
+        "due": "Due {date}",
+        "noDue": "No due date"
+      },
+      "journey": {
+        "title": "My journey",
+        "description": "Your A1 → C2 path opens as you progress.",
+        "empty": "Your journey will open as soon as your Learning Path is active.",
+        "current": "In progress",
+        "levels": {
+          "A1": "Introduce yourself",
+          "A2": "Express yourself",
+          "B1": "Argue",
+          "B2": "Nuance",
+          "C1": "Debate",
+          "C2": "Transmit"
+        }
+      },
+      "classSection": {
+        "title": "My class",
+        "empty": "You are not attached to any class yet.",
+        "unavailable": "Your class isn't visible from this space yet.",
+        "classroomsSoon": "Your class information will be available soon."
+      },
+      "access": {
+        "active": "Active access",
+        "expired": "Access expired",
+        "none": "No access",
+        "daysRemaining": "{days, plural, one {1 day left} other {# days left}}"
+      }
+    },
+    "studentRacines": {
+      "personaLabel": "Roots learner",
+      "personaSubtitle": "The inward return",
+      "sidebarSection": "My home",
+      "nav": {
+        "overview": "My dashboard",
+        "steps": "My steps",
+        "listens": "Listens",
+        "coach": "My coach",
+        "circle": "Palaver circle",
+        "messages": "Messages"
+      },
+      "greetingFallback": "Welcome",
+      "metaLanguageStep": "Roots · Step {step}",
+      "metaLanguageOnly": "Roots",
+      "mode": {
+        "solo": "Solo space",
+        "family": "Family space",
+        "noAccess": "No access",
+        "unknown": "Status pending"
+      },
+      "overview": {
+        "title": "My dashboard",
+        "sequenceTitle": "Oral sequence",
+        "sequenceEmpty": "No oral sequence is active. It will open with the first content.",
+        "coachNextTitle": "Next coach session",
+        "coachNextEmpty": "No session scheduled yet.",
+        "circleTitle": "Palaver circle",
+        "circleSoon": "Your circle will open soon.",
+        "familyEmptyTitle": "Your home is waiting for its profiles",
+        "familyEmptyBody": "Configure your loved ones' profiles to start together.",
+        "familyEmptyCta": "Configure the home",
+        "noAccessTitle": "Your Roots journey isn't activated yet",
+        "noAccessBody": "Finish discovery or activate a Solo/Family subscription to open the home.",
+        "noAccessCta": "See offers",
+        "contentSoonTitle": "Your Roots language is coming soon",
+        "contentSoonBody": "We're preparing the tales, listens and activities with real voices."
+      },
+      "steps": {
+        "title": "My steps",
+        "description": "Five steps to inhabit the language, not to certify it.",
+        "empty": "No step defined."
+      },
+      "listens": {
+        "title": "Listens",
+        "description": "Replays, sequences and voices of the home.",
+        "empty": "No listen available yet.",
+        "soon": "Listens will open with the first Roots content."
+      },
+      "coach": {
+        "title": "My coach",
+        "soon": "Human support opens with the first content.",
+        "empty": "No coach assigned yet."
+      },
+      "circleSection": {
+        "title": "Palaver circle",
+        "soon": "Your home's circle will be available soon.",
+        "empty": "No active circle yet."
+      },
+      "children": {
+        "title": "The home",
+        "description": "Each profile has its language and its step.",
+        "manage": "Manage profiles",
+        "open": "Open profile",
+        "ageYears": "{age} yrs"
+      }
+    }
   }
 }

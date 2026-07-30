@@ -23,7 +23,8 @@ export type FeatureFlag =
   | "CLOSED_MESSAGING_ENABLED"
   | "NOTIFICATIONS_ENABLED"
   | "RACINES_COACH_OPERATIONAL"
-  | "QA_MODE_ENABLED";
+  | "QA_MODE_ENABLED"
+  | "DASHBOARD_REDESIGN_ENABLED";
 
 const P4_FLAGS: readonly FeatureFlag[] = [
   "CIRCLE_ENABLED",
@@ -39,6 +40,7 @@ const P4_FLAGS: readonly FeatureFlag[] = [
   "NOTIFICATIONS_ENABLED",
   "RACINES_COACH_OPERATIONAL",
   "QA_MODE_ENABLED",
+  "DASHBOARD_REDESIGN_ENABLED",
 ] as const;
 
 export function getFlag(name: FeatureFlag): boolean {
@@ -115,6 +117,18 @@ export function isAssignmentsActive(): boolean {
  */
 export function isAudioFeedbackActive(): boolean {
   return isAssignmentsActive() && getFlag("AUDIO_FEEDBACK_ENABLED");
+}
+
+/**
+ * P4.6 · refonte des 8 dashboards YEMA. Server-only : gate visuel qui
+ * remplace les anciens composants dashboards par les nouveaux
+ * (`src/features/dashboards/*`) sans changer les routes publiques.
+ * Flag `false` (défaut) = les anciens dashboards restent seuls en place,
+ * comportement byte-identique. Aucun `NEXT_PUBLIC_*`, jamais évalué côté
+ * client, aucun accès DB nécessaire.
+ */
+export function isYemaDashboardRedesignActive(): boolean {
+  return getFlag("DASHBOARD_REDESIGN_ENABLED");
 }
 
 export function assertFlagEnabled(name: FeatureFlag): void {

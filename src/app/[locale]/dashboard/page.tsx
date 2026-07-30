@@ -11,9 +11,12 @@
 import { redirect } from "@/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
+import { isYemaDashboardRedesignActive } from "@/lib/flags";
 import Layout from "@/components/Layout";
 import { DashboardMonde } from "@/components/monde/DashboardMonde";
 import { DashboardRacines } from "@/components/racines/DashboardRacines";
+import { StudentMondeDashboard } from "@/features/dashboards/student-monde";
+import { StudentRacinesDashboard } from "@/features/dashboards/student-racines";
 
 interface Props { params: Promise<{ locale: string }> }
 
@@ -39,7 +42,15 @@ export default async function DashboardPage({ params }: Props) {
 
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
 
+  // P4.6 · gate visuel refonte des dashboards. Flag off = comportement
+  // byte-identique aux anciens dashboards. Aucune nouvelle route, aucune
+  // modification de la redirection onboarding ni du resolver LearningPath.
+  const useRedesign = isYemaDashboardRedesignActive();
+
   if (lp.universe === "MONDE") {
+    if (useRedesign) {
+      return <StudentMondeDashboard locale={loc} />;
+    }
     return (
       <Layout title="Monde">
         <DashboardMonde locale={loc} />
@@ -48,6 +59,9 @@ export default async function DashboardPage({ params }: Props) {
   }
 
   // Racines (P3)
+  if (useRedesign) {
+    return <StudentRacinesDashboard locale={loc} />;
+  }
   return (
     <Layout title={loc === "en" ? "Roots" : "Racines"}>
       <DashboardRacines locale={loc} />
