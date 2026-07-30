@@ -1,33 +1,30 @@
 import "server-only";
-import { ProductCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { FamilyGuardianActor } from "./actor";
 
-// P4.6 Lot 5 · comptage des sièges enfants PAR UNIVERS.
+// P4.6 Lot 5.1 · comptage des sièges enfants PAR UNIVERS EXPLICITE.
 //
-// Doctrine commerciale (brief §3) :
-//   - ROOTS_FAMILY  → 4 sièges enfants Racines max
-//   - FAMILY_MONDE  → sièges enfants Monde (produit à créer plus tard,
-//                     absent pour l'instant → 0 sièges Monde par défaut)
+// Doctrine commerciale :
+//   - ROOTS_FAMILY        → 4 sièges enfants Racines max
+//   - CHILD_WORLD_SINGLE  → 1 siège enfant Monde
+//   - FAMILY_WORLD        → 3 sièges enfants Monde
+//   - Aucun produit Famille ne débloque un Passage Monde adulte.
 //
-// Un enfant est comptabilisé selon son univers dérivé de activeLangue
-// (native → RACINES, foreign → MONDE). Les enfants sans langue active
-// sont comptés comme MONDE par défaut (aligné sur inferUniverse).
-
-const RACINES_LANGS = new Set(["wolof", "douala", "lingala", "bambara", "yoruba", "swahili"]);
+// L'univers d'un enfant est lu depuis ChildProfile.universe (colonne
+// explicite ajoutée par la migration 20260731000001_p4_6_lot5_1_monde_seats_
+// universe). En transition, un enfant sans universe défini est classé
+// UNKNOWN et n'entre dans aucun compteur (n'occupe donc aucun siège tant
+// que le backfill n'a pas été fait). Aucune liste de langues n'est utilisée
+// comme autorité (patch Lot 5.1 §2).
 
 export type ChildUniverse = "MONDE" | "RACINES";
 
-function childUniverseFrom(activeLangue: string | null, langues: unknown): ChildUniverse {
-  if (activeLangue && RACINES_LANGS.has(activeLangue)) return "RACINES";
-  if (Array.isArray(langues)) {
-    for (const l of langues) {
-      const n = (l as { langue?: string } | null)?.langue;
-      if (typeof n === "string" && RACINES_LANGS.has(n)) return "RACINES";
-    }
-  }
-  return "MONDE";
-}
+// Barème par ProductCode. Additive · ajout futur direct dans la table.
+const CHILD_SEATS_PER_PRODUCT: Record<string, { monde: number; racines: number }> = {
+  ROOTS_FAMILY: { monde: 0, racines: 4 },
+  CHILD_WORLD_SINGLE: { monde: 1, racines: 0 },
+  FAMILY_WORLD: { monde: 3, racines: 0 },
+};
 
 export interface UniverseSeatSnapshot {
   universe: ChildUniverse;
@@ -42,7 +39,6 @@ export async function getUniverseSeats(actor: FamilyGuardianActor): Promise<{
 }> {
   const householdIds = Array.from(new Set([...actor.householdIdsOwned, ...actor.householdIdsMember]));
 
-  // Grants HOUSEHOLD ACTIVE (souscriptions du foyer).
   const grants = householdIds.length
     ? await prisma.accessGrant.findMany({
         where: {
@@ -54,27 +50,30 @@ export async function getUniverseSeats(actor: FamilyGuardianActor): Promise<{
       })
     : [];
 
+  let mondeMax = 0;
   let racinesMax = 0;
-  // FAMILY_MONDE (produit à créer ultérieurement) alimenterait mondeMax.
-  // Absent du catalogue Lot 5 → toujours 0 pour l'instant.
-  const mondeMax = 0;
   for (const g of grants) {
-    const code = g.productVariant.product.code;
-    if (code === ProductCode.ROOTS_FAMILY) racinesMax += 4;
+    const code = g.productVariant.product.code as string;
+    const rule = CHILD_SEATS_PER_PRODUCT[code];
+    if (rule) {
+      mondeMax += rule.monde;
+      racinesMax += rule.racines;
+    }
   }
 
-  // Enfants existants du parent (source de vérité pour "used").
+  // Enfants existants du parent. On lit uniquement `universe` (autorité
+  // canonique Lot 5.1). Les enfants sans universe (backfill en attente)
+  // n'occupent aucun siège.
   const children = await prisma.childProfile.findMany({
     where: { parentUserId: actor.userId },
-    select: { id: true, activeLangue: true, langues: true },
+    select: { id: true, universe: true },
   });
 
-  let racinesUsed = 0;
   let mondeUsed = 0;
+  let racinesUsed = 0;
   for (const c of children) {
-    const uni = childUniverseFrom(c.activeLangue, c.langues);
-    if (uni === "RACINES") racinesUsed += 1;
-    else mondeUsed += 1;
+    if (c.universe === "MONDE") mondeUsed += 1;
+    else if (c.universe === "RACINES") racinesUsed += 1;
   }
 
   return {
@@ -93,9 +92,7 @@ export async function getUniverseSeats(actor: FamilyGuardianActor): Promise<{
   };
 }
 
-export type UniverseSeatDenial =
-  | "no_universe_subscription"
-  | "universe_seats_exhausted";
+export type UniverseSeatDenial = "no_universe_subscription" | "universe_seats_exhausted";
 
 export async function assertUniverseSeatAvailable(
   actor: FamilyGuardianActor,
@@ -106,4 +103,9 @@ export async function assertUniverseSeatAvailable(
   if (snap.seatsMax <= 0) return { ok: false, error: "no_universe_subscription" };
   if (snap.seatsAvailable <= 0) return { ok: false, error: "universe_seats_exhausted" };
   return { ok: true };
+}
+
+// Exportée pour usage direct dans le seed / QA fixtures et tests.
+export function seatCapacityForProduct(code: string): { monde: number; racines: number } {
+  return CHILD_SEATS_PER_PRODUCT[code] ?? { monde: 0, racines: 0 };
 }

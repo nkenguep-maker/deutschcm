@@ -73,6 +73,10 @@ enum ProductCode {
   COMPANION
   // P4.1 — offre "Suivi Racines" 30 000 XAF / 45 € (Q7/Q15 validées).
   ROOTS_COACH_ADDON
+  // P4.6 Lot 5.1 · offres Enfant Monde. SINGLE = 1 siège enfant, FAMILY_WORLD = 3 sièges.
+  // Aucun de ces produits ne débloque un Passage Monde adulte.
+  CHILD_WORLD_SINGLE
+  FAMILY_WORLD
 }
 
 enum BillingType {
@@ -1233,6 +1237,10 @@ model ChildProfile {
   // que l'enfant en ait un. Jamais retourné par API ni au client.
   pinHash      String?
   pinUpdatedAt DateTime?
+  // P4.6 Lot 5.1 · univers canonique de l'enfant (autorité pour dispatch
+  // dashboard + comptage sièges). Ne plus dériver de la langue.
+  // Nullable pour préserver les enfants existants avant backfill P-1.
+  universe     Universe?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

@@ -262,14 +262,22 @@ async function main() {
     select: { id: true, product: { select: { code: true } } },
     orderBy: { createdAt: "asc" },
   });
+  // P4.6 Lot 5.1 · FAMILY_WORLD = 3 sièges Enfant Monde (couvre l'enfant
+  // Monde bakée). Ne débloque JAMAIS de Passage Monde adulte.
+  const familyWorldVariant = await db.productVariant.findFirst({
+    where: { product: { code: "FAMILY_WORLD" }, active: true },
+    select: { id: true, product: { select: { code: true } } },
+    orderBy: { createdAt: "asc" },
+  });
   let familySeatGrantId = null;
   let familyHouseholdId = null;
+  let familyWorldGrantId = null;
   let childMondeId = null;
   let childRacinesId = null;
-  if (!rootsFamilyVariant) {
+  if (!rootsFamilyVariant || !familyWorldVariant) {
     process.stderr.write(
-      "\n⚠ fixture Family : product ROOTS_FAMILY absent du catalogue P-1 — " +
-      "exécuter `npx prisma db seed` sur P-1 pour l'ajouter puis re-baker.\n",
+      "\n⚠ fixture Family : product ROOTS_FAMILY ou FAMILY_WORLD absent du " +
+      "catalogue P-1 — exécuter `npx prisma db seed` sur P-1 puis re-baker.\n",
     );
   } else {
     const householdId = `${PREFIX}household_family`;
@@ -321,7 +329,27 @@ async function main() {
     });
     familySeatGrantId = seatGrantId;
 
+    // P4.6 Lot 5.1 · Grant HOUSEHOLD FAMILY_WORLD (3 sièges Enfant Monde).
+    const familyWorldGrantIdLocal = `${PREFIX}grant_hh_family_world`;
+    await db.accessGrant.upsert({
+      where: { id: familyWorldGrantIdLocal },
+      update: { status: "ACTIVE" },
+      create: {
+        id: familyWorldGrantIdLocal,
+        beneficiaryType: "HOUSEHOLD",
+        beneficiaryId: household.id,
+        productVariantId: familyWorldVariant.id,
+        sourceType: "SUBSCRIPTION",
+        sourceId: `${PREFIX}order_family_world`,
+        status: "ACTIVE",
+        startsAt: now,
+      },
+    });
+    familyWorldGrantId = familyWorldGrantIdLocal;
+
     // 2 ChildProfile avec PIN hashé (« 1234 » pour QA, hashé scrypt).
+    // P4.6 Lot 5.1 · universe explicite (MONDE / RACINES), plus aucune
+    // inférence depuis la langue.
     const [pinHashA, pinHashB] = await Promise.all([hashChildPin("1234"), hashChildPin("5678")]);
     const childMonde = await db.childProfile.upsert({
       where: { id: `${PREFIX}child_family_monde` },
@@ -329,6 +357,7 @@ async function main() {
         pinHash: pinHashA,
         pinUpdatedAt: now,
         householdId: household.id,
+        universe: "MONDE",
       },
       create: {
         id: `${PREFIX}child_family_monde`,
@@ -341,6 +370,7 @@ async function main() {
         activeLangue: "deutsch",
         pinHash: pinHashA,
         pinUpdatedAt: now,
+        universe: "MONDE",
       },
     });
     childMondeId = childMonde.id;
@@ -350,6 +380,7 @@ async function main() {
         pinHash: pinHashB,
         pinUpdatedAt: now,
         householdId: household.id,
+        universe: "RACINES",
       },
       create: {
         id: `${PREFIX}child_family_racines`,
@@ -362,6 +393,7 @@ async function main() {
         activeLangue: "wolof",
         pinHash: pinHashB,
         pinUpdatedAt: now,
+        universe: "RACINES",
       },
     });
     childRacinesId = childRacines.id;
@@ -379,9 +411,11 @@ async function main() {
     family: {
       householdId: familyHouseholdId,
       seatGrantId: familySeatGrantId,
+      familyWorldGrantId,
       childMondeId,
       childRacinesId,
       rootsFamilyVariant: rootsFamilyVariant?.id ?? null,
+      familyWorldVariant: familyWorldVariant?.id ?? null,
     },
   };
   process.stderr.write(`\n${JSON.stringify(summary, null, 2)}\n\nQA FIXTURES READY\n`);

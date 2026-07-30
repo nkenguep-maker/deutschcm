@@ -3,14 +3,24 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import {
   CHILD_SESSION_COOKIE_NAME,
+  pinVersionMatches,
   verifyChildSession,
 } from "@/lib/security/childSession";
 
-// P4.6 Lot 5 · resolveur central de la session enfant (server-only).
+// P4.6 Lot 5 (+ 5.1) · resolveur central de la session enfant (server-only).
 //
-// Retourne le ChildProfile réel ou null. Vérifie systématiquement la
-// signature HMAC, l'expiration, et l'existence du profil en DB. Aucun
-// pinHash n'est jamais retourné.
+// Contrôles empilés (échec silencieux → null) :
+//   1. Cookie présent
+//   2. Signature HMAC valide + non expiré
+//   3. ChildProfile existe en DB
+//   4. Version PIN dans le cookie = ChildProfile.pinUpdatedAt actuel
+//      (Lot 5.1 · invalidation immédiate après changement PIN)
+//   5. ChildProfile.universe défini (Lot 5.1 · fail-closed : aucun
+//      enfant non backfillé ne peut entrer en session)
+//
+// L'univers est lu depuis ChildProfile.universe (colonne explicite Lot
+// 5.1 · plus aucune inférence depuis la liste de langues). Aucun
+// pinHash ni pinUpdatedAt n'est jamais retourné dans le shape public.
 
 export interface ChildSessionActor {
   childProfileId: string;
@@ -22,21 +32,6 @@ export interface ChildSessionActor {
   langues: unknown[];
   householdId: string | null;
   universe: "MONDE" | "RACINES";
-}
-
-// Mapping langue → univers · aligné sur src/lib/languages.ts (native →
-// RACINES, foreign → MONDE). Approximation minimale ; à raffiner si la
-// détection d'univers devient plus complexe.
-function inferUniverse(activeLangue: string | null, langues: unknown[]): "MONDE" | "RACINES" {
-  const RACINES_LANGS = new Set(["wolof", "douala", "lingala", "bambara", "yoruba", "swahili"]);
-  if (activeLangue && RACINES_LANGS.has(activeLangue)) return "RACINES";
-  if (Array.isArray(langues)) {
-    for (const l of langues) {
-      const langName = (l as { langue?: string } | null)?.langue;
-      if (typeof langName === "string" && RACINES_LANGS.has(langName)) return "RACINES";
-    }
-  }
-  return "MONDE";
 }
 
 export async function resolveActiveChildSession(): Promise<ChildSessionActor | null> {
@@ -58,9 +53,18 @@ export async function resolveActiveChildSession(): Promise<ChildSessionActor | n
       activeLangue: true,
       langues: true,
       householdId: true,
+      universe: true,
+      pinUpdatedAt: true,
     },
   });
   if (!child) return null;
+
+  // Lot 5.1 · rejet immédiat si le PIN a été changé depuis émission.
+  if (!pinVersionMatches(check.payload.pv, child.pinUpdatedAt)) return null;
+
+  // Lot 5.1 · fail-closed sur l'univers · un enfant non backfillé n'entre
+  // dans aucun dashboard tant qu'il n'a pas de valeur explicite.
+  if (child.universe !== "MONDE" && child.universe !== "RACINES") return null;
 
   return {
     childProfileId: child.id,
@@ -71,6 +75,6 @@ export async function resolveActiveChildSession(): Promise<ChildSessionActor | n
     activeLangue: child.activeLangue,
     langues: (child.langues as unknown[]) ?? [],
     householdId: child.householdId,
-    universe: inferUniverse(child.activeLangue, (child.langues as unknown[]) ?? []),
+    universe: child.universe,
   };
 }

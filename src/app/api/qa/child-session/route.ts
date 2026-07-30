@@ -65,12 +65,13 @@ export async function GET(req: NextRequest) {
   const childId = FIXTURE_CHILD_IDS[childParam];
   const child = await prisma.childProfile.findFirst({
     where: { id: childId, parentUserId: parent.id },
-    select: { id: true },
+    select: { id: true, pinUpdatedAt: true },
   });
   if (!child) return notFound("child_not_owned");
 
-  // 4. Set cookie signé HMAC.
-  const cookieValue = encodeChildSession(child.id);
+  // 4. Set cookie signé HMAC · pinUpdatedAt encodé pour invalidation
+  // automatique lors d'un futur changement de PIN (Lot 5.1 §3).
+  const cookieValue = encodeChildSession(child.id, child.pinUpdatedAt);
   if (!cookieValue) return notFound("secret_unavailable");
 
   const jar = await cookies();

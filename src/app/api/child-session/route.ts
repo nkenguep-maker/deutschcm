@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   // 3. Vérification ownership + PIN côté serveur.
   const child = await prisma.childProfile.findFirst({
     where: { id: childProfileId, parentUserId: actor.userId },
-    select: { id: true, pinHash: true },
+    select: { id: true, pinHash: true, pinUpdatedAt: true },
   });
   if (!child) return err("NOT_FOUND", 404);
   if (!child.pinHash) return err("PIN_NOT_SET", 409);
@@ -64,8 +64,9 @@ export async function POST(req: NextRequest) {
   const ok = await verifyChildPin(pin, child.pinHash);
   if (!ok) return err("PIN_INVALID", 401);
 
-  // 4. Émission cookie signé.
-  const cookieValue = encodeChildSession(child.id);
+  // 4. Émission cookie signé · version PIN incluse (Lot 5.1) pour
+  // invalider automatiquement toute session antérieure après changement.
+  const cookieValue = encodeChildSession(child.id, child.pinUpdatedAt);
   if (!cookieValue) return err("SECRET_UNAVAILABLE", 500);
 
   const jar = await cookies();

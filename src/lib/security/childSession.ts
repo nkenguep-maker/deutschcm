@@ -23,6 +23,12 @@ export const CHILD_SESSION_TTL_SECONDS = 30 * 60;
 
 export interface ChildSessionPayload {
   childProfileId: string;
+  // P4.6 Lot 5.1 · invalidation immédiate après changement PIN.
+  // `pv` = pinVersion = timestamp ms de ChildProfile.pinUpdatedAt (ou 0
+  // si aucun PIN au moment de l'émission). resolveActiveChildSession
+  // compare ce champ à la valeur DB actuelle et refuse tout mismatch.
+  // Aucun hash de PIN ne circule dans le cookie.
+  pv: number;
   iat: number; // seconds since epoch
   exp: number;
 }
@@ -50,10 +56,16 @@ function sign(payload: string): string | null {
   return b64url(createHmac("sha256", secret).update(payload).digest());
 }
 
-export function encodeChildSession(childProfileId: string, nowSec?: number): string | null {
+export function encodeChildSession(
+  childProfileId: string,
+  pinUpdatedAt: Date | null,
+  nowSec?: number,
+): string | null {
   const now = nowSec ?? Math.floor(Date.now() / 1000);
+  const pv = pinUpdatedAt ? pinUpdatedAt.getTime() : 0;
   const payload: ChildSessionPayload = {
     childProfileId,
+    pv,
     iat: now,
     exp: now + CHILD_SESSION_TTL_SECONDS,
   };
@@ -61,6 +73,13 @@ export function encodeChildSession(childProfileId: string, nowSec?: number): str
   const sig = sign(body);
   if (!sig) return null;
   return `${body}.${sig}`;
+}
+
+// Utilitaire pour comparer une pinUpdatedAt DB à la version encodée
+// dans le cookie. Retourne true si la version courante correspond.
+export function pinVersionMatches(payloadPv: number, currentPinUpdatedAt: Date | null): boolean {
+  const currentPv = currentPinUpdatedAt ? currentPinUpdatedAt.getTime() : 0;
+  return payloadPv === currentPv;
 }
 
 export type ChildSessionVerification =
@@ -84,7 +103,12 @@ export function verifyChildSession(cookie: string, nowSec?: number): ChildSessio
   } catch {
     return { ok: false, reason: "malformed" };
   }
-  if (typeof payload.childProfileId !== "string" || typeof payload.iat !== "number" || typeof payload.exp !== "number") {
+  if (
+    typeof payload.childProfileId !== "string" ||
+    typeof payload.iat !== "number" ||
+    typeof payload.exp !== "number" ||
+    typeof payload.pv !== "number"
+  ) {
     return { ok: false, reason: "malformed" };
   }
   const now = nowSec ?? Math.floor(Date.now() / 1000);

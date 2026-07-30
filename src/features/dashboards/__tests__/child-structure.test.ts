@@ -195,13 +195,26 @@ describe("Session enfant sécurité (Lot 5)", () => {
   });
 });
 
-describe("Universe seat counting (Lot 5)", () => {
-  it("childSeatsUniverse : ROOTS_FAMILY donne 4 sièges Racines, aucun Monde par défaut", () => {
-    const src = readFileSync(resolve(__dirname, "../../../lib/family/childSeatsUniverse.ts"), "utf-8");
-    expect(src).toMatch(/ProductCode\.ROOTS_FAMILY/);
-    expect(src).toMatch(/racinesMax \+= 4/);
-    // Aucune mention d'un +=1 ou +=X sur mondeMax hors commentaires
-    const noComments = src.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
-    expect(noComments).not.toMatch(/mondeMax\s*\+=\s*\d+/);
+describe("Universe seat counting (Lot 5 + 5.1)", () => {
+  // Lot 5.1 · le module utilise une table (CHILD_SEATS_PER_PRODUCT) au
+  // lieu d'un switch. La couverture précise est faite par la suite
+  // src/lib/__tests__/childSeatsUniverse.test.ts (12 cas). Ici on vérifie
+  // uniquement les invariants structurels.
+  const src = readFileSync(resolve(__dirname, "../../../lib/family/childSeatsUniverse.ts"), "utf-8");
+  const stripComments = (s: string) =>
+    s.replace(/\/\/[^\n]*/g, "").replace(/\/\*[\s\S]*?\*\//g, "");
+
+  it("expose la doctrine par ProductCode (ROOTS_FAMILY, CHILD_WORLD_SINGLE, FAMILY_WORLD)", () => {
+    expect(src).toMatch(/ROOTS_FAMILY/);
+    expect(src).toMatch(/CHILD_WORLD_SINGLE/);
+    expect(src).toMatch(/FAMILY_WORLD/);
+  });
+
+  it("compte les enfants via ChildProfile.universe explicite (Lot 5.1)", () => {
+    // Le module doit lire c.universe, pas dériver depuis c.activeLangue.
+    const noComments = stripComments(src);
+    expect(noComments).toMatch(/c\.universe\s*===\s*"MONDE"/);
+    expect(noComments).toMatch(/c\.universe\s*===\s*"RACINES"/);
+    expect(noComments).not.toMatch(/RACINES_LANGS/);
   });
 });
