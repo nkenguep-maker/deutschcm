@@ -74,7 +74,7 @@ describe("Texte long · anti-overflow explicite", () => {
 });
 
 describe("Admin dashboard · grilles fluides", () => {
-  const src = read("src/app/[locale]/admin/page.tsx");
+  const src = read("src/app/[locale]/admin/LegacyAdminDashboard.tsx");
   it("KPIs ne sont plus figés en 5 colonnes", () => {
     expect(src).not.toMatch(/gridTemplateColumns:\s*["']repeat\(5,1fr\)["']/);
   });
@@ -110,7 +110,7 @@ describe("Safe-area et viewport", () => {
 
 describe("Shell mobile · header et admin drawer", () => {
   const css = read("src/app/globals.css");
-  const admin = read("src/app/[locale]/admin/page.tsx");
+  const admin = read("src/app/[locale]/admin/LegacyAdminDashboard.tsx");
 
   it("compression header actions sous 480px", () => {
     expect(css).toMatch(/@media \(max-width: 480px\)[\s\S]*?\.lang-chooser-name[\s\S]*?display: none/);

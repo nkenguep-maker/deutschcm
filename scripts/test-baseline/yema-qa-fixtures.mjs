@@ -11,6 +11,21 @@ import { assertNonProduction, getTestPassword } from "./_common.mjs";
 import { createClient } from "@supabase/supabase-js";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { randomBytes, scrypt as _scrypt } from "node:crypto";
+import { promisify } from "node:util";
+
+// P4.6 Lot 4A · hash PIN enfant canonique (miroir de src/lib/security/childPin.ts).
+// Le module TS n'est pas importable ici (ESM pur, aucun bundler). On duplique
+// intentionnellement les 8 lignes cryptographiques pour éviter un layer de build.
+const _scryptAsync = promisify(_scrypt);
+async function hashChildPin(pin) {
+  if (!/^\d{4,6}$/.test(pin)) throw new Error("invalid_pin_format");
+  const salt = randomBytes(16);
+  const key = await _scryptAsync(Buffer.from(pin, "utf8"), salt, 64, {
+    N: 1 << 15, r: 8, p: 1, maxmem: 64 * 1024 * 1024,
+  });
+  return `scrypt$${salt.toString("base64")}$${key.toString("base64")}`;
+}
 
 assertNonProduction();
 const PASSWORD = getTestPassword();
@@ -28,6 +43,7 @@ const db = new PrismaClient({
 const PREFIX = "test_yema_qa_";
 // student_monde et student_racines · profils/parcours distincts (LP MONDE
 // DEUTSCH vs LP RACINES WOLOF onboarded) · aucun mélange.
+// family (P4.6 Lot 4A) · guardian principal · appRole PARENT.
 const PERSONAS = [
   { label: "super_admin",     email: `${PREFIX}super_admin@example.com`,     role: "ADMIN",   appRole: "YEMA_ADMIN" },
   { label: "teacher",         email: `${PREFIX}teacher@example.com`,         role: "TEACHER", appRole: null },
@@ -35,6 +51,7 @@ const PERSONAS = [
   { label: "center_admin",    email: `${PREFIX}center_admin@example.com`,    role: "CENTER",  appRole: "CENTER_ADMIN" },
   { label: "student_monde",   email: `${PREFIX}student_monde@example.com`,   role: "STUDENT", appRole: "LEARNER" },
   { label: "student_racines", email: `${PREFIX}student_racines@example.com`, role: "STUDENT", appRole: "LEARNER" },
+  { label: "family",          email: `${PREFIX}family@example.com`,          role: "STUDENT", appRole: "PARENT" },
 ];
 
 async function listAllAuthMatching(prefix) {
@@ -70,6 +87,7 @@ async function syncMetadata(supabaseId, appRole) {
     : appRole === "YEMA_ADMIN" ? "ADMIN"
     : appRole === "RACINES_COACH" ? "STUDENT"
     : appRole === "LEARNER" ? "STUDENT"
+    : appRole === "PARENT" ? "STUDENT" // P4.6 Lot 4A · family guardian
     : "TEACHER";
   const rolesList = [activeSpace];
   const onboardedMap = { [activeSpace]: true };
@@ -233,6 +251,122 @@ async function main() {
     });
   }
 
+  // ─── P4.6 Lot 4A · fixture Famille ────────────────────────────────
+  // Guardian principal (family) · Household · 2 ChildProfile (Monde WOLOF
+  // + Racines) avec PIN hashé · AccessGrant HOUSEHOLD ROOTS_FAMILY
+  // (souscription du foyer) + 1 AccessGrant USER ROOTS_FAMILY (siège
+  // adulte explicit du guardian). AUCUN Passage Monde adulte.
+  const familyUser = created.family;
+  const rootsFamilyVariant = await db.productVariant.findFirst({
+    where: { product: { code: "ROOTS_FAMILY" }, active: true },
+    select: { id: true, product: { select: { code: true } } },
+    orderBy: { createdAt: "asc" },
+  });
+  let familySeatGrantId = null;
+  let familyHouseholdId = null;
+  let childMondeId = null;
+  let childRacinesId = null;
+  if (!rootsFamilyVariant) {
+    process.stderr.write(
+      "\n⚠ fixture Family : product ROOTS_FAMILY absent du catalogue P-1 — " +
+      "exécuter `npx prisma db seed` sur P-1 pour l'ajouter puis re-baker.\n",
+    );
+  } else {
+    const householdId = `${PREFIX}household_family`;
+    const household = await db.household.upsert({
+      where: { id: householdId },
+      update: {},
+      create: { id: householdId, ownerUserId: familyUser.dbId },
+    });
+    familyHouseholdId = household.id;
+    await db.householdMembership.upsert({
+      where: { householdId_userId: { householdId, userId: familyUser.dbId } },
+      update: { status: "ACTIVE" },
+      create: { householdId, userId: familyUser.dbId, role: "OWNER", status: "ACTIVE" },
+    });
+
+    // Grant HOUSEHOLD (souscription du foyer).
+    const householdGrantId = `${PREFIX}grant_hh_family`;
+    await db.accessGrant.upsert({
+      where: { id: householdGrantId },
+      update: { status: "ACTIVE" },
+      create: {
+        id: householdGrantId,
+        beneficiaryType: "HOUSEHOLD",
+        beneficiaryId: household.id,
+        productVariantId: rootsFamilyVariant.id,
+        sourceType: "SUBSCRIPTION",
+        sourceId: `${PREFIX}order_family`,
+        status: "ACTIVE",
+        startsAt: now,
+      },
+    });
+
+    // Grant USER (siège adulte attribué explicitement au guardian).
+    const seatGrantId = `${PREFIX}grant_user_family_seat_owner`;
+    await db.accessGrant.upsert({
+      where: { id: seatGrantId },
+      update: { status: "ACTIVE" },
+      create: {
+        id: seatGrantId,
+        beneficiaryType: "USER",
+        beneficiaryId: familyUser.dbId,
+        productVariantId: rootsFamilyVariant.id,
+        sourceType: "SUBSCRIPTION",
+        sourceId: household.id,
+        status: "ACTIVE",
+        startsAt: now,
+        metadata: { seatType: "ADULT_ROOTS", householdId: household.id },
+      },
+    });
+    familySeatGrantId = seatGrantId;
+
+    // 2 ChildProfile avec PIN hashé (« 1234 » pour QA, hashé scrypt).
+    const [pinHashA, pinHashB] = await Promise.all([hashChildPin("1234"), hashChildPin("5678")]);
+    const childMonde = await db.childProfile.upsert({
+      where: { id: `${PREFIX}child_family_monde` },
+      update: {
+        pinHash: pinHashA,
+        pinUpdatedAt: now,
+        householdId: household.id,
+      },
+      create: {
+        id: `${PREFIX}child_family_monde`,
+        parentUserId: familyUser.dbId,
+        householdId: household.id,
+        prenom: "Lina",
+        avatarAnimal: "panda",
+        age: 8,
+        langues: [{ langue: "deutsch", type: "foreign", echelle: 0, etoiles: 0, motsAppris: [] }],
+        activeLangue: "deutsch",
+        pinHash: pinHashA,
+        pinUpdatedAt: now,
+      },
+    });
+    childMondeId = childMonde.id;
+    const childRacines = await db.childProfile.upsert({
+      where: { id: `${PREFIX}child_family_racines` },
+      update: {
+        pinHash: pinHashB,
+        pinUpdatedAt: now,
+        householdId: household.id,
+      },
+      create: {
+        id: `${PREFIX}child_family_racines`,
+        parentUserId: familyUser.dbId,
+        householdId: household.id,
+        prenom: "Aïcha",
+        avatarAnimal: "chouette",
+        age: 6,
+        langues: [{ langue: "wolof", type: "native", echelle: 0, etoiles: 0, motsAppris: [] }],
+        activeLangue: "wolof",
+        pinHash: pinHashB,
+        pinUpdatedAt: now,
+      },
+    });
+    childRacinesId = childRacines.id;
+  }
+
   const summary = {
     personas: Object.fromEntries(
       Object.entries(created).map(([k, v]) => [k, { email: v.email, role: v.role }]),
@@ -241,6 +375,13 @@ async function main() {
       classroom: classroom.id, assignment: asm.id,
       submissionDraft: subDraft.id, submissionSubmitted: subSubmitted.id,
       feedbackPublished: fb.id,
+    },
+    family: {
+      householdId: familyHouseholdId,
+      seatGrantId: familySeatGrantId,
+      childMondeId,
+      childRacinesId,
+      rootsFamilyVariant: rootsFamilyVariant?.id ?? null,
     },
   };
   process.stderr.write(`\n${JSON.stringify(summary, null, 2)}\n\nQA FIXTURES READY\n`);

@@ -1262,6 +1262,138 @@
       "error": "Cannot load your home.",
       "retry": "Retry",
       "permissionDenied": "This space requires a family guardian account."
+    },
+    "center": {
+      "personaLabel": "Center administrator",
+      "personaSubtitle": "Your YEMA center",
+      "sidebarSection": "My center",
+      "greetingFallback": "Welcome",
+      "meta": "Center {name}",
+      "metaMinimal": "YEMA center",
+      "nav": {
+        "overview": "Center view",
+        "students": "Students",
+        "teachers": "Teachers",
+        "classes": "Classes",
+        "billing": "Billing",
+        "messages": "Messages",
+        "settings": "Settings"
+      },
+      "mobileNav": {
+        "overview": "Center",
+        "students": "Students",
+        "classes": "Classes",
+        "billing": "Billing",
+        "messages": "Messages"
+      },
+      "overview": {
+        "title": "Center view",
+        "kpisStudents": "Active students",
+        "kpisTeachers": "Teachers",
+        "kpisClassrooms": "Classes",
+        "kpisPending": "Pending enrolments",
+        "kpisEmptyHelp": "Metrics will appear as soon as a student or class becomes active.",
+        "openTasks": "To review",
+        "noOpenTasks": "Nothing to review for now."
+      },
+      "students": {
+        "title": "Students",
+        "description": "Students attached to your center.",
+        "empty": "No student enrolled yet.",
+        "loadFailed": "Cannot load the student list.",
+        "openStudent": "Open",
+        "levelLabel": "Level {level}"
+      },
+      "teachers": {
+        "title": "Teachers",
+        "description": "Teachers attached to your center.",
+        "empty": "No teacher assigned yet.",
+        "loadFailed": "Cannot load the teacher list.",
+        "openTeacher": "Open"
+      },
+      "classes": {
+        "title": "Classes",
+        "description": "Active classes of the center.",
+        "empty": "No active class yet.",
+        "loadFailed": "Cannot load classes.",
+        "levelLabel": "Level {level}",
+        "studentsCount": "{count, plural, one {1 student} other {# students}}",
+        "openClass": "Open"
+      },
+      "billing": {
+        "title": "Billing",
+        "description": "Real financial state of the center.",
+        "notWired": "Billing data is not available for your center yet.",
+        "empty": "No invoice to show yet."
+      },
+      "messages": {
+        "title": "Messages",
+        "soon": "Internal messaging and payment reminders will be available soon."
+      },
+      "settings": {
+        "title": "Settings",
+        "description": "Center details, team and preferences.",
+        "empty": "Configuration coming soon."
+      },
+      "loading": "Loading your center…",
+      "error": "Cannot load your center.",
+      "retry": "Retry",
+      "workspaceOff": "The center space isn't enabled on this environment yet."
+    },
+    "admin": {
+      "personaLabel": "Super Admin",
+      "personaSubtitle": "YEMA administration console",
+      "sidebarSection": "Console",
+      "nav": {
+        "console": "Console",
+        "accounts": "Accounts",
+        "audit": "Audit",
+        "environment": "Environment"
+      },
+      "mobileNav": {
+        "console": "Console",
+        "accounts": "Accounts",
+        "audit": "Audit",
+        "environment": "Env."
+      },
+      "console": {
+        "title": "Console",
+        "envLabel": "Environment",
+        "envUnknown": "not set",
+        "qaStatus": "QA console",
+        "qaActive": "active",
+        "qaInactive": "inactive",
+        "productionIntact": "Production untouched",
+        "productionIntactHelp": "No command in this batch ran against Production.",
+        "noAlerts": "No active alert."
+      },
+      "accounts": {
+        "title": "Accounts",
+        "description": "QA personas available for « Test as… ».",
+        "personasCount": "{count} personas",
+        "openPersona": "Test as",
+        "unavailable": "unavailable",
+        "roleLabel": "Role",
+        "destinationLabel": "Destination"
+      },
+      "audit": {
+        "title": "Audit",
+        "description": "Recent YEMA audit events.",
+        "empty": "No event to show.",
+        "loadFailed": "Cannot load the audit log.",
+        "actorAnonymous": "anonymous actor"
+      },
+      "environment": {
+        "title": "Environment",
+        "projectRef": "Supabase project ref",
+        "flagsTitle": "Feature flags",
+        "qaSessionTitle": "QA session",
+        "qaSessionMinutes": "{minutes} min max",
+        "noSecretsHelp": "No secret, key, token or signed URL is displayed here."
+      },
+      "loading": "Loading console…",
+      "error": "Cannot load console.",
+      "retry": "Retry"
     }
   }
 }

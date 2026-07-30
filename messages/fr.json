@@ -1262,6 +1262,138 @@
       "error": "Impossible de charger votre foyer.",
       "retry": "Réessayer",
       "permissionDenied": "Cet espace nécessite un compte responsable de famille."
+    },
+    "center": {
+      "personaLabel": "Administrateur de centre",
+      "personaSubtitle": "Ton centre YEMA",
+      "sidebarSection": "Mon centre",
+      "greetingFallback": "Bienvenue",
+      "meta": "Centre {name}",
+      "metaMinimal": "Centre YEMA",
+      "nav": {
+        "overview": "Vue du centre",
+        "students": "Élèves",
+        "teachers": "Enseignants",
+        "classes": "Classes",
+        "billing": "Facturation",
+        "messages": "Messages",
+        "settings": "Paramètres"
+      },
+      "mobileNav": {
+        "overview": "Centre",
+        "students": "Élèves",
+        "classes": "Classes",
+        "billing": "Facturation",
+        "messages": "Messages"
+      },
+      "overview": {
+        "title": "Vue du centre",
+        "kpisStudents": "Élèves actifs",
+        "kpisTeachers": "Enseignants",
+        "kpisClassrooms": "Classes",
+        "kpisPending": "Inscriptions en attente",
+        "kpisEmptyHelp": "Les métriques s'afficheront dès qu'un·e élève ou une classe seront actifs.",
+        "openTasks": "À traiter",
+        "noOpenTasks": "Rien à traiter pour l'instant."
+      },
+      "students": {
+        "title": "Élèves",
+        "description": "Élèves affectés à votre centre.",
+        "empty": "Aucun élève inscrit pour l'instant.",
+        "loadFailed": "Impossible de charger la liste des élèves.",
+        "openStudent": "Ouvrir",
+        "levelLabel": "Niveau {level}"
+      },
+      "teachers": {
+        "title": "Enseignants",
+        "description": "Enseignants affectés à votre centre.",
+        "empty": "Aucun enseignant affecté pour l'instant.",
+        "loadFailed": "Impossible de charger la liste des enseignants.",
+        "openTeacher": "Ouvrir"
+      },
+      "classes": {
+        "title": "Classes",
+        "description": "Classes actives du centre.",
+        "empty": "Aucune classe active pour l'instant.",
+        "loadFailed": "Impossible de charger les classes.",
+        "levelLabel": "Niveau {level}",
+        "studentsCount": "{count, plural, one {1 élève} other {# élèves}}",
+        "openClass": "Ouvrir"
+      },
+      "billing": {
+        "title": "Facturation",
+        "description": "État financier réel du centre.",
+        "notWired": "Les données de facturation ne sont pas encore disponibles pour votre centre.",
+        "empty": "Aucune facture à afficher pour l'instant."
+      },
+      "messages": {
+        "title": "Messages",
+        "soon": "La messagerie interne et les rappels de paiement seront bientôt disponibles."
+      },
+      "settings": {
+        "title": "Paramètres",
+        "description": "Coordonnées du centre, équipe et préférences.",
+        "empty": "Configuration à venir."
+      },
+      "loading": "Chargement de votre centre…",
+      "error": "Impossible de charger votre centre.",
+      "retry": "Réessayer",
+      "workspaceOff": "L'espace centre n'est pas encore activé sur cet environnement."
+    },
+    "admin": {
+      "personaLabel": "Super Admin",
+      "personaSubtitle": "Console d'administration YEMA",
+      "sidebarSection": "Console",
+      "nav": {
+        "console": "Console",
+        "accounts": "Comptes",
+        "audit": "Audit",
+        "environment": "Environnement"
+      },
+      "mobileNav": {
+        "console": "Console",
+        "accounts": "Comptes",
+        "audit": "Audit",
+        "environment": "Env."
+      },
+      "console": {
+        "title": "Console",
+        "envLabel": "Environnement",
+        "envUnknown": "non renseigné",
+        "qaStatus": "Console QA",
+        "qaActive": "active",
+        "qaInactive": "inactive",
+        "productionIntact": "Production intacte",
+        "productionIntactHelp": "Aucune commande de ce lot ne s'est exécutée en Production.",
+        "noAlerts": "Aucune alerte active."
+      },
+      "accounts": {
+        "title": "Comptes",
+        "description": "Personas QA disponibles pour « Tester comme… ».",
+        "personasCount": "{count} personas",
+        "openPersona": "Tester comme",
+        "unavailable": "indisponible",
+        "roleLabel": "Rôle",
+        "destinationLabel": "Destination"
+      },
+      "audit": {
+        "title": "Audit",
+        "description": "Événements récents de l'audit YEMA.",
+        "empty": "Aucun événement à afficher.",
+        "loadFailed": "Impossible de charger le journal.",
+        "actorAnonymous": "acteur anonyme"
+      },
+      "environment": {
+        "title": "Environnement",
+        "projectRef": "Project ref Supabase",
+        "flagsTitle": "Feature flags",
+        "qaSessionTitle": "Session QA",
+        "qaSessionMinutes": "{minutes} min max",
+        "noSecretsHelp": "Aucun secret, clé, token ou URL signée ne sont affichés ici."
+      },
+      "loading": "Chargement de la console…",
+      "error": "Impossible de charger la console.",
+      "retry": "Réessayer"
     }
   }
 }
