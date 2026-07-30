@@ -46,6 +46,12 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.redirect(new URL("/fr/goodbye", url.origin), { status: 303 });
   // Efface le label persona (affichage barre)
   response.cookies.set("yema_qa_persona", "", { path: "/", maxAge: 0 });
+  // P4.6 Lot 6 · aucun contexte enfant ne doit survivre au logout QA
+  // (brief §3). Idempotent : si le cookie n'existait pas, ce set le crée
+  // vide puis l'expire immédiatement (maxAge 0).
+  response.cookies.set("yema_child_session", "", {
+    path: "/", httpOnly: true, sameSite: "lax", secure: true, maxAge: 0,
+  });
   return response;
 }
 

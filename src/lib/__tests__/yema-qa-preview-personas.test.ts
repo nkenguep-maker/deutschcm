@@ -345,9 +345,28 @@ describe("QA route impersonate · allowlist body + gate + resolve server-side", 
     expect(idxJson).toBeGreaterThan(idxGate);
   });
 
-  it("gate → 404 stable {\"error\":\"Not found\"}", () => {
-    expect(src).toMatch(/status\.active[\s\S]*return notFound/);
-    expect(src).toMatch(/\{ error: "Not found" \}/);
+  it("gate off → return notFound() (404 stable · body { error: \"Not found\" })", () => {
+    // P4.6 Lot 6 · doctrine documentée · gate `status.active === false`
+    // ⇒ appel de notFound() sans code · aucun détail révélé côté attaquant
+    // Production.
+    //
+    // Le helper notFound() construit
+    //   NextResponse.json({ error: "Not found", ...(code ? { code } : {}) },
+    //                     { status: 404 })
+    // (source de vérité · src/app/api/qa/impersonate/route.ts:29-33).
+    //
+    //   - Sans arg   (gate off, Production) → body strict `{ error: "Not found" }`
+    //   - Avec code  (Preview uniquement)   → body `{ error: "Not found", code: "xxx" }`
+    //
+    // Le refactor QA-b1 Gate a introduit le spread conditionnel · l'ancien
+    // test attendait un pattern exact `{ error: "Not found" }` incompatible
+    // avec la construction dynamique. Le test est réécrit pour vérifier les
+    // trois invariants réels : (1) le gate appelle notFound() sans arg,
+    // (2) le helper notFound est bien défini avec le préfixe { error:
+    // "Not found", (3) le status HTTP renvoyé est 404.
+    expect(src).toMatch(/status\.active[\s\S]*return notFound\(\)/);
+    expect(src).toMatch(/function notFound\([^)]*\)\s*\{[\s\S]*NextResponse\.json\(\{\s*error:\s*"Not found"/);
+    expect(src).toMatch(/\{\s*status:\s*404\s*\}/);
   });
 
   it("allowlist body · uniquement `persona` acceptée", () => {

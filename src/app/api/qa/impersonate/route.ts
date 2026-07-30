@@ -152,6 +152,13 @@ export async function POST(request: NextRequest) {
   response.cookies.set("yema_qa_persona", persona.id, {
     path: "/", sameSite: "lax", secure: true, maxAge: 7200,
   });
+  // P4.6 Lot 6 · aucun cookie enfant ne survit à un changement de persona
+  // (brief §3). On efface systématiquement le cookie enfant à chaque
+  // impersonate · les personas child_monde/child_racines qui l'exigent
+  // le re-set via /api/qa/child-session juste après (endpoint destination).
+  response.cookies.set("yema_child_session", "", {
+    path: "/", httpOnly: true, sameSite: "lax", secure: true, maxAge: 0,
+  });
   return response;
 }
 

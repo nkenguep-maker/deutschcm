@@ -75,6 +75,10 @@ if (!dot.P1_BASELINE_CONFIRMED_NOT_PRODUCTION) fatal("P1_BASELINE_CONFIRMED_NOT_
 // Génération secrets QA · 32 octets base64url (~43 chars, > 32 min)
 const sessionSecret = randomBytes(32).toString("base64url");
 const linkSecret = randomBytes(32).toString("base64url");
+// P4.6 Lot 6 · secret dédié au cookie signé enfant (HMAC-SHA256).
+// Rotation à chaque déploiement Preview · les sessions enfants précédentes
+// sont automatiquement invalidées.
+const childSessionSecret = randomBytes(32).toString("base64url");
 
 const adminEmail = process.env.YEMA_QA_ADMIN_EMAIL || "";
 if (!adminEmail || !adminEmail.includes("@")) {
@@ -105,6 +109,15 @@ const qaEnv = {
   YEMA_RACINES_COACH_OPERATIONAL: "true",
   YEMA_COACH_WORKSPACE_ENABLED: "true",
   YEMA_AUDIO_FEEDBACK_ENABLED: "false",
+  // P4.6 Lot 6 · gate visuel refonte YEMA (dashboards 1→5 + enfants).
+  // Sans ce flag, les nouveaux dashboards restent invisibles et le
+  // legacy s'affiche à la place.
+  YEMA_DASHBOARD_REDESIGN_ENABLED: "true",
+  YEMA_CENTER_REAL_DATA_ENABLED: "true",
+  YEMA_CENTER_RLS_CONFIRMED: "true",
+  // P4.6 Lot 5 · secret HMAC du cookie enfant. Rotation à chaque Preview
+  // invalide toute session enfant antérieure.
+  YEMA_CHILD_SESSION_SECRET: childSessionSecret,
 };
 
 // Env pour le build/deploy · hérité PATH/HOME/USER + qaEnv (aucun leak).
