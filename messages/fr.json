@@ -1016,6 +1016,136 @@
         "open": "Ouvrir le profil",
         "ageYears": "{age} ans"
       }
+    },
+    "teacher": {
+      "personaLabel": "Enseignant·e",
+      "personaSubtitle": "Ton espace de classe",
+      "sidebarSection": "Mon espace",
+      "greetingFallback": "Bienvenue",
+      "meta": "Centre {center}",
+      "metaWithoutCenter": "Espace enseignant",
+      "unverifiedBadge": "Compte en attente de vérification",
+      "nav": {
+        "overview": "Tableau de bord",
+        "classes": "Mes classes",
+        "assignments": "Devoirs",
+        "corrections": "Corrections",
+        "resources": "Ressources",
+        "messages": "Messages"
+      },
+      "overview": {
+        "title": "Tableau de bord",
+        "kpis": {
+          "classes": "Classes",
+          "students": "Élèves actifs",
+          "pending": "Demandes en attente"
+        },
+        "kpisEmptyHelp": "Les métriques s'afficheront dès qu'un·e élève rejoindra une de vos classes.",
+        "unverifiedHelp": "Votre compte est en attente de vérification par un·e administrateur de centre. Vous pouvez déjà préparer votre travail ; certaines actions restent limitées jusqu'à validation."
+      },
+      "classes": {
+        "title": "Mes classes",
+        "description": "Vos classes actives et leurs effectifs réels.",
+        "empty": "Vous n'avez aucune classe active pour l'instant.",
+        "notAvailable": "Les informations de cette classe ne sont pas encore disponibles.",
+        "studentsCount": "{count, plural, one {1 élève} other {# élèves}}",
+        "levelLabel": "Niveau {level}",
+        "openClass": "Ouvrir la classe"
+      },
+      "assignments": {
+        "title": "Devoirs",
+        "description": "Cycle brouillon → publié → clos, aligné P4.5-B.",
+        "empty": "Aucun devoir pour l'instant.",
+        "loadFailed": "Impossible de charger les devoirs de cette classe.",
+        "newAssignment": "Nouveau devoir",
+        "openAssignment": "Ouvrir",
+        "status": {
+          "draft": "Brouillon",
+          "published": "Publié",
+          "closed": "Clos",
+          "archived": "Archivé"
+        },
+        "due": "Échéance {date}",
+        "noDue": "Pas d'échéance"
+      },
+      "corrections": {
+        "title": "Corrections",
+        "description": "Rendus à corriger, feedbacks à préparer.",
+        "empty": "Aucune correction en attente pour l'instant.",
+        "openSubmission": "Ouvrir",
+        "invisibleUntilPublished": "Le feedback reste invisible à l'élève tant qu'il n'est pas publié.",
+        "versionLabel": "v{version}",
+        "submittedOn": "Rendu le {date}",
+        "notSubmitted": "Non rendu"
+      },
+      "resources": {
+        "title": "Ressources",
+        "soon": "Vos ressources pédagogiques apparaîtront ici lorsqu'elles seront disponibles."
+      },
+      "messages": {
+        "title": "Messages",
+        "soon": "La messagerie avec vos élèves et votre centre sera bientôt disponible."
+      },
+      "loading": "Chargement de votre espace…",
+      "error": "Impossible de charger votre espace.",
+      "retry": "Réessayer",
+      "permissionDenied": "Cet espace nécessite un rôle enseignant vérifié.",
+      "workspaceOff": "L'espace enseignant n'est pas encore activé sur cet environnement."
+    },
+    "coachRacines": {
+      "personaLabel": "Coach Racines",
+      "personaSubtitle": "Ta maison de langue orale",
+      "sidebarSection": "Ma maison",
+      "greetingFallback": "Bienvenue",
+      "meta": "Coach · {activeCircles} cercles · {activeChildren} apprenants",
+      "metaMinimal": "Coach Racines",
+      "nav": {
+        "overview": "Tableau de bord",
+        "learners": "Mes apprenants",
+        "sessions": "Séances",
+        "messages": "Messages",
+        "sessionNotes": "Notes de séance"
+      },
+      "overview": {
+        "title": "Tableau de bord",
+        "capacityCirclesTitle": "Cercles actifs",
+        "capacityCirclesHelp": "{active} / {max} cercles",
+        "capacityChildrenTitle": "Apprenants suivis",
+        "capacityChildrenHelp": "{active} / {max} enfants",
+        "languagesTitle": "Répartition par langue",
+        "languagesEmpty": "Aucun apprenant affecté pour l'instant.",
+        "todaySessionsTitle": "Séances du jour",
+        "todaySessionsEmpty": "Aucune séance planifiée aujourd'hui.",
+        "notesToDraftTitle": "Notes à rédiger",
+        "notesToDraftEmpty": "Aucune note en attente."
+      },
+      "learners": {
+        "title": "Mes apprenants",
+        "description": "Apprenants réellement affectés à votre suivi.",
+        "empty": "Aucun apprenant affecté à votre suivi pour l'instant.",
+        "unavailable": "Les informations de cet apprenant ne sont pas encore disponibles.",
+        "openProfile": "Ouvrir le profil",
+        "ageBand": "Tranche d'âge {band}",
+        "languageLabel": "Langue Racines",
+        "circleLanguageLabel": "Cercle {language}"
+      },
+      "sessions": {
+        "title": "Séances",
+        "soon": "La planification des séances sera bientôt disponible."
+      },
+      "messages": {
+        "title": "Messages",
+        "soon": "La messagerie vocale avec vos apprenants sera bientôt disponible."
+      },
+      "sessionNotes": {
+        "title": "Notes de séance",
+        "soon": "Les notes de séance apparaîtront ici lorsqu'elles seront disponibles."
+      },
+      "loading": "Chargement de votre espace…",
+      "error": "Impossible de charger votre espace.",
+      "retry": "Réessayer",
+      "permissionDenied": "Cet espace nécessite un rôle Coach Racines actif.",
+      "workspaceOff": "L'espace Coach Racines n'est pas encore activé sur cet environnement."
     }
   }
 }

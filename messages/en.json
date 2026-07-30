@@ -1016,6 +1016,136 @@
         "open": "Open profile",
         "ageYears": "{age} yrs"
       }
+    },
+    "teacher": {
+      "personaLabel": "Teacher",
+      "personaSubtitle": "Your classroom space",
+      "sidebarSection": "My space",
+      "greetingFallback": "Welcome",
+      "meta": "Center {center}",
+      "metaWithoutCenter": "Teacher space",
+      "unverifiedBadge": "Account pending verification",
+      "nav": {
+        "overview": "Overview",
+        "classes": "My classes",
+        "assignments": "Assignments",
+        "corrections": "Corrections",
+        "resources": "Resources",
+        "messages": "Messages"
+      },
+      "overview": {
+        "title": "Overview",
+        "kpis": {
+          "classes": "Classes",
+          "students": "Active learners",
+          "pending": "Pending requests"
+        },
+        "kpisEmptyHelp": "Metrics will appear as soon as a learner joins one of your classes.",
+        "unverifiedHelp": "Your account is pending verification by a center administrator. You can prepare your work; some actions remain limited until validated."
+      },
+      "classes": {
+        "title": "My classes",
+        "description": "Your active classes and their real enrolments.",
+        "empty": "You have no active class yet.",
+        "notAvailable": "This class information is not available yet.",
+        "studentsCount": "{count, plural, one {1 learner} other {# learners}}",
+        "levelLabel": "Level {level}",
+        "openClass": "Open class"
+      },
+      "assignments": {
+        "title": "Assignments",
+        "description": "Draft → published → closed cycle, P4.5-B compliant.",
+        "empty": "No assignment yet.",
+        "loadFailed": "Cannot load this class's assignments.",
+        "newAssignment": "New assignment",
+        "openAssignment": "Open",
+        "status": {
+          "draft": "Draft",
+          "published": "Published",
+          "closed": "Closed",
+          "archived": "Archived"
+        },
+        "due": "Due {date}",
+        "noDue": "No due date"
+      },
+      "corrections": {
+        "title": "Corrections",
+        "description": "Submissions to review, feedback to prepare.",
+        "empty": "No correction pending.",
+        "openSubmission": "Open",
+        "invisibleUntilPublished": "Feedback stays hidden from the learner until published.",
+        "versionLabel": "v{version}",
+        "submittedOn": "Submitted on {date}",
+        "notSubmitted": "Not submitted"
+      },
+      "resources": {
+        "title": "Resources",
+        "soon": "Your teaching resources will appear here when available."
+      },
+      "messages": {
+        "title": "Messages",
+        "soon": "Messaging with your learners and center will be available soon."
+      },
+      "loading": "Loading your space…",
+      "error": "Cannot load your space.",
+      "retry": "Retry",
+      "permissionDenied": "This space requires a verified teacher role.",
+      "workspaceOff": "The teacher space isn't enabled on this environment yet."
+    },
+    "coachRacines": {
+      "personaLabel": "Roots coach",
+      "personaSubtitle": "Your oral-language home",
+      "sidebarSection": "My home",
+      "greetingFallback": "Welcome",
+      "meta": "Coach · {activeCircles} circles · {activeChildren} learners",
+      "metaMinimal": "Roots coach",
+      "nav": {
+        "overview": "Overview",
+        "learners": "My learners",
+        "sessions": "Sessions",
+        "messages": "Messages",
+        "sessionNotes": "Session notes"
+      },
+      "overview": {
+        "title": "Overview",
+        "capacityCirclesTitle": "Active circles",
+        "capacityCirclesHelp": "{active} / {max} circles",
+        "capacityChildrenTitle": "Learners followed",
+        "capacityChildrenHelp": "{active} / {max} children",
+        "languagesTitle": "Breakdown by language",
+        "languagesEmpty": "No learner assigned yet.",
+        "todaySessionsTitle": "Today's sessions",
+        "todaySessionsEmpty": "No session planned today.",
+        "notesToDraftTitle": "Notes to draft",
+        "notesToDraftEmpty": "No pending note."
+      },
+      "learners": {
+        "title": "My learners",
+        "description": "Learners actually assigned to your follow-up.",
+        "empty": "No learner assigned to your follow-up yet.",
+        "unavailable": "This learner's information is not available yet.",
+        "openProfile": "Open profile",
+        "ageBand": "Age band {band}",
+        "languageLabel": "Roots language",
+        "circleLanguageLabel": "Circle {language}"
+      },
+      "sessions": {
+        "title": "Sessions",
+        "soon": "Session scheduling will be available soon."
+      },
+      "messages": {
+        "title": "Messages",
+        "soon": "Voice messaging with your learners will be available soon."
+      },
+      "sessionNotes": {
+        "title": "Session notes",
+        "soon": "Session notes will appear here when available."
+      },
+      "loading": "Loading your space…",
+      "error": "Cannot load your space.",
+      "retry": "Retry",
+      "permissionDenied": "This space requires an active Roots coach role.",
+      "workspaceOff": "The Roots coach space isn't enabled on this environment yet."
     }
   }
 }
