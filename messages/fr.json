@@ -1394,6 +1394,130 @@
       "loading": "Chargement de la console…",
       "error": "Impossible de charger la console.",
       "retry": "Réessayer"
+    },
+    "childMonde": {
+      "personaLabel": "Enfant Monde",
+      "personaSubtitle": "Ma maison YEMA",
+      "sidebarSection": "Ma maison",
+      "greetingFallback": "Salut",
+      "meta": "Allemand · {stars} étoiles",
+      "metaMinimal": "Ma maison",
+      "nav": {
+        "home": "Maison",
+        "games": "Jeux",
+        "stories": "Histoires",
+        "badges": "Badges",
+        "progression": "Progression",
+        "adultActivities": "Avec un adulte"
+      },
+      "mobileNav": {
+        "home": "Maison",
+        "games": "Jeux",
+        "stories": "Histoires",
+        "badges": "Badges"
+      },
+      "home": {
+        "title": "Bonjour {prenom} !",
+        "welcomeHint": "D'abord on écoute, ensuite on montre, on parle quand on est prêt·e.",
+        "starsTitle": "Mes étoiles",
+        "starsCount": "{stars} étoiles gagnées",
+        "starsEmpty": "Pas encore d'étoile — la première arrive avec ta prochaine écoute.",
+        "nextActivityTitle": "Prochaine activité",
+        "nextActivityEmpty": "Une nouvelle activité arrivera bientôt."
+      },
+      "games": {
+        "title": "Mes jeux",
+        "description": "Écoute, montre, mime, chante.",
+        "empty": "Aucun jeu disponible pour l'instant. Les jeux ouvrent avec les premiers contenus."
+      },
+      "stories": {
+        "title": "Mes histoires",
+        "description": "Réécoute pour reconnaître les mots.",
+        "empty": "Aucune histoire disponible pour l'instant."
+      },
+      "badges": {
+        "title": "Mes badges",
+        "description": "Récompenses gagnées à l'écoute et au jeu.",
+        "empty": "Aucun badge encore. Il arrive avec ta première histoire terminée.",
+        "notPersistedNotice": "L'attribution des badges sera enregistrée dans une prochaine mise à jour."
+      },
+      "progression": {
+        "title": "Ma progression",
+        "description": "Ce que tu as travaillé cette semaine.",
+        "notWiredNotice": "La progression détaillée arrivera avec le journal enfant (à venir)."
+      },
+      "adultActivities": {
+        "title": "Avec un adulte",
+        "description": "Les moments à partager en famille.",
+        "empty": "Aucune activité famille pour le moment."
+      },
+      "loading": "Ta maison s'ouvre…",
+      "error": "Ta maison ne s'ouvre pas. Réessaie.",
+      "retry": "Réessayer",
+      "exitChildMode": "Quitter le mode enfant"
+    },
+    "childRacines": {
+      "personaLabel": "Enfant Racines",
+      "personaSubtitle": "Ma case YEMA",
+      "sidebarSection": "Ma case",
+      "greetingFallback": "Salaam",
+      "meta": "{language} · Étape {step}",
+      "metaMinimal": "Ma case",
+      "nav": {
+        "home": "Ma case",
+        "tales": "Contes",
+        "songs": "Chansons",
+        "badges": "Badges",
+        "oralProgress": "Progression orale",
+        "familyActivities": "Activités en famille"
+      },
+      "mobileNav": {
+        "home": "Ma case",
+        "tales": "Contes",
+        "songs": "Chansons",
+        "badges": "Badges"
+      },
+      "home": {
+        "title": "Bonjour {prenom} !",
+        "welcomeHint": "D'abord on écoute, puis on répète, puis on raconte.",
+        "stepTitle": "Mon étape",
+        "stepEmpty": "L'étape s'ouvrira avec ta première écoute.",
+        "nextListenTitle": "Prochaine écoute",
+        "nextListenEmpty": "Une nouvelle écoute arrivera bientôt.",
+        "coachTitle": "Mon coach",
+        "coachEmpty": "Aucun coach affecté pour l'instant."
+      },
+      "tales": {
+        "title": "Mes contes",
+        "description": "Écoute, réécoute, raconte à ton tour.",
+        "empty": "Aucun conte disponible pour l'instant."
+      },
+      "songs": {
+        "title": "Mes chansons",
+        "description": "Berceuses, comptines et chansons de la maison.",
+        "empty": "Aucune chanson disponible pour l'instant."
+      },
+      "badges": {
+        "title": "Mes badges",
+        "description": "Récompenses positives, sans compétition.",
+        "empty": "Aucun badge encore.",
+        "notPersistedNotice": "L'attribution des badges sera enregistrée dans une prochaine mise à jour."
+      },
+      "oralProgress": {
+        "title": "Ma progression orale",
+        "description": "Ce que tu as écouté et raconté.",
+        "notWiredNotice": "Le journal oral détaillé arrivera avec le prochain lot."
+      },
+      "familyActivities": {
+        "title": "En famille",
+        "description": "Moments à partager à la maison.",
+        "empty": "Aucune activité famille pour le moment."
+      },
+      "voiceRecordingSoon": "L'enregistrement vocal et l'envoi au coach arriveront avec la messagerie P4.6.",
+      "loading": "Ta case s'ouvre…",
+      "error": "Ta case ne s'ouvre pas. Réessaie.",
+      "retry": "Réessayer",
+      "exitChildMode": "Quitter le mode enfant"
     }
   }
 }

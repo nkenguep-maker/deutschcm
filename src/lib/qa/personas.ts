@@ -13,7 +13,9 @@ export type QaPersonaId =
   | "center_admin"
   | "student_monde"
   | "student_racines"
-  | "family";
+  | "family"
+  | "child_monde"
+  | "child_racines";
 
 export interface QaPersonaSpec {
   id: QaPersonaId;
@@ -94,6 +96,28 @@ export const QA_PERSONAS: readonly QaPersonaSpec[] = [
     destination: (locale) => `/${locale}/family`,
     available: true,
   },
+  {
+    // P4.6 Lot 5 · Enfant Monde. L'auth QA passe par le parent family
+    // (fixtureEmail identique). L'endpoint /api/qa/child-session set le
+    // cookie enfant vers le ChildProfile Monde bakée, puis redirige vers
+    // /[locale]/dashboard qui rend ChildMondeDashboard.
+    id: "child_monde",
+    label: { fr: "Enfant Monde", en: "World child" },
+    role: "PARENT",
+    fixtureEmail: `${PREFIX}family@example.com`,
+    destination: (locale) => `/api/qa/child-session?child=monde&locale=${locale}`,
+    available: true,
+  },
+  {
+    // P4.6 Lot 5 · Enfant Racines. Même mécanisme, cible ChildProfile
+    // Racines bakée. destination = endpoint QA qui set le cookie enfant.
+    id: "child_racines",
+    label: { fr: "Enfant Racines", en: "Roots child" },
+    role: "PARENT",
+    fixtureEmail: `${PREFIX}family@example.com`,
+    destination: (locale) => `/api/qa/child-session?child=racines&locale=${locale}`,
+    available: true,
+  },
 ] as const;
 
 export function getPersona(id: QaPersonaId): QaPersonaSpec | null {
@@ -102,7 +126,7 @@ export function getPersona(id: QaPersonaId): QaPersonaSpec | null {
 
 export function isQaPersonaId(x: unknown): x is QaPersonaId {
   return typeof x === "string"
-    && ["super_admin", "teacher", "coach", "center_admin", "student_monde", "student_racines", "family"].includes(x);
+    && ["super_admin", "teacher", "coach", "center_admin", "student_monde", "student_racines", "family", "child_monde", "child_racines"].includes(x);
 }
 
 /** Label pour affichage cookie/barre (fr par défaut). */

@@ -1394,6 +1394,130 @@
       "loading": "Loading console…",
       "error": "Cannot load console.",
       "retry": "Retry"
+    },
+    "childMonde": {
+      "personaLabel": "World child",
+      "personaSubtitle": "My YEMA home",
+      "sidebarSection": "My home",
+      "greetingFallback": "Hi",
+      "meta": "German · {stars} stars",
+      "metaMinimal": "My home",
+      "nav": {
+        "home": "Home",
+        "games": "Games",
+        "stories": "Stories",
+        "badges": "Badges",
+        "progression": "Progress",
+        "adultActivities": "With an adult"
+      },
+      "mobileNav": {
+        "home": "Home",
+        "games": "Games",
+        "stories": "Stories",
+        "badges": "Badges"
+      },
+      "home": {
+        "title": "Hello {prenom}!",
+        "welcomeHint": "First we listen, then we show, we speak when we're ready.",
+        "starsTitle": "My stars",
+        "starsCount": "{stars} stars earned",
+        "starsEmpty": "No star yet — the first one comes with your next listen.",
+        "nextActivityTitle": "Next activity",
+        "nextActivityEmpty": "A new activity will arrive soon."
+      },
+      "games": {
+        "title": "My games",
+        "description": "Listen, show, mime, sing.",
+        "empty": "No game available yet. Games open with the first content."
+      },
+      "stories": {
+        "title": "My stories",
+        "description": "Replay to recognise the words.",
+        "empty": "No story available yet."
+      },
+      "badges": {
+        "title": "My badges",
+        "description": "Rewards earned by listening and playing.",
+        "empty": "No badge yet. It arrives with your first finished story.",
+        "notPersistedNotice": "Badge tracking will be persisted in a future update."
+      },
+      "progression": {
+        "title": "My progress",
+        "description": "What you have worked on this week.",
+        "notWiredNotice": "Detailed progress will arrive with the child journal (coming soon)."
+      },
+      "adultActivities": {
+        "title": "With an adult",
+        "description": "Moments to share with family.",
+        "empty": "No family activity yet."
+      },
+      "loading": "Your home is opening…",
+      "error": "Your home isn't opening. Please retry.",
+      "retry": "Retry",
+      "exitChildMode": "Exit child mode"
+    },
+    "childRacines": {
+      "personaLabel": "Roots child",
+      "personaSubtitle": "My YEMA case",
+      "sidebarSection": "My case",
+      "greetingFallback": "Hello",
+      "meta": "{language} · Step {step}",
+      "metaMinimal": "My case",
+      "nav": {
+        "home": "My case",
+        "tales": "Tales",
+        "songs": "Songs",
+        "badges": "Badges",
+        "oralProgress": "Oral progress",
+        "familyActivities": "Family activities"
+      },
+      "mobileNav": {
+        "home": "My case",
+        "tales": "Tales",
+        "songs": "Songs",
+        "badges": "Badges"
+      },
+      "home": {
+        "title": "Hello {prenom}!",
+        "welcomeHint": "First we listen, then we repeat, then we tell.",
+        "stepTitle": "My step",
+        "stepEmpty": "The step will open with your first listen.",
+        "nextListenTitle": "Next listen",
+        "nextListenEmpty": "A new listen will arrive soon.",
+        "coachTitle": "My coach",
+        "coachEmpty": "No coach assigned yet."
+      },
+      "tales": {
+        "title": "My tales",
+        "description": "Listen, replay, tell in your turn.",
+        "empty": "No tale available yet."
+      },
+      "songs": {
+        "title": "My songs",
+        "description": "Lullabies, nursery rhymes and songs of the home.",
+        "empty": "No song available yet."
+      },
+      "badges": {
+        "title": "My badges",
+        "description": "Positive rewards, no competition.",
+        "empty": "No badge yet.",
+        "notPersistedNotice": "Badge tracking will be persisted in a future update."
+      },
+      "oralProgress": {
+        "title": "My oral progress",
+        "description": "What you listened to and told.",
+        "notWiredNotice": "The detailed oral journal will arrive in a future update."
+      },
+      "familyActivities": {
+        "title": "Family moments",
+        "description": "Moments to share at home.",
+        "empty": "No family activity yet."
+      },
+      "voiceRecordingSoon": "Voice recording and sending to the coach will arrive with P4.6 messaging.",
+      "loading": "Your case is opening…",
+      "error": "Your case isn't opening. Please retry.",
+      "retry": "Retry",
+      "exitChildMode": "Exit child mode"
     }
   }
 }
