@@ -11,14 +11,16 @@ import {
   DashboardShell,
   DashboardSidebar,
   DashboardHeader,
-  DashboardMobileNavigation,
+  DashboardMobileHeader,
   DashboardCard,
   DashboardEmptyState,
   DashboardErrorState,
   DashboardPageBoundary,
   DashboardSkeleton,
   DashboardStatusChip,
+  DashboardTabBar,
 } from "@/features/dashboards/shared";
+import type { DashboardTab } from "@/features/dashboards/shared";
 import { buildRacinesNav } from "./nav";
 import { OverviewSection } from "./sections/OverviewSection";
 import { StepsSection } from "./sections/StepsSection";
@@ -87,13 +89,25 @@ export function StudentRacinesDashboard({ locale }: { locale: "fr" | "en" }) {
     />
   );
 
-  const mobileNav = (
-    <DashboardMobileNavigation
-      groups={navGroups}
-      activeHref={dashboardHref}
+  const mobileHeader = (
+    <DashboardMobileHeader
       personaLabel={personaLabel}
+      personaSubtitle={personaSubtitle}
+      brandHref={`/${currentLocale ?? locale}`}
     />
   );
+
+  // Onglets mobile PDF §3 : Accueil · Étapes · Écoutes · Coach · Palabre.
+  // Aucun compteur (aucune donnée réelle notifications/messages n'existe dans
+  // ce lot).
+  const mobileTabs: DashboardTab[] = [
+    { key: "overview", label: t("studentRacines.mobileNav.overview"), href: dashboardHref },
+    { key: "steps", label: t("studentRacines.mobileNav.steps"), href: `${dashboardHref}#mes-etapes` },
+    { key: "listens", label: t("studentRacines.mobileNav.listens"), href: `${dashboardHref}#ecoutes` },
+    { key: "coach", label: t("studentRacines.mobileNav.coach"), href: `${dashboardHref}#mon-coach` },
+    { key: "circle", label: t("studentRacines.mobileNav.circle"), href: `${dashboardHref}#cercle` },
+  ];
+  const tabBar = <DashboardTabBar tabs={mobileTabs} activeKey="overview" />;
 
   if (state.kind === "loading") {
     return (
@@ -101,7 +115,8 @@ export function StudentRacinesDashboard({ locale }: { locale: "fr" | "en" }) {
         <DashboardShell
           universe="racines"
           sidebar={sidebar}
-          mobileNav={mobileNav}
+          mobileHeader={mobileHeader}
+          tabBar={tabBar}
           header={<DashboardHeader title={personaLabel} subtitle={tCommon("loading")} />}
         >
           <div style={{ display: "grid", gap: 16 }}>
@@ -123,7 +138,8 @@ export function StudentRacinesDashboard({ locale }: { locale: "fr" | "en" }) {
         <DashboardShell
           universe="racines"
           sidebar={sidebar}
-          mobileNav={mobileNav}
+          mobileHeader={mobileHeader}
+          tabBar={tabBar}
           header={<DashboardHeader title={personaLabel} />}
         >
           <DashboardErrorState
@@ -163,7 +179,8 @@ export function StudentRacinesDashboard({ locale }: { locale: "fr" | "en" }) {
         <DashboardShell
           universe="racines"
           sidebar={sidebar}
-          mobileNav={mobileNav}
+          mobileHeader={mobileHeader}
+          tabBar={tabBar}
           header={<DashboardHeader title={personaLabel} />}
         >
           <DashboardCard>
@@ -189,7 +206,8 @@ export function StudentRacinesDashboard({ locale }: { locale: "fr" | "en" }) {
       <DashboardShell
         universe="racines"
         sidebar={sidebar}
-        mobileNav={mobileNav}
+        mobileHeader={mobileHeader}
+          tabBar={tabBar}
         header={
           <DashboardHeader
             title={greeting}

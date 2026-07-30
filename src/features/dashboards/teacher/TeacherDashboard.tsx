@@ -14,13 +14,15 @@ import {
   DashboardEmptyState,
   DashboardErrorState,
   DashboardHeader,
-  DashboardMobileNavigation,
+  DashboardMobileHeader,
   DashboardPageBoundary,
   DashboardShell,
   DashboardSidebar,
   DashboardSkeleton,
   DashboardStatusChip,
+  DashboardTabBar,
 } from "@/features/dashboards/shared";
+import type { DashboardTab } from "@/features/dashboards/shared";
 import { buildTeacherNav } from "./nav";
 import { TeacherOverviewSection } from "./sections/TeacherOverviewSection";
 import { TeacherClassesSection } from "./sections/TeacherClassesSection";
@@ -134,20 +136,32 @@ export function TeacherDashboard({ locale }: { locale: "fr" | "en" }) {
     />
   );
 
-  const mobileNav = (
-    <DashboardMobileNavigation
-      groups={navGroups}
-      activeHref={baseHref}
+  const mobileHeader = (
+    <DashboardMobileHeader
       personaLabel={personaLabel}
+      personaSubtitle={t("meta", { center: "" }).replace("Centre ", "") || undefined}
+      brandHref={`/${currentLocale ?? locale}`}
     />
   );
+
+  // Compteurs réels uniquement (aucune donnée fictive) : les corrections et
+  // messages n'ayant pas d'endpoint d'agrégation dans ce lot, leur badge
+  // reste absent (badgeCount omis).
+  const buildTabs = (correctionsCount?: number | null): DashboardTab[] => [
+    { key: "overview", label: t("mobileNav.overview"), href: baseHref },
+    { key: "classes", label: t("mobileNav.classes"), href: `${baseHref}#mes-classes` },
+    { key: "corrections", label: t("mobileNav.corrections"), href: `${baseHref}#corrections`, badgeCount: correctionsCount ?? null },
+    { key: "assignments", label: t("mobileNav.assignments"), href: `${baseHref}#devoirs` },
+    { key: "messages", label: t("mobileNav.messages"), href: `${baseHref}#messages` },
+  ];
 
   if (state.kind === "loading") {
     return (
       <DashboardPageBoundary>
         <DashboardShell
           sidebar={sidebar}
-          mobileNav={mobileNav}
+          mobileHeader={mobileHeader}
+          tabBar={<DashboardTabBar tabs={buildTabs(null)} activeKey="overview" />}
           header={<DashboardHeader title={personaLabel} subtitle={t("loading")} />}
         >
           <div style={{ display: "grid", gap: 16 }}>
@@ -169,7 +183,8 @@ export function TeacherDashboard({ locale }: { locale: "fr" | "en" }) {
       <DashboardPageBoundary>
         <DashboardShell
           sidebar={sidebar}
-          mobileNav={mobileNav}
+          mobileHeader={mobileHeader}
+          tabBar={<DashboardTabBar tabs={buildTabs(null)} activeKey="overview" />}
           header={<DashboardHeader title={personaLabel} />}
         >
           <DashboardErrorState
@@ -209,7 +224,8 @@ export function TeacherDashboard({ locale }: { locale: "fr" | "en" }) {
     <DashboardPageBoundary>
       <DashboardShell
         sidebar={sidebar}
-        mobileNav={mobileNav}
+        mobileHeader={mobileHeader}
+        tabBar={<DashboardTabBar tabs={buildTabs(null)} activeKey="overview" />}
         header={
           <DashboardHeader
             title={personaLabel}

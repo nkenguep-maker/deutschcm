@@ -948,6 +948,13 @@
         "expired": "Accès expiré",
         "none": "Aucun accès",
         "daysRemaining": "{days, plural, one {1 jour restant} other {# jours restants}}"
+      },
+      "mobileNav": {
+        "overview": "Accueil",
+        "course": "Cours",
+        "assignments": "Devoirs",
+        "journey": "Parcours",
+        "messages": "Messages"
       }
     },
     "studentRacines": {
@@ -1015,6 +1022,13 @@
         "manage": "Gérer les profils",
         "open": "Ouvrir le profil",
         "ageYears": "{age} ans"
+      },
+      "mobileNav": {
+        "overview": "Accueil",
+        "steps": "Étapes",
+        "listens": "Écoutes",
+        "coach": "Coach",
+        "circle": "Palabre"
       }
     },
     "teacher": {
@@ -1090,7 +1104,14 @@
       "error": "Impossible de charger votre espace.",
       "retry": "Réessayer",
       "permissionDenied": "Cet espace nécessite un rôle enseignant vérifié.",
-      "workspaceOff": "L'espace enseignant n'est pas encore activé sur cet environnement."
+      "workspaceOff": "L'espace enseignant n'est pas encore activé sur cet environnement.",
+      "mobileNav": {
+        "overview": "Accueil",
+        "classes": "Classes",
+        "corrections": "Corrections",
+        "assignments": "Devoirs",
+        "messages": "Messages"
+      }
     },
     "coachRacines": {
       "personaLabel": "Coach Racines",
@@ -1145,7 +1166,14 @@
       "error": "Impossible de charger votre espace.",
       "retry": "Réessayer",
       "permissionDenied": "Cet espace nécessite un rôle Coach Racines actif.",
-      "workspaceOff": "L'espace Coach Racines n'est pas encore activé sur cet environnement."
+      "workspaceOff": "L'espace Coach Racines n'est pas encore activé sur cet environnement.",
+      "mobileNav": {
+        "overview": "Accueil",
+        "learners": "Apprenants",
+        "sessions": "Séances",
+        "messages": "Messages",
+        "sessionNotes": "Notes"
+      }
     }
   }
 }

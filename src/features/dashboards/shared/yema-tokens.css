@@ -4,6 +4,7 @@
 [data-yema-shell] {
   /* ── Fond & surfaces ── */
   --yema-bg: #16100B;
+  --yema-bg-app: #0F0B07;              /* hors cadre / fond de la tab bar mobile */
   --yema-sidebar: #130E09;
   --yema-surface: #201811;
   --yema-surface-2: #191209;
@@ -14,17 +15,23 @@
   --yema-gold: #D9A24B;
   --yema-gold-light: #E7B865;
   --yema-gold-dark: #C08A34;
+  --yema-gold-shadow: #8A5F1E;         /* ombre 3D bouton Monde */
+  --yema-gold-shadow-racines: #6E4A18; /* ombre 3D bouton Racines */
   --yema-gold-glow: rgba(217, 162, 75, 0.14);
   --yema-gold-edge: rgba(217, 162, 75, 0.28);
+  --yema-gold-wash: rgba(217, 162, 75, 0.15);
 
   /* ── Texte ── */
   --yema-text: #F3EADB;
+  --yema-text-soft: #B3A28A;
   --yema-text-muted: #8C7B63;
   --yema-text-faint: #6E5F4B;
 
   /* ── Sémantique ── */
   --yema-success: #8FCB9E;
+  --yema-success-bg: rgba(127, 185, 142, 0.12);
   --yema-alert: #E58C72;
+  --yema-alert-bg: rgba(224, 122, 95, 0.15);
 
   /* ── Univers Racines (surfaces bordeaux) ── */
   --yema-roots-surface: #2A1017;

@@ -948,6 +948,13 @@
         "expired": "Access expired",
         "none": "No access",
         "daysRemaining": "{days, plural, one {1 day left} other {# days left}}"
+      },
+      "mobileNav": {
+        "overview": "Home",
+        "course": "Course",
+        "assignments": "Assignments",
+        "journey": "Journey",
+        "messages": "Messages"
       }
     },
     "studentRacines": {
@@ -1015,6 +1022,13 @@
         "manage": "Manage profiles",
         "open": "Open profile",
         "ageYears": "{age} yrs"
+      },
+      "mobileNav": {
+        "overview": "Home",
+        "steps": "Steps",
+        "listens": "Listens",
+        "coach": "Coach",
+        "circle": "Palaver"
       }
     },
     "teacher": {
@@ -1090,7 +1104,14 @@
       "error": "Cannot load your space.",
       "retry": "Retry",
       "permissionDenied": "This space requires a verified teacher role.",
-      "workspaceOff": "The teacher space isn't enabled on this environment yet."
+      "workspaceOff": "The teacher space isn't enabled on this environment yet.",
+      "mobileNav": {
+        "overview": "Home",
+        "classes": "Classes",
+        "corrections": "Corrections",
+        "assignments": "Assignments",
+        "messages": "Messages"
+      }
     },
     "coachRacines": {
       "personaLabel": "Roots coach",
@@ -1145,7 +1166,14 @@
       "error": "Cannot load your space.",
       "retry": "Retry",
       "permissionDenied": "This space requires an active Roots coach role.",
-      "workspaceOff": "The Roots coach space isn't enabled on this environment yet."
+      "workspaceOff": "The Roots coach space isn't enabled on this environment yet.",
+      "mobileNav": {
+        "overview": "Home",
+        "learners": "Learners",
+        "sessions": "Sessions",
+        "messages": "Messages",
+        "sessionNotes": "Notes"
+      }
     }
   }
 }

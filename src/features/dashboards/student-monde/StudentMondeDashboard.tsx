@@ -12,14 +12,16 @@ import {
   DashboardShell,
   DashboardSidebar,
   DashboardHeader,
-  DashboardMobileNavigation,
+  DashboardMobileHeader,
   DashboardEmptyState,
   DashboardErrorState,
   DashboardPageBoundary,
   DashboardCard,
   DashboardSkeleton,
   DashboardStatusChip,
+  DashboardTabBar,
 } from "@/features/dashboards/shared";
+import type { DashboardTab } from "@/features/dashboards/shared";
 import { buildMondeNav } from "./nav";
 import { OverviewSection } from "./sections/OverviewSection";
 import { CourseSection } from "./sections/CourseSection";
@@ -109,20 +111,36 @@ export function StudentMondeDashboard({ locale }: { locale: "fr" | "en" }) {
     />
   );
 
-  const mobileNav = (
-    <DashboardMobileNavigation
-      groups={navGroups}
-      activeHref={dashboardHref}
+  const mobileHeader = (
+    <DashboardMobileHeader
       personaLabel={personaLabel}
+      personaSubtitle={personaSubtitle}
+      brandHref={`/${currentLocale ?? locale}`}
     />
   );
+
+  // Onglets mobile PDF §3 : Accueil · Cours · Devoirs · Parcours · Messages.
+  // Compteur Devoirs uniquement si assignments réels non-clos.
+  const openAssignmentsCount =
+    state.kind === "ready" && state.assignments.kind === "available"
+      ? state.assignments.assignments.filter((a) => a.status === "PUBLISHED").length
+      : null;
+  const mobileTabs: DashboardTab[] = [
+    { key: "overview", label: t("studentMonde.mobileNav.overview"), href: dashboardHref },
+    { key: "course", label: t("studentMonde.mobileNav.course"), href: `${dashboardHref}#mon-cours` },
+    { key: "assignments", label: t("studentMonde.mobileNav.assignments"), href: `${dashboardHref}#mes-devoirs`, badgeCount: openAssignmentsCount ?? null },
+    { key: "journey", label: t("studentMonde.mobileNav.journey"), href: `${dashboardHref}#mon-parcours` },
+    { key: "messages", label: t("studentMonde.mobileNav.messages"), href: `${dashboardHref}#messages` },
+  ];
+  const tabBar = <DashboardTabBar tabs={mobileTabs} activeKey="overview" />;
 
   if (state.kind === "loading") {
     return (
       <DashboardPageBoundary>
         <DashboardShell
           sidebar={sidebar}
-          mobileNav={mobileNav}
+          mobileHeader={mobileHeader}
+          tabBar={tabBar}
           header={<DashboardHeader title={personaLabel} subtitle={tCommon("loading")} />}
         >
           <div style={{ display: "grid", gap: 16 }}>
@@ -143,7 +161,8 @@ export function StudentMondeDashboard({ locale }: { locale: "fr" | "en" }) {
       <DashboardPageBoundary>
         <DashboardShell
           sidebar={sidebar}
-          mobileNav={mobileNav}
+          mobileHeader={mobileHeader}
+          tabBar={tabBar}
           header={<DashboardHeader title={personaLabel} />}
         >
           <DashboardErrorState
@@ -182,7 +201,8 @@ export function StudentMondeDashboard({ locale }: { locale: "fr" | "en" }) {
       <DashboardPageBoundary>
         <DashboardShell
           sidebar={sidebar}
-          mobileNav={mobileNav}
+          mobileHeader={mobileHeader}
+          tabBar={tabBar}
           header={<DashboardHeader title={personaLabel} />}
         >
           <DashboardCard>
@@ -210,7 +230,8 @@ export function StudentMondeDashboard({ locale }: { locale: "fr" | "en" }) {
     <DashboardPageBoundary>
       <DashboardShell
         sidebar={sidebar}
-        mobileNav={mobileNav}
+        mobileHeader={mobileHeader}
+          tabBar={tabBar}
         header={
           <DashboardHeader
             title={greeting}

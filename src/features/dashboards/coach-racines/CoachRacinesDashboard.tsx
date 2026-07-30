@@ -12,13 +12,15 @@ import { useLocale, useTranslations } from "next-intl";
 import {
   DashboardErrorState,
   DashboardHeader,
-  DashboardMobileNavigation,
+  DashboardMobileHeader,
   DashboardPageBoundary,
   DashboardShell,
   DashboardSidebar,
   DashboardSkeleton,
   DashboardStatusChip,
+  DashboardTabBar,
 } from "@/features/dashboards/shared";
+import type { DashboardTab } from "@/features/dashboards/shared";
 import { buildCoachRacinesNav } from "./nav";
 import { CoachOverviewSection } from "./sections/CoachOverviewSection";
 import { CoachLearnersSection } from "./sections/CoachLearnersSection";
@@ -97,13 +99,23 @@ export function CoachRacinesDashboard({ locale }: { locale: "fr" | "en" }) {
     />
   );
 
-  const mobileNav = (
-    <DashboardMobileNavigation
-      groups={navGroups}
-      activeHref={baseHref}
+  const mobileHeader = (
+    <DashboardMobileHeader
       personaLabel={personaLabel}
+      personaSubtitle={personaSubtitle}
+      brandHref={`/${currentLocale ?? locale}`}
     />
   );
+
+  // Compteurs réels uniquement (aucun endpoint session/notes/messages n'existe
+  // dans ce lot → badges absents pour ces trois onglets).
+  const buildTabs = (): DashboardTab[] => [
+    { key: "overview", label: t("mobileNav.overview"), href: baseHref },
+    { key: "learners", label: t("mobileNav.learners"), href: `${baseHref}#mes-apprenants` },
+    { key: "sessions", label: t("mobileNav.sessions"), href: `${baseHref}#seances` },
+    { key: "messages", label: t("mobileNav.messages"), href: `${baseHref}#messages` },
+    { key: "sessionNotes", label: t("mobileNav.sessionNotes"), href: `${baseHref}#notes-de-seance` },
+  ];
 
   if (state.kind === "loading") {
     return (
@@ -111,7 +123,8 @@ export function CoachRacinesDashboard({ locale }: { locale: "fr" | "en" }) {
         <DashboardShell
           universe="racines"
           sidebar={sidebar}
-          mobileNav={mobileNav}
+          mobileHeader={mobileHeader}
+          tabBar={<DashboardTabBar tabs={buildTabs()} activeKey="overview" />}
           header={<DashboardHeader title={personaLabel} subtitle={t("loading")} />}
         >
           <div style={{ display: "grid", gap: 16 }}>
@@ -132,7 +145,8 @@ export function CoachRacinesDashboard({ locale }: { locale: "fr" | "en" }) {
         <DashboardShell
           universe="racines"
           sidebar={sidebar}
-          mobileNav={mobileNav}
+          mobileHeader={mobileHeader}
+          tabBar={<DashboardTabBar tabs={buildTabs()} activeKey="overview" />}
           header={<DashboardHeader title={personaLabel} />}
         >
           <DashboardErrorState
@@ -175,7 +189,8 @@ export function CoachRacinesDashboard({ locale }: { locale: "fr" | "en" }) {
       <DashboardShell
         universe="racines"
         sidebar={sidebar}
-        mobileNav={mobileNav}
+        mobileHeader={mobileHeader}
+        tabBar={<DashboardTabBar tabs={buildTabs()} activeKey="overview" />}
         header={
           <DashboardHeader
             title={personaLabel}
