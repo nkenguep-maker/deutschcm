@@ -313,6 +313,12 @@ model User {
   circleFeedbacksAuthored   CircleFeedback[]        @relation("CircleFeedbackAuthor")
   circleReplyAuthored       CircleSubmissionReply[] @relation("CircleSubmissionReplyAuthor")
 
+  // ─── P4.6-A · Messagerie · relations back-refs ────────────────
+  messagingParticipations   MessagingConversationParticipant[] @relation("MessagingParticipantUser")
+  messagingMessagesSent     MessagingMessage[]                 @relation("MessagingMessageSenderUser")
+  messagingModerationActs   MessagingModerationAction[]        @relation("MessagingModerationActor")
+  messagingAudioAssetsOwned MessagingAudioAsset[]              @relation("MessagingAudioOwnerUser")
+
   @@index([email])
   @@index([centerId])
   @@index([supabaseId])
@@ -1252,6 +1258,11 @@ model ChildProfile {
   circleAssignmentTargets CircleAssignmentTarget[]
   circleSubmissions       CircleSubmission[]
 
+  // P4.6-A · Messagerie · back-refs
+  messagingParticipations   MessagingConversationParticipant[] @relation("MessagingParticipantChild")
+  messagingMessagesSent     MessagingMessage[]                 @relation("MessagingMessageSenderChild")
+  messagingAudioAssetsOwned MessagingAudioAsset[]              @relation("MessagingAudioOwnerChild")
+
   @@index([parentUserId])
   @@index([householdId])
   @@map("child_profiles")
@@ -1711,4 +1722,293 @@ model QaBootstrapNonce {
   @@index([expiresAt])
   @@index([consumedAt])
   @@map("qa_bootstrap_nonces")
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// P4.6-A · Messagerie · fondations · matrice de permissions server-side
+// ═══════════════════════════════════════════════════════════════════
+//
+// Doctrine :
+//   - 13 types de conversation exactement (WORLD_STUDENT_TEACHER →
+//     PLATFORM_BROADCAST). Aucun type ADMIN_METADATA_VIEW (vue synthétique
+//     séparée).
+//   - Enfants : envois strictement GUIDED_PHRASE + AUDIO (jamais TEXT
+//     libre côté serveur).
+//   - Parents : GUARDIAN_OBSERVER dans les fils enfant, jamais MEMBER
+//     du dialogue pédagogique.
+//   - Super Admin : lit uniquement CENTER_PLATFORM_SUPPORT +
+//     PLATFORM_BROADCAST, jamais body/transcript/storageKey pédagogique.
+//   - Contexts (centerId/classroomId/householdId/etc.) nullable au SQL
+//     mais validés par type dans src/lib/messaging/matrix.ts.
+//   - Audio : fondations uniquement (statut/storageKey privé), aucun
+//     upload MediaRecorder ni signed URL dans P4.6-A.
+
+enum ConversationType {
+  WORLD_STUDENT_TEACHER
+  WORLD_CLASS_GROUP
+  ROOTS_STUDENT_COACH
+  ROOTS_PALABRE_GROUP
+  CHILD_WORLD_GUIDED
+  CHILD_ROOTS_GUIDED
+  FAMILY_TEACHER
+  FAMILY_CENTER_BILLING
+  FAMILY_COACH
+  CENTER_TEACHER_INTERNAL
+  CENTER_COACH_INTERNAL
+  CENTER_PLATFORM_SUPPORT
+  PLATFORM_BROADCAST
+}
+
+enum MessagingConversationStatus {
+  ACTIVE
+  CLOSED
+  ARCHIVED
+}
+
+enum MessagingMessageKind {
+  TEXT
+  AUDIO
+  GUIDED_PHRASE
+  CARD
+  SYSTEM
+}
+
+enum MessagingCardType {
+  FEEDBACK_PUBLISHED
+  ENCOURAGEMENT
+  PAYMENT_REMINDER
+  PLATFORM_BROADCAST
+  SUPPORT_INTERVENTION
+}
+
+enum MessagingActorType {
+  USER
+  CHILD_PROFILE
+}
+
+enum MessagingParticipantRole {
+  MEMBER
+  MODERATOR
+  GUARDIAN_OBSERVER
+  READ_ONLY
+}
+
+enum MessagingModerationState {
+  ACTIVE
+  HIDDEN
+  DELETED
+  QUARANTINED
+}
+
+enum MessagingReceiptKind {
+  PARENT_COPY
+  DELIVERED
+  READ
+  ACKNOWLEDGED
+}
+
+enum MessagingAudioStatus {
+  PENDING
+  READY
+  FAILED
+  EXPIRED
+}
+
+model MessagingConversation {
+  id             String                       @id @default(cuid())
+  type           ConversationType
+  status         MessagingConversationStatus  @default(ACTIVE)
+  // Contexts métier · nullable au SQL, validés par type dans matrix.ts
+  centerId       String?
+  classroomId    String?
+  householdId    String?
+  assignmentId   String?
+  submissionId   String?
+  feedbackId     String?
+  // Pour rappels de paiement · référence future à un Invoice réel.
+  invoiceId      String?
+  createdAt      DateTime                     @default(now())
+  updatedAt      DateTime                     @updatedAt
+  lastMessageAt  DateTime?
+  closedAt       DateTime?
+  metadata       Json?
+
+  participants        MessagingConversationParticipant[]
+  messages            MessagingMessage[]
+  readStates          MessagingConversationReadState[]
+  moderationActions   MessagingModerationAction[]
+
+  @@index([type, centerId])
+  @@index([type, classroomId])
+  @@index([type, householdId])
+  @@index([lastMessageAt])
+  @@map("messaging_conversations")
+}
+
+model MessagingConversationParticipant {
+  id                String                    @id @default(cuid())
+  conversationId    String
+  conversation      MessagingConversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  actorType         MessagingActorType
+  userId            String?
+  user              User?                     @relation("MessagingParticipantUser", fields: [userId], references: [id], onDelete: SetNull)
+  childProfileId    String?
+  childProfile      ChildProfile?             @relation("MessagingParticipantChild", fields: [childProfileId], references: [id], onDelete: SetNull)
+  participantRole   MessagingParticipantRole  @default(MEMBER)
+  joinedAt          DateTime                  @default(now())
+  leftAt            DateTime?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  // Unicité active : un user ou un child ne peut avoir qu'une seule
+  // participation dans une conversation donnée. Le service métier gère
+  // le cycle add/remove (leftAt) sans supprimer la row.
+  @@unique([conversationId, userId], name: "conv_user_active", map: "msg_participant_user_uq")
+  @@unique([conversationId, childProfileId], name: "conv_child_active", map: "msg_participant_child_uq")
+  @@index([userId])
+  @@index([childProfileId])
+  @@index([conversationId, participantRole])
+  @@map("messaging_conversation_participants")
+}
+
+model MessagingMessage {
+  id                    String                     @id @default(cuid())
+  conversationId        String
+  conversation          MessagingConversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderType            MessagingActorType
+  senderUserId          String?
+  senderUser            User?                      @relation("MessagingMessageSenderUser", fields: [senderUserId], references: [id], onDelete: SetNull)
+  senderChildProfileId  String?
+  senderChildProfile    ChildProfile?              @relation("MessagingMessageSenderChild", fields: [senderChildProfileId], references: [id], onDelete: SetNull)
+  kind                  MessagingMessageKind
+  body                  String?
+  guidedPhraseId        String?
+  guidedPhrase          MessagingGuidedPhrase?     @relation(fields: [guidedPhraseId], references: [id], onDelete: SetNull)
+  replyToMessageId      String?
+  replyTo               MessagingMessage?          @relation("MessagingMessageReply", fields: [replyToMessageId], references: [id], onDelete: SetNull)
+  replies               MessagingMessage[]         @relation("MessagingMessageReply")
+  cardType              MessagingCardType?
+  cardPayload           Json?
+  audioAssetId          String?
+  audioAsset            MessagingAudioAsset?       @relation(fields: [audioAssetId], references: [id], onDelete: SetNull)
+  moderationState       MessagingModerationState   @default(ACTIVE)
+  idempotencyKey        String?
+  createdAt             DateTime                   @default(now())
+  publishedAt           DateTime?
+  deletedAt             DateTime?
+  metadata              Json?
+
+  attachments           MessagingMessageAttachment[]
+  receipts              MessagingMessageReceipt[]
+
+  @@unique([conversationId, idempotencyKey], name: "conv_idem_unique")
+  @@index([conversationId, createdAt])
+  @@index([senderUserId])
+  @@index([senderChildProfileId])
+  @@map("messaging_messages")
+}
+
+model MessagingMessageAttachment {
+  id          String            @id @default(cuid())
+  messageId   String
+  message     MessagingMessage  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  kind        String            // "audio", "card_ref", "other" · pas d'enum pour flexibilité
+  storageKey  String?           // clé bucket privé · aucune URL publique
+  mimeType    String?
+  sizeBytes   Int?
+  createdAt   DateTime          @default(now())
+
+  @@index([messageId])
+  @@map("messaging_message_attachments")
+}
+
+model MessagingAudioAsset {
+  id                    String                @id @default(cuid())
+  ownerUserId           String?
+  ownerUser             User?                 @relation("MessagingAudioOwnerUser", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerChildProfileId   String?
+  ownerChildProfile     ChildProfile?         @relation("MessagingAudioOwnerChild", fields: [ownerChildProfileId], references: [id], onDelete: SetNull)
+  status                MessagingAudioStatus  @default(PENDING)
+  storageKey            String?               // clé privée · jamais publique
+  mimeType              String?
+  sizeBytes             Int?
+  durationMs            Int?
+  waveform              Json?                 // représentation calculée client
+  transcript            String?
+  createdAt             DateTime              @default(now())
+  finalizedAt           DateTime?
+  expiresAt             DateTime?
+
+  messages              MessagingMessage[]
+
+  @@index([status, expiresAt])
+  @@index([ownerUserId])
+  @@index([ownerChildProfileId])
+  @@map("messaging_audio_assets")
+}
+
+model MessagingGuidedPhrase {
+  id                String              @id @default(cuid())
+  universe          Universe
+  locale            String              // "fr" | "en"
+  conversationType  ConversationType
+  category          String?
+  text              String
+  isActive          Boolean             @default(true)
+  ordering          Int                 @default(0)
+  createdAt         DateTime            @default(now())
+
+  messages          MessagingMessage[]
+
+  @@index([universe, conversationType, isActive])
+  @@map("messaging_guided_phrases")
+}
+
+model MessagingMessageReceipt {
+  id                        String                @id @default(cuid())
+  messageId                 String
+  message                   MessagingMessage      @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  kind                      MessagingReceiptKind
+  // Le récepteur peut être un User (parent observer, membre) ou un
+  // ChildProfile pour les futures notifications spécifiques enfants.
+  participantUserId         String?
+  participantChildProfileId String?
+  createdAt                 DateTime              @default(now())
+
+  @@index([messageId, kind])
+  @@index([participantUserId, kind])
+  @@map("messaging_message_receipts")
+}
+
+model MessagingConversationReadState {
+  id                        String                @id @default(cuid())
+  conversationId            String
+  conversation              MessagingConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  participantUserId         String?
+  participantChildProfileId String?
+  lastReadMessageId         String?
+  lastReadAt                DateTime              @default(now())
+  updatedAt                 DateTime              @updatedAt
+
+  @@unique([conversationId, participantUserId], name: "conv_read_user", map: "msg_read_user_uq")
+  @@unique([conversationId, participantChildProfileId], name: "conv_read_child", map: "msg_read_child_uq")
+  @@map("messaging_conversation_read_states")
+}
+
+model MessagingModerationAction {
+  id                String                    @id @default(cuid())
+  conversationId    String
+  conversation      MessagingConversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  actorUserId       String
+  actor             User                      @relation("MessagingModerationActor", fields: [actorUserId], references: [id], onDelete: Cascade)
+  // "HIDE_MESSAGE" | "CLOSE_CONVERSATION" | "REOPEN" | "INTERVENE_SUPPORT" ·
+  // pas d'enum pour permettre évolutions rapides.
+  action            String
+  targetMessageId   String?
+  reason            String?
+  metadata          Json?
+  createdAt         DateTime                  @default(now())
+
+  @@index([conversationId, createdAt])
+  @@map("messaging_moderation_actions")
 }

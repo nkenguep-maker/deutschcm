@@ -24,7 +24,9 @@ export type FeatureFlag =
   | "NOTIFICATIONS_ENABLED"
   | "RACINES_COACH_OPERATIONAL"
   | "QA_MODE_ENABLED"
-  | "DASHBOARD_REDESIGN_ENABLED";
+  | "DASHBOARD_REDESIGN_ENABLED"
+  | "MESSAGING_ENABLED"
+  | "MESSAGE_AUDIO_ENABLED";
 
 const P4_FLAGS: readonly FeatureFlag[] = [
   "CIRCLE_ENABLED",
@@ -41,6 +43,8 @@ const P4_FLAGS: readonly FeatureFlag[] = [
   "RACINES_COACH_OPERATIONAL",
   "QA_MODE_ENABLED",
   "DASHBOARD_REDESIGN_ENABLED",
+  "MESSAGING_ENABLED",
+  "MESSAGE_AUDIO_ENABLED",
 ] as const;
 
 export function getFlag(name: FeatureFlag): boolean {
@@ -129,6 +133,24 @@ export function isAudioFeedbackActive(): boolean {
  */
 export function isYemaDashboardRedesignActive(): boolean {
   return getFlag("DASHBOARD_REDESIGN_ENABLED");
+}
+
+/**
+ * P4.6-A · gate global du domaine Messagerie. Server-only. Sans ce flag,
+ * les endpoints /api/messaging/* retournent 404 stable et n'exécutent
+ * AUCUNE requête DB métier (aucun indice sur l'existence des conversations).
+ */
+export function isMessagingEnabled(): boolean {
+  return getFlag("MESSAGING_ENABLED");
+}
+
+/**
+ * P4.6-A · gate audio séparé. Reste false tant que le stockage audio
+ * privé n'est pas livré (P4.6-B). Aucun MediaRecorder ni signed URL
+ * ne fonctionne quand ce flag est off, même si MESSAGING_ENABLED est on.
+ */
+export function isMessagingAudioEnabled(): boolean {
+  return isMessagingEnabled() && getFlag("MESSAGE_AUDIO_ENABLED");
 }
 
 export function assertFlagEnabled(name: FeatureFlag): void {
