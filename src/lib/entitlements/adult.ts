@@ -33,29 +33,19 @@ export async function hasAdultWorldAccess(userId: string): Promise<boolean> {
 }
 
 export async function hasAdultRootsAccess(userId: string): Promise<boolean> {
-  // Racines adulte accessible via :
-  //   - ROOTS_SOLO (grant USER)
-  //   - ROOTS_FAMILY (grant HOUSEHOLD dont le user est membre) — siège adulte
-  const soloGrant = await activeUserGrantsForCodes(userId, [ProductCode.ROOTS_SOLO]);
-  if (soloGrant.length > 0) return true;
-
-  const memberships = await prisma.householdMembership.findMany({
-    where: { userId, status: "ACTIVE" },
-    select: { householdId: true },
-  });
-  if (memberships.length === 0) return false;
-
-  const householdIds = memberships.map((m) => m.householdId);
-  const familyGrant = await prisma.accessGrant.findFirst({
-    where: {
-      beneficiaryType: "HOUSEHOLD",
-      beneficiaryId: { in: householdIds },
-      status: "ACTIVE",
-      productVariant: { product: { code: ProductCode.ROOTS_FAMILY } },
-    },
-    select: { id: true },
-  });
-  return Boolean(familyGrant);
+  // Racines adulte accessible UNIQUEMENT via un grant USER explicite :
+  //   - ROOTS_SOLO       → siège individuel
+  //   - ROOTS_FAMILY     → siège adulte ATTRIBUÉ (voir assignAdultRootsSeat)
+  //
+  // La simple appartenance à un Household avec grant HOUSEHOLD ROOTS_FAMILY
+  // NE SUFFIT PAS (patch Lot 4A → 4B) : chaque adulte doit avoir son propre
+  // grant USER ROOTS_FAMILY dont le sourceId pointe vers le Household
+  // acheteur. Max 2 sièges USER par Household (assigné/révoqué côté serveur).
+  const grants = await activeUserGrantsForCodes(userId, [
+    ProductCode.ROOTS_SOLO,
+    ProductCode.ROOTS_FAMILY,
+  ]);
+  return grants.length > 0;
 }
 
 export interface AdultAccessSummary {

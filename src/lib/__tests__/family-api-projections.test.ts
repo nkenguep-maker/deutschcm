@@ -69,13 +69,19 @@ describe("Family APIs projections (Lot 4A · sécurité)", () => {
     expect(worldFn).not.toMatch(/FAMILY_MONDE/);
   });
 
-  it("lib/entitlements/adult.ts vérifie Racines adulte via ROOTS_SOLO ou ROOTS_FAMILY (brief §2)", () => {
+  it("lib/entitlements/adult.ts vérifie Racines adulte via grant USER ROOTS_SOLO ou ROOTS_FAMILY (patch commercial)", () => {
     const src = stripComments(readSrc("lib/entitlements/adult.ts"));
     const start = src.indexOf("export async function hasAdultRootsAccess");
     const end = src.indexOf("export ", start + 1);
     const rootsFn = src.slice(start, end > 0 ? end : undefined);
+    // Doit matcher les 2 product codes attendus.
     expect(rootsFn).toMatch(/ROOTS_SOLO/);
     expect(rootsFn).toMatch(/ROOTS_FAMILY/);
+    // Doit passer par activeUserGrantsForCodes (grant USER uniquement).
+    expect(rootsFn).toMatch(/activeUserGrantsForCodes/);
+    // Ne doit PLUS chercher HouseholdMembership + grant HOUSEHOLD.
+    expect(rootsFn).not.toMatch(/householdMembership/);
+    expect(rootsFn).not.toMatch(/beneficiaryType:\s*["']HOUSEHOLD["']/);
   });
 
   it("lib/family/seats.ts n'attribue AUCUN siège Monde par défaut à ROOTS_FAMILY (brief §2)", () => {
