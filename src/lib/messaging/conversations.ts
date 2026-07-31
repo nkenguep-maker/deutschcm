@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import type { ConversationType } from "@prisma/client";
 import type { MessagingActor } from "./actor";
 import { getRule } from "./matrix";
+import { broadcastReadStateUpdated } from "./realtimePublisher";
 
 // P4.6-A · services de résolution des conversations.
 //
@@ -145,5 +146,24 @@ export async function markConversationReadForActor(
       create: { ...commonData, participantChildProfileId: actor.childProfileId! },
     });
   }
+
+  // P4.6-B.1 · notifier les participants pour recalcul unread/badges ·
+  // aucun contenu, uniquement conversationId + timestamp.
+  const participants = await prisma.messagingConversationParticipant.findMany({
+    where: { conversationId, leftAt: null },
+    select: { userId: true, childProfileId: true },
+  });
+  const userIds = participants.map((p) => p.userId).filter((x): x is string => Boolean(x));
+  const childIds = participants.map((p) => p.childProfileId).filter((x): x is string => Boolean(x));
+  try {
+    await broadcastReadStateUpdated({
+      conversationId,
+      participantUserIds: userIds,
+      participantChildProfileIds: childIds,
+    });
+  } catch {
+    // Best-effort.
+  }
+
   return { ok: true as const };
 }

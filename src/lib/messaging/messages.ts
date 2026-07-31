@@ -5,6 +5,7 @@ import type { MessagingActor } from "./actor";
 import { assertConversationAccess } from "./conversations";
 import { getRule, isKindAllowedForActor } from "./matrix";
 import { isMessagingAudioEnabled } from "@/lib/flags";
+import { broadcastMessageCreated } from "./realtimePublisher";
 
 // P4.6-A · envoi de message côté serveur · toute autorité de sender,
 // participant et content vient du serveur.
@@ -200,6 +201,26 @@ export async function sendMessage(
     where: { id: input.conversationId },
     data: { lastMessageAt: now },
   });
+
+  // P4.6-B.1 · notifier les participants via Broadcast · payload minimal
+  // (aucun body/kind sensible) · les clients re-fetch via API pour lire
+  // le contenu et re-vérifier l'accès.
+  const participants = await prisma.messagingConversationParticipant.findMany({
+    where: { conversationId: input.conversationId, leftAt: null },
+    select: { userId: true, childProfileId: true },
+  });
+  const userIds = participants.map((p) => p.userId).filter((x): x is string => Boolean(x));
+  const childIds = participants.map((p) => p.childProfileId).filter((x): x is string => Boolean(x));
+  try {
+    await broadcastMessageCreated({
+      conversationId: input.conversationId,
+      messageId: created.id,
+      participantUserIds: userIds,
+      participantChildProfileIds: childIds,
+    });
+  } catch {
+    // Best-effort · polling fallback rattrapera si Realtime indisponible.
+  }
 
   return { ok: true, messageId: created.id };
 }

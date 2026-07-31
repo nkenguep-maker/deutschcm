@@ -13,6 +13,9 @@ type Props = {
   persona: PersonaId;
   locale: "fr" | "en";
   onSent: () => void;
+  // P4.6-B.1 · signal éphémère pour Realtime Presence (adulte uniquement).
+  // Ignoré côté enfant · aucun signal de saisie libre pour eux.
+  onActivity?: () => void;
 };
 
 function isChildPersona(p: PersonaId): boolean {
@@ -35,7 +38,7 @@ function makeIdempotencyKey(suffix: string): string {
   return `${Math.random().toString(36).slice(2, 12)}-${suffix}`;
 }
 
-export function MessageComposer({ conversationId, persona, locale, onSent }: Props) {
+export function MessageComposer({ conversationId, persona, locale, onSent, onActivity }: Props) {
   const t = useTranslations("yemaMessaging.composer");
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
@@ -168,7 +171,10 @@ export function MessageComposer({ conversationId, persona, locale, onSent }: Pro
         </button>
         <textarea
           value={body}
-          onChange={(e) => setBody(e.target.value)}
+          onChange={(e) => {
+            setBody(e.target.value);
+            onActivity?.();
+          }}
           placeholder={t("placeholder")}
           aria-label={t("placeholder")}
           rows={2}

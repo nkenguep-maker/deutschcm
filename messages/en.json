@@ -1588,7 +1588,13 @@
       "audioPlaceholder": "Voice message (coming)",
       "sentAt": "Sent at {time}",
       "typing": "…is typing",
+      "typingIndicator": "{count, plural, one {Someone is typing…} other {# people are typing…}}",
       "loadMore": "Load more"
+    },
+    "connection": {
+      "live": "Live connection active.",
+      "reconnecting": "Reconnecting…",
+      "dropped": "Live connection interrupted. Messages will continue to sync."
     },
     "kinds": {
       "TEXT": "Text",

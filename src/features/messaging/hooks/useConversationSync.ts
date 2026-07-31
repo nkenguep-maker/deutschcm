@@ -3,21 +3,21 @@
 import { useEffect, useRef, useState } from "react";
 import type { MessageRow } from "../types";
 
-// P4.6-B · Realtime hook · polling-fallback discipliné.
+// P4.6-B.1 · sync conversation active · Realtime + polling adaptatif.
 //
-// La DB reste la source de vérité (brief §7). Pas de trust au payload
-// event. Comportement :
-//   - Fetch initial des messages.
-//   - Polling toutes les 15s en fond (fallback si Realtime absent).
-//   - Rafraîchit sur focus tab (visibilitychange).
-//   - Dédup par messageId · préserve ordre createdAt+id.
-//   - On error : conserve la liste précédente, expose connectionDropped.
+// La DB reste la seule source de vérité (brief §2). Les événements
+// Realtime ne portent aucun contenu · ils déclenchent uniquement un
+// refetch qui re-vérifie l'accès côté serveur.
 //
-// Le brief autorise ce fallback en attendant l'intégration Supabase
-// Realtime channel. L'infra channel est prête (indexes messaging_messages
-// conversationId+createdAt), pas de dépendance côté client aujourd'hui.
+// Cadence polling ·
+//   - realtimeConnected=true  → polling espacé (60s) en filet de sécurité
+//   - realtimeConnected=false → polling actif (15s) en fallback
+//   - unmount / conv change   → cleanup (un seul timer à la fois)
+//
+// Dédup par messageId · préserve ordre createdAt+id.
 
-const POLL_INTERVAL_MS = 15_000;
+const POLL_FAST_MS = 15_000;
+const POLL_SLOW_MS = 60_000;
 
 export interface ConversationSyncState {
   messages: MessageRow[];
@@ -27,12 +27,19 @@ export interface ConversationSyncState {
   refetch: () => void;
 }
 
-export function useConversationSync(conversationId: string | null): ConversationSyncState {
+interface UseConversationSyncOptions {
+  realtimeConnected?: boolean;
+}
+
+export function useConversationSync(
+  conversationId: string | null,
+  options: UseConversationSyncOptions = {},
+): ConversationSyncState {
   const [messages, setMessages] = useState<MessageRow[]>([]);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [isError, setError] = useState<boolean>(false);
-  const [connectionDropped, setDropped] = useState<boolean>(false);
   const inFlight = useRef<AbortController | null>(null);
+  const realtimeConnected = options.realtimeConnected ?? false;
 
   const fetchMessages = () => {
     if (!conversationId) return;
@@ -46,7 +53,7 @@ export function useConversationSync(conversationId: string | null): Conversation
     })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((json: { messages: MessageRow[] }) => {
-        // Dédup par messageId · ordre createdAt+id.
+        // Dédup par messageId · ordre createdAt+id (stable).
         const map = new Map<string, MessageRow>();
         for (const m of json.messages) map.set(m.id, m);
         const list = Array.from(map.values()).sort((a, b) => {
@@ -56,36 +63,53 @@ export function useConversationSync(conversationId: string | null): Conversation
         });
         setMessages(list);
         setError(false);
-        setDropped(false);
       })
       .catch((e: Error) => {
         if (e.name === "AbortError") return;
         setError(true);
-        setDropped(true);
       })
       .finally(() => setLoading(false));
   };
 
+  // Fetch initial + refetch à chaque changement de conversation.
   useEffect(() => {
     if (!conversationId) {
-      // Reset explicite quand aucune conversation active · état vide propre.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setMessages([]);
       return;
     }
     fetchMessages();
-    const t = setInterval(fetchMessages, POLL_INTERVAL_MS);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId]);
+
+  // Polling adaptatif · un seul timer selon la disponibilité Realtime.
+  useEffect(() => {
+    if (!conversationId) return;
+    const interval = realtimeConnected ? POLL_SLOW_MS : POLL_FAST_MS;
+    const t = setInterval(fetchMessages, interval);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, realtimeConnected]);
+
+  // Refetch au retour de focus tab.
+  useEffect(() => {
+    if (!conversationId) return;
     const onFocus = () => {
       if (document.visibilityState === "visible") fetchMessages();
     };
     document.addEventListener("visibilitychange", onFocus);
-    return () => {
-      clearInterval(t);
-      document.removeEventListener("visibilitychange", onFocus);
-      inFlight.current?.abort();
-    };
+    return () => document.removeEventListener("visibilitychange", onFocus);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId]);
 
-  return { messages, isLoading, isError, connectionDropped, refetch: fetchMessages };
+  // Cleanup in-flight au démontage complet.
+  useEffect(() => () => inFlight.current?.abort(), []);
+
+  return {
+    messages,
+    isLoading,
+    isError,
+    connectionDropped: !realtimeConnected && isError,
+    refetch: fetchMessages,
+  };
 }

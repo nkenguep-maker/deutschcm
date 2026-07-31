@@ -1588,7 +1588,13 @@
       "audioPlaceholder": "Message vocal (bientôt)",
       "sentAt": "Envoyé à {time}",
       "typing": "…en train d'écrire",
+      "typingIndicator": "{count, plural, one {Une personne écrit…} other {# personnes écrivent…}}",
       "loadMore": "Voir plus"
+    },
+    "connection": {
+      "live": "Connexion instantanée active.",
+      "reconnecting": "Reconnexion en cours…",
+      "dropped": "Connexion instantanée interrompue. Les messages continuent de se synchroniser."
     },
     "kinds": {
       "TEXT": "Texte",

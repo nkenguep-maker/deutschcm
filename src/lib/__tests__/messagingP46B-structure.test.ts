@@ -108,12 +108,13 @@ describe("Filtres persona · source unique", () => {
   });
 });
 
-describe("useConversationSync · realtime avec polling fallback", () => {
+describe("useConversationSync · polling fallback (P4.6-B legacy · adapté P4.6-B.1)", () => {
   const src = read("features/messaging/hooks/useConversationSync.ts");
 
-  it("polling toutes les 15s", () => {
-    expect(src).toMatch(/POLL_INTERVAL_MS\s*=\s*15_000/);
-    expect(src).toMatch(/setInterval\(fetchMessages,\s*POLL_INTERVAL_MS\)/);
+  it("polling actif (rapide 15s ou lent 60s selon realtimeConnected)", () => {
+    expect(src).toMatch(/POLL_FAST_MS\s*=\s*15_000/);
+    expect(src).toMatch(/POLL_SLOW_MS\s*=\s*60_000/);
+    expect(src).toMatch(/setInterval\(fetchMessages/);
   });
 
   it("refetch sur visibilitychange", () => {

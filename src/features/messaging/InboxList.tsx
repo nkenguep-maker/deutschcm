@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { InboxItem } from "./types";
+import { useMessagingRealtime } from "./hooks/useMessagingRealtime";
 
 type Props = {
   filter: string;
@@ -16,20 +17,38 @@ export function InboxList({ filter, activeConversationId, onSelect }: Props) {
   const [items, setItems] = useState<InboxItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [inboxChannel, setInboxChannel] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Fetch on mount / filter change · état "loading" affiché pendant le
-    // fetch initial. Ces setState sont synchrones dans l'effet mais alignés
-    // sur le contrat du composant (fetch au montage et sur changement de
-    // filter). Le rendu suivant affichera loading=true puis loading=false.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLoading(true);
-    setError(false);
+  const refetch = useCallback(() => {
     fetch(`/api/messaging/inbox?filter=${encodeURIComponent(filter)}`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("http"))))
       .then((json: { conversations: InboxItem[] }) => setItems(json.conversations))
       .catch(() => setError(true))
       .finally(() => setLoading(false));
+  }, [filter]);
+
+  // Résout une seule fois le canal inbox de l'acteur courant.
+  useEffect(() => {
+    fetch("/api/messaging/self", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("http"))))
+      .then((json: { channelName: string }) => setInboxChannel(json.channelName))
+      .catch(() => setInboxChannel(null));
+  }, []);
+
+  // Realtime inbox · un canal unique par acteur. Cleanup au changement
+  // de persona (channelName change) ou démontage.
+  useMessagingRealtime({
+    channelName: inboxChannel,
+    onEvent: () => refetch(),
+  });
+
+  useEffect(() => {
+    // Fetch on mount / filter change.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoading(true);
+    setError(false);
+    refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   if (loading) return <div style={{ padding: 12, color: "var(--yema-text-muted)" }}>{t("loading")}</div>;

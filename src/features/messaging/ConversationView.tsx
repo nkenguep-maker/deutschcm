@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useConversationSync } from "./hooks/useConversationSync";
+import { useMessagingRealtime } from "./hooks/useMessagingRealtime";
 import { MessageComposer } from "./MessageComposer";
 import type { ConversationType, MessageKind, PersonaId } from "./types";
 
@@ -11,6 +12,10 @@ type Props = {
   conversationType: ConversationType | null;
   persona: PersonaId;
 };
+
+function isChildPersona(p: PersonaId): boolean {
+  return p === "child_monde" || p === "child_racines";
+}
 
 function formatTime(iso: string, locale: string): string {
   const d = new Date(iso);
@@ -38,13 +43,60 @@ function bubbleStyleForKind(kind: MessageKind): React.CSSProperties {
   return base;
 }
 
+const TYPING_EXPIRY_MS = 5_000;
+
 export function ConversationView({ conversationId, conversationType, persona }: Props) {
   const t = useTranslations("yemaMessaging.conversation");
   const tK = useTranslations("yemaMessaging.kinds");
   const tTop = useTranslations("yemaMessaging");
+  const tConn = useTranslations("yemaMessaging.connection");
   const locale = useLocale();
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
-  const sync = useConversationSync(conversationId);
+
+  const channelName = useMemo(
+    () => (conversationId ? `msg:conv:${conversationId}` : null),
+    [conversationId],
+  );
+  const [typingPersonas, setTypingPersonas] = useState<string[]>([]);
+
+  // Realtime · un canal par conversation active. Cleanup au switch fil.
+  const realtime = useMessagingRealtime({
+    channelName,
+    onEvent: () => {
+      // On refetch systématiquement · la DB reste source de vérité.
+      sync.refetch();
+    },
+    presence: {
+      persona,
+      onSync: (state) => {
+        const others: string[] = [];
+        const now = Date.now();
+        for (const [key, entries] of Object.entries(state)) {
+          if (key === persona) continue;
+          for (const e of entries) {
+            if (e.kind === "typing") {
+              const at = (e as { at?: number }).at;
+              if (typeof at !== "number" || now - at < TYPING_EXPIRY_MS) {
+                others.push(key);
+                break;
+              }
+            }
+          }
+        }
+        setTypingPersonas(others);
+      },
+    },
+  });
+
+  const realtimeConnected = realtime.status === "connected";
+  const sync = useConversationSync(conversationId, { realtimeConnected });
+
+  // Expiration locale du typing indicator · si pas de resync presence.
+  useEffect(() => {
+    if (typingPersonas.length === 0) return;
+    const timeout = setTimeout(() => setTypingPersonas([]), TYPING_EXPIRY_MS);
+    return () => clearTimeout(timeout);
+  }, [typingPersonas]);
 
   // Mark read après chargement (best-effort · fire-and-forget)
   useEffect(() => {
@@ -57,6 +109,13 @@ export function ConversationView({ conversationId, conversationType, persona }: 
     }).catch(() => {});
   }, [conversationId, sync.messages]);
 
+  const handleComposerActivity = () => {
+    // Adulte uniquement · enfants n'émettent JAMAIS de signal de saisie
+    // libre (composer guidé, aucun texte en cours).
+    if (isChildPersona(persona)) return;
+    realtime.sendTyping();
+  };
+
   if (!conversationId) {
     return (
       <div style={{ padding: 40, color: "var(--yema-text-muted)", textAlign: "center" }}>
@@ -65,8 +124,26 @@ export function ConversationView({ conversationId, conversationType, persona }: 
     );
   }
 
+  const showLiveDropped =
+    realtime.status === "dropped" || realtime.status === "reconnecting";
+
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
+      {showLiveDropped ? (
+        <div
+          role="status"
+          style={{
+            padding: "6px 14px",
+            background: "var(--yema-surface-2)",
+            color: "var(--yema-text-muted)",
+            fontSize: 12,
+            borderBottom: "1px solid var(--yema-border)",
+          }}
+        >
+          {tConn(realtime.status === "reconnecting" ? "reconnecting" : "dropped")}
+        </div>
+      ) : null}
+
       <div
         role="log"
         aria-live="polite"
@@ -106,9 +183,17 @@ export function ConversationView({ conversationId, conversationType, persona }: 
             </div>
           ))
         )}
-        {sync.connectionDropped ? (
-          <div style={{ padding: 8, color: "var(--yema-alert)", fontSize: 12 }}>
-            {tTop("connectionDropped")}
+        {typingPersonas.length > 0 ? (
+          <div
+            aria-live="polite"
+            style={{
+              padding: "4px 10px",
+              fontSize: 12,
+              color: "var(--yema-text-muted)",
+              fontStyle: "italic",
+            }}
+          >
+            {t("typingIndicator", { count: typingPersonas.length })}
           </div>
         ) : null}
       </div>
@@ -118,6 +203,7 @@ export function ConversationView({ conversationId, conversationType, persona }: 
         persona={persona}
         locale={loc}
         onSent={() => sync.refetch()}
+        onActivity={handleComposerActivity}
       />
     </div>
   );

@@ -1,19 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
+import { useMessagingRealtime } from "./hooks/useMessagingRealtime";
 
 // P4.6-B · CTA + badge non-lus consommable par les 9 dashboards.
+// P4.6-B.1 · badge mis à jour via Realtime inbox event · refetch minimal.
 // Quand YEMA_MESSAGING_ENABLED=false → l'API renvoie 404 · le composant
 // affiche null · le placeholder legacy prend seul l'espace.
-// Quand true → CTA vers /[locale]/messages + badge non-lus réel.
 
 export function MessagesInboxLink() {
   const t = useTranslations("yemaMessaging");
   const locale = useLocale();
   const [available, setAvailable] = useState<boolean | null>(null);
   const [unread, setUnread] = useState<number>(0);
+  const [inboxChannel, setInboxChannel] = useState<string | null>(null);
+
+  const refetchSummary = useCallback(() => {
+    fetch("/api/messaging/unread-summary", { cache: "no-store" })
+      .then((r) => (r.status === 404 ? null : r.json()))
+      .then((data: { totalUnread: number } | null) => {
+        if (data) setUnread(data.totalUnread ?? 0);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/messaging/unread-summary", { cache: "no-store" })
@@ -31,6 +42,19 @@ export function MessagesInboxLink() {
       })
       .catch(() => setAvailable(false));
   }, []);
+
+  useEffect(() => {
+    if (available !== true) return;
+    fetch("/api/messaging/self", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json: { channelName: string } | null) => setInboxChannel(json?.channelName ?? null))
+      .catch(() => setInboxChannel(null));
+  }, [available]);
+
+  useMessagingRealtime({
+    channelName: available === true ? inboxChannel : null,
+    onEvent: () => refetchSummary(),
+  });
 
   if (available !== true) return null;
 
