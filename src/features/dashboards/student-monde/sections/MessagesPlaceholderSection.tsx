@@ -6,9 +6,11 @@ import {
   DashboardEmptyState,
   DashboardSectionHeader,
 } from "@/features/dashboards/shared";
+import { MessagesInboxLink } from "@/features/messaging/MessagesInboxLink";
 
-// Lot 2 · aucune fausse conversation, aucune interaction. Simple annonce.
-// Le backend messagerie arrive au Lot 6/7.
+// Lot 2 · placeholder textuel · Lot P4.6-B · CTA + badge non-lus quand
+// YEMA_MESSAGING_ENABLED=true (composant MessagesInboxLink retourne null
+// quand l'API est 404).
 export function MessagesPlaceholderSection() {
   const t = useTranslations("yemaDashboards");
 
@@ -20,6 +22,7 @@ export function MessagesPlaceholderSection() {
           title={t("common.messagesSoon")}
           description={t("common.messagesSoonHelp")}
         />
+        <MessagesInboxLink />
       </DashboardCard>
     </section>
   );

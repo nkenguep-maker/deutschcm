@@ -1519,5 +1519,115 @@
       "retry": "Retry",
       "exitChildMode": "Exit child mode"
     }
+  },
+  "yemaMessaging": {
+    "title": "Messaging",
+    "loading": "Loading messaging…",
+    "error": "Cannot load messaging.",
+    "retry": "Retry",
+    "empty": "No conversation yet.",
+    "emptyFilter": "No conversation matches this filter.",
+    "search": {
+      "placeholder": "Search a conversation",
+      "clear": "Clear"
+    },
+    "back": "Back",
+    "matrix": {
+      "title": "Exchange matrix",
+      "cta": "View matrix",
+      "close": "Close",
+      "columnPersona": "Persona",
+      "columnMembers": "Recipients",
+      "columnKinds": "Message types",
+      "columnContexts": "Required contexts",
+      "columnReplies": "Replies",
+      "repliesYes": "Allowed",
+      "repliesNo": "Forbidden",
+      "childOnly": "Child only",
+      "adultOnly": "Adult only",
+      "readonly": "Read only"
+    },
+    "filters": {
+      "all": "All",
+      "unread": "Unread",
+      "class": "Classes",
+      "family": "Families",
+      "children": "Children",
+      "internal": "Internal",
+      "support": "Support",
+      "billing": "Billing",
+      "school": "School",
+      "sessions": "Sessions",
+      "child_copies": "Child copies",
+      "audio": "Audio",
+      "group": "Group",
+      "broadcast": "Broadcast",
+      "journal": "Journal"
+    },
+    "composer": {
+      "placeholder": "Write a message…",
+      "send": "Send",
+      "sending": "Sending…",
+      "microDisabled": "Coming soon",
+      "attachDisabled": "Coming soon",
+      "guidedTitle": "Suggested replies",
+      "guidedEmpty": "No phrase available in your language.",
+      "childNoTextHint": "Choose a phrase below.",
+      "audioSoon": "Audio will arrive in a future batch."
+    },
+    "conversation": {
+      "closed": "This conversation is closed.",
+      "readOnly": "Read-only thread.",
+      "parentCopyBadge": "Copy to parent",
+      "systemMessage": "System message",
+      "cardPublishedFeedback": "Feedback published",
+      "cardEncouragement": "Encouragement",
+      "cardPaymentReminder": "Payment reminder",
+      "cardPlatformBroadcast": "Platform announcement",
+      "cardSupportIntervention": "Support intervention",
+      "audioPlaceholder": "Voice message (coming)",
+      "sentAt": "Sent at {time}",
+      "typing": "…is typing",
+      "loadMore": "Load more"
+    },
+    "kinds": {
+      "TEXT": "Text",
+      "AUDIO": "Audio",
+      "GUIDED_PHRASE": "Guided phrase",
+      "CARD": "Card",
+      "SYSTEM": "System"
+    },
+    "types": {
+      "WORLD_STUDENT_TEACHER": "Student ↔ Teacher",
+      "WORLD_CLASS_GROUP": "Class",
+      "ROOTS_STUDENT_COACH": "Student ↔ Coach",
+      "ROOTS_PALABRE_GROUP": "Palaver circle",
+      "CHILD_WORLD_GUIDED": "World child",
+      "CHILD_ROOTS_GUIDED": "Roots child",
+      "FAMILY_TEACHER": "Family ↔ Teacher",
+      "FAMILY_CENTER_BILLING": "Family ↔ Center · Billing",
+      "FAMILY_COACH": "Family ↔ Coach",
+      "CENTER_TEACHER_INTERNAL": "Center · Teacher internal",
+      "CENTER_COACH_INTERNAL": "Center · Coach internal",
+      "CENTER_PLATFORM_SUPPORT": "Platform support",
+      "PLATFORM_BROADCAST": "Platform broadcast"
+    },
+    "unreadBadge": "{count, plural, one {1 unread} other {# unread}}",
+    "featureDisabled": "Messaging will be available soon.",
+    "connectionDropped": "Connection lost. New messages not synced.",
+    "reconnected": "Syncing…",
+    "openMessages": "Open messaging",
+    "dashboardCta": "See my messages",
+    "personaLabels": {
+      "super_admin": "Super Admin",
+      "center_admin": "Center",
+      "teacher": "Teacher",
+      "coach": "Roots coach",
+      "student_monde": "World learner",
+      "student_racines": "Roots learner",
+      "family": "Family",
+      "child_monde": "World child",
+      "child_racines": "Roots child"
+    }
   }
 }

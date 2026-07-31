@@ -6,9 +6,10 @@ import {
   DashboardEmptyState,
   DashboardSectionHeader,
 } from "@/features/dashboards/shared";
+import { MessagesInboxLink } from "@/features/messaging/MessagesInboxLink";
 
-// Messages · Lot 3 : placeholder strict. Aucune fausse conversation, aucun
-// faux compteur, aucun faux audio. Vraie messagerie prévue Lot 6/7.
+// Messages Enseignant · Lot 3 placeholder · P4.6-B CTA + badge non-lus.
+// MessagesInboxLink retourne null quand YEMA_MESSAGING_ENABLED=false.
 export function TeacherMessagesSection() {
   const t = useTranslations("yemaDashboards.teacher.messages");
 
@@ -17,6 +18,7 @@ export function TeacherMessagesSection() {
       <DashboardSectionHeader title={<span id="teacher-messages-title">{t("title")}</span>} />
       <DashboardCard>
         <DashboardEmptyState title={t("soon")} />
+        <MessagesInboxLink />
       </DashboardCard>
     </section>
   );

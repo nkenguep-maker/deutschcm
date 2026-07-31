@@ -1519,5 +1519,115 @@
       "retry": "Réessayer",
       "exitChildMode": "Quitter le mode enfant"
     }
+  },
+  "yemaMessaging": {
+    "title": "Messagerie",
+    "loading": "Chargement de la messagerie…",
+    "error": "Impossible de charger la messagerie.",
+    "retry": "Réessayer",
+    "empty": "Aucune conversation pour l'instant.",
+    "emptyFilter": "Aucune conversation ne correspond à ce filtre.",
+    "search": {
+      "placeholder": "Rechercher une conversation",
+      "clear": "Effacer"
+    },
+    "back": "Retour",
+    "matrix": {
+      "title": "Matrice des échanges",
+      "cta": "Voir la matrice",
+      "close": "Fermer",
+      "columnPersona": "Persona",
+      "columnMembers": "Destinataires",
+      "columnKinds": "Types de messages",
+      "columnContexts": "Contexts requis",
+      "columnReplies": "Réponses",
+      "repliesYes": "Autorisées",
+      "repliesNo": "Interdites",
+      "childOnly": "Enfant uniquement",
+      "adultOnly": "Adulte uniquement",
+      "readonly": "Lecture seule"
+    },
+    "filters": {
+      "all": "Tous",
+      "unread": "Non lus",
+      "class": "Classes",
+      "family": "Familles",
+      "children": "Enfants",
+      "internal": "Interne",
+      "support": "Support",
+      "billing": "Paiement",
+      "school": "Scolarité",
+      "sessions": "Séances",
+      "child_copies": "Copies enfants",
+      "audio": "Audio",
+      "group": "Groupe",
+      "broadcast": "Annonces",
+      "journal": "Journal"
+    },
+    "composer": {
+      "placeholder": "Écrire un message…",
+      "send": "Envoyer",
+      "sending": "Envoi…",
+      "microDisabled": "Bientôt disponible",
+      "attachDisabled": "Bientôt disponible",
+      "guidedTitle": "Réponses proposées",
+      "guidedEmpty": "Aucune phrase disponible dans ta langue.",
+      "childNoTextHint": "Choisis une phrase ci-dessous.",
+      "audioSoon": "L'audio arrivera dans un prochain lot."
+    },
+    "conversation": {
+      "closed": "Cette conversation est fermée.",
+      "readOnly": "Fil en lecture seule.",
+      "parentCopyBadge": "Copie au parent",
+      "systemMessage": "Message système",
+      "cardPublishedFeedback": "Feedback publié",
+      "cardEncouragement": "Encouragement",
+      "cardPaymentReminder": "Rappel de paiement",
+      "cardPlatformBroadcast": "Annonce plateforme",
+      "cardSupportIntervention": "Intervention support",
+      "audioPlaceholder": "Message vocal (bientôt)",
+      "sentAt": "Envoyé à {time}",
+      "typing": "…en train d'écrire",
+      "loadMore": "Voir plus"
+    },
+    "kinds": {
+      "TEXT": "Texte",
+      "AUDIO": "Audio",
+      "GUIDED_PHRASE": "Phrase guidée",
+      "CARD": "Carte",
+      "SYSTEM": "Système"
+    },
+    "types": {
+      "WORLD_STUDENT_TEACHER": "Élève ↔ Enseignant",
+      "WORLD_CLASS_GROUP": "Classe",
+      "ROOTS_STUDENT_COACH": "Élève ↔ Coach",
+      "ROOTS_PALABRE_GROUP": "Cercle de palabre",
+      "CHILD_WORLD_GUIDED": "Enfant Monde",
+      "CHILD_ROOTS_GUIDED": "Enfant Racines",
+      "FAMILY_TEACHER": "Famille ↔ Enseignant",
+      "FAMILY_CENTER_BILLING": "Famille ↔ Centre · Facturation",
+      "FAMILY_COACH": "Famille ↔ Coach",
+      "CENTER_TEACHER_INTERNAL": "Centre · Interne Enseignant",
+      "CENTER_COACH_INTERNAL": "Centre · Interne Coach",
+      "CENTER_PLATFORM_SUPPORT": "Support plateforme",
+      "PLATFORM_BROADCAST": "Annonce plateforme"
+    },
+    "unreadBadge": "{count, plural, one {1 non lu} other {# non lus}}",
+    "featureDisabled": "La messagerie sera bientôt disponible.",
+    "connectionDropped": "Connexion perdue. Nouveaux messages non synchronisés.",
+    "reconnected": "Synchronisation en cours…",
+    "openMessages": "Ouvrir la messagerie",
+    "dashboardCta": "Voir mes messages",
+    "personaLabels": {
+      "super_admin": "Super Admin",
+      "center_admin": "Centre",
+      "teacher": "Enseignant·e",
+      "coach": "Coach Racines",
+      "student_monde": "Élève Monde",
+      "student_racines": "Élève Racines",
+      "family": "Famille",
+      "child_monde": "Enfant Monde",
+      "child_racines": "Enfant Racines"
+    }
   }
 }
