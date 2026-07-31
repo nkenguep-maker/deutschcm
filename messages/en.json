@@ -1568,12 +1568,38 @@
       "placeholder": "Write a message…",
       "send": "Send",
       "sending": "Sending…",
-      "microDisabled": "Coming soon",
+      "microDisabled": "Audio recording is not available in this browser.",
       "attachDisabled": "Coming soon",
       "guidedTitle": "Suggested replies",
       "guidedEmpty": "No phrase available in your language.",
       "childNoTextHint": "Choose a phrase below.",
-      "audioSoon": "Audio will arrive in a future batch."
+      "audioSoon": "Audio will arrive in a future batch.",
+      "startRecording": "Record a voice message",
+      "tapToSpeak": "Tap to speak"
+    },
+    "audio": {
+      "play": "Play voice message",
+      "pause": "Pause",
+      "requestingPermission": "Requesting microphone access…",
+      "recording": "Recording",
+      "childListening": "Listening…",
+      "stop": "Stop",
+      "cancel": "Cancel",
+      "recordAgain": "Record again",
+      "send": "Send",
+      "sending": "Sending…",
+      "previewLabel": "Preview recording",
+      "errorUnauthorized": "Access denied.",
+      "errorGone": "This voice message is no longer available.",
+      "errorNetwork": "Cannot play voice message.",
+      "error": {
+        "unsupported": "Audio recording is not available in this browser.",
+        "permission_denied": "Allow the microphone to record a voice message.",
+        "no_microphone": "No microphone available.",
+        "device_busy": "The microphone is already used by another application.",
+        "insecure_context": "Recording requires a secure connection (HTTPS).",
+        "unknown": "Recording failed. Please try again."
+      }
     },
     "conversation": {
       "closed": "This conversation is closed.",

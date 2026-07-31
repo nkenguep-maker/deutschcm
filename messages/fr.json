@@ -1568,12 +1568,38 @@
       "placeholder": "Écrire un message…",
       "send": "Envoyer",
       "sending": "Envoi…",
-      "microDisabled": "Bientôt disponible",
+      "microDisabled": "Enregistrement audio indisponible sur ce navigateur.",
       "attachDisabled": "Bientôt disponible",
       "guidedTitle": "Réponses proposées",
       "guidedEmpty": "Aucune phrase disponible dans ta langue.",
       "childNoTextHint": "Choisis une phrase ci-dessous.",
-      "audioSoon": "L'audio arrivera dans un prochain lot."
+      "audioSoon": "L'audio arrivera dans un prochain lot.",
+      "startRecording": "Enregistrer un message vocal",
+      "tapToSpeak": "Appuie pour parler"
+    },
+    "audio": {
+      "play": "Lire le message vocal",
+      "pause": "Mettre en pause",
+      "requestingPermission": "Autorisation du microphone…",
+      "recording": "Enregistrement en cours",
+      "childListening": "J'écoute…",
+      "stop": "Arrêter",
+      "cancel": "Annuler",
+      "recordAgain": "Recommencer",
+      "send": "Envoyer",
+      "sending": "Envoi…",
+      "previewLabel": "Préécouter l'enregistrement",
+      "errorUnauthorized": "Accès refusé.",
+      "errorGone": "Ce message vocal n'est plus disponible.",
+      "errorNetwork": "Impossible de lire le message vocal.",
+      "error": {
+        "unsupported": "L'enregistrement audio n'est pas disponible sur ce navigateur.",
+        "permission_denied": "Autorisez le microphone pour enregistrer un message vocal.",
+        "no_microphone": "Aucun microphone disponible.",
+        "device_busy": "Le microphone est déjà utilisé par une autre application.",
+        "insecure_context": "L'enregistrement nécessite une connexion sécurisée (HTTPS).",
+        "unknown": "L'enregistrement a échoué. Réessayez."
+      }
     },
     "conversation": {
       "closed": "Cette conversation est fermée.",

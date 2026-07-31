@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useConversationSync } from "./hooks/useConversationSync";
 import { useMessagingRealtime } from "./hooks/useMessagingRealtime";
 import { MessageComposer } from "./MessageComposer";
+import { AudioBubble } from "./audio/AudioBubble";
 import type { ConversationType, MessageKind, PersonaId } from "./types";
 
 type Props = {
@@ -185,7 +186,11 @@ export function ConversationView({ conversationId, conversationType, persona }: 
                     {m.body ? <div>{m.body}</div> : null}
                   </div>
                 ) : m.kind === "AUDIO" ? (
-                  <div style={{ color: "var(--yema-text-muted)" }}>{t("audioPlaceholder")}</div>
+                  m.audioAssetId ? (
+                    <AudioBubble assetId={m.audioAssetId} durationMs={null} />
+                  ) : (
+                    <div style={{ color: "var(--yema-text-muted)" }}>{t("audioPlaceholder")}</div>
+                  )
                 ) : m.kind === "SYSTEM" ? (
                   <div>{t("systemMessage")}</div>
                 ) : (
