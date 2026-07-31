@@ -167,16 +167,21 @@ async function resolveSupabaseIdByEmail(email) {
 async function ensurePrismaUserForAuth({ email, role, prenom, nom }) {
   const supId = await resolveSupabaseIdByEmail(email);
   if (!supId) return null;
-  // Upsert User avec role · idempotent sur (email).
+  // Upsert User avec role · idempotent sur (email). onboardingDone=true
+  // pour éviter le redirect /onboarding sur les E2E users nouveaux.
+  const p = prenom ?? "E2E";
+  const n = nom ?? "Test";
   const u = await db.user.upsert({
     where: { email },
-    update: { supabaseId: supId, role },
+    update: { supabaseId: supId, role, onboardingDone: true, germanLevel: "A1", isValidated: true },
     create: {
       email,
       supabaseId: supId,
       role,
-      prenom: prenom ?? "E2E",
-      nom: nom ?? "Test",
+      fullName: `${p} ${n}`,
+      onboardingDone: true,
+      germanLevel: "A1",
+      isValidated: true,
     },
     select: { id: true },
   });

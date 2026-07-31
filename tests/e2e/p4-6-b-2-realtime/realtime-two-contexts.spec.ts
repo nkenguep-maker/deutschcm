@@ -32,9 +32,22 @@ test.describe("P4.6-B.3 · Realtime deux contextes P-1", () => {
     await page.goto("/fr/login");
     await page.getByLabel(/e-?mail/i).fill(email);
     await page.getByLabel(/mot de passe|password/i).fill(password);
-    await page.getByRole("button", { name: /se connecter|log in|login/i }).click();
-    await page.waitForURL(/\/fr\/(dashboard|apprentissage|messages)/, { timeout: 15_000 });
+    await page.getByRole("button", { name: /ouvrir ma maison|log in|login/i }).click();
+    await page.waitForURL(/\/fr\/(dashboard|apprentissage|messages|onboarding)/, { timeout: 15_000 });
     return page;
+  }
+
+  // Ouvre /fr/messages et clique sur "Élève ↔ Enseignant" (t_em_en).
+  // Attend l'apparition du composer (placeholder).
+  async function openFirstConversation(page: import("playwright/test").Page) {
+    await page.goto("/fr/messages");
+    // Attend l'inbox chargée · cible le libellé exact.
+    const item = page.getByRole("button", { name: /Élève.*Enseignant/i }).first();
+    await item.waitFor({ timeout: 20_000 });
+    await item.click({ force: true });
+    // Le composer doit apparaître · c'est un textarea avec ce placeholder.
+    await page.getByPlaceholder(/écrire un message|write a message/i)
+      .waitFor({ timeout: 20_000 });
   }
 
   test("1+2. Teacher → Student sans reload · dédup · latence <1s attendue", async ({ browser }) => {
@@ -43,11 +56,8 @@ test.describe("P4.6-B.3 · Realtime deux contextes P-1", () => {
     const teacherPage = await login(teacherCtx, TEACHER_EMAIL!, TEACHER_PASSWORD!);
     const studentPage = await login(studentCtx, STUDENT_EMAIL!, STUDENT_PASSWORD!);
 
-    await teacherPage.goto("/fr/messages");
-    await studentPage.goto("/fr/messages");
-
-    await teacherPage.locator('[role="log"], .msg-col-center').first().waitFor({ timeout: 15_000 });
-    await studentPage.locator('[role="log"], .msg-col-center').first().waitFor({ timeout: 15_000 });
+    await openFirstConversation(teacherPage);
+    await openFirstConversation(studentPage);
 
     const unique = `E2E-T2S-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const tSent = Date.now();
@@ -83,8 +93,10 @@ test.describe("P4.6-B.3 · Realtime deux contextes P-1", () => {
     const teacherPage = await login(teacherCtx, TEACHER_EMAIL!, TEACHER_PASSWORD!);
     const outsiderPage = await login(outsiderCtx, OUTSIDER_EMAIL!, OUTSIDER_PASSWORD!);
 
-    await teacherPage.goto("/fr/messages");
+    await openFirstConversation(teacherPage);
+    // Outsider · goto direct · s'il a une inbox, elle ne doit PAS contenir t_em_en.
     await outsiderPage.goto("/fr/messages");
+    await outsiderPage.waitForTimeout(3_000);
 
     const unique = `E2E-OUTSIDER-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     await teacherPage.getByPlaceholder(/écrire un message|write a message/i).fill(unique);
@@ -104,8 +116,8 @@ test.describe("P4.6-B.3 · Realtime deux contextes P-1", () => {
     const teacherPage = await login(teacherCtx, TEACHER_EMAIL!, TEACHER_PASSWORD!);
     const studentPage = await login(studentCtx, STUDENT_EMAIL!, STUDENT_PASSWORD!);
 
-    await teacherPage.goto("/fr/messages");
-    await studentPage.goto("/fr/messages");
+    await openFirstConversation(teacherPage);
+    await openFirstConversation(studentPage);
 
     const secret = "SECRET_" + Date.now();
     const tStart = Date.now();

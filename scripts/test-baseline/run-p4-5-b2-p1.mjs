@@ -246,12 +246,17 @@ function applyFlag(env, flag) {
     env.YEMA_ASSIGNMENTS_ENABLED = "true";
     env.YEMA_TEACHER_WORKSPACE_ENABLED = "true";
     env.YEMA_TEACHER_RLS_CONFIRMED = "true";
+    // P4.6-B.4 · messagerie ON pour E2E Realtime · MESSAGE_AUDIO reste off.
+    env.YEMA_MESSAGING_ENABLED = "true";
+    env.YEMA_MESSAGE_AUDIO_ENABLED = "false";
     // CIRCLE + CENTER + COACH restent OFF sauf demande explicite · b2 est
     // périmètre Monde uniquement.
   } else if (flag === "off") {
     env.YEMA_ASSIGNMENTS_ENABLED = "false";
     env.YEMA_TEACHER_WORKSPACE_ENABLED = "false";
     env.YEMA_TEACHER_RLS_CONFIRMED = "false";
+    env.YEMA_MESSAGING_ENABLED = "false";
+    env.YEMA_MESSAGE_AUDIO_ENABLED = "false";
   } else {
     fatal(`REFUSED: --flag must be 'on' or 'off' (got: ${flag ?? "none"})`);
   }
