@@ -1484,6 +1484,12 @@ enum AuditAction {
   CIRCLE_FEEDBACK_ADDENDUM_CREATED
   PRODUCTION_LIMIT_REACHED
   PARENT_REPLY_CREATED
+  // P4.6-C.1 · messagerie audio privé asynchrone.
+  MESSAGE_AUDIO_CREATED
+  MESSAGE_AUDIO_ACCESS_DENIED
+  MESSAGE_AUDIO_PLAYBACK_GRANTED
+  MESSAGE_AUDIO_UPLOAD_FAILED
+  MESSAGE_AUDIO_PURGED
 }
 
 // ─── P4.1 · StorageObject · métadonnées uploads privés ───────────
@@ -1812,6 +1818,7 @@ enum MessagingAudioStatus {
   READY
   FAILED
   EXPIRED
+  DELETED
 }
 
 model MessagingConversation {
@@ -1837,6 +1844,7 @@ model MessagingConversation {
   messages            MessagingMessage[]
   readStates          MessagingConversationReadState[]
   moderationActions   MessagingModerationAction[]
+  audioAssets         MessagingAudioAsset[]
 
   @@index([type, centerId])
   @@index([type, classroomId])
@@ -1928,6 +1936,10 @@ model MessagingAudioAsset {
   ownerUser             User?                 @relation("MessagingAudioOwnerUser", fields: [ownerUserId], references: [id], onDelete: SetNull)
   ownerChildProfileId   String?
   ownerChildProfile     ChildProfile?         @relation("MessagingAudioOwnerChild", fields: [ownerChildProfileId], references: [id], onDelete: SetNull)
+  // P4.6-C.1 · conversation d'origine · requis pour storage path
+  // v1/<conversationId>/<id>.<ext> et retention scans efficaces.
+  conversationId        String?
+  conversation          MessagingConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
   status                MessagingAudioStatus  @default(PENDING)
   storageKey            String?               // clé privée · jamais publique
   mimeType              String?
@@ -1936,14 +1948,17 @@ model MessagingAudioAsset {
   waveform              Json?                 // représentation calculée client
   transcript            String?
   createdAt             DateTime              @default(now())
-  finalizedAt           DateTime?
-  expiresAt             DateTime?
+  finalizedAt           DateTime?             // = readyAt (brief §5)
+  expiresAt             DateTime?             // = retentionUntil (brief §5)
+  deletedAt             DateTime?             // P4.6-C.1 · tombstone soft-delete
 
   messages              MessagingMessage[]
 
   @@index([status, expiresAt])
   @@index([ownerUserId])
   @@index([ownerChildProfileId])
+  @@index([conversationId, status])
+  @@index([status, deletedAt])
   @@map("messaging_audio_assets")
 }
 
