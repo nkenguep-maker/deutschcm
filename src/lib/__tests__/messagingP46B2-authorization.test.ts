@@ -146,25 +146,33 @@ describe("Migration realtime.messages · policies + helper functions", () => {
     expect(src).toMatch(/CREATE OR REPLACE FUNCTION public\.messaging_is_inbox_owner/);
   });
 
-  it("policy SELECT sur realtime.messages pour authenticated + msg:conv:/inbox_user", () => {
-    expect(src).toMatch(/CREATE POLICY "messaging_realtime_subscribe" ON realtime\.messages/);
+  it("policy SELECT · messaging_realtime_receive_authorized (P4.6-B.3)", () => {
+    // P4.6-B.3 · nom renommé depuis 'subscribe' pour clarté doctrinale.
+    expect(src).toMatch(/CREATE POLICY "messaging_realtime_receive_authorized" ON realtime\.messages/);
     expect(src).toMatch(/FOR SELECT[\s\S]*?TO authenticated/);
     expect(src).toMatch(/messaging_can_access_conversation/);
     expect(src).toMatch(/messaging_is_inbox_owner/);
   });
 
-  it("policy INSERT refuse tout emit client sur msg:*", () => {
-    expect(src).toMatch(/CREATE POLICY "messaging_realtime_send_deny_client"/);
-    expect(src).toMatch(/FOR INSERT[\s\S]*?TO authenticated[\s\S]*?realtime\.topic\(\) NOT LIKE 'msg:%'/);
+  it("policy INSERT présente UNIQUEMENT pour Presence sur msg:conv:* (P4.6-B.3)", () => {
+    // P4.6-B.3 · la doctrine évolue · plus de policy 'deny_client'.
+    // L'absence d'une policy INSERT permissive pour extension='broadcast'
+    // est ce qui refuse Broadcast client. Seule Presence est autorisée.
+    expect(src).toMatch(/CREATE POLICY "messaging_realtime_presence_send_authorized"/);
+    expect(src).toMatch(/extension\s*=\s*['"]presence['"]/);
+    // La ligne DROP POLICY IF EXISTS "messaging_realtime_send_deny_client"
+    // est tolérée (nettoyage legacy P4.6-B.2 v1) · seul CREATE est interdit.
+    expect(src).not.toMatch(/CREATE POLICY[^;]*messaging_realtime_send_deny_client/);
   });
 
   it("inbox_child · SELECT retourne false (aucun client child ne peut souscrire)", () => {
     expect(src).toMatch(/WHEN 'inbox_child' THEN[\s\S]*?false/);
   });
 
-  it("additif strict · DROP POLICY IF EXISTS avant CREATE (idempotence)", () => {
+  it("additif strict · DROP POLICY IF EXISTS avant CREATE (idempotence · legacy + nouveau nom)", () => {
     expect(src).toMatch(/DROP POLICY IF EXISTS "messaging_realtime_subscribe"/);
-    expect(src).toMatch(/DROP POLICY IF EXISTS "messaging_realtime_send_deny_client"/);
+    expect(src).toMatch(/DROP POLICY IF EXISTS "messaging_realtime_receive_authorized"/);
+    expect(src).toMatch(/DROP POLICY IF EXISTS "messaging_realtime_presence_send_authorized"/);
   });
 
   it("ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY (idempotent)", () => {

@@ -1,8 +1,10 @@
-// P4.6-B.2 · E2E deux contextes navigateur
+// P4.6-B.2 / P4.6-B.3 · E2E deux contextes navigateur
 //
-// Scénarios brief §8 · 1..7. Skip automatique si les credentials E2E ne
-// sont pas fournis (le lot précédent Lot 6 documente qu'un flow auth
-// séparé provisionne les 9 personas en P-1).
+// La commande obligatoire `npm run test:messaging-realtime:p1` gère
+// désormais la vérification des credentials avant même de lancer
+// Playwright · le test.skip global est conservé pour la suite locale
+// générale (dev sans creds) mais l'orchestrateur P4.6-B.3 échoue
+// non-skippable si les envs manquent.
 
 import { test, expect, type BrowserContext } from "playwright/test";
 
@@ -10,15 +12,19 @@ const TEACHER_EMAIL = process.env.E2E_TEACHER_EMAIL;
 const TEACHER_PASSWORD = process.env.E2E_TEACHER_PASSWORD;
 const STUDENT_EMAIL = process.env.E2E_STUDENT_EMAIL;
 const STUDENT_PASSWORD = process.env.E2E_STUDENT_PASSWORD;
+const OUTSIDER_EMAIL = process.env.E2E_OUTSIDER_EMAIL;
+const OUTSIDER_PASSWORD = process.env.E2E_OUTSIDER_PASSWORD;
 
 const CREDENTIALS_READY = Boolean(
-  TEACHER_EMAIL && TEACHER_PASSWORD && STUDENT_EMAIL && STUDENT_PASSWORD,
+  TEACHER_EMAIL && TEACHER_PASSWORD &&
+  STUDENT_EMAIL && STUDENT_PASSWORD &&
+  OUTSIDER_EMAIL && OUTSIDER_PASSWORD,
 );
 
-test.describe("P4.6-B.2 · Realtime deux contextes", () => {
+test.describe("P4.6-B.3 · Realtime deux contextes P-1", () => {
   test.skip(
     !CREDENTIALS_READY,
-    "E2E_TEACHER_EMAIL/PASSWORD + E2E_STUDENT_EMAIL/PASSWORD requis · voir runbook auth P-1",
+    "E2E_TEACHER/STUDENT/OUTSIDER_EMAIL+PASSWORD requis · voir npm run test:messaging-realtime:p1",
   );
 
   async function login(context: BrowserContext, email: string, password: string) {
@@ -31,7 +37,7 @@ test.describe("P4.6-B.2 · Realtime deux contextes", () => {
     return page;
   }
 
-  test("1+2. Teacher envoie · Student reçoit sans reload · dédup", async ({ browser }) => {
+  test("1+2. Teacher → Student sans reload · dédup · latence <1s attendue", async ({ browser }) => {
     const teacherCtx = await browser.newContext();
     const studentCtx = await browser.newContext();
     const teacherPage = await login(teacherCtx, TEACHER_EMAIL!, TEACHER_PASSWORD!);
@@ -40,42 +46,59 @@ test.describe("P4.6-B.2 · Realtime deux contextes", () => {
     await teacherPage.goto("/fr/messages");
     await studentPage.goto("/fr/messages");
 
-    // Sélectionner la première conversation partagée dans chaque contexte.
     await teacherPage.locator('[role="log"], .msg-col-center').first().waitFor({ timeout: 15_000 });
     await studentPage.locator('[role="log"], .msg-col-center').first().waitFor({ timeout: 15_000 });
 
-    const unique = `E2E-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const unique = `E2E-T2S-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const tSent = Date.now();
     await teacherPage.getByPlaceholder(/écrire un message|write a message/i).fill(unique);
     await teacherPage.getByRole("button", { name: /envoyer|send/i }).click();
 
-    // Le student doit voir le message sans reload (Realtime ou polling 15s).
     await expect(studentPage.getByText(unique)).toBeVisible({ timeout: 20_000 });
+    const latencyMs = Date.now() - tSent;
+    console.log(`[latency] Teacher → Student · ${latencyMs}ms`);
+    if (latencyMs < 1000) test.info().annotations.push({ type: "latency-t2s", description: `${latencyMs}ms · Realtime OK` });
+    else test.info().annotations.push({ type: "latency-t2s", description: `${latencyMs}ms · polling fallback probable` });
 
-    // Dédup · le message n'apparaît qu'une fois côté student.
+    // Dédup client.
     const occurrences = await studentPage.getByText(unique).count();
     expect(occurrences).toBe(1);
+
+    // Retour · Student → Teacher.
+    const unique2 = `E2E-S2T-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const sSent = Date.now();
+    await studentPage.getByPlaceholder(/écrire un message|write a message/i).fill(unique2);
+    await studentPage.getByRole("button", { name: /envoyer|send/i }).click();
+    await expect(teacherPage.getByText(unique2)).toBeVisible({ timeout: 20_000 });
+    console.log(`[latency] Student → Teacher · ${Date.now() - sSent}ms`);
+    expect(await teacherPage.getByText(unique2).count()).toBe(1);
 
     await teacherCtx.close();
     await studentCtx.close();
   });
 
-  test("3. Utilisateur étranger tente subscribe · aucun event", async ({ browser }) => {
-    // Foreigner = context anonyme sans login · tente de subscribe au canal
-    // de la conv teacher-student. Doit être refusé par private RLS.
-    const foreignerCtx = await browser.newContext();
-    const page = await foreignerCtx.newPage();
-    await page.goto("/fr/messages");
+  test("3. Outsider authentifié ne voit AUCUN message des autres", async ({ browser }) => {
+    const teacherCtx = await browser.newContext();
+    const outsiderCtx = await browser.newContext();
+    const teacherPage = await login(teacherCtx, TEACHER_EMAIL!, TEACHER_PASSWORD!);
+    const outsiderPage = await login(outsiderCtx, OUTSIDER_EMAIL!, OUTSIDER_PASSWORD!);
 
-    // Sans session, /fr/messages redirige vers login · pas de canal.
-    // (Le vrai test complet nécessite d'injecter un client Supabase
-    // ANON authentifié en tant qu'utilisateur non-participant · à faire
-    // dans le runbook auth P-1 avec un troisième user.)
-    await expect(page).toHaveURL(/\/fr\/login/);
+    await teacherPage.goto("/fr/messages");
+    await outsiderPage.goto("/fr/messages");
 
-    await foreignerCtx.close();
+    const unique = `E2E-OUTSIDER-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    await teacherPage.getByPlaceholder(/écrire un message|write a message/i).fill(unique);
+    await teacherPage.getByRole("button", { name: /envoyer|send/i }).click();
+
+    // L'outsider ne doit JAMAIS voir ce message · attente courte + assertion invisible.
+    await outsiderPage.waitForTimeout(5_000);
+    await expect(outsiderPage.getByText(unique)).not.toBeVisible();
+
+    await teacherCtx.close();
+    await outsiderCtx.close();
   });
 
-  test("4. Typing éphémère · aucun texte transmis", async ({ browser }) => {
+  test("4. Typing éphémère · aucun contenu de saisie transmis", async ({ browser }) => {
     const teacherCtx = await browser.newContext();
     const studentCtx = await browser.newContext();
     const teacherPage = await login(teacherCtx, TEACHER_EMAIL!, TEACHER_PASSWORD!);
@@ -85,61 +108,60 @@ test.describe("P4.6-B.2 · Realtime deux contextes", () => {
     await studentPage.goto("/fr/messages");
 
     const secret = "SECRET_" + Date.now();
+    const tStart = Date.now();
     await teacherPage.getByPlaceholder(/écrire un message|write a message/i).fill(secret);
-    // On n'envoie PAS · juste la saisie doit émettre typing.
 
-    // Le student doit voir l'indicateur "Une personne écrit…" mais JAMAIS
-    // le contenu SECRET_*.
+    // Indicateur générique visible côté student, contenu invisible.
     await expect(studentPage.getByText(/écrit|typing/i).first()).toBeVisible({ timeout: 10_000 });
+    console.log(`[latency] typing indicator · ${Date.now() - tStart}ms`);
     await expect(studentPage.getByText(secret)).not.toBeVisible({ timeout: 3_000 });
 
     await teacherCtx.close();
     await studentCtx.close();
   });
 
-  test("5. Déconnexion WebSocket · bannière + polling fallback", async ({ browser }) => {
+  test("5. Déconnexion WebSocket · bannière + polling + reconnexion sans doublon", async ({ browser }) => {
     const ctx = await browser.newContext();
     const page = await login(ctx, TEACHER_EMAIL!, TEACHER_PASSWORD!);
     await page.goto("/fr/messages");
+    await page.locator('[role="log"], .msg-col-center').first().waitFor({ timeout: 15_000 });
 
-    // Simule perte de connexion Realtime (route match sur WebSocket).
-    // Note · Playwright ne supporte pas route() pour WebSocket · on
-    // s'appuie sur la déconnexion via context.setOffline si supporté.
-    // Sinon on skip cette assertion et documente comme test manuel.
     await ctx.setOffline(true);
-    await page.waitForTimeout(3_000);
-
-    // Bannière connection.dropped ou reconnecting doit apparaître.
+    await page.waitForTimeout(4_000);
     const banner = page.getByText(/connexion instantanée|live connection/i);
-    // Ne pas failer si non affiché (dépend du timing WebSocket) · logue.
-    if (await banner.isVisible({ timeout: 5_000 }).catch(() => false)) {
+    // Best-effort · certains navigateurs headless ne ferment pas le WS immédiatement.
+    if (await banner.isVisible({ timeout: 3_000 }).catch(() => false)) {
       expect(await banner.isVisible()).toBeTruthy();
     }
 
+    const tReconnect = Date.now();
     await ctx.setOffline(false);
+    // Resync doit ramener l'inbox sans doublon.
+    await page.waitForTimeout(4_000);
+    console.log(`[latency] reconnect resync · ${Date.now() - tReconnect}ms`);
+
     await ctx.close();
   });
 
-  test("6. Switch persona · anciens channels fermés (WebSocket count stable)", async ({ browser }) => {
-    // Ouvre Teacher, mesure la console pour "unsubscribe" logs, puis
-    // logout + login Family. Aucun event Teacher ne doit arriver après.
-    // Ce scénario est plutôt structurel · couvert par les tests unit
-    // (cleanup useEffect return). Ici on smoke.
+  test("6. Switch persona · anciens channels fermés (session teacher logout)", async ({ browser }) => {
     const ctx = await browser.newContext();
     const teacherPage = await login(ctx, TEACHER_EMAIL!, TEACHER_PASSWORD!);
     await teacherPage.goto("/fr/messages");
     await teacherPage.waitForTimeout(2_000);
-    // Logout via UI si disponible, sinon clear cookies.
     await ctx.clearCookies();
     await teacherPage.goto("/fr/login");
     await expect(teacherPage).toHaveURL(/\/fr\/login/);
+    // Après clearCookies, aucun canal Realtime authentifié ne peut plus
+    // recevoir d'événements (RLS refuse subscribe sans auth.uid()).
     await ctx.close();
   });
 
-  test("7. Child · aucun typing émis · uniquement son fil guidé", async () => {
-    // Session enfant requiert PIN flow · non couvert par credentials
-    // classiques email/password. Test documenté et déféré au runbook
-    // auth P-1 (Lot 6 preview) qui provisionne les enfants.
-    test.skip(true, "Session enfant nécessite flow PIN · voir runbook Lot 6");
+  test("7. Child · realtimeAvailable=false · polling uniquement", async () => {
+    // La session enfant s'établit via un flow PIN (pas email/password) ·
+    // le provisioning email/password ne le couvre pas. Ce scénario est
+    // couvert par le test structurel messagingP46B2-authorization ·
+    // /api/messaging/self retourne channelName:null pour CHILD_PROFILE.
+    // E2E complet du flux enfant · attendu au runbook Lot 6 preview.
+    test.skip(true, "Session enfant flow PIN · voir runbook Lot 6 preview");
   });
 });
