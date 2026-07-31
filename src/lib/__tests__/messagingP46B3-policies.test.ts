@@ -69,8 +69,15 @@ describe("Migration SQL · policies séparées (SELECT / Presence-INSERT)", () =
     expect(MIGRATION).toMatch(/DROP POLICY IF EXISTS "messaging_realtime_presence_send_authorized"/);
   });
 
-  it("ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY (idempotent)", () => {
-    expect(MIGRATION).toMatch(/ALTER TABLE IF EXISTS realtime\.messages ENABLE ROW LEVEL SECURITY/);
+  it("aucun ALTER TABLE / ALTER OWNER / SET ROLE supabase_realtime_admin sur realtime.messages", () => {
+    // P4.6-B.4 correction · RLS déjà activée par défaut sur Supabase ·
+    // le rôle postgres du pooler ne peut pas modifier realtime.messages
+    // (42501 · owner=supabase_realtime_admin). Aucune commande structurelle
+    // ne doit apparaître dans la migration (hors commentaires).
+    const nonComment = MIGRATION.replace(/^\s*--.*$/gm, "");
+    expect(nonComment).not.toMatch(/ALTER TABLE[^;]*realtime\.messages/);
+    expect(nonComment).not.toMatch(/ALTER OWNER/);
+    expect(nonComment).not.toMatch(/SET ROLE supabase_realtime_admin/);
   });
 
   it("commentaires de vérification READ-ONLY inclus (runbook inline)", () => {

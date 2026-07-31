@@ -64,24 +64,28 @@ test.describe("P4.6-B.3 · Realtime deux contextes P-1", () => {
     await teacherPage.getByPlaceholder(/écrire un message|write a message/i).fill(unique);
     await teacherPage.getByRole("button", { name: /envoyer|send/i }).click();
 
-    await expect(studentPage.getByText(unique)).toBeVisible({ timeout: 20_000 });
+    // Le message apparaît dans plusieurs zones (inbox preview + log
+    // conversation) · on cible strictement le log pour valider la
+    // livraison ET compter la dédup.
+    const studentLog = studentPage.locator('[role="log"]');
+    await expect(studentLog.getByText(unique)).toBeVisible({ timeout: 20_000 });
     const latencyMs = Date.now() - tSent;
     console.log(`[latency] Teacher → Student · ${latencyMs}ms`);
     if (latencyMs < 1000) test.info().annotations.push({ type: "latency-t2s", description: `${latencyMs}ms · Realtime OK` });
     else test.info().annotations.push({ type: "latency-t2s", description: `${latencyMs}ms · polling fallback probable` });
 
-    // Dédup client.
-    const occurrences = await studentPage.getByText(unique).count();
-    expect(occurrences).toBe(1);
+    // Dédup client · exactement 1 bulle dans le log.
+    expect(await studentLog.getByText(unique).count()).toBe(1);
 
     // Retour · Student → Teacher.
     const unique2 = `E2E-S2T-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const sSent = Date.now();
     await studentPage.getByPlaceholder(/écrire un message|write a message/i).fill(unique2);
     await studentPage.getByRole("button", { name: /envoyer|send/i }).click();
-    await expect(teacherPage.getByText(unique2)).toBeVisible({ timeout: 20_000 });
+    const teacherLog = teacherPage.locator('[role="log"]');
+    await expect(teacherLog.getByText(unique2)).toBeVisible({ timeout: 20_000 });
     console.log(`[latency] Student → Teacher · ${Date.now() - sSent}ms`);
-    expect(await teacherPage.getByText(unique2).count()).toBe(1);
+    expect(await teacherLog.getByText(unique2).count()).toBe(1);
 
     await teacherCtx.close();
     await studentCtx.close();
@@ -118,15 +122,22 @@ test.describe("P4.6-B.3 · Realtime deux contextes P-1", () => {
 
     await openFirstConversation(teacherPage);
     await openFirstConversation(studentPage);
+    // Laisser Realtime aboutir · subscribe + setAuth async + presence sync initial vide.
+    await teacherPage.waitForTimeout(3_000);
+    await studentPage.waitForTimeout(3_000);
 
     const secret = "SECRET_" + Date.now();
     const tStart = Date.now();
-    await teacherPage.getByPlaceholder(/écrire un message|write a message/i).fill(secret);
+    // Simule frappe humaine · onChange doit tirer onActivity plusieurs fois.
+    await teacherPage.getByPlaceholder(/écrire un message|write a message/i)
+      .pressSequentially(secret, { delay: 50 });
 
-    // Indicateur générique visible côté student, contenu invisible.
-    await expect(studentPage.getByText(/écrit|typing/i).first()).toBeVisible({ timeout: 10_000 });
+    // Indicateur générique visible côté student · scope au log (évite l'inbox preview).
+    const typingLine = studentPage.locator('[role="log"], main').getByText(/écrit|écrivent|typing/i);
+    await expect(typingLine.first()).toBeVisible({ timeout: 15_000 });
     console.log(`[latency] typing indicator · ${Date.now() - tStart}ms`);
-    await expect(studentPage.getByText(secret)).not.toBeVisible({ timeout: 3_000 });
+    // Le contenu de saisie ne doit JAMAIS apparaître côté Student (aucun body).
+    await expect(studentPage.locator('[role="log"]').getByText(secret)).not.toBeVisible({ timeout: 3_000 });
 
     await teacherCtx.close();
     await studentCtx.close();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useConversationSync } from "./hooks/useConversationSync";
 import { useMessagingRealtime } from "./hooks/useMessagingRealtime";
@@ -45,6 +45,18 @@ function bubbleStyleForKind(kind: MessageKind): React.CSSProperties {
 
 const TYPING_EXPIRY_MS = 5_000;
 
+// P4.6-B.4 · presenceKey doit être unique PAR INSTANCE navigateur ·
+// useId() donne la même valeur pour deux clients rendant le même tree
+// (Student et Teacher se retrouveraient avec la même clé) → typing
+// s'auto-filtre comme "soi". crypto.randomUUID au montage · module-scope
+// helper pour rester "pur" côté React (react-hooks/purity).
+function makePresenceKey(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return `pk-${crypto.randomUUID()}`;
+  }
+  return `pk-${Math.random().toString(36).slice(2, 12)}`;
+}
+
 export function ConversationView({ conversationId, conversationType, persona }: Props) {
   const t = useTranslations("yemaMessaging.conversation");
   const tK = useTranslations("yemaMessaging.kinds");
@@ -60,9 +72,11 @@ export function ConversationView({ conversationId, conversationType, persona }: 
     () => (conversationId && !isChildPersona(persona) ? `msg:conv:${conversationId}` : null),
     [conversationId, persona],
   );
-  // P4.6-B.2 · presenceKey opaque local · sert UNIQUEMENT à filtrer
+  // P4.6-B.2/B.4 · presenceKey opaque local · sert UNIQUEMENT à filtrer
   // sa propre entrée du state. Aucun autre client ne le voit.
-  const presenceKey = useId();
+  // Unique par instance navigateur (crypto.randomUUID) · évite la collision
+  // useId observée entre deux clients rendant le même tree.
+  const [presenceKey] = useState<string>(() => makePresenceKey());
   const [typingCount, setTypingCount] = useState<number>(0);
 
   // Realtime · un canal par conversation active. Cleanup au switch fil.

@@ -23,6 +23,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import pg from "pg";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(__dirname, "..");
@@ -135,45 +136,100 @@ function fail(msg) {
   process.exit(1);
 }
 
+// Fallback DB pooler · rôle postgres a pg_read_all_data · autorisé à
+// lire pg_policies / pg_class / pg_proc, mais aucun DDL. Utilisé quand
+// Management API PAT retourne 403 (PAT non lié à P-1).
+function readDirectUrl() {
+  try {
+    // Priorité env (wrapper P-1) sinon .env.p1-baseline direct.
+    if (process.env.DIRECT_URL) return process.env.DIRECT_URL;
+    const raw = readFileSync(resolve(REPO, ".env.p1-baseline"), "utf-8");
+    const m = raw.match(/^DIRECT_URL=(\S+)/m);
+    return m?.[1] ?? null;
+  } catch { return null; }
+}
+
+async function queryViaDb() {
+  const conn = readDirectUrl();
+  if (!conn) return null;
+  if (!conn.includes(P1_REF)) throw new Error(`DIRECT_URL n'est pas P-1 · refusé`);
+  for (const b of BLOCKED_REFS) {
+    if (conn.includes(b)) throw new Error(`DIRECT_URL contient ref blocklistée · ${b}`);
+  }
+  const c = new pg.Client({ connectionString: conn });
+  await c.connect();
+  try {
+    const rls = await c.query("SELECT relrowsecurity FROM pg_class WHERE oid = 'realtime.messages'::regclass");
+    const fns = await c.query(
+      `SELECT proname FROM pg_proc WHERE pronamespace = 'public'::regnamespace AND proname = ANY($1::text[]) ORDER BY proname`,
+      [EXPECTED_FUNCTIONS],
+    );
+    const policies = await c.query(
+      `SELECT policyname, cmd, roles::text AS roles FROM pg_policies WHERE schemaname='realtime' AND tablename='messages' AND policyname LIKE 'messaging_%' ORDER BY policyname`,
+    );
+    return { rls: rls.rows, fns: fns.rows, policies: policies.rows };
+  } finally {
+    await c.end();
+  }
+}
+
 async function main() {
   assertP1(P1_REF);
   const pat = readPAT();
-  if (!pat) printFallback("SUPABASE_ACCESS_TOKEN absent dans .mcp.json");
 
   console.log(`[verify] project=${P1_REF} · check RLS + fonctions + policies…`);
 
-  let rls, fns, policies;
-  try {
-    rls = await q(
-      "SELECT relrowsecurity FROM pg_class WHERE oid = 'realtime.messages'::regclass;",
-      pat,
-    );
-    fns = await q(
-      `SELECT proname FROM pg_proc WHERE pronamespace = 'public'::regnamespace AND proname IN (${EXPECTED_FUNCTIONS.map((n) => `'${n}'`).join(", ")}) ORDER BY proname;`,
-      pat,
-    );
-    policies = await q(
-      `SELECT policyname, cmd, roles::text AS roles FROM pg_policies WHERE schemaname='realtime' AND tablename='messages' AND policyname LIKE 'messaging_%' ORDER BY policyname;`,
-      pat,
-    );
-  } catch (e) {
-    printFallback(e.message);
+  let rls, fns, policies, source;
+  // 1er essai · Management API si PAT disponible.
+  if (pat) {
+    try {
+      const rlsRaw = await q(
+        "SELECT relrowsecurity FROM pg_class WHERE oid = 'realtime.messages'::regclass;",
+        pat,
+      );
+      const fnsRaw = await q(
+        `SELECT proname FROM pg_proc WHERE pronamespace = 'public'::regnamespace AND proname IN (${EXPECTED_FUNCTIONS.map((n) => `'${n}'`).join(", ")}) ORDER BY proname;`,
+        pat,
+      );
+      const polRaw = await q(
+        `SELECT policyname, cmd, roles::text AS roles FROM pg_policies WHERE schemaname='realtime' AND tablename='messages' AND policyname LIKE 'messaging_%' ORDER BY policyname;`,
+        pat,
+      );
+      rls = Array.isArray(rlsRaw) ? rlsRaw : rlsRaw?.result ?? [];
+      fns = Array.isArray(fnsRaw) ? fnsRaw : fnsRaw?.result ?? [];
+      policies = Array.isArray(polRaw) ? polRaw : polRaw?.result ?? [];
+      source = "management-api";
+    } catch (e) {
+      console.log(`[verify] Management API indisponible (${e.message.slice(0, 80)}) · fallback DB pooler…`);
+    }
+  }
+  // 2e essai · DB pooler (postgres role, pg_read_all_data).
+  if (!rls) {
+    try {
+      const db = await queryViaDb();
+      if (!db) printFallback("ni PAT valide, ni DIRECT_URL accessible");
+      rls = db.rls;
+      fns = db.fns;
+      policies = db.policies;
+      source = "db-pooler";
+    } catch (e) {
+      printFallback(`DB pooler · ${e.message}`);
+    }
   }
 
   // 1. RLS
-  const rlsRow = Array.isArray(rls) ? rls[0] : rls?.result?.[0];
+  const rlsRow = rls[0];
   const rlsEnabled = rlsRow?.relrowsecurity === true || rlsRow?.relrowsecurity === "t";
   if (!rlsEnabled) fail("RLS non active sur realtime.messages");
 
   // 2. Fonctions
-  const fnList = (Array.isArray(fns) ? fns : fns?.result ?? []).map((r) => r.proname);
+  const fnList = fns.map((r) => r.proname);
   for (const expected of EXPECTED_FUNCTIONS) {
     if (!fnList.includes(expected)) fail(`fonction manquante · ${expected}`);
   }
 
   // 3. Policies attendues
-  const polList = (Array.isArray(policies) ? policies : policies?.result ?? []);
-  const polMap = new Map(polList.map((p) => [p.policyname, p]));
+  const polMap = new Map(policies.map((p) => [p.policyname, p]));
   for (const [name, cmd] of EXPECTED_POLICIES) {
     const p = polMap.get(name);
     if (!p) fail(`policy manquante · ${name}`);
@@ -187,13 +243,13 @@ async function main() {
   }
 
   // 5. Aucune policy pour rôle anon sur msg:*
-  for (const p of polList) {
-    if (/anon/i.test(String(p.roles))) {
+  for (const p of policies) {
+    if (/(^|\{)anon(\}|,)/i.test(String(p.roles))) {
       fail(`policy accessible au rôle anon détectée · ${p.policyname}`);
     }
   }
 
-  console.log(`[verify] OK · RLS=on · ${fnList.length}/${EXPECTED_FUNCTIONS.length} fonctions · ${polMap.size}/${EXPECTED_POLICIES.size} policies attendues · aucune policy Broadcast INSERT client · aucune policy anon`);
+  console.log(`[verify] OK · via=${source} · RLS=on · ${fnList.length}/${EXPECTED_FUNCTIONS.length} fonctions · ${polMap.size}/${EXPECTED_POLICIES.size} policies attendues · aucune policy Broadcast INSERT client · aucune policy anon`);
 }
 
 main().catch((e) => {

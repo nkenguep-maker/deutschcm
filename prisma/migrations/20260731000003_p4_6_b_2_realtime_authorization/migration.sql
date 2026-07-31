@@ -163,12 +163,13 @@ CREATE POLICY "messaging_realtime_presence_send_authorized" ON realtime.messages
   );
 
 -- ============================================================
--- 5. RLS activée sur realtime.messages
+-- 5. NOTE · RLS sur realtime.messages
 -- ============================================================
--- Supabase l'active par défaut ; commande idempotente incluse pour être
--- explicite. À exécuter uniquement depuis le SQL Editor si RLS était
--- désactivée manuellement.
-ALTER TABLE IF EXISTS realtime.messages ENABLE ROW LEVEL SECURITY;
+-- Supabase active RLS par défaut sur realtime.messages et n'autorise
+-- PAS ALTER TABLE depuis le rôle postgres (owner = supabase_realtime_admin).
+-- Aucun ALTER TABLE / ALTER OWNER / SET ROLE supabase_realtime_admin
+-- n'est donc effectué ici · ces commandes échouent en 42501.
+-- Vérification manuelle (voir §6) · relrowsecurity doit être true.
 
 -- ============================================================
 -- 6. Vérification (à exécuter séparément après application)

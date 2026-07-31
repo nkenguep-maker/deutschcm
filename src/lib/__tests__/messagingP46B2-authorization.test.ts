@@ -99,9 +99,12 @@ describe("Presence · payload strictement anonyme (P4.6-B.2)", () => {
 describe("ConversationView · presenceKey local via useId", () => {
   const src = read("features/messaging/ConversationView.tsx");
 
-  it("presenceKey vient de useId (opaque, unique par instance)", () => {
-    expect(src).toMatch(/import\s*\{[^}]*useId[^}]*\}\s*from\s*["']react["']/);
-    expect(src).toMatch(/const presenceKey = useId\(\)/);
+  it("presenceKey opaque unique par instance navigateur (crypto.randomUUID)", () => {
+    // P4.6-B.4 · useId() donnait la même valeur pour deux clients rendant
+    // le même tree · remplacé par crypto.randomUUID pour garantir unicité.
+    expect(src).toMatch(/makePresenceKey/);
+    expect(src).toMatch(/crypto\.randomUUID/);
+    expect(src).toMatch(/const \[presenceKey\] = useState<string>\(\(\) => makePresenceKey\(\)\)/);
   });
 
   it("passe presenceKey (pas persona) à useMessagingRealtime", () => {
@@ -175,8 +178,15 @@ describe("Migration realtime.messages · policies + helper functions", () => {
     expect(src).toMatch(/DROP POLICY IF EXISTS "messaging_realtime_presence_send_authorized"/);
   });
 
-  it("ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY (idempotent)", () => {
-    expect(src).toMatch(/ALTER TABLE IF EXISTS realtime\.messages ENABLE ROW LEVEL SECURITY/);
+  it("aucun ALTER TABLE / ALTER OWNER / SET ROLE supabase_realtime_admin (postgres non owner)", () => {
+    // Doctrine finale (P4.6-B.4) · Supabase active RLS par défaut sur
+    // realtime.messages · le rôle postgres ne peut pas exécuter ALTER TABLE
+    // (42501 · owner=supabase_realtime_admin). La migration ne doit contenir
+    // AUCUNE commande DDL structurelle sur realtime.messages (hors commentaires).
+    const nonComment = src.replace(/^\s*--.*$/gm, "");
+    expect(nonComment).not.toMatch(/ALTER TABLE[^;]*realtime\.messages/);
+    expect(nonComment).not.toMatch(/ALTER OWNER/);
+    expect(nonComment).not.toMatch(/SET ROLE supabase_realtime_admin/);
   });
 });
 

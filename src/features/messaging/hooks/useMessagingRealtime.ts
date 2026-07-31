@@ -83,38 +83,58 @@ export function useMessagingRealtime(opts: UseMessagingRealtimeOptions): UseMess
       return;
     }
     setStatus("subscribing");
-    // P4.6-B.2 · canal privé obligatoire · Realtime consulte les policies
-    // RLS sur realtime.messages pour autoriser subscribe/emit.
-    const ch = sb.channel(name, {
-      config: {
-        private: true,
-        ...(opts.presence ? { presence: { key: opts.presence.presenceKey } } : {}),
-      },
-    });
 
-    for (const evt of CHANNEL_EVENTS) {
-      ch.on("broadcast", { event: evt }, (raw) => {
-        onEventRef.current({ event: evt, data: (raw.payload ?? {}) as Record<string, unknown> });
+    let ch: RealtimeChannel | null = null;
+    let cancelled = false;
+
+    // P4.6-B.4 · propager le JWT AVANT subscribe · sinon les policies RLS
+    // voient auth.uid()=NULL et refusent l'abonnement au canal privé.
+    (async () => {
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session?.access_token) {
+          await sb.realtime.setAuth(session.access_token);
+        }
+      } catch { /* best-effort · subscribe échouera avec status dropped */ }
+      if (cancelled) return;
+
+      // P4.6-B.2 · canal privé obligatoire · Realtime consulte les policies
+      // RLS sur realtime.messages pour autoriser subscribe/emit.
+      ch = sb.channel(name, {
+        config: {
+          private: true,
+          ...(opts.presence ? { presence: { key: opts.presence.presenceKey } } : {}),
+        },
       });
-    }
-    if (opts.presence) {
-      const key = opts.presence.presenceKey;
-      ch.on("presence", { event: "sync" }, () => {
-        const state = ch.presenceState() as PresenceState;
-        onSyncRef.current?.(state, key);
+
+      for (const evt of CHANNEL_EVENTS) {
+        ch.on("broadcast", { event: evt }, (raw) => {
+          onEventRef.current({ event: evt, data: (raw.payload ?? {}) as Record<string, unknown> });
+        });
+      }
+      if (opts.presence) {
+        const key = opts.presence.presenceKey;
+        ch.on("presence", { event: "sync" }, () => {
+          if (!ch) return;
+          const state = ch.presenceState() as PresenceState;
+          onSyncRef.current?.(state, key);
+        });
+      }
+
+      ch.subscribe((s) => {
+        if (s === "SUBSCRIBED") setStatus("connected");
+        else if (s === "CHANNEL_ERROR" || s === "TIMED_OUT") setStatus("reconnecting");
+        else if (s === "CLOSED") setStatus("dropped");
       });
-    }
 
-    ch.subscribe((s) => {
-      if (s === "SUBSCRIBED") setStatus("connected");
-      else if (s === "CHANNEL_ERROR" || s === "TIMED_OUT") setStatus("reconnecting");
-      else if (s === "CLOSED") setStatus("dropped");
-    });
+      channelRef.current = ch;
+    })();
 
-    channelRef.current = ch;
     return () => {
       // Cleanup obligatoire · unmount, changement fil, changement persona.
-      ch.unsubscribe();
+      cancelled = true;
+      const active = channelRef.current;
+      if (active) active.unsubscribe();
       channelRef.current = null;
       setStatus("idle");
     };

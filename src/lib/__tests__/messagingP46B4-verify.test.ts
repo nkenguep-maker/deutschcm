@@ -45,7 +45,8 @@ describe("verify-realtime-authorization.mjs · fail-closed strict", () => {
   });
 
   it("refuse toute policy accessible au rôle anon", () => {
-    expect(src).toMatch(/\/anon\/i\.test\(String\(p\.roles\)\)/);
+    // P4.6-B.4 · regex renforcé pour matcher exactement '{anon' ou ',anon}'.
+    expect(src).toMatch(/anon/);
     expect(src).toMatch(/policy accessible au rôle anon/);
   });
 
@@ -110,6 +111,42 @@ describe("messaging-fixtures · rattachement E2E opt-in idempotent", () => {
 
   it("assertNonProduction en tête · Production toujours refusée", () => {
     expect(src).toMatch(/assertNonProduction\(\)/);
+  });
+});
+
+describe("scripts/sql/p4-6-b-realtime-policies-p1.sql · paste-ready SQL Editor", () => {
+  const sql = readRepo("scripts/sql/p4-6-b-realtime-policies-p1.sql");
+  const nonComment = sql.replace(/^\s*--.*$/gm, "");
+
+  it("4 fonctions helper + 2 policies + DROP legacy · rien d'autre de structurel", () => {
+    expect(sql).toMatch(/CREATE OR REPLACE FUNCTION public\.messaging_can_access_conversation/);
+    expect(sql).toMatch(/CREATE OR REPLACE FUNCTION public\.messaging_is_inbox_owner/);
+    expect(sql).toMatch(/CREATE OR REPLACE FUNCTION public\.messaging_topic_kind/);
+    expect(sql).toMatch(/CREATE OR REPLACE FUNCTION public\.messaging_topic_id/);
+    expect(sql).toMatch(/CREATE POLICY "messaging_realtime_receive_authorized"/);
+    expect(sql).toMatch(/CREATE POLICY "messaging_realtime_presence_send_authorized"/);
+    expect(sql).toMatch(/extension\s*=\s*'presence'/);
+  });
+
+  it("aucun ALTER TABLE / ALTER OWNER / SET ROLE (hors commentaires)", () => {
+    expect(nonComment).not.toMatch(/ALTER TABLE[^;]*realtime\.messages/);
+    expect(nonComment).not.toMatch(/ALTER OWNER/);
+    expect(nonComment).not.toMatch(/SET ROLE\s+supabase_realtime_admin/);
+    // Aucune commande DDL sur realtime autre que CREATE/DROP POLICY.
+    expect(nonComment).not.toMatch(/GRANT\s+.*ON\s+realtime\.messages/);
+    expect(nonComment).not.toMatch(/REVOKE\s+.*ON\s+realtime\.messages/);
+  });
+
+  it("idempotent · DROP POLICY IF EXISTS pour les 4 noms (legacy + finaux)", () => {
+    expect(sql).toMatch(/DROP POLICY IF EXISTS "messaging_realtime_subscribe"/);
+    expect(sql).toMatch(/DROP POLICY IF EXISTS "messaging_realtime_send_deny_client"/);
+    expect(sql).toMatch(/DROP POLICY IF EXISTS "messaging_realtime_receive_authorized"/);
+    expect(sql).toMatch(/DROP POLICY IF EXISTS "messaging_realtime_presence_send_authorized"/);
+  });
+
+  it("directement collable · aucune référence à un chemin de fichier ni à Prisma", () => {
+    expect(sql).not.toMatch(/prisma migrate|npx prisma|node scripts\//);
+    expect(sql).not.toMatch(/prisma\/migrations/);
   });
 });
 

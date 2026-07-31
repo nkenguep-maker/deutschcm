@@ -79,7 +79,9 @@ describe("useMessagingRealtime · un canal par instance, cleanup obligatoire", (
 
   it("subscribe dans useEffect avec cleanup unsubscribe", () => {
     expect(src).toMatch(/ch\.subscribe\(/);
-    expect(src).toMatch(/return \(\) => \{[\s\S]*?ch\.unsubscribe\(\);/);
+    // P4.6-B.4 · cleanup passe par channelRef.current.unsubscribe()
+    // (le ch local ne survit pas au cancellation de l'IIFE async).
+    expect(src).toMatch(/return \(\) => \{[\s\S]*?channelRef\.current[\s\S]*?unsubscribe\(\)/);
   });
 
   it("gère les 4 statuts Realtime (SUBSCRIBED, CHANNEL_ERROR, TIMED_OUT, CLOSED)", () => {
