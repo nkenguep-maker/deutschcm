@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useConversationSync } from "./hooks/useConversationSync";
 import { useMessagingRealtime } from "./hooks/useMessagingRealtime";
@@ -53,11 +53,17 @@ export function ConversationView({ conversationId, conversationType, persona }: 
   const locale = useLocale();
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
 
+  // P4.6-B.2 · enfant sans session Supabase Auth · aucun canal Realtime
+  // privé accessible (policies realtime.messages exigent auth.uid()).
+  // Les enfants passent en polling exclusif via useConversationSync fast.
   const channelName = useMemo(
-    () => (conversationId ? `msg:conv:${conversationId}` : null),
-    [conversationId],
+    () => (conversationId && !isChildPersona(persona) ? `msg:conv:${conversationId}` : null),
+    [conversationId, persona],
   );
-  const [typingPersonas, setTypingPersonas] = useState<string[]>([]);
+  // P4.6-B.2 · presenceKey opaque local · sert UNIQUEMENT à filtrer
+  // sa propre entrée du state. Aucun autre client ne le voit.
+  const presenceKey = useId();
+  const [typingCount, setTypingCount] = useState<number>(0);
 
   // Realtime · un canal par conversation active. Cleanup au switch fil.
   const realtime = useMessagingRealtime({
@@ -67,23 +73,23 @@ export function ConversationView({ conversationId, conversationType, persona }: 
       sync.refetch();
     },
     presence: {
-      persona,
-      onSync: (state) => {
-        const others: string[] = [];
+      presenceKey,
+      onSync: (state, selfKey) => {
+        let count = 0;
         const now = Date.now();
         for (const [key, entries] of Object.entries(state)) {
-          if (key === persona) continue;
+          if (key === selfKey) continue;
           for (const e of entries) {
             if (e.kind === "typing") {
               const at = (e as { at?: number }).at;
               if (typeof at !== "number" || now - at < TYPING_EXPIRY_MS) {
-                others.push(key);
+                count += 1;
                 break;
               }
             }
           }
         }
-        setTypingPersonas(others);
+        setTypingCount(count);
       },
     },
   });
@@ -93,10 +99,10 @@ export function ConversationView({ conversationId, conversationType, persona }: 
 
   // Expiration locale du typing indicator · si pas de resync presence.
   useEffect(() => {
-    if (typingPersonas.length === 0) return;
-    const timeout = setTimeout(() => setTypingPersonas([]), TYPING_EXPIRY_MS);
+    if (typingCount === 0) return;
+    const timeout = setTimeout(() => setTypingCount(0), TYPING_EXPIRY_MS);
     return () => clearTimeout(timeout);
-  }, [typingPersonas]);
+  }, [typingCount]);
 
   // Mark read après chargement (best-effort · fire-and-forget)
   useEffect(() => {
@@ -183,7 +189,7 @@ export function ConversationView({ conversationId, conversationType, persona }: 
             </div>
           ))
         )}
-        {typingPersonas.length > 0 ? (
+        {typingCount > 0 ? (
           <div
             aria-live="polite"
             style={{
@@ -193,7 +199,7 @@ export function ConversationView({ conversationId, conversationType, persona }: 
               fontStyle: "italic",
             }}
           >
-            {t("typingIndicator", { count: typingPersonas.length })}
+            {t("typingIndicator", { count: typingCount })}
           </div>
         ) : null}
       </div>

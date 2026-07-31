@@ -4,35 +4,45 @@ import { useEffect, useRef, useState } from "react";
 import type { RealtimeChannel, SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 
-// P4.6-B.1 · souscription Realtime à un canal Broadcast unique.
+// P4.6-B.1 / .2 · souscription Realtime à un canal Broadcast privé.
 //
-// Contrat ·
-//   - Un seul canal par instance de hook · sub/unsub au changement de
-//     channelName ou au démontage.
-//   - Les events Realtime ne portent aucune donnée sensible · uniquement
-//     un ping qui déclenche `onEvent`, lequel doit refetch via API.
-//   - Statut de connexion exposé pour désactiver le polling quand
-//     Realtime est actif.
-//   - Presence optionnel (typing éphémère) · aucun stockage DB.
+// Contrat P4.6-B.2 · TOUS les canaux Messagerie sont créés avec
+// `config.private: true`. Supabase Realtime refuse alors l'abonnement
+// tant que la policy RLS sur realtime.messages (migration 20260731000003)
+// n'autorise pas explicitement l'acteur pour ce topic.
+//
+// Fallback strict · si l'autorisation Realtime échoue (RLS pas encore
+// posée, ou acteur non participant), le canal reste en status "dropped"
+// et le polling 15s de useConversationSync reste actif. Aucun échec
+// visible côté user, aucune fuite côté sécurité.
 
 export type RealtimeStatus = "idle" | "subscribing" | "connected" | "reconnecting" | "dropped";
 
-type PresenceState = Record<string, Array<{ persona?: string; kind?: "typing" }>>;
+// P4.6-B.2 · Presence payload minimal · aucune identité, aucun rôle,
+// aucun nom, aucun avatar. L'identité affichée dérive de l'abonnement
+// authentifié (auth.uid()) côté serveur pour lots ultérieurs · pour
+// l'instant on affiche uniquement un compteur "N personnes écrivent".
+type PresencePayload = { kind: "typing"; at: number };
+type PresenceState = Record<string, Array<Partial<PresencePayload>>>;
 
 interface UseMessagingRealtimeOptions {
   channelName: string | null;
   // Handler pour tout event broadcast pertinent · déclenche un refetch.
   onEvent: (payload: { event: string; data: Record<string, unknown> }) => void;
-  // Presence pour typing (optionnel).
+  // Presence pour typing · si présent, active la souscription presence.
+  // La `presenceKey` sert UNIQUEMENT à identifier localement l'entrée
+  // presence de l'acteur courant (évite d'ajouter sa propre entrée à
+  // typingPersonas). Elle n'est JAMAIS reçue par les autres clients ·
+  // Supabase Realtime la garde côté serveur.
   presence?: {
-    persona: string;
-    onSync?: (state: PresenceState) => void;
+    presenceKey: string;
+    onSync?: (state: PresenceState, selfKey: string) => void;
   };
 }
 
 interface UseMessagingRealtimeResult {
   status: RealtimeStatus;
-  // Émet un event typing throttled (visible ~5s côté autres participants).
+  // Émet un event typing throttled · payload minimal { kind, at }.
   sendTyping: () => void;
 }
 
@@ -73,8 +83,13 @@ export function useMessagingRealtime(opts: UseMessagingRealtimeOptions): UseMess
       return;
     }
     setStatus("subscribing");
+    // P4.6-B.2 · canal privé obligatoire · Realtime consulte les policies
+    // RLS sur realtime.messages pour autoriser subscribe/emit.
     const ch = sb.channel(name, {
-      config: opts.presence ? { presence: { key: opts.presence.persona } } : {},
+      config: {
+        private: true,
+        ...(opts.presence ? { presence: { key: opts.presence.presenceKey } } : {}),
+      },
     });
 
     for (const evt of CHANNEL_EVENTS) {
@@ -83,9 +98,10 @@ export function useMessagingRealtime(opts: UseMessagingRealtimeOptions): UseMess
       });
     }
     if (opts.presence) {
+      const key = opts.presence.presenceKey;
       ch.on("presence", { event: "sync" }, () => {
         const state = ch.presenceState() as PresenceState;
-        onSyncRef.current?.(state);
+        onSyncRef.current?.(state, key);
       });
     }
 
@@ -103,7 +119,7 @@ export function useMessagingRealtime(opts: UseMessagingRealtimeOptions): UseMess
       setStatus("idle");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [opts.channelName, opts.presence?.persona]);
+  }, [opts.channelName, opts.presence?.presenceKey]);
 
   const sendTyping = () => {
     const ch = channelRef.current;
@@ -111,9 +127,10 @@ export function useMessagingRealtime(opts: UseMessagingRealtimeOptions): UseMess
     const now = Date.now();
     if (now - lastTypingRef.current < TYPING_THROTTLE_MS) return;
     lastTypingRef.current = now;
-    // Presence track · state expiré automatiquement à unsubscribe ; on
-    // envoie un heartbeat périodique via re-track pendant que l'user tape.
-    void ch.track({ persona: opts.presence.persona, kind: "typing", at: now });
+    // P4.6-B.2 · payload strictement minimal · aucun persona, aucun rôle,
+    // aucun userId. Les autres clients voient uniquement { kind, at }.
+    const payload: PresencePayload = { kind: "typing", at: now };
+    void ch.track(payload);
   };
 
   return { status, sendTyping };

@@ -47,7 +47,7 @@ export function MessagesInboxLink() {
     if (available !== true) return;
     fetch("/api/messaging/self", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((json: { channelName: string } | null) => setInboxChannel(json?.channelName ?? null))
+      .then((json: { channelName: string | null } | null) => setInboxChannel(json?.channelName ?? null))
       .catch(() => setInboxChannel(null));
   }, [available]);
 

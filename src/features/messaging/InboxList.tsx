@@ -28,10 +28,13 @@ export function InboxList({ filter, activeConversationId, onSelect }: Props) {
   }, [filter]);
 
   // Résout une seule fois le canal inbox de l'acteur courant.
+  // P4.6-B.2 · channelName peut être null (enfant sans auth Supabase) ·
+  // dans ce cas useMessagingRealtime skip la souscription et le polling
+  // fast (15s) rattrape les événements.
   useEffect(() => {
     fetch("/api/messaging/self", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("http"))))
-      .then((json: { channelName: string }) => setInboxChannel(json.channelName))
+      .then((json: { channelName: string | null }) => setInboxChannel(json.channelName ?? null))
       .catch(() => setInboxChannel(null));
   }, []);
 

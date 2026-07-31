@@ -194,8 +194,11 @@ describe("/api/messaging/self · gate 404 stable", () => {
     expect(src).toMatch(/status:\s*404/);
   });
 
-  it("actor USER → inboxUserChannelName · actor CHILD_PROFILE → inboxChildChannelName", () => {
-    expect(src).toMatch(/actor\.actorType === "USER"[\s\S]*?inboxUserChannelName\(actor\.userId!\)[\s\S]*?inboxChildChannelName\(actor\.childProfileId!\)/);
+  it("actor USER → inboxUserChannelName (P4.6-B.2 · enfant retire du client)", () => {
+    // P4.6-B.2 · le canal enfant est server-only · route retourne
+    // channelName: null pour CHILD_PROFILE.
+    expect(src).toMatch(/inboxUserChannelName\(actor\.userId!\)/);
+    expect(src).toMatch(/actor\.actorType !== "USER"[\s\S]*?channelName:\s*null/);
   });
 });
 

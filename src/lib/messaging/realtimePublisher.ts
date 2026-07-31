@@ -1,32 +1,36 @@
 import "server-only";
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
-// P4.6-B.1 · publisher Realtime côté serveur.
+// P4.6-B.1 / .2 · publisher Realtime côté serveur (privé).
 //
 // Après un write (sendMessage, markConversationReadForActor), on émet un
 // event Broadcast minimal · aucun body, aucun kind sensible, aucune PII.
-// Les clients autorisés reçoivent uniquement un "ping" qui déclenche un
-// refetch via l'API (source de vérité = DB).
+// Les clients autorisés (Supabase Auth authenticated + participant actif
+// de la conversation via policies realtime.messages) reçoivent uniquement
+// un "ping" qui déclenche un refetch via l'API (source de vérité = DB).
 //
-// Choix technique · pattern Broadcast (pas postgres_changes) · évite :
-//   - migration d'ajout à la publication supabase_realtime,
-//   - RLS complexe sur messaging_* (permission = matrice applicative),
-//   - fuite de payloads bruts vers des abonnés non-participants.
+// P4.6-B.2 · le publisher utilise SUPABASE_SERVICE_ROLE_KEY qui bypass
+// les RLS de realtime.messages · sans cela, aucune émission serveur ne
+// serait possible sur un canal privé.
 //
-// Sécurité · le canal est nommé par conversationId opaque (cuid). Un
-// client qui s'abonne sans y être participant recevra seulement le ping ;
-// tout refetch API sera bloqué par assertConversationAccess.
+// Sécurité · les canaux clients sont créés avec `config.private: true`.
+// Un client qui s'abonne sans y être participant (ou sans session auth)
+// est refusé par la policy `messaging_realtime_subscribe`. Un client
+// anon qui tenterait d'INSERT est refusé par `messaging_realtime_send_deny_client`.
 
-const NULL_URL = "";
+const NULL = "";
 
-function client() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? NULL_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? NULL_URL;
-  if (!url || !key) return null;
+let cachedServiceClient: ReturnType<typeof createSupabaseClient> | null = null;
+function serviceClient() {
+  if (cachedServiceClient) return cachedServiceClient;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? NULL;
+  const svc = process.env.SUPABASE_SERVICE_ROLE_KEY ?? NULL;
+  if (!url || !svc) return null;
   try {
-    return createBrowserClient(url, key, {
-      cookies: { getAll: () => [], setAll: () => {} },
+    cachedServiceClient = createSupabaseClient(url, svc, {
+      auth: { persistSession: false, autoRefreshToken: false },
     });
+    return cachedServiceClient;
   } catch {
     return null;
   }
@@ -47,13 +51,14 @@ export function inboxChildChannelName(childProfileId: string): string {
 }
 
 async function send(channel: string, event: MessagingBroadcastEvent): Promise<void> {
-  const sb = client();
+  const sb = serviceClient();
   if (!sb) return;
   try {
-    const ch = sb.channel(channel);
+    // P4.6-B.2 · canal privé côté serveur également · service_role bypass
+    // les policies mais on garde `private: true` par cohérence stricte
+    // (isolate contre toute évolution de policy).
+    const ch = sb.channel(channel, { config: { private: true } });
     await ch.send({ type: "broadcast", event: event.kind, payload: event });
-    // On ne garde pas le channel actif · un send() unique suffit pour
-    // notifier les abonnés existants côté Realtime.
     await ch.unsubscribe();
   } catch {
     // Best-effort · une panne Realtime ne doit jamais casser l'écriture DB.
