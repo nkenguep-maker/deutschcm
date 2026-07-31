@@ -140,6 +140,125 @@ async function seedFixtureMessage(conversationId, keySuffix, senderUserId, kind,
   return r.id;
 }
 
+// P4.6-B.4 · rattachement Prisma des 3 auth users E2E provisionnés
+// via scripts/provision-e2e-realtime-users.mjs.
+//
+// Contrat ·
+//   - Opt-in par env · si E2E_TEACHER_EMAIL absent → skip proprement,
+//     les fixtures QA normales continuent à fonctionner.
+//   - Idempotent · upsert User + upsert Teacher + upsert participation.
+//   - Le supabaseId est résolu par requête admin Supabase (identique au
+//     provisioning script) · aucun mot de passe utilisé ici.
+//   - Outsider · User Prisma créé SANS aucune participation active.
+//   - Aucune Production · assertNonProduction() en tête de script.
+async function resolveSupabaseIdByEmail(email) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const svc = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !svc) return null;
+  const res = await fetch(`${url}/auth/v1/admin/users?filter=${encodeURIComponent(email)}`, {
+    headers: { apikey: svc, Authorization: `Bearer ${svc}` },
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  const u = (data.users ?? []).find((x) => x.email === email);
+  return u?.id ?? null;
+}
+
+async function ensurePrismaUserForAuth({ email, role, prenom, nom }) {
+  const supId = await resolveSupabaseIdByEmail(email);
+  if (!supId) return null;
+  // Upsert User avec role · idempotent sur (email).
+  const u = await db.user.upsert({
+    where: { email },
+    update: { supabaseId: supId, role },
+    create: {
+      email,
+      supabaseId: supId,
+      role,
+      prenom: prenom ?? "E2E",
+      nom: nom ?? "Test",
+    },
+    select: { id: true },
+  });
+  return u.id;
+}
+
+async function ensureE2ELinkage(conversations) {
+  const teacherEmail = process.env.E2E_TEACHER_EMAIL;
+  const studentEmail = process.env.E2E_STUDENT_EMAIL;
+  const outsiderEmail = process.env.E2E_OUTSIDER_EMAIL;
+  if (!teacherEmail || !studentEmail || !outsiderEmail) {
+    process.stderr.write("[e2e] E2E_*_EMAIL absents · skip rattachement Prisma\n");
+    return { skipped: true };
+  }
+  const teacherId = await ensurePrismaUserForAuth({
+    email: teacherEmail,
+    role: "TEACHER",
+    prenom: "E2E",
+    nom: "Teacher",
+  });
+  const studentId = await ensurePrismaUserForAuth({
+    email: studentEmail,
+    role: "STUDENT",
+    prenom: "E2E",
+    nom: "Student",
+  });
+  const outsiderId = await ensurePrismaUserForAuth({
+    email: outsiderEmail,
+    role: "STUDENT",
+    prenom: "E2E",
+    nom: "Outsider",
+  });
+  if (!teacherId || !studentId || !outsiderId) {
+    throw new Error("[e2e] provisioning auth non complet · relancer provision-e2e-realtime-users.mjs");
+  }
+  // Rattacher Teacher + Student à t_em_en (WORLD_STUDENT_TEACHER).
+  await db.messagingConversationParticipant.upsert({
+    where: { conv_user_active: { conversationId: conversations.t_em_en, userId: teacherId } },
+    update: { participantRole: "MODERATOR", leftAt: null },
+    create: {
+      conversationId: conversations.t_em_en,
+      actorType: "USER",
+      userId: teacherId,
+      participantRole: "MODERATOR",
+    },
+  });
+  await db.messagingConversationParticipant.upsert({
+    where: { conv_user_active: { conversationId: conversations.t_em_en, userId: studentId } },
+    update: { participantRole: "MEMBER", leftAt: null },
+    create: {
+      conversationId: conversations.t_em_en,
+      actorType: "USER",
+      userId: studentId,
+      participantRole: "MEMBER",
+    },
+  });
+  // Outsider · aucune participation active dans t_em_en.
+  const outsiderInConv = await db.messagingConversationParticipant.findFirst({
+    where: { conversationId: conversations.t_em_en, userId: outsiderId, leftAt: null },
+    select: { id: true },
+  });
+  if (outsiderInConv) {
+    // Ne devrait jamais arriver · si un test précédent l'a ajouté, on
+    // le marque leftAt pour respecter le contrat "outsider = zéro accès".
+    await db.messagingConversationParticipant.update({
+      where: { id: outsiderInConv.id },
+      data: { leftAt: now },
+    });
+    process.stderr.write("[e2e] WARN · outsider avait un participant actif · marqué leftAt\n");
+  }
+  return {
+    skipped: false,
+    teacherId,
+    studentId,
+    outsiderId,
+    teacherEmail,
+    studentEmail,
+    outsiderEmail,
+    conversationId: conversations.t_em_en,
+  };
+}
+
 async function main() {
   process.stderr.write("═══ P4.6-A messaging fixtures P-1 ═══\n\n");
   const g = await ensureGuidedPhrases();
@@ -237,12 +356,19 @@ async function main() {
     cardPayload: { title: "Maintenance planifiée", body: "Ce weekend 22h-23h." },
   });
 
+  // P4.6-B.4 · rattachement E2E · opt-in via envs.
+  const e2e = await ensureE2ELinkage({ t_em_en });
+  if (!e2e.skipped) {
+    process.stderr.write(`[e2e] Prisma linkage OK · teacher/student rattachés à t_em_en · outsider isolé\n`);
+  }
+
   const summary = {
     conversations: [
       t_em_en, t_class_a1, t_er_co, t_palabre, t_km_en, t_kr_co,
       t_pa_en, t_pa_ac, t_pa_co, t_ac_en, t_ac_co, t_ac_sa, t_sa_broadcast,
     ],
     guidedPhrases: g.length,
+    e2eLinkage: e2e.skipped ? "skipped (E2E envs absent)" : "linked",
     note: "AUCUN t_sa_audit · vue Metadata via adminProjection.ts",
   };
   process.stderr.write(`\n${JSON.stringify(summary, null, 2)}\n\nMESSAGING FIXTURES READY\n`);
