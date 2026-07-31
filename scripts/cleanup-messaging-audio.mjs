@@ -1,23 +1,20 @@
 #!/usr/bin/env node
-// P4.6-C.1 · cleanup messaging_audio_assets · dry-run par défaut.
+// P4.6-C.1 / P4.6-C.1.1 · cleanup messaging_audio_assets · storage-first,
+// dry-run par défaut.
 //
-// Cibles ·
-//   - orphelins Storage : objet Storage sans AudioAsset associé (rare)
-//   - AudioAsset PENDING > 24h (upload jamais finalisé)
-//   - AudioAsset FAILED > 7 jours
-//   - AudioAsset expiresAt < now (retention dépassée)
+// Ordre STRICT (brief P4.6-C.1.1) ·
+//   1. scan candidats
+//   2. per-asset · re-verify · Storage.remove · vérifier réponse ·
+//      seulement après succès confirmé · marker DELETED + audit
+//   3. exit code non nul si au moins un asset --apply a échoué
 //
-// Sécurité ·
-//   - P-1 UNIQUEMENT · refuse Production et refs blocklistées
-//   - --dry-run par défaut · --apply explicite requis
-//   - AVANT suppression Storage · MARK Prisma DELETED + deletedAt=now
-//   - Idempotent · relance sans erreur
-//   - Aucun log de storageKey complet · aucun log de payload sensible
-//   - AuditEvent MESSAGE_AUDIO_PURGED agrégé (1 par run, compteurs)
+// Sécurité · P-1 UNIQUEMENT · aucun log de storageKey complet · aucun
+// log de secret.
 
 import { createClient } from "@supabase/supabase-js";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { interpretStorageRemove, runCleanup } from "../src/lib/messaging/audio/cleanupCore.mjs";
 
 const P1_REF = "kzzagbojjkivdzzcrmxn";
 const BLOCKED = new Set(["sbjhvlrkbyjckdxujjsk", "mamofhrurksyuuolucea", "qggwvonfumuimjfsgpdz"]);
@@ -29,16 +26,17 @@ const FAILED_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
 
 const args = process.argv.slice(2);
 const APPLY = args.includes("--apply");
+const targetIdIdx = args.indexOf("--target-asset");
+const targetAssetId = targetIdIdx >= 0 ? args[targetIdIdx + 1] : undefined;
 if (!APPLY && !args.includes("--dry-run")) {
-  // Défaut = dry-run · brief §8.
   console.log("[cleanup] mode = --dry-run (défaut · aucune suppression)");
 }
-if (APPLY) console.log("[cleanup] mode = --apply (suppressions effectives)");
+if (APPLY) console.log(`[cleanup] mode = --apply${targetAssetId ? ` --target-asset=${maskId(targetAssetId)}` : ""}`);
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const svc = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const dbUrl = process.env.DIRECT_URL;
-if (!url || !svc || !dbUrl) { console.error("MISSING env · NEXT_PUBLIC_SUPABASE_URL/SERVICE_ROLE_KEY/DIRECT_URL"); process.exit(2); }
+if (!url || !svc || !dbUrl) { console.error("MISSING env"); process.exit(2); }
 if (!url.includes(P1_REF) || !dbUrl.includes(P1_REF)) { console.error("REFUSED · non-P1"); process.exit(2); }
 for (const b of BLOCKED) if (url.includes(b) || dbUrl.includes(b)) { console.error(`REFUSED · blocklisted ${b}`); process.exit(2); }
 
@@ -48,84 +46,109 @@ const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: dbUrl })
 async function main() {
   const now = new Date();
 
-  const counters = { pendingExpired: 0, failedOld: 0, retentionExpired: 0, orphanStorage: 0, storageDeleted: 0, dbMarked: 0 };
-
-  // 1. Pending > 24h · marker FAILED puis nettoyer Storage.
-  const pending = await db.messagingAudioAsset.findMany({
-    where: {
-      status: "PENDING",
-      createdAt: { lt: new Date(now.getTime() - PENDING_TIMEOUT_MS) },
-      deletedAt: null,
+  /** @type {import("../src/lib/messaging/audio/cleanupCore.mjs").CleanupDeps} */
+  const deps = {
+    now: () => now,
+    findEligible: async () => {
+      // 3 catégories combinées · retention expirée, pending>24h, failed>7j.
+      const [pending, failedOld, retentionExpired] = await Promise.all([
+        db.messagingAudioAsset.findMany({
+          where: {
+            status: "PENDING",
+            createdAt: { lt: new Date(now.getTime() - PENDING_TIMEOUT_MS) },
+            deletedAt: null,
+          },
+          select: { id: true, status: true, storageKey: true, createdAt: true, expiresAt: true, deletedAt: true },
+        }),
+        db.messagingAudioAsset.findMany({
+          where: {
+            status: "FAILED",
+            createdAt: { lt: new Date(now.getTime() - FAILED_RETENTION_MS) },
+            deletedAt: null,
+          },
+          select: { id: true, status: true, storageKey: true, createdAt: true, expiresAt: true, deletedAt: true },
+        }),
+        db.messagingAudioAsset.findMany({
+          where: {
+            status: "READY",
+            expiresAt: { lt: now },
+            deletedAt: null,
+          },
+          select: { id: true, status: true, storageKey: true, createdAt: true, expiresAt: true, deletedAt: true },
+        }),
+      ]);
+      // Dédup par id (au cas où · overlap théoriquement impossible ici).
+      const map = new Map();
+      for (const a of [...pending, ...failedOld, ...retentionExpired]) map.set(a.id, a);
+      return Array.from(map.values());
     },
-    select: { id: true, storageKey: true },
-  });
-  counters.pendingExpired = pending.length;
-
-  // 2. Failed > 7j.
-  const failedOld = await db.messagingAudioAsset.findMany({
-    where: {
-      status: "FAILED",
-      createdAt: { lt: new Date(now.getTime() - FAILED_RETENTION_MS) },
-      deletedAt: null,
-    },
-    select: { id: true, storageKey: true },
-  });
-  counters.failedOld = failedOld.length;
-
-  // 3. Retention dépassée (expiresAt < now).
-  const retentionExpired = await db.messagingAudioAsset.findMany({
-    where: {
-      status: "READY",
-      expiresAt: { lt: now },
-      deletedAt: null,
-    },
-    select: { id: true, storageKey: true },
-  });
-  counters.retentionExpired = retentionExpired.length;
-
-  const toRemove = [...pending, ...failedOld, ...retentionExpired];
-  console.log(`[cleanup] scan · pending=${counters.pendingExpired} failedOld=${counters.failedOld} retention=${counters.retentionExpired}`);
-
-  if (!APPLY) {
-    console.log("[cleanup] dry-run · aucune suppression appliquée");
-  } else {
-    for (const a of toRemove) {
-      if (a.storageKey) {
-        const rm = await sb.storage.from(BUCKET).remove([a.storageKey]);
-        if (rm.error && !/not\s+found/i.test(rm.error.message)) {
-          console.error(`[cleanup] storage remove KO id=${maskId(a.id)} · ${rm.error.message.slice(0, 100)}`);
-          continue;
-        }
-        counters.storageDeleted += 1;
-      }
-      await db.messagingAudioAsset.update({
-        where: { id: a.id },
-        data: { status: "DELETED", deletedAt: now, storageKey: null },
+    reverifyEligibility: async (id) => {
+      // Fetch frais · re-verify que l'asset n'a pas changé pendant le scan.
+      const a = await db.messagingAudioAsset.findUnique({
+        where: { id },
+        select: { id: true, status: true, storageKey: true, createdAt: true, expiresAt: true, deletedAt: true },
       });
-      counters.dbMarked += 1;
-    }
-    // 4. Orphelin Storage · rare · borné à un scan léger.
-    const list = await sb.storage.from(BUCKET).list("v1", { limit: 100, sortBy: { column: "created_at", order: "asc" } });
-    if (list.data && list.data.length > 0) {
-      // Note · listing profond nécessite récursion par conv · deferred au futur script.
-      // Pour l'instant on log uniquement le compte des dossiers de conv racine.
-      counters.orphanStorage = list.data.length;
-    }
-    // AuditEvent agrégé.
-    await db.auditEvent.create({
-      data: {
-        action: "MESSAGE_AUDIO_PURGED",
-        targetType: "MessagingAudioAsset",
-        targetId: "batch",
-        metadata: counters,
-      },
-    });
-  }
+      if (!a) return null;
+      // Ne pas re-supprimer un asset qui a été "revived" (ex: transition
+      // PENDING → READY après le scan initial).
+      if (a.status === "READY" && (!a.expiresAt || a.expiresAt >= now)) return null;
+      return a;
+    },
+    storageRemove: async (storageKey) => {
+      // Aucune transaction Prisma ouverte pendant cet appel réseau.
+      const raw = await sb.storage.from(BUCKET).remove([storageKey]);
+      return interpretStorageRemove(raw, storageKey);
+    },
+    markDeleted: async (id, at) => {
+      await db.messagingAudioAsset.update({
+        where: { id },
+        data: { status: "DELETED", deletedAt: at, storageKey: null },
+      });
+    },
+    writeAudit: async (evt) => {
+      await db.auditEvent.create({
+        data: {
+          action: evt.action,
+          targetType: "MessagingAudioAsset",
+          targetId: evt.targetId,
+          metadata: evt.metadata,
+        },
+      });
+    },
+    // Orphelins Storage · scan léger v1/* (borné, seulement quand pas --target).
+    listOrphans: targetAssetId ? undefined : async () => {
+      const rootList = await sb.storage.from(BUCKET).list("v1", { limit: 100 });
+      if (!rootList.data || rootList.data.length === 0) return [];
+      const orphans = [];
+      for (const dir of rootList.data.slice(0, 20)) {
+        const conv = dir.name;
+        if (!conv) continue;
+        const objs = await sb.storage.from(BUCKET).list(`v1/${conv}`, { limit: 100 });
+        if (!objs.data) continue;
+        for (const o of objs.data) {
+          const assetIdCandidate = (o.name || "").replace(/\.[a-z0-9]+$/i, "");
+          if (!assetIdCandidate) continue;
+          const exists = await db.messagingAudioAsset.findUnique({
+            where: { id: assetIdCandidate },
+            select: { id: true },
+          });
+          if (!exists) orphans.push(`v1/${conv}/${o.name}`);
+        }
+      }
+      return orphans;
+    },
+  };
 
+  const { counters, hasFailures } = await runCleanup(deps, { dryRun: !APPLY, targetAssetId });
   console.log(`[cleanup] result · ${JSON.stringify(counters)}`);
+  if (hasFailures && APPLY) {
+    console.error("[cleanup] EXIT 1 · au moins une suppression a échoué");
+    process.exit(1);
+  }
 }
 
 function maskId(id) {
+  if (typeof id !== "string" || id.length < 6) return "***";
   return id.slice(0, 4) + "***" + id.slice(-3);
 }
 

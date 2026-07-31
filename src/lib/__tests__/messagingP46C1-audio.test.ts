@@ -286,13 +286,18 @@ describe("Cleanup script · dry-run par défaut · P-1 fail-closed", () => {
   });
 
   it("marker DELETED + deletedAt + storageKey=null · aucun log de storageKey complet", () => {
-    expect(src).toMatch(/status:\s*"DELETED",\s*deletedAt:\s*now,\s*storageKey:\s*null/);
+    // P4.6-C.1.1 · mutation déportée dans le core partagé · le CLI passe
+    // par deps.markDeleted qui exécute cette update Prisma.
+    expect(src).toMatch(/status:\s*"DELETED",\s*deletedAt:\s*at,\s*storageKey:\s*null/);
     expect(src).toMatch(/maskId/);
   });
 
-  it("AuditEvent MESSAGE_AUDIO_PURGED agrégé (1 par run)", () => {
-    expect(src).toMatch(/action:\s*"MESSAGE_AUDIO_PURGED"/);
-    expect(src).toMatch(/metadata:\s*counters/);
+  it("AuditEvent MESSAGE_AUDIO_PURGED · émis par le core après Storage confirmé", () => {
+    // P4.6-C.1.1 · action émise dans cleanupCore.mjs (§4 storage-first).
+    // Le CLI expose writeAudit qui appelle db.auditEvent.create.
+    expect(src).toMatch(/action:\s*evt\.action/);
+    const core = readRepo("src/lib/messaging/audio/cleanupCore.mjs");
+    expect(core).toMatch(/action:\s*"MESSAGE_AUDIO_PURGED"/);
   });
 });
 

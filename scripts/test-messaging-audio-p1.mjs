@@ -168,9 +168,66 @@ async function main() {
   }
   console.log(`[test] outsider playback refusé · status=${outsiderPlay.status}`);
 
-  // Cleanup dry-run
+  // Cleanup dry-run · aucune mutation.
   const cleanupDry = spawnSync("node", ["scripts/cleanup-messaging-audio.mjs", "--dry-run"], { stdio: "inherit", env: process.env });
   if (cleanupDry.status !== 0) fail("cleanup dry-run KO", 1);
+
+  // P4.6-C.1.1 · cycle purge complet · storage-first vérifié end-to-end.
+  //
+  //   1. force expiresAt=past sur NOTRE asset dédié (DB direct)
+  //   2. run cleanup --apply --target-asset <id> (isole notre asset)
+  //   3. confirme · exit 0 · DB status=DELETED · storage object absent
+  //   4. re-run --apply --target-asset · idempotent · scanned=0 ou alreadyDeleted=1
+  console.log(`[test] purge cycle · force expiresAt · asset=${assetId.slice(0,6)}***`);
+  const dbPurge = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DIRECT_URL }) });
+  const sbPurge = (await import("@supabase/supabase-js")).createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    { auth: { persistSession: false, autoRefreshToken: false } },
+  );
+  try {
+    // 1. Force expiration.
+    await dbPurge.messagingAudioAsset.update({
+      where: { id: assetId },
+      data: { expiresAt: new Date(Date.now() - 60 * 1000) },
+    });
+
+    // 2. Run apply targeted.
+    const apply = spawnSync("node", [
+      "scripts/cleanup-messaging-audio.mjs",
+      "--apply",
+      "--target-asset", assetId,
+    ], { stdio: "inherit", env: process.env });
+    if (apply.status !== 0) fail(`cleanup --apply exit ${apply.status}`, 1);
+
+    // 3. DB status=DELETED · storageKey=null.
+    const after = await dbPurge.messagingAudioAsset.findUnique({
+      where: { id: assetId },
+      select: { status: true, deletedAt: true, storageKey: true },
+    });
+    if (!after) fail("asset disparu de DB", 1);
+    if (after.status !== "DELETED") fail(`DB status attendu DELETED · reçu ${after.status}`, 1);
+    if (after.deletedAt === null) fail("deletedAt attendu non-null", 1);
+    if (after.storageKey !== null) fail("storageKey attendu null après purge", 1);
+    console.log("[test] purge · DB status=DELETED · deletedAt posé · storageKey null");
+
+    // Storage object absent (double-check via list).
+    const listAfter = await sbPurge.storage.from("yema-messaging-audio-private").list(`v1/${conversationId}`);
+    const stillThere = (listAfter.data ?? []).some((o) => o.name?.startsWith(assetId));
+    if (stillThere) fail("objet Storage encore présent après purge", 1);
+    console.log("[test] purge · Storage object confirmé absent");
+
+    // 4. Re-run idempotent · doit sortir 0 · asset déjà DELETED.
+    const applyAgain = spawnSync("node", [
+      "scripts/cleanup-messaging-audio.mjs",
+      "--apply",
+      "--target-asset", assetId,
+    ], { stdio: "inherit", env: process.env });
+    if (applyAgain.status !== 0) fail(`cleanup --apply retry exit ${applyAgain.status}`, 1);
+    console.log("[test] purge · retry idempotent OK");
+  } finally {
+    await dbPurge.$disconnect();
+  }
 
   console.log("[test:messaging-audio:p1] ALL OK");
 }
