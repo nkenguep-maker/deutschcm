@@ -134,6 +134,55 @@ describe("Lot 7C · package.json · nouveaux scripts P-1", () => {
   });
 });
 
+describe("Lot 7C.1 · orchestrateurs actifs · restauration + strict checks", () => {
+  const entSrc = readRepo("scripts/orchestrate-entitlements-p1.mjs");
+  const perSrc = readRepo("scripts/orchestrate-personas-p1.mjs");
+  const capSpec = readRepo("tests/e2e/personas/captures.spec.ts");
+  const perOrc = readRepo("scripts/orchestrate-personas-p1.mjs");
+  const capOrc = readRepo("scripts/orchestrate-personas-capture.mjs");
+
+  it("entitlements orchestrator · Family + Passage temp grant + cleanup finally", () => {
+    expect(entSrc).toMatch(/const tempPassage = await db\.accessGrant\.create/);
+    expect(entSrc).toMatch(/cleanup\.push/);
+    expect(entSrc).toMatch(/runCleanup/);
+    expect(entSrc).toMatch(/finally/);
+    expect(entSrc).toMatch(/aucun résidu temporaire/);
+  });
+
+  it("entitlements orchestrator · FAMILY_WORLD plafond 3 sièges enfant Monde", () => {
+    expect(entSrc).toMatch(/plafond 3 sièges enfant Monde/);
+    expect(entSrc).toMatch(/4e enfant Monde REFUSÉ/);
+  });
+
+  it("entitlements orchestrator · ROOTS_FAMILY ≤ 2 adultes + ≤ 4 enfants", () => {
+    expect(entSrc).toMatch(/max 2/);
+    expect(entSrc).toMatch(/max 4/);
+  });
+
+  it("personas orchestrator · Child Monde + Child Racines direct via /api/child-session", () => {
+    expect(perSrc).toMatch(/Child Monde \(Lina\)/);
+    expect(perSrc).toMatch(/Child Racines \(Aicha\)/);
+    expect(perSrc).toMatch(/\/api\/child-session/);
+  });
+
+  it("personas orchestrator · Invalidation PIN active · rotation temporaire + restauration", () => {
+    expect(perSrc).toMatch(/Invalidation PIN active · rotation temporaire/);
+    expect(perSrc).toMatch(/ancien PIN refusé/);
+    expect(perSrc).toMatch(/nouveau PIN accepté/);
+    expect(perSrc).toMatch(/PIN original restauré/);
+  });
+
+  it("capture spec · h1 strict === 1 · aucune tolérance", () => {
+    expect(capSpec).toMatch(/expect\(h1Count,\s*`h1 count \$\{p\.id\} \$\{vp\.name\}`\)\.toBe\(1\)/);
+    expect(capSpec).not.toMatch(/toBeLessThanOrEqual\(maxH1\)/);
+  });
+
+  it("orchestrateurs activent redesign flag pour éviter les 2 h1 legacy", () => {
+    expect(perOrc).toMatch(/YEMA_DASHBOARD_REDESIGN_ENABLED:\s*"true"/);
+    expect(capOrc).toMatch(/YEMA_DASHBOARD_REDESIGN_ENABLED:\s*"true"/);
+  });
+});
+
 describe("Lot 7C · non-régression · Lots précédents intacts", () => {
   it("Lot 7A · MondeIvoryOverview toujours importé", () => {
     const s = read("features/dashboards/student-monde/StudentMondeDashboard.tsx");

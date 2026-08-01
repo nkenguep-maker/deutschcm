@@ -5,6 +5,7 @@
 
 import { spawn, spawnSync } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
+import { randomBytes } from "node:crypto";
 
 const P1_REF = "kzzagbojjkivdzzcrmxn";
 const BLOCKED = new Set([
@@ -28,8 +29,18 @@ async function main() {
   console.log("[personas-capture] STEP 1 · fixtures QA");
   spawnSync("node", ["scripts/test-baseline/yema-qa-fixtures.mjs"], { stdio: "inherit", env: process.env });
 
-  console.log(`[personas-capture] STEP 2 · next start port ${PORT}`);
-  const server = spawn("npx", ["next", "start", "-p", PORT], { stdio: ["ignore", "pipe", "inherit"], env: process.env });
+  console.log(`[personas-capture] STEP 2 · next start port ${PORT} (redesign flag ON · HMAC injected)`);
+  const hmacSecret = process.env.YEMA_CHILD_SESSION_SECRET
+    ?? process.env.SUPABASE_JWT_SECRET
+    ?? randomBytes(32).toString("base64");
+  const server = spawn("npx", ["next", "start", "-p", PORT], {
+    stdio: ["ignore", "pipe", "inherit"],
+    env: {
+      ...process.env,
+      YEMA_DASHBOARD_REDESIGN_ENABLED: "true",
+      YEMA_CHILD_SESSION_SECRET: hmacSecret,
+    },
+  });
   let ready = false;
   server.stdout.on("data", (b) => { if (/Ready|ready in|Started/i.test(b.toString())) ready = true; });
   for (let i = 0; i < 30 && !ready; i++) await sleep(1000);

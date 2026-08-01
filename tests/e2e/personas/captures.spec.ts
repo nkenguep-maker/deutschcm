@@ -71,13 +71,12 @@ for (const p of PERSONAS) {
         const path = file(p.id, vp.name, locale);
         await page.screenshot({ path, fullPage: true });
         manifest.push(`${vp.name}\t${locale}\t${p.id}\t${route}\t${resp?.status() ?? "?"}`);
-        // Un seul h1 par page (Lot 7C · brief §12).
-        // TOLÉRANCE · student_monde / student_racines ont un h1 legacy
-        // dans le layout parent + un h1 dans le shell dashboard (bug
-        // identifié en Lot 7C · à corriger dans un mini-lot dédié).
+        // Lot 7C.1 · un seul h1 par page · aucune tolérance.
+        // Le flag YEMA_DASHBOARD_REDESIGN_ENABLED est activé par
+        // l'orchestrateur · les nouveaux dashboards Student n'ont plus
+        // qu'un h1 (DashboardHeader unique · legacy Layout non rendu).
         const h1Count = await page.locator("h1").count();
-        const maxH1 = (p.id === "student_monde" || p.id === "student_racines") ? 2 : 1;
-        expect(h1Count, `h1 count ${p.id} ${vp.name}`).toBeLessThanOrEqual(maxH1);
+        expect(h1Count, `h1 count ${p.id} ${vp.name}`).toBe(1);
         // Aucun overflow horizontal massif (marquee/carousel tolérés < 5).
         const overflowing = await page.$$eval("*", (els, w) =>
           els.filter((e) => e.getBoundingClientRect().right > w + 1).length,
