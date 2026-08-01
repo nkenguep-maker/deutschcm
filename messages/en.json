@@ -897,6 +897,125 @@
         "recentActivityTitle": "Recent activity",
         "recentActivityEmpty": "Nothing to show yet."
       },
+      "ivory": {
+        "signal": {
+          "no_pathway": "NO GOAL",
+          "next_stop": "NEXT STOP",
+          "travel_countdown": "DEPARTURE IN {days} DAYS",
+          "travel_no_date": "NO DATE SET",
+          "exam_countdown": "EXAM IN {days} DAYS",
+          "exam_no_date": "NO DATE SET"
+        },
+        "hero": {
+          "language_level": "German · {level}",
+          "language_no_level": "German",
+          "progress_label": "Pathway progress · {pct} %",
+          "progress_pct": "{pct} % done",
+          "title": {
+            "no_pathway": "Choose what this language should help you achieve.",
+            "STUDIES": "Study in Berlin",
+            "WORK": "Work in Zurich",
+            "TRAVEL": "Prepare for your trip",
+            "EXAM": "Pass your exam",
+            "DAILY_LIFE": "Speak with your family"
+          },
+          "subtitle": {
+            "no_pathway": "Your pathway starts as soon as you set a clear goal.",
+            "STUDIES": "Formal expression, academic vocabulary and admissions preparation.",
+            "WORK": "Professional oral practice, interview and industry vocabulary.",
+            "TRAVEL": "Practical situations, useful phrases and concrete progress.",
+            "EXAM": "Priority skills and calm practice for all four exam sections.",
+            "DAILY_LIFE": "Conversation topics and short family situations."
+          }
+        },
+        "cta": {
+          "resume": "Resume the course",
+          "define_goal": "Define my goal",
+          "complete_goal": "Complete my goal",
+          "edit_goal": "Edit my goal"
+        },
+        "empty": {
+          "no_pathway": {
+            "label": "NO PATHWAY",
+            "title": "Set your goal to start.",
+            "description": "Choose what this language should help you achieve."
+          },
+          "incomplete_goal": {
+            "label": "INCOMPLETE GOAL",
+            "title": "Complete your goal to refine the pathway.",
+            "description": "Add the city or the date to prioritise the right situations."
+          },
+          "no_assignments": {
+            "label": "NO ASSIGNMENT",
+            "title": "No assignment due right now.",
+            "description": "Keep going on your pathway."
+          },
+          "no_class": {
+            "label": "NO CLASS",
+            "title": "Your class will appear here.",
+            "description": "Your class will be visible as soon as your enrolment is confirmed."
+          }
+        },
+        "modules": {
+          "ADMISSION_CHECKLIST": {
+            "eyebrow": "ADMISSION FILE",
+            "title": "What your file must contain.",
+            "subtitle": "Step by step, prepare the expected documents.",
+            "items": [
+              "Introduce my background",
+              "Explain my study project",
+              "Understand a university brief",
+              "Prepare the essential documents"
+            ]
+          },
+          "INTERVIEW_TOPICS": {
+            "eyebrow": "INTERVIEW",
+            "title": "Topics to prepare for your interview.",
+            "subtitle": "Practise out loud, one topic at a time.",
+            "items": [
+              "Present my experience",
+              "Explain a key achievement",
+              "Ask questions to the recruiter",
+              "Negotiate an offer"
+            ]
+          },
+          "TRAVEL_SITUATIONS": {
+            "eyebrow": "SITUATIONS",
+            "title": "Kit of practical situations.",
+            "subtitle": "What you will actually meet on site.",
+            "items": [
+              "Arrival at the airport",
+              "Local transport",
+              "Hotel and bookings",
+              "Restaurant and shopping",
+              "Asking for help",
+              "Handling the unexpected"
+            ]
+          },
+          "EXAM_SKILLS": {
+            "eyebrow": "SKILLS",
+            "title": "The four exam skills.",
+            "subtitle": "Progress calmly, section by section.",
+            "items": [
+              "Listening",
+              "Reading",
+              "Speaking",
+              "Writing"
+            ]
+          },
+          "DAILY_TOPICS": {
+            "eyebrow": "DAILY TOPICS",
+            "title": "Conversation topics to practise.",
+            "subtitle": "Short, regular, realistic exchanges.",
+            "items": [
+              "Introduce yourself to the in-laws",
+              "Set up an appointment",
+              "Talk about a recent memory",
+              "Describe my day"
+            ]
+          }
+        }
+      },
       "course": {
         "title": "My course",
         "description": "Five A1 lessons to lay the foundations.",

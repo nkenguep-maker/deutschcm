@@ -897,6 +897,125 @@
         "recentActivityTitle": "Activités récentes",
         "recentActivityEmpty": "Rien à afficher pour l'instant."
       },
+      "ivory": {
+        "signal": {
+          "no_pathway": "AUCUN OBJECTIF",
+          "next_stop": "NEXT STOP",
+          "travel_countdown": "DÉPART DANS {days} JOURS",
+          "travel_no_date": "PAS DE DATE ENREGISTRÉE",
+          "exam_countdown": "EXAMEN DANS {days} JOURS",
+          "exam_no_date": "PAS DE DATE ENREGISTRÉE"
+        },
+        "hero": {
+          "language_level": "Allemand · {level}",
+          "language_no_level": "Allemand",
+          "progress_label": "Progression du parcours · {pct} %",
+          "progress_pct": "{pct} % accompli",
+          "title": {
+            "no_pathway": "Choisissez ce que cette langue doit vous permettre d'accomplir.",
+            "STUDIES": "Étudier à Berlin",
+            "WORK": "Travailler à Zurich",
+            "TRAVEL": "Préparer votre voyage",
+            "EXAM": "Réussir votre examen",
+            "DAILY_LIFE": "Parler avec votre entourage"
+          },
+          "subtitle": {
+            "no_pathway": "Votre parcours démarre dès que vous définissez un objectif clair.",
+            "STUDIES": "Expression formelle, vocabulaire académique et préparation des admissions.",
+            "WORK": "Oral professionnel, entretien et vocabulaire métier.",
+            "TRAVEL": "Situations pratiques, phrases utiles et progression concrète.",
+            "EXAM": "Compétences prioritaires et entraînement calme aux quatre épreuves.",
+            "DAILY_LIFE": "Sujets de conversation et situations familiales courtes."
+          }
+        },
+        "cta": {
+          "resume": "Reprendre le cours",
+          "define_goal": "Définir mon objectif",
+          "complete_goal": "Compléter mon objectif",
+          "edit_goal": "Modifier mon objectif"
+        },
+        "empty": {
+          "no_pathway": {
+            "label": "AUCUN PARCOURS",
+            "title": "Définissez votre objectif pour commencer.",
+            "description": "Choisissez ce que cette langue doit vous permettre d'accomplir."
+          },
+          "incomplete_goal": {
+            "label": "OBJECTIF INCOMPLET",
+            "title": "Complétez votre objectif pour affiner le parcours.",
+            "description": "Ajoutez la ville ou la date pour prioriser les bonnes situations."
+          },
+          "no_assignments": {
+            "label": "AUCUN DEVOIR",
+            "title": "Aucun devoir à rendre pour le moment.",
+            "description": "Continuez votre parcours."
+          },
+          "no_class": {
+            "label": "PAS DE CLASSE",
+            "title": "Votre classe apparaîtra ici.",
+            "description": "Votre classe sera visible dès que votre inscription sera confirmée."
+          }
+        },
+        "modules": {
+          "ADMISSION_CHECKLIST": {
+            "eyebrow": "DOSSIER ADMISSION",
+            "title": "Ce que votre dossier doit contenir.",
+            "subtitle": "Étape par étape, préparez les pièces attendues.",
+            "items": [
+              "Présenter mon parcours",
+              "Expliquer mon projet d'études",
+              "Comprendre une consigne universitaire",
+              "Préparer les documents essentiels"
+            ]
+          },
+          "INTERVIEW_TOPICS": {
+            "eyebrow": "ENTRETIEN",
+            "title": "Sujets à préparer pour votre entretien.",
+            "subtitle": "Répétez à l'oral, un sujet à la fois.",
+            "items": [
+              "Présenter mon expérience",
+              "Expliquer une réalisation clé",
+              "Poser des questions au recruteur",
+              "Négocier une proposition"
+            ]
+          },
+          "TRAVEL_SITUATIONS": {
+            "eyebrow": "SITUATIONS",
+            "title": "Kit de situations pratiques.",
+            "subtitle": "Ce que vous rencontrerez vraiment sur place.",
+            "items": [
+              "Arrivée à l'aéroport",
+              "Transport local",
+              "Hôtel et réservations",
+              "Restaurant et courses",
+              "Demander de l'aide",
+              "Gérer un imprévu"
+            ]
+          },
+          "EXAM_SKILLS": {
+            "eyebrow": "COMPÉTENCES",
+            "title": "Les quatre compétences de l'examen.",
+            "subtitle": "Progressez calmement, épreuve par épreuve.",
+            "items": [
+              "Compréhension orale",
+              "Compréhension écrite",
+              "Expression orale",
+              "Expression écrite"
+            ]
+          },
+          "DAILY_TOPICS": {
+            "eyebrow": "SUJETS DU QUOTIDIEN",
+            "title": "Sujets de conversation à pratiquer.",
+            "subtitle": "Des échanges courts, réguliers, réalistes.",
+            "items": [
+              "Se présenter à la belle-famille",
+              "Organiser un rendez-vous",
+              "Parler d'un souvenir récent",
+              "Décrire ma journée"
+            ]
+          }
+        }
+      },
       "course": {
         "title": "Mon cours",
         "description": "Cinq leçons A1 pour poser les bases.",

@@ -1,0 +1,138 @@
+/* Lot 7A · Monde Ivory tokens · scope [data-monde-ivory].
+ *
+ * Coexiste avec [data-yema-shell] (dark) et Racines · aucune valeur
+ * Racines n'est modifiée. Ne remplace aucun token existant.
+ *
+ * Palette · papier ivoire + encre + or unique. Un seul CTA principal
+ * en encre par écran. Or réservé pour signaler l'élément en cours
+ * (max 4 accents).
+ */
+
+[data-monde-ivory] {
+  /* Surfaces */
+  --monde-paper:          #F1EBE0;
+  --monde-surface:        #FBF8F2;
+  --monde-border:         #DED5C6;
+  --monde-border-strong:  #CBC0AE;
+
+  /* Encre (texte + CTA) */
+  --monde-ink:            #1C1712;
+  --monde-ink-hover:      #33291F;
+  --monde-on-ink:         #FBF8F2;
+  --monde-text-secondary: #7A7266;
+  --monde-text-muted:     #9C9184;
+
+  /* Or (accent · signale l'élément en cours) */
+  --monde-gold:           #A87423;
+  --monde-gold-light:     #C99A4E;
+  --monde-gold-on-ink:    #E7B865;
+  --monde-gold-tint:      rgba(168, 116, 35, 0.09);
+
+  /* Rayons + typographie */
+  --monde-r-card:  16px;
+  --monde-r-pill:  999px;
+  --monde-r-chip:  10px;
+
+  --monde-font-sans: var(--yema-font-jakarta, "Plus Jakarta Sans", system-ui, sans-serif);
+  --monde-font-mono: var(--yema-font-mono, "JetBrains Mono", ui-monospace, monospace);
+
+  /* Base */
+  background: var(--monde-paper);
+  color: var(--monde-ink);
+  font-family: var(--monde-font-sans);
+}
+
+/* Micro-labels (chips, signalétique) · JAMAIS tronqués · le conteneur
+ * peut wrap. */
+[data-monde-ivory] .monde-mono {
+  font-family: var(--monde-font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  flex: none;
+}
+
+/* Hero éditorial · le h1 unique reste dans DashboardHeader (shell
+ * partagé). L'ivory hero utilise <h2 class="monde-hero-title"> avec
+ * le poids visuel du hero (clamp 25..44px). text-wrap: pretty pour
+ * éviter les orphelins. */
+[data-monde-ivory] .monde-hero-title {
+  font-family: var(--monde-font-sans);
+  font-weight: 700;
+  font-size: clamp(25px, 4vw, 44px);
+  line-height: 1.1;
+  color: var(--monde-ink);
+  text-wrap: pretty;
+  margin: 0;
+}
+[data-monde-ivory] h2 {
+  font-family: var(--monde-font-sans);
+  font-weight: 600;
+  font-size: clamp(18px, 2vw, 22px);
+  line-height: 1.2;
+  color: var(--monde-ink);
+  text-wrap: pretty;
+  margin: 0;
+}
+[data-monde-ivory] h3 {
+  font-family: var(--monde-font-sans);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--monde-ink);
+  margin: 0;
+}
+
+/* CTA principal · encre. JAMAIS de dégradé, jamais d'or. */
+[data-monde-ivory] .monde-cta-primary {
+  min-height: 48px;
+  padding: 12px 24px;
+  border-radius: var(--monde-r-pill);
+  background: var(--monde-ink);
+  color: var(--monde-on-ink);
+  border: 1px solid var(--monde-ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+[data-monde-ivory] .monde-cta-primary:hover {
+  background: var(--monde-ink-hover);
+}
+[data-monde-ivory] .monde-cta-primary:focus-visible {
+  outline: 2px solid var(--monde-gold);
+  outline-offset: 2px;
+}
+
+[data-monde-ivory] .monde-cta-secondary {
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: var(--monde-r-pill);
+  background: transparent;
+  color: var(--monde-ink);
+  border: 1px solid var(--monde-border-strong);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+[data-monde-ivory] .monde-cta-secondary:hover {
+  background: var(--monde-gold-tint);
+}
+
+/* Mobile · CTA principal pleine largeur ≥ 54px (brief §16). */
+@media (max-width: 480px) {
+  [data-monde-ivory] .monde-cta-primary {
+    width: 100%;
+    min-height: 54px;
+  }
+}
+
+/* Prefers reduced motion · pas de compte à rebours animé, aucune
+ * animation gratuite (brief §17). */
+@media (prefers-reduced-motion: reduce) {
+  [data-monde-ivory] * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

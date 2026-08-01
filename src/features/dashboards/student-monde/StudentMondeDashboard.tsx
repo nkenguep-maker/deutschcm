@@ -24,6 +24,7 @@ import {
 import type { DashboardTab } from "@/features/dashboards/shared";
 import { buildMondeNav } from "./nav";
 import { OverviewSection } from "./sections/OverviewSection";
+import { MondeIvoryOverview } from "./ivory/MondeIvoryOverview";
 import { CourseSection } from "./sections/CourseSection";
 import { AssignmentsSection } from "./sections/AssignmentsSection";
 import { JourneySection } from "./sections/JourneySection";
@@ -241,6 +242,25 @@ export function StudentMondeDashboard({ locale }: { locale: "fr" | "en" }) {
         }
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+          {/* Lot 7A · Monde Ivory · hero + parcours (5 variants pilotés
+              par la data onboarding via resolveMondePath). AUCUN tab
+              sélecteur en production · le parcours vient uniquement de
+              l'onboarding. */}
+          <MondeIvoryOverview
+            input={{
+              // Le champ persisté canonique n'est pas encore projeté par
+              // /api/me/monde-dashboard · l'adaptateur retourne null et
+              // affiche l'état "Aucun parcours" (brief §12·A) tant que
+              // l'API n'expose pas learningGoal. Aucune migration
+              // nécessaire dans ce lot.
+              learningGoal: null,
+              targetCity: null,
+              targetDate: null,
+              progressPct: 0,
+              completed: false,
+              level: data.learningPath?.currentLevel ?? null,
+            }}
+          />
           <OverviewSection data={data} assignments={assignments} />
           <CourseSection courses={data.courses} accessStatus={data.access.status} />
           <AssignmentsSection assignments={assignments} />
