@@ -62,3 +62,6 @@ scripts/test-baseline/captures/
 .playwright/
 playwright-report/
 test-results/
+
+# Captures locales (Monde Ivory, Monde Context) — jamais commit
+captures/
