@@ -28,6 +28,7 @@ import { TeacherOverviewSection } from "./sections/TeacherOverviewSection";
 import { TeacherClassesSection } from "./sections/TeacherClassesSection";
 import { TeacherAssignmentsSection } from "./sections/TeacherAssignmentsSection";
 import { TeacherCorrectionsSection } from "./sections/TeacherCorrectionsSection";
+import { TeacherMondeContextSection } from "./sections/TeacherMondeContextSection";
 import { TeacherResourcesSection } from "./sections/TeacherResourcesSection";
 import { TeacherMessagesSection } from "./sections/TeacherMessagesSection";
 import type {
@@ -248,6 +249,9 @@ export function TeacherDashboard({ locale }: { locale: "fr" | "en" }) {
             baseHref={baseHref}
           />
           <TeacherCorrectionsSection />
+          {/* Lot 7B · contexte parcours Monde · distribution + preview
+              file avec PathwayMetaChip · réutilise /api/teacher/students. */}
+          <TeacherMondeContextSection />
           <TeacherResourcesSection />
           <TeacherMessagesSection />
           {classes.length === 0 && assignments.length === 0 && data.stats.activeStudentCount === 0 ? (

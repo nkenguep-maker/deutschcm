@@ -10,6 +10,10 @@ export interface FamilyChildRow {
   langues: unknown[];
   hasPin: boolean;
   createdAt: string;
+  // Lot 7B · universe projeté depuis ChildProfile pour permettre à
+  // Family UI de scoper le thème Monde Ivory vs Racines. AUCUN autre
+  // champ enfant sensible (pinHash, pinUpdatedAt, cookie) n'est exposé.
+  universe?: "MONDE" | "RACINES" | null;
 }
 
 export interface FamilySeatSnapshot {

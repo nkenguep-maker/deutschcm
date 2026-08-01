@@ -1637,6 +1637,51 @@
       "error": "Your case isn't opening. Please retry.",
       "retry": "Retry",
       "exitChildMode": "Exit child mode"
+    },
+    "mondeContext": {
+      "pathwayLabel": {
+        "STUDIES": "STUDIES",
+        "WORK": "WORK",
+        "TRAVEL": "TRAVEL",
+        "EXAM": "EXAM",
+        "DAILY_LIFE": "DAILY LIFE"
+      },
+      "fallback": {
+        "unknown_short": "TO DEFINE",
+        "unknown_long": "Goal to define"
+      },
+      "distribution": {
+        "title": "World pathway distribution",
+        "subtitle": "{count} learners across your classes"
+      },
+      "teacher": {
+        "title": "World pathways",
+        "description": "Summary view of your learners' goals.",
+        "empty": {
+          "title": "No learners yet.",
+          "description": "Learners will appear here once enrolled."
+        },
+        "learnersPreviewTitle": "Queue preview",
+        "anonymousLearner": "Learner"
+      },
+      "family": {
+        "level": "Level {level}",
+        "progress_label": "Pathway progress · {pct} %",
+        "progress_pct": "{pct} % done",
+        "minutes_this_week": "{count, plural, one {1 minute this week} other {# minutes this week}}",
+        "recommendation_label": "SUGGESTION FOR YOU",
+        "recommendation": {
+          "STUDIES": "Ask them to present their study project.",
+          "WORK": "Practise together a short professional introduction.",
+          "TRAVEL": "Role-play a practical travel situation for three minutes.",
+          "EXAM": "Review together the skill to work on this week.",
+          "DAILY_LIFE": "Pick a daily topic and speak without translating.",
+          "unknown": "Their goal will appear once configured."
+        },
+        "empty": {
+          "no_progress": "Progress will appear after their first activities."
+        }
+      }
     }
   },
   "yemaMessaging": {

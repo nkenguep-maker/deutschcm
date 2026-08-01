@@ -48,6 +48,9 @@ export async function listFamilyChildren(actor: FamilyGuardianActor): Promise<Fa
       langues: true,
       pinHash: true, // lu ici pour dériver hasPin, JAMAIS renvoyé au client
       createdAt: true,
+      // Lot 7B · universe projeté pour scoper thème Monde Ivory vs Racines
+      // côté UI Family (aucun autre champ enfant sensible n'est ajouté).
+      universe: true,
     },
   });
   return rows.map((r) => ({
@@ -59,6 +62,7 @@ export async function listFamilyChildren(actor: FamilyGuardianActor): Promise<Fa
     langues: (r.langues as unknown[]) ?? [],
     hasPin: Boolean(r.pinHash),
     createdAt: r.createdAt.toISOString(),
+    universe: r.universe ?? null,
   }));
 }
 

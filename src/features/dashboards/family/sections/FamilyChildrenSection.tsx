@@ -9,6 +9,7 @@ import {
   DashboardStatusChip,
 } from "@/features/dashboards/shared";
 import type { FamilyChildRow, FamilyDashboardResponse } from "../types";
+import { FamilyMondeChildCard } from "@/features/dashboards/monde-context";
 
 type Props = {
   data: FamilyDashboardResponse;
@@ -141,6 +142,25 @@ function ChildCard({
           {openLabel}
         </a>
       </div>
+      {/* Lot 7B · contexte Monde Ivoire · UNIQUEMENT quand universe est
+          explicitement MONDE. universe null / RACINES · aucun ivory
+          n'apparaît (fail-closed, Racines existant intact). */}
+      {child.universe === "MONDE" ? (
+        <FamilyMondeChildCard
+          child={{
+            id: child.id,
+            prenom: child.prenom,
+            avatarAnimal: child.avatarAnimal,
+            // learningGoal enfant n'est pas encore projeté (aucun champ
+            // learningGoal sur ChildProfile) · resolveMondePath retourne
+            // null · le contexte affiche l'état "Objectif à préciser".
+            learningGoal: null,
+            level: null,
+            progressPct: null,
+            minutesThisWeek: null,
+          }}
+        />
+      ) : null}
     </DashboardCard>
   );
 }

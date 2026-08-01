@@ -1637,6 +1637,51 @@
       "error": "Ta case ne s'ouvre pas. Réessaie.",
       "retry": "Réessayer",
       "exitChildMode": "Quitter le mode enfant"
+    },
+    "mondeContext": {
+      "pathwayLabel": {
+        "STUDIES": "ÉTUDES",
+        "WORK": "TRAVAIL",
+        "TRAVEL": "VOYAGE",
+        "EXAM": "EXAMEN",
+        "DAILY_LIFE": "VIE QUOTIDIENNE"
+      },
+      "fallback": {
+        "unknown_short": "À PRÉCISER",
+        "unknown_long": "Objectif à préciser"
+      },
+      "distribution": {
+        "title": "Distribution des parcours Monde",
+        "subtitle": "{count} apprenants dans vos classes"
+      },
+      "teacher": {
+        "title": "Parcours Monde",
+        "description": "Vue synthétique des objectifs de vos apprenants.",
+        "empty": {
+          "title": "Aucun apprenant pour le moment.",
+          "description": "Les apprenants apparaîtront ici dès leur inscription."
+        },
+        "learnersPreviewTitle": "Aperçu de la file",
+        "anonymousLearner": "Apprenant"
+      },
+      "family": {
+        "level": "Niveau {level}",
+        "progress_label": "Progression du parcours · {pct} %",
+        "progress_pct": "{pct} % accompli",
+        "minutes_this_week": "{count, plural, one {1 minute cette semaine} other {# minutes cette semaine}}",
+        "recommendation_label": "SUGGESTION POUR VOUS",
+        "recommendation": {
+          "STUDIES": "Demandez-lui de vous présenter son projet d'études.",
+          "WORK": "Entraînez ensemble une courte présentation professionnelle.",
+          "TRAVEL": "Jouez une situation pratique de voyage pendant trois minutes.",
+          "EXAM": "Relisez ensemble la compétence à travailler cette semaine.",
+          "DAILY_LIFE": "Choisissez un sujet quotidien et échangez sans traduction.",
+          "unknown": "Son objectif sera visible après sa configuration."
+        },
+        "empty": {
+          "no_progress": "La progression apparaîtra après ses premières activités."
+        }
+      }
     }
   },
   "yemaMessaging": {

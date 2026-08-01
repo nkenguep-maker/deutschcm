@@ -39,8 +39,12 @@ export interface TeacherStudentRow {
   fullName: string | null;
   level: string | null;
   classroomId: string;
+  classroomName?: string | null;
   joinedAt: string | null;
   isActive: boolean;
+  // Lot 7B · projection minimale du parcours · client fait
+  // resolveMondePath({ learningGoal }) · aucun autre champ User exposé.
+  learningGoal?: string | null;
 }
 
 export interface TeacherStudentsResponse {

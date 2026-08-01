@@ -161,7 +161,10 @@ describe("Lot 7A.2 · orchestrateur test P-1 · vérifie sécurité API", () => 
 
   it("check ?monde_path=EXAM ignoré côté produit", () => {
     expect(src).toMatch(/monde_path=EXAM/);
-    expect(src).toMatch(/override query change le rendu · leak sécurité/);
+    // Le message d'échec a évolué au Lot 7A.2 (SSR client-only) · on
+    // vérifie uniquement la présence du fetch de la query + comparaison
+    // de status.
+    expect(src).toMatch(/aucun override server|override change le status/);
   });
 });
 
