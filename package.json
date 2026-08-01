@@ -22,6 +22,9 @@
     "capture:monde-ivory:p1": "node scripts/capture-monde-ivory-p1.mjs",
     "test:monde-context:p1": "node scripts/test-monde-context-p1.mjs",
     "capture:monde-context:p1": "node scripts/capture-monde-context-p1.mjs",
+    "test:personas:p1": "node scripts/test-personas-p1.mjs",
+    "test:entitlements:p1": "node scripts/test-entitlements-p1.mjs",
+    "capture:personas:p1": "node scripts/capture-personas-p1.mjs",
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
