@@ -23,11 +23,9 @@ import {
 } from "@/features/dashboards/shared";
 import type { DashboardTab } from "@/features/dashboards/shared";
 import { buildMondeNav } from "./nav";
-import { OverviewSection } from "./sections/OverviewSection";
 import { MondeIvoryOverview } from "./ivory/MondeIvoryOverview";
 import { CourseSection } from "./sections/CourseSection";
 import { AssignmentsSection } from "./sections/AssignmentsSection";
-import { JourneySection } from "./sections/JourneySection";
 import { ClassSection } from "./sections/ClassSection";
 import { MessagesPlaceholderSection } from "./sections/MessagesPlaceholderSection";
 import type {
@@ -242,29 +240,24 @@ export function StudentMondeDashboard({ locale }: { locale: "fr" | "en" }) {
         }
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-          {/* Lot 7A · Monde Ivory · hero + parcours (5 variants pilotés
-              par la data onboarding via resolveMondePath). AUCUN tab
-              sélecteur en production · le parcours vient uniquement de
-              l'onboarding. */}
+          {/* Lot 7A / 7A.1 · Monde Ivory · composition UNIQUE brief §5 ·
+              identité (DashboardHeader) → parcours actif → hero → CTA →
+              progression → module → devoirs → prochaine étape → classe.
+              OverviewSection retiré (hero + CTA + progression + next
+              assignments dupliqués ivoirés) · JourneySection retiré
+              (duplication de la progression du hero). */}
           <MondeIvoryOverview
             input={{
-              // Le champ persisté canonique n'est pas encore projeté par
-              // /api/me/monde-dashboard · l'adaptateur retourne null et
-              // affiche l'état "Aucun parcours" (brief §12·A) tant que
-              // l'API n'expose pas learningGoal. Aucune migration
-              // nécessaire dans ce lot.
-              learningGoal: null,
-              targetCity: null,
+              learningGoal: data.onboarding?.learningGoal ?? null,
+              targetCity: data.onboarding?.targetCity ?? null,
               targetDate: null,
-              progressPct: 0,
-              completed: false,
+              progressPct: data.overallPct ?? 0,
+              completed: data.access.status === "EXPIRED" && (data.overallPct ?? 0) >= 100,
               level: data.learningPath?.currentLevel ?? null,
             }}
           />
-          <OverviewSection data={data} assignments={assignments} />
-          <CourseSection courses={data.courses} accessStatus={data.access.status} />
           <AssignmentsSection assignments={assignments} />
-          <JourneySection currentLevel={data.learningPath?.currentLevel ?? null} />
+          <CourseSection courses={data.courses} accessStatus={data.access.status} />
           <ClassSection />
           <MessagesPlaceholderSection />
         </div>

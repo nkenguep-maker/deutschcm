@@ -35,6 +35,11 @@ export interface MondeDashboardData {
   nextModule: { courseId: string; moduleId: string; label: string } | null;
   greetingName: string | null;
   xpTotal?: number;
+  // Lot 7A.1 · projection onboarding pour MondeIvoryOverview.
+  onboarding?: {
+    learningGoal: string | null;
+    targetCity: string | null;
+  };
 }
 
 export type MondeAssignmentStatus = "PUBLISHED" | "CLOSED";

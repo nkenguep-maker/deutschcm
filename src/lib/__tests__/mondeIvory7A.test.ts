@@ -199,11 +199,12 @@ describe("MondeIvoryOverview · orchestration + AUCUN tab de parcours en prod", 
   const src = read("features/dashboards/student-monde/ivory/MondeIvoryOverview.tsx");
 
   it("aucun tab/sélecteur de parcours visible en production", () => {
-    // Le seul override est dev/QA via ?monde_path= query · pas de tabs UI.
+    // Lot 7A.1 · l'override query a été retiré · aucun tab UI, aucun
+    // URLSearchParams client, aucun bypass. Le parcours vient uniquement
+    // de resolveMondePath(data.onboarding.learningGoal).
     expect(src).not.toMatch(/<Tabs\b|role="tablist"|onTabChange/);
-    // Le QA override est encadré par readQaOverride sans exposer d'UI.
-    expect(src).toMatch(/readQaOverride/);
-    expect(src).toMatch(/URLSearchParams/);
+    expect(src).not.toMatch(/function readQaOverride|const readQaOverride/);
+    expect(src).not.toMatch(/URLSearchParams/);
   });
 
   it("4 états métier gérés (no_pathway, incomplete_goal, active, completed)", () => {
@@ -318,17 +319,25 @@ describe("Non-régression · Racines / entitlements / messagerie intacts", () =>
   });
 });
 
-describe("Dashboard wire · MondeIvoryOverview rendu au-dessus de OverviewSection", () => {
+describe("Dashboard wire · composition UNIQUE Lot 7A.1 (OverviewSection retiré)", () => {
   const src = read("features/dashboards/student-monde/StudentMondeDashboard.tsx");
 
   it("import MondeIvoryOverview", () => {
     expect(src).toMatch(/import \{ MondeIvoryOverview \} from ["'].\/ivory\/MondeIvoryOverview["']/);
   });
 
-  it("rendu AVANT OverviewSection", () => {
-    const idxIvory = src.indexOf("<MondeIvoryOverview");
-    const idxOverview = src.indexOf("<OverviewSection");
-    expect(idxIvory).toBeGreaterThan(0);
-    expect(idxIvory).toBeLessThan(idxOverview);
+  it("OverviewSection RETIRÉ (composition unique · brief 7A.1 §5)", () => {
+    expect(src).not.toMatch(/import \{ OverviewSection \}/);
+    expect(src).not.toMatch(/<OverviewSection/);
+  });
+
+  it("JourneySection RETIRÉ (duplication progression du hero)", () => {
+    expect(src).not.toMatch(/import \{ JourneySection \}/);
+    expect(src).not.toMatch(/<JourneySection/);
+  });
+
+  it("AssignmentsSection + ClassSection conservés dans la hiérarchie ivoire", () => {
+    expect(src).toMatch(/<AssignmentsSection/);
+    expect(src).toMatch(/<ClassSection/);
   });
 });

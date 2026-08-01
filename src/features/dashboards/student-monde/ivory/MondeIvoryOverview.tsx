@@ -9,14 +9,17 @@ import { MondeIvoryEmptyState } from "./MondeIvoryEmptyState";
 import { derivePathStatus, resolveMondePath } from "./mondePath";
 import type { MondePath } from "./mondePath";
 
-// Lot 7A · Overview Monde Ivory · orchestre l'ordre desktop/mobile brief §4/16.
+// Lot 7A / 7A.1 · Overview Monde Ivory · orchestre l'ordre desktop/mobile
+// brief §4/§16.
 //
 // AUCUN tab de sélection de parcours en production · le parcours vient
 // UNIQUEMENT des données onboarding via resolveMondePath.
 //
-// Support de développement · si NEXT_PUBLIC_DEV_QA=true (jamais en prod)
-// ET query ?monde_path=STUDIES|WORK|... est présent, on force la variante.
-// Ce switch reste STRICTEMENT dev/QA · aucun bypass permission.
+// Lot 7A.1 · l'override query ?monde_path= est RETIRÉ. Toute exploration
+// des 5 variantes en QA se fait via un script server-only qui bascule
+// temporairement la valeur `learningGoal` du Student Monde QA puis
+// restaure la valeur d'origine · aucun bypass côté client, aucun
+// NEXT_PUBLIC.
 
 type Props = {
   input: {
@@ -30,22 +33,14 @@ type Props = {
   };
 };
 
-function readQaOverride(): MondePath | null {
-  if (typeof window === "undefined") return null;
-  const params = new URLSearchParams(window.location.search);
-  const raw = params.get("monde_path");
-  const allowed: readonly MondePath[] = ["STUDIES", "WORK", "TRAVEL", "EXAM", "DAILY_LIFE"];
-  if (raw && allowed.includes(raw as MondePath)) return raw as MondePath;
-  return null;
-}
-
 export function MondeIvoryOverview({ input }: Props) {
   const router = useRouter();
   const locale = useLocale();
 
-  const resolved = resolveMondePath({ learningGoal: input.learningGoal, mondePath: input.mondePath });
-  const qaOverride = readQaOverride();
-  const effectivePath = qaOverride ?? resolved;
+  const effectivePath = resolveMondePath({
+    learningGoal: input.learningGoal,
+    mondePath: input.mondePath,
+  });
   const status = derivePathStatus({
     path: effectivePath,
     targetDate: input.targetDate,
