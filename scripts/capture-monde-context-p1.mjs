@@ -20,6 +20,12 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 if (!url.includes(P1_REF)) die(2, `URL non-P1 · refusé`);
 for (const b of BLOCKED) if (url.includes(b)) die(2, `URL blocklisted · ${b}`);
 
+// Lot 7B.2 · defaults canoniques (voir test-monde-context-p1.mjs).
+process.env.MONDE_CONTEXT_TEACHER_EMAIL ||= "test_yema_qa_teacher@example.com";
+process.env.MONDE_CONTEXT_FAMILY_EMAIL  ||= "test_yema_qa_family@example.com";
+process.env.MONDE_CONTEXT_TEACHER_PASSWORD ||= process.env.P1_TEST_PASSWORD || "";
+process.env.MONDE_CONTEXT_FAMILY_PASSWORD  ||= process.env.P1_TEST_PASSWORD || "";
+
 const required = [
   "MONDE_CONTEXT_TEACHER_EMAIL",
   "MONDE_CONTEXT_TEACHER_PASSWORD",

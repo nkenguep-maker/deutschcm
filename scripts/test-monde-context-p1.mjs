@@ -30,6 +30,19 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 if (!url.includes(P1_REF)) die(2, `URL non-P1 · refusé (${url || "vide"})`);
 for (const b of BLOCKED) if (url.includes(b)) die(2, `URL blocklisted · ${b}`);
 
+// Lot 7B.2 · defaults canoniques · les comptes test_yema_qa_teacher et
+// test_yema_qa_family existent déjà côté P-1 · P1_TEST_PASSWORD partagé
+// par toutes les suites P-1 (voir scripts/test-baseline/_common.mjs).
+process.env.MONDE_CONTEXT_TEACHER_EMAIL ||= "test_yema_qa_teacher@example.com";
+process.env.MONDE_CONTEXT_FAMILY_EMAIL  ||= "test_yema_qa_family@example.com";
+process.env.MONDE_CONTEXT_FAMILY2_EMAIL ||= "test_yema_qa_family2@example.com";
+process.env.MONDE_CONTEXT_TEACHER_PASSWORD ||= process.env.P1_TEST_PASSWORD || "";
+process.env.MONDE_CONTEXT_FAMILY_PASSWORD  ||= process.env.P1_TEST_PASSWORD || "";
+process.env.MONDE_CONTEXT_FAMILY2_PASSWORD ||= process.env.P1_TEST_PASSWORD || "";
+
+if (!process.env.P1_TEST_PASSWORD && !process.env.MONDE_CONTEXT_TEACHER_PASSWORD) {
+  die(2, "MISSING P1_TEST_PASSWORD · NON-SKIPPABLE");
+}
 const required = [
   "MONDE_CONTEXT_TEACHER_EMAIL",
   "MONDE_CONTEXT_TEACHER_PASSWORD",

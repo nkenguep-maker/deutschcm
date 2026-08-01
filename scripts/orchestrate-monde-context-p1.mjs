@@ -31,10 +31,22 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 if (!url || !url.includes(P1_REF)) fail(0, `URL non-P1 · ${url}`);
 for (const b of BLOCKED) if (url.includes(b)) fail(0, `blocklisted ${b}`);
 
+// Lot 7B.2 · defaults canoniques (les comptes test_yema_qa_* existent
+// déjà sur P-1 grâce au fixture bakery · P1_TEST_PASSWORD partagé).
+process.env.MONDE_CONTEXT_TEACHER_EMAIL ||= "test_yema_qa_teacher@example.com";
+process.env.MONDE_CONTEXT_FAMILY_EMAIL  ||= "test_yema_qa_family@example.com";
+process.env.MONDE_CONTEXT_FAMILY2_EMAIL ||= "test_yema_qa_family2@example.com";
+process.env.MONDE_CONTEXT_TEACHER_PASSWORD ||= process.env.P1_TEST_PASSWORD || "";
+process.env.MONDE_CONTEXT_FAMILY_PASSWORD  ||= process.env.P1_TEST_PASSWORD || "";
+process.env.MONDE_CONTEXT_FAMILY2_PASSWORD ||= process.env.P1_TEST_PASSWORD || "";
+
 const TEACHER_EMAIL = process.env.MONDE_CONTEXT_TEACHER_EMAIL;
 const TEACHER_PASSWORD = process.env.MONDE_CONTEXT_TEACHER_PASSWORD;
 const FAMILY_EMAIL = process.env.MONDE_CONTEXT_FAMILY_EMAIL;
 const FAMILY_PASSWORD = process.env.MONDE_CONTEXT_FAMILY_PASSWORD;
+// Lot 7B.2 · isolation · second foyer indépendant.
+const FAMILY2_EMAIL = process.env.MONDE_CONTEXT_FAMILY2_EMAIL;
+const FAMILY2_PASSWORD = process.env.MONDE_CONTEXT_FAMILY2_PASSWORD;
 if (!TEACHER_EMAIL || !TEACHER_PASSWORD) fail(0, "MONDE_CONTEXT_TEACHER_* manquants · NON-SKIPPABLE", 2);
 if (!FAMILY_EMAIL || !FAMILY_PASSWORD) fail(0, "MONDE_CONTEXT_FAMILY_* manquants · NON-SKIPPABLE", 2);
 
@@ -90,10 +102,17 @@ async function main() {
         if (forbidden in s) fail(3, `Teacher student expose ${forbidden}`);
       }
     }
-    // Vérifier présence learningGoal (peut être null, mais la clé doit exister
-    // au moins sur les items qui l'ont projeté).
+    // Lot 7B.2 · isolation Teacher · apprenant externe ABSENT + apprenant
+    // inactif ABSENT (isActive filtré côté query, external non enrolled).
+    const fullNames = stuBody.items.map((s) => s.fullName ?? "");
+    if (fullNames.some((n) => n.includes("student_external"))) fail(3, "student_external visible · isolation cassée");
+    if (fullNames.some((n) => n.includes("student_inactive"))) fail(3, "student_inactive visible · isActive filter cassé");
+    // Vérifier au moins 3 parcours distincts (STUDIES/WORK/EXAM) dans les items.
+    const goals = new Set(stuBody.items.map((s) => s.learningGoal).filter(Boolean));
+    if (goals.size < 3) fail(3, `parcours variés attendus (≥3), observés ${goals.size}: ${[...goals].join(",")}`);
     console.log(`  · ${stuBody.items.length} apprenants · aucun champ sensible exposé`);
-    console.log(`  · learningGoal projeté sur ${stuBody.items.filter((s) => s.learningGoal !== undefined).length}`);
+    console.log(`  · parcours distincts observés · ${[...goals].join(", ")}`);
+    console.log(`  · student_external et student_inactive filtrés · isolation OK`);
 
     // ── SCENARIO Family · /api/family/dashboard expose learningGoal ─────
     console.log("[monde-context] STEP 4 · login Family QA");
@@ -111,11 +130,32 @@ async function main() {
     const mondeChildren = famBody.children.filter((c) => c.universe === "MONDE");
     console.log(`  · ${famBody.children.length} enfants (${mondeChildren.length} Monde)`);
     console.log(`  · aucun pinHash exposé · learningGoal projeté sur ${famBody.children.filter((c) => "learningGoal" in c).length}`);
+    // Lot 7B.2 · learningGoal réel présent sur les enfants Monde.
+    const goalsMonde = mondeChildren.map((c) => c.learningGoal).filter(Boolean);
+    if (goalsMonde.length < 1) fail(4, "aucun enfant Monde n'a de learningGoal (fixture manquante)");
+    console.log(`  · learningGoal Monde réels · ${goalsMonde.join(", ")}`);
 
-    // ── SCENARIO Isolation · Family sans lien ne voit rien du Teacher ──
-    console.log("[monde-context] STEP 5 · isolation · Family ne peut pas lire /api/teacher/*");
+    // ── SCENARIO Isolation · Family2 ne voit pas les enfants de Family ──
+    if (FAMILY2_EMAIL && FAMILY2_PASSWORD) {
+      console.log("[monde-context] STEP 5 · isolation · Family2 ne voit pas les enfants Family1");
+      const family2Cookie = await loginCookie(FAMILY2_EMAIL, FAMILY2_PASSWORD);
+      const f2Headers = { ...originHeaders, Cookie: family2Cookie };
+      const f2Res = await fetch(`http://${HOST}/api/family/dashboard`, { headers: f2Headers });
+      if (f2Res.status === 200) {
+        const f2Body = await f2Res.json();
+        const f1ChildIds = new Set(famBody.children.map((c) => c.id));
+        const leaked = (f2Body.children || []).filter((c) => f1ChildIds.has(c.id));
+        if (leaked.length > 0) fail(5, `Family2 voit ${leaked.length} enfants de Family1 · isolation cassée`);
+        console.log(`  · Family2 · ${f2Body.children?.length ?? 0} enfants (aucun de Family1)`);
+      } else {
+        console.log(`  · Family2 dashboard status=${f2Res.status} (skippé)`);
+      }
+    }
+
+    // ── SCENARIO Family1 → Teacher API refusé ──────────────────────────
+    console.log("[monde-context] STEP 6 · isolation · Family ne peut pas lire /api/teacher/*");
     const famToTeacher = await fetch(`http://${HOST}/api/teacher/students`, { headers: fHeaders });
-    if (famToTeacher.status === 200) fail(5, "Family a accédé à Teacher API · isolation cassée");
+    if (famToTeacher.status === 200) fail(6, "Family a accédé à Teacher API · isolation cassée");
     console.log(`  · Family → Teacher API refusé · status=${famToTeacher.status}`);
 
     console.log("[monde-context] ALL OK");

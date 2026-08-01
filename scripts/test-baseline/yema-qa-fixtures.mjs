@@ -52,6 +52,14 @@ const PERSONAS = [
   { label: "student_monde",   email: `${PREFIX}student_monde@example.com`,   role: "STUDENT", appRole: "LEARNER" },
   { label: "student_racines", email: `${PREFIX}student_racines@example.com`, role: "STUDENT", appRole: "LEARNER" },
   { label: "family",          email: `${PREFIX}family@example.com`,          role: "STUDENT", appRole: "PARENT" },
+  // Lot 7B.2 · apprenants supplémentaires · couverture distribution parcours.
+  { label: "student_work",     email: `${PREFIX}student_work@example.com`,     role: "STUDENT", appRole: "LEARNER" },
+  { label: "student_exam",     email: `${PREFIX}student_exam@example.com`,     role: "STUDENT", appRole: "LEARNER" },
+  { label: "student_nogoal",   email: `${PREFIX}student_nogoal@example.com`,   role: "STUDENT", appRole: "LEARNER" },
+  { label: "student_external", email: `${PREFIX}student_external@example.com`, role: "STUDENT", appRole: "LEARNER" },
+  { label: "student_inactive", email: `${PREFIX}student_inactive@example.com`, role: "STUDENT", appRole: "LEARNER" },
+  // Lot 7B.2 · isolation · second foyer non lié pour test cross-household.
+  { label: "family2",          email: `${PREFIX}family2@example.com`,          role: "STUDENT", appRole: "PARENT" },
 ];
 
 async function listAllAuthMatching(prefix) {
@@ -101,14 +109,15 @@ async function syncMetadata(supabaseId, appRole) {
   });
 }
 
-async function ensureDbUser(supabaseId, email, role) {
+async function ensureDbUser(supabaseId, email, role, learningGoal) {
+  const data = { supabaseId, role, fullName: `TEST QA ${email.split("@")[0]}`, onboardingDone: true };
+  // Lot 7B.2 · learningGoal projeté explicitement uniquement quand fourni ·
+  // sinon on ne touche pas la colonne (préserve les états existants).
+  if (learningGoal !== undefined) data.learningGoal = learningGoal;
   return db.user.upsert({
     where: { email },
-    update: { supabaseId, role, fullName: `TEST QA ${email.split("@")[0]}`, onboardingDone: true },
-    create: {
-      supabaseId, email, role,
-      fullName: `TEST QA ${email.split("@")[0]}`, onboardingDone: true,
-    },
+    update: data,
+    create: { email, ...data },
   });
 }
 
@@ -124,10 +133,21 @@ async function main() {
   process.stderr.write("═══ YEMA QA fixtures P-1 ═══\n\n");
   const existing = await listAllAuthMatching(PREFIX);
   const created = {};
+  // Lot 7B.2 · mapping des learningGoal par label · applique la valeur
+  // canonique au user QA correspondant · null explicite pour student_nogoal.
+  const LEARNING_GOALS = {
+    student_monde:    "STUDIES",
+    student_work:     "WORK",
+    student_exam:     "EXAM",
+    student_nogoal:   null,
+    student_external: "TRAVEL",
+    student_inactive: "DAILY_LIFE",
+  };
   for (const p of PERSONAS) {
     const { user } = await ensureAuthUser(p.email, existing);
     await syncMetadata(user.id, p.appRole);
-    const dbUser = await ensureDbUser(user.id, p.email, p.role);
+    const goal = Object.prototype.hasOwnProperty.call(LEARNING_GOALS, p.label) ? LEARNING_GOALS[p.label] : undefined;
+    const dbUser = await ensureDbUser(user.id, p.email, p.role, goal);
     if (p.appRole) await ensureAppRole(dbUser.id, p.appRole);
     created[p.label] = { email: p.email, authUuid: user.id, dbId: dbUser.id, role: p.role };
   }
@@ -156,6 +176,21 @@ async function main() {
     where: { classroomId_userId: { classroomId: classroom.id, userId: created.student_monde.dbId } },
     update: { isActive: true },
     create: { classroomId: classroom.id, userId: created.student_monde.dbId, isActive: true },
+  });
+  // Lot 7B.2 · enrollments supplémentaires · WORK + EXAM + null actifs ·
+  // student_inactive enrolled mais isActive=false · student_external non
+  // enrolled du tout (test hors classe).
+  for (const label of ["student_work", "student_exam", "student_nogoal"]) {
+    await db.classroomEnrollment.upsert({
+      where: { classroomId_userId: { classroomId: classroom.id, userId: created[label].dbId } },
+      update: { isActive: true },
+      create: { classroomId: classroom.id, userId: created[label].dbId, isActive: true },
+    });
+  }
+  await db.classroomEnrollment.upsert({
+    where: { classroomId_userId: { classroomId: classroom.id, userId: created.student_inactive.dbId } },
+    update: { isActive: false },
+    create: { classroomId: classroom.id, userId: created.student_inactive.dbId, isActive: false },
   });
 
   // 1 assignment PUBLISHED.
@@ -358,6 +393,8 @@ async function main() {
         pinUpdatedAt: now,
         householdId: household.id,
         universe: "MONDE",
+        // Lot 7B.2 · Lina · parcours STUDIES canonique (couverture Family Monde).
+        learningGoal: "STUDIES",
       },
       create: {
         id: `${PREFIX}child_family_monde`,
@@ -371,9 +408,37 @@ async function main() {
         pinHash: pinHashA,
         pinUpdatedAt: now,
         universe: "MONDE",
+        learningGoal: "STUDIES",
       },
     });
     childMondeId = childMonde.id;
+    // Lot 7B.2 · second enfant MONDE avec learningGoal=EXAM · couvre le
+    // scénario "parcours différent au sein du même foyer".
+    const pinHashC = await hashChildPin("2345");
+    await db.childProfile.upsert({
+      where: { id: `${PREFIX}child_family_monde_exam` },
+      update: {
+        pinHash: pinHashC,
+        pinUpdatedAt: now,
+        householdId: household.id,
+        universe: "MONDE",
+        learningGoal: "EXAM",
+      },
+      create: {
+        id: `${PREFIX}child_family_monde_exam`,
+        parentUserId: familyUser.dbId,
+        householdId: household.id,
+        prenom: "Malik",
+        avatarAnimal: "tortue",
+        age: 10,
+        langues: [{ langue: "deutsch", type: "foreign", echelle: 0, etoiles: 0, motsAppris: [] }],
+        activeLangue: "deutsch",
+        pinHash: pinHashC,
+        pinUpdatedAt: now,
+        universe: "MONDE",
+        learningGoal: "EXAM",
+      },
+    });
     const childRacines = await db.childProfile.upsert({
       where: { id: `${PREFIX}child_family_racines` },
       update: {
@@ -397,6 +462,47 @@ async function main() {
       },
     });
     childRacinesId = childRacines.id;
+
+    // Lot 7B.2 · isolation · second foyer indépendant · aucun enfant du
+    // household_family ne doit apparaître au family2. Household distinct,
+    // parentUserId différent, 1 enfant MONDE local.
+    const family2User = created.family2;
+    const household2Id = `${PREFIX}household_family2`;
+    const household2 = await db.household.upsert({
+      where: { id: household2Id },
+      update: {},
+      create: { id: household2Id, ownerUserId: family2User.dbId },
+    });
+    await db.householdMembership.upsert({
+      where: { householdId_userId: { householdId: household2.id, userId: family2User.dbId } },
+      update: { status: "ACTIVE" },
+      create: { householdId: household2.id, userId: family2User.dbId, role: "OWNER", status: "ACTIVE" },
+    });
+    const pinHashD = await hashChildPin("6789");
+    await db.childProfile.upsert({
+      where: { id: `${PREFIX}child_family2_monde` },
+      update: {
+        pinHash: pinHashD,
+        pinUpdatedAt: now,
+        householdId: household2.id,
+        universe: "MONDE",
+        learningGoal: "TRAVEL",
+      },
+      create: {
+        id: `${PREFIX}child_family2_monde`,
+        parentUserId: family2User.dbId,
+        householdId: household2.id,
+        prenom: "Nina",
+        avatarAnimal: "renard",
+        age: 9,
+        langues: [{ langue: "deutsch", type: "foreign", echelle: 0, etoiles: 0, motsAppris: [] }],
+        activeLangue: "deutsch",
+        pinHash: pinHashD,
+        pinUpdatedAt: now,
+        universe: "MONDE",
+        learningGoal: "TRAVEL",
+      },
+    });
   }
 
   const summary = {

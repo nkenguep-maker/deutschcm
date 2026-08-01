@@ -33,6 +33,12 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 if (!url || !url.includes(P1_REF)) fail(0, `URL non-P1`);
 for (const b of BLOCKED) if (url.includes(b)) fail(0, `blocklisted ${b}`);
 
+// Lot 7B.2 · defaults canoniques (voir orchestrate-monde-context-p1.mjs).
+process.env.MONDE_CONTEXT_TEACHER_EMAIL ||= "test_yema_qa_teacher@example.com";
+process.env.MONDE_CONTEXT_FAMILY_EMAIL  ||= "test_yema_qa_family@example.com";
+process.env.MONDE_CONTEXT_TEACHER_PASSWORD ||= process.env.P1_TEST_PASSWORD || "";
+process.env.MONDE_CONTEXT_FAMILY_PASSWORD  ||= process.env.P1_TEST_PASSWORD || "";
+
 const required = [
   "MONDE_CONTEXT_TEACHER_EMAIL",
   "MONDE_CONTEXT_TEACHER_PASSWORD",
