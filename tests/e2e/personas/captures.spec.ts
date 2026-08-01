@@ -71,18 +71,25 @@ for (const p of PERSONAS) {
         const path = file(p.id, vp.name, locale);
         await page.screenshot({ path, fullPage: true });
         manifest.push(`${vp.name}\t${locale}\t${p.id}\t${route}\t${resp?.status() ?? "?"}`);
-        // Lot 7C.1 · un seul h1 par page · aucune tolérance.
-        // Le flag YEMA_DASHBOARD_REDESIGN_ENABLED est activé par
-        // l'orchestrateur · les nouveaux dashboards Student n'ont plus
-        // qu'un h1 (DashboardHeader unique · legacy Layout non rendu).
+        // Lot 7C.2 · strict h1 === 1 sans tolérance · fix appliqué
+        // dans DashboardMonde/DashboardRacines (h1 legacy → h2).
         const h1Count = await page.locator("h1").count();
         expect(h1Count, `h1 count ${p.id} ${vp.name}`).toBe(1);
-        // Aucun overflow horizontal massif (marquee/carousel tolérés < 5).
-        const overflowing = await page.$$eval("*", (els, w) =>
-          els.filter((e) => e.getBoundingClientRect().right > w + 1).length,
-          vp.width,
-        );
-        expect(overflowing, `overflow ${p.id} ${vp.name}`).toBeLessThan(20);
+        // Lot 7C.2 · overflow strict · éléments hors viewport ignorés
+        // uniquement si contenus dans un sélecteur explicitement scrollable
+        // (marquee/carousel/data-overflow-ok). Aucune tolérance numérique.
+        const overflowing = await page.$$eval("*", (els, w) => {
+          const ALLOW = ["[data-overflow-ok]", ".marquee", "[role=marquee]", "[data-carousel]"];
+          return els.filter((e) => {
+            if (e.getBoundingClientRect().right <= w + 1) return false;
+            // Ignorer si l'élément OU un ancêtre matche une exception ciblée.
+            for (const sel of ALLOW) {
+              if (e.matches(sel) || e.closest(sel)) return false;
+            }
+            return true;
+          }).length;
+        }, vp.width);
+        expect(overflowing, `overflow ${p.id} ${vp.name} (elts non-scrollables > viewport)`).toBe(0);
       });
     }
   }

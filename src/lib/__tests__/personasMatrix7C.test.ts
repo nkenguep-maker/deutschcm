@@ -112,10 +112,10 @@ describe("Lot 7C · orchestrateurs P-1 fail-closed", () => {
     for (const code of ["PASSAGE", "ROOTS_SOLO", "ROOTS_FAMILY", "FAMILY_WORLD", "CHILD_WORLD_SINGLE"]) {
       expect(src, `product ${code}`).toMatch(new RegExp(code));
     }
-    // Plafonds durs · 3 sièges enfant Monde, 2 sièges adultes Racines, 4 enfants Racines.
-    expect(src).toMatch(/max 3/);
-    expect(src).toMatch(/max 2/);
-    expect(src).toMatch(/max 4/);
+    // Lot 7C.2 · cap enforced via HTTP canonique · doctrinal gaps documentés.
+    expect(src).toMatch(/max_children_reached/);
+    expect(src).toMatch(/attendu 409/);
+    expect(src).toMatch(/Doctrinal gaps documentés/);
     // Universe null fail-closed.
     expect(src).toMatch(/universe:\s*null/);
   });
@@ -142,21 +142,22 @@ describe("Lot 7C.1 · orchestrateurs actifs · restauration + strict checks", ()
   const capOrc = readRepo("scripts/orchestrate-personas-capture.mjs");
 
   it("entitlements orchestrator · Family + Passage temp grant + cleanup finally", () => {
-    expect(entSrc).toMatch(/const tempPassage = await db\.accessGrant\.create/);
+    expect(entSrc).toMatch(/db\.accessGrant\.create/);
     expect(entSrc).toMatch(/cleanup\.push/);
     expect(entSrc).toMatch(/runCleanup/);
     expect(entSrc).toMatch(/finally/);
-    expect(entSrc).toMatch(/aucun résidu temporaire/);
+    expect(entSrc).toMatch(/aucun résidu/);
   });
 
-  it("entitlements orchestrator · FAMILY_WORLD plafond 3 sièges enfant Monde", () => {
-    expect(entSrc).toMatch(/plafond 3 sièges enfant Monde/);
-    expect(entSrc).toMatch(/4e enfant Monde REFUSÉ/);
+  it("entitlements orchestrator · cap enfants canonique via HTTP POST", () => {
+    expect(entSrc).toMatch(/POST \/api\/family\/children/);
+    expect(entSrc).toMatch(/max_children_reached/);
+    expect(entSrc).toMatch(/5e enfant REFUSÉ/);
   });
 
-  it("entitlements orchestrator · ROOTS_FAMILY ≤ 2 adultes + ≤ 4 enfants", () => {
-    expect(entSrc).toMatch(/max 2/);
-    expect(entSrc).toMatch(/max 4/);
+  it("entitlements orchestrator · doctrinal gaps FAMILY_WORLD + CHILD_WORLD_SINGLE", () => {
+    expect(entSrc).toMatch(/FAMILY_WORLD 3-seat cap · non enforced/);
+    expect(entSrc).toMatch(/CHILD_WORLD_SINGLE 1-seat cap · non enforced/);
   });
 
   it("personas orchestrator · Child Monde + Child Racines direct via /api/child-session", () => {
@@ -180,6 +181,67 @@ describe("Lot 7C.1 · orchestrateurs actifs · restauration + strict checks", ()
   it("orchestrateurs activent redesign flag pour éviter les 2 h1 legacy", () => {
     expect(perOrc).toMatch(/YEMA_DASHBOARD_REDESIGN_ENABLED:\s*"true"/);
     expect(capOrc).toMatch(/YEMA_DASHBOARD_REDESIGN_ENABLED:\s*"true"/);
+  });
+});
+
+describe("Lot 7C.2 · fix h1 legacy DashboardMonde/DashboardRacines", () => {
+  it("DashboardMonde legacy · h1 dégradé en h2 (visuel inchangé)", () => {
+    const src = readRepo("src/components/monde/DashboardMonde.tsx");
+    expect(src).not.toMatch(/<h1[\s>]/);
+    expect(src).toMatch(/<h2 style=\{[\s\S]*?fontSize:\s*28/);
+  });
+
+  it("DashboardRacines legacy · h1 dégradé en h2 (visuel inchangé)", () => {
+    const src = readRepo("src/components/racines/DashboardRacines.tsx");
+    expect(src).not.toMatch(/<h1[\s>]/);
+    expect(src).toMatch(/<h2 style=\{[\s\S]*?fontSize:\s*28/);
+  });
+});
+
+describe("Lot 7C.2 · entitlements orchestrator · canonical HTTP + Super Admin isolation", () => {
+  const src = readRepo("scripts/orchestrate-entitlements-p1.mjs");
+
+  it("cap enfants testé via POST /api/family/children canonique", () => {
+    expect(src).toMatch(/POST \/api\/family\/children/);
+    expect(src).toMatch(/max_children_reached/);
+    expect(src).toMatch(/statut \$\{fifthAttempt\.status\} \(attendu 409\)/);
+  });
+
+  it("siège libéré réutilisable · flow explicite", () => {
+    expect(src).toMatch(/retrait 1 siège · réutilisation libérée/);
+    expect(src).toMatch(/siège libéré réutilisable/);
+  });
+
+  it("Super Admin refusé sur /api/family/dashboard ET /api/child-session", () => {
+    expect(src).toMatch(/Super Admin → \/api\/family\/dashboard refusé/);
+    expect(src).toMatch(/Super Admin → \/api\/child-session refusé/);
+  });
+
+  it("doctrinal gaps documentés (FAMILY_WORLD 3 + CHILD_WORLD_SINGLE 1)", () => {
+    expect(src).toMatch(/FAMILY_WORLD 3-seat cap · non enforced/);
+    expect(src).toMatch(/CHILD_WORLD_SINGLE 1-seat cap · non enforced/);
+  });
+
+  it("cleanup finally + relecture leak check", () => {
+    expect(src).toMatch(/runCleanup/);
+    expect(src).toMatch(/leakGrants/);
+    expect(src).toMatch(/leakChildren/);
+  });
+});
+
+describe("Lot 7C.2 · captures overflow strict === 0 avec exceptions ciblées", () => {
+  const spec = readRepo("tests/e2e/personas/captures.spec.ts");
+
+  it("overflow strict === 0 · aucune tolérance numérique globale", () => {
+    expect(spec).toMatch(/toBe\(0\)/);
+    expect(spec).not.toMatch(/toBeLessThan\(20\)/);
+    expect(spec).toMatch(/elts non-scrollables > viewport/);
+  });
+
+  it("exceptions déclarées via sélecteurs (data-overflow-ok, marquee, carousel)", () => {
+    expect(spec).toMatch(/ALLOW = \[[\s\S]*?data-overflow-ok/);
+    expect(spec).toMatch(/marquee/);
+    expect(spec).toMatch(/data-carousel/);
   });
 });
 
