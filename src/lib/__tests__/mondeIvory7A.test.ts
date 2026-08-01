@@ -28,17 +28,18 @@ describe("MondePath · exhaustivité + adaptateur", () => {
     expect(resolveMondePath({ learningGoal: "hello world" })).toBeNull();
   });
 
-  it("resolveMondePath · mots-clés FR/EN/DE", () => {
+  it("resolveMondePath · marqueurs stricts FR/EN/DE (Lot 7A.2 hardened)", () => {
+    // Marqueurs longs et sans ambiguïté · brief 7A.2 §3.
     expect(resolveMondePath({ learningGoal: "étudier à Berlin" })).toBe("STUDIES");
-    expect(resolveMondePath({ learningGoal: "study abroad" })).toBe("STUDIES");
+    expect(resolveMondePath({ learningGoal: "study abroad in Germany" })).toBe("STUDIES");
     expect(resolveMondePath({ learningGoal: "travailler à Zurich" })).toBe("WORK");
-    expect(resolveMondePath({ learningGoal: "job interview" })).toBe("WORK");
-    expect(resolveMondePath({ learningGoal: "voyager en Allemagne" })).toBe("TRAVEL");
-    expect(resolveMondePath({ learningGoal: "travel to Berlin" })).toBe("TRAVEL");
-    expect(resolveMondePath({ learningGoal: "passer un examen" })).toBe("EXAM");
-    expect(resolveMondePath({ learningGoal: "goethe certificate" })).toBe("EXAM");
-    expect(resolveMondePath({ learningGoal: "vie quotidienne" })).toBe("DAILY_LIFE");
-    expect(resolveMondePath({ learningGoal: "daily conversation" })).toBe("DAILY_LIFE");
+    expect(resolveMondePath({ learningGoal: "job interview soon" })).toBe("WORK");
+    expect(resolveMondePath({ learningGoal: "voyager à Munich" })).toBe("TRAVEL");
+    expect(resolveMondePath({ learningGoal: "travel to Berlin next month" })).toBe("TRAVEL");
+    expect(resolveMondePath({ learningGoal: "passer le goethe A2" })).toBe("EXAM");
+    expect(resolveMondePath({ learningGoal: "goethe zertifikat A1" })).toBe("EXAM");
+    expect(resolveMondePath({ learningGoal: "vie quotidienne à Zurich" })).toBe("DAILY_LIFE");
+    expect(resolveMondePath({ learningGoal: "daily life in Berlin" })).toBe("DAILY_LIFE");
   });
 
   it("resolveMondePath · mondePath explicite prime sur learningGoal", () => {

@@ -18,6 +18,8 @@
     "test:messaging-audio-ui:p1": "node scripts/test-messaging-audio-ui-p1.mjs",
     "test:messaging-audio-child:p1": "node scripts/test-messaging-audio-child-p1.mjs",
     "capture:messaging-audio:p1": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag on -- node scripts/capture-messaging-audio-p1.mjs",
+    "test:monde-ivory:p1": "node scripts/test-monde-ivory-p1.mjs",
+    "capture:monde-ivory:p1": "node scripts/capture-monde-ivory-p1.mjs",
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {

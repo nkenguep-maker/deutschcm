@@ -41,16 +41,31 @@ export function resolveMondePath(input: MondePathInput): MondePath | null {
   const goal = (input.learningGoal ?? "").trim().toLowerCase();
   if (!goal) return null;
 
-  // Mapping best-effort · mots-clés multilingues (FR/EN/DE simples).
-  // Fait autorité UNIQUEMENT lorsqu'un mot-clé clair est trouvé.
-  // WORK utilise "travail" (FR complet) plutôt que "trav" pour ne pas
-  // capturer "travel" (EN) qui appartient à TRAVEL.
+  // 1. Correspondance EXACTE à une valeur canonique · priorité absolue.
+  //    L'onboarding peut un jour envoyer directement "STUDIES", "WORK"...
+  const upper = goal.toUpperCase();
+  if ((MONDE_PATHS as readonly string[]).includes(upper)) return upper as MondePath;
+
+  // 2. Correspondance à un tag stable (préfixe long, jamais un mot court).
+  //    Volontairement STRICT · un texte libre qui parle de "test" (n'importe
+  //    quel test) ou de "family" (n'importe quel contexte familial) ou de
+  //    "work" (parle du travail scolaire par exemple) ne DOIT PAS produire
+  //    un parcours faux positif. On exige des marqueurs sans ambiguïté.
+  //    Lot 7A.2 · resserré · brief §3.
   const kw = {
-    STUDIES:    ["étud", "univ", "school", "study", "student", "college", "academ"],
-    TRAVEL:     ["voyag", "travel", "reise", "tourism", "trip"],
-    WORK:       ["travail", "work", "job", "arbeit", "entret", "interview", "recru"],
-    EXAM:       ["exam", "prüf", "test", "certi", "goethe", "telc", "testdaf"],
-    DAILY_LIFE: ["quotid", "daily", "famille", "family", "vie", "alltag", "everyday"],
+    STUDIES:    ["étudier à", "étudier en", "study abroad", "études supérieures",
+                 "universität", "university", "college abroad"],
+    TRAVEL:     ["voyager à", "voyager en", "travel to", "reise nach", "préparer mon voyage",
+                 "preparing my trip", "vacances à"],
+    WORK:       ["travailler à", "travailler en", "work in", "arbeiten in",
+                 "entretien d'embauche", "job interview", "trouver un emploi",
+                 "finding a job", "recrutement"],
+    EXAM:       ["passer le goethe", "passer telc", "passer testdaf", "goethe zertifikat",
+                 "goethe certificate", "telc exam", "testdaf exam", "examen goethe",
+                 "examen telc", "examen testdaf", "exam preparation", "préparer l'examen"],
+    DAILY_LIFE: ["belle-famille", "belle famille", "in-laws", "vie quotidienne",
+                 "daily life", "alltag mit", "parler avec ma famille",
+                 "speak with my family", "quotidien allemand", "everyday german"],
   } as const;
   // Ordre de résolution · TRAVEL avant WORK pour désambiguïser "travel".
   const order: readonly MondePath[] = ["STUDIES", "TRAVEL", "WORK", "EXAM", "DAILY_LIFE"];

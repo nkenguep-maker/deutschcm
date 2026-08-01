@@ -252,7 +252,15 @@ export function StudentMondeDashboard({ locale }: { locale: "fr" | "en" }) {
               targetCity: data.onboarding?.targetCity ?? null,
               targetDate: null,
               progressPct: data.overallPct ?? 0,
-              completed: data.access.status === "EXPIRED" && (data.overallPct ?? 0) >= 100,
+              // Lot 7A.2 · l'état `completed` ne peut PAS être dérivé
+              // d'un état commercial (`access.status === "EXPIRED"`) ni
+              // d'un simple pourcentage visuel. Aucun champ pédagogique
+              // explicite ne signale la fin du parcours dans le modèle
+              // actuel · `completed` reste donc `false` en runtime
+              // normal · la variante visuelle completed n'est activée
+              // que par le runner QA server-only (voir scripts
+              // capture-monde-ivory:p1). Documenté brief §2.
+              completed: false,
               level: data.learningPath?.currentLevel ?? null,
             }}
           />
