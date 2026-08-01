@@ -1209,7 +1209,10 @@
         "invisibleUntilPublished": "Le feedback reste invisible à l'élève tant qu'il n'est pas publié.",
         "versionLabel": "v{version}",
         "submittedOn": "Rendu le {date}",
-        "notSubmitted": "Non rendu"
+        "notSubmitted": "Non rendu",
+        "queueContextNote": "Apprenants scopés à vos classes · le contexte parcours guide vos priorités de correction.",
+        "awaitingReview": "À corriger",
+        "anonymousLearner": "Apprenant"
       },
       "resources": {
         "title": "Ressources",

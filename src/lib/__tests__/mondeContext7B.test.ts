@@ -184,7 +184,8 @@ describe("Lot 7B · Teacher composition · nouvelle section pathway", () => {
   });
 
   it("rendu dans la composition", () => {
-    expect(src).toMatch(/<TeacherMondeContextSection\s*\/>/);
+    // Lot 7B.1 · MondeContext prend désormais students en props.
+    expect(src).toMatch(/<TeacherMondeContextSection\s+students=\{students\}/);
   });
 
   it("aucun tab de parcours ajouté", () => {
@@ -265,11 +266,156 @@ describe("Lot 7B · non-régression totale", () => {
   });
 
   it("aucune nouvelle route API pour ce lot", () => {
-    // Le lot réutilise /api/teacher/students et /api/family/dashboard existants.
-    // Aucun nouveau route.ts n'est créé sous api/monde-context.
-    // Test structurel indirect · aucun import de nouvelle route.
-    const teacherSrc = read("features/dashboards/teacher/sections/TeacherMondeContextSection.tsx");
-    expect(teacherSrc).toMatch(/\/api\/teacher\/students/);
-    expect(teacherSrc).not.toMatch(/\/api\/monde-context/);
+    // Lot 7B.1 · le fetch students a été LIFT au niveau TeacherDashboard.
+    // MondeContext ne fait plus d'appel · Corrections ne fait plus d'appel.
+    // Un seul point de vérité · /api/teacher/students appelé UNE fois.
+    const dashSrc = read("features/dashboards/teacher/TeacherDashboard.tsx");
+    expect(dashSrc).toMatch(/\/api\/teacher\/students/);
+    const mondeSrc = read("features/dashboards/teacher/sections/TeacherMondeContextSection.tsx");
+    expect(mondeSrc).not.toMatch(/fetch\(/);
+    expect(mondeSrc).not.toMatch(/\/api\/monde-context/);
+    const corrSrc = read("features/dashboards/teacher/sections/TeacherCorrectionsSection.tsx");
+    expect(corrSrc).not.toMatch(/fetch\(/);
+  });
+});
+
+describe("Lot 7B.1 · Teacher single fetch · dedupe & prop-passing", () => {
+  const dashSrc = read("features/dashboards/teacher/TeacherDashboard.tsx");
+  const mondeSrc = read("features/dashboards/teacher/sections/TeacherMondeContextSection.tsx");
+  const corrSrc = read("features/dashboards/teacher/sections/TeacherCorrectionsSection.tsx");
+
+  it("un seul appel /api/teacher/students dans tout le dashboard", () => {
+    const dashCount = (dashSrc.match(/\/api\/teacher\/students/g) || []).length;
+    const mondeCount = (mondeSrc.match(/\/api\/teacher\/students/g) || []).length;
+    const corrCount = (corrSrc.match(/\/api\/teacher\/students/g) || []).length;
+    expect(dashCount).toBe(1);
+    expect(mondeCount).toBe(0);
+    expect(corrCount).toBe(0);
+  });
+
+  it("students passés en props à Corrections + MondeContext", () => {
+    expect(dashSrc).toMatch(/<TeacherCorrectionsSection\s+students=\{students\}/);
+    expect(dashSrc).toMatch(/<TeacherMondeContextSection\s+students=\{students\}/);
+  });
+
+  it("MondeContext accepte students en Props · aucun state fetch", () => {
+    expect(mondeSrc).toMatch(/students:\s*TeacherStudentRow\[\]/);
+    expect(mondeSrc).not.toMatch(/useEffect/);
+    expect(mondeSrc).not.toMatch(/useState/);
+  });
+});
+
+describe("Lot 7B.1 · TeacherCorrectionsSection · contexte parcours par ligne", () => {
+  const src = read("features/dashboards/teacher/sections/TeacherCorrectionsSection.tsx");
+
+  it("accepte students en props · aucun fetch client", () => {
+    expect(src).toMatch(/students:\s*TeacherStudentRow\[\]/);
+    expect(src).not.toMatch(/fetch\(/);
+  });
+
+  it("PathwayMetaChip rendu par ligne d'apprenant", () => {
+    expect(src).toMatch(/<PathwayMetaChip\s+learningGoal=\{s\.learningGoal\}\s+level=\{s\.level\}/);
+  });
+
+  it("aucun bouton d'action nouveau · aucune correction inventée", () => {
+    expect(src).not.toMatch(/<button/);
+    expect(src).not.toMatch(/onClick=/);
+    expect(src).not.toMatch(/mark.*correct|noter|grade\(/i);
+  });
+
+  it("scope [data-monde-ivory] uniquement quand la liste est rendue", () => {
+    expect(src).toMatch(/data-monde-ivory/);
+  });
+});
+
+describe("Lot 7B.1 · TeacherMondeContextSection · distribution seule (preview retirée)", () => {
+  const src = read("features/dashboards/teacher/sections/TeacherMondeContextSection.tsx");
+
+  it("aucune preview d'apprenant (learnersPreview retiré)", () => {
+    expect(src).not.toMatch(/learnersPreview/);
+    expect(src).not.toMatch(/anonymousLearner/);
+    expect(src).not.toMatch(/\.slice\(0,\s*5\)/);
+  });
+
+  it("rend uniquement PathwayDistributionCard (aucune <ul> de learners)", () => {
+    expect(src).toMatch(/<PathwayDistributionCard/);
+    expect(src).not.toMatch(/<ul\b/);
+  });
+});
+
+describe("Lot 7B.1 · Family · learningGoal projeté depuis ChildProfile", () => {
+  const querSrc = read("lib/family/queries.ts");
+  const typeSrc = read("features/dashboards/family/types.ts");
+  const secSrc = read("features/dashboards/family/sections/FamilyChildrenSection.tsx");
+
+  it("listFamilyChildren select ajoute learningGoal", () => {
+    expect(querSrc).toMatch(/learningGoal:\s*true/);
+  });
+
+  it("row.learningGoal projeté dans items retournés (nullable)", () => {
+    expect(querSrc).toMatch(/learningGoal:\s*r\.learningGoal\s*\?\?\s*null/);
+  });
+
+  it("FamilyChildRow expose learningGoal optional string|null", () => {
+    expect(typeSrc).toMatch(/learningGoal\?\s*:\s*string \| null/);
+  });
+
+  it("FamilyChildrenSection passe learningGoal réel au FamilyMondeChildCard", () => {
+    // Plus de null hardcodé · la valeur vient de child.learningGoal.
+    expect(secSrc).toMatch(/learningGoal:\s*child\.learningGoal\s*\?\?\s*null/);
+    expect(secSrc).not.toMatch(/learningGoal:\s*null,\s*\n\s*level:\s*null/);
+  });
+
+  it("pinHash toujours exclu du DTO client", () => {
+    const returnBlock = querSrc.match(/return rows\.map\([\s\S]*?\}\)\);/);
+    expect(returnBlock).toBeTruthy();
+    expect(returnBlock![0]).not.toMatch(/pinHash:\s*r\.pinHash/);
+  });
+});
+
+describe("Lot 7B.1 · Prisma migration · ChildProfile.learningGoal additif", () => {
+  const schema = readRepo("prisma/schema.prisma");
+  const migration = readRepo("prisma/migrations/20260801000001_lot7b1_child_profile_learning_goal/migration.sql");
+
+  it("schema.prisma déclare learningGoal String? sur ChildProfile", () => {
+    // Le bloc ChildProfile doit contenir learningGoal String? (nullable).
+    const start = schema.indexOf("model ChildProfile");
+    expect(start).toBeGreaterThan(0);
+    const end = schema.indexOf("@@map(\"child_profiles\")", start);
+    const scope = schema.slice(start, end);
+    expect(scope).toMatch(/learningGoal\s+String\?/);
+  });
+
+  it("migration additive · ADD COLUMN IF NOT EXISTS · aucun default", () => {
+    expect(migration).toMatch(/ADD COLUMN IF NOT EXISTS "learningGoal" TEXT/);
+    // Scope strict aux statements SQL (hors commentaires) · les checks
+    // "sans DEFAULT / NOT NULL / valeur par défaut de parcours" ne doivent
+    // pas être bruités par du texte descriptif.
+    const sqlOnly = migration
+      .split("\n")
+      .filter((l) => !l.trim().startsWith("--"))
+      .join("\n");
+    expect(sqlOnly).not.toMatch(/DEFAULT/);
+    expect(sqlOnly).not.toMatch(/NOT NULL/);
+    expect(sqlOnly).not.toMatch(/STUDIES|WORK|TRAVEL|EXAM|DAILY_LIFE/);
+  });
+
+  it("migration ne touche que child_profiles.learningGoal (aucun autre champ)", () => {
+    const alters = migration.match(/ALTER TABLE[\s\S]*?;/g) || [];
+    expect(alters.length).toBe(1);
+    expect(alters[0]).toMatch(/"child_profiles"/);
+    expect(alters[0]).toMatch(/"learningGoal"/);
+  });
+});
+
+describe("Lot 7B.1 · i18n · nouvelles clés corrections (parité FR/EN)", () => {
+  const fr = JSON.parse(readRepo("messages/fr.json"));
+  const en = JSON.parse(readRepo("messages/en.json"));
+
+  it("queueContextNote + awaitingReview + anonymousLearner présents FR + EN", () => {
+    for (const k of ["queueContextNote", "awaitingReview", "anonymousLearner"]) {
+      expect(fr.yemaDashboards.teacher.corrections[k]).toBeTruthy();
+      expect(en.yemaDashboards.teacher.corrections[k]).toBeTruthy();
+    }
   });
 });

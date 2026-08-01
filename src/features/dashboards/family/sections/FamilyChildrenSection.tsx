@@ -144,17 +144,17 @@ function ChildCard({
       </div>
       {/* Lot 7B · contexte Monde Ivoire · UNIQUEMENT quand universe est
           explicitement MONDE. universe null / RACINES · aucun ivory
-          n'apparaît (fail-closed, Racines existant intact). */}
+          n'apparaît (fail-closed, Racines existant intact).
+          Lot 7B.1 · learningGoal enfant est désormais projeté depuis
+          ChildProfile.learningGoal · resolveMondePath fait le mapping ou
+          retourne null (état "Objectif à préciser" honnête). */}
       {child.universe === "MONDE" ? (
         <FamilyMondeChildCard
           child={{
             id: child.id,
             prenom: child.prenom,
             avatarAnimal: child.avatarAnimal,
-            // learningGoal enfant n'est pas encore projeté (aucun champ
-            // learningGoal sur ChildProfile) · resolveMondePath retourne
-            // null · le contexte affiche l'état "Objectif à préciser".
-            learningGoal: null,
+            learningGoal: child.learningGoal ?? null,
             level: null,
             progressPct: null,
             minutesThisWeek: null,

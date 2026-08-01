@@ -1209,7 +1209,10 @@
         "invisibleUntilPublished": "Feedback stays hidden from the learner until published.",
         "versionLabel": "v{version}",
         "submittedOn": "Submitted on {date}",
-        "notSubmitted": "Not submitted"
+        "notSubmitted": "Not submitted",
+        "queueContextNote": "Learners scoped to your classes · pathway context guides your review priorities.",
+        "awaitingReview": "To review",
+        "anonymousLearner": "Learner"
       },
       "resources": {
         "title": "Resources",

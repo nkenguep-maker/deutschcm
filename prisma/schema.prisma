@@ -1247,6 +1247,10 @@ model ChildProfile {
   // dashboard + comptage sièges). Ne plus dériver de la langue.
   // Nullable pour préserver les enfants existants avant backfill P-1.
   universe     Universe?
+  // Lot 7B.1 · objectif pédagogique enfant (source canonique parcours Monde).
+  // Nullable · aucun défaut · resolveMondePath mappe la string libre vers
+  // MondePath. Alimenté par fixture QA · onboarding enfant à venir.
+  learningGoal String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

@@ -19,6 +19,11 @@ export interface FamilyChildRow {
   langues: unknown[];
   hasPin: boolean;
   createdAt: string;
+  universe?: "MONDE" | "RACINES" | null;
+  // Lot 7B.1 · source canonique parcours Monde enfant. Null jusqu'à ce
+  // qu'une fixture QA ou onboarding enfant l'alimente. resolveMondePath()
+  // côté UI mappe cette string libre vers MondePath ou renvoie null.
+  learningGoal?: string | null;
 }
 
 export interface FamilyDashboardData {
@@ -51,6 +56,9 @@ export async function listFamilyChildren(actor: FamilyGuardianActor): Promise<Fa
       // Lot 7B · universe projeté pour scoper thème Monde Ivory vs Racines
       // côté UI Family (aucun autre champ enfant sensible n'est ajouté).
       universe: true,
+      // Lot 7B.1 · projection de l'objectif pédagogique enfant · alimente
+      // resolveMondePath côté UI. Null autorisé (état "à préciser" honnête).
+      learningGoal: true,
     },
   });
   return rows.map((r) => ({
@@ -63,6 +71,7 @@ export async function listFamilyChildren(actor: FamilyGuardianActor): Promise<Fa
     hasPin: Boolean(r.pinHash),
     createdAt: r.createdAt.toISOString(),
     universe: r.universe ?? null,
+    learningGoal: r.learningGoal ?? null,
   }));
 }
 

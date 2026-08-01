@@ -36,6 +36,8 @@ import type {
   TeacherClassRow,
   TeacherClassesResponse,
   TeacherDashboardResponse,
+  TeacherStudentRow,
+  TeacherStudentsResponse,
 } from "./types";
 
 async function fetchJson<T>(url: string): Promise<T> {
@@ -53,6 +55,11 @@ type LoadState =
       classes: TeacherClassRow[];
       assignments: TeacherAssignmentRow[];
       assignmentsError: boolean;
+      // Lot 7B.1 · students chargés UNE SEULE fois au niveau dashboard.
+      // Corrections + MondeContext consomment cette même source (aucun
+      // second fetch client, aucun scope divergent).
+      students: TeacherStudentRow[];
+      studentsError: boolean;
     };
 
 export function TeacherDashboard({ locale }: { locale: "fr" | "en" }) {
@@ -68,8 +75,14 @@ export function TeacherDashboard({ locale }: { locale: "fr" | "en" }) {
     Promise.all([
       fetchJson<TeacherDashboardResponse>("/api/teacher/dashboard"),
       fetchJson<TeacherClassesResponse>("/api/teacher/classes?pageSize=50"),
+      // Lot 7B.1 · fetch canonique students · même endpoint scoped teacherId,
+      // consommé par Corrections (contexte parcours par ligne) et MondeContext
+      // (distribution globale). Aucun autre appel.
+      fetchJson<TeacherStudentsResponse>("/api/teacher/students?pageSize=100")
+        .then((r) => ({ ok: true as const, res: r }))
+        .catch(() => ({ ok: false as const })),
     ])
-      .then(async ([data, classesResp]) => {
+      .then(async ([data, classesResp, studentsResult]) => {
         // Devoirs · on charge en parallèle jusqu'à 3 premières classes pour
         // éviter d'exploser en N appels. Erreurs partielles absorbées.
         const targets = classesResp.items.slice(0, 3);
@@ -100,6 +113,8 @@ export function TeacherDashboard({ locale }: { locale: "fr" | "en" }) {
           classes: classesResp.items,
           assignments: assignments.slice(0, 20),
           assignmentsError,
+          students: studentsResult.ok ? studentsResult.res.items : [],
+          studentsError: !studentsResult.ok,
         });
       })
       .catch(() => setState({ kind: "error" }));
@@ -217,7 +232,7 @@ export function TeacherDashboard({ locale }: { locale: "fr" | "en" }) {
     );
   }
 
-  const { data, classes, assignments, assignmentsError } = state;
+  const { data, classes, assignments, assignmentsError, students, studentsError } = state;
   const centerName = data.center?.name ?? null;
   const meta = centerName ? t("meta", { center: centerName }) : t("metaWithoutCenter");
 
@@ -248,10 +263,12 @@ export function TeacherDashboard({ locale }: { locale: "fr" | "en" }) {
             loadError={assignmentsError && assignments.length === 0}
             baseHref={baseHref}
           />
-          <TeacherCorrectionsSection />
-          {/* Lot 7B · contexte parcours Monde · distribution + preview
-              file avec PathwayMetaChip · réutilise /api/teacher/students. */}
-          <TeacherMondeContextSection />
+          {/* Lot 7B.1 · contexte parcours intégré directement dans la file
+              de correction · chaque ligne apprenant porte PathwayMetaChip. */}
+          <TeacherCorrectionsSection students={students} loadError={studentsError} />
+          {/* Lot 7B.1 · MondeContext réduit à la distribution seule ·
+              aucune preview redondante · aucun second fetch. */}
+          <TeacherMondeContextSection students={students} />
           <TeacherResourcesSection />
           <TeacherMessagesSection />
           {classes.length === 0 && assignments.length === 0 && data.stats.activeStudentCount === 0 ? (

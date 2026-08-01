@@ -14,6 +14,10 @@ export interface FamilyChildRow {
   // Family UI de scoper le thème Monde Ivory vs Racines. AUCUN autre
   // champ enfant sensible (pinHash, pinUpdatedAt, cookie) n'est exposé.
   universe?: "MONDE" | "RACINES" | null;
+  // Lot 7B.1 · objectif pédagogique enfant · projeté depuis
+  // ChildProfile.learningGoal (source canonique ajoutée dans ce lot).
+  // Null tant qu'aucune fixture QA ou onboarding ne l'alimente.
+  learningGoal?: string | null;
 }
 
 export interface FamilySeatSnapshot {
