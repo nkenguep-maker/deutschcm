@@ -1653,6 +1653,14 @@
         "unknown_short": "TO DEFINE",
         "unknown_long": "Goal to define"
       },
+      "priority": {
+        "studies_written": "Focus · formal writing",
+        "work_oral": "Focus · professional oral",
+        "travel_situations": "Focus · practical situations",
+        "exam_skill": "Focus · exam preparation",
+        "daily_conversation": "Focus · conversation",
+        "unknown": "Focus to define"
+      },
       "distribution": {
         "title": "World pathway distribution",
         "subtitle": "{count} learners across your classes"

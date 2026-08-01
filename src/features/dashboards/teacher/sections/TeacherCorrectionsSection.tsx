@@ -8,6 +8,7 @@ import {
   DashboardSectionHeader,
 } from "@/features/dashboards/shared";
 import { PathwayMetaChip } from "@/features/dashboards/monde-context";
+import { priorityForPath, resolveMondePath } from "@/features/dashboards/student-monde/ivory";
 import type { TeacherStudentRow } from "../types";
 
 // Lot 7B.1 · corrections · file d'apprenants avec contexte parcours intégré.
@@ -31,6 +32,7 @@ type Props = {
 
 export function TeacherCorrectionsSection({ students, loadError = false }: Props) {
   const t = useTranslations("yemaDashboards.teacher.corrections");
+  const tCtx = useTranslations("yemaDashboards.mondeContext");
 
   return (
     <section id="corrections" aria-labelledby="corrections-title" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -63,49 +65,68 @@ export function TeacherCorrectionsSection({ students, loadError = false }: Props
                 flexDirection: "column",
               }}
             >
-              {students.map((s, i) => (
-                <li
-                  key={s.id}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 6,
-                    padding: "12px 0",
-                    borderTop: i === 0 ? "none" : "1px solid var(--monde-border)",
-                    minHeight: 44,
-                  }}
-                >
-                  <div
+              {students.map((s, i) => {
+                // Lot 7B.2 · priorité pédagogique traduite · rendu explicite
+                // par ligne (le chip pathway ne l'affiche pas · c'est ici
+                // que Teacher lit ce sur quoi porter la correction).
+                const path = resolveMondePath({ learningGoal: s.learningGoal ?? null });
+                const priorityKey = priorityForPath(path);
+                return (
+                  <li
+                    key={s.id}
+                    data-priority-key={priorityKey}
                     style={{
                       display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: 8,
-                      flexWrap: "wrap",
+                      flexDirection: "column",
+                      gap: 6,
+                      padding: "12px 0",
+                      borderTop: i === 0 ? "none" : "1px solid var(--monde-border)",
+                      minHeight: 44,
                     }}
                   >
-                    <span
+                    <div
                       style={{
-                        fontSize: 14,
-                        color: "var(--monde-ink)",
-                        fontWeight: 500,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: 8,
+                        flexWrap: "wrap",
                       }}
                     >
-                      {s.fullName ?? t("anonymousLearner")}
-                    </span>
-                    <span
-                      className="monde-mono"
-                      style={{
-                        color: "var(--monde-text-muted)",
-                        fontSize: 11,
-                      }}
-                    >
-                      {t("awaitingReview")}
-                    </span>
-                  </div>
-                  <PathwayMetaChip learningGoal={s.learningGoal} level={s.level} />
-                </li>
-              ))}
+                      <span
+                        style={{
+                          fontSize: 14,
+                          color: "var(--monde-ink)",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {s.fullName ?? t("anonymousLearner")}
+                      </span>
+                      <span
+                        className="monde-mono"
+                        style={{
+                          color: "var(--monde-text-muted)",
+                          fontSize: 11,
+                        }}
+                      >
+                        {t("awaitingReview")}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                      <PathwayMetaChip learningGoal={s.learningGoal} level={s.level} />
+                      <span
+                        style={{
+                          fontSize: 12,
+                          color: "var(--monde-text-secondary, #5B4E3E)",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {tCtx(priorityKey)}
+                      </span>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}

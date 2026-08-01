@@ -419,3 +419,126 @@ describe("Lot 7B.1 · i18n · nouvelles clés corrections (parité FR/EN)", () =
     }
   });
 });
+
+describe("Lot 7B.2 · POST /api/family/children · learningGoal validation", () => {
+  const src = read("app/api/family/children/route.ts");
+
+  it("MONDE_PATHS enum côté serveur avec 5 valeurs canoniques", () => {
+    expect(src).toMatch(/MONDE_PATHS.*=.*STUDIES.*WORK.*TRAVEL.*EXAM.*DAILY_LIFE/);
+  });
+
+  it("body accepte learningGoal optional string|null", () => {
+    expect(src).toMatch(/learningGoal\?:\s*string \| null/);
+  });
+
+  it("valeur non canonique retourne 400 learning_goal_invalid", () => {
+    expect(src).toMatch(/learning_goal_invalid/);
+    expect(src).toMatch(/MONDE_PATHS.*includes/);
+  });
+
+  it("learningGoal envoyé pour RACINES (aucune foreign) est normalisé null", () => {
+    // Le check hasForeign gate la persistance de learningGoal.
+    expect(src).toMatch(/hasForeign/);
+    expect(src).toMatch(/const hasForeign = built\.some\(\(l\) => l\.type === "foreign"\)/);
+  });
+
+  it("learningGoal persisté dans childProfile.create data", () => {
+    expect(src).toMatch(/learningGoal,?\s*[},]/);
+  });
+});
+
+describe("Lot 7B.2 · AddChildDialog · sélecteur parcours conditionnel MONDE", () => {
+  const src = read("app/[locale]/famille/page.tsx");
+
+  it("6 options FR (5 parcours + LATER)", () => {
+    for (const k of ["STUDIES", "WORK", "TRAVEL", "EXAM", "DAILY_LIFE", "LATER"]) {
+      expect(src).toMatch(new RegExp(`goalOpts:.*${k}`, "s"));
+    }
+  });
+
+  it("sélecteur conditionnel · rendu uniquement si foreign.length > 0", () => {
+    expect(src).toMatch(/foreign\.length > 0[\s\S]*?data-goal-field/);
+  });
+
+  it("LATER envoie null au serveur · aucun envoi pour Racines", () => {
+    expect(src).toMatch(/const learningGoal = foreign\.length > 0 && goal !== "LATER" \? goal : null/);
+  });
+
+  it("POST body inclut learningGoal", () => {
+    expect(src).toMatch(/JSON\.stringify\(\{[^}]*learningGoal[^}]*\}\)/);
+  });
+});
+
+describe("Lot 7B.2 · TeacherCorrectionsSection · priorité pédagogique rendue par ligne", () => {
+  const src = read("features/dashboards/teacher/sections/TeacherCorrectionsSection.tsx");
+
+  it("import priorityForPath + resolveMondePath", () => {
+    expect(src).toMatch(/import \{ priorityForPath, resolveMondePath \}/);
+  });
+
+  it("chaque ligne calcule le priorityKey", () => {
+    expect(src).toMatch(/const path = resolveMondePath/);
+    expect(src).toMatch(/const priorityKey = priorityForPath\(path\)/);
+  });
+
+  it("priorityKey est rendu via i18n dans le DOM (span visible)", () => {
+    expect(src).toMatch(/tCtx\(priorityKey\)/);
+  });
+
+  it("data-priority-key attribut posé pour vérification DOM externe", () => {
+    expect(src).toMatch(/data-priority-key=\{priorityKey\}/);
+  });
+});
+
+describe("Lot 7B.2 · i18n · priority.* 5 clés + unknown (parité FR/EN)", () => {
+  const fr = JSON.parse(readRepo("messages/fr.json"));
+  const en = JSON.parse(readRepo("messages/en.json"));
+
+  it("mondeContext.priority présent FR + EN avec 6 clés", () => {
+    const keys = ["studies_written", "work_oral", "travel_situations", "exam_skill", "daily_conversation", "unknown"];
+    for (const k of keys) {
+      expect(fr.yemaDashboards.mondeContext.priority[k]).toBeTruthy();
+      expect(en.yemaDashboards.mondeContext.priority[k]).toBeTruthy();
+    }
+  });
+});
+
+describe("Lot 7B.2 · Fixtures QA · Teacher enrollment + Family isolation", () => {
+  const src = readRepo("scripts/test-baseline/yema-qa-fixtures.mjs");
+
+  it("PERSONAS étendu avec 5 apprenants supplémentaires + family2", () => {
+    for (const label of ["student_work", "student_exam", "student_nogoal", "student_external", "student_inactive", "family2"]) {
+      expect(src).toMatch(new RegExp(`label:\\s*"${label}"`));
+    }
+  });
+
+  it("LEARNING_GOALS mappe chaque étudiant à un parcours canonique", () => {
+    expect(src).toMatch(/student_monde:\s*"STUDIES"/);
+    expect(src).toMatch(/student_work:\s*"WORK"/);
+    expect(src).toMatch(/student_exam:\s*"EXAM"/);
+    expect(src).toMatch(/student_nogoal:\s*null/);
+  });
+
+  it("student_inactive enrolled mais isActive=false (test hors distribution)", () => {
+    expect(src).toMatch(/student_inactive[\s\S]*?isActive:\s*false/);
+  });
+
+  it("student_external n'est PAS enrolled dans la classroom Teacher", () => {
+    // Négation forte · aucun bloc enrollment ne mentionne student_external.
+    expect(src).not.toMatch(/classroomEnrollment[\s\S]{0,200}student_external/);
+  });
+
+  it("Lina (child_family_monde) enrichi avec learningGoal=STUDIES", () => {
+    expect(src).toMatch(/child_family_monde[\s\S]{0,500}learningGoal:\s*"STUDIES"/);
+  });
+
+  it("second enfant MONDE Malik (child_family_monde_exam) learningGoal=EXAM", () => {
+    expect(src).toMatch(/child_family_monde_exam[\s\S]{0,500}learningGoal:\s*"EXAM"/);
+  });
+
+  it("isolation · household_family2 + child_family2_monde (parent différent)", () => {
+    expect(src).toMatch(/household_family2/);
+    expect(src).toMatch(/child_family2_monde/);
+    expect(src).toMatch(/parentUserId:\s*family2User\.dbId/);
+  });
+});

@@ -50,6 +50,18 @@ const COPY = {
     natalePick: "Notre langue de la maison",
     foreignPick: "Une langue à découvrir",
     languesHelp: "Choisissez une ou deux langues. Vous pourrez en ajouter plus tard.",
+    // Lot 7B.2 · sélecteur parcours Monde · uniquement quand une langue
+    // du monde (foreign) est cochée. 5 valeurs canoniques + différer.
+    goalLbl: "Parcours Monde",
+    goalHelp: "Uniquement pour une langue du monde. Vous pourrez le changer plus tard.",
+    goalOpts: {
+      STUDIES: "Études",
+      WORK: "Travail",
+      TRAVEL: "Voyage",
+      EXAM: "Examen",
+      DAILY_LIFE: "Vie quotidienne",
+      LATER: "Je définirai cet objectif plus tard",
+    },
     cancel: "Annuler",
     create: "Créer le profil",
     stars: (n: number) => (n <= 1 ? `${n} étoile` : `${n} étoiles`),
@@ -80,6 +92,16 @@ const COPY = {
     natalePick: "Our house language",
     foreignPick: "A language to discover",
     languesHelp: "Pick one or two. You can add more later.",
+    goalLbl: "World pathway",
+    goalHelp: "Only for a world language. You can change it later.",
+    goalOpts: {
+      STUDIES: "Studies",
+      WORK: "Work",
+      TRAVEL: "Travel",
+      EXAM: "Exam",
+      DAILY_LIFE: "Daily life",
+      LATER: "I'll define this goal later",
+    },
     cancel: "Cancel",
     create: "Create profile",
     stars: (n: number) => (n <= 1 ? `${n} star` : `${n} stars`),
@@ -211,6 +233,8 @@ function AddChildDialog({
   const [animal, setAnimal] = useState<AvatarAnimal>("chouette");
   const [natal, setNatal] = useState<string[]>([]);
   const [foreign, setForeign] = useState<string[]>([]);
+  // Lot 7B.2 · parcours Monde optionnel · "LATER" = envoi null au serveur.
+  const [goal, setGoal] = useState<"STUDIES" | "WORK" | "TRAVEL" | "EXAM" | "DAILY_LIFE" | "LATER">("LATER");
   const [err, setErr] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const t = (s: string) => (loc === "fr" ? frTypo(s) : s);
@@ -232,11 +256,14 @@ function AddChildDialog({
       ...natal.map((id) => ({ langue: id, type: "native" })),
       ...foreign.map((id) => ({ langue: id, type: "foreign" })),
     ];
+    // Lot 7B.2 · parcours envoyé uniquement pour enfant MONDE (foreign lang).
+    // "LATER" = null explicite · le back rejette toute valeur non canonique.
+    const learningGoal = foreign.length > 0 && goal !== "LATER" ? goal : null;
     try {
       const res = await fetch("/api/family/children", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ prenom: prenom.trim(), age, avatarAnimal: animal, langues }),
+        body: JSON.stringify({ prenom: prenom.trim(), age, avatarAnimal: animal, langues, learningGoal }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -337,6 +364,33 @@ function AddChildDialog({
             })}
           </div>
         </div>
+
+        {/* Lot 7B.2 · parcours Monde · visible UNIQUEMENT si l'enfant a
+            au moins une langue du monde (foreign) · Racines n'affiche
+            jamais ce sélecteur. */}
+        {foreign.length > 0 ? (
+          <div className="famille-field" data-goal-field>
+            <span className="famille-field-lbl">{t(copy.goalLbl)}</span>
+            <p className="famille-help">{t(copy.goalHelp)}</p>
+            <div className="famille-lang-list" role="radiogroup" aria-label={copy.goalLbl}>
+              {(["STUDIES", "WORK", "TRAVEL", "EXAM", "DAILY_LIFE", "LATER"] as const).map((k) => {
+                const on = goal === k;
+                return (
+                  <button
+                    key={k}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    className={`famille-lang-chip ${on ? "on" : ""}`}
+                    onClick={() => setGoal(k)}
+                  >
+                    <span className="famille-lang-name">{copy.goalOpts[k]}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
 
         {err ? <p className="famille-err" role="alert">{err}</p> : null}
         <div className="famille-dialog-actions">

@@ -21,6 +21,12 @@ export const dynamic = "force-dynamic";
 const AVATAR_ANIMALS = ["chouette", "tortue", "panda", "elephant", "girafe", "renard"] as const;
 type AvatarAnimal = (typeof AVATAR_ANIMALS)[number];
 
+// Lot 7B.2 · parcours pédagogique enfant (source canonique pour la carte
+// Family Monde). Uniquement pour enfants MONDE (foreign lang existante).
+// null signifie explicitement "je définirai plus tard".
+const MONDE_PATHS = ["STUDIES", "WORK", "TRAVEL", "EXAM", "DAILY_LIFE"] as const;
+type MondePathValue = (typeof MONDE_PATHS)[number];
+
 async function getParent() {
   const cookieStore = await cookies();
   const supabase = createServerClient(
@@ -87,6 +93,9 @@ export async function POST(req: Request) {
     avatarAnimal?: string;
     age?: number;
     langues?: { langue: string; type: string }[];
+    // Lot 7B.2 · optionnel · uniquement pour enfant MONDE (foreign lang).
+    // Refus strict de toute valeur non canonique.
+    learningGoal?: string | null;
   };
   const prenom = (body.prenom ?? "").trim().slice(0, 24);
   const age = Number(body.age);
@@ -119,6 +128,23 @@ export async function POST(req: Request) {
     // Limite douce · 4 langues par enfant suffit pour rester lisible.
     return NextResponse.json({ error: "too_many_langues" }, { status: 400 });
   }
+
+  // Lot 7B.2 · validation stricte learningGoal · uniquement pour MONDE.
+  // Universe MONDE est induit par la présence d'au moins une foreign lang.
+  // learningGoal envoyé pour RACINES (aucune foreign lang) · normalisé null
+  // silencieusement (l'UI empêche déjà l'envoi, mais on protège serveur).
+  const hasForeign = built.some((l) => l.type === "foreign");
+  let learningGoal: MondePathValue | null = null;
+  if (body.learningGoal !== undefined && body.learningGoal !== null) {
+    if (typeof body.learningGoal !== "string" || !(MONDE_PATHS as readonly string[]).includes(body.learningGoal)) {
+      return NextResponse.json({ error: "learning_goal_invalid" }, { status: 400 });
+    }
+    if (hasForeign) {
+      learningGoal = body.learningGoal as MondePathValue;
+    }
+    // Sinon · valeur silencieusement ignorée (Racines ne stocke pas de parcours Monde).
+  }
+
   // P3 hardening · doctrine §4 · maximum 4 enfants par foyer (offre Famille).
   const MAX_CHILDREN = 4;
   const count = await prisma.childProfile.count({ where: { parentUserId: guard.parentId } });
@@ -135,6 +161,7 @@ export async function POST(req: Request) {
       // Prisma Json field · cast via unknown pour rester typé
       langues: built as unknown as object,
       activeLangue: built[0].langue,
+      learningGoal,
     },
   });
   return NextResponse.json({

@@ -1653,6 +1653,14 @@
         "unknown_short": "À PRÉCISER",
         "unknown_long": "Objectif à préciser"
       },
+      "priority": {
+        "studies_written": "Priorité · écrit formel",
+        "work_oral": "Priorité · oral professionnel",
+        "travel_situations": "Priorité · situations pratiques",
+        "exam_skill": "Priorité · préparation examen",
+        "daily_conversation": "Priorité · expression orale",
+        "unknown": "Priorité à préciser"
+      },
       "distribution": {
         "title": "Distribution des parcours Monde",
         "subtitle": "{count} apprenants dans vos classes"
