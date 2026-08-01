@@ -15,6 +15,8 @@ import { prisma } from "@/lib/prisma";
 import { getLanguage, LANGUAGES } from "@/lib/languages";
 import type { ChildLangue, ChildLangueType } from "@/lib/childScales";
 import { initialStep } from "@/lib/childScales";
+import { resolveFamilyGuardianActorOrNull } from "@/lib/family/actor";
+import { assertCanAddChildProfile } from "@/lib/family/seats";
 
 export const dynamic = "force-dynamic";
 
@@ -145,11 +147,19 @@ export async function POST(req: Request) {
     // Sinon · valeur silencieusement ignorée (Racines ne stocke pas de parcours Monde).
   }
 
-  // P3 hardening · doctrine §4 · maximum 4 enfants par foyer (offre Famille).
-  const MAX_CHILDREN = 4;
-  const count = await prisma.childProfile.count({ where: { parentUserId: guard.parentId } });
-  if (count >= MAX_CHILDREN) {
-    return NextResponse.json({ error: "max_children_reached", limit: MAX_CHILDREN, current: count }, { status: 409 });
+  // Lot 7C.3 · plafond canonique via assertCanAddChildProfile · agrège
+  // FAMILY_WORLD (3) + CHILD_WORLD_SINGLE (1) + ROOTS_FAMILY (4) + fallback
+  // legacy (4). Le service métier centralise la doctrine commerciale.
+  const guardian = await resolveFamilyGuardianActorOrNull();
+  if (!guardian) return NextResponse.json({ error: "guardian_unresolved" }, { status: 401 });
+  const gate = await assertCanAddChildProfile(guardian);
+  if (!gate.ok) {
+    return NextResponse.json({
+      error: "max_children_reached",
+      reason: gate.reason,
+      limit: gate.snapshot.seats.reduce((n, s) => n + s.seatsTotal, 0),
+      current: gate.snapshot.totalChildrenActuallyLinked,
+    }, { status: 409 });
   }
 
   const created = await prisma.childProfile.create({

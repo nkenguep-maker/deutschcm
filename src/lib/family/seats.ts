@@ -37,11 +37,23 @@ interface GrantRow {
   };
 }
 
+// Lot 7C.3 · mapping canonique ProductCode → nombre de sièges enfant.
+// Chaque code Family commercial doit avoir une entrée explicite · le
+// default: 0 ne s'applique qu'aux codes inconnus (protection future).
+// Contrat commercial figé (brief §2) ·
+//   - FAMILY_WORLD          → 3 sièges enfant Monde
+//   - CHILD_WORLD_SINGLE    → 1 siège enfant Monde
+//   - ROOTS_FAMILY          → 4 sièges enfant Racines
+// PASSAGE et ROOTS_SOLO sont des grants USER individuels (ne débloquent
+// aucun siège enfant côté HOUSEHOLD).
 function seatsFromGrant(grant: GrantRow): number {
-  // Barème par défaut selon ProductCode existant (schema Prisma).
   switch (grant.productVariant.product.code) {
+    case "FAMILY_WORLD":
+      return 3;
+    case "CHILD_WORLD_SINGLE":
+      return 1;
     case "ROOTS_FAMILY":
-      return 4; // brief §2 · jusqu'à 4 enfants Racines
+      return 4;
     default:
       return 0;
   }

@@ -57,14 +57,20 @@ describe("DashboardRacines · rend les 4 modes distinctement", () => {
   });
 });
 
-describe("Limite enfants · POST /api/family/children (hardening §4)", () => {
+describe("Limite enfants · POST /api/family/children (hardening §4 · Lot 7C.3 canonical)", () => {
   const src = read("src/app/api/family/children/route.ts");
-  it("MAX_CHILDREN vaut 4 (doctrine §12)", () => {
-    expect(src).toMatch(/MAX_CHILDREN\s*=\s*4/);
+  it("utilise assertCanAddChildProfile canonique (au lieu de MAX_CHILDREN hardcoded)", () => {
+    // Lot 7C.3 · MAX_CHILDREN=4 remplacé par assertCanAddChildProfile ·
+    // seatsFromGrant() enforce désormais FAMILY_WORLD=3, CHILD_WORLD_SINGLE=1,
+    // ROOTS_FAMILY=4 (fallback 4 pour sans grant).
+    expect(src).toMatch(/assertCanAddChildProfile\(guardian\)/);
+    expect(src).not.toMatch(/const MAX_CHILDREN = 4/);
   });
-  it("refus 409 avec detail { limit, current } quand plafond atteint", () => {
+  it("refus 409 avec detail { reason, limit, current } dérivé du snapshot", () => {
     expect(src).toMatch(/max_children_reached/);
-    expect(src).toMatch(/limit:\s*MAX_CHILDREN/);
+    expect(src).toMatch(/reason: gate\.reason/);
+    expect(src).toMatch(/limit: gate\.snapshot\.seats\.reduce/);
+    expect(src).toMatch(/current: gate\.snapshot\.totalChildrenActuallyLinked/);
   });
 });
 
