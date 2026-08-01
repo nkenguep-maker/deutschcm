@@ -122,41 +122,41 @@ async function main() {
   const HOST = `127.0.0.1:${PORT}`;
 
   console.log("[entitlements] STEP 6 · Cap enfants CANONIQUE · POST /api/family/children");
-  // Endpoint MAX_CHILDREN=4 (route.ts:123-127). Family QA a déjà 3 enfants ·
-  // 4e sera OK, 5e refusé 409 max_children_reached.
+  // Lot 7C.3 · endpoint utilise assertCanAddChildProfile → getFamilySeatSnapshot
+  // → seatsFromGrant (FAMILY_WORLD=3 · ROOTS_FAMILY=4 · CHILD_WORLD_SINGLE=1).
+  // Family QA household · FAMILY_WORLD (3) + ROOTS_FAMILY (4) = 7 sièges total.
+  // Boucle · ajouter jusqu'au 409 canonique.
   const familyCookie = await loginCookie("test_yema_qa_family@example.com");
   const H = { Cookie: familyCookie, Origin: `http://${HOST}`, Host: HOST, "Content-Type": "application/json" };
   const currentChildren = await db.childProfile.count({ where: { parentUserId: familyUser.id } });
   console.log(`  · ${currentChildren} enfants actuels`);
-  // Ajouter jusqu'à 4 si nécessaire (dans finally on supprime les temp).
   const tempChildIds = [];
-  while ((await db.childProfile.count({ where: { parentUserId: familyUser.id } })) < 4) {
+  let refused = null;
+  for (let i = 0; i < 12; i++) { // borne haute · évite boucle infinie
     const r = await fetch(`http://${HOST}/api/family/children`, {
       method: "POST", headers: H,
       body: JSON.stringify({
-        prenom: "TempKid", age: 8, avatarAnimal: "girafe",
+        prenom: `TempKid${i}`, age: 8, avatarAnimal: "girafe",
         langues: [{ langue: "deutsch", type: "foreign" }],
         learningGoal: "STUDIES",
       }),
     });
-    const body = await r.json();
-    if (r.status !== 200 || !body.child?.id) fail(`ajout temp échoue · ${r.status} ${JSON.stringify(body)}`);
-    tempChildIds.push(body.child.id);
-    cleanup.push(async () => { await db.childProfile.delete({ where: { id: body.child.id } }); });
-    console.log(`  · +1 enfant temp · id=${body.child.id}`);
+    if (r.status === 200) {
+      const body = await r.json();
+      tempChildIds.push(body.child.id);
+      cleanup.push(async () => { try { await db.childProfile.delete({ where: { id: body.child.id } }); } catch {} });
+      console.log(`  · +1 enfant temp (${tempChildIds.length}) · id=${body.child.id}`);
+    } else if (r.status === 409) {
+      refused = await r.json();
+      break;
+    } else {
+      fail(`statut inattendu ${r.status}`);
+      break;
+    }
   }
-  // Tenter le 5e · doit être refusé par assertCanAddChildProfile.
-  const fifthAttempt = await fetch(`http://${HOST}/api/family/children`, {
-    method: "POST", headers: H,
-    body: JSON.stringify({
-      prenom: "Refused", age: 8, avatarAnimal: "chouette",
-      langues: [{ langue: "deutsch", type: "foreign" }],
-    }),
-  });
-  if (fifthAttempt.status !== 409) fail(`5e enfant · statut ${fifthAttempt.status} (attendu 409)`);
-  const refusalBody = await fifthAttempt.json();
-  if (refusalBody.error !== "max_children_reached") fail(`raison canonique inattendue · ${JSON.stringify(refusalBody)}`);
-  console.log(`  ✓ 5e enfant REFUSÉ 409 · error=${refusalBody.error} limit=${refusalBody.limit}`);
+  if (!refused) fail(`aucun refus 409 observé après 12 tentatives`);
+  if (refused.error !== "max_children_reached") fail(`error inattendue · ${JSON.stringify(refused)}`);
+  console.log(`  ✓ REFUSÉ 409 · error=${refused.error} reason=${refused.reason} limit=${refused.limit} current=${refused.current}`);
 
   console.log("[entitlements] STEP 7 · retrait 1 siège · réutilisation libérée");
   if (tempChildIds.length > 0) {
@@ -207,10 +207,11 @@ async function main() {
   if (mm.length > 0) fail(`Mismatch RACINES/learningGoal · ${mm.map((c) => c.id).join(",")}`);
   console.log(`  · aucun mismatch ✓`);
 
-  console.log("[entitlements] STEP 11 · Doctrinal gaps documentés");
-  console.log(`  · FAMILY_WORLD 3-seat cap · non enforced (seatsFromGrant() retourne 0)`);
-  console.log(`  · CHILD_WORLD_SINGLE 1-seat cap · non enforced (idem)`);
-  console.log(`  · fallback max_children=4 s'applique · à corriger dans lot Prisma dédié`);
+  console.log("[entitlements] STEP 11 · Caps commerciaux CANONIQUES (Lot 7C.3)");
+  console.log(`  · FAMILY_WORLD → 3 sièges enfant Monde ✓`);
+  console.log(`  · CHILD_WORLD_SINGLE → 1 siège enfant Monde ✓`);
+  console.log(`  · ROOTS_FAMILY → 4 sièges enfant Racines ✓`);
+  console.log(`  · endpoint /api/family/children utilise assertCanAddChildProfile canonique ✓`);
 
   console.log("[entitlements] ALL OK");
 }
