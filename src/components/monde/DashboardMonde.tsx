@@ -211,10 +211,13 @@ export function DashboardMonde({ locale }: { locale: "fr" | "en" }) {
           fontFamily: "var(--font-jetbrains, monospace)", fontSize: 11,
           letterSpacing: "0.1em", textTransform: "uppercase",
         }}>{c.universeLbl}</p>
-        <h1 style={{
+        {/* Lot 7C.2 · dégradé h1→h2 · le h1 canonique est le titre de la
+            page (`Layout.title = "Monde"`). Deux h1 = accessibilité cassée +
+            SEO ambigu. Style visuel inchangé. */}
+        <h2 style={{
           fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: 28,
           color: "var(--creme)", margin: "0 0 6px", overflowWrap: "anywhere",
-        }}>{greeting}</h1>
+        }}>{greeting}</h2>
         <p style={{ color: "var(--creme-mute)", fontSize: 14, margin: 0 }}>
           {c.languageDeutsch} · {c.levelLbl} {data.learningPath?.currentLevel ?? "A1"}
           {" · "}
