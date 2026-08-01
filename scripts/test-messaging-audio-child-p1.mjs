@@ -10,8 +10,9 @@ if (process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_UR
   console.error(`[test:messaging-audio-child:p1] URL non-P1 · refusé`);
   process.exit(2);
 }
-if (!process.env.P1_TEST_PASSWORD) {
-  console.error("[test:messaging-audio-child:p1] MISSING P1_TEST_PASSWORD · NON-SKIPPABLE");
+const MISSING = ["P1_TEST_PASSWORD", "YEMA_E2E_CHILD_PIN"].filter((k) => !process.env[k]);
+if (MISSING.length > 0) {
+  console.error(`[test:messaging-audio-child:p1] MISSING ${MISSING.join(", ")} · NON-SKIPPABLE`);
   process.exit(2);
 }
 

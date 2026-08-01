@@ -98,24 +98,46 @@ describe("Adult UI spec · 6 scénarios A-F", () => {
 describe("Child PIN spec · flow avatar + PIN + assertions polling-only", () => {
   const src = readRepo("tests/e2e/p4-6-c-audio-child/audio-child.spec.ts");
 
-  it("flow avatar + PIN utilisé (pas de bypass)", () => {
-    expect(src).toMatch(/enterChildMode/);
+  it("flow avatar + PIN utilisé (POST /api/child-session)", () => {
     expect(src).toMatch(/CHILD_PIN/);
     expect(src).toMatch(/YEMA_E2E_CHILD_PIN/);
+    expect(src).toMatch(/\/api\/child-session/);
   });
 
   it("assertion AUCUN textarea côté enfant", () => {
-    expect(src).toMatch(/textareaCount\).toBe\(0\)/);
+    expect(src).toMatch(/textareaCount\)\.toBe\(0\)/);
   });
 
   it("assertion AUCUN WebSocket msg:conv:*/msg:inbox:child:*", () => {
     expect(src).toMatch(/websocket/);
     expect(src).toMatch(/msg:conv:\|msg:inbox:child:/);
-    expect(src).toMatch(/msgWs\.length\).toBe\(0\)/);
+    expect(src).toMatch(/msgWs\)\.toEqual\(\[\]\)/);
   });
 
-  it("PIN fallback fixture QA '1234' documenté", () => {
-    expect(src).toMatch(/1234.*fixture QA fallback|fixture QA/);
+  it("PIN sans fallback · fail-closed si YEMA_E2E_CHILD_PIN absent", () => {
+    // P4.6-C.3.1 · retrait de tout fallback "1234" · aucun default.
+    expect(src).not.toMatch(/YEMA_E2E_CHILD_PIN\s*\?\?\s*["']1234["']/);
+    expect(src).toMatch(/YEMA_E2E_CHILD_PIN absent · NON-SKIPPABLE/);
+  });
+
+  it("scénario PARENT_COPY visible + unique + playback parent lié 200", () => {
+    expect(src).toMatch(/PARENT_COPY visible/);
+    expect(src).toMatch(/receipts\.length\)\.toBe\(1\)/);
+    expect(src).toMatch(/Playback parent lié 200|playRes\.status\(\)\)\.toBe\(200\)/);
+  });
+
+  it("scénario parent non lié · conv invisible + playback 404 · aucune URL", () => {
+    expect(src).toMatch(/family2|Family2/);
+    expect(src).toMatch(/convCount\)\.toBe\(0\)/);
+    expect(src).toMatch(/playRes\.status\(\)\)\.toBe\(404\)/);
+    expect(src).toMatch(/body\)\.not\.toMatch\(\/https/);
+  });
+
+  it("afterAll · nettoyage storage-first obligatoire", () => {
+    expect(src).toMatch(/test\.afterAll/);
+    expect(src).toMatch(/cleanup-messaging-audio\.mjs[\s\S]*?--apply[\s\S]*?--target-asset/);
+    expect(src).toMatch(/messagingMessageReceipt\.deleteMany/);
+    expect(src).toMatch(/messagingMessage\.deleteMany/);
   });
 });
 
@@ -144,8 +166,10 @@ describe("Non-skippable commands · exit 2 si envs manquants", () => {
     expect(uiCmd).toMatch(/URL non-P1 · refusé/);
   });
 
-  it("test-messaging-audio-child-p1 · P1_TEST_PASSWORD requis · exit 2", () => {
-    expect(childCmd).toMatch(/MISSING P1_TEST_PASSWORD · NON-SKIPPABLE/);
+  it("test-messaging-audio-child-p1 · P1_TEST_PASSWORD + YEMA_E2E_CHILD_PIN requis · exit 2", () => {
+    expect(childCmd).toMatch(/P1_TEST_PASSWORD/);
+    expect(childCmd).toMatch(/YEMA_E2E_CHILD_PIN/);
+    expect(childCmd).toMatch(/NON-SKIPPABLE/);
     expect(childCmd).toMatch(/process\.exit\(2\)/);
   });
 });

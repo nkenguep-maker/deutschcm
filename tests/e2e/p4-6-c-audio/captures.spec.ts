@@ -19,14 +19,14 @@ const VIEWPORTS = [
   { name: "mobile-390", width: 390, height: 844 },
 ];
 
-async function loginAndOpen(page: Page): Promise<void> {
-  await page.goto("/fr/login");
+async function loginAndOpen(page: Page, locale: "fr" | "en" = "fr"): Promise<void> {
+  await page.goto(`/${locale}/login`);
   await page.getByLabel(/e-?mail/i).fill(TEACHER_EMAIL!);
   await page.getByLabel(/mot de passe|password/i).fill(TEACHER_PASSWORD!);
-  await page.getByRole("button", { name: /ouvrir ma maison/i }).click();
-  await page.waitForURL(/\/fr\/(dashboard|messages|onboarding)/, { timeout: 15_000 });
-  await page.goto("/fr/messages");
-  const item = page.getByRole("button", { name: /Élève.*Enseignant/i }).first();
+  await page.getByRole("button", { name: /ouvrir ma maison|open my house|log in/i }).click();
+  await page.waitForURL(new RegExp(`/${locale}/(dashboard|messages|onboarding|apprentissage)`), { timeout: 15_000 });
+  await page.goto(`/${locale}/messages`);
+  const item = page.getByRole("button", { name: /Élève.*Enseignant|Student.*Teacher/i }).first();
   await item.waitFor({ timeout: 15_000 });
   await item.click({ force: true });
   // Sur mobile, deux composers coexistent dans le DOM (desktop hidden +
@@ -76,6 +76,39 @@ test.describe.serial("P4.6-C.3 captures", () => {
       await ctx.close();
     });
   }
+
+  // P4.6-C.3.1 · captures EN minimales (§8 brief).
+  test("desktop-1440 EN · adulte AUDIO bubble", async ({ browser }) => {
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+    await ctx.addInitScript(MOCK_SRC);
+    const page = await ctx.newPage();
+    await loginAndOpen(page, "en");
+    // Envoyer un audio pour capturer la bulle.
+    await page.getByRole("button", { name: /record a voice message|enregistrer un message vocal/i }).first().click();
+    await page.getByRole("button", { name: /stop|arrêter/i }).first().waitFor({ timeout: 10_000 });
+    await page.waitForTimeout(400);
+    await page.getByRole("button", { name: /stop|arrêter/i }).first().click();
+    await page.getByRole("button", { name: /^send$|^envoyer$/i }).first().waitFor({ timeout: 10_000 });
+    await page.getByRole("button", { name: /^send$|^envoyer$/i }).first().click();
+    await page.locator('[role="log"]').getByRole("button", { name: /play voice message|lire le message vocal/i }).first().waitFor({ timeout: 20_000 });
+    const p = `${OUT}/desktop-1440-adult-EN-AUDIO-bubble.png`;
+    await page.screenshot({ path: p });
+    manifest.push(p);
+    await ctx.close();
+  });
+
+  test("mobile-390 EN · adulte RECORDING", async ({ browser }) => {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await ctx.addInitScript(MOCK_SRC);
+    const page = await ctx.newPage();
+    await loginAndOpen(page, "en");
+    await page.getByRole("button", { name: /record a voice message|enregistrer un message vocal/i }).first().click();
+    await page.getByRole("button", { name: /stop|arrêter/i }).first().waitFor({ timeout: 10_000 });
+    const p = `${OUT}/mobile-390-adult-EN-RECORDING.png`;
+    await page.screenshot({ path: p });
+    manifest.push(p);
+    await ctx.close();
+  });
 
   test.afterAll(async () => {
     const manifestPath = `${OUT}/MANIFEST.txt`;

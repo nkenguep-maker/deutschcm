@@ -192,6 +192,8 @@ async function ensureE2ELinkage(conversations) {
   const teacherEmail = process.env.E2E_TEACHER_EMAIL;
   const studentEmail = process.env.E2E_STUDENT_EMAIL;
   const outsiderEmail = process.env.E2E_OUTSIDER_EMAIL;
+  // P4.6-C.3.1 · family2 · parent non lié · Household distinct.
+  const family2Email = process.env.E2E_FAMILY2_EMAIL ?? "e2e.family2.p1@yema-test.local";
   if (!teacherEmail || !studentEmail || !outsiderEmail) {
     process.stderr.write("[e2e] E2E_*_EMAIL absents · skip rattachement Prisma\n");
     return { skipped: true };
@@ -244,22 +246,69 @@ async function ensureE2ELinkage(conversations) {
     select: { id: true },
   });
   if (outsiderInConv) {
-    // Ne devrait jamais arriver · si un test précédent l'a ajouté, on
-    // le marque leftAt pour respecter le contrat "outsider = zéro accès".
     await db.messagingConversationParticipant.update({
       where: { id: outsiderInConv.id },
       data: { leftAt: now },
     });
     process.stderr.write("[e2e] WARN · outsider avait un participant actif · marqué leftAt\n");
   }
+
+  // P4.6-C.3.1 · Family2 · parent non lié · Household distinct.
+  //   - User Family réel
+  //   - Household distinct (ownerUserId = family2Id)
+  //   - AUCUNE relation avec le ChildProfile Monde QA
+  //   - AUCUNE participation à CHILD_WORLD_GUIDED
+  //   - AUCUN receipt PARENT_COPY
+  const family2Id = await ensurePrismaUserForAuth({
+    email: family2Email,
+    role: "STUDENT", // PARENT app-role attribué séparément si nécessaire
+    prenom: "E2E",
+    nom: "Family2",
+  });
+  if (!family2Id) {
+    process.stderr.write("[e2e] WARN · family2 auth absent · skip Household provisioning\n");
+  } else {
+    await db.household.upsert({
+      where: { id: `test_yema_qa_household_family2_e2e` },
+      update: { status: "ACTIVE" },
+      create: {
+        id: `test_yema_qa_household_family2_e2e`,
+        ownerUserId: family2Id,
+        status: "ACTIVE",
+      },
+    });
+    // Vérification défensive · family2 ne doit AVOIR AUCUN participant
+    // actif dans les conversations enfant.
+    const family2InChild = await db.messagingConversationParticipant.findMany({
+      where: {
+        conversationId: { in: [conversations.t_km_en, conversations.t_kr_co].filter(Boolean) },
+        userId: family2Id,
+        leftAt: null,
+      },
+      select: { id: true },
+    });
+    if (family2InChild.length > 0) {
+      for (const p of family2InChild) {
+        await db.messagingConversationParticipant.update({
+          where: { id: p.id },
+          data: { leftAt: now },
+        });
+      }
+      process.stderr.write(`[e2e] WARN · family2 avait ${family2InChild.length} participation(s) enfant · marquées leftAt\n`);
+    }
+    process.stderr.write("[e2e] family2 · Household distinct · zéro participation enfant · OK\n");
+  }
+
   return {
     skipped: false,
     teacherId,
     studentId,
     outsiderId,
+    family2Id,
     teacherEmail,
     studentEmail,
     outsiderEmail,
+    family2Email,
     conversationId: conversations.t_em_en,
   };
 }
@@ -361,8 +410,8 @@ async function main() {
     cardPayload: { title: "Maintenance planifiée", body: "Ce weekend 22h-23h." },
   });
 
-  // P4.6-B.4 · rattachement E2E · opt-in via envs.
-  const e2e = await ensureE2ELinkage({ t_em_en });
+  // P4.6-B.4 / C.3.1 · rattachement E2E · opt-in via envs.
+  const e2e = await ensureE2ELinkage({ t_em_en, t_km_en, t_kr_co });
   if (!e2e.skipped) {
     process.stderr.write(`[e2e] Prisma linkage OK · teacher/student rattachés à t_em_en · outsider isolé\n`);
   }
