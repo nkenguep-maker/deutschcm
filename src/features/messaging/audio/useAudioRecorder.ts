@@ -122,6 +122,7 @@ export function useAudioRecorder(opts: UseAudioRecorderOptions): UseAudioRecorde
   const tickTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const maxTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previewUrlRef = useRef<string | null>(null);
+  const cancelledRef = useRef<boolean>(false);
   const onErrorRef = useRef(opts.onError);
   // Sync ref dans un effet (react-hooks/purity interdit ref.current = ... en render).
   useEffect(() => { onErrorRef.current = opts.onError; });
@@ -187,13 +188,16 @@ export function useAudioRecorder(opts: UseAudioRecorderOptions): UseAudioRecorde
       startedAtRef.current = Date.now();
       dispatch({ type: "RECORDING_START", mime: mime.canonicalMime });
 
+      cancelledRef.current = false;
       rec.ondataavailable = (ev) => {
         if (ev.data && ev.data.size > 0) chunksRef.current.push(ev.data);
       };
       rec.onstop = () => {
-        // Si on est en cancel, l'état a déjà été remis à IDLE et blob ignoré.
-        // Sinon, on construit le Blob + preview URL.
-        if (state.state === "IDLE") return;
+        // cancelledRef · flag stable · évite le closure staleness sur state.
+        if (cancelledRef.current) {
+          chunksRef.current = [];
+          return;
+        }
         const blob = new Blob(chunksRef.current, { type: mime.canonicalMime });
         chunksRef.current = [];
         revokePreview();
@@ -229,8 +233,9 @@ export function useAudioRecorder(opts: UseAudioRecorderOptions): UseAudioRecorde
 
   const cancel = useCallback(() => {
     // Annule sans produire de Blob · nettoie tout.
+    cancelledRef.current = true;
     if (recorderRef.current) {
-      try { recorderRef.current.ondataavailable = null; recorderRef.current.onstop = null; recorderRef.current.stop(); } catch { /* noop */ }
+      try { recorderRef.current.stop(); } catch { /* noop */ }
     }
     chunksRef.current = [];
     cleanupTracks();
