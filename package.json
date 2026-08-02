@@ -24,6 +24,7 @@
     "capture:monde-context:p1": "node scripts/capture-monde-context-p1.mjs",
     "test:personas:p1": "node scripts/test-personas-p1.mjs",
     "test:entitlements:p1": "node scripts/test-entitlements-p1.mjs",
+    "test:roots-adult-seats:p1": "tsx scripts/test-roots-adult-seats-p1.ts",
     "capture:personas:p1": "node scripts/capture-personas-p1.mjs",
     "seed": "tsx prisma/seed.ts"
   },

@@ -259,9 +259,9 @@ describe("Gate 8A · POST /api/family/children · universe EXPLICITE (brief §1)
     expect(src).toMatch(/status:\s*400/);
   });
 
-  it("AddChildDialog envoie universe explicite dans le POST body", () => {
+  it("AddChildDialog envoie universe explicite (Gate 8B · sélectionné par le parent, jamais dérivé)", () => {
     const client = readRepo("src/app/[locale]/famille/page.tsx");
-    expect(client).toMatch(/const universe:\s*"MONDE" \| "RACINES" = foreign\.length > 0/);
+    expect(client).toMatch(/useState<"MONDE" \| "RACINES" \| null>\(null\)/);
     expect(client).toMatch(/JSON\.stringify\(\{[^}]*universe[^}]*\}\)/);
   });
 });
@@ -375,6 +375,84 @@ describe("Lot 7C.2 · captures overflow strict === 0 avec exceptions ciblées", 
     expect(spec).toMatch(/ALLOW = \[[\s\S]*?data-overflow-ok/);
     expect(spec).toMatch(/marquee/);
     expect(spec).toMatch(/data-carousel/);
+  });
+});
+
+describe("Gate 8B · sélecteur univers EXPLICITE dans AddChildDialog (brief §1)", () => {
+  const src = readRepo("src/app/[locale]/famille/page.tsx");
+
+  it("state universe: null par défaut · aucune valeur pré-sélectionnée", () => {
+    expect(src).toMatch(/const \[universe, setUniverse\] = useState<"MONDE" \| "RACINES" \| null>\(null\)/);
+  });
+
+  it("radiogroup avec MONDE + RACINES · aria roles présents", () => {
+    expect(src).toMatch(/role="radiogroup"[^>]*aria-label=\{copy\.universeLbl\}/);
+    expect(src).toMatch(/id: "MONDE"[\s\S]*?id: "RACINES"/);
+  });
+
+  it("submit désactivé tant qu'universe n'est pas choisi", () => {
+    expect(src).toMatch(/disabled=\{submitting \|\| !universe\}/);
+  });
+
+  it("erreur validate avant langue · errUniverse si universe null", () => {
+    expect(src).toMatch(/if \(!universe\) return setErr\(copy\.errUniverse\)/);
+  });
+
+  it("learningGoal conditionnel universe === MONDE (NON depuis foreign.length)", () => {
+    expect(src).toMatch(/\{universe === "MONDE" \? \(/);
+    expect(src).not.toMatch(/\{foreign\.length > 0 \? \(\s*<div className="famille-field" data-goal-field/);
+  });
+
+  it("learningGoal dérivé de universe === MONDE, jamais de foreign", () => {
+    expect(src).toMatch(/const learningGoal = universe === "MONDE" && goal !== "LATER" \? goal : null/);
+  });
+
+  it("copy FR + EN contiennent universeLbl / MondeLabel / RacinesLabel / errUniverse", () => {
+    for (const k of ["universeLbl", "universeMondeLabel", "universeMondeDesc", "universeRacinesLabel", "universeRacinesDesc", "errUniverse"]) {
+      expect(src).toMatch(new RegExp(`${k}:`));
+    }
+  });
+});
+
+describe("Gate 8B · ROOTS adulte 3e actif via tsx · script test-roots-adult-seats-p1.ts", () => {
+  const src = readRepo("scripts/test-roots-adult-seats-p1.ts");
+
+  it("utilise assignAdultRootsSeat + revokeAdultRootsSeat services canoniques", () => {
+    expect(src).toMatch(/assignAdultRootsSeat/);
+    expect(src).toMatch(/revokeAdultRootsSeat/);
+    expect(src).toMatch(/MAX_ADULT_ROOTS_SEATS_PER_HOUSEHOLD/);
+  });
+
+  it("tente activement 3e siège · attend household_seats_exhausted", () => {
+    expect(src).toMatch(/household_seats_exhausted/);
+    expect(src).toMatch(/3e siège REFUSÉ/);
+  });
+
+  it("teste user externe (non membre) · attend user_is_not_household_member", () => {
+    expect(src).toMatch(/user_is_not_household_member/);
+    expect(src).toMatch(/user externe REFUSÉ/);
+  });
+
+  it("teste place libérée réutilisable · revoke + retry succès", () => {
+    expect(src).toMatch(/siège réutilisable prouvé/);
+  });
+
+  it("cleanup finally · relecture leak users temp", () => {
+    expect(src).toMatch(/runCleanup/);
+    expect(src).toMatch(/leakUsers/);
+    expect(src).toMatch(/temp_gate8b_/);
+  });
+
+  it("wrapper P-1 fail-closed · URL check + refs blocklistées", () => {
+    expect(src).toMatch(/P1_REF = "kzzagbojjkivdzzcrmxn"/);
+    expect(src).toMatch(/sbjhvlrkbyjckdxujjsk/);
+  });
+});
+
+describe("Gate 8B · npm script test:roots-adult-seats:p1 branché", () => {
+  const pkg = JSON.parse(readRepo("package.json"));
+  it("script tsx exposé", () => {
+    expect(pkg.scripts["test:roots-adult-seats:p1"]).toBe("tsx scripts/test-roots-adult-seats-p1.ts");
   });
 });
 
