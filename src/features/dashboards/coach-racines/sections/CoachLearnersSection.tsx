@@ -39,11 +39,11 @@ export function CoachLearnersSection({ learners, loading, baseHref }: Props) {
           <DashboardEmptyState title={t("empty")} />
         </DashboardCard>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }}>
+        <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }} data-testid="coach-learners-list">
           {learners.map((child) => {
             const hasDisplayName = typeof child.displayName === "string" && child.displayName.trim().length > 0;
             return (
-              <li key={child.id}>
+              <li key={child.id} data-testid="coach-learner-card" data-circle-language={child.circleLanguage ?? ""}>
                 <DashboardCard>
                   <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                     <span

@@ -14,6 +14,7 @@ import { useLocale } from "next-intl";
 import { StateBlock } from "@/components/StateBlock";
 import { frTypo } from "@/components/landing/typo";
 import { AnimalAvatar, AVATAR_ANIMALS, ANIMAL_LABEL_FR, ANIMAL_LABEL_EN, type AvatarAnimal } from "@/components/famille/AnimalAvatar";
+import { ChildPinDialog } from "@/components/famille/ChildPinDialog";
 import { LANGUAGES } from "@/lib/languages";
 import type { ChildLangue } from "@/lib/childScales";
 
@@ -40,6 +41,13 @@ const COPY = {
       action: "Ajouter un enfant",
     },
     parentSpace: "Espace parent",
+    openChildSpace: "Ouvrir son espace",
+    childPinTitle: "Ouvrir l'espace de {prenom}",
+    childPinLabel: "Code enfant",
+    childPinPlaceholder: "••••",
+    childPinSubmit: "Entrer",
+    childPinCancel: "Annuler",
+    childPinErrGeneric: "Le code ne correspond pas. Réessaie ou demande à ton parent.",
     step: "Nouveau profil",
     prenomLbl: "Prénom",
     ageLbl: "Âge",
@@ -90,6 +98,13 @@ const COPY = {
       action: "Add a child",
     },
     parentSpace: "Parent space",
+    openChildSpace: "Open child space",
+    childPinTitle: "Open {prenom}'s space",
+    childPinLabel: "Child PIN",
+    childPinPlaceholder: "••••",
+    childPinSubmit: "Enter",
+    childPinCancel: "Cancel",
+    childPinErrGeneric: "The PIN doesn't match. Try again or ask your parent.",
     step: "New profile",
     prenomLbl: "First name",
     ageLbl: "Age",
@@ -137,6 +152,8 @@ export default function FamillePage() {
   const [children, setChildren] = useState<Child[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
+  // Gate 8K · state pour ChildPinDialog · uniquement en mémoire React.
+  const [pinChild, setPinChild] = useState<Child | null>(null);
 
   useEffect(() => {
     fetch("/api/family/children")
@@ -177,7 +194,7 @@ export default function FamillePage() {
             const activeLangue = child.langues.find((l) => l.langue === child.activeLangue) ?? child.langues[0];
             const totalStars = child.langues.reduce((sum, l) => sum + l.etoiles, 0);
             return (
-              <li key={child.id} className="famille-card-item">
+              <li key={child.id} className="famille-card-item" data-testid="family-child-card">
                 <Link href={`/${locale}/famille/enfant/${child.id}`} className="famille-card">
                   <AnimalAvatar animal={child.avatarAnimal} size={112} ariaLabel={loc === "en" ? ANIMAL_LABEL_EN[child.avatarAnimal] : ANIMAL_LABEL_FR[child.avatarAnimal]} />
                   <p className="famille-card-name">{child.prenom}</p>
@@ -192,6 +209,20 @@ export default function FamillePage() {
                   </p>
                   <p className="famille-card-stars">✦ {c.stars(totalStars)}</p>
                 </Link>
+                {/* Gate 8K · action explicite « Ouvrir son espace » ·
+                    déclenche le dialogue PIN canonique. Le Link legacy
+                    reste (accessible parents/QA) mais l'action PIN est
+                    le vrai flow enfant produit. */}
+                <button
+                  type="button"
+                  className="famille-btn ghost"
+                  onClick={() => setPinChild(child)}
+                  style={{ marginTop: 8, minHeight: 44, width: "100%" }}
+                  data-testid="family-child-open-space"
+                  aria-label={`${c.openChildSpace} · ${child.prenom}`}
+                >
+                  {c.openChildSpace}
+                </button>
               </li>
             );
           })}
@@ -224,6 +255,25 @@ export default function FamillePage() {
             setChildren((prev) => [...(prev ?? []), child]);
             setShowAdd(false);
           }}
+        />
+      ) : null}
+
+      {/* Gate 8K · dialogue PIN enfant · rendu conditionnel sur
+          pinChild · le composant gère lui-même POST /api/child-session
+          + navigation vers /{locale}/dashboard sur 200. */}
+      {pinChild ? (
+        <ChildPinDialog
+          child={{ id: pinChild.id, prenom: pinChild.prenom, avatarAnimal: pinChild.avatarAnimal }}
+          locale={locale}
+          copy={{
+            title: c.childPinTitle,
+            pinLbl: c.childPinLabel,
+            pinPlaceholder: c.childPinPlaceholder,
+            submit: c.childPinSubmit,
+            cancel: c.childPinCancel,
+            errGeneric: c.childPinErrGeneric,
+          }}
+          onClose={() => setPinChild(null)}
         />
       ) : null}
     </main>
