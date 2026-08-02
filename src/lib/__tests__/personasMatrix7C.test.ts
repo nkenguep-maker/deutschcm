@@ -378,6 +378,72 @@ describe("Lot 7C.2 · captures overflow strict === 0 avec exceptions ciblées", 
   });
 });
 
+describe("Gate 8I · final-browser-acceptance · Playwright Coach dashboards + dual context captures", () => {
+  const wrapper = readRepo("scripts/test-final-browser-acceptance-p1.mjs");
+  const orc = readRepo("scripts/orchestrate-final-browser-acceptance-p1.ts");
+  const spec = readRepo("tests/e2e/final-browser-acceptance/gate8i.spec.ts");
+  const config = readRepo("playwright.final-browser-acceptance.config.ts");
+  const pkg = JSON.parse(readRepo("package.json"));
+
+  it("wrapper fail-closed + flags Coach obligatoires", () => {
+    expect(wrapper).toMatch(/MISSING P1_TEST_PASSWORD/);
+    expect(wrapper).toMatch(/MISSING SUPABASE_SERVICE_ROLE_KEY/);
+    expect(wrapper).toMatch(/YEMA_COACH_WORKSPACE_ENABLED:\s*"true"/);
+    expect(wrapper).toMatch(/YEMA_ROOTS_COACH_RLS_CONFIRMED:\s*"true"/);
+  });
+
+  it("npm scripts test:final-browser-acceptance + capture branchés", () => {
+    expect(pkg.scripts["test:final-browser-acceptance:p1"]).toBe("node scripts/test-final-browser-acceptance-p1.mjs");
+    expect(pkg.scripts["capture:final-browser-acceptance:p1"]).toBe("node scripts/capture-final-browser-acceptance-p1.mjs");
+  });
+
+  it("orchestrateur provisionne Coach A/B + enfants Racines distincts + PASSAGE + LP", () => {
+    expect(orc).toMatch(/childAId = `test_yema_qa_gate8i_child_a_/);
+    expect(orc).toMatch(/childBId = `test_yema_qa_gate8i_child_b_/);
+    expect(orc).toMatch(/tempPassageId = `test_yema_qa_gate8i_passage_/);
+    expect(orc).toMatch(/universe:\s*"RACINES"/);
+    expect(orc).toMatch(/language:\s*"WOLOF"/);
+    expect(orc).toMatch(/language:\s*"SWAHILI"/);
+  });
+
+  it("orchestrateur lance Playwright chromium avec credentials propagés", () => {
+    expect(orc).toMatch(/GATE8I_COACH_A_EMAIL:\s*coachAEmail/);
+    expect(orc).toMatch(/GATE8I_COACH_B_EMAIL:\s*coachBEmail/);
+    expect(orc).toMatch(/playwright\.final-browser-acceptance\.config\.ts/);
+  });
+
+  it("Playwright spec teste Family + Monde adulte FR + EN (6 tests)", () => {
+    expect(spec).toMatch(/for \(const locale of \["fr", "en"\]/);
+    expect(spec).toMatch(/Family avant navigation/);
+    expect(spec).toMatch(/Monde adulte apres navigation/);
+    expect(spec).toMatch(/Family apres retour/);
+    expect(spec).toMatch(/not\.toMatch\(\/Lina\|Malik\|Aïcha\//);
+  });
+
+  it("Playwright spec teste Coach A/B dashboards Chromium", () => {
+    expect(spec).toMatch(/Coach A \+ Coach B dashboards Chromium/);
+    expect(spec).toMatch(/dashboard Racines Chromium/);
+    expect(spec).toMatch(/coach-\$\{label\}-fr-1440\.png/);
+  });
+
+  it("Playwright config · testDir + chromium project", () => {
+    expect(config).toMatch(/testDir:\s*"tests\/e2e\/final-browser-acceptance"/);
+    expect(config).toMatch(/name:\s*"chromium"/);
+  });
+
+  it("captures h1===1 + overflow===0 strict", () => {
+    expect(spec).toMatch(/h1Count === 1 && overflow === 0/);
+  });
+
+  it("cleanup finally · 6 niveaux · relecture leak 5 checks", () => {
+    expect(orc).toMatch(/leakUsers/);
+    expect(orc).toMatch(/leakChildren/);
+    expect(orc).toMatch(/leakCircles/);
+    expect(orc).toMatch(/leakHouseholds/);
+    expect(orc).toMatch(/leakGrants/);
+  });
+});
+
 describe("Gate 8H · final-visual-evidence · isolation Coach A/B SYMÉTRIQUE avec enfants distincts", () => {
   const wrapper = readRepo("scripts/test-final-visual-evidence-p1.mjs");
   const orc = readRepo("scripts/orchestrate-final-visual-evidence-p1.ts");
