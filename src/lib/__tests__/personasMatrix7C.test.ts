@@ -1086,6 +1086,64 @@ describe("Gate 8A · assignAdultRootsSeat · service canonique adulte Racines", 
   });
 });
 
+describe("Gate 8L · final runtime assertions · logout UI réel + manifest dedupe + network scoping adulte", () => {
+  const spec = readRepo("tests/e2e/final-browser-acceptance/gate8l-runtime.spec.ts");
+  const wrapper = readRepo("scripts/test-final-runtime-assertions-p1.mjs");
+  const capture = readRepo("scripts/capture-final-runtime-assertions-p1.mjs");
+  const orch = readRepo("scripts/orchestrate-final-runtime-assertions-p1.ts");
+  const pkg = JSON.parse(readRepo("package.json"));
+
+  it("wrapper test:final-runtime-assertions:p1 · fail-closed P-1 + P1_TEST_PASSWORD + SERVICE_ROLE", () => {
+    expect(wrapper).toMatch(/kzzagbojjkivdzzcrmxn/);
+    expect(wrapper).toMatch(/P1_TEST_PASSWORD/);
+    expect(wrapper).toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
+    expect(wrapper).toMatch(/YEMA_COACH_WORKSPACE_ENABLED/);
+    expect(wrapper).toMatch(/YEMA_ROOTS_COACH_RLS_CONFIRMED/);
+  });
+
+  it("wrapper capture:final-runtime-assertions:p1 · delegue au test wrapper", () => {
+    expect(capture).toMatch(/kzzagbojjkivdzzcrmxn/);
+    expect(capture).toMatch(/test-final-runtime-assertions-p1\.mjs/);
+  });
+
+  it("orchestrateur tsx · next start + npx playwright test config final-browser-acceptance", () => {
+    expect(orch).toMatch(/next start/);
+    expect(orch).toMatch(/"playwright", "test"/);
+    expect(orch).toMatch(/gate8l-runtime\.spec\.ts/);
+  });
+
+  it("npm scripts branchés · test + capture", () => {
+    expect(pkg.scripts["test:final-runtime-assertions:p1"]).toBe("node scripts/test-final-runtime-assertions-p1.mjs");
+    expect(pkg.scripts["capture:final-runtime-assertions:p1"]).toBe("node scripts/capture-final-runtime-assertions-p1.mjs");
+  });
+
+  it("spec · logout UI réel via bouton exitChildMode (getByRole button + regex quitter/exit)", () => {
+    expect(spec).toMatch(/getByRole\("button", \{ name: \/quitter\|exit\/i \}\)/);
+    expect(spec).toMatch(/waitForResponse[\s\S]*\/api\/child-session[\s\S]*DELETE/);
+  });
+
+  it("spec · session enfant invalidée après logout · GET /api/child-session active=false", () => {
+    expect(spec).toMatch(/\/api\/child-session/);
+    expect(spec).toMatch(/sessionBody\?\.active[\s\S]*toBe\(false\)/);
+  });
+
+  it("spec · network scoping adulte · Family API NON appelée sur /dashboard", () => {
+    expect(spec).toMatch(/familyCalls[\s\S]*\/api\/family\/dashboard/);
+    expect(spec).toMatch(/Family API NOT called on \/dashboard route/);
+  });
+
+  it("spec · manifest dedupe par filename dans test.afterAll · dernière entrée gagne + sort", () => {
+    expect(spec).toMatch(/test\.afterAll/);
+    expect(spec).toMatch(/new Map<string, string>\(\)/);
+    expect(spec).toMatch(/\.sort\(\(a, b\) => a\.split\("\\t"\)\[0\]\.localeCompare\(b\.split\("\\t"\)\[0\]\)\)/);
+  });
+
+  it("spec · reality-check documenté · Messages UI absent du produit enfant", () => {
+    expect(spec).toMatch(/aucune messagerie/);
+    expect(spec).toMatch(/REALITY-CHECK/);
+  });
+});
+
 describe("Lot 7C · non-régression · Lots précédents intacts", () => {
   it("Lot 7A · MondeIvoryOverview toujours importé", () => {
     const s = read("features/dashboards/student-monde/StudentMondeDashboard.tsx");
