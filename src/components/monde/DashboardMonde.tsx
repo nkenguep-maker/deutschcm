@@ -159,7 +159,6 @@ export function DashboardMonde({ locale }: { locale: "fr" | "en" }) {
   }
 
   const noLP = !data.hasLearningPath;
-  const noAccess = data.access.status === "NONE";
   const expired = data.access.status === "EXPIRED";
   const active = data.access.status === "ACTIVE";
 

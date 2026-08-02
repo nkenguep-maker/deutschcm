@@ -147,18 +147,22 @@ export async function POST(req: Request) {
     // Sinon · valeur silencieusement ignorée (Racines ne stocke pas de parcours Monde).
   }
 
-  // Lot 7C.3 · plafond canonique via assertCanAddChildProfile · agrège
-  // FAMILY_WORLD (3) + CHILD_WORLD_SINGLE (1) + ROOTS_FAMILY (4) + fallback
-  // legacy (4). Le service métier centralise la doctrine commerciale.
+  // Lot 7C.4 · univers dérivé EXPLICITEMENT de la présence d'une foreign
+  // lang · MONDE si au moins une langue "foreign", sinon RACINES. La
+  // décision passe au service canonique AVANT toute création (aucun
+  // ChildProfile créé puis supprimé). Cross-subsidy impossible · le pool
+  // Monde ne consomme pas de sièges Racines et réciproquement.
+  const universe: "MONDE" | "RACINES" = hasForeign ? "MONDE" : "RACINES";
   const guardian = await resolveFamilyGuardianActorOrNull();
   if (!guardian) return NextResponse.json({ error: "guardian_unresolved" }, { status: 401 });
-  const gate = await assertCanAddChildProfile(guardian);
+  const gate = await assertCanAddChildProfile(guardian, universe);
   if (!gate.ok) {
     return NextResponse.json({
       error: "max_children_reached",
       reason: gate.reason,
-      limit: gate.snapshot.seats.reduce((n, s) => n + s.seatsTotal, 0),
-      current: gate.snapshot.totalChildrenActuallyLinked,
+      universe: gate.universe,
+      limit: gate.limit,
+      current: gate.current,
     }, { status: 409 });
   }
 
@@ -171,6 +175,9 @@ export async function POST(req: Request) {
       // Prisma Json field · cast via unknown pour rester typé
       langues: built as unknown as object,
       activeLangue: built[0].langue,
+      // Lot 7C.4 · univers explicite persisté à la création · le dashboard
+      // et le seat snapshot dépendent de ce champ (jamais dérivé).
+      universe,
       learningGoal,
     },
   });

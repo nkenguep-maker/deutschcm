@@ -27,6 +27,13 @@ export async function POST(req: NextRequest) {
     }
     const b = (body ?? {}) as Record<string, unknown>;
 
+    // Lot 7C.4 · universe explicite du client · fail-closed si absent/invalide.
+    const rawUniverse = b.universe;
+    const universe = rawUniverse === "MONDE" ? "MONDE" as const
+      : rawUniverse === "RACINES" ? "RACINES" as const
+      : null;
+    if (universe === null) return err("INVALID_UNIVERSE", "universe required (MONDE|RACINES)", 400);
+
     const result = await createChildProfile(actor, {
       prenom: (b.prenom as string) ?? "",
       age: (b.age as number) ?? -1,
@@ -34,12 +41,15 @@ export async function POST(req: NextRequest) {
       activeLangue: (b.activeLangue as string | null | undefined) ?? null,
       langues: (b.langues as unknown[]) ?? [],
       pin: typeof b.pin === "string" ? b.pin : null,
+      universe,
+      learningGoal: typeof b.learningGoal === "string" ? b.learningGoal : null,
     });
 
     if (!result.ok) {
       const status =
         result.error === "no_seat_available" ? 409 :
         result.error === "invalid_pin" ? 400 :
+        result.error === "invalid_universe" ? 400 :
         400;
       return err(result.error.toUpperCase(), result.error, status);
     }

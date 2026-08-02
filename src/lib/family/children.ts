@@ -2,7 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { hashChildPin, normalizePin } from "@/lib/security/childPin";
 import type { FamilyGuardianActor } from "./actor";
-import { assertCanAddChildProfile } from "./seats";
+import { assertCanAddChildProfile, type SeatUniverse } from "./seats";
 
 // P4.6 Lot 4A · création d'un enfant sous un guardian.
 //
@@ -23,11 +23,14 @@ export interface CreateChildInput {
   activeLangue?: string | null;
   langues?: unknown[];
   pin?: string | null; // optionnel : si présent, hashé et stocké
+  // Lot 7C.4 · univers obligatoire · exigé par le service canonique.
+  universe: SeatUniverse;
+  learningGoal?: string | null;
 }
 
 export type CreateChildResult =
   | { ok: true; child: { id: string; prenom: string; hasPin: boolean } }
-  | { ok: false; error: "invalid_prenom" | "invalid_age" | "invalid_avatar" | "invalid_pin" | "no_seat_available" };
+  | { ok: false; error: "invalid_prenom" | "invalid_age" | "invalid_avatar" | "invalid_pin" | "invalid_universe" | "no_seat_available" };
 
 function validatePrenom(p: unknown): string | null {
   if (typeof p !== "string") return null;
@@ -67,8 +70,15 @@ export async function createChildProfile(
     pinHash = await hashChildPin(norm);
   }
 
-  const gate = await assertCanAddChildProfile(actor);
+  // Lot 7C.4 · univers exigé + fail-closed sur mismatch.
+  if (input.universe !== "MONDE" && input.universe !== "RACINES") {
+    return { ok: false, error: "invalid_universe" };
+  }
+  const gate = await assertCanAddChildProfile(actor, input.universe);
   if (!gate.ok) return { ok: false, error: "no_seat_available" };
+
+  // learningGoal Monde interdit sur RACINES · normalisé null silencieusement.
+  const learningGoal = input.universe === "MONDE" ? (input.learningGoal ?? null) : null;
 
   const created = await prisma.childProfile.create({
     data: {
@@ -80,6 +90,8 @@ export async function createChildProfile(
       activeLangue: input.activeLangue ?? null,
       pinHash,
       pinUpdatedAt: pinHash ? new Date() : null,
+      universe: input.universe,
+      learningGoal,
     },
     select: { id: true, prenom: true, pinHash: true },
   });
