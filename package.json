@@ -39,6 +39,8 @@
     "capture:final-visual-evidence:p1": "node scripts/capture-final-visual-evidence-p1.mjs",
     "test:final-browser-acceptance:p1": "node scripts/test-final-browser-acceptance-p1.mjs",
     "capture:final-browser-acceptance:p1": "node scripts/capture-final-browser-acceptance-p1.mjs",
+    "test:final-child-evidence:p1": "node scripts/test-final-child-evidence-p1.mjs",
+    "capture:final-child-evidence:p1": "node scripts/capture-final-child-evidence-p1.mjs",
     "capture:personas:p1": "node scripts/capture-personas-p1.mjs",
     "seed": "tsx prisma/seed.ts"
   },

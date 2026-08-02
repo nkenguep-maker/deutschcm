@@ -378,6 +378,57 @@ describe("Lot 7C.2 · captures overflow strict === 0 avec exceptions ciblées", 
   });
 });
 
+describe("Gate 8J · final-child-evidence · Coach DOM isolation + Child dashboards + network scoping", () => {
+  const wrapper = readRepo("scripts/test-final-child-evidence-p1.mjs");
+  const orc = readRepo("scripts/orchestrate-final-child-evidence-p1.ts");
+  const spec = readRepo("tests/e2e/final-browser-acceptance/gate8j-child-coach-dom.spec.ts");
+  const pkg = JSON.parse(readRepo("package.json"));
+
+  it("wrapper fail-closed + flags Coach", () => {
+    expect(wrapper).toMatch(/MISSING P1_TEST_PASSWORD/);
+    expect(wrapper).toMatch(/YEMA_COACH_WORKSPACE_ENABLED:\s*"true"/);
+    expect(wrapper).toMatch(/YEMA_ROOTS_COACH_RLS_CONFIRMED:\s*"true"/);
+  });
+
+  it("npm scripts test:final-child-evidence + capture branchés", () => {
+    expect(pkg.scripts["test:final-child-evidence:p1"]).toBe("node scripts/test-final-child-evidence-p1.mjs");
+    expect(pkg.scripts["capture:final-child-evidence:p1"]).toBe("node scripts/capture-final-child-evidence-p1.mjs");
+  });
+
+  it("spec Playwright · Coach A/B DOM · cross-leak isolation (assertion ABSENCE)", () => {
+    expect(spec).toMatch(/TempRacinesB ABSENT du DOM \(cross-leak isolation\)/);
+    expect(spec).toMatch(/TempRacinesA ABSENT du DOM \(cross-leak isolation\)/);
+    expect(spec).toMatch(/not\.toContain\(CHILD_B_NAME\)/);
+    expect(spec).toMatch(/not\.toContain\(CHILD_A_NAME\)/);
+  });
+
+  it("spec Playwright · Child Monde/Racines dashboards via session cookie (UI PIN modal absent du produit)", () => {
+    expect(spec).toMatch(/UI PIN modal absent du produit/);
+    expect(spec).toMatch(/page\.request\.post.*api\/child-session/);
+    expect(spec).toMatch(/child-dashboard-session-cookie/);
+  });
+
+  it("spec Playwright · Child assertions bilingues (FR + EN pour chaque univers)", () => {
+    expect(spec).toMatch(/for \(const locale of \["fr", "en"\]/);
+    expect(spec).toMatch(/child_\$\{label\}/);
+    expect(spec).toMatch(/"monde".*"MONDE".*"Lina"/);
+    expect(spec).toMatch(/"racines".*"RACINES".*"Aïcha"/);
+  });
+
+  it("spec Playwright · Network interception · Family API vs adult API", () => {
+    expect(spec).toMatch(/page\.on\("request"/);
+    expect(spec).toMatch(/Family API called on \/famille/);
+    expect(spec).toMatch(/Adult API NOT called on \/famille/);
+  });
+
+  it("orchestrator cleanup finally · 6 niveaux + relecture 4 checks", () => {
+    expect(orc).toMatch(/leakUsers/);
+    expect(orc).toMatch(/leakChildren/);
+    expect(orc).toMatch(/leakCircles/);
+    expect(orc).toMatch(/leakHouseholds/);
+  });
+});
+
 describe("Gate 8I · final-browser-acceptance · Playwright Coach dashboards + dual context captures", () => {
   const wrapper = readRepo("scripts/test-final-browser-acceptance-p1.mjs");
   const orc = readRepo("scripts/orchestrate-final-browser-acceptance-p1.ts");
