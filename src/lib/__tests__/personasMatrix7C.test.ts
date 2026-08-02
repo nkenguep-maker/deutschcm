@@ -378,6 +378,114 @@ describe("Lot 7C.2 · captures overflow strict === 0 avec exceptions ciblées", 
   });
 });
 
+describe("Gate 8K · fix(child) UI PIN dialog + Coach data-testid + Playwright UI flow", () => {
+  const dialog = readRepo("src/components/famille/ChildPinDialog.tsx");
+  const familyPage = readRepo("src/app/[locale]/famille/page.tsx");
+  const coachSection = readRepo("src/features/dashboards/coach-racines/sections/CoachLearnersSection.tsx");
+  const spec = readRepo("tests/e2e/final-browser-acceptance/gate8k-child-ui-flow.spec.ts");
+  const wrapper = readRepo("scripts/test-child-ui-signoff-p1.mjs");
+  const pkg = JSON.parse(readRepo("package.json"));
+
+  it("ChildPinDialog composant séparé", () => {
+    expect(dialog).toMatch(/export function ChildPinDialog/);
+    expect(dialog).toMatch(/POST[^"]*\/api\/child-session/);
+  });
+
+  it("ChildPinDialog · aucune valeur PIN par défaut · input numeric password", () => {
+    expect(dialog).toMatch(/useState\(""\)/);
+    expect(dialog).toMatch(/inputMode="numeric"/);
+    expect(dialog).toMatch(/type="password"/);
+  });
+
+  it("ChildPinDialog · erreur générique (aucune divulgation)", () => {
+    expect(dialog).toMatch(/errGeneric/);
+  });
+
+  it("ChildPinDialog · submit désactivé pendant envoi + PIN < 4 char", () => {
+    expect(dialog).toMatch(/disabled=\{submitting \|\| pin\.length < 4\}/);
+  });
+
+  it("ChildPinDialog · aucune persistance localStorage/sessionStorage (hors commentaire)", () => {
+    const withoutComments = dialog.replace(/\/\/[^\n]*/g, "");
+    expect(withoutComments).not.toMatch(/localStorage/);
+    expect(withoutComments).not.toMatch(/sessionStorage/);
+  });
+
+  it("ChildPinDialog · redirect router.push + wipe PIN après 200", () => {
+    expect(dialog).toMatch(/router\.push/);
+    expect(dialog).toMatch(/setPin\(""\)/);
+  });
+
+  it("ChildPinDialog · cibles tactiles 44px + label + aria-labelledby", () => {
+    expect(dialog).toMatch(/minHeight:\s*44/);
+    expect(dialog).toMatch(/aria-labelledby/);
+    expect(dialog).toMatch(/aria-modal="true"/);
+  });
+
+  it("Family page · state pinChild + action Ouvrir son espace", () => {
+    expect(familyPage).toMatch(/const \[pinChild, setPinChild\] = useState<Child \| null>/);
+    expect(familyPage).toMatch(/openChildSpace/);
+    expect(familyPage).toMatch(/data-testid="family-child-open-space"/);
+    expect(familyPage).toMatch(/data-testid="family-child-card"/);
+  });
+
+  it("Family page · render ChildPinDialog conditionnel", () => {
+    expect(familyPage).toMatch(/<ChildPinDialog/);
+    expect(familyPage).toMatch(/onClose=\{\(\) => setPinChild\(null\)/);
+  });
+
+  it("copy FR + EN · openChildSpace + childPinTitle + childPinErrGeneric", () => {
+    for (const k of ["openChildSpace", "childPinTitle", "childPinLabel", "childPinSubmit", "childPinCancel", "childPinErrGeneric"]) {
+      expect(familyPage).toMatch(new RegExp(`${k}:`));
+    }
+  });
+
+  it("CoachLearnersSection · data-testid coach-learner-card + data-circle-language", () => {
+    expect(coachSection).toMatch(/data-testid="coach-learners-list"/);
+    expect(coachSection).toMatch(/data-testid="coach-learner-card"/);
+    expect(coachSection).toMatch(/data-circle-language=\{child\.circleLanguage/);
+  });
+
+  it("CoachLearnersSection · aucune donnée sensible dans data-*", () => {
+    expect(coachSection).not.toMatch(/data-child-profile-id/);
+    expect(coachSection).not.toMatch(/data-household-id/);
+  });
+
+  it("Playwright spec · UI PIN flow bilingue", () => {
+    expect(spec).toMatch(/for \(const locale of \["fr", "en"\]/);
+    expect(spec).toMatch(/family-child-open-space/);
+    expect(spec).toMatch(/child-pin-dialog/);
+    expect(spec).toMatch(/child-pin-submit/);
+  });
+
+  it("Playwright spec · erreur générique testée", () => {
+    expect(spec).toMatch(/PIN incorrect → erreur générique/);
+  });
+
+  it("Playwright spec · POST /api/child-session waitForResponse status 200", () => {
+    expect(spec).toMatch(/waitForResponse/);
+    expect(spec).toMatch(/\/api\/child-session/);
+    expect(spec).toMatch(/\.toBe\(200\)/);
+  });
+
+  it("Playwright spec · Coach API scope + circleLanguage", () => {
+    expect(spec).toMatch(/roots-coach\/profiles/);
+    expect(spec).toMatch(/WOLOF/);
+    expect(spec).toMatch(/SWAHILI/);
+  });
+
+  it("npm script test:child-ui-signoff:p1 branché", () => {
+    expect(pkg.scripts["test:child-ui-signoff:p1"]).toBe("node scripts/test-child-ui-signoff-p1.mjs");
+    expect(pkg.scripts["capture:child-ui-signoff:p1"]).toBe("node scripts/capture-child-ui-signoff-p1.mjs");
+  });
+
+  it("wrapper fail-closed + flags Coach", () => {
+    expect(wrapper).toMatch(/MISSING P1_TEST_PASSWORD/);
+    expect(wrapper).toMatch(/YEMA_COACH_WORKSPACE_ENABLED:\s*"true"/);
+    expect(wrapper).toMatch(/YEMA_ROOTS_COACH_RLS_CONFIRMED:\s*"true"/);
+  });
+});
+
 describe("Gate 8J · final-child-evidence · Coach DOM isolation + Child dashboards + network scoping", () => {
   const wrapper = readRepo("scripts/test-final-child-evidence-p1.mjs");
   const orc = readRepo("scripts/orchestrate-final-child-evidence-p1.ts");
