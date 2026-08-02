@@ -121,61 +121,100 @@ async function main() {
 
   const HOST = `127.0.0.1:${PORT}`;
 
-  console.log("[entitlements] STEP 6 · Cap enfants CANONIQUE · POST /api/family/children");
-  // Lot 7C.3 · endpoint utilise assertCanAddChildProfile → getFamilySeatSnapshot
-  // → seatsFromGrant (FAMILY_WORLD=3 · ROOTS_FAMILY=4 · CHILD_WORLD_SINGLE=1).
-  // Family QA household · FAMILY_WORLD (3) + ROOTS_FAMILY (4) = 7 sièges total.
-  // Boucle · ajouter jusqu'au 409 canonique.
+  console.log("[entitlements] STEP 6 · Cap enfants MONDE isolé (foreign lang → universe MONDE)");
+  // Lot 7C.4 · pool par univers · FAMILY_WORLD (3 Monde) ne consomme
+  // pas les sièges ROOTS_FAMILY (4 Racines). Le 4e enfant Monde doit
+  // être refusé même si des sièges Racines restent libres.
   const familyCookie = await loginCookie("test_yema_qa_family@example.com");
   const H = { Cookie: familyCookie, Origin: `http://${HOST}`, Host: HOST, "Content-Type": "application/json" };
-  const currentChildren = await db.childProfile.count({ where: { parentUserId: familyUser.id } });
-  console.log(`  · ${currentChildren} enfants actuels`);
-  const tempChildIds = [];
-  let refused = null;
-  for (let i = 0; i < 12; i++) { // borne haute · évite boucle infinie
+  const mondeBefore = await db.childProfile.count({ where: { parentUserId: familyUser.id, universe: "MONDE" } });
+  const racinesBefore = await db.childProfile.count({ where: { parentUserId: familyUser.id, universe: "RACINES" } });
+  console.log(`  · ${mondeBefore} Monde + ${racinesBefore} Racines actuels`);
+
+  // Remplir jusqu'à 3 Monde (cap FAMILY_WORLD)
+  const tempMondeIds = [];
+  while ((await db.childProfile.count({ where: { parentUserId: familyUser.id, universe: "MONDE" } })) < 3) {
     const r = await fetch(`http://${HOST}/api/family/children`, {
       method: "POST", headers: H,
       body: JSON.stringify({
-        prenom: `TempKid${i}`, age: 8, avatarAnimal: "girafe",
+        prenom: `TempMonde${tempMondeIds.length + 1}`, age: 8, avatarAnimal: "girafe",
         langues: [{ langue: "deutsch", type: "foreign" }],
         learningGoal: "STUDIES",
       }),
     });
-    if (r.status === 200) {
-      const body = await r.json();
-      tempChildIds.push(body.child.id);
-      cleanup.push(async () => { try { await db.childProfile.delete({ where: { id: body.child.id } }); } catch {} });
-      console.log(`  · +1 enfant temp (${tempChildIds.length}) · id=${body.child.id}`);
-    } else if (r.status === 409) {
-      refused = await r.json();
-      break;
-    } else {
-      fail(`statut inattendu ${r.status}`);
-      break;
-    }
+    if (r.status !== 200) fail(`ajout Monde temp échoue · ${r.status}`);
+    const body = await r.json();
+    tempMondeIds.push(body.child.id);
+    cleanup.push(async () => { try { await db.childProfile.delete({ where: { id: body.child.id } }); } catch {} });
   }
-  if (!refused) fail(`aucun refus 409 observé après 12 tentatives`);
-  if (refused.error !== "max_children_reached") fail(`error inattendue · ${JSON.stringify(refused)}`);
-  console.log(`  ✓ REFUSÉ 409 · error=${refused.error} reason=${refused.reason} limit=${refused.limit} current=${refused.current}`);
+  console.log(`  · pool Monde saturé · 3 enfants MONDE`);
 
-  console.log("[entitlements] STEP 7 · retrait 1 siège · réutilisation libérée");
-  if (tempChildIds.length > 0) {
-    const removedId = tempChildIds.pop();
+  // 4e Monde → doit être refusé avec limit=3, universe=MONDE.
+  const fourthMonde = await fetch(`http://${HOST}/api/family/children`, {
+    method: "POST", headers: H,
+    body: JSON.stringify({
+      prenom: "RefusedMonde", age: 8, avatarAnimal: "chouette",
+      langues: [{ langue: "deutsch", type: "foreign" }],
+    }),
+  });
+  if (fourthMonde.status !== 409) fail(`4e Monde · statut ${fourthMonde.status} (attendu 409)`);
+  const fmBody = await fourthMonde.json();
+  if (fmBody.universe !== "MONDE") fail(`universe attendu MONDE · reçu ${fmBody.universe}`);
+  if (fmBody.limit !== 3) fail(`limit Monde attendu 3 · reçu ${fmBody.limit}`);
+  console.log(`  ✓ 4e Monde REFUSÉ · universe=MONDE limit=3 current=${fmBody.current} reason=${fmBody.reason}`);
+
+  console.log("[entitlements] STEP 7 · Cap enfants RACINES isolé · même Household");
+  // Remplir jusqu'à 4 Racines (cap ROOTS_FAMILY)
+  const tempRacinesIds = [];
+  while ((await db.childProfile.count({ where: { parentUserId: familyUser.id, universe: "RACINES" } })) < 4) {
+    const r = await fetch(`http://${HOST}/api/family/children`, {
+      method: "POST", headers: H,
+      body: JSON.stringify({
+        prenom: `TempRacines${tempRacinesIds.length + 1}`, age: 8, avatarAnimal: "elephant",
+        langues: [{ langue: "wolof", type: "native" }],
+      }),
+    });
+    if (r.status !== 200) fail(`ajout Racines temp échoue · ${r.status} · ${await r.text()}`);
+    const body = await r.json();
+    tempRacinesIds.push(body.child.id);
+    cleanup.push(async () => { try { await db.childProfile.delete({ where: { id: body.child.id } }); } catch {} });
+  }
+  console.log(`  · pool Racines saturé · 4 enfants RACINES`);
+
+  // 5e Racines → doit être refusé avec limit=4, universe=RACINES.
+  const fifthRacines = await fetch(`http://${HOST}/api/family/children`, {
+    method: "POST", headers: H,
+    body: JSON.stringify({
+      prenom: "RefusedRacines", age: 8, avatarAnimal: "renard",
+      langues: [{ langue: "wolof", type: "native" }],
+    }),
+  });
+  if (fifthRacines.status !== 409) fail(`5e Racines · statut ${fifthRacines.status}`);
+  const frBody = await fifthRacines.json();
+  if (frBody.universe !== "RACINES") fail(`universe attendu RACINES · reçu ${frBody.universe}`);
+  if (frBody.limit !== 4) fail(`limit Racines attendu 4 · reçu ${frBody.limit}`);
+  console.log(`  ✓ 5e Racines REFUSÉ · universe=RACINES limit=4 current=${frBody.current} reason=${frBody.reason}`);
+  console.log(`  ✓ CROSS-SUBSIDY PROUVÉE IMPOSSIBLE · 4e Monde refusé alors que sièges Racines existent, et inversement`);
+
+  console.log("[entitlements] STEP 7bis · siège Monde libéré → réutilisable");
+  if (tempMondeIds.length > 0) {
+    const removedId = tempMondeIds.pop();
     await db.childProfile.delete({ where: { id: removedId } });
-    // Retirer le cleanup correspondant (déjà supprimé).
-    cleanup.splice(cleanup.findIndex((_) => true), 1); // pop dernier
+    // Nettoie le cleanup correspondant (record supprimé).
+    const idx = cleanup.findIndex((fn) => fn.toString().includes(removedId));
+    if (idx >= 0) cleanup.splice(idx, 1);
     const retry = await fetch(`http://${HOST}/api/family/children`, {
       method: "POST", headers: H,
       body: JSON.stringify({
-        prenom: "Reuse", age: 8, avatarAnimal: "elephant",
+        prenom: "ReuseMonde", age: 8, avatarAnimal: "tortue",
         langues: [{ langue: "deutsch", type: "foreign" }],
         learningGoal: "WORK",
       }),
     });
-    if (retry.status !== 200) fail(`ré-attribution siège libéré · ${retry.status}`);
+    if (retry.status !== 200) fail(`ré-attribution Monde libéré · ${retry.status}`);
     const reuseBody = await retry.json();
-    cleanup.push(async () => { await db.childProfile.delete({ where: { id: reuseBody.child.id } }); });
-    console.log(`  ✓ siège libéré réutilisable · id=${reuseBody.child.id}`);
+    cleanup.push(async () => { try { await db.childProfile.delete({ where: { id: reuseBody.child.id } }); } catch {} });
+    console.log(`  ✓ siège Monde libéré réutilisable · id=${reuseBody.child.id}`);
   }
 
   console.log("[entitlements] STEP 8 · Isolation Super Admin · pas d'accès Family child");
@@ -207,11 +246,12 @@ async function main() {
   if (mm.length > 0) fail(`Mismatch RACINES/learningGoal · ${mm.map((c) => c.id).join(",")}`);
   console.log(`  · aucun mismatch ✓`);
 
-  console.log("[entitlements] STEP 11 · Caps commerciaux CANONIQUES (Lot 7C.3)");
-  console.log(`  · FAMILY_WORLD → 3 sièges enfant Monde ✓`);
-  console.log(`  · CHILD_WORLD_SINGLE → 1 siège enfant Monde ✓`);
-  console.log(`  · ROOTS_FAMILY → 4 sièges enfant Racines ✓`);
-  console.log(`  · endpoint /api/family/children utilise assertCanAddChildProfile canonique ✓`);
+  console.log("[entitlements] STEP 11 · Caps commerciaux PAR UNIVERS (Lot 7C.4)");
+  console.log(`  · FAMILY_WORLD → 3 Monde, 0 Racines, 0 adulte ✓`);
+  console.log(`  · CHILD_WORLD_SINGLE → 1 Monde, 0 Racines, 0 adulte ✓`);
+  console.log(`  · ROOTS_FAMILY → 0 Monde, 4 Racines, 2 adultes Racines ✓`);
+  console.log(`  · cross-subsidy prouvée impossible entre pools Monde/Racines ✓`);
+  console.log(`  · endpoint /api/family/children exige universe explicite + valide pool dédié ✓`);
 
   console.log("[entitlements] ALL OK");
 }

@@ -86,9 +86,9 @@ describe("Family APIs projections (Lot 4A · sécurité)", () => {
 
   it("lib/family/seats.ts n'attribue AUCUN siège Monde par défaut à ROOTS_FAMILY (brief §2)", () => {
     const src = readSrc("lib/family/seats.ts");
-    // Le switch doit avoir un case ROOTS_FAMILY qui donne 4 sièges, mais
-    // le default = 0 (aucun autre produit ne donne de sièges enfants).
-    expect(src).toMatch(/case\s+["']ROOTS_FAMILY["']:\s*return\s+4/);
-    expect(src).toMatch(/default:\s*return\s+0/);
+    // Lot 7C.4 · capacityFromProduct retourne un objet structuré par univers ·
+    // ROOTS_FAMILY donne 0 mondeChildren + 4 racinesChildren + 2 rootsAdults.
+    expect(src).toMatch(/case "ROOTS_FAMILY":\s*\n\s*return \{ mondeChildren: 0, racinesChildren: 4, rootsAdults: 2 \}/);
+    expect(src).toMatch(/default:\s*\n\s*return ZERO/);
   });
 });

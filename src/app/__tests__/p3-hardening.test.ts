@@ -57,20 +57,18 @@ describe("DashboardRacines · rend les 4 modes distinctement", () => {
   });
 });
 
-describe("Limite enfants · POST /api/family/children (hardening §4 · Lot 7C.3 canonical)", () => {
+describe("Limite enfants · POST /api/family/children (Lot 7C.4 · per-universe pools)", () => {
   const src = read("src/app/api/family/children/route.ts");
-  it("utilise assertCanAddChildProfile canonique (au lieu de MAX_CHILDREN hardcoded)", () => {
-    // Lot 7C.3 · MAX_CHILDREN=4 remplacé par assertCanAddChildProfile ·
-    // seatsFromGrant() enforce désormais FAMILY_WORLD=3, CHILD_WORLD_SINGLE=1,
-    // ROOTS_FAMILY=4 (fallback 4 pour sans grant).
-    expect(src).toMatch(/assertCanAddChildProfile\(guardian\)/);
+  it("utilise assertCanAddChildProfile(guardian, universe) canonique", () => {
+    expect(src).toMatch(/assertCanAddChildProfile\(guardian,\s*universe\)/);
     expect(src).not.toMatch(/const MAX_CHILDREN = 4/);
   });
-  it("refus 409 avec detail { reason, limit, current } dérivé du snapshot", () => {
+  it("refus 409 avec detail { reason, universe, limit, current } par pool", () => {
     expect(src).toMatch(/max_children_reached/);
     expect(src).toMatch(/reason: gate\.reason/);
-    expect(src).toMatch(/limit: gate\.snapshot\.seats\.reduce/);
-    expect(src).toMatch(/current: gate\.snapshot\.totalChildrenActuallyLinked/);
+    expect(src).toMatch(/universe: gate\.universe/);
+    expect(src).toMatch(/limit: gate\.limit/);
+    expect(src).toMatch(/current: gate\.current/);
   });
 });
 

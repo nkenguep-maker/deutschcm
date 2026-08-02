@@ -111,9 +111,10 @@ describe("Lot 7C · orchestrateurs P-1 fail-closed", () => {
     for (const code of ["PASSAGE", "ROOTS_SOLO", "ROOTS_FAMILY", "FAMILY_WORLD", "CHILD_WORLD_SINGLE"]) {
       expect(src, `product ${code}`).toMatch(new RegExp(code));
     }
-    // Lot 7C.3 · caps enforced canoniquement via assertCanAddChildProfile.
-    expect(src).toMatch(/max_children_reached/);
-    expect(src).toMatch(/Caps commerciaux CANONIQUES/);
+    // Lot 7C.4 · caps par univers · pools Monde et Racines séparés.
+    expect(src).toMatch(/pool Monde saturé/);
+    expect(src).toMatch(/pool Racines saturé/);
+    expect(src).toMatch(/CROSS-SUBSIDY PROUVÉE IMPOSSIBLE/);
     expect(src).toMatch(/universe:\s*null/);
   });
 });
@@ -148,15 +149,15 @@ describe("Lot 7C.1 · orchestrateurs actifs · restauration + strict checks", ()
 
   it("entitlements orchestrator · cap enfants canonique via HTTP POST", () => {
     expect(entSrc).toMatch(/POST \/api\/family\/children/);
-    expect(entSrc).toMatch(/max_children_reached/);
-    expect(entSrc).toMatch(/REFUSÉ 409/);
+    expect(entSrc).toMatch(/4e Monde REFUSÉ/);
+    expect(entSrc).toMatch(/5e Racines REFUSÉ/);
   });
 
-  it("entitlements orchestrator · caps commerciaux CANONIQUES (Lot 7C.3)", () => {
-    expect(entSrc).toMatch(/FAMILY_WORLD → 3 sièges enfant Monde/);
-    expect(entSrc).toMatch(/CHILD_WORLD_SINGLE → 1 siège enfant Monde/);
-    expect(entSrc).toMatch(/ROOTS_FAMILY → 4 sièges enfant Racines/);
-    expect(entSrc).toMatch(/assertCanAddChildProfile canonique/);
+  it("entitlements orchestrator · caps commerciaux PAR UNIVERS (Lot 7C.4)", () => {
+    expect(entSrc).toMatch(/FAMILY_WORLD → 3 Monde/);
+    expect(entSrc).toMatch(/CHILD_WORLD_SINGLE → 1 Monde/);
+    expect(entSrc).toMatch(/ROOTS_FAMILY → 0 Monde, 4 Racines/);
+    expect(entSrc).toMatch(/cross-subsidy prouvée impossible/);
   });
 
   it("personas orchestrator · Child Monde + Child Racines direct via /api/child-session", () => {
@@ -183,21 +184,96 @@ describe("Lot 7C.1 · orchestrateurs actifs · restauration + strict checks", ()
   });
 });
 
-describe("Lot 7C.3 · seatsFromGrant · mappings canoniques commerciaux", () => {
+describe("Lot 7C.4 · capacityFromProduct · pools structurés par univers", () => {
   const src = readRepo("src/lib/family/seats.ts");
 
-  it("FAMILY_WORLD retourne 3 sièges enfant Monde", () => {
-    expect(src).toMatch(/case "FAMILY_WORLD":\s*\n\s*return 3;/);
+  it("FamilySeatCapacity type · 3 champs distincts (mondeChildren / racinesChildren / rootsAdults)", () => {
+    expect(src).toMatch(/export interface FamilySeatCapacity/);
+    expect(src).toMatch(/mondeChildren:\s*number/);
+    expect(src).toMatch(/racinesChildren:\s*number/);
+    expect(src).toMatch(/rootsAdults:\s*number/);
   });
-  it("CHILD_WORLD_SINGLE retourne 1 siège enfant Monde", () => {
-    expect(src).toMatch(/case "CHILD_WORLD_SINGLE":\s*\n\s*return 1;/);
+
+  it("FAMILY_WORLD → 3 Monde / 0 Racines / 0 adulte", () => {
+    expect(src).toMatch(/case "FAMILY_WORLD":\s*\n\s*return \{ mondeChildren: 3, racinesChildren: 0, rootsAdults: 0 \}/);
   });
-  it("ROOTS_FAMILY retourne 4 sièges enfant Racines", () => {
-    expect(src).toMatch(/case "ROOTS_FAMILY":\s*\n\s*return 4;/);
+  it("CHILD_WORLD_SINGLE → 1 Monde / 0 Racines / 0 adulte", () => {
+    expect(src).toMatch(/case "CHILD_WORLD_SINGLE":\s*\n\s*return \{ mondeChildren: 1, racinesChildren: 0, rootsAdults: 0 \}/);
   });
-  it("commentaire canonique · doctrine brief §2", () => {
-    expect(src).toMatch(/brief §2/);
-    expect(src).toMatch(/mapping canonique/);
+  it("ROOTS_FAMILY → 0 Monde / 4 Racines / 2 adultes", () => {
+    expect(src).toMatch(/case "ROOTS_FAMILY":\s*\n\s*return \{ mondeChildren: 0, racinesChildren: 4, rootsAdults: 2 \}/);
+  });
+  it("code inconnu → ZERO fail-closed", () => {
+    expect(src).toMatch(/default:\s*\n\s*return ZERO/);
+  });
+});
+
+describe("Lot 7C.4 · assertCanAddChildProfile · exige universe + pool dédié", () => {
+  const src = readRepo("src/lib/family/seats.ts");
+
+  it("signature accepte universe: SeatUniverse", () => {
+    expect(src).toMatch(/assertCanAddChildProfile\(\s*actor:\s*FamilyGuardianActor,\s*universe:\s*SeatUniverse/);
+  });
+  it("refuse universe invalide (fail-closed universe_invalid)", () => {
+    expect(src).toMatch(/reason:\s*"universe_invalid"/);
+  });
+  it("consulte uniquement le pool demandé (mondeChildren OU racinesChildren)", () => {
+    expect(src).toMatch(/universe === "MONDE" \? snap\.capacity\.mondeChildren : snap\.capacity\.racinesChildren/);
+    expect(src).toMatch(/universe === "MONDE" \? snap\.remaining\.mondeChildren : snap\.remaining\.racinesChildren/);
+  });
+  it("réponse KO expose universe + limit + current du pool spécifique", () => {
+    expect(src).toMatch(/universe:\s*SeatUniverse \| null/);
+    expect(src).toMatch(/limit:\s*number/);
+    expect(src).toMatch(/current:\s*number/);
+  });
+});
+
+describe("Lot 7C.4 · getFamilySeatSnapshot · comptage explicite par universe", () => {
+  const src = readRepo("src/lib/family/seats.ts");
+
+  it("count ChildProfile filtré par universe MONDE et RACINES séparément", () => {
+    expect(src).toMatch(/universe:\s*"MONDE"/);
+    expect(src).toMatch(/universe:\s*"RACINES"/);
+    expect(src).toMatch(/mondeUsed/);
+    expect(src).toMatch(/racinesUsed/);
+  });
+  it("snapshot expose capacity + used + remaining structurés", () => {
+    expect(src).toMatch(/capacity: FamilySeatCapacity/);
+    expect(src).toMatch(/used: FamilySeatCapacity/);
+    expect(src).toMatch(/remaining: FamilySeatCapacity/);
+  });
+});
+
+describe("Lot 7C.4 · POST /api/family/children · universe explicite passé au service", () => {
+  const src = readRepo("src/app/api/family/children/route.ts");
+
+  it("dérive universe depuis hasForeign (foreign lang → MONDE, sinon RACINES)", () => {
+    expect(src).toMatch(/const universe:\s*"MONDE" \| "RACINES" = hasForeign \? "MONDE" : "RACINES"/);
+  });
+  it("passe universe à assertCanAddChildProfile", () => {
+    expect(src).toMatch(/assertCanAddChildProfile\(guardian,\s*universe\)/);
+  });
+  it("erreur 409 canonique expose universe + limit dérivés du pool", () => {
+    expect(src).toMatch(/universe: gate\.universe/);
+    expect(src).toMatch(/limit: gate\.limit/);
+    expect(src).toMatch(/current: gate\.current/);
+  });
+  it("ChildProfile.create persiste universe (jamais dérivé rétroactivement)", () => {
+    expect(src).toMatch(/universe,\s*\n\s*learningGoal/);
+  });
+});
+
+describe("Lot 7C.4 · createChildProfile · universe obligatoire + learningGoal Monde restrict", () => {
+  const src = readRepo("src/lib/family/children.ts");
+
+  it("CreateChildInput exige universe: SeatUniverse", () => {
+    expect(src).toMatch(/universe:\s*SeatUniverse/);
+  });
+  it("refus invalid_universe si universe absent/invalide", () => {
+    expect(src).toMatch(/"invalid_universe"/);
+  });
+  it("learningGoal Monde normalisé null si universe RACINES", () => {
+    expect(src).toMatch(/input\.universe === "MONDE" \? \(input\.learningGoal \?\? null\) : null/);
   });
 });
 
@@ -208,8 +284,8 @@ describe("Lot 7C.3 · POST /api/family/children · assertCanAddChildProfile cano
     expect(src).toMatch(/import \{ resolveFamilyGuardianActorOrNull \}/);
     expect(src).toMatch(/import \{ assertCanAddChildProfile \}/);
   });
-  it("route utilise assertCanAddChildProfile (pas MAX_CHILDREN=4 hardcoded)", () => {
-    expect(src).toMatch(/assertCanAddChildProfile\(guardian\)/);
+  it("route utilise assertCanAddChildProfile avec universe (Lot 7C.4)", () => {
+    expect(src).toMatch(/assertCanAddChildProfile\(guardian,\s*universe\)/);
     expect(src).not.toMatch(/const MAX_CHILDREN = 4/);
   });
   it("erreur 409 canonique inclut reason + limit dérivé du snapshot", () => {
@@ -237,13 +313,13 @@ describe("Lot 7C.2 · entitlements orchestrator · canonical HTTP + Super Admin 
 
   it("cap enfants testé via POST /api/family/children canonique", () => {
     expect(src).toMatch(/POST \/api\/family\/children/);
-    expect(src).toMatch(/max_children_reached/);
-    expect(src).toMatch(/REFUSÉ 409/);
+    expect(src).toMatch(/4e Monde REFUSÉ/);
+    expect(src).toMatch(/5e Racines REFUSÉ/);
   });
 
   it("siège libéré réutilisable · flow explicite", () => {
-    expect(src).toMatch(/retrait 1 siège · réutilisation libérée/);
-    expect(src).toMatch(/siège libéré réutilisable/);
+    expect(src).toMatch(/siège Monde libéré → réutilisable/);
+    expect(src).toMatch(/siège Monde libéré réutilisable/);
   });
 
   it("Super Admin refusé sur /api/family/dashboard ET /api/child-session", () => {
@@ -251,10 +327,10 @@ describe("Lot 7C.2 · entitlements orchestrator · canonical HTTP + Super Admin 
     expect(src).toMatch(/Super Admin → \/api\/child-session refusé/);
   });
 
-  it("caps commerciaux canonique CANONIQUES (Lot 7C.3)", () => {
-    expect(src).toMatch(/FAMILY_WORLD → 3 sièges enfant Monde/);
-    expect(src).toMatch(/CHILD_WORLD_SINGLE → 1 siège enfant Monde/);
-    expect(src).toMatch(/ROOTS_FAMILY → 4 sièges enfant Racines/);
+  it("caps commerciaux PAR UNIVERS (Lot 7C.4)", () => {
+    expect(src).toMatch(/FAMILY_WORLD → 3 Monde/);
+    expect(src).toMatch(/CHILD_WORLD_SINGLE → 1 Monde/);
+    expect(src).toMatch(/ROOTS_FAMILY → 0 Monde, 4 Racines/);
   });
 
   it("cleanup finally + relecture leak check", () => {
