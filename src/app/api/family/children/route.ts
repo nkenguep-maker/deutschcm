@@ -98,6 +98,10 @@ export async function POST(req: Request) {
     // Lot 7B.2 · optionnel · uniquement pour enfant MONDE (foreign lang).
     // Refus strict de toute valeur non canonique.
     learningGoal?: string | null;
+    // Gate 8A · univers EXPLICITE requis · JAMAIS dérivé de la langue
+    // côté serveur. Le client (formulaire ou UI) décide. Le serveur
+    // valide et refuse null/inconnu (brief §1).
+    universe?: "MONDE" | "RACINES" | string;
   };
   const prenom = (body.prenom ?? "").trim().slice(0, 24);
   const age = Number(body.age);
@@ -147,12 +151,17 @@ export async function POST(req: Request) {
     // Sinon · valeur silencieusement ignorée (Racines ne stocke pas de parcours Monde).
   }
 
-  // Lot 7C.4 · univers dérivé EXPLICITEMENT de la présence d'une foreign
-  // lang · MONDE si au moins une langue "foreign", sinon RACINES. La
-  // décision passe au service canonique AVANT toute création (aucun
-  // ChildProfile créé puis supprimé). Cross-subsidy impossible · le pool
-  // Monde ne consomme pas de sièges Racines et réciproquement.
-  const universe: "MONDE" | "RACINES" = hasForeign ? "MONDE" : "RACINES";
+  // Gate 8A · univers EXPLICITE du client · le serveur ne dérive JAMAIS
+  // universe de la langue (brief §1 · doctrine figée). Absent ou invalide
+  // → 400 fail-closed. Le client (AddChildDialog ou autre UI) doit
+  // envoyer explicitement "MONDE" ou "RACINES".
+  const universe: "MONDE" | "RACINES" | null =
+    body.universe === "MONDE" ? "MONDE" :
+    body.universe === "RACINES" ? "RACINES" :
+    null;
+  if (universe === null) {
+    return NextResponse.json({ error: "universe_required", details: "MONDE|RACINES" }, { status: 400 });
+  }
   const guardian = await resolveFamilyGuardianActorOrNull();
   if (!guardian) return NextResponse.json({ error: "guardian_unresolved" }, { status: 401 });
   const gate = await assertCanAddChildProfile(guardian, universe);

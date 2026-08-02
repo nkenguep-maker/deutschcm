@@ -259,11 +259,16 @@ function AddChildDialog({
     // Lot 7B.2 · parcours envoyé uniquement pour enfant MONDE (foreign lang).
     // "LATER" = null explicite · le back rejette toute valeur non canonique.
     const learningGoal = foreign.length > 0 && goal !== "LATER" ? goal : null;
+    // Gate 8A · univers EXPLICITE envoyé au serveur (brief §1). Le client
+    // décide (ici depuis la présence d'une foreign lang), le serveur ne
+    // dérive JAMAIS depuis la langue. Une future UI pourra ajouter un
+    // sélecteur univers explicite · le contrat serveur reste le même.
+    const universe: "MONDE" | "RACINES" = foreign.length > 0 ? "MONDE" : "RACINES";
     try {
       const res = await fetch("/api/family/children", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ prenom: prenom.trim(), age, avatarAnimal: animal, langues, learningGoal }),
+        body: JSON.stringify({ prenom: prenom.trim(), age, avatarAnimal: animal, langues, learningGoal, universe }),
       });
       const data = await res.json();
       if (!res.ok) {
