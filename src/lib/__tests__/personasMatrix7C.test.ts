@@ -378,6 +378,47 @@ describe("Lot 7C.2 · captures overflow strict === 0 avec exceptions ciblées", 
   });
 });
 
+describe("Gate 8D · final-deployment-e2e · Coach A/B provisioning + isolation active", () => {
+  const wrapper = readRepo("scripts/test-final-deployment-e2e-p1.mjs");
+  const orc = readRepo("scripts/orchestrate-final-deployment-e2e-p1.ts");
+  const pkg = JSON.parse(readRepo("package.json"));
+
+  it("wrapper fail-closed · exige P1_TEST_PASSWORD + SUPABASE_SERVICE_ROLE_KEY", () => {
+    expect(wrapper).toMatch(/MISSING P1_TEST_PASSWORD/);
+    expect(wrapper).toMatch(/MISSING SUPABASE_SERVICE_ROLE_KEY/);
+    expect(wrapper).toMatch(/kzzagbojjkivdzzcrmxn/);
+  });
+
+  it("npm scripts test:final-deployment-e2e:p1 + capture:final-deployment-e2e:p1 branchés", () => {
+    expect(pkg.scripts["test:final-deployment-e2e:p1"]).toBe("node scripts/test-final-deployment-e2e-p1.mjs");
+    expect(pkg.scripts["capture:final-deployment-e2e:p1"]).toBe("node scripts/capture-final-deployment-e2e-p1.mjs");
+  });
+
+  it("orchestrateur provisionne Coach A + Coach B temporaires via Auth admin API", () => {
+    expect(orc).toMatch(/ensureCoachAuthUser/);
+    expect(orc).toMatch(/RACINES_COACH/);
+    expect(orc).toMatch(/temp_gate8d_coach_a_/);
+    expect(orc).toMatch(/temp_gate8d_coach_b_/);
+  });
+
+  it("orchestrateur teste isolation symétrique · Coach A ET Coach B refusés Teacher/Family", () => {
+    expect(orc).toMatch(/for \(const \[label, h\] of \[\["Coach A", hA\], \["Coach B", hB\]\]/);
+    expect(orc).toMatch(/accède Teacher · isolation cassée/);
+    expect(orc).toMatch(/accède Family · isolation cassée/);
+  });
+
+  it("cleanup finally · UserAppRole + User + Auth admin deleteUser", () => {
+    expect(orc).toMatch(/userAppRole\.deleteMany/);
+    expect(orc).toMatch(/admin\.auth\.admin\.deleteUser/);
+    expect(orc).toMatch(/leakUsers/);
+  });
+
+  it("SpaceSwitcher reality documenté · 1 SpaceRole = switcher invisible", () => {
+    expect(orc).toMatch(/SpaceSwitcher UI reality/);
+    expect(orc).toMatch(/1 role STUDENT · switcher non visible/);
+  });
+});
+
 describe("Gate 8C · deployment-readiness · Coach isolation + Super Admin audio", () => {
   const wrapper = readRepo("scripts/test-deployment-readiness-p1.mjs");
   const orc = readRepo("scripts/orchestrate-deployment-readiness-p1.ts");

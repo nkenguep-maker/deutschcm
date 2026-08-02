@@ -27,6 +27,8 @@
     "test:roots-adult-seats:p1": "tsx scripts/test-roots-adult-seats-p1.ts",
     "test:deployment-readiness:p1": "node scripts/test-deployment-readiness-p1.mjs",
     "capture:deployment-readiness:p1": "node scripts/capture-deployment-readiness-p1.mjs",
+    "test:final-deployment-e2e:p1": "node scripts/test-final-deployment-e2e-p1.mjs",
+    "capture:final-deployment-e2e:p1": "node scripts/capture-final-deployment-e2e-p1.mjs",
     "capture:personas:p1": "node scripts/capture-personas-p1.mjs",
     "seed": "tsx prisma/seed.ts"
   },
