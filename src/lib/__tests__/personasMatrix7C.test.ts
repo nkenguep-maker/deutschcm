@@ -378,6 +378,64 @@ describe("Lot 7C.2 · captures overflow strict === 0 avec exceptions ciblées", 
   });
 });
 
+describe("Gate 8H · final-visual-evidence · isolation Coach A/B SYMÉTRIQUE avec enfants distincts", () => {
+  const wrapper = readRepo("scripts/test-final-visual-evidence-p1.mjs");
+  const orc = readRepo("scripts/orchestrate-final-visual-evidence-p1.ts");
+  const pkg = JSON.parse(readRepo("package.json"));
+
+  it("wrapper fail-closed + flags Coach P-1 injectés", () => {
+    expect(wrapper).toMatch(/MISSING P1_TEST_PASSWORD/);
+    expect(wrapper).toMatch(/MISSING SUPABASE_SERVICE_ROLE_KEY/);
+    expect(wrapper).toMatch(/YEMA_COACH_WORKSPACE_ENABLED:\s*"true"/);
+    expect(wrapper).toMatch(/YEMA_ROOTS_COACH_RLS_CONFIRMED:\s*"true"/);
+  });
+
+  it("npm scripts test:final-visual-evidence + capture branchés", () => {
+    expect(pkg.scripts["test:final-visual-evidence:p1"]).toBe("node scripts/test-final-visual-evidence-p1.mjs");
+    expect(pkg.scripts["capture:final-visual-evidence:p1"]).toBe("node scripts/capture-final-visual-evidence-p1.mjs");
+  });
+
+  it("orchestrateur crée 2 enfants Racines DISTINCTS (childAId + childBId)", () => {
+    expect(orc).toMatch(/childAId = `test_yema_qa_gate8h_child_a_/);
+    expect(orc).toMatch(/childBId = `test_yema_qa_gate8h_child_b_/);
+    expect(orc).toMatch(/prenom:\s*"TempRacinesA"/);
+    expect(orc).toMatch(/prenom:\s*"TempRacinesB"/);
+    expect(orc).toMatch(/universe:\s*"RACINES"/);
+  });
+
+  it("chaque enfant assigné à son propre Circle via CircleMembership CHILD", () => {
+    expect(orc).toMatch(/circleId: circleAId, childProfileId: childAId, role: "CHILD"/);
+    expect(orc).toMatch(/circleId: circleBId, childProfileId: childBId, role: "CHILD"/);
+  });
+
+  it("isolation SYMÉTRIQUE testée · Coach A voit A pas B", () => {
+    expect(orc).toMatch(/Coach A ne voit PAS TempRacinesA/);
+    expect(orc).toMatch(/Coach A voit TempRacinesB.*isolation cassée/);
+  });
+
+  it("isolation SYMÉTRIQUE testée · Coach B voit B pas A", () => {
+    expect(orc).toMatch(/Coach B ne voit PAS TempRacinesB/);
+    expect(orc).toMatch(/Coach B voit TempRacinesA.*isolation cassée/);
+    expect(orc).toMatch(/ISOLATION COACH A\/B SYMÉTRIQUE PROUVÉE ACTIVEMENT/);
+  });
+
+  it("cleanup finally · 5 niveaux (memberships + circles + children + households + users + auth)", () => {
+    expect(orc).toMatch(/childProfile\.deleteMany/);
+    expect(orc).toMatch(/circleMembership\.deleteMany/);
+    expect(orc).toMatch(/circle\.deleteMany/);
+    expect(orc).toMatch(/household\.deleteMany/);
+    expect(orc).toMatch(/user\.delete/);
+    expect(orc).toMatch(/admin\.auth\.admin\.deleteUser/);
+  });
+
+  it("relecture leak · 4 checks (users + children + circles + households)", () => {
+    expect(orc).toMatch(/leakUsers/);
+    expect(orc).toMatch(/leakChildren/);
+    expect(orc).toMatch(/leakCircles/);
+    expect(orc).toMatch(/leakHouseholds/);
+  });
+});
+
 describe("Gate 8G · final-evidence · Coach API ACTIF via flags + isolation Circle A/B", () => {
   const wrapper = readRepo("scripts/test-final-evidence-p1.mjs");
   const orc = readRepo("scripts/orchestrate-final-evidence-p1.ts");

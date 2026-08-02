@@ -35,6 +35,8 @@
     "capture:browser-signoff:p1": "node scripts/capture-browser-signoff-p1.mjs",
     "test:final-evidence:p1": "node scripts/test-final-evidence-p1.mjs",
     "capture:final-evidence:p1": "node scripts/capture-final-evidence-p1.mjs",
+    "test:final-visual-evidence:p1": "node scripts/test-final-visual-evidence-p1.mjs",
+    "capture:final-visual-evidence:p1": "node scripts/capture-final-visual-evidence-p1.mjs",
     "capture:personas:p1": "node scripts/capture-personas-p1.mjs",
     "seed": "tsx prisma/seed.ts"
   },
