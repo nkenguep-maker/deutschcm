@@ -44,6 +44,13 @@ const COPY = {
     prenomLbl: "Prénom",
     ageLbl: "Âge",
     animalLbl: "Animal",
+    // Gate 8B · sélecteur univers EXPLICITE · brief §1 · aucune inférence
+    // depuis la langue. Le parent choisit sciemment l'espace pédagogique.
+    universeLbl: "Quel espace souhaitez-vous créer pour cet enfant ?",
+    universeMondeLabel: "Monde",
+    universeMondeDesc: "apprendre une langue internationale",
+    universeRacinesLabel: "Racines",
+    universeRacinesDesc: "transmettre une langue patrimoniale",
     languesLbl: "Langues à écouter",
     nativeLbl: "Langues africaines",
     foreignLbl: "Langues du monde",
@@ -70,6 +77,7 @@ const COPY = {
     errAge: "Âge entre 3 et 12.",
     errAnimal: "Choisissez un animal.",
     errLang: "Choisissez au moins une langue.",
+    errUniverse: "Choisissez l'espace (Monde ou Racines).",
     errServer: "Impossible de créer le profil.",
   },
   en: {
@@ -86,6 +94,11 @@ const COPY = {
     prenomLbl: "First name",
     ageLbl: "Age",
     animalLbl: "Animal",
+    universeLbl: "Which learning space would you like to create for this child?",
+    universeMondeLabel: "Monde",
+    universeMondeDesc: "learn an international language",
+    universeRacinesLabel: "Roots",
+    universeRacinesDesc: "pass on a heritage language",
     languesLbl: "Languages to listen to",
     nativeLbl: "African languages",
     foreignLbl: "World languages",
@@ -110,6 +123,7 @@ const COPY = {
     errAge: "Age between 3 and 12.",
     errAnimal: "Pick an animal.",
     errLang: "Pick at least one language.",
+    errUniverse: "Pick the space (Monde or Roots).",
     errServer: "Could not create profile.",
   },
 };
@@ -233,6 +247,9 @@ function AddChildDialog({
   const [animal, setAnimal] = useState<AvatarAnimal>("chouette");
   const [natal, setNatal] = useState<string[]>([]);
   const [foreign, setForeign] = useState<string[]>([]);
+  // Gate 8B · univers explicite · aucune valeur par défaut · sélection
+  // obligatoire par le parent. Brief §1 · aucune inférence depuis la langue.
+  const [universe, setUniverse] = useState<"MONDE" | "RACINES" | null>(null);
   // Lot 7B.2 · parcours Monde optionnel · "LATER" = envoi null au serveur.
   const [goal, setGoal] = useState<"STUDIES" | "WORK" | "TRAVEL" | "EXAM" | "DAILY_LIFE" | "LATER">("LATER");
   const [err, setErr] = useState<string | null>(null);
@@ -250,20 +267,17 @@ function AddChildDialog({
     if (!prenom.trim()) return setErr(copy.errName);
     if (age < 3 || age > 12) return setErr(copy.errAge);
     if (!animal) return setErr(copy.errAnimal);
+    // Gate 8B · univers doit être choisi AVANT langue.
+    if (!universe) return setErr(copy.errUniverse);
     if (totalLangues === 0) return setErr(copy.errLang);
     setSubmitting(true);
     const langues = [
       ...natal.map((id) => ({ langue: id, type: "native" })),
       ...foreign.map((id) => ({ langue: id, type: "foreign" })),
     ];
-    // Lot 7B.2 · parcours envoyé uniquement pour enfant MONDE (foreign lang).
-    // "LATER" = null explicite · le back rejette toute valeur non canonique.
-    const learningGoal = foreign.length > 0 && goal !== "LATER" ? goal : null;
-    // Gate 8A · univers EXPLICITE envoyé au serveur (brief §1). Le client
-    // décide (ici depuis la présence d'une foreign lang), le serveur ne
-    // dérive JAMAIS depuis la langue. Une future UI pourra ajouter un
-    // sélecteur univers explicite · le contrat serveur reste le même.
-    const universe: "MONDE" | "RACINES" = foreign.length > 0 ? "MONDE" : "RACINES";
+    // Gate 8B · learningGoal Monde envoyé UNIQUEMENT si universe MONDE ·
+    // Racines force null (le serveur normalise mais le client est propre).
+    const learningGoal = universe === "MONDE" && goal !== "LATER" ? goal : null;
     try {
       const res = await fetch("/api/family/children", {
         method: "POST",
@@ -324,9 +338,39 @@ function AddChildDialog({
           </div>
         </div>
 
+        {/* Gate 8B · sélecteur univers EXPLICITE · brief §1 · aucune
+            valeur par défaut · le parent doit choisir sciemment. Placé
+            AVANT les langues pour éviter toute inférence implicite. */}
+        <div className="famille-field" data-universe-selector>
+          <span className="famille-field-lbl">{t(copy.universeLbl)}</span>
+          <div className="famille-lang-list" role="radiogroup" aria-label={copy.universeLbl}>
+            {([
+              { id: "MONDE" as const, label: copy.universeMondeLabel, desc: copy.universeMondeDesc },
+              { id: "RACINES" as const, label: copy.universeRacinesLabel, desc: copy.universeRacinesDesc },
+            ]).map((u) => {
+              const on = universe === u.id;
+              return (
+                <button
+                  key={u.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  className={`famille-lang-chip ${on ? "on" : ""}`}
+                  onClick={() => setUniverse(u.id)}
+                  style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "10px 14px" }}
+                >
+                  <span className="famille-lang-name" style={{ fontWeight: 600 }}>{u.label}</span>
+                  <span className="famille-lang-code" style={{ fontSize: 11, marginTop: 2 }}>{u.desc}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Langues : deux groupes distincts pour poser la nuance côté
             parent (natale = maison ; étrangère = découverte). Côté
-            enfant, la nuance disparaît (même monde chaleureux). */}
+            enfant, la nuance disparaît (même monde chaleureux).
+            Gate 8B · le choix de langue ne modifie JAMAIS universe. */}
         <div className="famille-field">
           <span className="famille-field-lbl">{t(copy.languesLbl)}</span>
           <p className="famille-help">{t(copy.languesHelp)}</p>
@@ -370,10 +414,10 @@ function AddChildDialog({
           </div>
         </div>
 
-        {/* Lot 7B.2 · parcours Monde · visible UNIQUEMENT si l'enfant a
-            au moins une langue du monde (foreign) · Racines n'affiche
+        {/* Gate 8B · parcours Monde · visible UNIQUEMENT si universe MONDE
+            (JAMAIS déduit de la langue · brief §1). Racines n'affiche
             jamais ce sélecteur. */}
-        {foreign.length > 0 ? (
+        {universe === "MONDE" ? (
           <div className="famille-field" data-goal-field>
             <span className="famille-field-lbl">{t(copy.goalLbl)}</span>
             <p className="famille-help">{t(copy.goalHelp)}</p>
@@ -400,7 +444,14 @@ function AddChildDialog({
         {err ? <p className="famille-err" role="alert">{err}</p> : null}
         <div className="famille-dialog-actions">
           <button type="button" className="famille-btn ghost" onClick={onCancel}>{copy.cancel}</button>
-          <button type="button" className="famille-btn primary" onClick={submit} disabled={submitting}>
+          <button
+            type="button"
+            className="famille-btn primary"
+            onClick={submit}
+            /* Gate 8B · submit désactivé tant qu'universe n'est pas choisi
+               (brief §1 · aucune valeur par défaut). */
+            disabled={submitting || !universe}
+          >
             {copy.create}
           </button>
         </div>

@@ -456,12 +456,12 @@ describe("Lot 7B.2 · AddChildDialog · sélecteur parcours conditionnel MONDE",
     }
   });
 
-  it("sélecteur conditionnel · rendu uniquement si foreign.length > 0", () => {
-    expect(src).toMatch(/foreign\.length > 0[\s\S]*?data-goal-field/);
+  it("sélecteur parcours conditionnel · Gate 8B · basé sur universe === MONDE (plus sur foreign)", () => {
+    expect(src).toMatch(/universe === "MONDE" \?\s*\(\s*<div className="famille-field" data-goal-field/);
   });
 
-  it("LATER envoie null au serveur · aucun envoi pour Racines", () => {
-    expect(src).toMatch(/const learningGoal = foreign\.length > 0 && goal !== "LATER" \? goal : null/);
+  it("LATER envoie null au serveur · Gate 8B · learningGoal basé sur universe MONDE", () => {
+    expect(src).toMatch(/const learningGoal = universe === "MONDE" && goal !== "LATER" \? goal : null/);
   });
 
   it("POST body inclut learningGoal", () => {
