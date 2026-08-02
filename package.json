@@ -25,6 +25,8 @@
     "test:personas:p1": "node scripts/test-personas-p1.mjs",
     "test:entitlements:p1": "node scripts/test-entitlements-p1.mjs",
     "test:roots-adult-seats:p1": "tsx scripts/test-roots-adult-seats-p1.ts",
+    "test:deployment-readiness:p1": "node scripts/test-deployment-readiness-p1.mjs",
+    "capture:deployment-readiness:p1": "node scripts/capture-deployment-readiness-p1.mjs",
     "capture:personas:p1": "node scripts/capture-personas-p1.mjs",
     "seed": "tsx prisma/seed.ts"
   },

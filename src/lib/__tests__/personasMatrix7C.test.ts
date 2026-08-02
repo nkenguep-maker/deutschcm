@@ -378,6 +378,62 @@ describe("Lot 7C.2 · captures overflow strict === 0 avec exceptions ciblées", 
   });
 });
 
+describe("Gate 8C · deployment-readiness · Coach isolation + Super Admin audio", () => {
+  const wrapper = readRepo("scripts/test-deployment-readiness-p1.mjs");
+  const orc = readRepo("scripts/orchestrate-deployment-readiness-p1.ts");
+  const pkg = JSON.parse(readRepo("package.json"));
+
+  it("wrapper fail-closed · exige P1_TEST_PASSWORD + SUPABASE_SERVICE_ROLE_KEY", () => {
+    expect(wrapper).toMatch(/MISSING P1_TEST_PASSWORD/);
+    expect(wrapper).toMatch(/MISSING SUPABASE_SERVICE_ROLE_KEY/);
+    expect(wrapper).toMatch(/kzzagbojjkivdzzcrmxn/);
+  });
+
+  it("npm script test:deployment-readiness:p1 branché", () => {
+    expect(pkg.scripts["test:deployment-readiness:p1"]).toBe("node scripts/test-deployment-readiness-p1.mjs");
+  });
+
+  it("npm script capture:deployment-readiness:p1 branché", () => {
+    expect(pkg.scripts["capture:deployment-readiness:p1"]).toBe("node scripts/capture-deployment-readiness-p1.mjs");
+  });
+
+  it("orchestrateur teste Coach A isolation (Teacher + Family refusés)", () => {
+    expect(orc).toMatch(/Coach A isolation active/);
+    expect(orc).toMatch(/Coach access Teacher · isolation cassée/);
+    expect(orc).toMatch(/Coach access Family · isolation cassée/);
+  });
+
+  it("orchestrateur teste Super Admin refus playback pédagogique", () => {
+    expect(orc).toMatch(/Super Admin refus playback pédagogique/);
+    expect(orc).toMatch(/api\/messaging\/audio\/\$\{existingAsset\.id\}\/playback/);
+    expect(orc).toMatch(/aucune signed URL\/storageKey/);
+  });
+
+  it("orchestrateur vérifie exhaustivement forbidden fields dans la réponse Super Admin", () => {
+    expect(orc).toMatch(/forbiddenFields = \["url", "storageKey", "storage_key", "bucket", "body", "transcript"\]/);
+  });
+});
+
+describe("Gate 8C · playback route enforce Super Admin non-participant pédagogique", () => {
+  const route = readRepo("src/app/api/messaging/audio/[audioAssetId]/playback/route.ts");
+
+  it("participant check strict avant playback (return notFound si non participant)", () => {
+    expect(route).toMatch(/if \(!participant\)/);
+    expect(route).toMatch(/return notFound\(\)/);
+  });
+
+  it("Super Admin explicitement refusé sur conversations pédagogiques (defense-in-depth)", () => {
+    expect(route).toMatch(/super_admin_pedagogical_forbidden/);
+    expect(route).toMatch(/allowed:\s*readonly string\[\] = \["CENTER_PLATFORM_SUPPORT", "PLATFORM_BROADCAST"\]/);
+  });
+
+  it("audit log MESSAGE_AUDIO_ACCESS_DENIED avec reasonCode", () => {
+    expect(route).toMatch(/MESSAGE_AUDIO_ACCESS_DENIED/);
+    expect(route).toMatch(/reasonCode:\s*"not_participant"/);
+    expect(route).toMatch(/reasonCode:\s*"super_admin_pedagogical_forbidden"/);
+  });
+});
+
 describe("Gate 8B · sélecteur univers EXPLICITE dans AddChildDialog (brief §1)", () => {
   const src = readRepo("src/app/[locale]/famille/page.tsx");
 
