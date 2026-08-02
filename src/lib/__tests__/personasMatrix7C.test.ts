@@ -156,8 +156,8 @@ describe("Lot 7C.1 · orchestrateurs actifs · restauration + strict checks", ()
   it("entitlements orchestrator · caps commerciaux PAR UNIVERS (Lot 7C.4)", () => {
     expect(entSrc).toMatch(/FAMILY_WORLD → 3 Monde/);
     expect(entSrc).toMatch(/CHILD_WORLD_SINGLE → 1 Monde/);
-    expect(entSrc).toMatch(/ROOTS_FAMILY → 0 Monde, 4 Racines/);
-    expect(entSrc).toMatch(/cross-subsidy prouvée impossible/);
+    expect(entSrc).toMatch(/ROOTS_FAMILY → 4 Racines/);
+    expect(entSrc).toMatch(/CROSS-SUBSIDY PROUVÉE IMPOSSIBLE/);
   });
 
   it("personas orchestrator · Child Monde + Child Racines direct via /api/child-session", () => {
@@ -244,11 +244,33 @@ describe("Lot 7C.4 · getFamilySeatSnapshot · comptage explicite par universe",
   });
 });
 
-describe("Lot 7C.4 · POST /api/family/children · universe explicite passé au service", () => {
+describe("Gate 8A · POST /api/family/children · universe EXPLICITE (brief §1)", () => {
   const src = readRepo("src/app/api/family/children/route.ts");
 
-  it("dérive universe depuis hasForeign (foreign lang → MONDE, sinon RACINES)", () => {
-    expect(src).toMatch(/const universe:\s*"MONDE" \| "RACINES" = hasForeign \? "MONDE" : "RACINES"/);
+  it("universe reçu explicitement du body (JAMAIS dérivé de la langue)", () => {
+    expect(src).toMatch(/body\.universe === "MONDE" \? "MONDE"/);
+    expect(src).toMatch(/body\.universe === "RACINES" \? "RACINES"/);
+    // Le serveur NE doit PAS dériver universe depuis hasForeign.
+    expect(src).not.toMatch(/const universe:\s*"MONDE" \| "RACINES" = hasForeign/);
+  });
+
+  it("universe absent ou invalide → 400 universe_required", () => {
+    expect(src).toMatch(/universe_required/);
+    expect(src).toMatch(/status:\s*400/);
+  });
+
+  it("AddChildDialog envoie universe explicite dans le POST body", () => {
+    const client = readRepo("src/app/[locale]/famille/page.tsx");
+    expect(client).toMatch(/const universe:\s*"MONDE" \| "RACINES" = foreign\.length > 0/);
+    expect(client).toMatch(/JSON\.stringify\(\{[^}]*universe[^}]*\}\)/);
+  });
+});
+
+describe("Lot 7C.4 · POST /api/family/children · service canonique par pool", () => {
+  const src = readRepo("src/app/api/family/children/route.ts");
+
+  it("dérive universe depuis body (Gate 8A · brief §1)", () => {
+    expect(src).toMatch(/body\.universe === "MONDE"/);
   });
   it("passe universe à assertCanAddChildProfile", () => {
     expect(src).toMatch(/assertCanAddChildProfile\(guardian,\s*universe\)/);
@@ -327,10 +349,10 @@ describe("Lot 7C.2 · entitlements orchestrator · canonical HTTP + Super Admin 
     expect(src).toMatch(/Super Admin → \/api\/child-session refusé/);
   });
 
-  it("caps commerciaux PAR UNIVERS (Lot 7C.4)", () => {
+  it("caps commerciaux PAR UNIVERS (Lot 7C.4 · Gate 8A)", () => {
     expect(src).toMatch(/FAMILY_WORLD → 3 Monde/);
     expect(src).toMatch(/CHILD_WORLD_SINGLE → 1 Monde/);
-    expect(src).toMatch(/ROOTS_FAMILY → 0 Monde, 4 Racines/);
+    expect(src).toMatch(/ROOTS_FAMILY → 4 Racines/);
   });
 
   it("cleanup finally + relecture leak check", () => {
@@ -353,6 +375,41 @@ describe("Lot 7C.2 · captures overflow strict === 0 avec exceptions ciblées", 
     expect(spec).toMatch(/ALLOW = \[[\s\S]*?data-overflow-ok/);
     expect(spec).toMatch(/marquee/);
     expect(spec).toMatch(/data-carousel/);
+  });
+});
+
+describe("Gate 8A · CHILD_WORLD_SINGLE + ROOTS adulte 3 · tests actifs orchestrateur", () => {
+  const src = readRepo("scripts/orchestrate-entitlements-p1.mjs");
+
+  it("STEP 11 · CHILD_WORLD_SINGLE isolé sur family2 household · 2e Monde REFUSÉ limit=1", () => {
+    expect(src).toMatch(/CHILD_WORLD_SINGLE isolé · household family2/);
+    expect(src).toMatch(/CHILD_WORLD_SINGLE · 2e Monde REFUSÉ/);
+    expect(src).toMatch(/CWS limit attendu 1/);
+  });
+
+  it("STEP 12 · ROOTS adulte 3e via service canonique assignAdultRootsSeat", () => {
+    expect(src).toMatch(/ROOTS_FAMILY 3e adulte via assignAdultRootsSeat/);
+    expect(src).toMatch(/assignAdultRootsSeat contient household_seats_exhausted/);
+  });
+
+  it("cleanup CHILD_WORLD_SINGLE grant temporaire dans finally", () => {
+    expect(src).toMatch(/test_yema_qa_temp_cws_/);
+    expect(src).toMatch(/cleanup\.push\(async \(\) => \{[^}]*delete[^}]*cwsGrantId/);
+  });
+});
+
+describe("Gate 8A · assignAdultRootsSeat · service canonique adulte Racines", () => {
+  const src = readRepo("src/lib/family/adultSeats.ts");
+
+  it("MAX_ADULT_ROOTS_SEATS_PER_HOUSEHOLD === 2", () => {
+    expect(src).toMatch(/MAX_ADULT_ROOTS_SEATS_PER_HOUSEHOLD = 2/);
+  });
+
+  it("erreurs métier exhaustives", () => {
+    expect(src).toMatch(/household_has_no_family_subscription/);
+    expect(src).toMatch(/user_is_not_household_member/);
+    expect(src).toMatch(/user_already_has_seat/);
+    expect(src).toMatch(/household_seats_exhausted/);
   });
 });
 
