@@ -378,6 +378,96 @@ describe("Lot 7C.2 · captures overflow strict === 0 avec exceptions ciblées", 
   });
 });
 
+describe("Gate 8E · final-production-signoff · dual context + Coach Circles isolation", () => {
+  const wrapper = readRepo("scripts/test-final-production-signoff-p1.mjs");
+  const orc = readRepo("scripts/orchestrate-final-production-signoff-p1.ts");
+  const pkg = JSON.parse(readRepo("package.json"));
+
+  it("wrapper fail-closed · exige P1_TEST_PASSWORD + SUPABASE_SERVICE_ROLE_KEY", () => {
+    expect(wrapper).toMatch(/MISSING P1_TEST_PASSWORD/);
+    expect(wrapper).toMatch(/MISSING SUPABASE_SERVICE_ROLE_KEY/);
+    expect(wrapper).toMatch(/kzzagbojjkivdzzcrmxn/);
+  });
+
+  it("npm scripts test:final-production-signoff:p1 + capture branchés", () => {
+    expect(pkg.scripts["test:final-production-signoff:p1"]).toBe("node scripts/test-final-production-signoff-p1.mjs");
+    expect(pkg.scripts["capture:final-production-signoff:p1"]).toBe("node scripts/capture-final-production-signoff-p1.mjs");
+  });
+
+  it("dual context · PASSAGE grant temp + LearningPath adulte temp", () => {
+    expect(orc).toMatch(/dual context · Family QA \+ PASSAGE \+ LearningPath temp/);
+    expect(orc).toMatch(/db\.accessGrant\.create/);
+    expect(orc).toMatch(/db\.learningPath\.create/);
+    expect(orc).toMatch(/universe:\s*"MONDE"/);
+  });
+
+  it("navigation route-based (aucun SpaceSwitcher) · /fr/famille + /fr/dashboard", () => {
+    expect(orc).toMatch(/aucun SpaceSwitcher/);
+    expect(orc).toMatch(/\/fr\/famille/);
+    expect(orc).toMatch(/\/fr\/dashboard/);
+  });
+
+  it("retrait PASSAGE · Family reste accessible (test enforce)", () => {
+    expect(orc).toMatch(/retrait PASSAGE · comportement canonique/);
+    expect(orc).toMatch(/Family reste accessible après retrait/);
+  });
+
+  it("Coach model canonical via CircleMembership role=COACH", () => {
+    expect(orc).toMatch(/CircleMembership/);
+    expect(orc).toMatch(/role:\s*"COACH"/);
+    expect(orc).toMatch(/role:\s*"CHILD"/);
+    expect(orc).toMatch(/status:\s*"ACTIVE"/);
+  });
+
+  it("Coach A/B provisionnés avec Circles distincts (WOLOF + SWAHILI)", () => {
+    expect(orc).toMatch(/circleAId = `test_yema_qa_gate8e_circle_a_/);
+    expect(orc).toMatch(/circleBId = `test_yema_qa_gate8e_circle_b_/);
+    expect(orc).toMatch(/language:\s*"WOLOF"/);
+    expect(orc).toMatch(/language:\s*"SWAHILI"/);
+  });
+
+  it("Aïcha (Racines existant) assignée comme CHILD au Circle A", () => {
+    expect(orc).toMatch(/childProfileId:\s*"test_yema_qa_child_family_racines"/);
+  });
+
+  it("isolation active · Coach A refusé Teacher/Family + non-cross-Coach", () => {
+    expect(orc).toMatch(/Coach A refusé sur Teacher/);
+    expect(orc).toMatch(/Coach B voit Aïcha \(Circle A\) · isolation cassée/);
+  });
+
+  it("cleanup finally · Circles + CircleMembership + Auth admin deleteUser", () => {
+    expect(orc).toMatch(/circleMembership\.deleteMany/);
+    expect(orc).toMatch(/circle\.delete/);
+    expect(orc).toMatch(/leakCircles/);
+    expect(orc).toMatch(/admin\.auth\.admin\.deleteUser/);
+  });
+
+  it("YEMA_COACH_WORKSPACE_ENABLED activé dans env spawn (feature flag)", () => {
+    expect(orc).toMatch(/YEMA_COACH_WORKSPACE_ENABLED:\s*"true"/);
+  });
+});
+
+describe("Gate 8E · Coach model reality-check · CircleMembership canonique v1", () => {
+  const schema = readRepo("prisma/schema.prisma");
+  const dashSrc = readRepo("src/features/dashboards/coach-racines/CoachRacinesDashboard.tsx");
+
+  it("CircleMembership.role enum inclut COACH", () => {
+    expect(schema).toMatch(/enum CircleRole \{[\s\S]*?COACH[\s\S]*?\}/);
+  });
+
+  it("Circle model rattaché à Household + language + status ACTIVE", () => {
+    // Schema Prisma · Circle model avec 3 champs canoniques.
+    expect(schema).toMatch(/model Circle \{/);
+    expect(schema).toMatch(/householdId\s+String/);
+    expect(schema).toMatch(/language\s+LanguageCode/);
+    expect(schema).toMatch(/status\s+CircleStatus/);
+  });
+
+  it("CoachRacinesDashboard existe et rend une liste de learners", () => {
+    expect(dashSrc).toMatch(/learners/i);
+  });
+});
+
 describe("Gate 8D · final-deployment-e2e · Coach A/B provisioning + isolation active", () => {
   const wrapper = readRepo("scripts/test-final-deployment-e2e-p1.mjs");
   const orc = readRepo("scripts/orchestrate-final-deployment-e2e-p1.ts");
