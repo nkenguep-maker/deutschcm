@@ -9,8 +9,6 @@
 // surface principale. Le mini-lot Gate 8E dedie captures ciblees
 // finales peut etre planifie post-deploy Production initial.
 
-import { spawn } from "node:child_process";
-
 const P1_REF = "kzzagbojjkivdzzcrmxn";
 const BLOCKED = new Set(["sbjhvlrkbyjckdxujjsk", "mamofhrurksyuuolucea", "qggwvonfumuimjfsgpdz"]);
 

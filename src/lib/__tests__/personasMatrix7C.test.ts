@@ -378,6 +378,78 @@ describe("Lot 7C.2 · captures overflow strict === 0 avec exceptions ciblées", 
   });
 });
 
+describe("Gate 8G · final-evidence · Coach API ACTIF via flags + isolation Circle A/B", () => {
+  const wrapper = readRepo("scripts/test-final-evidence-p1.mjs");
+  const orc = readRepo("scripts/orchestrate-final-evidence-p1.ts");
+  const pkg = JSON.parse(readRepo("package.json"));
+
+  it("wrapper injecte YEMA_COACH_WORKSPACE_ENABLED + YEMA_ROOTS_COACH_RLS_CONFIRMED", () => {
+    expect(wrapper).toMatch(/YEMA_COACH_WORKSPACE_ENABLED:\s*"true"/);
+    expect(wrapper).toMatch(/YEMA_ROOTS_COACH_RLS_CONFIRMED:\s*"true"/);
+  });
+
+  it("wrapper bypass run-p4-5-b2 allowlist strict · direct tsx (flags Coach requis)", () => {
+    // Le wrapper contient un commentaire mentionnant run-p4-5-b2 pour
+    // documenter le bypass · mais NE l'invoque PAS via spawn.
+    expect(wrapper).toMatch(/spawn\("npx", \["tsx", "scripts\/orchestrate-final-evidence-p1\.ts"\]/);
+    expect(wrapper).toMatch(/Bypass run-p4-5-b2-p1\.mjs allowlist/);
+  });
+
+  it("npm scripts test:final-evidence:p1 + capture branchés", () => {
+    expect(pkg.scripts["test:final-evidence:p1"]).toBe("node scripts/test-final-evidence-p1.mjs");
+    expect(pkg.scripts["capture:final-evidence:p1"]).toBe("node scripts/capture-final-evidence-p1.mjs");
+  });
+
+  it("orchestrator vérifie flags Coach obligatoires (fail-closed)", () => {
+    expect(orc).toMatch(/YEMA_COACH_WORKSPACE_ENABLED != true/);
+    expect(orc).toMatch(/YEMA_ROOTS_COACH_RLS_CONFIRMED != true/);
+  });
+
+  it("orchestrator provisionne 2 households TEMP + 2 Circles distincts (WOLOF + SWAHILI)", () => {
+    expect(orc).toMatch(/householdAId = `test_yema_qa_gate8g_hh_a_/);
+    expect(orc).toMatch(/householdBId = `test_yema_qa_gate8g_hh_b_/);
+    expect(orc).toMatch(/language:\s*"WOLOF"/);
+    expect(orc).toMatch(/language:\s*"SWAHILI"/);
+  });
+
+  it("orchestrator teste API /api/roots-coach/profiles 200 · Aicha visible Coach A", () => {
+    expect(orc).toMatch(/\/api\/roots-coach\/profiles/);
+    expect(orc).toMatch(/Coach A voit Aicha \(Circle A CHILD\)/);
+  });
+
+  it("orchestrator teste isolation · Coach B ne voit PAS Aicha (Circle A)", () => {
+    expect(orc).toMatch(/Coach B NE voit PAS Aicha/);
+    expect(orc).toMatch(/isolation Circle A\/B prouvée/);
+  });
+
+  it("orchestrator teste cross-household · Coach ne voit pas Family QA enfants", () => {
+    expect(orc).toMatch(/isolation cross-household cassée/);
+    expect(orc).toMatch(/aucun leak QA/);
+  });
+
+  it("orchestrator cleanup households + circles + memberships + users + Auth", () => {
+    expect(orc).toMatch(/householdMembership\.deleteMany/);
+    expect(orc).toMatch(/household\.deleteMany/);
+    expect(orc).toMatch(/circleMembership\.deleteMany/);
+    expect(orc).toMatch(/admin\.auth\.admin\.deleteUser/);
+  });
+});
+
+describe("Gate 8G · lint fix · spawn unused imports removed from capture wrappers", () => {
+  it("capture-deployment-readiness-p1.mjs · no spawn import", () => {
+    const src = readRepo("scripts/capture-deployment-readiness-p1.mjs");
+    expect(src).not.toMatch(/import \{ spawn \}/);
+  });
+  it("capture-final-deployment-e2e-p1.mjs · no spawn import", () => {
+    const src = readRepo("scripts/capture-final-deployment-e2e-p1.mjs");
+    expect(src).not.toMatch(/import \{ spawn \}/);
+  });
+  it("capture-final-production-signoff-p1.mjs · no spawn import", () => {
+    const src = readRepo("scripts/capture-final-production-signoff-p1.mjs");
+    expect(src).not.toMatch(/import \{ spawn \}/);
+  });
+});
+
 describe("Gate 8F · browser-signoff · Playwright chromium réel dual context", () => {
   const wrapper = readRepo("scripts/test-browser-signoff-p1.mjs");
   const orc = readRepo("scripts/orchestrate-browser-signoff-p1.ts");

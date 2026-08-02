@@ -9,8 +9,6 @@
 // des specs supplementaires targeted uniquement si necessaire.
 // Voir tests/e2e/personas et tests/e2e/monde-context deja produites.
 
-import { spawn } from "node:child_process";
-
 const P1_REF = "kzzagbojjkivdzzcrmxn";
 const BLOCKED = new Set(["sbjhvlrkbyjckdxujjsk", "mamofhrurksyuuolucea", "qggwvonfumuimjfsgpdz"]);
 

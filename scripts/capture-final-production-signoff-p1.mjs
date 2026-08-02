@@ -2,8 +2,6 @@
 // Gate 8E · wrapper npm run capture:final-production-signoff:p1.
 // Delegation aux captures existantes (54 PNG cumules).
 
-import { spawn } from "node:child_process";
-
 const P1_REF = "kzzagbojjkivdzzcrmxn";
 const BLOCKED = new Set(["sbjhvlrkbyjckdxujjsk", "mamofhrurksyuuolucea", "qggwvonfumuimjfsgpdz"]);
 
