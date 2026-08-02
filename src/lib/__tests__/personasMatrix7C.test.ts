@@ -378,6 +378,59 @@ describe("Lot 7C.2 · captures overflow strict === 0 avec exceptions ciblées", 
   });
 });
 
+describe("Gate 8F · browser-signoff · Playwright chromium réel dual context", () => {
+  const wrapper = readRepo("scripts/test-browser-signoff-p1.mjs");
+  const orc = readRepo("scripts/orchestrate-browser-signoff-p1.ts");
+  const spec = readRepo("tests/e2e/browser-signoff/dual-context.spec.ts");
+  const pkg = JSON.parse(readRepo("package.json"));
+
+  it("wrapper fail-closed · exige P1_TEST_PASSWORD + SUPABASE_SERVICE_ROLE_KEY", () => {
+    expect(wrapper).toMatch(/MISSING P1_TEST_PASSWORD/);
+    expect(wrapper).toMatch(/MISSING SUPABASE_SERVICE_ROLE_KEY/);
+    expect(wrapper).toMatch(/kzzagbojjkivdzzcrmxn/);
+  });
+
+  it("npm scripts test:browser-signoff:p1 + capture branchés", () => {
+    expect(pkg.scripts["test:browser-signoff:p1"]).toBe("node scripts/test-browser-signoff-p1.mjs");
+    expect(pkg.scripts["capture:browser-signoff:p1"]).toBe("node scripts/capture-browser-signoff-p1.mjs");
+  });
+
+  it("orchestrateur provisionne PASSAGE + LP adulte temp + cleanup finally", () => {
+    expect(orc).toMatch(/PASSAGE \+ LearningPath adulte MONDE temp/);
+    expect(orc).toMatch(/db\.accessGrant\.create/);
+    expect(orc).toMatch(/db\.learningPath\.create/);
+    expect(orc).toMatch(/cleanup\.push/);
+  });
+
+  it("orchestrateur lance Playwright chromium réel (pas fetch)", () => {
+    expect(orc).toMatch(/playwright.*test.*--config.*playwright\.browser-signoff\.config\.ts/);
+    expect(orc).toMatch(/YEMA_DASHBOARD_REDESIGN_ENABLED/);
+  });
+
+  it("spec Playwright utilise page.goto + waitForLoadState (chromium réel)", () => {
+    expect(spec).toMatch(/page\.goto/);
+    expect(spec).toMatch(/waitForLoadState/);
+    expect(spec).not.toMatch(/^\s*fetch\(/m);
+  });
+
+  it("spec vérifie DOM · noms enfants présents Family et ABSENTS dashboard adulte", () => {
+    expect(spec).toMatch(/Family shows children names/);
+    expect(spec).toMatch(/Adult dashboard sans noms enfants/);
+    expect(spec).toMatch(/not\.toMatch\(\/Lina\|Malik\|Aïcha\//);
+  });
+
+  it("spec produit MANIFEST avec h1Count + overflowCount + result", () => {
+    expect(spec).toMatch(/h1Count\\toverflowCount\\tresult/);
+    expect(spec).toMatch(/captureAndRecord/);
+  });
+
+  it("cleanup finally · leak check grants temp Gate 8F", () => {
+    expect(orc).toMatch(/gate8f_/);
+    expect(orc).toMatch(/leak/);
+    expect(orc).toMatch(/aucun résidu/);
+  });
+});
+
 describe("Gate 8E · final-production-signoff · dual context + Coach Circles isolation", () => {
   const wrapper = readRepo("scripts/test-final-production-signoff-p1.mjs");
   const orc = readRepo("scripts/orchestrate-final-production-signoff-p1.ts");
