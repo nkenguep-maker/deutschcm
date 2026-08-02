@@ -1142,6 +1142,43 @@ describe("Gate 8L · final runtime assertions · logout UI réel + manifest dedu
     expect(spec).toMatch(/aucune messagerie/);
     expect(spec).toMatch(/REALITY-CHECK/);
   });
+
+  it("Gate 8L+ · Coach A/B assertions DOM · count=1 + data-circle-language WOLOF/SWAHILI", () => {
+    expect(spec).toMatch(/GATE8L_COACH_A_EMAIL[\s\S]*WOLOF/);
+    expect(spec).toMatch(/GATE8L_COACH_B_EMAIL[\s\S]*SWAHILI/);
+    expect(spec).toMatch(/data-testid=coach-learner-card/);
+    expect(spec).toMatch(/data-circle-language/);
+  });
+
+  it("Gate 8L+ · Retour /famille · Coach API NOT called + Family API called ≥1×", () => {
+    expect(spec).toMatch(/\/fr\/famille/);
+    expect(spec).toMatch(/Coach API NOT called sur \/famille/);
+    expect(spec).toMatch(/Family API appelée au moins 1×/);
+  });
+
+  it("Gate 8L+ · Child Messages route reality · /messages accessible avec cookie enfant", () => {
+    expect(spec).toMatch(/Child MONDE · \/messages accessible avec session enfant/);
+    expect(spec).toMatch(/pas de 500/);
+    expect(spec).toMatch(/pas de 404 · route livrée/);
+  });
+
+  it("Gate 8L+ · Manifest verification post-write · entries/duplicates/missingPng/invalidRows", () => {
+    expect(spec).toMatch(/MANIFEST_VERIFY\.txt/);
+    expect(spec).toMatch(/entries === uniqueFilenames/);
+    expect(spec).toMatch(/duplicates === 0/);
+    expect(spec).toMatch(/missingPng === 0/);
+    expect(spec).toMatch(/invalidRows === 0/);
+  });
+
+  it("Gate 8L+ · Orchestrator provisions Coach A/B temp + WOLOF/SWAHILI Circles + cleanup finally", () => {
+    expect(orch).toMatch(/temp_gate8l_coach_a/);
+    expect(orch).toMatch(/temp_gate8l_coach_b/);
+    expect(orch).toMatch(/language: "WOLOF"/);
+    expect(orch).toMatch(/language: "SWAHILI"/);
+    expect(orch).toMatch(/GATE8L_COACH_A_EMAIL/);
+    expect(orch).toMatch(/GATE8L_COACH_B_EMAIL/);
+    expect(orch).toMatch(/leakUsers[\s\S]*temp_gate8l_/);
+  });
 });
 
 describe("Lot 7C · non-régression · Lots précédents intacts", () => {
