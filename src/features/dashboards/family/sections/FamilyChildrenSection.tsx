@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import {
-  DashboardButtonLink,
   DashboardCard,
   DashboardEmptyState,
   DashboardSectionHeader,
@@ -10,16 +9,20 @@ import {
 } from "@/features/dashboards/shared";
 import type { FamilyChildRow, FamilyDashboardResponse } from "../types";
 import { FamilyMondeChildCard } from "@/features/dashboards/monde-context";
+import { FamilyChildActions, type FamilyChildActionsCopy } from "../FamilyChildActions";
+import type { AvatarAnimal } from "@/components/famille/AnimalAvatar";
 
 type Props = {
   data: FamilyDashboardResponse;
   baseHref: string;
+  locale: "fr" | "en";
+  actionsCopy: FamilyChildActionsCopy;
 };
 
 // Ma famille · brief §6 : cartes enfant avec prénom (jamais d'ID brut),
 // univers dérivé de la langue active, statut PIN, action ouvrir. CTA
 // « ajouter un enfant » uniquement si canAddChild.
-export function FamilyChildrenSection({ data, baseHref }: Props) {
+export function FamilyChildrenSection({ data, locale, actionsCopy }: Props) {
   const t = useTranslations("yemaDashboards.family.children");
 
   const totalSeats = data.seats.reduce((n, s) => n + s.seatsTotal, 0);
@@ -45,9 +48,7 @@ export function FamilyChildrenSection({ data, baseHref }: Props) {
             title={t("empty")}
             action={
               data.canAddChild ? (
-                <DashboardButtonLink variant="primary" href={`${baseHref}/children/new`}>
-                  {t("addChild")}
-                </DashboardButtonLink>
+                <FamilyChildActions locale={locale} copy={actionsCopy} canAddChild={true} slot="add" />
               ) : (
                 <DashboardStatusChip tone="alert">{t("noSeat")}</DashboardStatusChip>
               )
@@ -57,17 +58,28 @@ export function FamilyChildrenSection({ data, baseHref }: Props) {
       ) : (
         <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }}>
           {data.children.map((c) => (
-            <li key={c.id}>
-              <ChildCard child={c} baseHref={baseHref} openLabel={t("openChild")} pinYes={t("hasPinYes")} pinNo={t("hasPinNo")} />
+            <li key={c.id} data-testid="family-child-card">
+              <ChildCard
+                child={c}
+                pinYes={t("hasPinYes")}
+                pinNo={t("hasPinNo")}
+                actionsSlot={
+                  <FamilyChildActions
+                    locale={locale}
+                    copy={actionsCopy}
+                    canAddChild={data.canAddChild}
+                    slot="child"
+                    child={{ id: c.id, prenom: c.prenom, avatarAnimal: c.avatarAnimal as AvatarAnimal }}
+                  />
+                }
+              />
             </li>
           ))}
           {data.canAddChild ? (
             <li>
               <DashboardCard tone="surface-2">
                 <div style={{ display: "flex", justifyContent: "center" }}>
-                  <DashboardButtonLink variant="secondary" href={`${baseHref}/children/new`}>
-                    + {t("addChild")}
-                  </DashboardButtonLink>
+                  <FamilyChildActions locale={locale} copy={actionsCopy} canAddChild={true} slot="add" />
                 </div>
               </DashboardCard>
             </li>
@@ -80,16 +92,14 @@ export function FamilyChildrenSection({ data, baseHref }: Props) {
 
 function ChildCard({
   child,
-  baseHref,
-  openLabel,
   pinYes,
   pinNo,
+  actionsSlot,
 }: {
   child: FamilyChildRow;
-  baseHref: string;
-  openLabel: string;
   pinYes: string;
   pinNo: string;
+  actionsSlot: React.ReactNode;
 }) {
   return (
     <DashboardCard>
@@ -124,23 +134,7 @@ function ChildCard({
             </DashboardStatusChip>
           </div>
         </div>
-        <a
-          href={`${baseHref}/children/${child.id}`}
-          style={{
-            fontSize: 12,
-            color: "var(--yema-gold-light)",
-            textDecoration: "none",
-            padding: "8px 14px",
-            borderRadius: "var(--yema-r-pill)",
-            border: "1px solid var(--yema-gold-edge)",
-            minHeight: 36,
-            display: "inline-flex",
-            alignItems: "center",
-            flexShrink: 0,
-          }}
-        >
-          {openLabel}
-        </a>
+        {actionsSlot}
       </div>
       {/* Lot 7B · contexte Monde Ivoire · UNIQUEMENT quand universe est
           explicitement MONDE. universe null / RACINES · aucun ivory

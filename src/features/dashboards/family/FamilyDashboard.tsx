@@ -28,6 +28,7 @@ import { FamilyMessagesSection } from "./sections/FamilyMessagesSection";
 import { FamilyPaymentsSection } from "./sections/FamilyPaymentsSection";
 import { FamilySettingsSection } from "./sections/FamilySettingsSection";
 import type { FamilyDashboardResponse } from "./types";
+import type { FamilyChildActionsCopy } from "./FamilyChildActions";
 
 async function fetchDashboard(): Promise<FamilyDashboardResponse> {
   const res = await fetch("/api/family/dashboard", { cache: "no-store" });
@@ -43,10 +44,56 @@ type LoadState =
 export function FamilyDashboard({ locale }: { locale: "fr" | "en" }) {
   const t = useTranslations("yemaDashboards.family");
   const tCommon = useTranslations("yemaDashboards.common");
+  const tActions = useTranslations("yemaDashboards.family.actions");
+  const tAdd = useTranslations("yemaDashboards.family.addDialog");
   const currentLocale = useLocale();
   const [state, setState] = useState<LoadState>({ kind: "loading" });
 
   const baseHref = `/${currentLocale ?? locale}/family`;
+
+  const actionsCopy: FamilyChildActionsCopy = {
+    openChildSpace: tActions("openChildSpace"),
+    addChild: tActions("addChild"),
+    childPinTitle: tActions("childPinTitle"),
+    childPinLabel: tActions("childPinLabel"),
+    childPinPlaceholder: tActions("childPinPlaceholder"),
+    childPinSubmit: tActions("childPinSubmit"),
+    childPinCancel: tActions("childPinCancel"),
+    childPinErrGeneric: tActions("childPinErrGeneric"),
+    addDialog: {
+      step: tAdd("step"),
+      prenomLbl: tAdd("prenomLbl"),
+      ageLbl: tAdd("ageLbl"),
+      animalLbl: tAdd("animalLbl"),
+      universeLbl: tAdd("universeLbl"),
+      universeMondeLabel: tAdd("universeMondeLabel"),
+      universeMondeDesc: tAdd("universeMondeDesc"),
+      universeRacinesLabel: tAdd("universeRacinesLabel"),
+      universeRacinesDesc: tAdd("universeRacinesDesc"),
+      languesLbl: tAdd("languesLbl"),
+      languesHelp: tAdd("languesHelp"),
+      nativeLbl: tAdd("nativeLbl"),
+      foreignLbl: tAdd("foreignLbl"),
+      goalLbl: tAdd("goalLbl"),
+      goalHelp: tAdd("goalHelp"),
+      goalOpts: {
+        STUDIES: tAdd("goalOpts.STUDIES"),
+        WORK: tAdd("goalOpts.WORK"),
+        TRAVEL: tAdd("goalOpts.TRAVEL"),
+        EXAM: tAdd("goalOpts.EXAM"),
+        DAILY_LIFE: tAdd("goalOpts.DAILY_LIFE"),
+        LATER: tAdd("goalOpts.LATER"),
+      },
+      cancel: tAdd("cancel"),
+      create: tAdd("create"),
+      errName: tAdd("errName"),
+      errAge: tAdd("errAge"),
+      errAnimal: tAdd("errAnimal"),
+      errLang: tAdd("errLang"),
+      errUniverse: tAdd("errUniverse"),
+      errServer: tAdd("errServer"),
+    },
+  };
 
   const load = () => {
     setState({ kind: "loading" });
@@ -196,7 +243,7 @@ export function FamilyDashboard({ locale }: { locale: "fr" | "en" }) {
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
           <FamilyOverviewSection data={data} />
-          <FamilyChildrenSection data={data} baseHref={baseHref} />
+          <FamilyChildrenSection data={data} baseHref={baseHref} locale={locale} actionsCopy={actionsCopy} />
           <FamilyProgressionSection profiles={data.children} />
           <FamilySessionsSection />
           <FamilyMessagesSection />

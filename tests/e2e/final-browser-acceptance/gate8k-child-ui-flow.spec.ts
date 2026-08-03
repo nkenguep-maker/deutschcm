@@ -79,42 +79,86 @@ test.describe("Release Canonicalization · /famille redirige vers /family (FR + 
   }
 });
 
-test.describe("Gate 8K · Child PIN flow via API canonique · session + dashboard rendu", () => {
-  // Le flow UI PIN inline (page /famille legacy) a été remplacé par le
-  // redirect canonique vers /family. Le composant ChildPinDialog reste
-  // exposé (src/components/famille/ChildPinDialog.tsx · tests structurels
-  // couvrent son intégrité) et le contrat serveur POST /api/child-session
-  // reste la source de vérité de la session enfant. Ce spec valide le flow
-  // bout-en-bout côté serveur puis assert le rendu du dashboard enfant.
+test.describe("Gate 8K · Child PIN flow UI réel · /family → dialog → dashboard", () => {
+  // Parité restaurée · le flow UI PIN passe par ChildPinDialog rendu depuis
+  // FamilyChildActions sur la route canonique /[locale]/family (Monde et
+  // Racines, FR + EN). Le test clique réellement le bouton "Ouvrir son
+  // espace", saisit le PIN, observe POST /api/child-session et vérifie le
+  // rendu du dashboard enfant avec le prénom.
   for (const [label, childId, pin, prenom, entitlement] of [
     ["monde", "test_yema_qa_child_family_monde", "1234", "Lina", "FAMILY_WORLD"],
     ["racines", "test_yema_qa_child_family_racines", "5678", "Aïcha", "ROOTS_FAMILY"],
   ] as const) {
     for (const locale of ["fr", "en"] as const) {
-      test(`${locale} · Child ${label.toUpperCase()} · PIN via API → dashboard rendu prenom=${prenom}`, async ({ page }) => {
+      test(`${locale} · Child ${label.toUpperCase()} · UI PIN /family → dashboard prenom=${prenom}`, async ({ page }) => {
+        test.setTimeout(60_000);
         await loginViaSupabase(page, FAMILY_EMAIL, PASSWORD);
         await page.setViewportSize({ width: 1440, height: 1000 });
-        // Ouvrir session enfant via API canonique (le dialogue UI vit ailleurs
-        // depuis Release Canonicalization · voir ChildPinDialog composant).
-        const openResp = await page.request.post(`${process.env.PLAYWRIGHT_BASE_URL}/api/child-session`, {
-          data: { childProfileId: childId, pin },
-        });
+        // Naviguer vers /family (canonique) · attendre chargement InboxList.
+        await page.goto(`/${locale}/family`, { waitUntil: "networkidle" });
+        // Trouver la carte enfant · cliquer "Ouvrir son espace" (data-testid).
+        const openBtn = page.locator(`[data-testid="family-child-open-space"][data-child-id="${childId}"]`);
+        await openBtn.waitFor({ state: "visible", timeout: 15_000 });
+        await openBtn.click();
+        // Dialogue PIN visible.
+        await expect(page.locator('[data-testid="child-pin-dialog"]')).toBeVisible();
+        if (locale === "fr") {
+          await captureAndRecord(page, `child-${label}-pin-dialog-${locale}-1440.png`, {
+            persona: "family_pin_dialog", locale, viewport: "1440", route: `/${locale}/family`,
+            section: "child-pin-dialog", universe: label.toUpperCase(), entitlement,
+          });
+        }
+        // Saisir PIN · attendre POST + navigation.
+        await page.locator('[data-testid="child-pin-input"]').fill(pin);
+        const [openResp] = await Promise.all([
+          page.waitForResponse((r) => r.url().includes("/api/child-session") && r.request().method() === "POST"),
+          page.locator('[data-testid="child-pin-submit"]').click(),
+        ]);
         expect(openResp.status(), `POST /api/child-session ${label}`).toBe(200);
-        // Naviguer vers /dashboard · le dashboard enfant doit rendre avec le prenom.
-        await page.goto(`/${locale}/dashboard`, { waitUntil: "networkidle" });
+        // Redirect vers /dashboard enfant · le composant router.push().
+        await page.waitForURL((u) => u.pathname.includes("/dashboard"), { timeout: 15_000 });
         const bodyText = await page.locator("body").textContent();
         expect(bodyText, `Child ${label} dashboard rendu prenom=${prenom}`).toContain(prenom);
         if (locale === "fr") {
           await captureAndRecord(page, `child-${label}-ui-dashboard-${locale}-1440.png`, {
             persona: `child_${label}_ui`, locale, viewport: "1440", route: `/${locale}/dashboard`,
-            section: "child-dashboard-via-pin-api", universe: label.toUpperCase(), entitlement,
+            section: "child-dashboard-via-ui-pin", universe: label.toUpperCase(), entitlement,
           });
         }
-        // Logout enfant.
+        // Logout · via API (le composant enfant a un bouton exitChildMode
+        // couvert par Gate 8L Playwright · ici on garantit la propreté state).
         await page.request.delete(`${process.env.PLAYWRIGHT_BASE_URL}/api/child-session`);
       });
     }
   }
+});
+
+test.describe("Gate 8K · AddChildDialog accessible depuis /family (radiogroup Monde/Racines)", () => {
+  test("fr · /family · ouvrir AddChildDialog + radiogroup MONDE/RACINES visible", async ({ page }) => {
+    await loginViaSupabase(page, FAMILY_EMAIL, PASSWORD);
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto("/fr/family", { waitUntil: "networkidle" });
+    // Cliquer "Ajouter un enfant" (empty state OU footer selon canAddChild).
+    const addBtn = page.locator('[data-testid="family-add-child-open"]').first();
+    // Family QA a déjà 3 enfants · canAddChild peut être false si sièges épuisés.
+    // On teste le comportement conforme dans les deux cas.
+    const addCount = await addBtn.count();
+    if (addCount === 0) {
+      test.info().annotations.push({ type: "info", description: "canAddChild=false · sièges épuisés · AddChildDialog non exposé (comportement attendu)" });
+      return;
+    }
+    await addBtn.click();
+    await expect(page.locator('[data-testid="add-child-dialog"]')).toBeVisible();
+    // Radiogroup universe · deux boutons MONDE + RACINES.
+    await expect(page.locator('[data-testid="add-child-universe-MONDE"]')).toBeVisible();
+    await expect(page.locator('[data-testid="add-child-universe-RACINES"]')).toBeVisible();
+    // Submit désactivé tant qu'universe n'est pas choisi.
+    const submit = page.locator('[data-testid="add-child-submit"]');
+    await expect(submit).toBeDisabled();
+    // Cancel · retour dashboard sans mutation.
+    await page.locator('[data-testid="add-child-cancel"]').click();
+    await expect(page.locator('[data-testid="add-child-dialog"]')).not.toBeVisible();
+  });
 });
 
 test.describe("Gate 8K · PIN invalide · POST /api/child-session refusé 401", () => {

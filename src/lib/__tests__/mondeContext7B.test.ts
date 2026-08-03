@@ -455,10 +455,15 @@ describe("Lot 7B.2 · AddChildDialog · sélecteur parcours conditionnel MONDE",
   // par les tests server-side "Lot 7C.4 · POST /api/family/children" +
   // "Lot 7C.4 · createChildProfile · universe + learningGoal Monde restrict".
 
-  it("placeholder · migration UX AddChildDialog vers /family/children/new pending", () => {
-    // Sentinel · le nouveau flow Family link vers /children/new.
-    const familyChildrenSection = read("features/dashboards/family/sections/FamilyChildrenSection.tsx");
-    expect(familyChildrenSection).toMatch(/\/children\/new/);
+  it("AddChildDialog restauré · POST canonique + universe explicite + learningGoal MONDE conditionnel", () => {
+    // Family Parity Patch · AddChildDialog extrait dans src/components/famille
+    // pour restaurer la parité sur /family (composant réutilisable depuis
+    // FamilyChildActions client).
+    const addDialog = read("components/famille/AddChildDialog.tsx");
+    expect(addDialog).toMatch(/fetch\("\/api\/family\/children"/);
+    expect(addDialog).toMatch(/const learningGoal = universe === "MONDE" && goal !== "LATER" \? goal : null/);
+    expect(addDialog).toMatch(/const \[universe, setUniverse\] = useState<"MONDE" \| "RACINES" \| null>\(null\)/);
+    expect(addDialog).toMatch(/\{universe === "MONDE" \? \(/);
   });
 });
 

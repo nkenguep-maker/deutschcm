@@ -966,19 +966,37 @@ describe("Gate 8C · playback route enforce Super Admin non-participant pédagog
 });
 
 describe("Gate 8B · sélecteur univers EXPLICITE dans AddChildDialog (brief §1)", () => {
-  // Release Canonicalization · l'AddChildDialog inline vivait dans le legacy
-  // /famille (désormais redirect vers /family). Les 7 assertions wiring UX
-  // (state universe null, radiogroup, submit disabled, errUniverse, learning
-  // Goal conditionnel MONDE, copy universeLbl) sont retirées · la migration
-  // du dialogue vers /family/children/new reste ouverte (voir Family
-  // ChildrenSection.tsx qui link vers cette route future). La validation
-  // server-side universe (POST /api/family/children) reste couverte par
-  // "Lot 7C.4 · dérive universe depuis body" + "Lot 7C.4 · caps commerciaux".
+  // Family Parity Patch · AddChildDialog restauré en composant client
+  // extrait dans src/components/famille/AddChildDialog.tsx et réutilisé
+  // depuis FamilyChildActions rendu par FamilyChildrenSection sur /family.
+  // Les assertions inline UX historiques sont ré-appliquées sur le composant
+  // extrait.
+  const src = readRepo("src/components/famille/AddChildDialog.tsx");
 
-  it("placeholder · migration UI AddChildDialog vers /family en cours", () => {
-    // Sentinel pour rappeler la dette technique.
-    const familyChildrenSection = readRepo("src/features/dashboards/family/sections/FamilyChildrenSection.tsx");
-    expect(familyChildrenSection).toMatch(/\/children\/new/);
+  it("state universe: null par défaut · aucune valeur pré-sélectionnée", () => {
+    expect(src).toMatch(/const \[universe, setUniverse\] = useState<"MONDE" \| "RACINES" \| null>\(null\)/);
+  });
+
+  it("radiogroup MONDE + RACINES · aria roles présents", () => {
+    expect(src).toMatch(/role="radiogroup" aria-label=\{copy\.universeLbl\}/);
+    expect(src).toMatch(/id: "MONDE" as const/);
+    expect(src).toMatch(/id: "RACINES" as const/);
+  });
+
+  it("submit désactivé tant qu'universe n'est pas choisi", () => {
+    expect(src).toMatch(/disabled=\{submitting \|\| !universe\}/);
+  });
+
+  it("erreur validate avant langue · errUniverse si universe null", () => {
+    expect(src).toMatch(/if \(!universe\) return setErr\(copy\.errUniverse\)/);
+  });
+
+  it("learningGoal conditionnel universe === MONDE (rendu conditionnel)", () => {
+    expect(src).toMatch(/\{universe === "MONDE" \? \(/);
+  });
+
+  it("learningGoal dérivé de universe === MONDE, jamais de foreign", () => {
+    expect(src).toMatch(/const learningGoal = universe === "MONDE" && goal !== "LATER" \? goal : null/);
   });
 });
 
@@ -1325,6 +1343,106 @@ describe("Release Canonicalization · /family + /center/stats + QA fail-closed +
     expect(matrix).toMatch(/id:\s*"child_racines"[\s\S]{0,300}homeRoute:\s*"\/fr\/family"/);
     // Aucune référence résiduelle à /fr/famille dans les homeRoutes.
     expect(matrix).not.toMatch(/homeRoute:\s*"\/fr\/famille/);
+  });
+});
+
+describe("Family Parity Patch · child actions restaurés sur /family (canonique)", () => {
+  const familyDashboard = readRepo("src/features/dashboards/family/FamilyDashboard.tsx");
+  const childrenSection = readRepo("src/features/dashboards/family/sections/FamilyChildrenSection.tsx");
+  const actions = readRepo("src/features/dashboards/family/FamilyChildActions.tsx");
+  const addDialog = readRepo("src/components/famille/AddChildDialog.tsx");
+  const pinDialog = readRepo("src/components/famille/ChildPinDialog.tsx");
+  const fr = JSON.parse(readRepo("messages/fr.json"));
+  const en = JSON.parse(readRepo("messages/en.json"));
+  const spec = readRepo("tests/e2e/final-browser-acceptance/gate8k-child-ui-flow.spec.ts");
+
+  it("FamilyChildActions extrait · client component réutilisant ChildPinDialog + AddChildDialog", () => {
+    expect(actions).toMatch(/"use client"/);
+    expect(actions).toMatch(/import \{ ChildPinDialog \}/);
+    expect(actions).toMatch(/import \{ AddChildDialog[^}]*\}/);
+    expect(actions).toMatch(/data-testid="family-child-open-space"/);
+    expect(actions).toMatch(/data-testid="family-add-child-open"/);
+  });
+
+  it("AddChildDialog extrait de l'ancien /famille · POST canonique /api/family/children + universe explicite", () => {
+    expect(addDialog).toMatch(/"use client"/);
+    expect(addDialog).toMatch(/fetch\("\/api\/family\/children"/);
+    expect(addDialog).toMatch(/const \[universe, setUniverse\] = useState<"MONDE" \| "RACINES" \| null>\(null\)/);
+    // Aucune valeur par défaut.
+    expect(addDialog).toMatch(/disabled=\{submitting \|\| !universe\}/);
+    // learningGoal uniquement MONDE (Lot 7B.2).
+    expect(addDialog).toMatch(/const learningGoal = universe === "MONDE" && goal !== "LATER" \? goal : null/);
+    // radiogroup MONDE + RACINES via template literal `add-child-universe-${u.id}`.
+    expect(addDialog).toMatch(/data-testid=\{`add-child-universe-\$\{u\.id\}`\}/);
+    expect(addDialog).toMatch(/id: "MONDE" as const/);
+    expect(addDialog).toMatch(/id: "RACINES" as const/);
+    // errUniverse validation.
+    expect(addDialog).toMatch(/if \(!universe\) return setErr\(copy\.errUniverse\)/);
+  });
+
+  it("FamilyDashboard construit actionsCopy et le passe à FamilyChildrenSection", () => {
+    expect(familyDashboard).toMatch(/const actionsCopy: FamilyChildActionsCopy = \{/);
+    expect(familyDashboard).toMatch(/openChildSpace: tActions\("openChildSpace"\)/);
+    expect(familyDashboard).toMatch(/childPinTitle: tActions\("childPinTitle"\)/);
+    expect(familyDashboard).toMatch(/addDialog: \{[\s\S]{0,200}step: tAdd\("step"\)/);
+    expect(familyDashboard).toMatch(/<FamilyChildrenSection[\s\S]{0,200}actionsCopy=\{actionsCopy\}/);
+  });
+
+  it("FamilyChildrenSection rend FamilyChildActions par carte enfant + footer add", () => {
+    expect(childrenSection).toMatch(/import \{ FamilyChildActions/);
+    expect(childrenSection).toMatch(/slot="child"/);
+    expect(childrenSection).toMatch(/slot="add"/);
+    expect(childrenSection).toMatch(/data-testid="family-child-card"/);
+  });
+
+  it("i18n · yemaDashboards.family.actions + addDialog · FR + EN identiques (parité clés)", () => {
+    for (const [lang, doc] of [["fr", fr], ["en", en]] as const) {
+      const a = doc.yemaDashboards?.family?.actions;
+      const d = doc.yemaDashboards?.family?.addDialog;
+      expect(a, `${lang} actions block`).toBeTruthy();
+      expect(d, `${lang} addDialog block`).toBeTruthy();
+      for (const k of ["openChildSpace", "addChild", "childPinTitle", "childPinLabel", "childPinSubmit", "childPinCancel", "childPinErrGeneric"]) {
+        expect(a[k], `${lang} actions.${k}`).toBeTruthy();
+      }
+      for (const k of ["universeLbl", "universeMondeLabel", "universeRacinesLabel", "errUniverse", "create", "cancel"]) {
+        expect(d[k], `${lang} addDialog.${k}`).toBeTruthy();
+      }
+    }
+  });
+
+  it("Playwright spec · UI PIN flow /family réel · Monde + Racines × FR + EN", () => {
+    expect(spec).toMatch(/UI PIN \/family → dashboard prenom/);
+    expect(spec).toMatch(/page\.goto\(`\/\$\{locale\}\/family`/);
+    expect(spec).toMatch(/data-testid="family-child-open-space"/);
+    expect(spec).toMatch(/data-testid="child-pin-dialog"/);
+    expect(spec).toMatch(/data-testid="child-pin-input"/);
+    expect(spec).toMatch(/data-testid="child-pin-submit"/);
+    expect(spec).toMatch(/waitForResponse[\s\S]*\/api\/child-session[\s\S]*POST/);
+    // Non-régression · aucun test Gate 8K ne remplace le clic UI par un
+    // appel API direct (via l'ancien "PIN flow API canonique").
+    expect(spec).not.toMatch(/UI PIN inline \(page \/famille legacy\) a été remplacé/);
+  });
+
+  it("Playwright spec · AddChildDialog radiogroup Monde/Racines depuis /family", () => {
+    expect(spec).toMatch(/data-testid="family-add-child-open"/);
+    expect(spec).toMatch(/data-testid="add-child-dialog"/);
+    expect(spec).toMatch(/data-testid="add-child-universe-MONDE"/);
+    expect(spec).toMatch(/data-testid="add-child-universe-RACINES"/);
+    expect(spec).toMatch(/toBeDisabled/);
+  });
+
+  it("Non-régression · /famille + /famille/enfant redirects préservés", () => {
+    const famillePage = readRepo("src/app/[locale]/famille/page.tsx");
+    const familleEnfantPage = readRepo("src/app/[locale]/famille/enfant/[profilId]/page.tsx");
+    expect(famillePage).toMatch(/redirect\(`\/\$\{locale\}\/family`\)/);
+    expect(familleEnfantPage).toMatch(/redirect\(`\/\$\{locale\}\/family`\)/);
+  });
+
+  it("Non-régression · ChildPinDialog composant inchangé (data-testids + POST /api/child-session)", () => {
+    expect(pinDialog).toMatch(/data-testid="child-pin-dialog"/);
+    expect(pinDialog).toMatch(/data-testid="child-pin-input"/);
+    expect(pinDialog).toMatch(/data-testid="child-pin-submit"/);
+    expect(pinDialog).toMatch(/fetch\("\/api\/child-session"/);
   });
 });
 
