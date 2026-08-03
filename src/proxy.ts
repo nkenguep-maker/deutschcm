@@ -64,10 +64,9 @@ const PROTECTED_ROUTES: Record<string, SpaceRole[]> = {
   "/dashboard": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
   "/courses": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
   "/progress": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
-  // /famille = espace foyer parent, réservé aux rôles STUDENT (qui peut
-  // être parent) et ADMIN (opération). TEACHER et CENTER ne doivent pas
-  // y accéder par défaut — un multi-rôle explicite STUDENT + TEACHER
-  // fonctionnera toujours puisque canAccessRoute() OR sur roles.
+  // /family = espace foyer parent (route canonique i18n · redesign). /famille
+  // reste ouvert au même scope · il redirige serveur-side vers /family.
+  "/family": ["STUDENT", "ADMIN"],
   "/famille": ["STUDENT", "ADMIN"],
   // Funnel P1 · découverte + activation · réservé STUDENT strict
   // (hardening §6). ADMIN n'est PAS un contournement générique — il a
@@ -86,6 +85,7 @@ function spaceForPath(pathname: string): SpaceRole | null {
   if (
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/courses") ||
+    pathname.startsWith("/family") ||
     pathname.startsWith("/famille") ||
     pathname.startsWith("/decouverte") ||
     pathname.startsWith("/activation-intent") ||
