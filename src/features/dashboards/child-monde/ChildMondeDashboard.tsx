@@ -10,6 +10,7 @@ import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   DashboardButton,
+  DashboardButtonLink,
   DashboardCard,
   DashboardEmptyState,
   DashboardHeader,
@@ -87,10 +88,22 @@ export function ChildMondeDashboard({ locale, child }: Props) {
     />
   );
 
-  const exitCta = (
-    <DashboardButton variant="secondary" size="sm" onClick={exitChildMode} disabled={exiting}>
-      {t("exitChildMode")}
-    </DashboardButton>
+  const messagesHref = `/${currentLocale ?? locale}/messages`;
+  const headerActions = (
+    <div style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+      <DashboardButtonLink
+        href={messagesHref}
+        variant="secondary"
+        size="sm"
+        data-testid="child-messages-cta"
+        style={{ minHeight: 44 }}
+      >
+        {t("openMessages")}
+      </DashboardButtonLink>
+      <DashboardButton variant="secondary" size="sm" onClick={exitChildMode} disabled={exiting}>
+        {t("exitChildMode")}
+      </DashboardButton>
+    </div>
   );
 
   return (
@@ -103,7 +116,7 @@ export function ChildMondeDashboard({ locale, child }: Props) {
           <DashboardHeader
             title={t("home.title", { prenom: child.prenom })}
             subtitle={totalStars > 0 ? t("meta", { stars: totalStars }) : t("metaMinimal")}
-            actions={exitCta}
+            actions={headerActions}
             meta={
               child.activeLangue ? (
                 <DashboardStatusChip tone="gold">{child.activeLangue}</DashboardStatusChip>

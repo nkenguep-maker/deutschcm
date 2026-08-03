@@ -1156,10 +1156,9 @@ describe("Gate 8L · final runtime assertions · logout UI réel + manifest dedu
     expect(spec).toMatch(/Family API appelée au moins 1×/);
   });
 
-  it("Gate 8L+ · Child Messages route reality · /messages accessible avec cookie enfant", () => {
-    expect(spec).toMatch(/Child MONDE · \/messages accessible avec session enfant/);
-    expect(spec).toMatch(/pas de 500/);
-    expect(spec).toMatch(/pas de 404 · route livrée/);
+  it("Gate 8L++ · Child Messages CTA reel · cible dashboard → click → /messages", () => {
+    expect(spec).toMatch(/CTA Messages/);
+    expect(spec).toMatch(/waitForURL\(\/\\\/fr\\\/messages\//);
   });
 
   it("Gate 8L+ · Manifest verification post-write · entries/duplicates/missingPng/invalidRows", () => {
@@ -1168,6 +1167,52 @@ describe("Gate 8L · final runtime assertions · logout UI réel + manifest dedu
     expect(spec).toMatch(/duplicates === 0/);
     expect(spec).toMatch(/missingPng === 0/);
     expect(spec).toMatch(/invalidRows === 0/);
+  });
+
+  it("Gate 8L++ · CTA Messages enfant · openMessages i18n FR/EN + testid canonique", () => {
+    const fr = JSON.parse(readRepo("messages/fr.json"));
+    const en = JSON.parse(readRepo("messages/en.json"));
+    expect(fr.yemaDashboards.childMonde.openMessages).toBe("Messages");
+    expect(fr.yemaDashboards.childRacines.openMessages).toBe("Messages");
+    expect(en.yemaDashboards.childMonde.openMessages).toBe("Messages");
+    expect(en.yemaDashboards.childRacines.openMessages).toBe("Messages");
+    const childMonde = read("features/dashboards/child-monde/ChildMondeDashboard.tsx");
+    const childRacines = read("features/dashboards/child-racines/ChildRacinesDashboard.tsx");
+    expect(childMonde).toMatch(/data-testid="child-messages-cta"/);
+    expect(childRacines).toMatch(/data-testid="child-messages-cta"/);
+    expect(childMonde).toMatch(/openMessages/);
+    expect(childRacines).toMatch(/openMessages/);
+    expect(childMonde).toMatch(/messagesHref[\s\S]*\/messages/);
+    expect(childRacines).toMatch(/messagesHref[\s\S]*\/messages/);
+    // Cible tactile ≥ 44 hardcodé.
+    expect(childMonde).toMatch(/minHeight: 44/);
+    expect(childRacines).toMatch(/minHeight: 44/);
+  });
+
+  it("Gate 8L++ · spec · CTA click → /messages 200 + aucun textarea + aucun input libre", () => {
+    expect(spec).toMatch(/data-testid=child-messages-cta/);
+    expect(spec).toMatch(/CTA Messages [\s\S]*hauteur ≥ 44px/);
+    expect(spec).toMatch(/focus clavier/);
+    expect(spec).toMatch(/Aucun textarea sur \/messages child/);
+    expect(spec).toMatch(/Aucun input texte libre/);
+  });
+
+  it("Gate 8L++ · GUIDED_PHRASE + AUDIO prouvés via API contract (guided-phrases + audio-capability)", () => {
+    expect(spec).toMatch(/\/api\/messaging\/guided-phrases\?type=/);
+    expect(spec).toMatch(/CHILD_WORLD_GUIDED/);
+    expect(spec).toMatch(/CHILD_ROOTS_GUIDED/);
+    expect(spec).toMatch(/audio-capability/);
+    expect(spec).toMatch(/audioJson\?\.enabled/);
+  });
+
+  it("Gate 8L++ · spec · Racines sans palette Ivoire (data-universe !== monde)", () => {
+    expect(spec).toMatch(/Universe Racines · pas Ivoire/);
+  });
+
+  it("Gate 8L++ · /famille isolé · /api/family/* called + /api/me/monde-dashboard non + /api/student/* non", () => {
+    expect(spec).toMatch(/\/api\/family\/\* appelée/);
+    expect(spec).toMatch(/\/api\/me\/monde-dashboard NON appelée/);
+    expect(spec).toMatch(/\/api\/student\/\* NON appelée/);
   });
 
   it("Gate 8L+ · Orchestrator provisions Coach A/B temp + WOLOF/SWAHILI Circles + cleanup finally", () => {

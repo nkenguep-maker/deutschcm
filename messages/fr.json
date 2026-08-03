@@ -1576,7 +1576,8 @@
       "loading": "Ta maison s'ouvre…",
       "error": "Ta maison ne s'ouvre pas. Réessaie.",
       "retry": "Réessayer",
-      "exitChildMode": "Quitter le mode enfant"
+      "exitChildMode": "Quitter le mode enfant",
+      "openMessages": "Messages"
     },
     "childRacines": {
       "personaLabel": "Enfant Racines",
@@ -1639,7 +1640,8 @@
       "loading": "Ta case s'ouvre…",
       "error": "Ta case ne s'ouvre pas. Réessaie.",
       "retry": "Réessayer",
-      "exitChildMode": "Quitter le mode enfant"
+      "exitChildMode": "Quitter le mode enfant",
+      "openMessages": "Messages"
     },
     "mondeContext": {
       "pathwayLabel": {

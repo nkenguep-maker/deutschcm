@@ -1576,7 +1576,8 @@
       "loading": "Your home is opening…",
       "error": "Your home isn't opening. Please retry.",
       "retry": "Retry",
-      "exitChildMode": "Exit child mode"
+      "exitChildMode": "Exit child mode",
+      "openMessages": "Messages"
     },
     "childRacines": {
       "personaLabel": "Roots child",
@@ -1639,7 +1640,8 @@
       "loading": "Your case is opening…",
       "error": "Your case isn't opening. Please retry.",
       "retry": "Retry",
-      "exitChildMode": "Exit child mode"
+      "exitChildMode": "Exit child mode",
+      "openMessages": "Messages"
     },
     "mondeContext": {
       "pathwayLabel": {

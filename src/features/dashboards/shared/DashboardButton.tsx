@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
 import Link from "next/link";
 import type { LinkProps } from "next/link";
 
@@ -69,7 +69,12 @@ export function DashboardButton({
   );
 }
 
-type ButtonLinkProps = Common & LinkProps & { className?: string };
+type ButtonLinkProps = Common & LinkProps & {
+  className?: string;
+  style?: CSSProperties;
+} & Pick<AnchorHTMLAttributes<HTMLAnchorElement>, "aria-label" | "title"> & {
+  "data-testid"?: string;
+};
 
 export function DashboardButtonLink({
   variant = "primary",
@@ -77,10 +82,11 @@ export function DashboardButtonLink({
   leadingIcon,
   children,
   className,
+  style: styleOverride,
   ...rest
 }: ButtonLinkProps) {
   return (
-    <Link {...rest} className={className} style={style(variant, size)}>
+    <Link {...rest} className={className} style={{ ...style(variant, size), ...(styleOverride ?? {}) }}>
       {leadingIcon}
       {children}
     </Link>

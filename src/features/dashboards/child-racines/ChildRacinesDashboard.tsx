@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   DashboardButton,
+  DashboardButtonLink,
   DashboardCard,
   DashboardEmptyState,
   DashboardHeader,
@@ -99,10 +100,22 @@ export function ChildRacinesDashboard({ locale, child }: Props) {
     />
   );
 
-  const exitCta = (
-    <DashboardButton variant="secondary" size="sm" onClick={exitChildMode} disabled={exiting}>
-      {t("exitChildMode")}
-    </DashboardButton>
+  const messagesHref = `/${currentLocale ?? locale}/messages`;
+  const headerActions = (
+    <div style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+      <DashboardButtonLink
+        href={messagesHref}
+        variant="secondary"
+        size="sm"
+        data-testid="child-messages-cta"
+        style={{ minHeight: 44 }}
+      >
+        {t("openMessages")}
+      </DashboardButtonLink>
+      <DashboardButton variant="secondary" size="sm" onClick={exitChildMode} disabled={exiting}>
+        {t("exitChildMode")}
+      </DashboardButton>
+    </div>
   );
 
   return (
@@ -116,7 +129,7 @@ export function ChildRacinesDashboard({ locale, child }: Props) {
           <DashboardHeader
             title={t("home.title", { prenom: child.prenom })}
             subtitle={step ? t("meta", { language: languageLabel, step }) : t("metaMinimal")}
-            actions={exitCta}
+            actions={headerActions}
             meta={step ? <DashboardStatusChip tone="gold">{step}</DashboardStatusChip> : undefined}
           />
         }

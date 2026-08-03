@@ -123,6 +123,31 @@
       await db.circleMembership.create({ data: { circleId: cid, childProfileId: chid, role: "CHILD" as never, status: "ACTIVE" as never, joinedAt: new Date() } });
     }
 
+    // Conversations enfant guidées (Monde + Racines) · seed InboxList pour
+    // que MessageComposer se render côté /messages (le composer n'apparaît
+    // qu'après sélection d'une conversation). Le child Family QA (Lina Monde
+    // + Aïcha Racines) participe. Aucun message pré-écrit · uniquement le
+    // canal de conversation pour rendre le composer visible.
+    const convMondeId = `test_yema_qa_gate8l_conv_child_monde_${ts}`;
+    const convRacinesId = `test_yema_qa_gate8l_conv_child_racines_${ts}`;
+    const familyHhId = "test_yema_qa_household_family";
+    await db.messagingConversation.create({ data: {
+      id: convMondeId, type: "CHILD_WORLD_GUIDED" as never, status: "ACTIVE" as never, householdId: familyHhId,
+    } });
+    await db.messagingConversation.create({ data: {
+      id: convRacinesId, type: "CHILD_ROOTS_GUIDED" as never, status: "ACTIVE" as never, householdId: familyHhId,
+    } });
+    await db.messagingConversationParticipant.createMany({ data: [
+      { conversationId: convMondeId, actorType: "CHILD_PROFILE" as never, childProfileId: "test_yema_qa_child_family_monde", participantRole: "MEMBER" as never },
+      { conversationId: convRacinesId, actorType: "CHILD_PROFILE" as never, childProfileId: "test_yema_qa_child_family_racines", participantRole: "MEMBER" as never },
+    ] });
+    cleanup.push(async () => {
+      try {
+        await db.messagingConversationParticipant.deleteMany({ where: { conversationId: { in: [convMondeId, convRacinesId] } } });
+        await db.messagingConversation.deleteMany({ where: { id: { in: [convMondeId, convRacinesId] } } });
+      } catch {}
+    });
+
     console.log(`[final-runtime] STEP 2 · next start port ${PORT}`);
     const hmacSecret = process.env.YEMA_CHILD_SESSION_SECRET
       ?? process.env.SUPABASE_JWT_SECRET

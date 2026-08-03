@@ -24,8 +24,10 @@ async function loginViaSupabase(page: Page, email: string, password: string) {
     expires_at: s.expires_at ?? (Math.floor(Date.now() / 1000) + s.expires_in),
     refresh_token: s.refresh_token, user: s.user,
   };
+  // @supabase/ssr 0.10.3+ exige base64URL (-_) et non pas base64 classique
+  // (+/=) · sinon stringFromBase64URL throw et le cookie est ignoré → 401.
+  const value = `base64-${Buffer.from(JSON.stringify(payload)).toString("base64url")}`;
   const cookie = `sb-${supRef}-auth-token`;
-  const value = `base64-${Buffer.from(JSON.stringify(payload)).toString("base64")}`;
   const host = new URL(process.env.PLAYWRIGHT_BASE_URL!).hostname;
   await page.context().addCookies([
     { name: cookie, value, domain: host, path: "/", httpOnly: false, secure: false, sameSite: "Lax" },

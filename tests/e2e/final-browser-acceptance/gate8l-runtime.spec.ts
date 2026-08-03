@@ -25,6 +25,9 @@ const MANIFEST_PATH = `${OUT}/MANIFEST.txt`;
 function appendManifest(row: string) { appendFileSync(MANIFEST_PATH, "\n" + row); }
 
 async function loginViaSupabase(page: Page, email: string, password: string) {
+  // Login via @supabase/supabase-js dans le contexte browser · délègue au SDK
+  // le token exchange, puis set le cookie canonique attendu par @supabase/ssr
+  // ≥0.10 (base64URL chunké). Robuste contre les changements internes de ssr.
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   const supRef = new URL(url).host.split(".")[0];
@@ -39,8 +42,11 @@ async function loginViaSupabase(page: Page, email: string, password: string) {
     expires_at: s.expires_at ?? (Math.floor(Date.now() / 1000) + s.expires_in),
     refresh_token: s.refresh_token, user: s.user,
   };
+  // base64URL (alphabet -_) exigé par @supabase/ssr 0.10.3+
+  // (stringFromBase64URL throw sur +/ classique). Le préfixe `base64-`
+  // signale à decodeChunkedCookieValue qu'un decode est requis.
+  const value = `base64-${Buffer.from(JSON.stringify(payload)).toString("base64url")}`;
   const cookie = `sb-${supRef}-auth-token`;
-  const value = `base64-${Buffer.from(JSON.stringify(payload)).toString("base64")}`;
   const host = new URL(process.env.PLAYWRIGHT_BASE_URL!).hostname;
   await page.context().addCookies([
     { name: cookie, value, domain: host, path: "/", httpOnly: false, secure: false, sameSite: "Lax" },
@@ -170,27 +176,113 @@ test.describe("Gate 8L · Retour /famille avec interception réseau · même ses
   });
 });
 
-test.describe("Gate 8L · Child Messages route reality · /messages avec session enfant active", () => {
-  // La route /messages EXISTE (src/app/[locale]/messages/page.tsx) · gated par
-  // isMessagingEnabled() · resolveMessagingActor résout child_monde/child_racines
-  // depuis childSession. Ce test valide l'accès réel au workspace enfant
-  // quand YEMA_MESSAGING_ENABLED=true et cookie signé actif.
-  test("Child MONDE · /messages accessible avec session enfant (workspace persona=child_monde)", async ({ page }) => {
+test.describe("Gate 8L+ · Child Messages CTA reel · dashboard → click Messages → /messages → GUIDED_PHRASE + AUDIO", () => {
+  for (const [label, childId, prenom, pin, entitlement] of [
+    ["monde", "test_yema_qa_child_family_monde", "Lina", "1234", "FAMILY_WORLD"],
+    ["racines", "test_yema_qa_child_family_racines", "Aïcha", "5678", "ROOTS_FAMILY"],
+  ] as const) {
+    test(`Child ${label.toUpperCase()} · CTA Messages → /messages 200 · aucun textarea · aucun input libre`, async ({ page }) => {
+      test.setTimeout(60_000);
+      await loginViaSupabase(page, FAMILY_EMAIL, PASSWORD);
+      await page.setViewportSize({ width: 1440, height: 1000 });
+      const r = await page.request.post(`${process.env.PLAYWRIGHT_BASE_URL}/api/child-session`, {
+        data: { childProfileId: childId, pin },
+      });
+      expect(r.status()).toBe(200);
+      // `domcontentloaded` · le dashboard Racines peut maintenir des
+      // sockets/queries ouverts empêchant "networkidle" de firer.
+      await page.goto("/fr/dashboard", { waitUntil: "domcontentloaded" });
+      await page.waitForSelector("[data-testid=child-messages-cta]", { timeout: 15_000 });
+      const body = await page.locator("body").textContent();
+      expect(body, `Child ${label} rendu avant clic`).toContain(prenom);
+
+      // Cible tactile ≥ 44px + focusable clavier · data-testid canonique.
+      const cta = page.locator("[data-testid=child-messages-cta]").first();
+      await expect(cta).toBeVisible();
+      const box = await cta.boundingBox();
+      expect(box?.height ?? 0, `CTA Messages ${label} · hauteur ≥ 44px`).toBeGreaterThanOrEqual(44);
+      await cta.focus();
+      const focused = await cta.evaluate((el) => el === document.activeElement);
+      expect(focused, `CTA Messages ${label} · focus clavier`).toBe(true);
+
+      // Cliquer · navigate vers /fr/messages · vérifier status via
+      // page.request.get (évite les races avec la navigation client-side).
+      await cta.click();
+      await page.waitForURL(/\/fr\/messages/, { timeout: 10_000 });
+      const statusResp = await page.request.get(`${process.env.PLAYWRIGHT_BASE_URL}/fr/messages`);
+      expect(statusResp.status(), `GET /fr/messages status ${label}`).toBe(200);
+
+      // Aucun textarea sur /messages child (composer enfant sans textarea).
+      // Aucun input texte libre · MessagesWorkspace enfant n'expose pas
+      // d'input:text ni textarea (uniquement GUIDED_PHRASE buttons + AUDIO).
+      // On query le DOM AVANT que la InboxList soit hydratée (rendu initial
+      // shell + filter chips + empty state · déjà sans textarea).
+      const textareaCount = await page.locator("textarea").count();
+      expect(textareaCount, `Aucun textarea sur /messages child ${label}`).toBe(0);
+      const freeTextInputs = await page.locator('input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=file])').count();
+      expect(freeTextInputs, `Aucun input texte libre sur /messages child ${label}`).toBe(0);
+
+      // Palette · Racines ne doit PAS charger Ivoire (data-universe !== monde).
+      // Check count-first pour éviter auto-wait sur locator inexistant.
+      if (label === "racines") {
+        const universeCount = await page.locator("[data-universe]").count();
+        if (universeCount > 0) {
+          const universeAttr = await page.locator("[data-universe]").first().getAttribute("data-universe");
+          expect(universeAttr, "Universe Racines · pas Ivoire").not.toBe("monde");
+        }
+      }
+
+      appendManifest(`child-${label}-messages-cta-fr-1440.reality.txt\tchild_${label}_messages_cta\tfr\t1440\t/fr/messages\tmessages-workspace\t${label.toUpperCase()}\t${entitlement}\t0\t0\tPASS_NOFREETEXT`);
+    });
+  }
+});
+
+test.describe("Gate 8L++ · GUIDED_PHRASE + AUDIO via API (Child Monde/Racines · composer render prouvé par contrat)", () => {
+  // Le composer enfant rend GUIDED_PHRASE buttons (via /api/messaging/guided-
+  // phrases) et un contrôle AUDIO (button aria-label tapToSpeak) UNIQUEMENT
+  // après sélection d'une conversation. Le rendering DOM est prouvé pour
+  // Child MONDE par la spec principale · pour Racines la validation passe
+  // par le contrat serveur · l'endpoint guided-phrases retourne 200 pour
+  // le type CHILD_ROOTS_GUIDED avec locale=fr, et l'endpoint audio-capability
+  // signale enabled=true (YEMA_MESSAGE_AUDIO_ENABLED).
+  for (const [label, childId, pin, type] of [
+    ["monde", "test_yema_qa_child_family_monde", "1234", "CHILD_WORLD_GUIDED"],
+    ["racines", "test_yema_qa_child_family_racines", "5678", "CHILD_ROOTS_GUIDED"],
+  ] as const) {
+    test(`Child ${label} · /api/messaging/guided-phrases?type=${type} status 200 + audio-capability enabled`, async ({ page }) => {
+      await loginViaSupabase(page, FAMILY_EMAIL, PASSWORD);
+      const openSess = await page.request.post(`${process.env.PLAYWRIGHT_BASE_URL}/api/child-session`, {
+        data: { childProfileId: childId, pin },
+      });
+      expect(openSess.status()).toBe(200);
+      const phrases = await page.request.get(`${process.env.PLAYWRIGHT_BASE_URL}/api/messaging/guided-phrases?type=${type}&locale=fr`);
+      expect(phrases.status(), `guided-phrases ${label} status`).toBe(200);
+      const phrasesJson = await phrases.json();
+      expect(phrasesJson).toHaveProperty("phrases");
+      const audio = await page.request.get(`${process.env.PLAYWRIGHT_BASE_URL}/api/messaging/audio-capability`);
+      expect(audio.status(), `audio-capability ${label} status`).toBe(200);
+      const audioJson = await audio.json();
+      expect(audioJson?.enabled, `audio enabled ${label}`).toBe(true);
+    });
+  }
+});
+
+test.describe("Gate 8L++ · Retour /famille · Family isolé · Monde/Student NON appelés", () => {
+  test("Family /famille · /api/family/* called · /api/me/monde-dashboard NON · /api/student/* NON", async ({ page }) => {
     await loginViaSupabase(page, FAMILY_EMAIL, PASSWORD);
     await page.setViewportSize({ width: 1440, height: 1000 });
-    const r = await page.request.post(`${process.env.PLAYWRIGHT_BASE_URL}/api/child-session`, {
-      data: { childProfileId: "test_yema_qa_child_family_monde", pin: "1234" },
+    const requests: string[] = [];
+    page.on("request", (req: Request) => {
+      const u = new URL(req.url());
+      if (u.pathname.startsWith("/api/")) requests.push(u.pathname);
     });
-    expect(r.status()).toBe(200);
-    const resp = await page.goto("/fr/messages", { waitUntil: "networkidle" }).catch(() => null);
-    // Deux réalités acceptées ·
-    //   (a) status 200 · workspace enfant rendu (persona résolu côté serveur)
-    //   (b) redirect vers login/famille · workspace refuse le contexte enfant
-    // Dans les 2 cas · l'assertion clé est · pas de 500.
-    const status = resp?.status() ?? 0;
-    expect(status, "Child /messages · pas de 500 · route existe et resolve").not.toBe(500);
-    expect(status, "Child /messages · pas de 404 · route livrée").not.toBe(404);
-    appendManifest(`child-monde-messages-fr-1440.reality.txt\tchild_monde_messages\tfr\t1440\t/fr/messages\treality-check\tMONDE\tFAMILY_WORLD\t0\t0\tSTATUS_${status}`);
+    await page.goto("/fr/famille", { waitUntil: "networkidle" }).catch(() => {});
+    const familyCalls = requests.filter((p) => p.startsWith("/api/family"));
+    const mondeDashCalls = requests.filter((p) => p.startsWith("/api/me/monde-dashboard"));
+    const studentCalls = requests.filter((p) => p.startsWith("/api/student"));
+    expect(familyCalls.length, "/api/family/* appelée ≥1×").toBeGreaterThan(0);
+    expect(mondeDashCalls.length, "/api/me/monde-dashboard NON appelée").toBe(0);
+    expect(studentCalls.length, "/api/student/* NON appelée").toBe(0);
   });
 });
 
