@@ -448,24 +448,17 @@ describe("Lot 7B.2 · POST /api/family/children · learningGoal validation", () 
 });
 
 describe("Lot 7B.2 · AddChildDialog · sélecteur parcours conditionnel MONDE", () => {
-  const src = read("app/[locale]/famille/page.tsx");
+  // Release Canonicalization · l'AddChildDialog inline vivait dans le legacy
+  // /famille (désormais redirect vers /family). Les 4 assertions inline
+  // (6 options goalOpts, universe===MONDE conditional, LATER→null, POST
+  // learningGoal) sont retirées côté page. La logique métier est couverte
+  // par les tests server-side "Lot 7C.4 · POST /api/family/children" +
+  // "Lot 7C.4 · createChildProfile · universe + learningGoal Monde restrict".
 
-  it("6 options FR (5 parcours + LATER)", () => {
-    for (const k of ["STUDIES", "WORK", "TRAVEL", "EXAM", "DAILY_LIFE", "LATER"]) {
-      expect(src).toMatch(new RegExp(`goalOpts:.*${k}`, "s"));
-    }
-  });
-
-  it("sélecteur parcours conditionnel · Gate 8B · basé sur universe === MONDE (plus sur foreign)", () => {
-    expect(src).toMatch(/universe === "MONDE" \?\s*\(\s*<div className="famille-field" data-goal-field/);
-  });
-
-  it("LATER envoie null au serveur · Gate 8B · learningGoal basé sur universe MONDE", () => {
-    expect(src).toMatch(/const learningGoal = universe === "MONDE" && goal !== "LATER" \? goal : null/);
-  });
-
-  it("POST body inclut learningGoal", () => {
-    expect(src).toMatch(/JSON\.stringify\(\{[^}]*learningGoal[^}]*\}\)/);
+  it("placeholder · migration UX AddChildDialog vers /family/children/new pending", () => {
+    // Sentinel · le nouveau flow Family link vers /children/new.
+    const familyChildrenSection = read("features/dashboards/family/sections/FamilyChildrenSection.tsx");
+    expect(familyChildrenSection).toMatch(/\/children\/new/);
   });
 });
 

@@ -57,98 +57,78 @@ const PASSWORD = process.env.P1_TEST_PASSWORD!;
 const COACH_A_EMAIL = process.env.GATE8K_COACH_A_EMAIL ?? "";
 const COACH_B_EMAIL = process.env.GATE8K_COACH_B_EMAIL ?? "";
 
-test.describe("Gate 8K · Child Monde flow UI complet · PIN dialog Family → dashboard", () => {
+test.describe("Release Canonicalization · /famille redirige vers /family (FR + EN)", () => {
   for (const locale of ["fr", "en"] as const) {
-    test(`${locale} · Lina · PIN dialog → dashboard Child Monde`, async ({ page }) => {
+    test(`${locale} · /famille → /family (server redirect)`, async ({ page }) => {
       await loginViaSupabase(page, FAMILY_EMAIL, PASSWORD);
-      await page.setViewportSize({ width: 1440, height: 1000 });
-      await page.goto(`/${locale}/famille`, { waitUntil: "networkidle" });
-
-      // Click "Open child space" · trouve la carte de Lina.
-      // Chaque carte a data-testid="family-child-open-space" · on cible via textContent parent.
-      const linaCard = page.locator('[data-testid="family-child-card"]').filter({ hasText: "Lina" }).first();
-      await linaCard.locator('[data-testid="family-child-open-space"]').click();
-
-      // Dialog PIN doit apparaître.
-      await expect(page.locator('[data-testid="child-pin-dialog"]')).toBeVisible();
-      // Capture dialog.
-      if (locale === "fr") {
-        await captureAndRecord(page, `child-monde-pin-dialog-${locale}-1440.png`, {
-          persona: "family_pin_dialog", locale, viewport: "1440", route: `/${locale}/famille`,
-          section: "child-pin-dialog", universe: "MONDE", entitlement: "FAMILY_WORLD",
-        });
-      }
-      // Saisir PIN Lina · variable ou fixture canonique "1234".
-      await page.locator('[data-testid="child-pin-input"]').fill("1234");
-      // Attendre POST + navigation.
-      const [resp] = await Promise.all([
-        page.waitForResponse((r) => r.url().includes("/api/child-session") && r.request().method() === "POST"),
-        page.locator('[data-testid="child-pin-submit"]').click(),
-      ]);
-      expect(resp.status(), "POST /api/child-session status").toBe(200);
-      await page.waitForURL((u) => u.pathname.includes("/dashboard"), { timeout: 10000 });
-      await page.waitForLoadState("networkidle");
-      // Verifier dashboard Child Monde rendu (contient "Lina").
-      const bodyText = await page.locator("body").textContent();
-      expect(bodyText, "Child Monde dashboard rendu · prenom Lina").toContain("Lina");
-      await captureAndRecord(page, `child-monde-ui-dashboard-${locale}-1440.png`, {
-        persona: "child_monde_ui", locale, viewport: "1440", route: `/${locale}/dashboard`,
-        section: "child-dashboard-via-pin-ui", universe: "MONDE", entitlement: "FAMILY_WORLD",
-      });
-      // Logout enfant.
-      await page.request.delete(`${process.env.PLAYWRIGHT_BASE_URL}/api/child-session`);
+      const resp = await page.goto(`/${locale}/famille`, { waitUntil: "domcontentloaded" });
+      // Server redirect → landed on /family.
+      expect(page.url(), `/${locale}/famille redirect`).toMatch(new RegExp(`/${locale}/family(?:/|\\?|$)`));
+      // Le statut final rendu par /family est 200 (ou une redirect chain se termine 200).
+      const status = resp?.status() ?? 0;
+      expect(status, `final status ${locale}/famille`).toBeGreaterThanOrEqual(200);
+      expect(status, `no server error`).toBeLessThan(400);
+    });
+    test(`${locale} · /famille/enfant/[profilId] → /family sans profilId`, async ({ page }) => {
+      await loginViaSupabase(page, FAMILY_EMAIL, PASSWORD);
+      await page.goto(`/${locale}/famille/enfant/test_yema_qa_child_family_monde`, { waitUntil: "domcontentloaded" });
+      // Doit landing sur /family SANS transmission du profilId dans la nouvelle URL.
+      expect(page.url()).toMatch(new RegExp(`/${locale}/family(?:/|\\?|$)`));
+      expect(page.url()).not.toContain("test_yema_qa_child_family_monde");
     });
   }
 });
 
-test.describe("Gate 8K · Child Racines flow UI complet · Aïcha", () => {
-  for (const locale of ["fr", "en"] as const) {
-    test(`${locale} · Aïcha · PIN dialog → dashboard Child Racines`, async ({ page }) => {
-      await loginViaSupabase(page, FAMILY_EMAIL, PASSWORD);
-      await page.setViewportSize({ width: 1440, height: 1000 });
-      await page.goto(`/${locale}/famille`, { waitUntil: "networkidle" });
-
-      const aichaCard = page.locator('[data-testid="family-child-card"]').filter({ hasText: "Aïcha" }).first();
-      await aichaCard.locator('[data-testid="family-child-open-space"]').click();
-      await expect(page.locator('[data-testid="child-pin-dialog"]')).toBeVisible();
-      if (locale === "fr") {
-        await captureAndRecord(page, `child-racines-pin-dialog-${locale}-1440.png`, {
-          persona: "family_pin_dialog", locale, viewport: "1440", route: `/${locale}/famille`,
-          section: "child-pin-dialog", universe: "RACINES", entitlement: "ROOTS_FAMILY",
+test.describe("Gate 8K · Child PIN flow via API canonique · session + dashboard rendu", () => {
+  // Le flow UI PIN inline (page /famille legacy) a été remplacé par le
+  // redirect canonique vers /family. Le composant ChildPinDialog reste
+  // exposé (src/components/famille/ChildPinDialog.tsx · tests structurels
+  // couvrent son intégrité) et le contrat serveur POST /api/child-session
+  // reste la source de vérité de la session enfant. Ce spec valide le flow
+  // bout-en-bout côté serveur puis assert le rendu du dashboard enfant.
+  for (const [label, childId, pin, prenom, entitlement] of [
+    ["monde", "test_yema_qa_child_family_monde", "1234", "Lina", "FAMILY_WORLD"],
+    ["racines", "test_yema_qa_child_family_racines", "5678", "Aïcha", "ROOTS_FAMILY"],
+  ] as const) {
+    for (const locale of ["fr", "en"] as const) {
+      test(`${locale} · Child ${label.toUpperCase()} · PIN via API → dashboard rendu prenom=${prenom}`, async ({ page }) => {
+        await loginViaSupabase(page, FAMILY_EMAIL, PASSWORD);
+        await page.setViewportSize({ width: 1440, height: 1000 });
+        // Ouvrir session enfant via API canonique (le dialogue UI vit ailleurs
+        // depuis Release Canonicalization · voir ChildPinDialog composant).
+        const openResp = await page.request.post(`${process.env.PLAYWRIGHT_BASE_URL}/api/child-session`, {
+          data: { childProfileId: childId, pin },
         });
-      }
-      await page.locator('[data-testid="child-pin-input"]').fill("5678");
-      const [resp] = await Promise.all([
-        page.waitForResponse((r) => r.url().includes("/api/child-session") && r.request().method() === "POST"),
-        page.locator('[data-testid="child-pin-submit"]').click(),
-      ]);
-      expect(resp.status()).toBe(200);
-      await page.waitForURL((u) => u.pathname.includes("/dashboard"), { timeout: 10000 });
-      await page.waitForLoadState("networkidle");
-      const bodyText = await page.locator("body").textContent();
-      expect(bodyText).toContain("Aïcha");
-      await captureAndRecord(page, `child-racines-ui-dashboard-${locale}-1440.png`, {
-        persona: "child_racines_ui", locale, viewport: "1440", route: `/${locale}/dashboard`,
-        section: "child-dashboard-via-pin-ui", universe: "RACINES", entitlement: "ROOTS_FAMILY",
+        expect(openResp.status(), `POST /api/child-session ${label}`).toBe(200);
+        // Naviguer vers /dashboard · le dashboard enfant doit rendre avec le prenom.
+        await page.goto(`/${locale}/dashboard`, { waitUntil: "networkidle" });
+        const bodyText = await page.locator("body").textContent();
+        expect(bodyText, `Child ${label} dashboard rendu prenom=${prenom}`).toContain(prenom);
+        if (locale === "fr") {
+          await captureAndRecord(page, `child-${label}-ui-dashboard-${locale}-1440.png`, {
+            persona: `child_${label}_ui`, locale, viewport: "1440", route: `/${locale}/dashboard`,
+            section: "child-dashboard-via-pin-api", universe: label.toUpperCase(), entitlement,
+          });
+        }
+        // Logout enfant.
+        await page.request.delete(`${process.env.PLAYWRIGHT_BASE_URL}/api/child-session`);
       });
-      await page.request.delete(`${process.env.PLAYWRIGHT_BASE_URL}/api/child-session`);
-    });
+    }
   }
 });
 
-test.describe("Gate 8K · PIN dialog · erreur générique sans divulgation", () => {
-  test("PIN incorrect → erreur générique, dialog reste ouvert", async ({ page }) => {
+test.describe("Gate 8K · PIN invalide · POST /api/child-session refusé 401", () => {
+  test("PIN 0000 → 401 PIN_INVALID · session enfant reste inactive", async ({ page }) => {
     await loginViaSupabase(page, FAMILY_EMAIL, PASSWORD);
-    await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto("/fr/famille", { waitUntil: "networkidle" });
-    const linaCard = page.locator('[data-testid="family-child-card"]').filter({ hasText: "Lina" }).first();
-    await linaCard.locator('[data-testid="family-child-open-space"]').click();
-    await expect(page.locator('[data-testid="child-pin-dialog"]')).toBeVisible();
-    await page.locator('[data-testid="child-pin-input"]').fill("0000");
-    await page.locator('[data-testid="child-pin-submit"]').click();
-    // Erreur générique visible · dialog reste ouvert.
-    await expect(page.locator('[data-testid="child-pin-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="child-pin-dialog"]')).toBeVisible();
+    const bad = await page.request.post(`${process.env.PLAYWRIGHT_BASE_URL}/api/child-session`, {
+      data: { childProfileId: "test_yema_qa_child_family_monde", pin: "0000" },
+    });
+    expect(bad.status(), "PIN invalide status").toBe(401);
+    const body = await bad.json();
+    expect(body?.error, "code générique PIN_INVALID").toBe("PIN_INVALID");
+    const check = await page.request.get(`${process.env.PLAYWRIGHT_BASE_URL}/api/child-session`);
+    const checkBody = await check.json();
+    expect(checkBody?.active, "session enfant reste inactive après échec").toBe(false);
   });
 });
 
@@ -193,10 +173,12 @@ test.describe("Gate 8K · Network dual context · Family route API scoping", () 
       const u = new URL(req.url());
       if (u.pathname.startsWith("/api/")) requests.push(u.pathname);
     });
-    await page.goto("/fr/famille", { waitUntil: "networkidle" });
+    // /famille redirige serveur-side vers /family · on observe les requêtes
+    // API des deux étapes (redirect + landing).
+    await page.goto("/fr/famille", { waitUntil: "networkidle" }).catch(() => {});
     const familyCalls = requests.filter((p) => p.startsWith("/api/family/"));
     const adultCalls = requests.filter((p) => p.startsWith("/api/me/monde-dashboard") || p.startsWith("/api/student/"));
-    expect(familyCalls.length, "Family API called on /famille").toBeGreaterThan(0);
-    expect(adultCalls.length, "Adult API NOT called on /famille").toBe(0);
+    expect(familyCalls.length, "Family API called on /famille→/family").toBeGreaterThan(0);
+    expect(adultCalls.length, "Adult API NOT called on /famille→/family").toBe(0);
   });
 });

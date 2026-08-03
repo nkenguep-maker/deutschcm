@@ -259,11 +259,10 @@ describe("Gate 8A · POST /api/family/children · universe EXPLICITE (brief §1)
     expect(src).toMatch(/status:\s*400/);
   });
 
-  it("AddChildDialog envoie universe explicite (Gate 8B · sélectionné par le parent, jamais dérivé)", () => {
-    const client = readRepo("src/app/[locale]/famille/page.tsx");
-    expect(client).toMatch(/useState<"MONDE" \| "RACINES" \| null>\(null\)/);
-    expect(client).toMatch(/JSON\.stringify\(\{[^}]*universe[^}]*\}\)/);
-  });
+  // Release Canonicalization · l'AddChildDialog inline vivait dans le
+  // legacy /famille (désormais redirect). L'assertion inline est retirée ·
+  // la validation server-side universe reste couverte par les tests
+  // "Lot 7C.4 · POST /api/family/children · dérive universe depuis body".
 });
 
 describe("Lot 7C.4 · POST /api/family/children · service canonique par pool", () => {
@@ -380,7 +379,9 @@ describe("Lot 7C.2 · captures overflow strict === 0 avec exceptions ciblées", 
 
 describe("Gate 8K · fix(child) UI PIN dialog + Coach data-testid + Playwright UI flow", () => {
   const dialog = readRepo("src/components/famille/ChildPinDialog.tsx");
-  const familyPage = readRepo("src/app/[locale]/famille/page.tsx");
+  // Release Canonicalization · l'ancienne var familyPage (legacy /famille
+  // page.tsx) est retirée · le contenu est désormais un redirect testé dans
+  // le describe "Release Canonicalization" plus bas.
   const coachSection = readRepo("src/features/dashboards/coach-racines/sections/CoachLearnersSection.tsx");
   const spec = readRepo("tests/e2e/final-browser-acceptance/gate8k-child-ui-flow.spec.ts");
   const wrapper = readRepo("scripts/test-child-ui-signoff-p1.mjs");
@@ -422,23 +423,12 @@ describe("Gate 8K · fix(child) UI PIN dialog + Coach data-testid + Playwright U
     expect(dialog).toMatch(/aria-modal="true"/);
   });
 
-  it("Family page · state pinChild + action Ouvrir son espace", () => {
-    expect(familyPage).toMatch(/const \[pinChild, setPinChild\] = useState<Child \| null>/);
-    expect(familyPage).toMatch(/openChildSpace/);
-    expect(familyPage).toMatch(/data-testid="family-child-open-space"/);
-    expect(familyPage).toMatch(/data-testid="family-child-card"/);
-  });
-
-  it("Family page · render ChildPinDialog conditionnel", () => {
-    expect(familyPage).toMatch(/<ChildPinDialog/);
-    expect(familyPage).toMatch(/onClose=\{\(\) => setPinChild\(null\)/);
-  });
-
-  it("copy FR + EN · openChildSpace + childPinTitle + childPinErrGeneric", () => {
-    for (const k of ["openChildSpace", "childPinTitle", "childPinLabel", "childPinSubmit", "childPinCancel", "childPinErrGeneric"]) {
-      expect(familyPage).toMatch(new RegExp(`${k}:`));
-    }
-  });
+  // Release Canonicalization · l'invocation UI de <ChildPinDialog /> vivait
+  // dans le legacy /famille (désormais redirect vers /family). Les tests
+  // wiring UX (state pinChild, testids "family-child-*", copy openChildSpace)
+  // sont retirés · la migration vers /family + integration PIN reste ouverte
+  // (voir FamilyChildrenSection). Le composant ChildPinDialog lui-même
+  // reste couvert par les 5 tests "ChildPinDialog · ..." plus haut.
 
   it("CoachLearnersSection · data-testid coach-learner-card + data-circle-language", () => {
     expect(coachSection).toMatch(/data-testid="coach-learners-list"/);
@@ -451,21 +441,23 @@ describe("Gate 8K · fix(child) UI PIN dialog + Coach data-testid + Playwright U
     expect(coachSection).not.toMatch(/data-household-id/);
   });
 
-  it("Playwright spec · UI PIN flow bilingue", () => {
+  it("Playwright spec · PIN flow API canonique bilingue", () => {
+    // Depuis Release Canonicalization · le flow PIN passe par POST /api/child
+    // -session (le dialogue UI vit dans src/components/famille/ChildPinDialog
+    // pour usage futur dans /family, plus dans /famille/page.tsx).
     expect(spec).toMatch(/for \(const locale of \["fr", "en"\]/);
-    expect(spec).toMatch(/family-child-open-space/);
-    expect(spec).toMatch(/child-pin-dialog/);
-    expect(spec).toMatch(/child-pin-submit/);
+    expect(spec).toMatch(/POST \/api\/child-session/);
   });
 
-  it("Playwright spec · erreur générique testée", () => {
-    expect(spec).toMatch(/PIN incorrect → erreur générique/);
+  it("Playwright spec · redirect /famille et /famille/enfant assertés", () => {
+    expect(spec).toMatch(/\/famille → \/family \(server redirect\)/);
+    expect(spec).toMatch(/\/famille\/enfant\/\[profilId\] → \/family sans profilId/);
   });
 
-  it("Playwright spec · POST /api/child-session waitForResponse status 200", () => {
-    expect(spec).toMatch(/waitForResponse/);
-    expect(spec).toMatch(/\/api\/child-session/);
-    expect(spec).toMatch(/\.toBe\(200\)/);
+  it("Playwright spec · POST /api/child-session status 200 + PIN invalide 401", () => {
+    expect(spec).toMatch(/openResp\.status\(\)[\s\S]*\.toBe\(200\)/);
+    expect(spec).toMatch(/PIN 0000 → 401 PIN_INVALID/);
+    expect(spec).toMatch(/PIN_INVALID/);
   });
 
   it("Playwright spec · Coach API scope + circleLanguage", () => {
@@ -974,38 +966,19 @@ describe("Gate 8C · playback route enforce Super Admin non-participant pédagog
 });
 
 describe("Gate 8B · sélecteur univers EXPLICITE dans AddChildDialog (brief §1)", () => {
-  const src = readRepo("src/app/[locale]/famille/page.tsx");
+  // Release Canonicalization · l'AddChildDialog inline vivait dans le legacy
+  // /famille (désormais redirect vers /family). Les 7 assertions wiring UX
+  // (state universe null, radiogroup, submit disabled, errUniverse, learning
+  // Goal conditionnel MONDE, copy universeLbl) sont retirées · la migration
+  // du dialogue vers /family/children/new reste ouverte (voir Family
+  // ChildrenSection.tsx qui link vers cette route future). La validation
+  // server-side universe (POST /api/family/children) reste couverte par
+  // "Lot 7C.4 · dérive universe depuis body" + "Lot 7C.4 · caps commerciaux".
 
-  it("state universe: null par défaut · aucune valeur pré-sélectionnée", () => {
-    expect(src).toMatch(/const \[universe, setUniverse\] = useState<"MONDE" \| "RACINES" \| null>\(null\)/);
-  });
-
-  it("radiogroup avec MONDE + RACINES · aria roles présents", () => {
-    expect(src).toMatch(/role="radiogroup"[^>]*aria-label=\{copy\.universeLbl\}/);
-    expect(src).toMatch(/id: "MONDE"[\s\S]*?id: "RACINES"/);
-  });
-
-  it("submit désactivé tant qu'universe n'est pas choisi", () => {
-    expect(src).toMatch(/disabled=\{submitting \|\| !universe\}/);
-  });
-
-  it("erreur validate avant langue · errUniverse si universe null", () => {
-    expect(src).toMatch(/if \(!universe\) return setErr\(copy\.errUniverse\)/);
-  });
-
-  it("learningGoal conditionnel universe === MONDE (NON depuis foreign.length)", () => {
-    expect(src).toMatch(/\{universe === "MONDE" \? \(/);
-    expect(src).not.toMatch(/\{foreign\.length > 0 \? \(\s*<div className="famille-field" data-goal-field/);
-  });
-
-  it("learningGoal dérivé de universe === MONDE, jamais de foreign", () => {
-    expect(src).toMatch(/const learningGoal = universe === "MONDE" && goal !== "LATER" \? goal : null/);
-  });
-
-  it("copy FR + EN contiennent universeLbl / MondeLabel / RacinesLabel / errUniverse", () => {
-    for (const k of ["universeLbl", "universeMondeLabel", "universeMondeDesc", "universeRacinesLabel", "universeRacinesDesc", "errUniverse"]) {
-      expect(src).toMatch(new RegExp(`${k}:`));
-    }
+  it("placeholder · migration UI AddChildDialog vers /family en cours", () => {
+    // Sentinel pour rappeler la dette technique.
+    const familyChildrenSection = readRepo("src/features/dashboards/family/sections/FamilyChildrenSection.tsx");
+    expect(familyChildrenSection).toMatch(/\/children\/new/);
   });
 });
 
@@ -1223,6 +1196,135 @@ describe("Gate 8L · final runtime assertions · logout UI réel + manifest dedu
     expect(orch).toMatch(/GATE8L_COACH_A_EMAIL/);
     expect(orch).toMatch(/GATE8L_COACH_B_EMAIL/);
     expect(orch).toMatch(/leakUsers[\s\S]*temp_gate8l_/);
+  });
+});
+
+describe("Release Canonicalization · /family + /center/stats + QA fail-closed + preflight", () => {
+  const famillePage = readRepo("src/app/[locale]/famille/page.tsx");
+  const familleEnfantPage = readRepo("src/app/[locale]/famille/enfant/[profilId]/page.tsx");
+  const familyPage = readRepo("src/app/[locale]/family/page.tsx");
+  const centerStatsPage = readRepo("src/app/[locale]/center/stats/page.tsx");
+  const centerPage = readRepo("src/app/[locale]/center/page.tsx");
+  const teacherPage = readRepo("src/app/[locale]/teacher/page.tsx");
+  const dashboardPage = readRepo("src/app/[locale]/dashboard/page.tsx");
+  const adminPage = readRepo("src/app/[locale]/admin/page.tsx");
+  const coachRacinesPage = readRepo("src/app/[locale]/coach/racines/page.tsx");
+  const qaPage = readRepo("src/app/[locale]/qa/page.tsx");
+  const qaConfig = readRepo("src/lib/qa/config.ts");
+  const preflight = readRepo("scripts/preflight-release-prod.mjs");
+  const proxy = readRepo("src/proxy.ts");
+  const pkg = JSON.parse(readRepo("package.json"));
+
+  it("/family est l'unique route Family canonique · SSR + gate actor + FamilyDashboard", () => {
+    expect(familyPage).toMatch(/from "@\/features\/dashboards\/family"/);
+    expect(familyPage).toMatch(/resolveFamilyGuardianActorOrNull/);
+    expect(familyPage).toMatch(/redirect\(`\/\$\{locale\}\/login`\)/);
+    expect(familyPage).toMatch(/<FamilyDashboard locale=/);
+  });
+
+  it("/famille redirige serveur-side vers /family · FR + EN", () => {
+    expect(famillePage).toMatch(/import \{ redirect \} from "next\/navigation"/);
+    expect(famillePage).toMatch(/redirect\(`\/\$\{locale\}\/family`\)/);
+    expect(famillePage).not.toMatch(/"use client"/);
+    expect(famillePage).not.toMatch(/FamillePage|useState|ChildPinDialog/);
+  });
+
+  it("/famille/enfant/[profilId] redirige vers /family (profilId non transmis)", () => {
+    expect(familleEnfantPage).toMatch(/import \{ redirect \} from "next\/navigation"/);
+    expect(familleEnfantPage).toMatch(/redirect\(`\/\$\{locale\}\/family`\)/);
+    // Le redirect ne doit PAS inclure profilId dans la nouvelle URL.
+    expect(familleEnfantPage).not.toMatch(/redirect\([^)]*profilId/);
+    expect(familleEnfantPage).not.toMatch(/"use client"/);
+  });
+
+  it("/center/stats n'importe plus le composant legacy · redirige vers /center", () => {
+    expect(centerStatsPage).toMatch(/import \{ redirect \} from "next\/navigation"/);
+    expect(centerStatsPage).toMatch(/redirect\(`\/\$\{locale\}\/center`\)/);
+    // Aucun import du composant legacy dans le nouveau redirect stub.
+    expect(centerStatsPage).not.toMatch(/import [\s\S]*CenterDashboardView/);
+    expect(centerStatsPage).not.toMatch(/getCenterDashboard/);
+  });
+
+  it("CenterDashboardView reste importé uniquement comme fallback flag OFF (jamais inconditionnel)", () => {
+    // /center dispatcher conserve le fallback legacy quand flag off.
+    expect(centerPage).toMatch(/isYemaDashboardRedesignActive/);
+    expect(centerPage).toMatch(/CenterDashboardView/);
+    // /center/stats ne l'importe plus (le stub redirect ne contient aucun import).
+    expect(centerStatsPage).not.toMatch(/import [\s\S]*CenterDashboardView/);
+  });
+
+  it("QA page fail-closed · notFound() si !status.active", () => {
+    expect(qaPage).toMatch(/resolveQaConfig/);
+    expect(qaPage).toMatch(/if \(!status\.active\) notFound\(\)/);
+  });
+
+  it("QA config exige VERCEL_ENV=preview (jamais production) + flag + P-1", () => {
+    expect(qaConfig).toMatch(/vercelEnv === "preview"/);
+    expect(qaConfig).toMatch(/QA_MODE_ENABLED/);
+    expect(qaConfig).toMatch(/QA_ALLOWED_PROJECT_REF = "kzzagbojjkivdzzcrmxn"/);
+    expect(qaConfig).toMatch(/not_preview/);
+  });
+
+  it("QA API routes fail-closed · toutes appellent resolveQaConfig() + return 404 stable", () => {
+    for (const p of ["bootstrap", "child-session", "impersonate", "logout", "status"]) {
+      const src = readRepo(`src/app/api/qa/${p}/route.ts`);
+      expect(src, `qa/${p}`).toMatch(/resolveQaConfig/);
+      expect(src, `qa/${p} · 404`).toMatch(/status:\s*404/);
+    }
+  });
+
+  it("Preflight release Production · refuse non-prod + variables requises exhaustives", () => {
+    expect(preflight).toMatch(/VERCEL_ENV.*production/);
+    expect(preflight).toMatch(/YEMA_DASHBOARD_REDESIGN_ENABLED/);
+    expect(preflight).toMatch(/YEMA_MESSAGING_ENABLED/);
+    expect(preflight).toMatch(/YEMA_MESSAGE_AUDIO_ENABLED/);
+    expect(preflight).toMatch(/YEMA_COACH_WORKSPACE_ENABLED/);
+    expect(preflight).toMatch(/YEMA_ROOTS_COACH_RLS_CONFIRMED/);
+    expect(preflight).toMatch(/YEMA_CHILD_SESSION_SECRET/);
+    // Exit non-nul si variable manquante.
+    expect(preflight).toMatch(/process\.exit\(failures\.length\)/);
+    // Aucune valeur loguée (secrets).
+    expect(preflight).not.toMatch(/process\.env\[[^\]]+\]\s*\)\s*[;,]?\s*[\/]?[\/]?[^\n]*(console\.log|console\.error)/);
+  });
+
+  it("Preflight npm script branché", () => {
+    expect(pkg.scripts["preflight:release:prod"]).toBe("node scripts/preflight-release-prod.mjs");
+  });
+
+  it("Les 5 dispatchers rendent le redesign lorsque flag=true + gardent le fallback legacy quand false", () => {
+    for (const [label, src] of [
+      ["dashboard", dashboardPage],
+      ["admin", adminPage],
+      ["teacher", teacherPage],
+      ["center", centerPage],
+      ["coach/racines", coachRacinesPage],
+    ] as const) {
+      expect(src, `${label} · flag read`).toMatch(/isYemaDashboardRedesignActive/);
+    }
+    // Fallback legacy encore importé (compilable quand flag false).
+    expect(dashboardPage).toMatch(/DashboardMonde|DashboardRacines/);
+    expect(adminPage).toMatch(/LegacyAdminDashboard/);
+    expect(teacherPage).toMatch(/TeacherDashboardView/);
+    expect(centerPage).toMatch(/CenterDashboardView/);
+    expect(coachRacinesPage).toMatch(/RootsCoachDashboardView/);
+  });
+
+  it("proxy.ts · /family + /famille scope STUDENT + ADMIN · spaceForPath supporte les deux", () => {
+    expect(proxy).toMatch(/"\/family":\s*\["STUDENT",\s*"ADMIN"\]/);
+    expect(proxy).toMatch(/"\/famille":\s*\["STUDENT",\s*"ADMIN"\]/);
+    expect(proxy).toMatch(/pathname\.startsWith\("\/family"\)/);
+    expect(proxy).toMatch(/pathname\.startsWith\("\/famille"\)/);
+  });
+
+  it("Personas matrix · family + child_* pointent vers /fr/family (canonique)", () => {
+    const matrix = readRepo("src/lib/personas/matrix.ts");
+    // family homeRoute = /fr/family
+    expect(matrix).toMatch(/id:\s*"family"[\s\S]{0,300}homeRoute:\s*"\/fr\/family"/);
+    // child_monde + child_racines · homeRoute canonique /fr/family (plus /famille/enfant)
+    expect(matrix).toMatch(/id:\s*"child_monde"[\s\S]{0,300}homeRoute:\s*"\/fr\/family"/);
+    expect(matrix).toMatch(/id:\s*"child_racines"[\s\S]{0,300}homeRoute:\s*"\/fr\/family"/);
+    // Aucune référence résiduelle à /fr/famille dans les homeRoutes.
+    expect(matrix).not.toMatch(/homeRoute:\s*"\/fr\/famille/);
   });
 });
 

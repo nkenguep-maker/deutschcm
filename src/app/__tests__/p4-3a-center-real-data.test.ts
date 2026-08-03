@@ -10,12 +10,16 @@ function read(rel: string) {
 }
 
 describe("P4.3a · pages Center · aucun mock rendu", () => {
+  // Release Canonicalization · /center/stats est désormais un redirect
+  // permanent vers /center (les stats sont consolidées côté nouveau
+  // CenterDashboard). La page ne rend plus de données · elle n'est plus
+  // couverte par les assertions "flag-gated" ni "resolveCenterActor".
+  // Un test dédié dans personasMatrix7C valide le redirect.
   const pages = [
     "src/app/[locale]/center/page.tsx",
     "src/app/[locale]/center/teachers/page.tsx",
     "src/app/[locale]/center/classes/page.tsx",
     "src/app/[locale]/center/students/page.tsx",
-    "src/app/[locale]/center/stats/page.tsx",
   ];
   it.each(pages)("%s · aucun const MOCK_/STUDENTS/CLASSES hardcoded", (file) => {
     const s = read(file);

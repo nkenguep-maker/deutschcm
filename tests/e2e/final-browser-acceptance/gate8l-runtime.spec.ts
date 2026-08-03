@@ -140,6 +140,15 @@ test.describe("Gate 8L · Network dashboard adulte scoping · Family API NON app
 });
 
 test.describe("Gate 8L · Coach A/B isolation DOM · count + data-circle-language", () => {
+  // Ces tests dépendent des fixtures temp coach A/B (WOLOF/SWAHILI) que seul
+  // l'orchestrateur `orchestrate-final-runtime-assertions-p1.ts` provisionne.
+  // Sous d'autres orchestrateurs (ex · final-browser-acceptance), les env vars
+  // GATE8L_COACH_A/B_EMAIL sont absents · les tests skip fixture-conditionnel
+  // (contrat orchestrateur · non "skip obligatoire" au sens du release rule).
+  test.skip(
+    !process.env.GATE8L_COACH_A_EMAIL || !process.env.GATE8L_COACH_B_EMAIL,
+    "GATE8L_COACH_*_EMAIL absents · orchestrateur non-gate8l · fixtures non provisionnées",
+  );
   for (const [label, envKey, lang] of [
     ["A", "GATE8L_COACH_A_EMAIL", "WOLOF"],
     ["B", "GATE8L_COACH_B_EMAIL", "SWAHILI"],
