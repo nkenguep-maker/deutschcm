@@ -1,6 +1,8 @@
 name: Persona section pages
 
 on:
+  push:
+    branches: [fix/live-persona-section-pages]
   pull_request:
     branches: [main]
   workflow_dispatch:
