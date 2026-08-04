@@ -1,16 +1,9 @@
 // P4.6 Lot 4B · Admin dispatch server-side.
-//
-// Flag YEMA_DASHBOARD_REDESIGN_ENABLED gate le rendu :
-//   false → LegacyAdminDashboard (client component byte-identique au
-//           legacy antérieur — le contenu original est déplacé dans
-//           LegacyAdminDashboard.tsx sans modification fonctionnelle,
-//           seule la fonction est renommée pour éviter la collision).
-//   true  → AdminDashboard YEMA (server-first, données résolvées via
-//           src/lib/admin/consoleData.ts, aucune fetch client, aucun
-//           secret rendu).
 
 import { isYemaDashboardRedesignActive } from "@/lib/flags";
 import { AdminDashboard } from "@/features/dashboards/admin";
+import { InternalPersonaDashboard } from "@/features/dashboards/internal-test/InternalPersonaDashboard";
+import { resolveActiveInternalPersona } from "@/lib/internalPersonaPage";
 import {
   getAdminEnvSummary,
   getAdminPersonas,
@@ -26,12 +19,17 @@ export default async function Page({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
+
+  const internalPersona = await resolveActiveInternalPersona(["super_admin"]);
+  if (internalPersona) {
+    return <InternalPersonaDashboard persona={internalPersona} locale={loc} />;
+  }
 
   if (!isYemaDashboardRedesignActive()) {
     return <LegacyAdminDashboard />;
   }
 
-  const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
   const [personas, audit, env] = await Promise.all([
     Promise.resolve(getAdminPersonas(loc)),
     getAdminRecentAudit(20),

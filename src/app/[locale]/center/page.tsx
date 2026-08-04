@@ -1,9 +1,4 @@
 // P4.3a · Center dashboard · SSR · scope strict centerId.
-// Compteurs réels uniquement (teacher/classroom/student/pending). Aucun
-// mock. Métriques non calculables affichent "Donnée indisponible".
-//
-// P4.6 Lot 4B · redesign flag YEMA_DASHBOARD_REDESIGN_ENABLED gate
-// la vue rendue quand true. Legacy inchangé quand flag off.
 
 import { redirect } from "next/navigation";
 import { isCenterRealDataActive, isYemaDashboardRedesignActive } from "@/lib/flags";
@@ -12,6 +7,8 @@ import { getCenterDashboard } from "@/lib/center/queries";
 import CenterFeaturePlaceholder from "@/components/center/CenterFeaturePlaceholder";
 import CenterDashboardView from "@/components/center/CenterDashboardView";
 import { CenterDashboard } from "@/features/dashboards/center";
+import { InternalPersonaDashboard } from "@/features/dashboards/internal-test/InternalPersonaDashboard";
+import { resolveActiveInternalPersona } from "@/lib/internalPersonaPage";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +18,13 @@ export default async function Page({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
+
+  const internalPersona = await resolveActiveInternalPersona(["center_admin"]);
+  if (internalPersona) {
+    return <InternalPersonaDashboard persona={internalPersona} locale={loc} />;
+  }
+
   if (!isCenterRealDataActive()) {
     return <CenterFeaturePlaceholder locale={locale} />;
   }
@@ -28,7 +32,6 @@ export default async function Page({
   if (!actor) redirect(`/${locale}/login`);
 
   if (isYemaDashboardRedesignActive()) {
-    const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
     return <CenterDashboard locale={loc} />;
   }
 

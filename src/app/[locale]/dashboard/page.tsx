@@ -1,8 +1,7 @@
 // /dashboard · aiguillage par univers (P2, étendu P3).
 // Server component qui charge le LearningPath actif de l'utilisateur et
-// route Monde / Racines. En mode test interne Production, le cookie persona
-// choisit explicitement le parcours fixture du propriétaire sans modifier le
-// parcours réel utilisé hors de ce mode.
+// route Monde / Racines. En mode test interne Production, le persona actif
+// rend un jeu de démonstration complet et isolé du parcours réel.
 
 import { cookies } from "next/headers";
 import { redirect } from "@/navigation";
@@ -17,6 +16,8 @@ import { StudentRacinesDashboard } from "@/features/dashboards/student-racines";
 import { resolveActiveChildSession } from "@/lib/family/childResolvers";
 import { ChildMondeDashboard } from "@/features/dashboards/child-monde";
 import { ChildRacinesDashboard } from "@/features/dashboards/child-racines";
+import { InternalPersonaDashboard } from "@/features/dashboards/internal-test/InternalPersonaDashboard";
+import { resolveActiveInternalPersona } from "@/lib/internalPersonaPage";
 import {
   INTERNAL_TEST_COOKIE_NAME,
   isInternalPersonaId,
@@ -29,6 +30,16 @@ interface Props { params: Promise<{ locale: string }> }
 export default async function DashboardPage({ params }: Props) {
   const { locale } = await params;
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
+
+  const internalPersona = await resolveActiveInternalPersona([
+    "student_monde",
+    "student_racines",
+    "child_monde",
+    "child_racines",
+  ]);
+  if (internalPersona) {
+    return <InternalPersonaDashboard persona={internalPersona} locale={loc} />;
+  }
 
   const childSession = await resolveActiveChildSession();
   if (childSession) {
