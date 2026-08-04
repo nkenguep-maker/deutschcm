@@ -67,12 +67,20 @@ describe("Internal persona dashboards · complete UI contract", () => {
     }
   });
 
-  it("keeps the unauthenticated visual audit preview-only", () => {
-    const preview = read("src/app/[locale]/persona-preview/[persona]/page.tsx");
-    const api = read("src/app/api/internal-test/persona-ui-contracts/route.ts");
+  it("keeps visual and runtime audits under the existing QA public gate", () => {
+    const proxy = read("src/proxy.ts");
+    const preview = read("src/app/[locale]/qa/persona-preview/[persona]/page.tsx");
+    const contractApi = read("src/app/api/internal-test/persona-ui-contracts/route.ts");
+    const renderAudit = read("src/app/api/internal-test/persona-render-audit/route.ts");
+
+    expect(proxy).toContain('"/qa"');
     expect(preview).toContain('process.env.VERCEL_ENV === "production"');
     expect(preview).toContain("notFound()");
-    expect(api).toContain('process.env.VERCEL_ENV === "production"');
-    expect(api).toContain("status: 404");
+    expect(contractApi).toContain('process.env.VERCEL_ENV === "production"');
+    expect(contractApi).toContain("status: 404");
+    expect(renderAudit).toContain('process.env.VERCEL_ENV === "production"');
+    expect(renderAudit).toContain("data-internal-persona-dashboard");
+    expect(renderAudit).toContain("data-persona-section");
+    expect(renderAudit).toContain("redirectedToLogin");
   });
 });
