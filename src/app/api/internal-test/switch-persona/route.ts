@@ -6,12 +6,12 @@ import {
   INTERNAL_TEST_COOKIE_MAX_AGE,
   INTERNAL_TEST_COOKIE_NAME,
   internalPersonaDestination,
+  internalPersonaRequiredSpaceRole,
   isInternalPersonaId,
   isInternalTesterEmail,
-  type InternalPersonaId,
 } from "@/lib/internalTest";
 import { ensureInternalTestWorkspace } from "@/lib/internalTestProvisioning";
-import { syncUserMetadata, type SpaceRole } from "@/lib/roles";
+import { syncUserMetadata } from "@/lib/roles";
 import {
   CHILD_SESSION_COOKIE_NAME,
   CHILD_SESSION_TTL_SECONDS,
@@ -28,15 +28,6 @@ function cookieOptions(maxAge: number, httpOnly = true) {
     path: "/",
     maxAge,
   };
-}
-
-function activeSpaceForPersona(persona: InternalPersonaId): SpaceRole {
-  switch (persona) {
-    case "super_admin": return "ADMIN";
-    case "teacher": return "TEACHER";
-    case "center_admin": return "CENTER";
-    default: return "STUDENT";
-  }
 }
 
 export async function POST(req: NextRequest) {
@@ -60,6 +51,9 @@ export async function POST(req: NextRequest) {
 
   if (action === "reset") {
     await syncUserMetadata({ supabaseId: dbUser.supabaseId, activeSpace: "STUDENT" });
+    const { error: refreshError } = await supabase.auth.refreshSession();
+    if (refreshError) console.warn("[internal-test] session refresh after reset failed", refreshError.message);
+
     const response = NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url), 303);
     response.cookies.set(INTERNAL_TEST_COOKIE_NAME, "", cookieOptions(0));
     response.cookies.set(CHILD_SESSION_COOKIE_NAME, "", cookieOptions(0));
@@ -72,8 +66,14 @@ export async function POST(req: NextRequest) {
   }
 
   const fixture = await ensureInternalTestWorkspace(dbUser.id);
-  const activeSpace = activeSpaceForPersona(rawPersona);
+  const activeSpace = internalPersonaRequiredSpaceRole(rawPersona);
   await syncUserMetadata({ supabaseId: dbUser.supabaseId, activeSpace });
+
+  // Supabase stores roles/active_space in the access-token JWT. Updating
+  // user_metadata alone does not refresh the current browser token, so the
+  // next request could still be evaluated as STUDENT by the proxy.
+  const { error: refreshError } = await supabase.auth.refreshSession();
+  if (refreshError) console.warn("[internal-test] session refresh after persona switch failed", refreshError.message);
 
   const destination = internalPersonaDestination(rawPersona, locale);
   const response = NextResponse.redirect(new URL(destination, req.url), 303);
