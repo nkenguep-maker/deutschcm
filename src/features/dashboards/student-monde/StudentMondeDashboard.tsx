@@ -1,13 +1,7 @@
 "use client";
 
-// StudentMondeDashboard · Lot 2 P4.6.
-// Réutilise strictement les APIs existantes (/api/me/monde-dashboard et
-// /api/student/assignments) — aucun resolver dupliqué. Rendu client comme
-// l'ancien composant, mais wrap dans le shell YEMA (data-yema-shell) qui
-// applique la palette sombre/or scopée.
-
 import { useEffect, useState } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   DashboardShell,
   DashboardSidebar,
@@ -22,17 +16,14 @@ import {
   DashboardTabBar,
 } from "@/features/dashboards/shared";
 import type { DashboardTab } from "@/features/dashboards/shared";
+import { routeSectionNav, routeSectionTabs, sectionPageHref } from "@/features/dashboards/shared/sectionRouting";
 import { buildMondeNav } from "./nav";
 import { MondeIvoryOverview } from "./ivory/MondeIvoryOverview";
 import { CourseSection } from "./sections/CourseSection";
 import { AssignmentsSection } from "./sections/AssignmentsSection";
 import { ClassSection } from "./sections/ClassSection";
 import { MessagesPlaceholderSection } from "./sections/MessagesPlaceholderSection";
-import type {
-  AssignmentsAvailability,
-  MondeDashboardData,
-  MondeStudentAssignment,
-} from "./types";
+import type { AssignmentsAvailability, MondeDashboardData, MondeStudentAssignment } from "./types";
 
 async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url, { cache: "no-store" });
@@ -46,13 +37,10 @@ async function loadDashboard(): Promise<MondeDashboardData> {
 
 async function loadAssignments(): Promise<AssignmentsAvailability> {
   try {
-    const raw = await fetchJson<{ assignments?: MondeStudentAssignment[] }>(
-      "/api/student/assignments",
-    );
+    const raw = await fetchJson<{ assignments?: MondeStudentAssignment[] }>("/api/student/assignments");
     return { kind: "available", assignments: raw.assignments ?? [] };
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    // API renvoie 404/403 lorsque flag ASSIGNMENTS_ENABLED off ou pas de role
     if (msg.includes("404") || msg.includes("403")) return { kind: "unavailable" };
     return { kind: "error" };
   }
@@ -63,13 +51,18 @@ type LoadState =
   | { kind: "error" }
   | { kind: "ready"; data: MondeDashboardData; assignments: AssignmentsAvailability };
 
-export function StudentMondeDashboard({ locale }: { locale: "fr" | "en" }) {
+type Props = { locale: "fr" | "en"; activeSectionId?: string };
+
+const ALLOWED = new Set(["accueil", "objectif", "progression", "mon-cours", "mes-devoirs", "mon-parcours", "ma-classe", "messages"]);
+
+export function StudentMondeDashboard({ locale, activeSectionId = "accueil" }: Props) {
   const t = useTranslations("yemaDashboards");
   const tCommon = useTranslations("yemaDashboards.common");
   const currentLocale = useLocale();
   const [state, setState] = useState<LoadState>({ kind: "loading" });
-
+  const activeSection = ALLOWED.has(activeSectionId) ? activeSectionId : "accueil";
   const dashboardHref = `/${currentLocale ?? locale}/dashboard`;
+  const activeHref = sectionPageHref(dashboardHref, activeSection, "accueil");
 
   const load = () => {
     setState({ kind: "loading" });
@@ -83,7 +76,7 @@ export function StudentMondeDashboard({ locale }: { locale: "fr" | "en" }) {
     load();
   }, []);
 
-  const navGroups = buildMondeNav(
+  const navGroups = routeSectionNav(buildMondeNav(
     {
       overview: t("studentMonde.nav.overview"),
       course: t("studentMonde.nav.course"),
@@ -94,182 +87,74 @@ export function StudentMondeDashboard({ locale }: { locale: "fr" | "en" }) {
       sectionLabel: t("studentMonde.sidebarSection"),
     },
     dashboardHref,
-  );
+  ), dashboardHref, "accueil");
 
   const personaLabel = t("studentMonde.personaLabel");
   const personaSubtitle = t("studentMonde.personaSubtitle");
-
   const sidebar = (
-    <DashboardSidebar
-      groups={navGroups}
-      activeHref={dashboardHref}
-      personaLabel={personaLabel}
-      personaSubtitle={personaSubtitle}
-      brandHref={`/${currentLocale ?? locale}`}
-      previewBadge={tCommon("previewBadge")}
-    />
+    <DashboardSidebar groups={navGroups} activeHref={activeHref} personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${currentLocale ?? locale}`} previewBadge={tCommon("previewBadge")} />
   );
+  const mobileHeader = <DashboardMobileHeader personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${currentLocale ?? locale}`} />;
 
-  const mobileHeader = (
-    <DashboardMobileHeader
-      personaLabel={personaLabel}
-      personaSubtitle={personaSubtitle}
-      brandHref={`/${currentLocale ?? locale}`}
-    />
-  );
-
-  // Onglets mobile PDF §3 : Accueil · Cours · Devoirs · Parcours · Messages.
-  // Compteur Devoirs uniquement si assignments réels non-clos.
-  const openAssignmentsCount =
-    state.kind === "ready" && state.assignments.kind === "available"
-      ? state.assignments.assignments.filter((a) => a.status === "PUBLISHED").length
-      : null;
-  const mobileTabs: DashboardTab[] = [
+  const openAssignmentsCount = state.kind === "ready" && state.assignments.kind === "available"
+    ? state.assignments.assignments.filter((a) => a.status === "PUBLISHED").length
+    : null;
+  const rawTabs: DashboardTab[] = [
     { key: "overview", label: t("studentMonde.mobileNav.overview"), href: dashboardHref },
     { key: "course", label: t("studentMonde.mobileNav.course"), href: `${dashboardHref}#mon-cours` },
     { key: "assignments", label: t("studentMonde.mobileNav.assignments"), href: `${dashboardHref}#mes-devoirs`, badgeCount: openAssignmentsCount ?? null },
     { key: "journey", label: t("studentMonde.mobileNav.journey"), href: `${dashboardHref}#mon-parcours` },
     { key: "messages", label: t("studentMonde.mobileNav.messages"), href: `${dashboardHref}#messages` },
   ];
-  const tabBar = <DashboardTabBar tabs={mobileTabs} activeKey="overview" />;
+  const mobileTabs = routeSectionTabs(rawTabs, dashboardHref, "accueil");
+  const activeTab = ({ accueil: "overview", objectif: "overview", progression: "overview", "mon-cours": "course", "mes-devoirs": "assignments", "mon-parcours": "journey", "ma-classe": "overview", messages: "messages" } as Record<string, string>)[activeSection];
+  const tabBar = <DashboardTabBar tabs={mobileTabs} activeKey={activeTab} />;
+
+  const shell = (body: React.ReactNode, header: React.ReactNode) => (
+    <DashboardPageBoundary>
+      <DashboardShell sidebar={sidebar} mobileHeader={mobileHeader} tabBar={tabBar} header={header}>{body}</DashboardShell>
+    </DashboardPageBoundary>
+  );
 
   if (state.kind === "loading") {
-    return (
-      <DashboardPageBoundary>
-        <DashboardShell
-          sidebar={sidebar}
-          mobileHeader={mobileHeader}
-          tabBar={tabBar}
-          header={<DashboardHeader title={personaLabel} subtitle={tCommon("loading")} />}
-        >
-          <div style={{ display: "grid", gap: 16 }}>
-            <DashboardSkeleton height={140} rounded={18} />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
-              <DashboardSkeleton height={140} rounded={18} />
-              <DashboardSkeleton height={140} rounded={18} />
-            </div>
-            <DashboardSkeleton height={280} rounded={18} />
-          </div>
-        </DashboardShell>
-      </DashboardPageBoundary>
+    return shell(
+      <div style={{ display: "grid", gap: 16 }}><DashboardSkeleton height={140} rounded={18} /><DashboardSkeleton height={280} rounded={18} /></div>,
+      <DashboardHeader title={personaLabel} subtitle={tCommon("loading")} />,
     );
   }
-
   if (state.kind === "error") {
-    return (
-      <DashboardPageBoundary>
-        <DashboardShell
-          sidebar={sidebar}
-          mobileHeader={mobileHeader}
-          tabBar={tabBar}
-          header={<DashboardHeader title={personaLabel} />}
-        >
-          <DashboardErrorState
-            title={tCommon("error")}
-            action={
-              <button
-                type="button"
-                onClick={load}
-                style={{
-                  marginTop: 8,
-                  padding: "10px 18px",
-                  minHeight: 40,
-                  borderRadius: "var(--yema-r-pill)",
-                  background: "transparent",
-                  border: "1px solid var(--yema-gold-edge)",
-                  color: "var(--yema-gold-light)",
-                  fontFamily: "inherit",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                {tCommon("retry")}
-              </button>
-            }
-          />
-        </DashboardShell>
-      </DashboardPageBoundary>
+    return shell(
+      <DashboardErrorState title={tCommon("error")} action={<button type="button" onClick={load}>{tCommon("retry")}</button>} />,
+      <DashboardHeader title={personaLabel} />,
     );
   }
 
   const { data, assignments } = state;
-
   if (!data.hasLearningPath) {
-    return (
-      <DashboardPageBoundary>
-        <DashboardShell
-          sidebar={sidebar}
-          mobileHeader={mobileHeader}
-          tabBar={tabBar}
-          header={<DashboardHeader title={personaLabel} />}
-        >
-          <DashboardCard>
-            <DashboardEmptyState title={t("studentMonde.overview.nextAssignmentsEmpty")} />
-          </DashboardCard>
-        </DashboardShell>
-      </DashboardPageBoundary>
-    );
+    return shell(<DashboardCard><DashboardEmptyState title={t("studentMonde.overview.nextAssignmentsEmpty")} /></DashboardCard>, <DashboardHeader title={personaLabel} />);
   }
 
   const greeting = data.greetingName?.split(" ")[0] ?? t("studentMonde.greetingFallback");
-  const meta = data.learningPath?.currentLevel
-    ? t("studentMonde.metaLanguageLevel", { level: data.learningPath.currentLevel })
-    : t("studentMonde.metaLanguageLevelUnknown");
-  const accessLabel =
-    data.access.status === "ACTIVE" ? t("studentMonde.access.active") :
-    data.access.status === "EXPIRED" ? t("studentMonde.access.expired") :
-    t("studentMonde.access.none");
-  const accessTone =
-    data.access.status === "ACTIVE" ? "success" as const :
-    data.access.status === "EXPIRED" ? "alert" as const :
-    "muted" as const;
+  const meta = data.learningPath?.currentLevel ? t("studentMonde.metaLanguageLevel", { level: data.learningPath.currentLevel }) : t("studentMonde.metaLanguageLevelUnknown");
+  const accessLabel = data.access.status === "ACTIVE" ? t("studentMonde.access.active") : data.access.status === "EXPIRED" ? t("studentMonde.access.expired") : t("studentMonde.access.none");
+  const accessTone = data.access.status === "ACTIVE" ? "success" as const : data.access.status === "EXPIRED" ? "alert" as const : "muted" as const;
 
-  return (
-    <DashboardPageBoundary>
-      <DashboardShell
-        sidebar={sidebar}
-        mobileHeader={mobileHeader}
-          tabBar={tabBar}
-        header={
-          <DashboardHeader
-            title={greeting}
-            subtitle={meta}
-            meta={<DashboardStatusChip tone={accessTone}>{accessLabel}</DashboardStatusChip>}
-          />
-        }
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-          {/* Lot 7A / 7A.1 · Monde Ivory · composition UNIQUE brief §5 ·
-              identité (DashboardHeader) → parcours actif → hero → CTA →
-              progression → module → devoirs → prochaine étape → classe.
-              OverviewSection retiré (hero + CTA + progression + next
-              assignments dupliqués ivoirés) · JourneySection retiré
-              (duplication de la progression du hero). */}
-          <MondeIvoryOverview
-            input={{
-              learningGoal: data.onboarding?.learningGoal ?? null,
-              targetCity: data.onboarding?.targetCity ?? null,
-              targetDate: null,
-              progressPct: data.overallPct ?? 0,
-              // Lot 7A.2 · l'état `completed` ne peut PAS être dérivé
-              // d'un état commercial (`access.status === "EXPIRED"`) ni
-              // d'un simple pourcentage visuel. Aucun champ pédagogique
-              // explicite ne signale la fin du parcours dans le modèle
-              // actuel · `completed` reste donc `false` en runtime
-              // normal · la variante visuelle completed n'est activée
-              // que par le runner QA server-only (voir scripts
-              // capture-monde-ivory:p1). Documenté brief §2.
-              completed: false,
-              level: data.learningPath?.currentLevel ?? null,
-            }}
-          />
-          <AssignmentsSection assignments={assignments} />
-          <CourseSection courses={data.courses} accessStatus={data.access.status} />
-          <ClassSection />
-          <MessagesPlaceholderSection />
-        </div>
-      </DashboardShell>
-    </DashboardPageBoundary>
+  const overview = (
+    <MondeIvoryOverview input={{ learningGoal: data.onboarding?.learningGoal ?? null, targetCity: data.onboarding?.targetCity ?? null, targetDate: null, progressPct: data.overallPct ?? 0, completed: false, level: data.learningPath?.currentLevel ?? null }} />
+  );
+  const content: Record<string, React.ReactNode> = {
+    accueil: overview,
+    objectif: overview,
+    progression: overview,
+    "mon-parcours": overview,
+    "mes-devoirs": <AssignmentsSection assignments={assignments} />,
+    "mon-cours": <CourseSection courses={data.courses} accessStatus={data.access.status} />,
+    "ma-classe": <ClassSection />,
+    messages: <MessagesPlaceholderSection />,
+  };
+
+  return shell(
+    <div data-live-persona-section={activeSection}>{content[activeSection]}</div>,
+    <DashboardHeader title={greeting} subtitle={meta} meta={<DashboardStatusChip tone={accessTone}>{accessLabel}</DashboardStatusChip>} />,
   );
 }
