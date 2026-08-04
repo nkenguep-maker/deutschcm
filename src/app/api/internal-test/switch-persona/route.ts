@@ -1,6 +1,5 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import {
@@ -23,6 +22,8 @@ import {
 
 export const dynamic = "force-dynamic";
 
+type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>;
+
 function cookieOptions(maxAge: number, httpOnly = true) {
   return {
     httpOnly,
@@ -34,20 +35,11 @@ function cookieOptions(maxAge: number, httpOnly = true) {
 }
 
 async function setEffectivePersonaMetadata(params: {
+  supabase: ServerSupabaseClient;
   userId: string;
-  supabaseId: string;
+  currentMetadata: Record<string, unknown>;
   persona: InternalPersonaId | null;
 }): Promise<void> {
-  const admin = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } },
-  );
-
-  const { data: current, error: readError } = await admin.auth.admin.getUserById(params.supabaseId);
-  if (readError || !current.user) throw new Error("internal persona metadata read failed");
-
-  const existing = (current.user.user_metadata ?? {}) as Record<string, unknown>;
   const {
     roles: _roles,
     onboarded_map: _onboardedMap,
@@ -56,7 +48,7 @@ async function setEffectivePersonaMetadata(params: {
     internal_test_app_role: _internalAppRole,
     internal_test_universe: _internalUniverse,
     ...preserved
-  } = existing;
+  } = params.currentMetadata;
 
   let nextMetadata: Record<string, unknown>;
   if (params.persona) {
@@ -87,15 +79,19 @@ async function setEffectivePersonaMetadata(params: {
     };
   }
 
-  const { error: updateError } = await admin.auth.admin.updateUserById(params.supabaseId, {
-    user_metadata: nextMetadata,
+  // La route est déjà authentifiée et strictement réservée au propriétaire.
+  // Mettre à jour l'utilisateur courant évite de dépendre d'une Service Role
+  // absente ou rattachée à un autre projet Vercel/Supabase.
+  const { data, error } = await params.supabase.auth.updateUser({
+    data: nextMetadata,
   });
-  if (updateError) throw new Error("internal persona metadata update failed");
+  if (error || !data.user) {
+    const code = error && "code" in error ? String(error.code) : "unknown";
+    throw new Error(`internal persona metadata update failed (${code})`);
+  }
 }
 
-async function refreshBrowserSession(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-): Promise<boolean> {
+async function refreshBrowserSession(supabase: ServerSupabaseClient): Promise<boolean> {
   const { error } = await supabase.auth.refreshSession();
   return !error;
 }
@@ -116,21 +112,25 @@ export async function POST(req: NextRequest) {
 
   const dbUser = await prisma.user.findUnique({
     where: { supabaseId: user.id },
-    select: { id: true, supabaseId: true },
+    select: { id: true },
   });
   if (!dbUser) return NextResponse.json({ error: "USER_NOT_FOUND" }, { status: 404 });
+
+  const currentMetadata = (user.user_metadata ?? {}) as Record<string, unknown>;
 
   if (action === "reset") {
     try {
       await setEffectivePersonaMetadata({
+        supabase,
         userId: dbUser.id,
-        supabaseId: dbUser.supabaseId,
+        currentMetadata,
         persona: null,
       });
       if (!(await refreshBrowserSession(supabase))) {
         return NextResponse.json({ error: "SESSION_REFRESH_FAILED" }, { status: 500 });
       }
-    } catch {
+    } catch (error) {
+      console.error("[internal-test] persona reset failed", error);
       return NextResponse.json({ error: "PERSONA_RESET_FAILED" }, { status: 500 });
     }
 
@@ -164,8 +164,9 @@ export async function POST(req: NextRequest) {
     }
 
     await setEffectivePersonaMetadata({
+      supabase,
       userId: dbUser.id,
-      supabaseId: dbUser.supabaseId,
+      currentMetadata,
       persona: rawPersona,
     });
     if (!(await refreshBrowserSession(supabase))) {
