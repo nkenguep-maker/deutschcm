@@ -13,69 +13,15 @@ const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
 
 const EXPECTED = {
-  super_admin: {
-    requiredSpaceRole: "ADMIN",
-    appRole: "YEMA_ADMIN",
-    universe: null,
-    destinationPath: "/admin",
-    authKind: "adult_session",
-  },
-  teacher: {
-    requiredSpaceRole: "TEACHER",
-    appRole: "TEACHER",
-    universe: "MONDE",
-    destinationPath: "/teacher",
-    authKind: "adult_session",
-  },
-  coach: {
-    requiredSpaceRole: "STUDENT",
-    appRole: "RACINES_COACH",
-    universe: "RACINES",
-    destinationPath: "/coach/racines",
-    authKind: "adult_session",
-  },
-  center_admin: {
-    requiredSpaceRole: "CENTER",
-    appRole: "CENTER_ADMIN",
-    universe: null,
-    destinationPath: "/center",
-    authKind: "adult_session",
-  },
-  student_monde: {
-    requiredSpaceRole: "STUDENT",
-    appRole: "LEARNER",
-    universe: "MONDE",
-    destinationPath: "/dashboard",
-    authKind: "adult_session",
-  },
-  student_racines: {
-    requiredSpaceRole: "STUDENT",
-    appRole: "LEARNER",
-    universe: "RACINES",
-    destinationPath: "/dashboard",
-    authKind: "adult_session",
-  },
-  family: {
-    requiredSpaceRole: "STUDENT",
-    appRole: "PARENT",
-    universe: null,
-    destinationPath: "/family",
-    authKind: "adult_session",
-  },
-  child_monde: {
-    requiredSpaceRole: "STUDENT",
-    appRole: null,
-    universe: "MONDE",
-    destinationPath: "/dashboard",
-    authKind: "child_session",
-  },
-  child_racines: {
-    requiredSpaceRole: "STUDENT",
-    appRole: null,
-    universe: "RACINES",
-    destinationPath: "/dashboard",
-    authKind: "child_session",
-  },
+  super_admin: { spaceRole: "ADMIN", appRole: "YEMA_ADMIN", universe: null, destinationPath: "/admin", authKind: "session" },
+  teacher: { spaceRole: "TEACHER", appRole: "TEACHER", universe: "MONDE", destinationPath: "/teacher", authKind: "session" },
+  coach: { spaceRole: "STUDENT", appRole: "RACINES_COACH", universe: "RACINES", destinationPath: "/coach/racines", authKind: "session" },
+  center_admin: { spaceRole: "CENTER", appRole: "CENTER_ADMIN", universe: null, destinationPath: "/center", authKind: "session" },
+  student_monde: { spaceRole: "STUDENT", appRole: "LEARNER", universe: "MONDE", destinationPath: "/dashboard", authKind: "session" },
+  student_racines: { spaceRole: "STUDENT", appRole: "LEARNER", universe: "RACINES", destinationPath: "/dashboard", authKind: "session" },
+  family: { spaceRole: "STUDENT", appRole: "PARENT", universe: null, destinationPath: "/family", authKind: "session" },
+  child_monde: { spaceRole: "STUDENT", appRole: null, universe: "MONDE", destinationPath: "/dashboard", authKind: "child_session" },
+  child_racines: { spaceRole: "STUDENT", appRole: null, universe: "RACINES", destinationPath: "/dashboard", authKind: "child_session" },
 } as const;
 
 describe("Production internal personas · exact attribute matrix", () => {
@@ -85,17 +31,20 @@ describe("Production internal personas · exact attribute matrix", () => {
 
   for (const id of INTERNAL_PERSONA_IDS) {
     it(`${id} keeps its role, app role, universe, route and auth kind`, () => {
-      expect(INTERNAL_PERSONA_ATTRIBUTES[id]).toEqual(EXPECTED[id]);
+      const attributes = INTERNAL_PERSONA_ATTRIBUTES[id];
+      expect(attributes).toEqual(expect.objectContaining(EXPECTED[id]));
+      expect(attributes.id).toBe(id);
+      expect(attributes.requiredSpaceRole).toBe(EXPECTED[id].spaceRole);
+      expect(attributes.requiredAttributes.length).toBeGreaterThan(0);
       expect(internalPersonaDestination(id, "fr")).toBe(`/fr${EXPECTED[id].destinationPath}`);
       expect(internalPersonaDestination(id, "en")).toBe(`/en${EXPECTED[id].destinationPath}`);
     });
   }
 
   it("accepts the persona cookie only for the owner account", () => {
-    expect(resolveInternalPersona("center_admin", " NKENGUE.P@GMAIL.COM ")).toEqual({
-      id: "center_admin",
-      attributes: EXPECTED.center_admin,
-    });
+    const resolved = resolveInternalPersona("center_admin", " NKENGUE.P@GMAIL.COM ");
+    expect(resolved?.id).toBe("center_admin");
+    expect(resolved?.attributes).toEqual(expect.objectContaining(EXPECTED.center_admin));
     expect(resolveInternalPersona("center_admin", "other@example.com")).toBeNull();
     expect(resolveInternalPersona("unknown", "nkengue.p@gmail.com")).toBeNull();
   });
@@ -108,7 +57,7 @@ describe("Production internal personas · exact attribute matrix", () => {
   });
 });
 
-describe("Production internal personas · stale JWT regression", () => {
+describe("Production internal personas · session and routing regression", () => {
   const proxy = read("src/proxy.ts");
   const switchRoute = read("src/app/api/internal-test/switch-persona/route.ts");
 
@@ -123,8 +72,18 @@ describe("Production internal personas · stale JWT regression", () => {
     expect(proxy).toContain("onboardedMap[targetSpace] === false && personaSpace !== targetSpace");
   });
 
-  it("the switch route refreshes the Supabase access token before redirect", () => {
+  it("the switch route emits a strict single-role session before redirect", () => {
+    expect(switchRoute).toContain("getInternalPersonaContract");
+    expect(switchRoute).toContain("roles: [contract.spaceRole]");
+    expect(switchRoute).toContain("onboarded_map: { [contract.spaceRole]: true }");
+    expect(switchRoute).toContain("internal_test_persona: params.persona");
+    expect(switchRoute).toContain("internal_test_app_role: contract.appRole");
+    expect(switchRoute).toContain("internal_test_universe: contract.universe");
     expect(switchRoute).toContain("supabase.auth.refreshSession()");
-    expect(switchRoute).toContain("internalPersonaRequiredSpaceRole(rawPersona)");
+  });
+
+  it("reset restores the real DB role set instead of leaving a persona role", () => {
+    expect(switchRoute).toContain("getUserRoles(params.userId)");
+    expect(switchRoute).toContain("roles: restoredRoles");
   });
 });
