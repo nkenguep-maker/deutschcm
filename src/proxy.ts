@@ -3,6 +3,10 @@ import { routing } from "./i18n/routing"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { createServerClient } from "@supabase/ssr"
+import {
+  INTERNAL_TEST_COOKIE_NAME,
+  resolveInternalPersona,
+} from "./lib/internalPersona"
 
 // Multi-rôles YEMA — le proxy lit user_metadata.roles (miroir DB).
 // Source de vérité = table user_roles (Prisma). Le proxy n'interroge
@@ -188,7 +192,7 @@ export async function proxy(request: NextRequest) {
     return loginRedirect()
   }
 
-  let user: { user_metadata?: Record<string, unknown> } | null = null
+  let user: { email?: string | null; user_metadata?: Record<string, unknown> } | null = null
   try {
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -225,20 +229,34 @@ export async function proxy(request: NextRequest) {
     if (legacyRole) roles = [legacyRole]
   }
 
+  // Le JWT de la requête qui suit immédiatement une bascule persona peut
+  // encore contenir l'ancien tableau roles. Le cookie persona est HttpOnly,
+  // posé uniquement par la route owner-only, et n'est accepté qu'avec
+  // l'email propriétaire vérifié : il fournit donc un overlay fail-closed.
+  const internalPersona = resolveInternalPersona(
+    request.cookies.get(INTERNAL_TEST_COOKIE_NAME)?.value,
+    user.email,
+  )
+  const personaSpace = internalPersona?.attributes.requiredSpaceRole
+  if (personaSpace && !roles.includes(personaSpace)) {
+    roles = [...roles, personaSpace]
+  }
+
   // Aucun rôle → forcer setup
   if (roles.length === 0) {
     if (canonicalPath === "/setup-role") return response
     return NextResponse.redirect(new URL(`/${locale}/setup-role`, request.url))
   }
 
-  const activeSpace = (typeof meta.active_space === "string" ? meta.active_space : undefined) as SpaceRole | undefined
+  const metadataActiveSpace = (typeof meta.active_space === "string" ? meta.active_space : undefined) as SpaceRole | undefined
+  const activeSpace = personaSpace ?? metadataActiveSpace
   const onboardedMap = (meta.onboarded_map ?? {}) as Record<string, boolean>
 
   // Onboarding par rôle : si on entre dans un espace dont le rôle
   // n'a pas encore été onboardé, rediriger vers son onboarding.
   const targetSpace = spaceForPath(canonicalPath)
   if (targetSpace && roles.includes(targetSpace) && !canonicalPath.startsWith("/onboarding")) {
-    if (onboardedMap[targetSpace] === false) {
+    if (onboardedMap[targetSpace] === false && personaSpace !== targetSpace) {
       return NextResponse.redirect(new URL(getOnboardingRoute(targetSpace, locale), request.url))
     }
   }
