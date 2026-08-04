@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   DashboardCard,
   DashboardHeader,
@@ -59,12 +60,9 @@ function PersonaSection({ section, locale }: { section: InternalPersonaSection; 
       id={section.id}
       data-persona-section={section.id}
       aria-labelledby={`${section.id}-title`}
-      style={{ display: "flex", flexDirection: "column", gap: 12, scrollMarginTop: 96 }}
+      style={{ display: "flex", flexDirection: "column", gap: 12 }}
     >
-      <DashboardSectionHeader
-        title={<span id={`${section.id}-title`}>{title}</span>}
-        description={description}
-      />
+      <DashboardSectionHeader title={<span id={`${section.id}-title`}>{title}</span>} description={description} />
 
       {section.kind === "hero" ? (
         <DashboardCard tone="gold" style={{ padding: 24, overflow: "hidden", position: "relative" }}>
@@ -84,12 +82,9 @@ function PersonaSection({ section, locale }: { section: InternalPersonaSection; 
             </div>
           ) : null}
           {section.cta ? (
-            <a
-              href={`#${section.id}`}
-              style={{ display: "inline-flex", minHeight: 48, alignItems: "center", justifyContent: "center", padding: "0 20px", borderRadius: "var(--yema-r-pill)", background: "var(--yema-text)", color: "var(--yema-bg)", fontSize: 13, fontWeight: 750, textDecoration: "none" }}
-            >
+            <span style={{ display: "inline-flex", minHeight: 48, alignItems: "center", justifyContent: "center", padding: "0 20px", borderRadius: "var(--yema-r-pill)", background: "var(--yema-text)", color: "var(--yema-bg)", fontSize: 13, fontWeight: 750 }}>
               {localize(section.cta, locale)}
-            </a>
+            </span>
           ) : null}
         </DashboardCard>
       ) : null}
@@ -116,9 +111,23 @@ function PersonaSection({ section, locale }: { section: InternalPersonaSection; 
   );
 }
 
-export function InternalPersonaDashboard({ persona, locale }: { persona: InternalPersonaId; locale: "fr" | "en" }) {
+function sectionHref(baseHref: string, firstSectionId: string, sectionId: string): string {
+  return sectionId === firstSectionId ? baseHref : `${baseHref}/view/${sectionId}`;
+}
+
+type Props = {
+  persona: InternalPersonaId;
+  locale: "fr" | "en";
+  activeSectionId?: string;
+  baseHrefOverride?: string;
+};
+
+export function InternalPersonaDashboard({ persona, locale, activeSectionId, baseHrefOverride }: Props) {
   const contract = INTERNAL_PERSONA_UI_CONTRACTS[persona];
-  const baseHref = `/${locale}${contract.route}`;
+  const firstSection = contract.sections[0];
+  const activeSection = contract.sections.find((section) => section.id === activeSectionId) ?? firstSection;
+  const baseHref = baseHrefOverride ?? `/${locale}${contract.route}`;
+  const activeHref = sectionHref(baseHref, firstSection.id, activeSection.id);
   const title = localize(contract.title, locale);
   const subtitle = localize(contract.subtitle, locale);
 
@@ -128,21 +137,21 @@ export function InternalPersonaDashboard({ persona, locale }: { persona: Interna
     items: contract.sections.map((section) => ({
       key: section.id,
       label: localize(section.title, locale),
-      href: `${baseHref}#${section.id}`,
+      href: sectionHref(baseHref, firstSection.id, section.id),
     })),
   }];
 
   const tabs: DashboardTab[] = contract.tabs.map((tab) => ({
     key: tab.id,
     label: localize(tab.label, locale),
-    href: `${baseHref}#${tab.id}`,
+    href: sectionHref(baseHref, firstSection.id, tab.id),
     badgeCount: tab.badge ?? null,
   }));
 
   const sidebar = (
     <DashboardSidebar
       groups={groups}
-      activeHref={baseHref}
+      activeHref={activeHref}
       personaLabel={title}
       personaSubtitle={subtitle}
       brandHref={`/${locale}`}
@@ -154,19 +163,68 @@ export function InternalPersonaDashboard({ persona, locale }: { persona: Interna
     />
   );
 
+  const mobileSectionNav = (
+    <nav
+      aria-label={locale === "fr" ? "Toutes les rubriques" : "All sections"}
+      style={{
+        display: "flex",
+        gap: 8,
+        overflowX: "auto",
+        padding: "10px 16px 12px",
+        borderBottom: "1px solid var(--yema-border)",
+        background: "var(--yema-bg)",
+        scrollbarWidth: "none",
+      }}
+    >
+      {contract.sections.map((section) => {
+        const href = sectionHref(baseHref, firstSection.id, section.id);
+        const active = section.id === activeSection.id;
+        return (
+          <Link
+            key={section.id}
+            href={href}
+            aria-current={active ? "page" : undefined}
+            style={{
+              flex: "0 0 auto",
+              minHeight: 38,
+              display: "inline-flex",
+              alignItems: "center",
+              padding: "0 13px",
+              borderRadius: "var(--yema-r-pill)",
+              border: `1px solid ${active ? "var(--yema-gold-edge)" : "var(--yema-border)"}`,
+              background: active ? "var(--yema-gold-glow)" : "var(--yema-surface-2)",
+              color: active ? "var(--yema-gold-light)" : "var(--yema-text-muted)",
+              fontSize: 12,
+              fontWeight: active ? 700 : 550,
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {localize(section.title, locale)}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+
   return (
     <DashboardPageBoundary>
-      <div data-internal-persona-dashboard={persona} data-persona-section-count={contract.sections.length}>
+      <div
+        data-internal-persona-dashboard={persona}
+        data-persona-active-section={activeSection.id}
+        data-persona-section-count={contract.sections.length}
+      >
         <DashboardShell
           universe={contract.universe}
           sidebar={sidebar}
           mobileHeader={<DashboardMobileHeader personaLabel={title} personaSubtitle={subtitle} brandHref={`/${locale}`} />}
-          tabBar={<DashboardTabBar tabs={tabs} activeKey={contract.tabs[0]?.id ?? "overview"} />}
+          mobileNav={mobileSectionNav}
+          tabBar={<DashboardTabBar tabs={tabs} activeKey={activeSection.id} />}
           header={
             <DashboardHeader
-              title={title}
+              title={localize(activeSection.title, locale)}
               subtitle={subtitle}
-              meta={<DashboardStatusChip tone="gold">{locale === "fr" ? "Fixture complète" : "Complete fixture"}</DashboardStatusChip>}
+              meta={<DashboardStatusChip tone="gold">{locale === "fr" ? "Une rubrique par page" : "One section per page"}</DashboardStatusChip>}
             />
           }
         >
@@ -175,17 +233,17 @@ export function InternalPersonaDashboard({ persona, locale }: { persona: Interna
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
                 <div>
                   <div className="yema-mono" style={{ color: "var(--yema-gold-light)", fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase" }}>
-                    {locale === "fr" ? "TEST INTERNE · CONTENU COMPLET" : "INTERNAL TEST · COMPLETE CONTENT"}
+                    {locale === "fr" ? "TEST INTERNE · PAGE DÉDIÉE" : "INTERNAL TEST · DEDICATED PAGE"}
                   </div>
                   <div style={{ color: "var(--yema-text-muted)", fontSize: 12, marginTop: 4 }}>
-                    {locale === "fr" ? "Jeu de données isolé : aucune progression ni transaction réelle n’est modifiée." : "Isolated dataset: no real progress or transaction is changed."}
+                    {locale === "fr" ? "Cette rubrique est isolée et prête à recevoir ses données et cours réels." : "This section is isolated and ready for real data and course content."}
                   </div>
                 </div>
-                <DashboardStatusChip tone="success">{contract.sections.length} {locale === "fr" ? "sections contrôlées" : "verified sections"}</DashboardStatusChip>
+                <DashboardStatusChip tone="success">1 / {contract.sections.length}</DashboardStatusChip>
               </div>
             </DashboardCard>
 
-            {contract.sections.map((section) => <PersonaSection key={section.id} section={section} locale={locale} />)}
+            <PersonaSection section={activeSection} locale={locale} />
           </div>
         </DashboardShell>
       </div>
