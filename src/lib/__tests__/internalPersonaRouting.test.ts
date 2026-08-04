@@ -82,6 +82,15 @@ describe("Production internal personas · session and routing regression", () =>
     expect(switchRoute).toContain("supabase.auth.refreshSession()");
   });
 
+  it("updates the authenticated owner instead of requiring a service-role key", () => {
+    expect(switchRoute).toContain("params.supabase.auth.updateUser");
+    expect(switchRoute).toContain("currentMetadata");
+    expect(switchRoute).not.toContain("createAdminClient");
+    expect(switchRoute).not.toContain("SUPABASE_SERVICE_ROLE_KEY");
+    expect(switchRoute).not.toContain("auth.admin.getUserById");
+    expect(switchRoute).not.toContain("auth.admin.updateUserById");
+  });
+
   it("reset restores the real DB role set instead of leaving a persona role", () => {
     expect(switchRoute).toContain("getUserRoles(params.userId)");
     expect(switchRoute).toContain("roles: restoredRoles");
