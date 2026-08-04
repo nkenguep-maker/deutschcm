@@ -6,7 +6,7 @@ const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
 
 describe("Production internal testing · owner-only", () => {
-  const gate = read("src/lib/internalTest.ts");
+  const gate = read("src/lib/internalPersona.ts");
   const switchRoute = read("src/app/api/internal-test/switch-persona/route.ts");
   const consolePage = read("src/app/[locale]/internal-test/page.tsx");
 
