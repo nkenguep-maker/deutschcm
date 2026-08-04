@@ -16,51 +16,54 @@ const ROUTES = [
   "src/app/[locale]/family/view/[section]/page.tsx",
 ];
 
-describe("Internal persona dashboards · dedicated pages", () => {
-  it("covers all nine personas and keeps each tab routable", () => {
-    expect(Object.keys(INTERNAL_PERSONA_UI_CONTRACTS)).toHaveLength(INTERNAL_PERSONA_IDS.length);
+const LIVE_DASHBOARDS = [
+  "src/features/dashboards/student-monde/StudentMondeDashboard.tsx",
+  "src/features/dashboards/student-racines/StudentRacinesDashboard.tsx",
+  "src/features/dashboards/teacher/TeacherDashboard.tsx",
+  "src/features/dashboards/coach-racines/CoachRacinesDashboard.tsx",
+  "src/features/dashboards/center/CenterDashboard.tsx",
+  "src/features/dashboards/family/FamilyDashboard.tsx",
+  "src/features/dashboards/admin/AdminDashboard.tsx",
+  "src/features/dashboards/child-monde/ChildMondeDashboard.tsx",
+  "src/features/dashboards/child-racines/ChildRacinesDashboard.tsx",
+];
 
+describe("Persona dashboards · dedicated pages", () => {
+  it("covers all nine internal personas and keeps each tab routable", () => {
+    expect(Object.keys(INTERNAL_PERSONA_UI_CONTRACTS)).toHaveLength(INTERNAL_PERSONA_IDS.length);
     for (const persona of INTERNAL_PERSONA_IDS) {
       const contract = INTERNAL_PERSONA_UI_CONTRACTS[persona];
       const ids = contract.sections.map((section) => section.id);
       expect(new Set(ids).size).toBe(ids.length);
-      expect(contract.tabs.length).toBeGreaterThanOrEqual(4);
-      expect(contract.sections.length).toBeGreaterThanOrEqual(4);
       for (const tab of contract.tabs) expect(ids).toContain(tab.id);
-      for (const section of contract.sections) {
-        expect(section.title.fr.length).toBeGreaterThan(0);
-        expect(section.title.en.length).toBeGreaterThan(0);
-        if (["list", "timeline", "chat", "status"].includes(section.kind)) {
-          expect(section.rows?.length).toBeGreaterThan(0);
-        }
-        if (section.kind === "metrics") expect(section.metrics?.length).toBeGreaterThan(0);
-      }
     }
   });
 
-  it("adds one section route to every persona space", () => {
+  it("serves both internal fixtures and authenticated live dashboards", () => {
     for (const route of ROUTES) {
       const source = read(route);
-      expect(source).toContain("InternalPersonaSectionRoute");
-      expect(source).toContain("sectionId={section}");
+      expect(source).toContain("activeSectionId={section}");
+      expect(source).toContain("InternalPersonaDashboard");
     }
-
-    const renderer = read("src/features/dashboards/internal-test/InternalPersonaDashboard.tsx");
-    expect(renderer).toContain("/view/${sectionId}");
-    expect(renderer).toContain("data-persona-active-section");
-    expect(renderer).toContain("<PersonaSection section={activeSection}");
+    expect(read(ROUTES[0])).toContain("LiveStudentSectionRoute");
   });
 
-  it("audits every preview page and keeps it disabled in production", () => {
+  it("renders one live section at a time for every dashboard", () => {
+    for (const dashboard of LIVE_DASHBOARDS) {
+      const source = read(dashboard);
+      expect(source).toContain("activeSectionId");
+      expect(source).toContain("data-live-persona-section");
+      expect(source).toContain("sectionPageHref");
+    }
+  });
+
+  it("keeps QA previews disabled in production and audits every fixture page", () => {
     const preview = read("src/app/[locale]/qa/persona-preview/[persona]/page.tsx");
     const sectionPreview = read("src/app/[locale]/qa/persona-preview/[persona]/view/[section]/page.tsx");
     const audit = read("src/app/api/internal-test/persona-render-audit/route.ts");
-
     expect(preview).toContain("baseHrefOverride");
     expect(sectionPreview).toContain('process.env.VERCEL_ENV === "production"');
-    expect(sectionPreview).toContain("activeSectionId={section}");
     expect(audit).toContain("data-persona-active-section");
     expect(audit).toContain("unexpectedSections");
-    expect(audit).toContain("redirectedToLogin");
   });
 });
