@@ -53,3 +53,5 @@ Les routes de prévisualisation QA restent désactivées en Production.
 - les contrôles de rôle, de session enfant, d’univers et les feature flags existants sont conservés ;
 - les tests de routage et le build Next.js complet passent sous Node.js 22 ;
 - le déploiement Preview Vercel a rendu 66 pages sur 66 pour les neuf personas, sans rubrique supplémentaire ni redirection vers la connexion dans l’audit QA.
+
+Le déploiement Production a été redéclenché le 4 août 2026 après la remise à zéro de la limite de builds Vercel.
