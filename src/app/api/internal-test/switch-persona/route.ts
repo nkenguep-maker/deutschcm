@@ -1,17 +1,18 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import {
   INTERNAL_TEST_COOKIE_MAX_AGE,
   INTERNAL_TEST_COOKIE_NAME,
+  getInternalPersonaContract,
   internalPersonaDestination,
   isInternalPersonaId,
   isInternalTesterEmail,
   type InternalPersonaId,
 } from "@/lib/internalTest";
 import { ensureInternalTestWorkspace } from "@/lib/internalTestProvisioning";
-import { syncUserMetadata, type SpaceRole } from "@/lib/roles";
 import {
   CHILD_SESSION_COOKIE_NAME,
   CHILD_SESSION_TTL_SECONDS,
@@ -30,13 +31,55 @@ function cookieOptions(maxAge: number, httpOnly = true) {
   };
 }
 
-function activeSpaceForPersona(persona: InternalPersonaId): SpaceRole {
-  switch (persona) {
-    case "super_admin": return "ADMIN";
-    case "teacher": return "TEACHER";
-    case "center_admin": return "CENTER";
-    default: return "STUDENT";
-  }
+async function setEffectivePersonaMetadata(
+  supabaseId: string,
+  persona: InternalPersonaId | null,
+): Promise<void> {
+  const admin = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false, autoRefreshToken: false } },
+  );
+
+  const { data: current, error: readError } = await admin.auth.admin.getUserById(supabaseId);
+  if (readError || !current.user) throw new Error("internal persona metadata read failed");
+
+  const existing = (current.user.user_metadata ?? {}) as Record<string, unknown>;
+  const {
+    roles: _roles,
+    onboarded_map: _onboardedMap,
+    active_space: _activeSpace,
+    internal_test_persona: _internalPersona,
+    ...preserved
+  } = existing;
+
+  const nextMetadata = persona
+    ? (() => {
+        const contract = getInternalPersonaContract(persona);
+        return {
+          ...preserved,
+          roles: [contract.spaceRole],
+          onboarded_map: { [contract.spaceRole]: true },
+          active_space: contract.spaceRole,
+          internal_test_persona: persona,
+        };
+      })()
+    : {
+        ...preserved,
+        roles: ["STUDENT"],
+        onboarded_map: { STUDENT: true },
+        active_space: "STUDENT",
+      };
+
+  const { error: updateError } = await admin.auth.admin.updateUserById(supabaseId, {
+    user_metadata: nextMetadata,
+  });
+  if (updateError) throw new Error("internal persona metadata update failed");
+}
+
+async function refreshBrowserSession(supabase: Awaited<ReturnType<typeof createClient>>): Promise<boolean> {
+  const { error } = await supabase.auth.refreshSession();
+  return !error;
 }
 
 export async function POST(req: NextRequest) {
@@ -59,7 +102,15 @@ export async function POST(req: NextRequest) {
   if (!dbUser) return NextResponse.json({ error: "USER_NOT_FOUND" }, { status: 404 });
 
   if (action === "reset") {
-    await syncUserMetadata({ supabaseId: dbUser.supabaseId, activeSpace: "STUDENT" });
+    try {
+      await setEffectivePersonaMetadata(dbUser.supabaseId, null);
+      if (!(await refreshBrowserSession(supabase))) {
+        return NextResponse.json({ error: "SESSION_REFRESH_FAILED" }, { status: 500 });
+      }
+    } catch {
+      return NextResponse.json({ error: "PERSONA_RESET_FAILED" }, { status: 500 });
+    }
+
     const response = NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url), 303);
     response.cookies.set(INTERNAL_TEST_COOKIE_NAME, "", cookieOptions(0));
     response.cookies.set(CHILD_SESSION_COOKIE_NAME, "", cookieOptions(0));
@@ -71,14 +122,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "PERSONA_INVALID" }, { status: 400 });
   }
 
-  const fixture = await ensureInternalTestWorkspace(dbUser.id);
-  const activeSpace = activeSpaceForPersona(rawPersona);
-  await syncUserMetadata({ supabaseId: dbUser.supabaseId, activeSpace });
+  let fixture: Awaited<ReturnType<typeof ensureInternalTestWorkspace>>;
+  try {
+    fixture = await ensureInternalTestWorkspace(dbUser.id);
+    await setEffectivePersonaMetadata(dbUser.supabaseId, rawPersona);
+    if (!(await refreshBrowserSession(supabase))) {
+      return NextResponse.json({ error: "SESSION_REFRESH_FAILED" }, { status: 500 });
+    }
+  } catch {
+    return NextResponse.json({ error: "PERSONA_SWITCH_FAILED" }, { status: 500 });
+  }
 
+  const contract = getInternalPersonaContract(rawPersona);
   const destination = internalPersonaDestination(rawPersona, locale);
   const response = NextResponse.redirect(new URL(destination, req.url), 303);
   response.cookies.set(INTERNAL_TEST_COOKIE_NAME, rawPersona, cookieOptions(INTERNAL_TEST_COOKIE_MAX_AGE));
-  response.cookies.set("active_space", activeSpace, cookieOptions(30 * 24 * 60 * 60, false));
+  response.cookies.set("active_space", contract.spaceRole, cookieOptions(30 * 24 * 60 * 60, false));
   response.cookies.set(CHILD_SESSION_COOKIE_NAME, "", cookieOptions(0));
 
   if (rawPersona === "child_monde" || rawPersona === "child_racines") {
