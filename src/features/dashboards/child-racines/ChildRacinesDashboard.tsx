@@ -1,10 +1,5 @@
 "use client";
 
-// ChildRacinesDashboard · Lot 5 · rendu quand le cookie enfant est actif
-// pour un profil dont l'univers dérivé est RACINES. Universe="racines"
-// sur le shell → surfaces bordeaux. Étape É1-É5 lue depuis
-// ChildLangue.echelle réelle. Aucune fausse messagerie ni faux audio.
-
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -21,18 +16,14 @@ import {
   DashboardStatusChip,
   DashboardTabBar,
 } from "@/features/dashboards/shared";
+import { routeSectionNav, routeSectionTabs, sectionPageHref } from "@/features/dashboards/shared/sectionRouting";
 import { buildChildRacinesNav, buildChildRacinesMobileTabs } from "./nav";
 import type { ChildData } from "@/features/dashboards/child-monde/types";
 
-type Props = {
-  locale: "fr" | "en";
-  child: ChildData;
-};
+type Props = { locale: "fr" | "en"; child: ChildData; activeSectionId?: string };
+const ALLOWED = new Set(["case", "quete", "chemin", "missions", "contes", "chansons", "badges", "progression", "famille"]);
 
 function stepFromEchelle(echelle: number): "E1" | "E2" | "E3" | "E4" | "E5" | null {
-  // ChildLangue.echelle croît de 0 à 8 (voir src/lib/childScales.ts). On
-  // remappe grossièrement en étapes doctrinales É1..É5 · à raffiner quand
-  // le journal oral détaillé sera branché.
   if (!Number.isFinite(echelle) || echelle < 0) return null;
   if (echelle < 2) return "E1";
   if (echelle < 4) return "E2";
@@ -41,168 +32,50 @@ function stepFromEchelle(echelle: number): "E1" | "E2" | "E3" | "E4" | "E5" | nu
   return "E5";
 }
 
-export function ChildRacinesDashboard({ locale, child }: Props) {
+export function ChildRacinesDashboard({ locale, child, activeSectionId = "case" }: Props) {
   const t = useTranslations("yemaDashboards.childRacines");
   const tCommon = useTranslations("yemaDashboards.common");
   const currentLocale = useLocale();
   const baseHref = `/${currentLocale ?? locale}/dashboard`;
+  const activeSection = ALLOWED.has(activeSectionId) ? activeSectionId : "case";
+  const activeHref = sectionPageHref(baseHref, activeSection, "case");
   const [exiting, setExiting] = useState(false);
-
-  const activeLang = child.langues.find((l) => l.langue === child.activeLangue) ?? child.langues[0] ?? null;
+  const activeLang = child.langues.find((language) => language.langue === child.activeLangue) ?? child.langues[0] ?? null;
   const step = activeLang ? stepFromEchelle(activeLang.echelle) : null;
   const languageLabel = activeLang?.langue ?? child.activeLangue ?? "—";
 
   const exitChildMode = async () => {
     setExiting(true);
-    try {
-      await fetch("/api/child-session", { method: "DELETE" });
-    } finally {
-      window.location.href = `/${currentLocale ?? locale}/login`;
-    }
+    try { await fetch("/api/child-session", { method: "DELETE" }); }
+    finally { window.location.href = `/${currentLocale ?? locale}/login`; }
   };
 
-  const navGroups = buildChildRacinesNav(
-    {
-      home: t("nav.home"),
-      tales: t("nav.tales"),
-      songs: t("nav.songs"),
-      badges: t("nav.badges"),
-      oralProgress: t("nav.oralProgress"),
-      familyActivities: t("nav.familyActivities"),
-      sectionLabel: t("sidebarSection"),
-    },
-    baseHref,
-  );
-
-  const mobileTabs = buildChildRacinesMobileTabs(
-    { home: t("mobileNav.home"), tales: t("mobileNav.tales"), songs: t("mobileNav.songs"), badges: t("mobileNav.badges") },
-    baseHref,
-  );
-
+  const navGroups = routeSectionNav(buildChildRacinesNav({ home: t("nav.home"), tales: t("nav.tales"), songs: t("nav.songs"), badges: t("nav.badges"), oralProgress: t("nav.oralProgress"), familyActivities: t("nav.familyActivities"), sectionLabel: t("sidebarSection") }, baseHref), baseHref, "case");
+  const mobileTabs = routeSectionTabs(buildChildRacinesMobileTabs({ home: t("mobileNav.home"), tales: t("mobileNav.tales"), songs: t("mobileNav.songs"), badges: t("mobileNav.badges") }, baseHref), baseHref, "case");
+  const activeTab = ({ case: "home", quete: "home", chemin: "home", missions: "home", contes: "tales", chansons: "songs", badges: "badges", progression: "home", famille: "home" } as Record<string, string>)[activeSection];
   const personaLabel = t("personaLabel");
+  const sidebar = <DashboardSidebar groups={navGroups} activeHref={activeHref} personaLabel={personaLabel} personaSubtitle={t("sidebarSection")} brandHref={`/${currentLocale ?? locale}`} previewBadge={tCommon("previewBadge")} />;
+  const mobileHeader = <DashboardMobileHeader personaLabel={personaLabel} personaSubtitle={t("sidebarSection")} brandHref={`/${currentLocale ?? locale}`} />;
+  const headerActions = <div style={{ display: "inline-flex", gap: 8, alignItems: "center" }}><DashboardButtonLink href={`/${currentLocale ?? locale}/messages`} variant="secondary" size="sm" style={{ minHeight: 44 }}>{t("openMessages")}</DashboardButtonLink><DashboardButton variant="secondary" size="sm" onClick={exitChildMode} disabled={exiting}>{t("exitChildMode")}</DashboardButton></div>;
 
-  const sidebar = (
-    <DashboardSidebar
-      groups={navGroups}
-      activeHref={baseHref}
-      personaLabel={personaLabel}
-      personaSubtitle={t("sidebarSection")}
-      brandHref={`/${currentLocale ?? locale}`}
-      previewBadge={tCommon("previewBadge")}
-    />
+  const home = (
+    <section id="case" style={{ display: "grid", gap: 12 }}>
+      <DashboardSectionHeader title={t("home.title", { prenom: child.prenom })} />
+      <DashboardCard tone="gold"><div>{t("home.welcomeHint")}</div></DashboardCard>
+      <DashboardCard><h3>{t("home.stepTitle")}</h3>{step ? <DashboardStatusChip tone="gold">{step}</DashboardStatusChip> : <DashboardEmptyState title={t("home.stepEmpty")} />}</DashboardCard>
+      <DashboardCard><h3>{t("home.nextListenTitle")}</h3><DashboardEmptyState title={t("home.nextListenEmpty")} /></DashboardCard>
+      <DashboardCard><h3>{t("home.coachTitle")}</h3><DashboardEmptyState title={t("home.coachEmpty")} /></DashboardCard>
+    </section>
   );
+  const emptySection = (id: string, title: string, description: string, empty: string, notice?: string) => <section id={id} style={{ display: "grid", gap: 12 }}><DashboardSectionHeader title={title} description={description} /><DashboardCard><DashboardEmptyState title={empty} description={notice} /></DashboardCard></section>;
+  const content: Record<string, React.ReactNode> = {
+    case: home, quete: home, chemin: home, missions: home,
+    contes: emptySection("contes", t("tales.title"), t("tales.description"), t("tales.empty")),
+    chansons: emptySection("chansons", t("songs.title"), t("songs.description"), t("songs.empty")),
+    badges: emptySection("badges", t("badges.title"), t("badges.description"), t("badges.empty"), t("badges.notPersistedNotice")),
+    progression: emptySection("progression", t("oralProgress.title"), t("oralProgress.description"), t("oralProgress.notWiredNotice"), t("voiceRecordingSoon")),
+    famille: emptySection("famille", t("familyActivities.title"), t("familyActivities.description"), t("familyActivities.empty")),
+  };
 
-  const mobileHeader = (
-    <DashboardMobileHeader
-      personaLabel={personaLabel}
-      personaSubtitle={t("sidebarSection")}
-      brandHref={`/${currentLocale ?? locale}`}
-    />
-  );
-
-  const messagesHref = `/${currentLocale ?? locale}/messages`;
-  const headerActions = (
-    <div style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
-      <DashboardButtonLink
-        href={messagesHref}
-        variant="secondary"
-        size="sm"
-        data-testid="child-messages-cta"
-        style={{ minHeight: 44 }}
-      >
-        {t("openMessages")}
-      </DashboardButtonLink>
-      <DashboardButton variant="secondary" size="sm" onClick={exitChildMode} disabled={exiting}>
-        {t("exitChildMode")}
-      </DashboardButton>
-    </div>
-  );
-
-  return (
-    <DashboardPageBoundary>
-      <DashboardShell
-        universe="racines"
-        sidebar={sidebar}
-        mobileHeader={mobileHeader}
-        tabBar={<DashboardTabBar tabs={mobileTabs} activeKey="home" />}
-        header={
-          <DashboardHeader
-            title={t("home.title", { prenom: child.prenom })}
-            subtitle={step ? t("meta", { language: languageLabel, step }) : t("metaMinimal")}
-            actions={headerActions}
-            meta={step ? <DashboardStatusChip tone="gold">{step}</DashboardStatusChip> : undefined}
-          />
-        }
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-          <section id="case" aria-labelledby="case-title" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <DashboardSectionHeader title={<span id="case-title">{t("home.title", { prenom: child.prenom })}</span>} />
-            <DashboardCard tone="gold">
-              <div style={{ fontSize: 14, color: "var(--yema-text)" }}>{t("home.welcomeHint")}</div>
-            </DashboardCard>
-            <DashboardCard>
-              <h3 style={{ margin: "0 0 8px", fontSize: 14.5, fontWeight: 600, color: "var(--yema-text)" }}>{t("home.stepTitle")}</h3>
-              {step ? (
-                <div style={{ fontSize: 13, color: "var(--yema-text)" }}>
-                  <DashboardStatusChip tone="gold">{step}</DashboardStatusChip>
-                </div>
-              ) : (
-                <DashboardEmptyState title={t("home.stepEmpty")} />
-              )}
-            </DashboardCard>
-            <DashboardCard>
-              <h3 style={{ margin: "0 0 8px", fontSize: 14.5, fontWeight: 600, color: "var(--yema-text)" }}>{t("home.nextListenTitle")}</h3>
-              <DashboardEmptyState title={t("home.nextListenEmpty")} />
-            </DashboardCard>
-            <DashboardCard>
-              <h3 style={{ margin: "0 0 8px", fontSize: 14.5, fontWeight: 600, color: "var(--yema-text)" }}>{t("home.coachTitle")}</h3>
-              <DashboardEmptyState title={t("home.coachEmpty")} />
-            </DashboardCard>
-          </section>
-
-          <section id="contes" aria-labelledby="contes-title" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <DashboardSectionHeader
-              title={<span id="contes-title">{t("tales.title")}</span>}
-              description={t("tales.description")}
-            />
-            <DashboardCard><DashboardEmptyState title={t("tales.empty")} /></DashboardCard>
-          </section>
-
-          <section id="chansons" aria-labelledby="chansons-title" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <DashboardSectionHeader
-              title={<span id="chansons-title">{t("songs.title")}</span>}
-              description={t("songs.description")}
-            />
-            <DashboardCard><DashboardEmptyState title={t("songs.empty")} /></DashboardCard>
-          </section>
-
-          <section id="badges" aria-labelledby="badges-title" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <DashboardSectionHeader
-              title={<span id="badges-title">{t("badges.title")}</span>}
-              description={t("badges.description")}
-            />
-            <DashboardCard><DashboardEmptyState title={t("badges.empty")} description={t("badges.notPersistedNotice")} /></DashboardCard>
-          </section>
-
-          <section id="oral" aria-labelledby="oral-title" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <DashboardSectionHeader
-              title={<span id="oral-title">{t("oralProgress.title")}</span>}
-              description={t("oralProgress.description")}
-            />
-            <DashboardCard>
-              <DashboardEmptyState title={t("oralProgress.notWiredNotice")} description={t("voiceRecordingSoon")} />
-            </DashboardCard>
-          </section>
-
-          <section id="famille" aria-labelledby="famille-title" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <DashboardSectionHeader
-              title={<span id="famille-title">{t("familyActivities.title")}</span>}
-              description={t("familyActivities.description")}
-            />
-            <DashboardCard><DashboardEmptyState title={t("familyActivities.empty")} /></DashboardCard>
-          </section>
-        </div>
-      </DashboardShell>
-    </DashboardPageBoundary>
-  );
+  return <DashboardPageBoundary><DashboardShell universe="racines" sidebar={sidebar} mobileHeader={mobileHeader} tabBar={<DashboardTabBar tabs={mobileTabs} activeKey={activeTab} />} header={<DashboardHeader title={t("home.title", { prenom: child.prenom })} subtitle={step ? t("meta", { language: languageLabel, step }) : t("metaMinimal")} actions={headerActions} meta={step ? <DashboardStatusChip tone="gold">{step}</DashboardStatusChip> : undefined} />}><div data-live-persona-section={activeSection}>{content[activeSection]}</div></DashboardShell></DashboardPageBoundary>;
 }
