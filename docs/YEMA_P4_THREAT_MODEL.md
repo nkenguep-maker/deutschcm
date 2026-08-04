@@ -269,6 +269,8 @@ Aucun sous-lot P4 ne peut être activé en production tant que ses blockers ne s
 - [x] 0 cross-center leak — smoke Playwright `scripts/test-baseline/p4-3a-smoke.mjs` (fixtures A/B) validé sur P-1. Voir `docs/YEMA_P4_3A_CENTER_REAL_DATA.md` §8.
 - [x] 0 cross-teacher leak (test dédié P4.3b) — smoke Playwright `scripts/test-baseline/p4-3b-smoke.mjs` + fixtures 10 acteurs (Teacher A/B, ambigüité, zero binding, Center admin seul, coach). Voir `docs/YEMA_P4_3B_TEACHER_WORKSPACE.md` §11.
 - [x] RLS Teacher policies versionnées (`prisma/migrations/20260723000005_p4_3b_teacher_rls`) sur `teachers`, `classrooms`, `classroom_enrollments`, `class_join_requests` — activation prod gated par `TEACHER_RLS_CONFIRMED=true`.
+- [x] 0 cross-coach leak (P4.4 · smoke `scripts/test-baseline/p4-4-smoke.mjs`) · Coach A/B disjoints · coach retiré → 404 immédiat (Q10) · Career Coach → 403 · aucun bypass `is_yema_admin` sur les 3 helpers Coach. Voir `docs/YEMA_P4_4_ROOTS_COACH_WORKSPACE.md` §14.
+- [x] Projection minimale ChildProfile (P4.4 · fonction SECURITY DEFINER `get_roots_coach_assigned_profiles` + policy `child_profiles_service_only` conservée) · aucun email/téléphone/DOB/adresse accessible au Coach.
 - [ ] 0 cross-circle leak (test dédié P4.2+)
 - [ ] 0 cross-household leak (test dédié P4.2+)
 - [ ] 0 DM privé adulte-enfant possible (P4.6 · `ThreadType.ONE_TO_ONE` bloqué côté API sans suppression destructive)
@@ -284,3 +286,169 @@ Aucun sous-lot P4 ne peut être activé en production tant que ses blockers ne s
 - [ ] Validation juridique Q7 (rétention audios) obtenue avant `AUDIO_FEEDBACK_ENABLED = true`
 
 Un blocker ouvert = mise en production interdite. Aucun contournement de feature flag n'est autorisé sans validation de tous les items ci-dessus pour le sous-lot concerné.
+
+---
+
+## Annexe P4.5-B · Menaces Monde (Assignment / Submission / Feedback) avec preuves
+
+Statut · **P4.5-B VALIDATED**. Chaque menace ci-dessous est vérifiée
+runtime ou par verrou structurel documenté.
+
+### AP4.5-B.1 · Injection d'identifiants dans body / query / headers
+
+- **Menace** · un client tente d'injecter `userId`, `studentId`,
+  `teacherId`, `classroomId`, `assignmentId`, `submissionId`,
+  `feedbackId`, `status`, `version`, `storageObjectId`,
+  `supersedesSubmissionId` dans le body d'une mutation.
+- **Contrôle** · `src/lib/assignments/bodyValidators.ts` · allowlist
+  stricte (`SUBMISSION_ALLOWED_KEYS = ["writtenContent"]`, idem feedback)
+  + `FORBIDDEN_KEYS` levée avec code `invalid_submission_transition`.
+  Les IDs de ressource proviennent EXCLUSIVEMENT du path canonique.
+- **Preuve** · tests structurels b1 (`p4-5-b2b3b-b1-student-ui-structural.test.ts`
+  · allowlist writtenContent verrouillée dans les 3 views client) +
+  runtime word-counter defense-in-depth (PATCH 1001 mots → 4xx
+  `submission_too_long`).
+
+### AP4.5-B.2 · Déplacement d'un draft vers un autre scope
+
+- **Menace** · muter `assignmentId` ou `userId` sur une AssignmentSubmission
+  DRAFT pour la déplacer.
+- **Contrôle** · trigger DB `sub_scope_immutable` (RAISE EXCEPTION sur
+  UPDATE de `assignmentId`, `userId`, `version`).
+- **Preuve** · `p4-5-b-structural.test.ts` (immutabilité columnar) +
+  runtime backend `p4-5-b2b-runtime.mjs`.
+
+### AP4.5-B.3 · Transition directe via JWT authenticated
+
+- **Menace** · un client authenticated tente UPDATE direct via PostgREST
+  pour changer `status` DRAFT → SUBMITTED ou PUBLISHED.
+- **Contrôle** · aucune policy UPDATE côté client, tous les paths passent
+  par routes Next `service_role`. RLS + column hardening blocs.
+- **Preuve** · `scripts/test-baseline/p4-5-b2b-jwt-rls.mjs` (assertions
+  RLS/JWT · toute UPDATE directe refusée).
+
+### AP4.5-B.4 · Modification d'une submission soumise
+
+- **Menace** · PATCH content sur SUBMITTED / SUPERSEDED.
+- **Contrôle** · `updateStudentSubmissionDraft` throw
+  `submission_immutable` si status != DRAFT + trigger DB `sub_content_immutable`.
+- **Preuve** · tests structurels + runtime `student-a.spec.ts` (readonly
+  branch sur SUBMITTED · 0 textarea, 0 bouton Save/Submit).
+
+### AP4.5-B.5 · Modification d'un feedback publié
+
+- **Menace** · PATCH `writtenContent` sur PUBLISHED / ADDENDUM.
+- **Contrôle** · `updateAssignmentFeedbackDraft` refuse si status != DRAFT.
+- **Preuve** · services B1 test + runtime backend races feedback.
+
+### AP4.5-B.6 · Double soumission (race SUBMIT)
+
+- **Menace** · 2 requêtes SUBMIT concurrentes sur la même submission.
+- **Contrôle** · retries sérialisables SSI + garde `where { id, status: sub.status }`
+  (mise à jour conditionnelle · 2ᵉ tx retourne 0 rows → 409).
+- **Preuve** · `p4-5-b2b3-runtime-http.mjs` §9.2 (double submit HTTP ·
+  auditDelta = 1 exactement).
+
+### AP4.5-B.7 · Double publication (race PUBLISH assignment / feedback)
+
+- **Menace** · 2 POST /publish concurrents.
+- **Contrôle** · `assertAssignmentTransition` refuse PUBLISHED→PUBLISHED
+  (409 `invalid_assignment_transition`). Idem feedback.
+- **Preuve** · `p4-5-b2b3-runtime-http.mjs` §9.4 (double publish HTTP ·
+  auditDelta = 1 · 0 P2034 exposé).
+
+### AP4.5-B.8 · Double version (race POST /versions)
+
+- **Menace** · 2 POST /versions concurrents.
+- **Contrôle** · retries sérialisables SSI + garde `where { id, status: SUBMITTED }`
+  sur transition v_(n-1) → SUPERSEDED.
+- **Preuve** · `p4-5-b2b3-runtime-http.mjs` §9.3 (new version HTTP ·
+  statuses [409, 200], versions [v1 SUPERSEDED, v2 DRAFT]).
+
+### AP4.5-B.9 · Double addendum (race POST /addendum)
+
+- **Menace** · 2 POST /addendum concurrents sur la même lignée
+  génèrent un numéro de version dupliqué ou détruisent le feedback
+  original PUBLISHED.
+- **Contrôle** · `pg_advisory_xact_lock(hashtext(submissionId:teacherId))`
+  sérialise strictement · la 2ᵉ tx voit le state commité de la 1ᵉʳ
+  (baseline `latest` re-lu sous le lock avant insertion).
+- **Preuve** · `p4-5-b2b3-runtime-http.mjs` §9.5 (double addendum HTTP) ·
+  résultat doctrinal ·
+  * deux requêtes sérialisées
+  * deux succès HTTP
+  * versions N+1 puis N+2
+  * aucun numéro de version dupliqué
+  * original préservé
+  * deux `FEEDBACK_ADDENDUM_CREATED`
+  * zéro P2034 exposé
+
+  La cardinalité `auditDelta = 1` s'applique aux transitions `DRAFT → next`
+  (submit, publish, close) mais **PAS** à la double création d'addendum ·
+  chaque appel commit une nouvelle row ADDENDUM et son AuditEvent
+  correspondant.
+
+### AP4.5-B.10 · Audit fantôme après rollback
+
+- **Menace** · AuditEvent écrit hors transaction persiste alors que la
+  mutation métier a rollback (P2034 serialization failure).
+- **Contrôle** · `writeAuditEvent(...tx)` · always écrit DANS la
+  transaction ouverte, jamais en dehors.
+- **Preuve** · runtime races HTTP · sur chaque race la `auditDelta` est
+  exactement 1 (jamais 2 même si les 2 tx ont commencé).
+
+### AP4.5-B.11 · Fuite de PII dans AuditEvent
+
+- **Menace** · logger `writtenContent` (contenu élève) ou emails / noms
+  dans `AuditEvent.metadata`.
+- **Contrôle** · services B1 n'écrivent QUE `{teacherId, assignmentId,
+  classroomId, version, routeAction, supersededSubmissionId?}` dans
+  metadata. Aucun contenu jamais persisté.
+- **Preuve** · grep sur les usages `writeAuditEvent` (Monde) + review
+  manuelle b3 · aucun `writtenContent` metadata.
+
+### AP4.5-B.12 · Cache UI après révocation
+
+- **Menace** · un Student cache une réponse liste après retrait
+  d'enrollment et voit toujours les assignments.
+- **Contrôle** · toutes les pages Student/Teacher sont
+  `export const dynamic = "force-dynamic"` · SSR à chaque requête ·
+  aucun cache HTTP.
+- **Preuve** · `enrollment-removed.spec.ts` (3 tests runtime · direct
+  navigate `/fr/student/assignments/{asmPubA}` → 404 immédiat après
+  retrait de l'enrollment).
+
+### AP4.5-B.13 · Données visibles flag-off
+
+- **Menace** · retirer `YEMA_ASSIGNMENTS_ENABLED` mais laisser fuir
+  des données via cache RSC ou UI stale.
+- **Contrôle** · resolver + adapter court-circuitent EN PREMIER (retour
+  `feature_disabled` sans jamais toucher la DB). Placeholder `feature_disabled`
+  n'importe rien du domaine assignments.
+- **Preuve** · `flag-off.spec.ts` · 7 pages anti-leak (grep contenu
+  fixture A dans HTML · absent) + 20 routes API → 404 + bilan mutations
+  = 0.
+
+### AP4.5-B.14 · Accès cross-tenant
+
+- **Menace** · Teacher B ouvre les URLs de Teacher A (assignment,
+  submission, feedback).
+- **Contrôle** · services B1 filtrent par `actor.teacherId` · retournent
+  `assignment_not_found` (anti-énumération) · adapter convertit en
+  `null` → page rend `notFound()`.
+- **Preuve** · `isolation.spec.ts` · 5 URLs Teacher B → ressources A ·
+  status 404 + HTML anti-leak (aucun titre, aucun contenu, aucun feedback
+  A dans le HTML).
+
+### AP4.5-B.15 · Exposition de secrets P-1 / prod
+
+- **Menace** · un secret Supabase (URL, anon, service_role) leake dans
+  les logs, l'output d'un script ou un artefact commité.
+- **Contrôle** · wrapper `run-p4-5-b2-p1.mjs` n'affiche QUE le banner
+  `P-1 ENVIRONMENT VERIFIED / projectRef=… / assignmentsEnabled=…`.
+  Blacklist explicite refs prod (`sbjhvlrkbyjckdxujjsk`,
+  `mamofhrurksyuuolucea`, `qggwvonfumuimjfsgpdz`). `.env.local` jamais
+  modifié (byte-identique vérifié). `.playwright/`, `playwright-report/`,
+  `test-results/` gitignorés.
+- **Preuve** · `git status --short` en fin de b2 et b3 · uniquement
+  `AUDIT.md` non tracké.

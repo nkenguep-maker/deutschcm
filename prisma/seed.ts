@@ -150,6 +150,36 @@ const CATALOG: ProductDef[] = [
     variants: [],
     capabilities: ["COURSE_ACCESS"],
   },
+  // P4.6 Lot 5.1 · offres Enfant Monde. Aucun Passage Monde adulte
+  // débloqué par ces produits (contrat sécurité côté serveur).
+  {
+    code: "CHILD_WORLD_SINGLE",
+    universe: "MONDE",
+    billingType: "SUBSCRIPTION",
+    isActive: true,
+    // Un seul siège Enfant Monde. Prix V1 alignés sur la courbe ROOTS_SOLO.
+    variants: [
+      { language: "DEUTSCH", currency: "XAF", amount: 3_500, durationDays: 30 },
+      { language: "DEUTSCH", currency: "XAF", amount: 35_000, durationDays: 365 },
+      { language: "DEUTSCH", currency: "EUR", amount: 990, durationDays: 30 },
+      { language: "DEUTSCH", currency: "EUR", amount: 99, durationDays: 365 },
+    ],
+    capabilities: ["COURSE_ACCESS", "CHILD_PROFILES"],
+  },
+  {
+    code: "FAMILY_WORLD",
+    universe: "MONDE",
+    billingType: "SUBSCRIPTION",
+    isActive: true,
+    // Jusqu'à 3 sièges Enfant Monde. Prix V1 alignés sur ROOTS_FAMILY.
+    variants: [
+      { language: "DEUTSCH", currency: "XAF", amount: 9_900, durationDays: 30 },
+      { language: "DEUTSCH", currency: "XAF", amount: 99_000, durationDays: 365 },
+      { language: "DEUTSCH", currency: "EUR", amount: 1_990, durationDays: 30 },
+      { language: "DEUTSCH", currency: "EUR", amount: 149, durationDays: 365 },
+    ],
+    capabilities: ["COURSE_ACCESS", "CHILD_PROFILES"],
+  },
 ];
 
 async function seedProduct(def: ProductDef) {

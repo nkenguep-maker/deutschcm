@@ -3,6 +3,12 @@
 // Tous les changements passent par des transactions Serializable et émettent
 // un AuditEvent dans la même transaction. Le profil actif enfant est
 // nettoyé côté user_metadata au niveau route quand un enfant est retiré.
+//
+// P4.4 · émissions Coach Racines · ROOTS_COACH_CAPACITY_REACHED sur capacité
+// atteinte pendant `assignCoach` (Q15) · ROOTS_COACH_ASSIGNMENT_REVOKED sur
+// `removeCoach` avant commit (Q10 · révocation immédiate). Fire-and-forget
+// après commit tx pour éviter de bloquer la réponse. Metadata sanitizée en
+// défense (aucun email/nom/téléphone/DOB).
 
 import type { PrismaClient } from "@prisma/client";
 import {
@@ -10,8 +16,10 @@ import {
   assertCircleChildCapacity,
   assertCircleCoachCapacity,
   assertCoachCapacityAvailable,
+  assertCoachProfileCapacityForChildAdd,
 } from "@/lib/circles/capacity";
 import { acquireCircleLock } from "@/lib/db/locks";
+import { writeAuditEvent } from "@/lib/audit/events";
 
 type TxClient = Omit<
   PrismaClient,
@@ -77,6 +85,14 @@ export async function addChildToCircle(
 
   await acquireCircleLock(tx, input.circleId);
   await assertCircleChildCapacity(tx, input.circleId);
+  // P4.4 hardening · si le Circle a un COACH ACTIVE, garantir que ce coach
+  // ne dépasse pas son budget profil (20). Sinon `coach_profile_capacity_reached`
+  // → 409 mappé côté API, aucun leak de code Prisma.
+  // NOTE · l'audit ROOTS_COACH_CAPACITY_REACHED est émis par la route caller
+  // APRÈS l'échec définitif (post-retry) via `emitCoachCapacityAudit`. On ne
+  // fait AUCUNE écriture d'audit ici · sinon les retries SSI produiraient
+  // des doublons (fire-and-forget hors tx = survit à un rollback).
+  await assertCoachProfileCapacityForChildAdd(tx, input.circleId);
 
   // Dédup · pas de duplicate ACTIVE membership pour ce child.
   const existing = await tx.circleMembership.findFirst({
@@ -222,6 +238,10 @@ export async function assignCoach(
   // 1 seul coach ACTIVE par cercle.
   await assertCircleCoachCapacity(tx, input.circleId);
   // 20 profils + 10 Circles max par coach.
+  // NOTE · l'audit ROOTS_COACH_CAPACITY_REACHED est émis par la route caller
+  // APRÈS l'échec définitif (post-retry) via `emitCoachCapacityAudit`. On ne
+  // fait AUCUNE écriture d'audit ici · sinon les retries SSI produiraient
+  // des doublons (fire-and-forget hors tx = survit à un rollback).
   await assertCoachCapacityAvailable(tx, input.coachUserId, input.circleId);
 
   const membership = await tx.circleMembership.create({
@@ -241,7 +261,7 @@ export async function assignCoach(
 /** ADMIN retire le coach · ancien coach perd l'accès immédiatement (Q10). */
 export async function removeCoach(
   tx: TxClient,
-  input: { circleId: string },
+  input: { circleId: string; adminUserId?: string; reason?: string },
 ): Promise<{ removedMembershipId: string | null; previousCoachUserId: string | null }> {
   const membership = await tx.circleMembership.findFirst({
     where: { circleId: input.circleId, role: "COACH", status: "ACTIVE" },
@@ -252,6 +272,26 @@ export async function removeCoach(
     where: { id: membership.id },
     data: { status: "REMOVED", removedAt: new Date() },
   });
+  // P4.4 closure · idempotence transactionnelle · l'audit est écrit DANS la
+  // même tx que l'update de statut. Sur SSI rollback ou retry, l'audit est
+  // rollback avec le membership · exactement 1 audit par commit effectif.
+  await writeAuditEvent(
+    {
+      actorUserId: input.adminUserId ?? null,
+      actorRole: input.adminUserId ? "YEMA_ADMIN" : null,
+      action: "ROOTS_COACH_ASSIGNMENT_REVOKED",
+      targetType: "CircleMembership",
+      targetId: membership.id,
+      scopeType: "Circle",
+      scopeId: input.circleId,
+      metadata: {
+        previousCoachUserId: membership.userId,
+        reasonCode: input.reason ?? "removed",
+        routeAction: "removeCoach",
+      },
+    },
+    tx,
+  );
   return { removedMembershipId: membership.id, previousCoachUserId: membership.userId };
 }
 

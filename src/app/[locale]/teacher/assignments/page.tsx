@@ -1,35 +1,41 @@
-// P4.3b · Teacher assignments · LOCK_HONESTLY (P4.5 dependency).
+// P4.5-B2b3b-a Gate UI Teacher · liste assignments Teacher.
+// Résolution 4 états (feature off / anonymous / role absent / OK) via
+// pageResolver. Data via adapter (délégué services B1).
 
 import { redirect } from "next/navigation";
-import { isTeacherWorkspaceActive } from "@/lib/flags";
-import { resolveTeacherActorOrNull } from "@/lib/permissions/teacher";
 import TeacherFeaturePlaceholder from "@/components/teacher/TeacherFeaturePlaceholder";
-import TeacherLockedView from "@/components/teacher/TeacherLockedView";
+import TeacherRoleAbsentPlaceholder from "@/components/teacher/TeacherRoleAbsentPlaceholder";
+import TeacherAssignmentsView from "@/components/teacher/TeacherAssignmentsView";
+import { resolveTeacherPage } from "@/lib/teacher/pageResolver";
+import { loadTeacherAssignmentsForClassroom } from "@/lib/teacher/assignmentsAdapter";
+import { getTeacherClasses } from "@/lib/teacher/queries";
 
 export const dynamic = "force-dynamic";
 
-const COPY = {
-  fr: {
-    title: "Devoirs",
-    body: "La création et le suivi des activités seront disponibles dans une prochaine étape.",
-  },
-  en: {
-    title: "Assignments",
-    body: "Creating and tracking activities will be available in a later step.",
-  },
-} as const;
-
 export default async function Page({
-  params,
+  params, searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ classroomId?: string }>;
 }) {
   const { locale } = await params;
-  if (!isTeacherWorkspaceActive()) {
-    return <TeacherFeaturePlaceholder locale={locale} />;
-  }
-  const actor = await resolveTeacherActorOrNull();
-  if (!actor) redirect(`/${locale}/login`);
-  const c = locale === "en" ? COPY.en : COPY.fr;
-  return <TeacherLockedView locale={locale} title={c.title} body={c.body} />;
+  const resolution = await resolveTeacherPage();
+  if (resolution.kind === "feature_off") return <TeacherFeaturePlaceholder locale={locale} />;
+  if (resolution.kind === "anonymous") redirect(`/${locale}/login`);
+  if (resolution.kind === "role_absent") return <TeacherRoleAbsentPlaceholder locale={locale} />;
+
+  const { items: classrooms } = await getTeacherClasses(resolution.actor.teacherId, { pageSize: 100 });
+  const sp = await searchParams;
+  const selectedClassroomId = sp?.classroomId ?? (classrooms[0]?.id ?? null);
+  const assignments = selectedClassroomId
+    ? (await loadTeacherAssignmentsForClassroom(resolution.actor, selectedClassroomId)) ?? []
+    : [];
+  return (
+    <TeacherAssignmentsView
+      locale={locale}
+      classrooms={classrooms}
+      selectedClassroomId={selectedClassroomId}
+      assignments={assignments}
+    />
+  );
 }

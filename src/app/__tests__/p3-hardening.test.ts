@@ -57,14 +57,18 @@ describe("DashboardRacines · rend les 4 modes distinctement", () => {
   });
 });
 
-describe("Limite enfants · POST /api/family/children (hardening §4)", () => {
+describe("Limite enfants · POST /api/family/children (Lot 7C.4 · per-universe pools)", () => {
   const src = read("src/app/api/family/children/route.ts");
-  it("MAX_CHILDREN vaut 4 (doctrine §12)", () => {
-    expect(src).toMatch(/MAX_CHILDREN\s*=\s*4/);
+  it("utilise assertCanAddChildProfile(guardian, universe) canonique", () => {
+    expect(src).toMatch(/assertCanAddChildProfile\(guardian,\s*universe\)/);
+    expect(src).not.toMatch(/const MAX_CHILDREN = 4/);
   });
-  it("refus 409 avec detail { limit, current } quand plafond atteint", () => {
+  it("refus 409 avec detail { reason, universe, limit, current } par pool", () => {
     expect(src).toMatch(/max_children_reached/);
-    expect(src).toMatch(/limit:\s*MAX_CHILDREN/);
+    expect(src).toMatch(/reason: gate\.reason/);
+    expect(src).toMatch(/universe: gate\.universe/);
+    expect(src).toMatch(/limit: gate\.limit/);
+    expect(src).toMatch(/current: gate\.current/);
   });
 });
 

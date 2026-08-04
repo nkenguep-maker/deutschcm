@@ -147,3 +147,134 @@ Grants tables ·
 - `GRANT SELECT ON audit_events TO authenticated` · seule la policy `is_yema_admin` renvoie des lignes · les autres users voient 0 rows.
 - `REVOKE ALL ON <4 tables> FROM anon` · aucun accès anonyme quelle que soit la RLS.
 - Aucune policy `INSERT/UPDATE/DELETE` côté client · toutes les écritures P4.1 passent par des routes Next avec Prisma en `service_role` (bypass RLS).
+
+---
+
+## 7. Delta P4.5-B · service_role paths + fixtures P-1 + protections
+
+### 7.1 Scripts fixtures P-1
+
+Deux scripts server-side dédiés (aucun secret dans le repo · service_role
+lu depuis `.env.p1-baseline`, chargé exclusivement par le wrapper) ·
+
+- `scripts/test-baseline/p4-5-b-fixtures.mjs` · rows Prisma (10 personas
+  test_p4_5_b_* + Classrooms A/B + Assignments + Submissions + Feedbacks
+  + lignée E2E dédiée `asmE2ENewVersion` + `subE2ENewVersion`).
+  Défense · `assertNonProduction()` refuse toute cible non-P-1
+  (blacklist `sbjhvlrkbyjckdxujjsk`, `mamofhrurksyuuolucea`,
+  `qggwvonfumuimjfsgpdz`).
+- `scripts/test-baseline/p4-5-b-auth-fixtures.mjs` · Auth Supabase
+  (`admin.auth.admin.createUser` avec `email_confirm: true` + password
+  from `P1_TEST_PASSWORD`) + sync `supabaseId` sur les rows Prisma
+  correspondantes + sync `user_metadata.{roles, onboarded_map, active_space}`
+  (sans quoi le proxy Next redirige `/setup-role` ou `/onboarding`).
+
+### 7.2 Cleanup Auth + métier
+
+- `scripts/test-baseline/p4-5-b-cleanup.mjs` · purge Prisma. Prédicat
+  étendu (b2 Gate final) pour cibler AUSSI les rows créées par les tests
+  E2E avec id auto-cuid (via `submissionId startsWith PREFIX` et
+  `assignmentId startsWith PREFIX`). Sortie stable `BASELINE DATA CLEANED`.
+- `scripts/test-baseline/p4-5-b-auth-cleanup.mjs` · purge Auth Supabase
+  users prefix `test_p4_5_b_` via `admin.auth.admin.deleteUser`. Vérifie
+  0 résiduel après. Sortie stable `AUTH BASELINE CLEANED`.
+
+### 7.3 Wrapper P-1
+
+`scripts/test-baseline/run-p4-5-b2-p1.mjs` · seul point d'entrée pour
+lancer un binaire enfant (dev server Next, Playwright, fixtures, cleanup)
+avec l'environnement Supabase P-1 verrouillé ·
+
+- Charge exclusivement `.env.p1-baseline` (aucun `.env.local` lu).
+- Refuse toute variable dont la valeur contient une ref production.
+- Parse le JWT `NEXT_PUBLIC_SUPABASE_ANON_KEY` pour vérifier le payload
+  `ref` = P-1.
+- Valide toutes les URLs Supabase (`NEXT_PUBLIC_SUPABASE_URL`,
+  `SUPABASE_URL`, `DIRECT_URL`, `DATABASE_URL`, `SHADOW_DATABASE_URL`).
+- Applique le flag demandé `--flag on|off` (`YEMA_ASSIGNMENTS_ENABLED` +
+  `YEMA_TEACHER_WORKSPACE_ENABLED` + `YEMA_TEACHER_RLS_CONFIRMED` on/off
+  synchronisés).
+- Sortie limitée · `P-1 ENVIRONMENT VERIFIED / projectRef=… /
+  assignmentsEnabled=…` · **jamais de log de secret**.
+
+### 7.4 Migrations P4.5-B
+
+Migrations SQL versionnées (aucun secret nécessaire · Prisma migrate
+via service_role sur P-1) · voir `docs/YEMA_P4_5_ASSIGNMENTS_SUBMISSIONS_FEEDBACK.md`
+§15.11-15.13 pour la matrice RLS et le hardening columnar.
+
+### 7.5 Chemins serveur autorisés (assignments)
+
+Routes API `/api/{student,teacher}/**/route.ts` utilisent EXCLUSIVEMENT ·
+
+- `runStudentRoute()` et `runTeacherRoute()` (helpers Prisma tx)
+- `assignmentsFlagOr404()` (feature gate)
+- services B1 (`src/lib/assignments/{student,teacher}.ts`)
+- body validators allowlist (`src/lib/assignments/bodyValidators.ts`)
+
+Ces routes ouvrent une transaction Prisma en `service_role` (bypass RLS
+serveur uniquement, hors du chemin JWT client) pour appliquer les
+transitions métier · publish, close, submit, supersede, feedback publish,
+addendum · **exclusivement**. Les mutations DRAFT autorisées côté JWT
+(voir `docs/YEMA_P4_5_ASSIGNMENTS_SUBMISSIONS_FEEDBACK.md` §15.12)
+passent également par ces routes serveur pour bénéficier du même seam
+et de l'écriture d'AuditEvents in-transaction.
+
+Aucune route Monde n'appelle directement `admin.auth.admin.*` (fonction
+Supabase Auth admin). L'auth admin API n'est utilisée QUE par les scripts
+fixtures/cleanup P-1 (hors runtime prod).
+
+### 7.6 `storageObjectId` · règles précises par chemin
+
+Le trigger `feedback_scope_immutable` (migration `20260724000004`) refuse
+toute mutation de `supersedesFeedbackId` après création. Pour
+`storageObjectId`, la règle exacte diffère par chemin d'appel ·
+
+**JWT `authenticated`** ·
+
+- initialisation `storageObjectId` de `NULL` vers une valeur · **refusée**
+  (aucune policy WRITE ne couvre cette colonne côté client · les
+  policies `20260724000002` autorisent uniquement les colonnes texte
+  éditables, et `20260724000003` restreint aux rows `status='DRAFT'`)
+- remplacement d'une valeur existante · **refusé** (trigger d'immutabilité
+  `20260724000004`)
+
+**Chemin serveur trusted / `service_role`** ·
+
+- initialisation contrôlée `NULL → valeur` autorisée pour la future
+  finalisation P4.5-D (le trigger `20260724000004` autorise explicitement
+  la transition `OLD.storageObjectId IS NULL AND NEW.storageObjectId IS NOT NULL`)
+- remplacement ultérieur refusé par le trigger d'immutabilité (`OLD.storageObjectId
+  IS NOT NULL AND NEW.storageObjectId IS DISTINCT FROM OLD.storageObjectId
+  → RAISE EXCEPTION`)
+
+**Aucun upload audio n'est implémenté dans P4.5-B**. `AUDIO_FEEDBACK_ENABLED`
+reste `false`. La finalisation storage 2-phase (`service_role` uniquement)
+sera livrée en P4.5-D · aucun handler côté route API Monde n'invoque
+actuellement la transition `NULL → valeur`.
+
+### 7.7 Interdictions pour JWT `authenticated`
+
+- Aucune UPDATE directe via PostgREST · vérifié runtime par
+  `p4-5-b2b-jwt-rls.mjs`.
+- Aucune INSERT `assignment`, `assignment_submissions`, `assignment_feedbacks`
+  côté client (RLS pas de policy INSERT).
+- Aucune DELETE côté client (RLS pas de policy DELETE).
+- Toutes les transitions passent par le service `service_role`.
+
+### 7.8 Absence de `service_role` dans les composants client
+
+Interdiction stricte · aucun `SUPABASE_SERVICE_ROLE_KEY` importé dans
+`src/components/**` ou `src/app/**/page.tsx`. Vérifié par ·
+
+- Convention `NEXT_PUBLIC_*` prefix pour tout ce qui est bundlé client.
+- Grep périodique · aucune occurrence hors `src/lib/**/server*`,
+  `scripts/**`, `prisma/**`.
+
+### 7.9 Absence de secret dans les AuditEvents et logs
+
+- Vérifié §11 threat model (AP4.5-B.11) · aucun `writtenContent` /
+  email / nom / téléphone dans `AuditEvent.metadata`.
+- Wrapper P-1 log-only `projectRef` + flag (aucune clé, aucun token).
+- Playwright configuré `screenshot/video only-on-failure` · artefacts
+  dans `test-results/` gitignoré · jamais commité.

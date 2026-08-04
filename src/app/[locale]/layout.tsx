@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from "next-intl"
 import { notFound } from "next/navigation"
 import { routing } from "@/i18n/routing"
 import { TestSpaceBar } from "@/components/TestSpaceBar"
+import { QaTestBar } from "@/components/qa/QaTestBar"
 
 // SEO · métadonnées localisées par locale. Le canonique et les
 // alternates hreflang pointent vers l'URL locale (jamais la racine)
@@ -121,6 +122,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
+      <QaTestBar />
       <TestSpaceBar />
       {children}
     </NextIntlClientProvider>

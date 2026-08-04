@@ -15,11 +15,19 @@ import { prisma } from "@/lib/prisma";
 import { getLanguage, LANGUAGES } from "@/lib/languages";
 import type { ChildLangue, ChildLangueType } from "@/lib/childScales";
 import { initialStep } from "@/lib/childScales";
+import { resolveFamilyGuardianActorOrNull } from "@/lib/family/actor";
+import { assertCanAddChildProfile } from "@/lib/family/seats";
 
 export const dynamic = "force-dynamic";
 
 const AVATAR_ANIMALS = ["chouette", "tortue", "panda", "elephant", "girafe", "renard"] as const;
 type AvatarAnimal = (typeof AVATAR_ANIMALS)[number];
+
+// Lot 7B.2 · parcours pédagogique enfant (source canonique pour la carte
+// Family Monde). Uniquement pour enfants MONDE (foreign lang existante).
+// null signifie explicitement "je définirai plus tard".
+const MONDE_PATHS = ["STUDIES", "WORK", "TRAVEL", "EXAM", "DAILY_LIFE"] as const;
+type MondePathValue = (typeof MONDE_PATHS)[number];
 
 async function getParent() {
   const cookieStore = await cookies();
@@ -87,6 +95,13 @@ export async function POST(req: Request) {
     avatarAnimal?: string;
     age?: number;
     langues?: { langue: string; type: string }[];
+    // Lot 7B.2 · optionnel · uniquement pour enfant MONDE (foreign lang).
+    // Refus strict de toute valeur non canonique.
+    learningGoal?: string | null;
+    // Gate 8A · univers EXPLICITE requis · JAMAIS dérivé de la langue
+    // côté serveur. Le client (formulaire ou UI) décide. Le serveur
+    // valide et refuse null/inconnu (brief §1).
+    universe?: "MONDE" | "RACINES" | string;
   };
   const prenom = (body.prenom ?? "").trim().slice(0, 24);
   const age = Number(body.age);
@@ -119,11 +134,45 @@ export async function POST(req: Request) {
     // Limite douce · 4 langues par enfant suffit pour rester lisible.
     return NextResponse.json({ error: "too_many_langues" }, { status: 400 });
   }
-  // P3 hardening · doctrine §4 · maximum 4 enfants par foyer (offre Famille).
-  const MAX_CHILDREN = 4;
-  const count = await prisma.childProfile.count({ where: { parentUserId: guard.parentId } });
-  if (count >= MAX_CHILDREN) {
-    return NextResponse.json({ error: "max_children_reached", limit: MAX_CHILDREN, current: count }, { status: 409 });
+
+  // Lot 7B.2 · validation stricte learningGoal · uniquement pour MONDE.
+  // Universe MONDE est induit par la présence d'au moins une foreign lang.
+  // learningGoal envoyé pour RACINES (aucune foreign lang) · normalisé null
+  // silencieusement (l'UI empêche déjà l'envoi, mais on protège serveur).
+  const hasForeign = built.some((l) => l.type === "foreign");
+  let learningGoal: MondePathValue | null = null;
+  if (body.learningGoal !== undefined && body.learningGoal !== null) {
+    if (typeof body.learningGoal !== "string" || !(MONDE_PATHS as readonly string[]).includes(body.learningGoal)) {
+      return NextResponse.json({ error: "learning_goal_invalid" }, { status: 400 });
+    }
+    if (hasForeign) {
+      learningGoal = body.learningGoal as MondePathValue;
+    }
+    // Sinon · valeur silencieusement ignorée (Racines ne stocke pas de parcours Monde).
+  }
+
+  // Gate 8A · univers EXPLICITE du client · le serveur ne dérive JAMAIS
+  // universe de la langue (brief §1 · doctrine figée). Absent ou invalide
+  // → 400 fail-closed. Le client (AddChildDialog ou autre UI) doit
+  // envoyer explicitement "MONDE" ou "RACINES".
+  const universe: "MONDE" | "RACINES" | null =
+    body.universe === "MONDE" ? "MONDE" :
+    body.universe === "RACINES" ? "RACINES" :
+    null;
+  if (universe === null) {
+    return NextResponse.json({ error: "universe_required", details: "MONDE|RACINES" }, { status: 400 });
+  }
+  const guardian = await resolveFamilyGuardianActorOrNull();
+  if (!guardian) return NextResponse.json({ error: "guardian_unresolved" }, { status: 401 });
+  const gate = await assertCanAddChildProfile(guardian, universe);
+  if (!gate.ok) {
+    return NextResponse.json({
+      error: "max_children_reached",
+      reason: gate.reason,
+      universe: gate.universe,
+      limit: gate.limit,
+      current: gate.current,
+    }, { status: 409 });
   }
 
   const created = await prisma.childProfile.create({
@@ -135,6 +184,10 @@ export async function POST(req: Request) {
       // Prisma Json field · cast via unknown pour rester typé
       langues: built as unknown as object,
       activeLangue: built[0].langue,
+      // Lot 7C.4 · univers explicite persisté à la création · le dashboard
+      // et le seat snapshot dépendent de ce champ (jamais dérivé).
+      universe,
+      learningGoal,
     },
   });
   return NextResponse.json({

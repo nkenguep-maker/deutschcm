@@ -17,11 +17,16 @@ export type FeatureFlag =
   | "TEACHER_WORKSPACE_ENABLED"
   | "TEACHER_RLS_CONFIRMED"
   | "COACH_WORKSPACE_ENABLED"
+  | "ROOTS_COACH_RLS_CONFIRMED"
   | "ASSIGNMENTS_ENABLED"
   | "AUDIO_FEEDBACK_ENABLED"
   | "CLOSED_MESSAGING_ENABLED"
   | "NOTIFICATIONS_ENABLED"
-  | "RACINES_COACH_OPERATIONAL";
+  | "RACINES_COACH_OPERATIONAL"
+  | "QA_MODE_ENABLED"
+  | "DASHBOARD_REDESIGN_ENABLED"
+  | "MESSAGING_ENABLED"
+  | "MESSAGE_AUDIO_ENABLED";
 
 const P4_FLAGS: readonly FeatureFlag[] = [
   "CIRCLE_ENABLED",
@@ -30,11 +35,16 @@ const P4_FLAGS: readonly FeatureFlag[] = [
   "TEACHER_WORKSPACE_ENABLED",
   "TEACHER_RLS_CONFIRMED",
   "COACH_WORKSPACE_ENABLED",
+  "ROOTS_COACH_RLS_CONFIRMED",
   "ASSIGNMENTS_ENABLED",
   "AUDIO_FEEDBACK_ENABLED",
   "CLOSED_MESSAGING_ENABLED",
   "NOTIFICATIONS_ENABLED",
   "RACINES_COACH_OPERATIONAL",
+  "QA_MODE_ENABLED",
+  "DASHBOARD_REDESIGN_ENABLED",
+  "MESSAGING_ENABLED",
+  "MESSAGE_AUDIO_ENABLED",
 ] as const;
 
 export function getFlag(name: FeatureFlag): boolean {
@@ -73,6 +83,74 @@ export function isTeacherWorkspaceActive(): boolean {
     return false;
   }
   return true;
+}
+
+/**
+ * P4.4 · workspace Coach Racines · même pattern double confirmation.
+ * `COACH_WORKSPACE_ENABLED` seul en dev · en prod, requiert aussi
+ * `ROOTS_COACH_RLS_CONFIRMED=true` (policies RLS + projection function
+ * posées et validées).
+ *
+ * Note · `RACINES_COACH_OPERATIONAL` reste indépendant · il gouverne
+ * l'opérationnalité commerciale (paiement, réservation session, etc.),
+ * pas l'exposition du workspace en lecture.
+ */
+export function isRootsCoachWorkspaceActive(): boolean {
+  if (!getFlag("COACH_WORKSPACE_ENABLED")) return false;
+  if (process.env.NODE_ENV === "production" && !getFlag("ROOTS_COACH_RLS_CONFIRMED")) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * P4.5 · workflow assignments (Monde + Racines). `ASSIGNMENTS_ENABLED = false`
+ * verrouille TOUTES les nouvelles routes P4.5 en 404/placeholder. En production,
+ * l'exposition effective d'un endpoint reste conditionnée aux guards RLS
+ * existants Teacher (`isTeacherWorkspaceActive`) ou Coach
+ * (`isRootsCoachWorkspaceActive`) selon le contexte · brief §22.
+ */
+export function isAssignmentsActive(): boolean {
+  return getFlag("ASSIGNMENTS_ENABLED");
+}
+
+/**
+ * P4.5 · audio (submission + feedback). Requiert `ASSIGNMENTS_ENABLED` en
+ * plus de `AUDIO_FEEDBACK_ENABLED` · un déploiement peut vouloir garder
+ * l'audio verrouillé pendant que l'écrit est déjà accepté (brief §22).
+ */
+export function isAudioFeedbackActive(): boolean {
+  return isAssignmentsActive() && getFlag("AUDIO_FEEDBACK_ENABLED");
+}
+
+/**
+ * P4.6 · refonte des 8 dashboards YEMA. Server-only : gate visuel qui
+ * remplace les anciens composants dashboards par les nouveaux
+ * (`src/features/dashboards/*`) sans changer les routes publiques.
+ * Flag `false` (défaut) = les anciens dashboards restent seuls en place,
+ * comportement byte-identique. Aucun `NEXT_PUBLIC_*`, jamais évalué côté
+ * client, aucun accès DB nécessaire.
+ */
+export function isYemaDashboardRedesignActive(): boolean {
+  return getFlag("DASHBOARD_REDESIGN_ENABLED");
+}
+
+/**
+ * P4.6-A · gate global du domaine Messagerie. Server-only. Sans ce flag,
+ * les endpoints /api/messaging/* retournent 404 stable et n'exécutent
+ * AUCUNE requête DB métier (aucun indice sur l'existence des conversations).
+ */
+export function isMessagingEnabled(): boolean {
+  return getFlag("MESSAGING_ENABLED");
+}
+
+/**
+ * P4.6-A · gate audio séparé. Reste false tant que le stockage audio
+ * privé n'est pas livré (P4.6-B). Aucun MediaRecorder ni signed URL
+ * ne fonctionne quand ce flag est off, même si MESSAGING_ENABLED est on.
+ */
+export function isMessagingAudioEnabled(): boolean {
+  return isMessagingEnabled() && getFlag("MESSAGE_AUDIO_ENABLED");
 }
 
 export function assertFlagEnabled(name: FeatureFlag): void {

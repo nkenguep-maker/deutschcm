@@ -6,7 +6,12 @@ Plateforme d'apprentissage de l'allemand alignée CEFR (A1 → C1), positionnée
 comme alternative indépendante aux organismes officiels. Édition YEMA.
 
 **Repo** : github.com/nkenguep-maker/deutschcm
-**Supabase** : project `sbjhvlrkbyjckdxujjsk`
+
+**Supabase** :
+
+- **P-1 (autorisé)** : `kzzagbojjkivdzzcrmxn` — cible unique pour tous travaux dev, QA, Preview et scripts runtime. Utiliser `.env.p1-baseline` (jamais `.env.local` qui pointe historiquement vers la prod).
+- **Production (interdit sur cette base de code depuis l'incident 2026-07-23)** : `sbjhvlrkbyjckdxujjsk`. Ne jamais s'y connecter depuis ce repo ; les scripts refusent la ref via `assertNonProduction()`.
+- **Autres refs blacklistées** : `mamofhrurksyuuolucea`, `qggwvonfumuimjfsgpdz`.
 
 ## Stack
 
@@ -43,6 +48,6 @@ comme alternative indépendante aux organismes officiels. Édition YEMA.
 
 ## MCP
 
-- `supabase` — read-only, `sbjhvlrkbyjckdxujjsk`
+- `supabase` — read-only, P-1 uniquement (`kzzagbojjkivdzzcrmxn`)
 
 Config dans `.mcp.json` (gitignored, contient le PAT).

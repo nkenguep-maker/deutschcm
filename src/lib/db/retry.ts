@@ -17,9 +17,18 @@ function isSerializationFailure(e: unknown): boolean {
   );
 }
 
+export type ConcurrentUpdateCode =
+  | "concurrent_membership_update"
+  | "concurrent_invitation_update"
+  | "concurrent_coach_assignment"
+  | "concurrent_coach_replacement"
+  | "concurrent_assignment_update"
+  | "concurrent_submission_update"
+  | "concurrent_feedback_update";
+
 export class ConcurrentUpdateError extends Error {
   constructor(
-    public readonly code: "concurrent_membership_update" | "concurrent_invitation_update",
+    public readonly code: ConcurrentUpdateCode,
     message: string,
     public readonly cause?: unknown,
   ) {
@@ -30,7 +39,7 @@ export class ConcurrentUpdateError extends Error {
 
 export interface RetryOptions {
   max?: number;
-  errorCode?: "concurrent_membership_update" | "concurrent_invitation_update";
+  errorCode?: ConcurrentUpdateCode;
 }
 
 /**

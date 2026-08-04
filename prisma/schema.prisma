@@ -73,6 +73,10 @@ enum ProductCode {
   COMPANION
   // P4.1 — offre "Suivi Racines" 30 000 XAF / 45 € (Q7/Q15 validées).
   ROOTS_COACH_ADDON
+  // P4.6 Lot 5.1 · offres Enfant Monde. SINGLE = 1 siège enfant, FAMILY_WORLD = 3 sièges.
+  // Aucun de ces produits ne débloque un Passage Monde adulte.
+  CHILD_WORLD_SINGLE
+  FAMILY_WORLD
 }
 
 enum BillingType {
@@ -302,6 +306,18 @@ model User {
   invitationsIssued     CircleInvitation[]   @relation("InvitationInviter")
   invitationsAccepted   CircleInvitation[]   @relation("InvitationAcceptor")
   invitationsRevoked    CircleInvitation[]   @relation("InvitationRevoker")
+
+  // ─── P4.5 · Racines productions Coach/Parent ──────────────────
+  circleAssignmentsCreated  CircleAssignment[]      @relation("CircleAssignmentCoach")
+  circleSubmissionsMade     CircleSubmission[]      @relation("CircleSubmissionSubmitter")
+  circleFeedbacksAuthored   CircleFeedback[]        @relation("CircleFeedbackAuthor")
+  circleReplyAuthored       CircleSubmissionReply[] @relation("CircleSubmissionReplyAuthor")
+
+  // ─── P4.6-A · Messagerie · relations back-refs ────────────────
+  messagingParticipations   MessagingConversationParticipant[] @relation("MessagingParticipantUser")
+  messagingMessagesSent     MessagingMessage[]                 @relation("MessagingMessageSenderUser")
+  messagingModerationActs   MessagingModerationAction[]        @relation("MessagingModerationActor")
+  messagingAudioAssetsOwned MessagingAudioAsset[]              @relation("MessagingAudioOwnerUser")
 
   @@index([email])
   @@index([centerId])
@@ -895,6 +911,9 @@ model Teacher {
   user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   center     LanguageCenter? @relation(fields: [centerId], references: [id])
   classrooms Classroom[]
+  // P4.5 · back-relations Monde assignments/feedback (fondations sous flag).
+  createdAssignments  Assignment[]         @relation("AssignmentCreator")
+  authoredFeedbacks   AssignmentFeedback[] @relation("AssignmentFeedbackAuthor")
 
   @@map("teachers")
 }
@@ -935,35 +954,111 @@ model ClassroomEnrollment {
 }
 
 model Assignment {
-  id          String    @id @default(uuid())
-  classroomId String
-  title       String
-  description String?
-  moduleId    String?
-  dueDate     DateTime?
-  maxScore    Int       @default(100)
-  createdAt   DateTime  @default(now())
+  id                 String            @id @default(uuid())
+  classroomId        String
+  title              String
+  description        String?
+  instructions       String?
+  moduleId           String?
+  dueDate            DateTime?
+  maxScore           Int               @default(100)
+  // P4.5 · lifecycle et type de production attendue.
+  type               AssignmentType    @default(WRITTEN)
+  status             AssignmentStatus  @default(DRAFT)
+  publishedAt        DateTime?
+  closedAt           DateTime?
+  archivedAt         DateTime?
+  createdByTeacherId String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @default(now())
 
-  classroom   Classroom              @relation(fields: [classroomId], references: [id], onDelete: Cascade)
-  module      Module?                @relation(fields: [moduleId], references: [id], onDelete: SetNull)
-  submissions AssignmentSubmission[]
+  classroom       Classroom              @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  module          Module?                @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  createdByTeacher Teacher?              @relation("AssignmentCreator", fields: [createdByTeacherId], references: [id], onDelete: SetNull)
+  submissions     AssignmentSubmission[]
 
+  @@index([classroomId, status])
+  @@index([status, publishedAt])
   @@map("assignments")
 }
 
+enum AssignmentType {
+  WRITTEN
+  AUDIO
+  MIXED
+}
+
+enum AssignmentStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+  ARCHIVED
+}
+
 model AssignmentSubmission {
-  id           String   @id @default(uuid())
-  assignmentId String
-  userId       String
-  score        Float?
-  feedback     String?
-  submittedAt  DateTime @default(now())
+  id              String              @id @default(uuid())
+  assignmentId    String
+  userId          String
+  score           Float?
+  feedback        String?
+  submittedAt     DateTime            @default(now())
+  // P4.5 · lifecycle + versionnement + association Storage optionnel.
+  status          SubmissionStatus    @default(DRAFT)
+  version         Int                 @default(1)
+  writtenContent  String?
+  storageObjectId String?
+  withdrawnAt     DateTime?
+  updatedAt       DateTime            @default(now())
 
-  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignment  Assignment          @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  storageObject StorageObject?    @relation("AssignmentSubmissionStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
+  feedbacks   AssignmentFeedback[]
 
-  @@unique([assignmentId, userId])
+  @@unique([assignmentId, userId, version])
+  @@index([assignmentId, status])
   @@map("assignment_submissions")
+}
+
+enum SubmissionStatus {
+  DRAFT
+  SUBMITTED
+  WITHDRAWN
+  SUPERSEDED
+}
+
+// P4.5 · retour Teacher immuable après PUBLISHED (trigger DB).
+model AssignmentFeedback {
+  id                    String            @id @default(cuid())
+  submissionId          String
+  authorTeacherId       String
+  status                FeedbackStatus    @default(DRAFT)
+  version               Int               @default(1)
+  supersedesFeedbackId  String?
+  writtenContent        String?
+  storageObjectId       String?
+  publishedAt           DateTime?
+  retractedAt           DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @default(now())
+
+  submission        AssignmentSubmission  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  authorTeacher     Teacher               @relation("AssignmentFeedbackAuthor", fields: [authorTeacherId], references: [id], onDelete: Restrict)
+  storageObject     StorageObject?        @relation("AssignmentFeedbackStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
+  supersedesFeedback AssignmentFeedback?  @relation("AssignmentFeedbackSupersedes", fields: [supersedesFeedbackId], references: [id], onDelete: SetNull)
+  addenda           AssignmentFeedback[]  @relation("AssignmentFeedbackSupersedes")
+
+  @@index([submissionId])
+  @@index([authorTeacherId, status])
+  @@index([submissionId, version])
+  @@map("assignment_feedbacks")
+}
+
+enum FeedbackStatus {
+  DRAFT
+  PUBLISHED
+  ADDENDUM
+  RETRACTED_BY_ADMIN
 }
 
 model StudentGroup {
@@ -1143,6 +1238,19 @@ model ChildProfile {
   activeLangue String?
   // P4.1 · rattachement explicite au foyer (opt-in, SetNull préserve enfant en cas de suppression foyer).
   householdId  String?
+  // P4.6 Lot 4A · PIN enfant hashé (scrypt · Node crypto natif · format
+  // "scrypt$<salt_b64>$<hash_b64>"). Nullable : PIN optionnel jusqu'à ce
+  // que l'enfant en ait un. Jamais retourné par API ni au client.
+  pinHash      String?
+  pinUpdatedAt DateTime?
+  // P4.6 Lot 5.1 · univers canonique de l'enfant (autorité pour dispatch
+  // dashboard + comptage sièges). Ne plus dériver de la langue.
+  // Nullable pour préserver les enfants existants avant backfill P-1.
+  universe     Universe?
+  // Lot 7B.1 · objectif pédagogique enfant (source canonique parcours Monde).
+  // Nullable · aucun défaut · resolveMondePath mappe la string libre vers
+  // MondePath. Alimenté par fixture QA · onboarding enfant à venir.
+  learningGoal String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -1150,6 +1258,14 @@ model ChildProfile {
   household         Household?         @relation("HouseholdChildren", fields: [householdId], references: [id], onDelete: SetNull)
   circleMemberships CircleMembership[]
   storageObjects    StorageObject[]    @relation("StorageObjectChildOwner")
+  // P4.5 · productions Circle-scoped (ciblage individuel + soumissions).
+  circleAssignmentTargets CircleAssignmentTarget[]
+  circleSubmissions       CircleSubmission[]
+
+  // P4.6-A · Messagerie · back-refs
+  messagingParticipations   MessagingConversationParticipant[] @relation("MessagingParticipantChild")
+  messagingMessagesSent     MessagingMessage[]                 @relation("MessagingMessageSenderChild")
+  messagingAudioAssetsOwned MessagingAudioAsset[]              @relation("MessagingAudioOwnerChild")
 
   @@index([parentUserId])
   @@index([householdId])
@@ -1176,6 +1292,8 @@ model Circle {
   createdBy   User               @relation("CircleCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
   memberships CircleMembership[]
   invitations CircleInvitation[]
+  // P4.5 · activités Coach → Circle.
+  assignments CircleAssignment[]
 
   // Note · l'unicité "un seul Circle non-archivé par (foyer, langue)" est
   // portée par un index partiel PostgreSQL créé dans la migration :
@@ -1336,6 +1454,46 @@ enum AuditAction {
   TEACHER_CLASS_ACCESS_DENIED
   TEACHER_STUDENT_ACCESS_DENIED
   TEACHER_SCOPE_AMBIGUOUS
+  // P4.4 · Roots Coach workspace refusals · voir permissions/rootsCoach.ts +
+  // migration 20260723000008_p4_4_roots_coach_rls. Emis fire-and-forget.
+  ROOTS_COACH_ACCESS_DENIED
+  ROOTS_COACH_CIRCLE_ACCESS_DENIED
+  ROOTS_COACH_PROFILE_ACCESS_DENIED
+  ROOTS_COACH_CAPACITY_REACHED
+  ROOTS_COACH_ASSIGNMENT_REVOKED
+  ROOTS_COACH_SCOPE_AMBIGUOUS
+  // P4.5 · Monde (Teacher/Student) assignments + submissions + feedback.
+  ASSIGNMENT_CREATED
+  ASSIGNMENT_PUBLISHED
+  ASSIGNMENT_CLOSED
+  ASSIGNMENT_ACCESS_DENIED
+  SUBMISSION_CREATED
+  SUBMISSION_SUBMITTED
+  SUBMISSION_WITHDRAWN
+  SUBMISSION_ACCESS_DENIED
+  FEEDBACK_DRAFTED
+  FEEDBACK_PUBLISHED
+  FEEDBACK_ADDENDUM_CREATED
+  FEEDBACK_ACCESS_DENIED
+  STORAGE_UPLOAD_DENIED
+  // P4.5 · Racines (Coach/Circle) activités + productions + feedback + fil.
+  CIRCLE_ASSIGNMENT_CREATED
+  CIRCLE_ASSIGNMENT_PUBLISHED
+  CIRCLE_ASSIGNMENT_CLOSED
+  CIRCLE_SUBMISSION_CREATED
+  CIRCLE_SUBMISSION_SUBMITTED
+  CIRCLE_SUBMISSION_WITHDRAWN
+  CIRCLE_FEEDBACK_DRAFTED
+  CIRCLE_FEEDBACK_PUBLISHED
+  CIRCLE_FEEDBACK_ADDENDUM_CREATED
+  PRODUCTION_LIMIT_REACHED
+  PARENT_REPLY_CREATED
+  // P4.6-C.1 · messagerie audio privé asynchrone.
+  MESSAGE_AUDIO_CREATED
+  MESSAGE_AUDIO_ACCESS_DENIED
+  MESSAGE_AUDIO_PLAYBACK_GRANTED
+  MESSAGE_AUDIO_UPLOAD_FAILED
+  MESSAGE_AUDIO_PURGED
 }
 
 // ─── P4.1 · StorageObject · métadonnées uploads privés ───────────
@@ -1360,6 +1518,11 @@ model StorageObject {
 
   owner        User?         @relation("StorageObjectOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
   ownerChild   ChildProfile? @relation("StorageObjectChildOwner", fields: [ownerChildProfileId], references: [id], onDelete: SetNull)
+  // P4.5 · back-relations pour associations submission/feedback (Monde + Racines).
+  assignmentSubmissions AssignmentSubmission[] @relation("AssignmentSubmissionStorage")
+  assignmentFeedbacks   AssignmentFeedback[]   @relation("AssignmentFeedbackStorage")
+  circleSubmissions     CircleSubmission[]     @relation("CircleSubmissionStorage")
+  circleFeedbacks       CircleFeedback[]       @relation("CircleFeedbackStorage")
 
   @@unique([bucket, path])
   @@index([purpose, retentionUntil])
@@ -1375,6 +1538,155 @@ enum StorageObjectPurpose {
   CIRCLE_MESSAGE_AUDIO
   CLASS_MESSAGE_AUDIO
   ATTACHMENT
+}
+
+// ─── P4.5 · Racines · activité, ciblage, production, feedback, reply ──
+// Doctrine · docs/YEMA_P4_5_ASSIGNMENTS_SUBMISSIONS_FEEDBACK.md.
+// Immutabilité feedback PUBLISHED et submission SUBMITTED · triggers DB
+// (voir migration 20260723000010_p4_5_racines_productions_rls).
+
+model CircleAssignment {
+  id                    String                   @id @default(cuid())
+  circleId              String
+  createdByCoachUserId  String
+  title                 String
+  instructions          String?
+  productionType        CircleAssignmentType     @default(WRITTEN)
+  status                CircleAssignmentStatus   @default(DRAFT)
+  publishedAt           DateTime?
+  closedAt              DateTime?
+  archivedAt            DateTime?
+  dueAt                 DateTime?
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @default(now())
+
+  circle                Circle                   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  createdByCoach        User                     @relation("CircleAssignmentCoach", fields: [createdByCoachUserId], references: [id], onDelete: Restrict)
+  targets               CircleAssignmentTarget[]
+  submissions           CircleSubmission[]
+
+  @@index([circleId, status])
+  @@index([createdByCoachUserId, publishedAt])
+  @@index([circleId, publishedAt])
+  @@map("circle_assignments")
+}
+
+enum CircleAssignmentType {
+  WRITTEN
+  AUDIO
+  MIXED
+}
+
+enum CircleAssignmentStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+  ARCHIVED
+}
+
+model CircleAssignmentTarget {
+  id             String            @id @default(cuid())
+  assignmentId   String
+  childProfileId String
+  createdAt      DateTime          @default(now())
+
+  assignment     CircleAssignment  @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  childProfile   ChildProfile      @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, childProfileId])
+  @@index([childProfileId])
+  @@map("circle_assignment_targets")
+}
+
+model CircleSubmission {
+  id                 String                 @id @default(cuid())
+  assignmentId       String
+  childProfileId     String
+  submittedByUserId  String
+  version            Int                    @default(1)
+  status             CircleSubmissionStatus @default(DRAFT)
+  writtenContent     String?
+  storageObjectId    String?
+  submittedAt        DateTime?
+  withdrawnAt        DateTime?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @default(now())
+
+  assignment        CircleAssignment          @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  childProfile      ChildProfile              @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
+  submittedBy       User                      @relation("CircleSubmissionSubmitter", fields: [submittedByUserId], references: [id], onDelete: Restrict)
+  storageObject     StorageObject?            @relation("CircleSubmissionStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
+  feedbacks         CircleFeedback[]
+  replies           CircleSubmissionReply[]
+
+  @@index([assignmentId, status])
+  @@index([childProfileId, status])
+  @@index([assignmentId, childProfileId, version])
+  @@map("circle_submissions")
+}
+
+enum CircleSubmissionStatus {
+  DRAFT
+  SUBMITTED
+  WITHDRAWN
+  SUPERSEDED
+}
+
+model CircleFeedback {
+  id                    String                @id @default(cuid())
+  submissionId          String
+  authorCoachUserId     String
+  status                CircleFeedbackStatus  @default(DRAFT)
+  version               Int                   @default(1)
+  supersedesFeedbackId  String?
+  writtenContent        String?
+  storageObjectId       String?
+  publishedAt           DateTime?
+  retractedAt           DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @default(now())
+
+  submission            CircleSubmission      @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  authorCoach           User                  @relation("CircleFeedbackAuthor", fields: [authorCoachUserId], references: [id], onDelete: Restrict)
+  storageObject         StorageObject?        @relation("CircleFeedbackStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
+  supersedesFeedback    CircleFeedback?       @relation("CircleFeedbackSupersedes", fields: [supersedesFeedbackId], references: [id], onDelete: SetNull)
+  addenda               CircleFeedback[]      @relation("CircleFeedbackSupersedes")
+
+  @@index([submissionId])
+  @@index([authorCoachUserId, status])
+  @@index([submissionId, version])
+  @@map("circle_feedbacks")
+}
+
+enum CircleFeedbackStatus {
+  DRAFT
+  PUBLISHED
+  ADDENDUM
+  RETRACTED_BY_ADMIN
+}
+
+// Q14 · fil structuré parent–Coach sur une production. Aucune messagerie
+// générale. §10 · pas d'audio, pas de pièce jointe, pas de DM.
+model CircleSubmissionReply {
+  id            String                       @id @default(cuid())
+  submissionId  String
+  authorUserId  String
+  authorRole    CircleSubmissionReplyRole
+  body          String
+  createdAt     DateTime                     @default(now())
+  hiddenAt      DateTime?
+
+  submission    CircleSubmission             @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  author        User                         @relation("CircleSubmissionReplyAuthor", fields: [authorUserId], references: [id], onDelete: Restrict)
+
+  @@index([submissionId, createdAt])
+  @@index([authorUserId])
+  @@map("circle_submission_replies")
+}
+
+enum CircleSubmissionReplyRole {
+  PARENT
+  COACH
 }
 
 // ─── Demandes de démo (centres) ──────────────────────────────────
@@ -1393,4 +1705,329 @@ model CenterApplication {
   @@index([status])
   @@index([createdAt])
   @@map("center_applications")
+}
+
+// ─── QA-b1 · Store durable des nonces bootstrap ─────────────────
+// Preview-only · consommation atomique via UPDATE...RETURNING (voir
+// src/lib/qa/nonces.ts + docs/YEMA_QA_PREVIEW_PERSONAS.md).
+//
+// Le nonce brut n'est JAMAIS persisté · seul son SHA-256 (64 hex).
+// Aucune adresse e-mail complète · uniquement `qaAdminEmailHash`
+// (SHA-256 short) déjà utilisé pour le cookie QA.
+//
+// RLS strictement deny pour anon + authenticated (aucun SELECT/INSERT/
+// UPDATE/DELETE côté client). Les routes QA server-only accèdent via
+// Prisma en service_role (bypass RLS).
+model QaBootstrapNonce {
+  id                String    @id @default(cuid())
+  nonceHash         String    @unique @map("nonce_hash")
+  qaAdminEmailHash  String    @map("qa_admin_email_hash")
+  deploymentHost    String    @map("deployment_host")
+  projectRef        String    @map("project_ref")
+  issuedAt          DateTime  @map("issued_at")
+  expiresAt         DateTime  @map("expires_at")
+  consumedAt        DateTime? @map("consumed_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@index([expiresAt])
+  @@index([consumedAt])
+  @@map("qa_bootstrap_nonces")
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// P4.6-A · Messagerie · fondations · matrice de permissions server-side
+// ═══════════════════════════════════════════════════════════════════
+//
+// Doctrine :
+//   - 13 types de conversation exactement (WORLD_STUDENT_TEACHER →
+//     PLATFORM_BROADCAST). Aucun type ADMIN_METADATA_VIEW (vue synthétique
+//     séparée).
+//   - Enfants : envois strictement GUIDED_PHRASE + AUDIO (jamais TEXT
+//     libre côté serveur).
+//   - Parents : GUARDIAN_OBSERVER dans les fils enfant, jamais MEMBER
+//     du dialogue pédagogique.
+//   - Super Admin : lit uniquement CENTER_PLATFORM_SUPPORT +
+//     PLATFORM_BROADCAST, jamais body/transcript/storageKey pédagogique.
+//   - Contexts (centerId/classroomId/householdId/etc.) nullable au SQL
+//     mais validés par type dans src/lib/messaging/matrix.ts.
+//   - Audio : fondations uniquement (statut/storageKey privé), aucun
+//     upload MediaRecorder ni signed URL dans P4.6-A.
+
+enum ConversationType {
+  WORLD_STUDENT_TEACHER
+  WORLD_CLASS_GROUP
+  ROOTS_STUDENT_COACH
+  ROOTS_PALABRE_GROUP
+  CHILD_WORLD_GUIDED
+  CHILD_ROOTS_GUIDED
+  FAMILY_TEACHER
+  FAMILY_CENTER_BILLING
+  FAMILY_COACH
+  CENTER_TEACHER_INTERNAL
+  CENTER_COACH_INTERNAL
+  CENTER_PLATFORM_SUPPORT
+  PLATFORM_BROADCAST
+}
+
+enum MessagingConversationStatus {
+  ACTIVE
+  CLOSED
+  ARCHIVED
+}
+
+enum MessagingMessageKind {
+  TEXT
+  AUDIO
+  GUIDED_PHRASE
+  CARD
+  SYSTEM
+}
+
+enum MessagingCardType {
+  FEEDBACK_PUBLISHED
+  ENCOURAGEMENT
+  PAYMENT_REMINDER
+  PLATFORM_BROADCAST
+  SUPPORT_INTERVENTION
+}
+
+enum MessagingActorType {
+  USER
+  CHILD_PROFILE
+}
+
+enum MessagingParticipantRole {
+  MEMBER
+  MODERATOR
+  GUARDIAN_OBSERVER
+  READ_ONLY
+}
+
+enum MessagingModerationState {
+  ACTIVE
+  HIDDEN
+  DELETED
+  QUARANTINED
+}
+
+enum MessagingReceiptKind {
+  PARENT_COPY
+  DELIVERED
+  READ
+  ACKNOWLEDGED
+}
+
+enum MessagingAudioStatus {
+  PENDING
+  READY
+  FAILED
+  EXPIRED
+  DELETED
+}
+
+model MessagingConversation {
+  id             String                       @id @default(cuid())
+  type           ConversationType
+  status         MessagingConversationStatus  @default(ACTIVE)
+  // Contexts métier · nullable au SQL, validés par type dans matrix.ts
+  centerId       String?
+  classroomId    String?
+  householdId    String?
+  assignmentId   String?
+  submissionId   String?
+  feedbackId     String?
+  // Pour rappels de paiement · référence future à un Invoice réel.
+  invoiceId      String?
+  createdAt      DateTime                     @default(now())
+  updatedAt      DateTime                     @updatedAt
+  lastMessageAt  DateTime?
+  closedAt       DateTime?
+  metadata       Json?
+
+  participants        MessagingConversationParticipant[]
+  messages            MessagingMessage[]
+  readStates          MessagingConversationReadState[]
+  moderationActions   MessagingModerationAction[]
+  audioAssets         MessagingAudioAsset[]
+
+  @@index([type, centerId])
+  @@index([type, classroomId])
+  @@index([type, householdId])
+  @@index([lastMessageAt])
+  @@map("messaging_conversations")
+}
+
+model MessagingConversationParticipant {
+  id                String                    @id @default(cuid())
+  conversationId    String
+  conversation      MessagingConversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  actorType         MessagingActorType
+  userId            String?
+  user              User?                     @relation("MessagingParticipantUser", fields: [userId], references: [id], onDelete: SetNull)
+  childProfileId    String?
+  childProfile      ChildProfile?             @relation("MessagingParticipantChild", fields: [childProfileId], references: [id], onDelete: SetNull)
+  participantRole   MessagingParticipantRole  @default(MEMBER)
+  joinedAt          DateTime                  @default(now())
+  leftAt            DateTime?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  // Unicité active : un user ou un child ne peut avoir qu'une seule
+  // participation dans une conversation donnée. Le service métier gère
+  // le cycle add/remove (leftAt) sans supprimer la row.
+  @@unique([conversationId, userId], name: "conv_user_active", map: "msg_participant_user_uq")
+  @@unique([conversationId, childProfileId], name: "conv_child_active", map: "msg_participant_child_uq")
+  @@index([userId])
+  @@index([childProfileId])
+  @@index([conversationId, participantRole])
+  @@map("messaging_conversation_participants")
+}
+
+model MessagingMessage {
+  id                    String                     @id @default(cuid())
+  conversationId        String
+  conversation          MessagingConversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderType            MessagingActorType
+  senderUserId          String?
+  senderUser            User?                      @relation("MessagingMessageSenderUser", fields: [senderUserId], references: [id], onDelete: SetNull)
+  senderChildProfileId  String?
+  senderChildProfile    ChildProfile?              @relation("MessagingMessageSenderChild", fields: [senderChildProfileId], references: [id], onDelete: SetNull)
+  kind                  MessagingMessageKind
+  body                  String?
+  guidedPhraseId        String?
+  guidedPhrase          MessagingGuidedPhrase?     @relation(fields: [guidedPhraseId], references: [id], onDelete: SetNull)
+  replyToMessageId      String?
+  replyTo               MessagingMessage?          @relation("MessagingMessageReply", fields: [replyToMessageId], references: [id], onDelete: SetNull)
+  replies               MessagingMessage[]         @relation("MessagingMessageReply")
+  cardType              MessagingCardType?
+  cardPayload           Json?
+  audioAssetId          String?
+  audioAsset            MessagingAudioAsset?       @relation(fields: [audioAssetId], references: [id], onDelete: SetNull)
+  moderationState       MessagingModerationState   @default(ACTIVE)
+  idempotencyKey        String?
+  createdAt             DateTime                   @default(now())
+  publishedAt           DateTime?
+  deletedAt             DateTime?
+  metadata              Json?
+
+  attachments           MessagingMessageAttachment[]
+  receipts              MessagingMessageReceipt[]
+
+  @@unique([conversationId, idempotencyKey], name: "conv_idem_unique")
+  @@index([conversationId, createdAt])
+  @@index([senderUserId])
+  @@index([senderChildProfileId])
+  @@map("messaging_messages")
+}
+
+model MessagingMessageAttachment {
+  id          String            @id @default(cuid())
+  messageId   String
+  message     MessagingMessage  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  kind        String            // "audio", "card_ref", "other" · pas d'enum pour flexibilité
+  storageKey  String?           // clé bucket privé · aucune URL publique
+  mimeType    String?
+  sizeBytes   Int?
+  createdAt   DateTime          @default(now())
+
+  @@index([messageId])
+  @@map("messaging_message_attachments")
+}
+
+model MessagingAudioAsset {
+  id                    String                @id @default(cuid())
+  ownerUserId           String?
+  ownerUser             User?                 @relation("MessagingAudioOwnerUser", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerChildProfileId   String?
+  ownerChildProfile     ChildProfile?         @relation("MessagingAudioOwnerChild", fields: [ownerChildProfileId], references: [id], onDelete: SetNull)
+  // P4.6-C.1 · conversation d'origine · requis pour storage path
+  // v1/<conversationId>/<id>.<ext> et retention scans efficaces.
+  conversationId        String?
+  conversation          MessagingConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  status                MessagingAudioStatus  @default(PENDING)
+  storageKey            String?               // clé privée · jamais publique
+  mimeType              String?
+  sizeBytes             Int?
+  durationMs            Int?
+  waveform              Json?                 // représentation calculée client
+  transcript            String?
+  createdAt             DateTime              @default(now())
+  finalizedAt           DateTime?             // = readyAt (brief §5)
+  expiresAt             DateTime?             // = retentionUntil (brief §5)
+  deletedAt             DateTime?             // P4.6-C.1 · tombstone soft-delete
+
+  messages              MessagingMessage[]
+
+  @@index([status, expiresAt])
+  @@index([ownerUserId])
+  @@index([ownerChildProfileId])
+  @@index([conversationId, status])
+  @@index([status, deletedAt])
+  @@map("messaging_audio_assets")
+}
+
+model MessagingGuidedPhrase {
+  id                String              @id @default(cuid())
+  universe          Universe
+  locale            String              // "fr" | "en"
+  conversationType  ConversationType
+  category          String?
+  text              String
+  isActive          Boolean             @default(true)
+  ordering          Int                 @default(0)
+  createdAt         DateTime            @default(now())
+
+  messages          MessagingMessage[]
+
+  @@index([universe, conversationType, isActive])
+  @@map("messaging_guided_phrases")
+}
+
+model MessagingMessageReceipt {
+  id                        String                @id @default(cuid())
+  messageId                 String
+  message                   MessagingMessage      @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  kind                      MessagingReceiptKind
+  // Le récepteur peut être un User (parent observer, membre) ou un
+  // ChildProfile pour les futures notifications spécifiques enfants.
+  participantUserId         String?
+  participantChildProfileId String?
+  createdAt                 DateTime              @default(now())
+
+  @@index([messageId, kind])
+  @@index([participantUserId, kind])
+  @@map("messaging_message_receipts")
+}
+
+model MessagingConversationReadState {
+  id                        String                @id @default(cuid())
+  conversationId            String
+  conversation              MessagingConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  participantUserId         String?
+  participantChildProfileId String?
+  lastReadMessageId         String?
+  lastReadAt                DateTime              @default(now())
+  updatedAt                 DateTime              @updatedAt
+
+  @@unique([conversationId, participantUserId], name: "conv_read_user", map: "msg_read_user_uq")
+  @@unique([conversationId, participantChildProfileId], name: "conv_read_child", map: "msg_read_child_uq")
+  @@map("messaging_conversation_read_states")
+}
+
+model MessagingModerationAction {
+  id                String                    @id @default(cuid())
+  conversationId    String
+  conversation      MessagingConversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  actorUserId       String
+  actor             User                      @relation("MessagingModerationActor", fields: [actorUserId], references: [id], onDelete: Cascade)
+  // "HIDE_MESSAGE" | "CLOSE_CONVERSATION" | "REOPEN" | "INTERVENE_SUPPORT" ·
+  // pas d'enum pour permettre évolutions rapides.
+  action            String
+  targetMessageId   String?
+  reason            String?
+  metadata          Json?
+  createdAt         DateTime                  @default(now())
+
+  @@index([conversationId, createdAt])
+  @@map("messaging_moderation_actions")
 }

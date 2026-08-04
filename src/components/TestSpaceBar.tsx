@@ -33,6 +33,14 @@ export function TestSpaceBar() {
   const locale = useLocale();
 
   useEffect(() => {
+    // Skip fetch sur les pages publiques post-auth (goodbye, login, register…)
+    // où l'user n'a par définition pas de session · évite un 401 console.
+    const noLocale = pathname.replace(/^\/(fr|en)/, "") || "/";
+    const publicPost = ["/goodbye", "/teacher/goodbye", "/login", "/register"];
+    if (publicPost.some((p) => noLocale === p || noLocale.startsWith(p + "/"))) {
+      setRoles([]);
+      return;
+    }
     let cancelled = false;
     fetch("/api/me")
       .then((r) => (r.ok ? r.json() : null))
@@ -52,7 +60,7 @@ export function TestSpaceBar() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [pathname]);
 
   // Reset active guess based on current pathname
   useEffect(() => {

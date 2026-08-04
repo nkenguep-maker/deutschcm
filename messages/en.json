@@ -850,5 +850,1036 @@
       "etape_en_cours": "step in progress",
       "etape_a_venir": "step upcoming"
     }
+  },
+  "yemaDashboards": {
+    "common": {
+      "loading": "Loading…",
+      "error": "Can't display this content",
+      "retry": "Retry",
+      "messagesSoon": "Messaging coming soon",
+      "messagesSoonHelp": "The messaging module opens in the next batch.",
+      "previewBadge": "Preview P-1 · work in progress"
+    },
+    "studentMonde": {
+      "personaLabel": "World learner",
+      "personaSubtitle": "The outward journey",
+      "sidebarSection": "My space",
+      "nav": {
+        "overview": "My dashboard",
+        "course": "My course",
+        "assignments": "My assignments",
+        "journey": "My journey",
+        "class": "My class",
+        "messages": "Messages"
+      },
+      "greetingFallback": "Welcome",
+      "metaLanguageLevel": "German · Level {level}",
+      "metaLanguageLevelUnknown": "German",
+      "overview": {
+        "title": "My dashboard",
+        "continueEyebrow": "Continue",
+        "continueTitle": "Continue the course",
+        "continueSubStart": "Your first step into German A1.",
+        "continueSubResume": "Pick up where you left off.",
+        "continueSubDone": "You completed the A1 programme.",
+        "continueSubNoAccess": "Your discovery journey is complete — activate your Passage to continue.",
+        "continueSubExpired": "Your progress is saved.",
+        "start": "Start",
+        "resume": "Resume",
+        "review": "Review my journey",
+        "activate": "Choose a Passage",
+        "seeOffers": "See offers",
+        "progressLabel": "Level progress",
+        "progressPct": "{pct}%",
+        "nextAssignmentsTitle": "Upcoming assignments",
+        "nextAssignmentsEmpty": "No assignments published yet.",
+        "nextAssignmentsUnavailable": "The assignments section isn't active yet.",
+        "recentActivityTitle": "Recent activity",
+        "recentActivityEmpty": "Nothing to show yet."
+      },
+      "ivory": {
+        "signal": {
+          "no_pathway": "NO GOAL",
+          "next_stop": "NEXT STOP",
+          "travel_countdown": "DEPARTURE IN {days} DAYS",
+          "travel_no_date": "NO DATE SET",
+          "exam_countdown": "EXAM IN {days} DAYS",
+          "exam_no_date": "NO DATE SET"
+        },
+        "hero": {
+          "language_level": "German · {level}",
+          "language_no_level": "German",
+          "progress_label": "Pathway progress · {pct} %",
+          "progress_pct": "{pct} % done",
+          "title": {
+            "no_pathway": "Choose what this language should help you achieve.",
+            "STUDIES": "Study in Berlin",
+            "WORK": "Work in Zurich",
+            "TRAVEL": "Prepare for your trip",
+            "EXAM": "Pass your exam",
+            "DAILY_LIFE": "Speak with your family"
+          },
+          "subtitle": {
+            "no_pathway": "Your pathway starts as soon as you set a clear goal.",
+            "STUDIES": "Formal expression, academic vocabulary and admissions preparation.",
+            "WORK": "Professional oral practice, interview and industry vocabulary.",
+            "TRAVEL": "Practical situations, useful phrases and concrete progress.",
+            "EXAM": "Priority skills and calm practice for all four exam sections.",
+            "DAILY_LIFE": "Conversation topics and short family situations."
+          }
+        },
+        "cta": {
+          "resume": "Resume the course",
+          "define_goal": "Define my goal",
+          "complete_goal": "Complete my goal",
+          "edit_goal": "Edit my goal"
+        },
+        "empty": {
+          "no_pathway": {
+            "label": "NO PATHWAY",
+            "title": "Set your goal to start.",
+            "description": "Choose what this language should help you achieve."
+          },
+          "incomplete_goal": {
+            "label": "INCOMPLETE GOAL",
+            "title": "Complete your goal to refine the pathway.",
+            "description": "Add the city or the date to prioritise the right situations."
+          },
+          "no_assignments": {
+            "label": "NO ASSIGNMENT",
+            "title": "No assignment due right now.",
+            "description": "Keep going on your pathway."
+          },
+          "no_class": {
+            "label": "NO CLASS",
+            "title": "Your class will appear here.",
+            "description": "Your class will be visible as soon as your enrolment is confirmed."
+          }
+        },
+        "modules": {
+          "ADMISSION_CHECKLIST": {
+            "eyebrow": "ADMISSION FILE",
+            "title": "What your file must contain.",
+            "subtitle": "Step by step, prepare the expected documents.",
+            "items": [
+              "Introduce my background",
+              "Explain my study project",
+              "Understand a university brief",
+              "Prepare the essential documents"
+            ]
+          },
+          "INTERVIEW_TOPICS": {
+            "eyebrow": "INTERVIEW",
+            "title": "Topics to prepare for your interview.",
+            "subtitle": "Practise out loud, one topic at a time.",
+            "items": [
+              "Present my experience",
+              "Explain a key achievement",
+              "Ask questions to the recruiter",
+              "Negotiate an offer"
+            ]
+          },
+          "TRAVEL_SITUATIONS": {
+            "eyebrow": "SITUATIONS",
+            "title": "Kit of practical situations.",
+            "subtitle": "What you will actually meet on site.",
+            "items": [
+              "Arrival at the airport",
+              "Local transport",
+              "Hotel and bookings",
+              "Restaurant and shopping",
+              "Asking for help",
+              "Handling the unexpected"
+            ]
+          },
+          "EXAM_SKILLS": {
+            "eyebrow": "SKILLS",
+            "title": "The four exam skills.",
+            "subtitle": "Progress calmly, section by section.",
+            "items": [
+              "Listening",
+              "Reading",
+              "Speaking",
+              "Writing"
+            ]
+          },
+          "DAILY_TOPICS": {
+            "eyebrow": "DAILY TOPICS",
+            "title": "Conversation topics to practise.",
+            "subtitle": "Short, regular, realistic exchanges.",
+            "items": [
+              "Introduce yourself to the in-laws",
+              "Set up an appointment",
+              "Talk about a recent memory",
+              "Describe my day"
+            ]
+          }
+        }
+      },
+      "course": {
+        "title": "My course",
+        "description": "Five A1 lessons to lay the foundations.",
+        "empty": "No lesson accessible yet.",
+        "seeLesson": "See lesson",
+        "modulesOf": "{done} of {total} modules",
+        "status": {
+          "completed": "Completed",
+          "inProgress": "In progress",
+          "open": "Start",
+          "locked": "Locked"
+        }
+      },
+      "assignments": {
+        "title": "My assignments",
+        "description": "Assignments published by your teachers.",
+        "empty": "No assignments published.",
+        "unavailable": "P4.5-B assignments aren't active yet.",
+        "open": "Open",
+        "status": {
+          "published": "Published",
+          "closed": "Closed"
+        },
+        "due": "Due {date}",
+        "noDue": "No due date"
+      },
+      "journey": {
+        "title": "My journey",
+        "description": "Your A1 → C2 path opens as you progress.",
+        "empty": "Your journey will open as soon as your Learning Path is active.",
+        "current": "In progress",
+        "levels": {
+          "A1": "Introduce yourself",
+          "A2": "Express yourself",
+          "B1": "Argue",
+          "B2": "Nuance",
+          "C1": "Debate",
+          "C2": "Transmit"
+        }
+      },
+      "classSection": {
+        "title": "My class",
+        "empty": "You are not attached to any class yet.",
+        "unavailable": "Your class isn't visible from this space yet.",
+        "classroomsSoon": "Your class information will be available soon."
+      },
+      "access": {
+        "active": "Active access",
+        "expired": "Access expired",
+        "none": "No access",
+        "daysRemaining": "{days, plural, one {1 day left} other {# days left}}"
+      },
+      "mobileNav": {
+        "overview": "Home",
+        "course": "Course",
+        "assignments": "Assignments",
+        "journey": "Journey",
+        "messages": "Messages"
+      }
+    },
+    "studentRacines": {
+      "personaLabel": "Roots learner",
+      "personaSubtitle": "The inward return",
+      "sidebarSection": "My home",
+      "nav": {
+        "overview": "My dashboard",
+        "steps": "My steps",
+        "listens": "Listens",
+        "coach": "My coach",
+        "circle": "Palaver circle",
+        "messages": "Messages"
+      },
+      "greetingFallback": "Welcome",
+      "metaLanguageStep": "Roots · Step {step}",
+      "metaLanguageOnly": "Roots",
+      "mode": {
+        "solo": "Solo space",
+        "family": "Family space",
+        "noAccess": "No access",
+        "unknown": "Status pending"
+      },
+      "overview": {
+        "title": "My dashboard",
+        "sequenceTitle": "Oral sequence",
+        "sequenceEmpty": "No oral sequence is active. It will open with the first content.",
+        "coachNextTitle": "Next coach session",
+        "coachNextEmpty": "No session scheduled yet.",
+        "circleTitle": "Palaver circle",
+        "circleSoon": "Your circle will open soon.",
+        "familyEmptyTitle": "Your home is waiting for its profiles",
+        "familyEmptyBody": "Configure your loved ones' profiles to start together.",
+        "familyEmptyCta": "Configure the home",
+        "noAccessTitle": "Your Roots journey isn't activated yet",
+        "noAccessBody": "Finish discovery or activate a Solo/Family subscription to open the home.",
+        "noAccessCta": "See offers",
+        "contentSoonTitle": "Your Roots language is coming soon",
+        "contentSoonBody": "We're preparing the tales, listens and activities with real voices."
+      },
+      "steps": {
+        "title": "My steps",
+        "description": "Five steps to inhabit the language, not to certify it.",
+        "empty": "No step defined."
+      },
+      "listens": {
+        "title": "Listens",
+        "description": "Replays, sequences and voices of the home.",
+        "empty": "No listen available yet.",
+        "soon": "Listens will open with the first Roots content."
+      },
+      "coach": {
+        "title": "My coach",
+        "soon": "Human support opens with the first content.",
+        "empty": "No coach assigned yet."
+      },
+      "circleSection": {
+        "title": "Palaver circle",
+        "soon": "Your home's circle will be available soon.",
+        "empty": "No active circle yet."
+      },
+      "children": {
+        "title": "The home",
+        "description": "Each profile has its language and its step.",
+        "manage": "Manage profiles",
+        "open": "Open profile",
+        "ageYears": "{age} yrs"
+      },
+      "mobileNav": {
+        "overview": "Home",
+        "steps": "Steps",
+        "listens": "Listens",
+        "coach": "Coach",
+        "circle": "Palaver"
+      }
+    },
+    "teacher": {
+      "personaLabel": "Teacher",
+      "personaSubtitle": "Your classroom space",
+      "sidebarSection": "My space",
+      "greetingFallback": "Welcome",
+      "meta": "Center {center}",
+      "metaWithoutCenter": "Teacher space",
+      "unverifiedBadge": "Account pending verification",
+      "nav": {
+        "overview": "Overview",
+        "classes": "My classes",
+        "assignments": "Assignments",
+        "corrections": "Corrections",
+        "resources": "Resources",
+        "messages": "Messages"
+      },
+      "overview": {
+        "title": "Overview",
+        "kpis": {
+          "classes": "Classes",
+          "students": "Active learners",
+          "pending": "Pending requests"
+        },
+        "kpisEmptyHelp": "Metrics will appear as soon as a learner joins one of your classes.",
+        "unverifiedHelp": "Your account is pending verification by a center administrator. You can prepare your work; some actions remain limited until validated."
+      },
+      "classes": {
+        "title": "My classes",
+        "description": "Your active classes and their real enrolments.",
+        "empty": "You have no active class yet.",
+        "notAvailable": "This class information is not available yet.",
+        "studentsCount": "{count, plural, one {1 learner} other {# learners}}",
+        "levelLabel": "Level {level}",
+        "openClass": "Open class"
+      },
+      "assignments": {
+        "title": "Assignments",
+        "description": "Draft → published → closed cycle, P4.5-B compliant.",
+        "empty": "No assignment yet.",
+        "loadFailed": "Cannot load this class's assignments.",
+        "newAssignment": "New assignment",
+        "openAssignment": "Open",
+        "status": {
+          "draft": "Draft",
+          "published": "Published",
+          "closed": "Closed",
+          "archived": "Archived"
+        },
+        "due": "Due {date}",
+        "noDue": "No due date"
+      },
+      "corrections": {
+        "title": "Corrections",
+        "description": "Submissions to review, feedback to prepare.",
+        "empty": "No correction pending.",
+        "openSubmission": "Open",
+        "invisibleUntilPublished": "Feedback stays hidden from the learner until published.",
+        "versionLabel": "v{version}",
+        "submittedOn": "Submitted on {date}",
+        "notSubmitted": "Not submitted",
+        "queueContextNote": "Learners scoped to your classes · pathway context guides your review priorities.",
+        "awaitingReview": "To review",
+        "anonymousLearner": "Learner"
+      },
+      "resources": {
+        "title": "Resources",
+        "soon": "Your teaching resources will appear here when available."
+      },
+      "messages": {
+        "title": "Messages",
+        "soon": "Messaging with your learners and center will be available soon."
+      },
+      "loading": "Loading your space…",
+      "error": "Cannot load your space.",
+      "retry": "Retry",
+      "permissionDenied": "This space requires a verified teacher role.",
+      "workspaceOff": "The teacher space isn't enabled on this environment yet.",
+      "mobileNav": {
+        "overview": "Home",
+        "classes": "Classes",
+        "corrections": "Corrections",
+        "assignments": "Assignments",
+        "messages": "Messages"
+      }
+    },
+    "coachRacines": {
+      "personaLabel": "Roots coach",
+      "personaSubtitle": "Your oral-language home",
+      "sidebarSection": "My home",
+      "greetingFallback": "Welcome",
+      "meta": "Coach · {activeCircles} circles · {activeChildren} learners",
+      "metaMinimal": "Roots coach",
+      "nav": {
+        "overview": "Overview",
+        "learners": "My learners",
+        "sessions": "Sessions",
+        "messages": "Messages",
+        "sessionNotes": "Session notes"
+      },
+      "overview": {
+        "title": "Overview",
+        "capacityCirclesTitle": "Active circles",
+        "capacityCirclesHelp": "{active} / {max} circles",
+        "capacityChildrenTitle": "Learners followed",
+        "capacityChildrenHelp": "{active} / {max} children",
+        "languagesTitle": "Breakdown by language",
+        "languagesEmpty": "No learner assigned yet.",
+        "todaySessionsTitle": "Today's sessions",
+        "todaySessionsEmpty": "No session planned today.",
+        "notesToDraftTitle": "Notes to draft",
+        "notesToDraftEmpty": "No pending note."
+      },
+      "learners": {
+        "title": "My learners",
+        "description": "Learners actually assigned to your follow-up.",
+        "empty": "No learner assigned to your follow-up yet.",
+        "unavailable": "This learner's information is not available yet.",
+        "openProfile": "Open profile",
+        "ageBand": "Age band {band}",
+        "languageLabel": "Roots language",
+        "circleLanguageLabel": "Circle {language}"
+      },
+      "sessions": {
+        "title": "Sessions",
+        "soon": "Session scheduling will be available soon."
+      },
+      "messages": {
+        "title": "Messages",
+        "soon": "Voice messaging with your learners will be available soon."
+      },
+      "sessionNotes": {
+        "title": "Session notes",
+        "soon": "Session notes will appear here when available."
+      },
+      "loading": "Loading your space…",
+      "error": "Cannot load your space.",
+      "retry": "Retry",
+      "permissionDenied": "This space requires an active Roots coach role.",
+      "workspaceOff": "The Roots coach space isn't enabled on this environment yet.",
+      "mobileNav": {
+        "overview": "Home",
+        "learners": "Learners",
+        "sessions": "Sessions",
+        "messages": "Messages",
+        "sessionNotes": "Notes"
+      }
+    },
+    "family": {
+      "personaLabel": "Family",
+      "personaSubtitle": "The home and its learners",
+      "sidebarSection": "My family",
+      "greetingFallback": "Welcome",
+      "meta": "{count, plural, one {1 linked child} other {# linked children}}",
+      "nav": {
+        "overview": "Home",
+        "children": "My children",
+        "progression": "Progress",
+        "sessions": "Sessions",
+        "messages": "Messages",
+        "payments": "Payments",
+        "settings": "Settings"
+      },
+      "mobileNav": {
+        "overview": "Home",
+        "children": "Children",
+        "progression": "Progress",
+        "payments": "Payments",
+        "messages": "Messages"
+      },
+      "overview": {
+        "title": "Home",
+        "kpisChildrenTitle": "Linked children",
+        "kpisSeatsTitle": "Available seats",
+        "kpisAdultTitle": "Adult access",
+        "kpisAdultNone": "No adult access active",
+        "kpisAdultMonde": "World",
+        "kpisAdultRacines": "Roots",
+        "noChildrenTitle": "No child linked yet",
+        "noChildrenBody": "Add a child profile to get started.",
+        "addChildCta": "Add a child",
+        "noSeatCta": "See family plans",
+        "recentTitle": "Recent activity",
+        "recentEmpty": "Nothing to show yet."
+      },
+      "children": {
+        "title": "My children",
+        "description": "Child profiles attached to your home.",
+        "empty": "No child linked yet.",
+        "openChild": "Open profile",
+        "addChild": "Add a child",
+        "noSeat": "All child seats are used.",
+        "seatsUsed": "{used} of {total} seats used",
+        "hasPinYes": "PIN set",
+        "hasPinNo": "No PIN"
+      },
+      "actions": {
+        "openChildSpace": "Open child space",
+        "addChild": "Add a child",
+        "childPinTitle": "Open {prenom}'s space",
+        "childPinLabel": "Child PIN",
+        "childPinPlaceholder": "••••",
+        "childPinSubmit": "Enter",
+        "childPinCancel": "Cancel",
+        "childPinErrGeneric": "The PIN doesn't match. Try again or ask your parent."
+      },
+      "addDialog": {
+        "step": "New profile",
+        "prenomLbl": "First name",
+        "ageLbl": "Age",
+        "animalLbl": "Animal",
+        "universeLbl": "Which learning space would you like to create for this child?",
+        "universeMondeLabel": "Monde",
+        "universeMondeDesc": "learn an international language",
+        "universeRacinesLabel": "Roots",
+        "universeRacinesDesc": "pass on a heritage language",
+        "languesLbl": "Languages to listen to",
+        "languesHelp": "Pick one or two. You can add more later.",
+        "nativeLbl": "African languages",
+        "foreignLbl": "World languages",
+        "goalLbl": "World pathway",
+        "goalHelp": "Only for a world language. You can change it later.",
+        "goalOpts": {
+          "STUDIES": "Studies",
+          "WORK": "Work",
+          "TRAVEL": "Travel",
+          "EXAM": "Exam",
+          "DAILY_LIFE": "Daily life",
+          "LATER": "I'll define this goal later"
+        },
+        "cancel": "Cancel",
+        "create": "Create profile",
+        "errName": "Name missing.",
+        "errAge": "Age between 3 and 12.",
+        "errAnimal": "Pick an animal.",
+        "errLang": "Pick at least one language.",
+        "errUniverse": "Pick the space (Monde or Roots).",
+        "errServer": "Could not create profile."
+      },
+      "progression": {
+        "title": "Progress",
+        "description": "Progress per child based on available data.",
+        "empty": "No progress to show yet.",
+        "notAvailableYet": "Progress data is not wired to this space yet."
+      },
+      "sessions": {
+        "title": "Sessions",
+        "empty": "No session scheduled.",
+        "soon": "Session scheduling arrives with the future Coach backend."
+      },
+      "messages": {
+        "title": "Messages",
+        "soon": "Family messaging will arrive with Lots 6 and 7 (P4.6 backend)."
+      },
+      "payments": {
+        "title": "Payments",
+        "planTitle": "Active plan",
+        "planEmpty": "No active plan detected.",
+        "planActive": "Plan {code} active",
+        "invoicesTitle": "Invoices",
+        "invoicesEmpty": "No invoice to show yet."
+      },
+      "settings": {
+        "title": "Settings",
+        "description": "Guardians, payer, consents and child security.",
+        "guardiansTitle": "Guardians",
+        "guardiansEmpty": "You are the only registered guardian.",
+        "payerTitle": "Payer",
+        "payerEmpty": "No distinct payer identified.",
+        "pinTitle": "Child security (PIN)",
+        "pinHelp": "Each child's PIN secures their access. Stored hashed, never in cleartext.",
+        "consentTitle": "Consents",
+        "consentEmpty": "No consent to configure yet."
+      },
+      "loading": "Loading your home…",
+      "error": "Cannot load your home.",
+      "retry": "Retry",
+      "permissionDenied": "This space requires a family guardian account."
+    },
+    "center": {
+      "personaLabel": "Center administrator",
+      "personaSubtitle": "Your YEMA center",
+      "sidebarSection": "My center",
+      "greetingFallback": "Welcome",
+      "meta": "Center {name}",
+      "metaMinimal": "YEMA center",
+      "nav": {
+        "overview": "Center view",
+        "students": "Students",
+        "teachers": "Teachers",
+        "classes": "Classes",
+        "billing": "Billing",
+        "messages": "Messages",
+        "settings": "Settings"
+      },
+      "mobileNav": {
+        "overview": "Center",
+        "students": "Students",
+        "classes": "Classes",
+        "billing": "Billing",
+        "messages": "Messages"
+      },
+      "overview": {
+        "title": "Center view",
+        "kpisStudents": "Active students",
+        "kpisTeachers": "Teachers",
+        "kpisClassrooms": "Classes",
+        "kpisPending": "Pending enrolments",
+        "kpisEmptyHelp": "Metrics will appear as soon as a student or class becomes active.",
+        "openTasks": "To review",
+        "noOpenTasks": "Nothing to review for now."
+      },
+      "students": {
+        "title": "Students",
+        "description": "Students attached to your center.",
+        "empty": "No student enrolled yet.",
+        "loadFailed": "Cannot load the student list.",
+        "openStudent": "Open",
+        "levelLabel": "Level {level}"
+      },
+      "teachers": {
+        "title": "Teachers",
+        "description": "Teachers attached to your center.",
+        "empty": "No teacher assigned yet.",
+        "loadFailed": "Cannot load the teacher list.",
+        "openTeacher": "Open"
+      },
+      "classes": {
+        "title": "Classes",
+        "description": "Active classes of the center.",
+        "empty": "No active class yet.",
+        "loadFailed": "Cannot load classes.",
+        "levelLabel": "Level {level}",
+        "studentsCount": "{count, plural, one {1 student} other {# students}}",
+        "openClass": "Open"
+      },
+      "billing": {
+        "title": "Billing",
+        "description": "Real financial state of the center.",
+        "notWired": "Billing data is not available for your center yet.",
+        "empty": "No invoice to show yet."
+      },
+      "messages": {
+        "title": "Messages",
+        "soon": "Internal messaging and payment reminders will be available soon."
+      },
+      "settings": {
+        "title": "Settings",
+        "description": "Center details, team and preferences.",
+        "empty": "Configuration coming soon."
+      },
+      "loading": "Loading your center…",
+      "error": "Cannot load your center.",
+      "retry": "Retry",
+      "workspaceOff": "The center space isn't enabled on this environment yet."
+    },
+    "admin": {
+      "personaLabel": "Super Admin",
+      "personaSubtitle": "YEMA administration console",
+      "sidebarSection": "Console",
+      "nav": {
+        "console": "Console",
+        "accounts": "Accounts",
+        "audit": "Audit",
+        "environment": "Environment"
+      },
+      "mobileNav": {
+        "console": "Console",
+        "accounts": "Accounts",
+        "audit": "Audit",
+        "environment": "Env."
+      },
+      "console": {
+        "title": "Console",
+        "envLabel": "Environment",
+        "envUnknown": "not set",
+        "qaStatus": "QA console",
+        "qaActive": "active",
+        "qaInactive": "inactive",
+        "productionIntact": "Production untouched",
+        "productionIntactHelp": "No command in this batch ran against Production.",
+        "noAlerts": "No active alert."
+      },
+      "accounts": {
+        "title": "Accounts",
+        "description": "QA personas available for « Test as… ».",
+        "personasCount": "{count} personas",
+        "openPersona": "Test as",
+        "unavailable": "unavailable",
+        "roleLabel": "Role",
+        "destinationLabel": "Destination"
+      },
+      "audit": {
+        "title": "Audit",
+        "description": "Recent YEMA audit events.",
+        "empty": "No event to show.",
+        "loadFailed": "Cannot load the audit log.",
+        "actorAnonymous": "anonymous actor"
+      },
+      "environment": {
+        "title": "Environment",
+        "projectRef": "Supabase project ref",
+        "flagsTitle": "Feature flags",
+        "qaSessionTitle": "QA session",
+        "qaSessionMinutes": "{minutes} min max",
+        "noSecretsHelp": "No secret, key, token or signed URL is displayed here."
+      },
+      "loading": "Loading console…",
+      "error": "Cannot load console.",
+      "retry": "Retry"
+    },
+    "childMonde": {
+      "personaLabel": "World child",
+      "personaSubtitle": "My YEMA home",
+      "sidebarSection": "My home",
+      "greetingFallback": "Hi",
+      "meta": "German · {stars} stars",
+      "metaMinimal": "My home",
+      "nav": {
+        "home": "Home",
+        "games": "Games",
+        "stories": "Stories",
+        "badges": "Badges",
+        "progression": "Progress",
+        "adultActivities": "With an adult"
+      },
+      "mobileNav": {
+        "home": "Home",
+        "games": "Games",
+        "stories": "Stories",
+        "badges": "Badges"
+      },
+      "home": {
+        "title": "Hello {prenom}!",
+        "welcomeHint": "First we listen, then we show, we speak when we're ready.",
+        "starsTitle": "My stars",
+        "starsCount": "{stars} stars earned",
+        "starsEmpty": "No star yet — the first one comes with your next listen.",
+        "nextActivityTitle": "Next activity",
+        "nextActivityEmpty": "A new activity will arrive soon."
+      },
+      "games": {
+        "title": "My games",
+        "description": "Listen, show, mime, sing.",
+        "empty": "No game available yet. Games open with the first content."
+      },
+      "stories": {
+        "title": "My stories",
+        "description": "Replay to recognise the words.",
+        "empty": "No story available yet."
+      },
+      "badges": {
+        "title": "My badges",
+        "description": "Rewards earned by listening and playing.",
+        "empty": "No badge yet. It arrives with your first finished story.",
+        "notPersistedNotice": "Badge tracking will be persisted in a future update."
+      },
+      "progression": {
+        "title": "My progress",
+        "description": "What you have worked on this week.",
+        "notWiredNotice": "Detailed progress will arrive with the child journal (coming soon)."
+      },
+      "adultActivities": {
+        "title": "With an adult",
+        "description": "Moments to share with family.",
+        "empty": "No family activity yet."
+      },
+      "loading": "Your home is opening…",
+      "error": "Your home isn't opening. Please retry.",
+      "retry": "Retry",
+      "exitChildMode": "Exit child mode",
+      "openMessages": "Messages"
+    },
+    "childRacines": {
+      "personaLabel": "Roots child",
+      "personaSubtitle": "My YEMA case",
+      "sidebarSection": "My case",
+      "greetingFallback": "Hello",
+      "meta": "{language} · Step {step}",
+      "metaMinimal": "My case",
+      "nav": {
+        "home": "My case",
+        "tales": "Tales",
+        "songs": "Songs",
+        "badges": "Badges",
+        "oralProgress": "Oral progress",
+        "familyActivities": "Family activities"
+      },
+      "mobileNav": {
+        "home": "My case",
+        "tales": "Tales",
+        "songs": "Songs",
+        "badges": "Badges"
+      },
+      "home": {
+        "title": "Hello {prenom}!",
+        "welcomeHint": "First we listen, then we repeat, then we tell.",
+        "stepTitle": "My step",
+        "stepEmpty": "The step will open with your first listen.",
+        "nextListenTitle": "Next listen",
+        "nextListenEmpty": "A new listen will arrive soon.",
+        "coachTitle": "My coach",
+        "coachEmpty": "No coach assigned yet."
+      },
+      "tales": {
+        "title": "My tales",
+        "description": "Listen, replay, tell in your turn.",
+        "empty": "No tale available yet."
+      },
+      "songs": {
+        "title": "My songs",
+        "description": "Lullabies, nursery rhymes and songs of the home.",
+        "empty": "No song available yet."
+      },
+      "badges": {
+        "title": "My badges",
+        "description": "Positive rewards, no competition.",
+        "empty": "No badge yet.",
+        "notPersistedNotice": "Badge tracking will be persisted in a future update."
+      },
+      "oralProgress": {
+        "title": "My oral progress",
+        "description": "What you listened to and told.",
+        "notWiredNotice": "The detailed oral journal will arrive in a future update."
+      },
+      "familyActivities": {
+        "title": "Family moments",
+        "description": "Moments to share at home.",
+        "empty": "No family activity yet."
+      },
+      "voiceRecordingSoon": "Voice recording and sending to the coach will arrive with P4.6 messaging.",
+      "loading": "Your case is opening…",
+      "error": "Your case isn't opening. Please retry.",
+      "retry": "Retry",
+      "exitChildMode": "Exit child mode",
+      "openMessages": "Messages"
+    },
+    "mondeContext": {
+      "pathwayLabel": {
+        "STUDIES": "STUDIES",
+        "WORK": "WORK",
+        "TRAVEL": "TRAVEL",
+        "EXAM": "EXAM",
+        "DAILY_LIFE": "DAILY LIFE"
+      },
+      "fallback": {
+        "unknown_short": "TO DEFINE",
+        "unknown_long": "Goal to define"
+      },
+      "priority": {
+        "studies_written": "Focus · formal writing",
+        "work_oral": "Focus · professional oral",
+        "travel_situations": "Focus · practical situations",
+        "exam_skill": "Focus · exam preparation",
+        "daily_conversation": "Focus · conversation",
+        "unknown": "Focus to define"
+      },
+      "distribution": {
+        "title": "World pathway distribution",
+        "subtitle": "{count} learners across your classes"
+      },
+      "teacher": {
+        "title": "World pathways",
+        "description": "Summary view of your learners' goals.",
+        "empty": {
+          "title": "No learners yet.",
+          "description": "Learners will appear here once enrolled."
+        },
+        "learnersPreviewTitle": "Queue preview",
+        "anonymousLearner": "Learner"
+      },
+      "family": {
+        "level": "Level {level}",
+        "progress_label": "Pathway progress · {pct} %",
+        "progress_pct": "{pct} % done",
+        "minutes_this_week": "{count, plural, one {1 minute this week} other {# minutes this week}}",
+        "recommendation_label": "SUGGESTION FOR YOU",
+        "recommendation": {
+          "STUDIES": "Ask them to present their study project.",
+          "WORK": "Practise together a short professional introduction.",
+          "TRAVEL": "Role-play a practical travel situation for three minutes.",
+          "EXAM": "Review together the skill to work on this week.",
+          "DAILY_LIFE": "Pick a daily topic and speak without translating.",
+          "unknown": "Their goal will appear once configured."
+        },
+        "empty": {
+          "no_progress": "Progress will appear after their first activities."
+        }
+      }
+    }
+  },
+  "yemaMessaging": {
+    "title": "Messaging",
+    "loading": "Loading messaging…",
+    "error": "Cannot load messaging.",
+    "retry": "Retry",
+    "empty": "No conversation yet.",
+    "emptyFilter": "No conversation matches this filter.",
+    "search": {
+      "placeholder": "Search a conversation",
+      "clear": "Clear"
+    },
+    "back": "Back",
+    "matrix": {
+      "title": "Exchange matrix",
+      "cta": "View matrix",
+      "close": "Close",
+      "columnPersona": "Persona",
+      "columnMembers": "Recipients",
+      "columnKinds": "Message types",
+      "columnContexts": "Required contexts",
+      "columnReplies": "Replies",
+      "repliesYes": "Allowed",
+      "repliesNo": "Forbidden",
+      "childOnly": "Child only",
+      "adultOnly": "Adult only",
+      "readonly": "Read only"
+    },
+    "filters": {
+      "all": "All",
+      "unread": "Unread",
+      "class": "Classes",
+      "family": "Families",
+      "children": "Children",
+      "internal": "Internal",
+      "support": "Support",
+      "billing": "Billing",
+      "school": "School",
+      "sessions": "Sessions",
+      "child_copies": "Child copies",
+      "audio": "Audio",
+      "group": "Group",
+      "broadcast": "Broadcast",
+      "journal": "Journal"
+    },
+    "composer": {
+      "placeholder": "Write a message…",
+      "send": "Send",
+      "sending": "Sending…",
+      "microDisabled": "Audio recording is not available in this browser.",
+      "attachDisabled": "Coming soon",
+      "guidedTitle": "Suggested replies",
+      "guidedEmpty": "No phrase available in your language.",
+      "childNoTextHint": "Choose a phrase below.",
+      "audioSoon": "Audio will arrive in a future batch.",
+      "startRecording": "Record a voice message",
+      "tapToSpeak": "Tap to speak"
+    },
+    "audio": {
+      "play": "Play voice message",
+      "pause": "Pause",
+      "requestingPermission": "Requesting microphone access…",
+      "recording": "Recording",
+      "childListening": "Listening…",
+      "stop": "Stop",
+      "cancel": "Cancel",
+      "recordAgain": "Record again",
+      "send": "Send",
+      "sending": "Sending…",
+      "previewLabel": "Preview recording",
+      "errorUnauthorized": "Access denied.",
+      "errorGone": "This voice message is no longer available.",
+      "errorNetwork": "Cannot play voice message.",
+      "error": {
+        "unsupported": "Audio recording is not available in this browser.",
+        "permission_denied": "Allow the microphone to record a voice message.",
+        "no_microphone": "No microphone available.",
+        "device_busy": "The microphone is already used by another application.",
+        "insecure_context": "Recording requires a secure connection (HTTPS).",
+        "unknown": "Recording failed. Please try again."
+      }
+    },
+    "conversation": {
+      "closed": "This conversation is closed.",
+      "readOnly": "Read-only thread.",
+      "parentCopyBadge": "Copy to parent",
+      "systemMessage": "System message",
+      "cardPublishedFeedback": "Feedback published",
+      "cardEncouragement": "Encouragement",
+      "cardPaymentReminder": "Payment reminder",
+      "cardPlatformBroadcast": "Platform announcement",
+      "cardSupportIntervention": "Support intervention",
+      "audioPlaceholder": "Voice message (coming)",
+      "sentAt": "Sent at {time}",
+      "typing": "…is typing",
+      "typingIndicator": "{count, plural, one {Someone is typing…} other {# people are typing…}}",
+      "loadMore": "Load more"
+    },
+    "connection": {
+      "live": "Live connection active.",
+      "reconnecting": "Reconnecting…",
+      "dropped": "Live connection interrupted. Messages will continue to sync."
+    },
+    "kinds": {
+      "TEXT": "Text",
+      "AUDIO": "Audio",
+      "GUIDED_PHRASE": "Guided phrase",
+      "CARD": "Card",
+      "SYSTEM": "System"
+    },
+    "types": {
+      "WORLD_STUDENT_TEACHER": "Student ↔ Teacher",
+      "WORLD_CLASS_GROUP": "Class",
+      "ROOTS_STUDENT_COACH": "Student ↔ Coach",
+      "ROOTS_PALABRE_GROUP": "Palaver circle",
+      "CHILD_WORLD_GUIDED": "World child",
+      "CHILD_ROOTS_GUIDED": "Roots child",
+      "FAMILY_TEACHER": "Family ↔ Teacher",
+      "FAMILY_CENTER_BILLING": "Family ↔ Center · Billing",
+      "FAMILY_COACH": "Family ↔ Coach",
+      "CENTER_TEACHER_INTERNAL": "Center · Teacher internal",
+      "CENTER_COACH_INTERNAL": "Center · Coach internal",
+      "CENTER_PLATFORM_SUPPORT": "Platform support",
+      "PLATFORM_BROADCAST": "Platform broadcast"
+    },
+    "unreadBadge": "{count, plural, one {1 unread} other {# unread}}",
+    "featureDisabled": "Messaging will be available soon.",
+    "connectionDropped": "Connection lost. New messages not synced.",
+    "reconnected": "Syncing…",
+    "openMessages": "Open messaging",
+    "dashboardCta": "See my messages",
+    "personaLabels": {
+      "super_admin": "Super Admin",
+      "center_admin": "Center",
+      "teacher": "Teacher",
+      "coach": "Roots coach",
+      "student_monde": "World learner",
+      "student_racines": "Roots learner",
+      "family": "Family",
+      "child_monde": "World child",
+      "child_racines": "Roots child"
+    }
   }
 }

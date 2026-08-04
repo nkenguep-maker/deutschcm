@@ -24,7 +24,14 @@ export async function GET() {
 
     const dbUser = await prisma.user.findUnique({
       where: { supabaseId: user.id },
-      select: { id: true, fullName: true, xpTotal: true },
+      select: {
+        id: true, fullName: true, xpTotal: true,
+        // Lot 7A.1 · projection MINIMALE des champs onboarding pour
+        // alimenter resolveMondePath() côté client. Aucun autre champ
+        // User ne sort d'ici · pas de fuite d'objet complet.
+        learningGoal: true,
+        city: true,
+      },
     });
     if (!dbUser) return err("NOT_FOUND", "user profile missing", 404);
 
@@ -53,6 +60,10 @@ export async function GET() {
         overallPct: 0,
         nextModule: null,
         greetingName: dbUser.fullName ?? null,
+        onboarding: {
+          learningGoal: dbUser.learningGoal ?? null,
+          targetCity: dbUser.city ?? null,
+        },
       });
     }
 
@@ -95,6 +106,12 @@ export async function GET() {
       nextModule: next,
       greetingName: dbUser.fullName ?? null,
       xpTotal: dbUser.xpTotal ?? 0,
+      // Lot 7A.1 · données onboarding pour MondeIvoryOverview ·
+      // resolveMondePath() décide côté client.
+      onboarding: {
+        learningGoal: dbUser.learningGoal ?? null,
+        targetCity: dbUser.city ?? null,
+      },
     });
   } catch (e) {
     console.error("[monde-dashboard] FAIL", e);

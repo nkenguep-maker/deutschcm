@@ -34,6 +34,11 @@ const PUBLIC_ROUTES = [
   // (auth + ownership check). Si un anon arrive ici, la page fetche
   // l'endpoint, reçoit 401, et redirige vers /login (voir page.tsx).
   "/activation",
+  // QA-b2a · console persona-picker QA Preview. La page se protège
+  // elle-même (verify cookie yema_qa_session + gate 4 conditions) et
+  // rend notFound() si KO. Le proxy la laisse passer pour permettre le
+  // bootstrap → /qa sans exiger une session Supabase préalable.
+  "/qa",
 ]
 
 // Routes protégées → rôle requis pour l'espace parent.
@@ -59,10 +64,9 @@ const PROTECTED_ROUTES: Record<string, SpaceRole[]> = {
   "/dashboard": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
   "/courses": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
   "/progress": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
-  // /famille = espace foyer parent, réservé aux rôles STUDENT (qui peut
-  // être parent) et ADMIN (opération). TEACHER et CENTER ne doivent pas
-  // y accéder par défaut — un multi-rôle explicite STUDENT + TEACHER
-  // fonctionnera toujours puisque canAccessRoute() OR sur roles.
+  // /family = espace foyer parent (route canonique i18n · redesign). /famille
+  // reste ouvert au même scope · il redirige serveur-side vers /family.
+  "/family": ["STUDENT", "ADMIN"],
   "/famille": ["STUDENT", "ADMIN"],
   // Funnel P1 · découverte + activation · réservé STUDENT strict
   // (hardening §6). ADMIN n'est PAS un contournement générique — il a
@@ -81,6 +85,7 @@ function spaceForPath(pathname: string): SpaceRole | null {
   if (
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/courses") ||
+    pathname.startsWith("/family") ||
     pathname.startsWith("/famille") ||
     pathname.startsWith("/decouverte") ||
     pathname.startsWith("/activation-intent") ||

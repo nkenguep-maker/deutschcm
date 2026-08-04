@@ -254,6 +254,10 @@ export async function getTeacherStudents(teacherId: string, args: PageArgs = {})
             id: true,
             fullName: true,
             germanLevel: true,
+            // Lot 7B · learningGoal projeté pour permettre au client
+            // Teacher de dériver le parcours via resolveMondePath.
+            // Aucun autre champ User sensible n'est exposé.
+            learningGoal: true,
           },
         },
       },
@@ -267,6 +271,7 @@ export async function getTeacherStudents(teacherId: string, args: PageArgs = {})
     classroomName: e.classroom.name,
     joinedAt: e.joinedAt,
     isActive: e.isActive,
+    learningGoal: e.user.learningGoal ?? null,
   }));
   return { items, total, page, pageSize };
 }
