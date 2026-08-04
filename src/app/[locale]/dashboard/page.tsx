@@ -1,13 +1,10 @@
 // /dashboard · aiguillage par univers (P2, étendu P3).
 // Server component qui charge le LearningPath actif de l'utilisateur et
-// route :
-//   Monde   → <DashboardMonde />   (P2)
-//   Racines → <DashboardRacines /> (P3 · nouvel espace, remplace le Foyer
-//                                    universel qui restait un fallback)
-//   sinon   → /onboarding (fallback funnel)
-//
-// Le middleware garantit que seul un rôle STUDENT arrive ici.
+// route Monde / Racines. En mode test interne Production, le cookie persona
+// choisit explicitement le parcours fixture du propriétaire sans modifier le
+// parcours réel utilisé hors de ce mode.
 
+import { cookies } from "next/headers";
 import { redirect } from "@/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
@@ -20,6 +17,12 @@ import { StudentRacinesDashboard } from "@/features/dashboards/student-racines";
 import { resolveActiveChildSession } from "@/lib/family/childResolvers";
 import { ChildMondeDashboard } from "@/features/dashboards/child-monde";
 import { ChildRacinesDashboard } from "@/features/dashboards/child-racines";
+import {
+  INTERNAL_TEST_COOKIE_NAME,
+  isInternalPersonaId,
+  isInternalTesterEmail,
+} from "@/lib/internalTest";
+import { hasInternalTestMarker } from "@/lib/internalTestProvisioning";
 
 interface Props { params: Promise<{ locale: string }> }
 
@@ -27,11 +30,6 @@ export default async function DashboardPage({ params }: Props) {
   const { locale } = await params;
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
 
-  // P4.6 Lot 5 · session enfant prioritaire · si le cookie enfant est
-  // valide, on rend le dashboard enfant correspondant à l'univers du
-  // ChildProfile. La session Supabase du responsable n'est PAS lue ici :
-  // aucun parentUserId n'est exposé au client, aucune route adulte n'est
-  // accessible pendant que le cookie enfant est actif.
   const childSession = await resolveActiveChildSession();
   if (childSession) {
     const childData = {
@@ -67,23 +65,32 @@ export default async function DashboardPage({ params }: Props) {
   });
   if (!dbUser) { redirect({ href: "/onboarding", locale }); return null; }
 
-  const lp = await prisma.learningPath.findFirst({
+  const paths = await prisma.learningPath.findMany({
     where: { userId: dbUser.id, status: "ACTIVE" },
     orderBy: { createdAt: "desc" },
-    select: { universe: true },
+    select: { universe: true, onboardingAnswers: true },
   });
+
+  const jar = await cookies();
+  const rawPersona = jar.get(INTERNAL_TEST_COOKIE_NAME)?.value;
+  const persona = isInternalPersonaId(rawPersona) ? rawPersona : null;
+  const internalOwner = isInternalTesterEmail(user.email);
+  const requestedUniverse =
+    internalOwner && persona === "student_monde" ? "MONDE" :
+    internalOwner && persona === "student_racines" ? "RACINES" :
+    null;
+
+  const lp = requestedUniverse
+    ? paths.find((path) => path.universe === requestedUniverse && hasInternalTestMarker(path.onboardingAnswers))
+      ?? paths.find((path) => path.universe === requestedUniverse)
+    : paths.find((path) => !hasInternalTestMarker(path.onboardingAnswers)) ?? paths[0];
 
   if (!lp) { redirect({ href: "/onboarding", locale }); return null; }
 
-  // P4.6 · gate visuel refonte des dashboards. Flag off = comportement
-  // byte-identique aux anciens dashboards. Aucune nouvelle route, aucune
-  // modification de la redirection onboarding ni du resolver LearningPath.
   const useRedesign = isYemaDashboardRedesignActive();
 
   if (lp.universe === "MONDE") {
-    if (useRedesign) {
-      return <StudentMondeDashboard locale={loc} />;
-    }
+    if (useRedesign) return <StudentMondeDashboard locale={loc} />;
     return (
       <Layout title="Monde">
         <DashboardMonde locale={loc} />
@@ -91,10 +98,7 @@ export default async function DashboardPage({ params }: Props) {
     );
   }
 
-  // Racines (P3)
-  if (useRedesign) {
-    return <StudentRacinesDashboard locale={loc} />;
-  }
+  if (useRedesign) return <StudentRacinesDashboard locale={loc} />;
   return (
     <Layout title={loc === "en" ? "Roots" : "Racines"}>
       <DashboardRacines locale={loc} />
