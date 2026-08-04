@@ -1,18 +1,8 @@
-import { InternalPersonaSectionRoute } from "@/features/dashboards/internal-test/InternalPersonaSectionRoute";
+import { LiveStudentSectionRoute } from "@/features/dashboards/live/LiveStudentSectionRoute";
 
 export const dynamic = "force-dynamic";
 
-export default async function PersonaDashboardSectionPage({
-  params,
-}: {
-  params: Promise<{ locale: string; section: string }>;
-}) {
+export default async function PersonaDashboardSectionPage({ params }: { params: Promise<{ locale: string; section: string }> }) {
   const { locale, section } = await params;
-  return (
-    <InternalPersonaSectionRoute
-      accepted={["student_monde", "student_racines", "child_monde", "child_racines"]}
-      locale={locale}
-      sectionId={section}
-    />
-  );
+  return <LiveStudentSectionRoute locale={locale} sectionId={section} />;
 }

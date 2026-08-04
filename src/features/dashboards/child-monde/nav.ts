@@ -18,7 +18,7 @@ export function buildChildMondeNav(labels: {
       { key: "stories", label: labels.stories, href: `${baseHref}#histoires` },
       { key: "badges", label: labels.badges, href: `${baseHref}#badges` },
       { key: "progression", label: labels.progression, href: `${baseHref}#progression` },
-      { key: "adultActivities", label: labels.adultActivities, href: `${baseHref}#adulte` },
+      { key: "adultActivities", label: labels.adultActivities, href: `${baseHref}#avec-adulte` },
     ],
   }];
 }

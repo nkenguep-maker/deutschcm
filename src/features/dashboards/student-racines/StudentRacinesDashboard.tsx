@@ -1,10 +1,5 @@
 "use client";
 
-// StudentRacinesDashboard · Lot 2 P4.6.
-// Réutilise /api/me/racines-dashboard existant — aucun resolver dupliqué.
-// Rendu client comme l'ancien composant, mais dans le shell YEMA en
-// variante Racines (surfaces bordeaux via data-yema-universe="racines").
-
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -21,6 +16,7 @@ import {
   DashboardTabBar,
 } from "@/features/dashboards/shared";
 import type { DashboardTab } from "@/features/dashboards/shared";
+import { routeSectionNav, routeSectionTabs, sectionPageHref } from "@/features/dashboards/shared/sectionRouting";
 import { buildRacinesNav } from "./nav";
 import { OverviewSection } from "./sections/OverviewSection";
 import { StepsSection } from "./sections/StepsSection";
@@ -37,197 +33,70 @@ async function loadDashboard(): Promise<RacinesDashboardData> {
   return (await res.json()) as RacinesDashboardData;
 }
 
-type LoadState =
-  | { kind: "loading" }
-  | { kind: "error" }
-  | { kind: "ready"; data: RacinesDashboardData };
+type LoadState = { kind: "loading" } | { kind: "error" } | { kind: "ready"; data: RacinesDashboardData };
+type Props = { locale: "fr" | "en"; activeSectionId?: string };
+const ALLOWED = new Set(["accueil", "mot-du-jour", "mes-etapes", "ecoutes", "mon-coach", "cercle", "messages"]);
 
-export function StudentRacinesDashboard({ locale }: { locale: "fr" | "en" }) {
+export function StudentRacinesDashboard({ locale, activeSectionId = "accueil" }: Props) {
   const t = useTranslations("yemaDashboards");
   const tCommon = useTranslations("yemaDashboards.common");
   const currentLocale = useLocale();
   const [state, setState] = useState<LoadState>({ kind: "loading" });
-
+  const activeSection = ALLOWED.has(activeSectionId) ? activeSectionId : "accueil";
   const dashboardHref = `/${currentLocale ?? locale}/dashboard`;
+  const activeHref = sectionPageHref(dashboardHref, activeSection, "accueil");
 
   const load = () => {
     setState({ kind: "loading" });
-    loadDashboard()
-      .then((data) => setState({ kind: "ready", data }))
-      .catch(() => setState({ kind: "error" }));
+    loadDashboard().then((data) => setState({ kind: "ready", data })).catch(() => setState({ kind: "error" }));
   };
+  useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    load();
-  }, []);
-
-  const navGroups = buildRacinesNav(
-    {
-      overview: t("studentRacines.nav.overview"),
-      steps: t("studentRacines.nav.steps"),
-      listens: t("studentRacines.nav.listens"),
-      coach: t("studentRacines.nav.coach"),
-      circle: t("studentRacines.nav.circle"),
-      messages: t("studentRacines.nav.messages"),
-      sectionLabel: t("studentRacines.sidebarSection"),
-    },
-    dashboardHref,
-  );
+  const navGroups = routeSectionNav(buildRacinesNav({
+    overview: t("studentRacines.nav.overview"),
+    steps: t("studentRacines.nav.steps"),
+    listens: t("studentRacines.nav.listens"),
+    coach: t("studentRacines.nav.coach"),
+    circle: t("studentRacines.nav.circle"),
+    messages: t("studentRacines.nav.messages"),
+    sectionLabel: t("studentRacines.sidebarSection"),
+  }, dashboardHref), dashboardHref, "accueil");
 
   const personaLabel = t("studentRacines.personaLabel");
   const personaSubtitle = t("studentRacines.personaSubtitle");
-
-  const sidebar = (
-    <DashboardSidebar
-      groups={navGroups}
-      activeHref={dashboardHref}
-      personaLabel={personaLabel}
-      personaSubtitle={personaSubtitle}
-      brandHref={`/${currentLocale ?? locale}`}
-      previewBadge={tCommon("previewBadge")}
-    />
-  );
-
-  const mobileHeader = (
-    <DashboardMobileHeader
-      personaLabel={personaLabel}
-      personaSubtitle={personaSubtitle}
-      brandHref={`/${currentLocale ?? locale}`}
-    />
-  );
-
-  // Onglets mobile PDF §3 : Accueil · Étapes · Écoutes · Coach · Palabre.
-  // Aucun compteur (aucune donnée réelle notifications/messages n'existe dans
-  // ce lot).
-  const mobileTabs: DashboardTab[] = [
+  const sidebar = <DashboardSidebar groups={navGroups} activeHref={activeHref} personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${currentLocale ?? locale}`} previewBadge={tCommon("previewBadge")} />;
+  const mobileHeader = <DashboardMobileHeader personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${currentLocale ?? locale}`} />;
+  const rawTabs: DashboardTab[] = [
     { key: "overview", label: t("studentRacines.mobileNav.overview"), href: dashboardHref },
     { key: "steps", label: t("studentRacines.mobileNav.steps"), href: `${dashboardHref}#mes-etapes` },
     { key: "listens", label: t("studentRacines.mobileNav.listens"), href: `${dashboardHref}#ecoutes` },
     { key: "coach", label: t("studentRacines.mobileNav.coach"), href: `${dashboardHref}#mon-coach` },
     { key: "circle", label: t("studentRacines.mobileNav.circle"), href: `${dashboardHref}#cercle` },
   ];
-  const tabBar = <DashboardTabBar tabs={mobileTabs} activeKey="overview" />;
+  const tabs = routeSectionTabs(rawTabs, dashboardHref, "accueil");
+  const activeTab = ({ accueil: "overview", "mot-du-jour": "overview", "mes-etapes": "steps", ecoutes: "listens", "mon-coach": "coach", cercle: "circle", messages: "overview" } as Record<string, string>)[activeSection];
+  const tabBar = <DashboardTabBar tabs={tabs} activeKey={activeTab} />;
+  const shell = (body: React.ReactNode, header: React.ReactNode) => <DashboardPageBoundary><DashboardShell universe="racines" sidebar={sidebar} mobileHeader={mobileHeader} tabBar={tabBar} header={header}>{body}</DashboardShell></DashboardPageBoundary>;
 
-  if (state.kind === "loading") {
-    return (
-      <DashboardPageBoundary>
-        <DashboardShell
-          universe="racines"
-          sidebar={sidebar}
-          mobileHeader={mobileHeader}
-          tabBar={tabBar}
-          header={<DashboardHeader title={personaLabel} subtitle={tCommon("loading")} />}
-        >
-          <div style={{ display: "grid", gap: 16 }}>
-            <DashboardSkeleton height={140} rounded={18} />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
-              <DashboardSkeleton height={140} rounded={18} />
-              <DashboardSkeleton height={140} rounded={18} />
-              <DashboardSkeleton height={140} rounded={18} />
-            </div>
-          </div>
-        </DashboardShell>
-      </DashboardPageBoundary>
-    );
-  }
-
-  if (state.kind === "error") {
-    return (
-      <DashboardPageBoundary>
-        <DashboardShell
-          universe="racines"
-          sidebar={sidebar}
-          mobileHeader={mobileHeader}
-          tabBar={tabBar}
-          header={<DashboardHeader title={personaLabel} />}
-        >
-          <DashboardErrorState
-            title={tCommon("error")}
-            action={
-              <button
-                type="button"
-                onClick={load}
-                style={{
-                  marginTop: 8,
-                  padding: "10px 18px",
-                  minHeight: 40,
-                  borderRadius: "var(--yema-r-pill)",
-                  background: "transparent",
-                  border: "1px solid var(--yema-gold-edge)",
-                  color: "var(--yema-gold-light)",
-                  fontFamily: "inherit",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                {tCommon("retry")}
-              </button>
-            }
-          />
-        </DashboardShell>
-      </DashboardPageBoundary>
-    );
-  }
+  if (state.kind === "loading") return shell(<div style={{ display: "grid", gap: 16 }}><DashboardSkeleton height={140} rounded={18} /><DashboardSkeleton height={220} rounded={18} /></div>, <DashboardHeader title={personaLabel} subtitle={tCommon("loading")} />);
+  if (state.kind === "error") return shell(<DashboardErrorState title={tCommon("error")} action={<button type="button" onClick={load}>{tCommon("retry")}</button>} />, <DashboardHeader title={personaLabel} />);
 
   const { data } = state;
-
-  if (!data.hasLearningPath) {
-    return (
-      <DashboardPageBoundary>
-        <DashboardShell
-          universe="racines"
-          sidebar={sidebar}
-          mobileHeader={mobileHeader}
-          tabBar={tabBar}
-          header={<DashboardHeader title={personaLabel} />}
-        >
-          <DashboardCard>
-            <DashboardEmptyState title={t("studentRacines.overview.noAccessTitle")} description={t("studentRacines.overview.noAccessBody")} />
-          </DashboardCard>
-        </DashboardShell>
-      </DashboardPageBoundary>
-    );
-  }
+  if (!data.hasLearningPath) return shell(<DashboardCard><DashboardEmptyState title={t("studentRacines.overview.noAccessTitle")} description={t("studentRacines.overview.noAccessBody")} /></DashboardCard>, <DashboardHeader title={personaLabel} />);
 
   const greeting = data.greetingName?.split(" ")[0] ?? t("studentRacines.greetingFallback");
-  const meta = data.racinesStep
-    ? t("studentRacines.metaLanguageStep", { step: data.racinesStep })
-    : t("studentRacines.metaLanguageOnly");
-  const modeLabel =
-    data.mode === "SOLO" ? t("studentRacines.mode.solo") :
-    data.mode === "FAMILY" ? t("studentRacines.mode.family") :
-    data.mode === "NO_ACCESS" ? t("studentRacines.mode.noAccess") :
-    t("studentRacines.mode.unknown");
+  const meta = data.racinesStep ? t("studentRacines.metaLanguageStep", { step: data.racinesStep }) : t("studentRacines.metaLanguageOnly");
+  const modeLabel = data.mode === "SOLO" ? t("studentRacines.mode.solo") : data.mode === "FAMILY" ? t("studentRacines.mode.family") : data.mode === "NO_ACCESS" ? t("studentRacines.mode.noAccess") : t("studentRacines.mode.unknown");
+  const overview = <OverviewSection data={data} />;
+  const content: Record<string, React.ReactNode> = {
+    accueil: overview,
+    "mot-du-jour": overview,
+    "mes-etapes": <><StepsSection steps={data.steps} currentStep={data.racinesStep} />{data.mode === "FAMILY" && data.household.childrenCount > 0 ? <ChildrenSection profiles={data.children} /> : null}</>,
+    ecoutes: <ListensSection anyLanguageReady={data.anyLanguageReady} />,
+    "mon-coach": <CoachSection />,
+    cercle: <CircleSection />,
+    messages: <MessagesPlaceholderSection />,
+  };
 
-  return (
-    <DashboardPageBoundary>
-      <DashboardShell
-        universe="racines"
-        sidebar={sidebar}
-        mobileHeader={mobileHeader}
-          tabBar={tabBar}
-        header={
-          <DashboardHeader
-            title={greeting}
-            subtitle={meta}
-            meta={<DashboardStatusChip tone="neutral">{modeLabel}</DashboardStatusChip>}
-          />
-        }
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-          <OverviewSection data={data} />
-          <StepsSection steps={data.steps} currentStep={data.racinesStep} />
-          {data.mode === "FAMILY" && data.household.childrenCount > 0 ? (
-            <ChildrenSection profiles={data.children} />
-          ) : null}
-          <ListensSection anyLanguageReady={data.anyLanguageReady} />
-          <CoachSection />
-          <CircleSection />
-          <MessagesPlaceholderSection />
-        </div>
-      </DashboardShell>
-    </DashboardPageBoundary>
-  );
+  return shell(<div data-live-persona-section={activeSection}>{content[activeSection]}</div>, <DashboardHeader title={greeting} subtitle={meta} meta={<DashboardStatusChip tone="neutral">{modeLabel}</DashboardStatusChip>} />);
 }

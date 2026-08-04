@@ -12,7 +12,7 @@ export function buildChildRacinesNav(labels: {
       { key: "tales", label: labels.tales, href: `${baseHref}#contes` },
       { key: "songs", label: labels.songs, href: `${baseHref}#chansons` },
       { key: "badges", label: labels.badges, href: `${baseHref}#badges` },
-      { key: "oralProgress", label: labels.oralProgress, href: `${baseHref}#oral` },
+      { key: "oralProgress", label: labels.oralProgress, href: `${baseHref}#progression` },
       { key: "familyActivities", label: labels.familyActivities, href: `${baseHref}#famille` },
     ],
   }];
