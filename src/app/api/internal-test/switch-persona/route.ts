@@ -13,6 +13,7 @@ import {
   type InternalPersonaId,
 } from "@/lib/internalTest";
 import { ensureInternalTestWorkspace } from "@/lib/internalTestProvisioning";
+import { verifyInternalPersonaFixture } from "@/lib/internalPersonaVerification";
 import { getUserRoles } from "@/lib/roles";
 import {
   CHILD_SESSION_COOKIE_NAME,
@@ -148,6 +149,11 @@ export async function POST(req: NextRequest) {
   let childSessionValue: string | null = null;
   try {
     fixture = await ensureInternalTestWorkspace(dbUser.id);
+    await verifyInternalPersonaFixture({
+      persona: rawPersona,
+      userId: dbUser.id,
+      fixture,
+    });
 
     if (rawPersona === "child_monde" || rawPersona === "child_racines") {
       const child = rawPersona === "child_monde" ? fixture.childMonde : fixture.childRacines;
@@ -165,7 +171,8 @@ export async function POST(req: NextRequest) {
     if (!(await refreshBrowserSession(supabase))) {
       return NextResponse.json({ error: "SESSION_REFRESH_FAILED" }, { status: 500 });
     }
-  } catch {
+  } catch (error) {
+    console.error("[internal-test] persona switch failed", error);
     return NextResponse.json({ error: "PERSONA_SWITCH_FAILED" }, { status: 500 });
   }
 
