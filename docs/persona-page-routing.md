@@ -45,3 +45,11 @@ Sur ordinateur, chaque élément du menu latéral ouvre sa page dédiée. Sur mo
 Chaque page conserve un identifiant de rubrique stable. Les cours, activités, devoirs, messages, séances, paiements et données de progression pourront donc remplacer progressivement les fixtures internes sans modifier les URLs ni la structure de navigation.
 
 Les routes de prévisualisation QA restent désactivées en Production.
+
+## Validation finale
+
+- les routes servent soit les fixtures du mode persona interne, soit les données du compte authentifié réel ;
+- chaque dashboard réel ne rend qu’une rubrique à la fois ;
+- les contrôles de rôle, de session enfant, d’univers et les feature flags existants sont conservés ;
+- les tests de routage et le build Next.js complet passent sous Node.js 22 ;
+- le déploiement Preview Vercel a rendu 66 pages sur 66 pour les neuf personas, sans rubrique supplémentaire ni redirection vers la connexion dans l’audit QA.
