@@ -7,8 +7,7 @@ import { INTERNAL_PERSONA_UI_CONTRACTS } from "@/features/dashboards/internal-te
 const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
 
-const ROUTES = [
-  "src/app/[locale]/dashboard/view/[section]/page.tsx",
+const DIRECT_ROUTES = [
   "src/app/[locale]/teacher/view/[section]/page.tsx",
   "src/app/[locale]/coach/racines/view/[section]/page.tsx",
   "src/app/[locale]/center/view/[section]/page.tsx",
@@ -40,12 +39,17 @@ describe("Persona dashboards · dedicated pages", () => {
   });
 
   it("serves both internal fixtures and authenticated live dashboards", () => {
-    for (const route of ROUTES) {
+    for (const route of DIRECT_ROUTES) {
       const source = read(route);
       expect(source).toContain("activeSectionId={section}");
       expect(source).toContain("InternalPersonaDashboard");
     }
-    expect(read(ROUTES[0])).toContain("LiveStudentSectionRoute");
+    const learnerRoute = read("src/app/[locale]/dashboard/view/[section]/page.tsx");
+    const learnerResolver = read("src/features/dashboards/live/LiveStudentSectionRoute.tsx");
+    expect(learnerRoute).toContain("LiveStudentSectionRoute");
+    expect(learnerRoute).toContain("sectionId={section}");
+    expect(learnerResolver).toContain("InternalPersonaDashboard");
+    expect(learnerResolver).toContain("activeSectionId={sectionId}");
   });
 
   it("renders one live section at a time for every dashboard", () => {
