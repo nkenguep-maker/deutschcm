@@ -75,12 +75,15 @@ export default async function OnboardingRouterPage({ params }: Props) {
         return null;
       }
     }
-    // Onboarding form pas fini · on repointe sur le formulaire d'univers.
-    if (step === "ACCOUNT_READY" || step === "UNIVERSE_SELECTED" || step === "LANGUAGE_SELECTED") {
+    // Tant que l'univers ou la langue ne sont pas choisis, on reste sur le
+    // formulaire d'univers. Dès que la langue est présente, LANGUAGE_SELECTED
+    // doit avancer vers /onboarding/{univers}/niveau via nextFunnelHref.
+    if (step === "ACCOUNT_READY" || step === "UNIVERSE_SELECTED") {
       if (path?.universe === "MONDE") redirect({ href: "/onboarding/monde", locale });
       if (path?.universe === "RACINES") redirect({ href: "/onboarding/racines", locale });
     } else {
-      // SELF_ASSESSED / DISCOVERY_STARTED / DISCOVERY_COMPLETED / ACTIVATION_SELECTED / ACTIVATED
+      // LANGUAGE_SELECTED / SELF_ASSESSED / DISCOVERY_STARTED /
+      // DISCOVERY_COMPLETED / ACTIVATION_SELECTED / ACTIVATED
       const dest = nextFunnelHref(step, {
         hasSupabaseUser: true,
         learningPath: path,
