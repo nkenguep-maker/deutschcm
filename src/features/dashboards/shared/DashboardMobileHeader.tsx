@@ -9,14 +9,17 @@ type Props = {
   right?: ReactNode;
 };
 
-// Mobile header compact (spec PDF §2.1) : logo V + wordmark YEMA + identité
-// persona. Reste dans le shell mobile sous 900px.
 export function DashboardMobileHeader({
   personaLabel,
   personaSubtitle,
   brandHref = "/",
   right,
 }: Props) {
+  const isChildPersona = /enfant|child/i.test(personaLabel);
+  const localeBase = brandHref === "/" ? "" : brandHref.replace(/\/$/, "");
+  const offersHref = `${localeBase}/offers` || "/offers";
+  const offersLabel = brandHref.startsWith("/en") ? "Offers" : "Offres";
+
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
       <Link
@@ -47,6 +50,26 @@ export function DashboardMobileHeader({
           </div>
         ) : null}
       </div>
+      {!isChildPersona ? (
+        <Link
+          href={offersHref}
+          style={{
+            minHeight: 36,
+            display: "inline-flex",
+            alignItems: "center",
+            padding: "0 10px",
+            borderRadius: 999,
+            border: "1px solid var(--yema-gold-edge)",
+            background: "var(--yema-gold-glow)",
+            color: "var(--yema-gold-light)",
+            textDecoration: "none",
+            fontSize: 11,
+            fontWeight: 700,
+          }}
+        >
+          {offersLabel}
+        </Link>
+      ) : null}
       {right ? <div style={{ flexShrink: 0 }}>{right}</div> : null}
     </div>
   );

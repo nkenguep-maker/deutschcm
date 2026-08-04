@@ -1,7 +1,6 @@
 // P2 · GET /api/me/monde-dashboard · état complet du dashboard étudiant Monde.
-// Uniquement STUDENT authentifié · retourne 200 même sans grant (le client
-// rend un état "aucun accès" honnête).
 
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
@@ -11,6 +10,12 @@ import {
   nextIncompleteModule,
   overallProgress,
 } from "@/lib/monde";
+import {
+  INTERNAL_TEST_COOKIE_NAME,
+  isInternalPersonaId,
+  isInternalTesterEmail,
+} from "@/lib/internalTest";
+import { hasInternalTestMarker } from "@/lib/internalTestProvisioning";
 
 function err(code: string, message: string, status: number) {
   return NextResponse.json({ error: message, code }, { status });
@@ -26,24 +31,19 @@ export async function GET() {
       where: { supabaseId: user.id },
       select: {
         id: true, fullName: true, xpTotal: true,
-        // Lot 7A.1 · projection MINIMALE des champs onboarding pour
-        // alimenter resolveMondePath() côté client. Aucun autre champ
-        // User ne sort d'ici · pas de fuite d'objet complet.
         learningGoal: true,
         city: true,
       },
     });
     if (!dbUser) return err("NOT_FOUND", "user profile missing", 404);
 
-    // Rôle · STUDENT strict pour rester cohérent avec /api/funnel.
     const studentRole = await prisma.userRole.findFirst({
       where: { userId: dbUser.id, role: "STUDENT", status: "ACTIVE" },
       select: { id: true },
     });
     if (!studentRole) return err("FORBIDDEN_NOT_STUDENT", "STUDENT role required", 403);
 
-    // LearningPath Monde le plus récent
-    const lp = await prisma.learningPath.findFirst({
+    const candidates = await prisma.learningPath.findMany({
       where: { userId: dbUser.id, status: "ACTIVE", universe: "MONDE" },
       orderBy: { createdAt: "desc" },
       select: {
@@ -51,6 +51,14 @@ export async function GET() {
         onboardingAnswers: true, createdAt: true,
       },
     });
+    const jar = await cookies();
+    const rawPersona = jar.get(INTERNAL_TEST_COOKIE_NAME)?.value;
+    const persona = isInternalPersonaId(rawPersona) ? rawPersona : null;
+    const useInternal = isInternalTesterEmail(user.email) && persona === "student_monde";
+    const lp = useInternal
+      ? candidates.find((path) => hasInternalTestMarker(path.onboardingAnswers)) ?? candidates[0]
+      : candidates.find((path) => !hasInternalTestMarker(path.onboardingAnswers)) ?? candidates[0];
+
     if (!lp) {
       return NextResponse.json({
         universe: "MONDE",
@@ -67,7 +75,6 @@ export async function GET() {
       });
     }
 
-    // Grants actifs du user OU du learning path
     const grants = await prisma.accessGrant.findMany({
       where: {
         OR: [
@@ -79,7 +86,6 @@ export async function GET() {
     });
     const access = computeMondeAccess(grants);
 
-    // Progression sur les modules a1-beta-*
     const progressList = await prisma.moduleProgress.findMany({
       where: {
         userId: dbUser.id,
@@ -106,8 +112,6 @@ export async function GET() {
       nextModule: next,
       greetingName: dbUser.fullName ?? null,
       xpTotal: dbUser.xpTotal ?? 0,
-      // Lot 7A.1 · données onboarding pour MondeIvoryOverview ·
-      // resolveMondePath() décide côté client.
       onboarding: {
         learningGoal: dbUser.learningGoal ?? null,
         targetCity: dbUser.city ?? null,

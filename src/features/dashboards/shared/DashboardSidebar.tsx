@@ -27,8 +27,12 @@ export function DashboardSidebar({
   personaSubtitle,
   personaAvatar,
   brandHref = "/",
-  previewBadge,
 }: Props) {
+  const isChildPersona = /enfant|child/i.test(personaLabel ?? "");
+  const localeBase = brandHref === "/" ? "" : brandHref.replace(/\/$/, "");
+  const offersHref = `${localeBase}/offers` || "/offers";
+  const offersLabel = brandHref.startsWith("/en") ? "All offers" : "Toutes les offres";
+
   return (
     <nav
       aria-label="Navigation principale"
@@ -147,18 +151,28 @@ export function DashboardSidebar({
         ))}
       </div>
 
-      {previewBadge ? (
-        <div
+      {!isChildPersona ? (
+        <Link
+          href={offersHref}
           style={{
-            fontSize: 11,
-            color: "var(--yema-text-faint)",
-            padding: "10px 12px",
-            border: "1px dashed var(--yema-border-strong)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 10,
+            minHeight: 44,
+            padding: "10px 14px",
             borderRadius: "var(--yema-r-chip)",
+            border: "1px solid var(--yema-gold-edge)",
+            background: "var(--yema-gold-glow)",
+            color: "var(--yema-gold-light)",
+            fontSize: 13,
+            fontWeight: 700,
+            textDecoration: "none",
           }}
         >
-          {previewBadge}
-        </div>
+          <span>{offersLabel}</span>
+          <span aria-hidden="true">→</span>
+        </Link>
       ) : null}
 
       {footer}
