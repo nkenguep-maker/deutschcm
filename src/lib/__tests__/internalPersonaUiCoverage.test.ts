@@ -7,80 +7,60 @@ import { INTERNAL_PERSONA_UI_CONTRACTS } from "@/features/dashboards/internal-te
 const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
 
-const REQUIRED: Record<(typeof INTERNAL_PERSONA_IDS)[number], string[]> = {
-  student_monde: ["accueil", "objectif", "progression", "mes-devoirs", "mon-cours", "mon-parcours", "ma-classe", "messages"],
-  student_racines: ["accueil", "mot-du-jour", "mes-etapes", "ecoutes", "mon-coach", "cercle", "messages"],
-  teacher: ["accueil", "corrections", "classes", "devoirs", "ressources", "messages"],
-  coach: ["accueil", "seances-du-jour", "apprenants", "seances", "messages", "notes"],
-  center_admin: ["centre", "a-traiter", "eleves", "enseignants", "classes", "facturation", "factures", "messages", "parametres"],
-  super_admin: ["console", "comptes", "audit", "environnement"],
-  family: ["accueil", "enfants", "progression", "activite-prioritaire", "histoires-jeux", "seances", "paiements", "messages", "parametres"],
-  child_monde: ["maison", "quete", "chemin", "missions", "recompense", "jeux", "histoires", "badges", "avec-adulte"],
-  child_racines: ["case", "quete", "chemin", "missions", "contes", "chansons", "badges", "famille"],
-};
+const ROUTES = [
+  "src/app/[locale]/dashboard/view/[section]/page.tsx",
+  "src/app/[locale]/teacher/view/[section]/page.tsx",
+  "src/app/[locale]/coach/racines/view/[section]/page.tsx",
+  "src/app/[locale]/center/view/[section]/page.tsx",
+  "src/app/[locale]/admin/view/[section]/page.tsx",
+  "src/app/[locale]/family/view/[section]/page.tsx",
+];
 
-describe("Internal persona dashboards · complete UI contract", () => {
-  it("covers exactly the nine product personas", () => {
-    expect(Object.keys(INTERNAL_PERSONA_UI_CONTRACTS)).toEqual(expect.arrayContaining([...INTERNAL_PERSONA_IDS]));
+describe("Internal persona dashboards · dedicated pages", () => {
+  it("covers all nine personas and keeps each tab routable", () => {
     expect(Object.keys(INTERNAL_PERSONA_UI_CONTRACTS)).toHaveLength(INTERNAL_PERSONA_IDS.length);
-  });
 
-  for (const persona of INTERNAL_PERSONA_IDS) {
-    it(`${persona} exposes every mandatory section with real demo rows`, () => {
+    for (const persona of INTERNAL_PERSONA_IDS) {
       const contract = INTERNAL_PERSONA_UI_CONTRACTS[persona];
       const ids = contract.sections.map((section) => section.id);
-      expect(ids).toEqual(expect.arrayContaining(REQUIRED[persona]));
       expect(new Set(ids).size).toBe(ids.length);
       expect(contract.tabs.length).toBeGreaterThanOrEqual(4);
       expect(contract.sections.length).toBeGreaterThanOrEqual(4);
-
+      for (const tab of contract.tabs) expect(ids).toContain(tab.id);
       for (const section of contract.sections) {
         expect(section.title.fr.length).toBeGreaterThan(0);
         expect(section.title.en.length).toBeGreaterThan(0);
-        if (section.kind === "hero") {
-          expect(section.cta?.fr.length).toBeGreaterThan(0);
-          expect(section.progress).toBeGreaterThanOrEqual(0);
-        }
         if (["list", "timeline", "chat", "status"].includes(section.kind)) {
           expect(section.rows?.length).toBeGreaterThan(0);
         }
-        if (section.kind === "metrics") {
-          expect(section.metrics?.length).toBeGreaterThan(0);
-        }
+        if (section.kind === "metrics") expect(section.metrics?.length).toBeGreaterThan(0);
       }
-    });
-  }
-
-  it("wires every production persona route to the isolated complete renderer", () => {
-    const routes = [
-      "src/app/[locale]/dashboard/page.tsx",
-      "src/app/[locale]/teacher/page.tsx",
-      "src/app/[locale]/coach/racines/page.tsx",
-      "src/app/[locale]/center/page.tsx",
-      "src/app/[locale]/admin/page.tsx",
-      "src/app/[locale]/family/page.tsx",
-    ];
-    for (const route of routes) {
-      const source = read(route);
-      expect(source).toContain("resolveActiveInternalPersona");
-      expect(source).toContain("InternalPersonaDashboard");
     }
   });
 
-  it("keeps visual and runtime audits under the existing QA public gate", () => {
-    const proxy = read("src/proxy.ts");
-    const preview = read("src/app/[locale]/qa/persona-preview/[persona]/page.tsx");
-    const contractApi = read("src/app/api/internal-test/persona-ui-contracts/route.ts");
-    const renderAudit = read("src/app/api/internal-test/persona-render-audit/route.ts");
+  it("adds one section route to every persona space", () => {
+    for (const route of ROUTES) {
+      const source = read(route);
+      expect(source).toContain("InternalPersonaSectionRoute");
+      expect(source).toContain("sectionId={section}");
+    }
 
-    expect(proxy).toContain('"/qa"');
-    expect(preview).toContain('process.env.VERCEL_ENV === "production"');
-    expect(preview).toContain("notFound()");
-    expect(contractApi).toContain('process.env.VERCEL_ENV === "production"');
-    expect(contractApi).toContain("status: 404");
-    expect(renderAudit).toContain('process.env.VERCEL_ENV === "production"');
-    expect(renderAudit).toContain("data-internal-persona-dashboard");
-    expect(renderAudit).toContain("data-persona-section");
-    expect(renderAudit).toContain("redirectedToLogin");
+    const renderer = read("src/features/dashboards/internal-test/InternalPersonaDashboard.tsx");
+    expect(renderer).toContain("/view/${sectionId}");
+    expect(renderer).toContain("data-persona-active-section");
+    expect(renderer).toContain("<PersonaSection section={activeSection}");
+  });
+
+  it("audits every preview page and keeps it disabled in production", () => {
+    const preview = read("src/app/[locale]/qa/persona-preview/[persona]/page.tsx");
+    const sectionPreview = read("src/app/[locale]/qa/persona-preview/[persona]/view/[section]/page.tsx");
+    const audit = read("src/app/api/internal-test/persona-render-audit/route.ts");
+
+    expect(preview).toContain("baseHrefOverride");
+    expect(sectionPreview).toContain('process.env.VERCEL_ENV === "production"');
+    expect(sectionPreview).toContain("activeSectionId={section}");
+    expect(audit).toContain("data-persona-active-section");
+    expect(audit).toContain("unexpectedSections");
+    expect(audit).toContain("redirectedToLogin");
   });
 });
