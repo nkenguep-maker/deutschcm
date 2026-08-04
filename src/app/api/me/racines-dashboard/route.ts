@@ -1,10 +1,6 @@
 // P3 · GET /api/me/racines-dashboard · état complet du dashboard étudiant Racines.
-// Session · STUDENT strict · retourne 200 même sans contenu (état honnête).
-//
-// Hardening §2 · le mode Solo/Famille vient de l'AccessGrant + Product ou
-// de l'activationIntent, JAMAIS du nombre d'enfants. childrenCount ne
-// devient qu'une info exposée séparément.
 
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
@@ -17,6 +13,12 @@ import {
 } from "@/lib/racines";
 import { readAnswers } from "@/lib/funnel-state";
 import { prismaLangToId } from "@/lib/discovery";
+import {
+  INTERNAL_TEST_COOKIE_NAME,
+  isInternalPersonaId,
+  isInternalTesterEmail,
+} from "@/lib/internalTest";
+import { hasInternalTestMarker } from "@/lib/internalTestProvisioning";
 
 function err(code: string, message: string, status: number) {
   return NextResponse.json({ error: message, code }, { status });
@@ -40,8 +42,7 @@ export async function GET() {
     });
     if (!studentRole) return err("FORBIDDEN_NOT_STUDENT", "STUDENT role required", 403);
 
-    // LearningPath Racines
-    const lp = await prisma.learningPath.findFirst({
+    const candidates = await prisma.learningPath.findMany({
       where: { userId: dbUser.id, status: "ACTIVE", universe: "RACINES" },
       orderBy: { createdAt: "desc" },
       select: {
@@ -49,8 +50,14 @@ export async function GET() {
         onboardingAnswers: true,
       },
     });
+    const jar = await cookies();
+    const rawPersona = jar.get(INTERNAL_TEST_COOKIE_NAME)?.value;
+    const persona = isInternalPersonaId(rawPersona) ? rawPersona : null;
+    const useInternal = isInternalTesterEmail(user.email) && persona === "student_racines";
+    const lp = useInternal
+      ? candidates.find((path) => hasInternalTestMarker(path.onboardingAnswers)) ?? candidates[0]
+      : candidates.find((path) => !hasInternalTestMarker(path.onboardingAnswers)) ?? candidates[0];
 
-    // AccessGrants actifs pour ce user (Racines · include productVariant.product)
     const grants = lp
       ? await prisma.accessGrant.findMany({
           where: {
@@ -64,15 +71,12 @@ export async function GET() {
         })
       : [];
 
-    // Ne considère que les grants Racines (product.universe === RACINES ou
-    // product.code appartient à la famille Racines).
     const racinesGrants = grants.filter((g) => {
       const p = g.productVariant?.product;
       return p && (p.universe === "RACINES" || p.code?.startsWith("ROOTS_"));
     });
     const activeGrant = racinesGrants.find((g) => !g.endsAt || new Date(g.endsAt).getTime() > Date.now());
 
-    // Enfants du parent · filtre parentUserId server-resolved
     const children = await prisma.childProfile.findMany({
       where: { parentUserId: dbUser.id },
       select: {
@@ -82,13 +86,11 @@ export async function GET() {
       orderBy: { createdAt: "asc" },
     });
 
-    // Household existe-t-il ?
     const household = await prisma.household.findFirst({
       where: { ownerUserId: dbUser.id, status: "ACTIVE" },
       select: { id: true },
     });
 
-    // Activation intent depuis onboardingAnswers (P1)
     const answers = lp ? readAnswers(lp) : {};
     const activationIntentOffer = answers.activationIntent?.racinesOffer ?? null;
 
@@ -109,8 +111,8 @@ export async function GET() {
       universe: "RACINES",
       hasLearningPath: Boolean(lp),
       learningPath: lp ? { id: lp.id, language: lp.language, currentLevel: lp.currentLevel } : null,
-      mode,                                    // "SOLO" | "FAMILY" | "NO_ACCESS" | "UNKNOWN"
-      household: householdSummary,             // { childrenCount, householdConfigured, incoherent }
+      mode,
+      household: householdSummary,
       langStatus,
       anyLanguageReady: anyRacinesLanguageReady(),
       racinesStep,
@@ -123,8 +125,6 @@ export async function GET() {
         activeLangue: c.activeLangue,
         langues: Array.isArray(c.langues) ? c.langues : [],
       })),
-      // activeChildId persisté côté user_metadata (P3 hardening §6).
-      // Le front peut le lire directement depuis /api/me si besoin.
       activeChildId: (user.user_metadata?.activeChildId as string | null) ?? null,
       greetingName: dbUser.fullName ?? null,
     });
