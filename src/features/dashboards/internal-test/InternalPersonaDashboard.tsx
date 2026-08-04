@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   DashboardCard,
   DashboardHeader,
@@ -61,10 +62,7 @@ function PersonaSection({ section, locale }: { section: InternalPersonaSection; 
       aria-labelledby={`${section.id}-title`}
       style={{ display: "flex", flexDirection: "column", gap: 12 }}
     >
-      <DashboardSectionHeader
-        title={<span id={`${section.id}-title`}>{title}</span>}
-        description={description}
-      />
+      <DashboardSectionHeader title={<span id={`${section.id}-title`}>{title}</span>} description={description} />
 
       {section.kind === "hero" ? (
         <DashboardCard tone="gold" style={{ padding: 24, overflow: "hidden", position: "relative" }}>
@@ -84,9 +82,7 @@ function PersonaSection({ section, locale }: { section: InternalPersonaSection; 
             </div>
           ) : null}
           {section.cta ? (
-            <span
-              style={{ display: "inline-flex", minHeight: 48, alignItems: "center", justifyContent: "center", padding: "0 20px", borderRadius: "var(--yema-r-pill)", background: "var(--yema-text)", color: "var(--yema-bg)", fontSize: 13, fontWeight: 750 }}
-            >
+            <span style={{ display: "inline-flex", minHeight: 48, alignItems: "center", justifyContent: "center", padding: "0 20px", borderRadius: "var(--yema-r-pill)", background: "var(--yema-text)", color: "var(--yema-bg)", fontSize: 13, fontWeight: 750 }}>
               {localize(section.cta, locale)}
             </span>
           ) : null}
@@ -167,6 +163,50 @@ export function InternalPersonaDashboard({ persona, locale, activeSectionId, bas
     />
   );
 
+  const mobileSectionNav = (
+    <nav
+      aria-label={locale === "fr" ? "Toutes les rubriques" : "All sections"}
+      style={{
+        display: "flex",
+        gap: 8,
+        overflowX: "auto",
+        padding: "10px 16px 12px",
+        borderBottom: "1px solid var(--yema-border)",
+        background: "var(--yema-bg)",
+        scrollbarWidth: "none",
+      }}
+    >
+      {contract.sections.map((section) => {
+        const href = sectionHref(baseHref, firstSection.id, section.id);
+        const active = section.id === activeSection.id;
+        return (
+          <Link
+            key={section.id}
+            href={href}
+            aria-current={active ? "page" : undefined}
+            style={{
+              flex: "0 0 auto",
+              minHeight: 38,
+              display: "inline-flex",
+              alignItems: "center",
+              padding: "0 13px",
+              borderRadius: "var(--yema-r-pill)",
+              border: `1px solid ${active ? "var(--yema-gold-edge)" : "var(--yema-border)"}`,
+              background: active ? "var(--yema-gold-glow)" : "var(--yema-surface-2)",
+              color: active ? "var(--yema-gold-light)" : "var(--yema-text-muted)",
+              fontSize: 12,
+              fontWeight: active ? 700 : 550,
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {localize(section.title, locale)}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+
   return (
     <DashboardPageBoundary>
       <div
@@ -178,6 +218,7 @@ export function InternalPersonaDashboard({ persona, locale, activeSectionId, bas
           universe={contract.universe}
           sidebar={sidebar}
           mobileHeader={<DashboardMobileHeader personaLabel={title} personaSubtitle={subtitle} brandHref={`/${locale}`} />}
+          mobileNav={mobileSectionNav}
           tabBar={<DashboardTabBar tabs={tabs} activeKey={activeSection.id} />}
           header={
             <DashboardHeader
