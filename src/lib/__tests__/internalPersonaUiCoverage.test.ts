@@ -68,7 +68,7 @@ describe("Internal persona dashboards · complete UI contract", () => {
   });
 
   it("keeps the unauthenticated visual audit preview-only", () => {
-    const preview = read("src/app/[locale]/_internal-persona-preview/[persona]/page.tsx");
+    const preview = read("src/app/[locale]/persona-preview/[persona]/page.tsx");
     const api = read("src/app/api/internal-test/persona-ui-contracts/route.ts");
     expect(preview).toContain('process.env.VERCEL_ENV === "production"');
     expect(preview).toContain("notFound()");
