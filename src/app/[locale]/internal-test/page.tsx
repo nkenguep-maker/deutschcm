@@ -4,6 +4,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import {
   INTERNAL_TEST_COOKIE_NAME,
+  getInternalPersonaContract,
   type InternalPersonaId,
   isInternalPersonaId,
   isInternalTesterEmail,
@@ -42,7 +43,7 @@ export default async function InternalTestPage({ params }: { params: Promise<{ l
 
   return (
     <main style={{ minHeight: "100vh", background: "var(--espresso, #120d0b)", color: "var(--creme, #f4ebdc)", padding: "40px 16px 96px" }}>
-      <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1180, margin: "0 auto" }}>
         <header style={{ marginBottom: 28 }}>
           <p style={{ margin: "0 0 8px", color: "var(--brass, #d9a855)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase" }}>
             {loc === "fr" ? "Production · tests internes" : "Production · internal testing"}
@@ -50,10 +51,10 @@ export default async function InternalTestPage({ params }: { params: Promise<{ l
           <h1 style={{ margin: "0 0 10px", fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "clamp(30px, 5vw, 52px)", lineHeight: 1.05 }}>
             {loc === "fr" ? "Tester les neuf maisons YEMA." : "Test all nine YEMA spaces."}
           </h1>
-          <p style={{ margin: 0, maxWidth: 760, color: "var(--creme-mute, #b9aa98)", lineHeight: 1.65 }}>
+          <p style={{ margin: 0, maxWidth: 820, color: "var(--creme-mute, #b9aa98)", lineHeight: 1.65 }}>
             {loc === "fr"
-              ? "Cette console utilise le vrai site et la vraie base Production. Les fixtures sont privées, idempotentes et rattachées uniquement à votre compte propriétaire."
-              : "This console uses the real Production site and database. Fixtures are private, idempotent and attached only to your owner account."}
+              ? "Chaque bascule réémet une session limitée au rôle du persona, vérifie son univers et affiche ici le contrat d’attributs attendu. Les fixtures restent privées et rattachées uniquement à votre compte propriétaire."
+              : "Each switch reissues a session limited to the persona role, verifies its universe, and shows the expected attribute contract here. Fixtures remain private and attached only to your owner account."}
           </p>
         </header>
 
@@ -70,11 +71,20 @@ export default async function InternalTestPage({ params }: { params: Promise<{ l
           </form>
         </div>
 
-        <section aria-label={loc === "fr" ? "Personas disponibles" : "Available personas"} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
+        <section aria-label={loc === "fr" ? "Personas disponibles" : "Available personas"} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
           {PERSONAS.map((persona) => {
             const active = activePersona === persona.id;
+            const contract = getInternalPersonaContract(persona.id);
+            const badges = [
+              `Space: ${contract.spaceRole}`,
+              `App: ${contract.appRole ?? "CHILD"}`,
+              `Universe: ${contract.universe ?? "GLOBAL"}`,
+              `Auth: ${contract.authKind}`,
+              `Route: ${contract.destinationPath}`,
+            ];
+
             return (
-              <article key={persona.id} style={{ border: active ? "1px solid var(--brass, #d9a855)" : "1px solid rgba(244,235,220,.14)", borderRadius: 18, padding: 20, background: active ? "rgba(217,168,85,.09)" : "rgba(244,235,220,.025)", display: "flex", flexDirection: "column", gap: 12 }}>
+              <article key={persona.id} style={{ border: active ? "1px solid var(--brass, #d9a855)" : "1px solid rgba(244,235,220,.14)", borderRadius: 18, padding: 20, background: active ? "rgba(217,168,85,.09)" : "rgba(244,235,220,.025)", display: "flex", flexDirection: "column", gap: 14 }}>
                 <div>
                   <p style={{ margin: "0 0 6px", fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", color: active ? "var(--brass, #d9a855)" : "var(--creme-mute, #b9aa98)" }}>
                     {active ? (loc === "fr" ? "Actif" : "Active") : persona.id.replaceAll("_", " ")}
@@ -84,6 +94,24 @@ export default async function InternalTestPage({ params }: { params: Promise<{ l
                     {loc === "fr" ? persona.descriptionFr : persona.descriptionEn}
                   </p>
                 </div>
+
+                <div aria-label={loc === "fr" ? "Contrat technique" : "Technical contract"} style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {badges.map((badge) => (
+                    <span key={badge} style={{ border: "1px solid rgba(244,235,220,.14)", borderRadius: 999, padding: "5px 8px", fontSize: 10, color: "var(--creme-mute, #b9aa98)" }}>
+                      {badge}
+                    </span>
+                  ))}
+                </div>
+
+                <div>
+                  <p style={{ margin: "0 0 6px", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--brass, #d9a855)" }}>
+                    {loc === "fr" ? "Attributs contrôlés" : "Checked attributes"}
+                  </p>
+                  <ul style={{ margin: 0, paddingLeft: 18, color: "var(--creme-mute, #b9aa98)", fontSize: 12, lineHeight: 1.55 }}>
+                    {contract.requiredAttributes.map((attribute) => <li key={attribute}>{attribute}</li>)}
+                  </ul>
+                </div>
+
                 <form action="/api/internal-test/switch-persona" method="post" style={{ marginTop: "auto" }}>
                   <input type="hidden" name="persona" value={persona.id} />
                   <input type="hidden" name="locale" value={loc} />
