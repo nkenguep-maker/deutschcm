@@ -5,19 +5,48 @@ import { describe, expect, it } from "vitest";
 const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
 
+function contractBlock(source: string, id: string): string {
+  const marker = `  ${id}: {`;
+  const start = source.indexOf(marker);
+  if (start < 0) return "";
+  const next = source.indexOf("\n  },", start);
+  return next < 0 ? source.slice(start) : source.slice(start, next + 5);
+}
+
 describe("Production internal testing · owner-only", () => {
   const gate = read("src/lib/internalTest.ts");
   const switchRoute = read("src/app/api/internal-test/switch-persona/route.ts");
   const consolePage = read("src/app/[locale]/internal-test/page.tsx");
 
+  const expected = {
+    super_admin: { spaceRole: "ADMIN", appRole: "YEMA_ADMIN", universe: "null", authKind: "session", destinationPath: "/admin" },
+    teacher: { spaceRole: "TEACHER", appRole: "TEACHER", universe: "MONDE", authKind: "session", destinationPath: "/teacher" },
+    coach: { spaceRole: "STUDENT", appRole: "RACINES_COACH", universe: "RACINES", authKind: "session", destinationPath: "/coach/racines" },
+    center_admin: { spaceRole: "CENTER", appRole: "CENTER_ADMIN", universe: "null", authKind: "session", destinationPath: "/center" },
+    student_monde: { spaceRole: "STUDENT", appRole: "LEARNER", universe: "MONDE", authKind: "session", destinationPath: "/dashboard" },
+    student_racines: { spaceRole: "STUDENT", appRole: "LEARNER", universe: "RACINES", authKind: "session", destinationPath: "/dashboard" },
+    family: { spaceRole: "STUDENT", appRole: "PARENT", universe: "null", authKind: "session", destinationPath: "/family" },
+    child_monde: { spaceRole: "STUDENT", appRole: "null", universe: "MONDE", authKind: "child_session", destinationPath: "/dashboard" },
+    child_racines: { spaceRole: "STUDENT", appRole: "null", universe: "RACINES", authKind: "child_session", destinationPath: "/dashboard" },
+  } as const;
+
   it("déclare exactement les 9 personas produit", () => {
-    for (const id of [
-      "super_admin", "teacher", "coach", "center_admin",
-      "student_monde", "student_racines", "family",
-      "child_monde", "child_racines",
-    ]) {
-      expect(gate).toContain(`"${id}"`);
+    for (const id of Object.keys(expected)) {
+      expect(gate).toContain(`${id}: {`);
       expect(consolePage).toContain(`id: "${id}"`);
+    }
+  });
+
+  it("fige les attributs exacts de chaque persona", () => {
+    for (const [id, contract] of Object.entries(expected)) {
+      const block = contractBlock(gate, id);
+      expect(block, `${id} contract missing`).not.toBe("");
+      expect(block).toContain(`spaceRole: "${contract.spaceRole}"`);
+      expect(block).toContain(contract.appRole === "null" ? "appRole: null" : `appRole: "${contract.appRole}"`);
+      expect(block).toContain(contract.universe === "null" ? "universe: null" : `universe: "${contract.universe}"`);
+      expect(block).toContain(`authKind: "${contract.authKind}"`);
+      expect(block).toContain(`destinationPath: "${contract.destinationPath}"`);
+      expect(block).toContain("requiredAttributes:");
     }
   });
 
@@ -26,6 +55,22 @@ describe("Production internal testing · owner-only", () => {
     expect(switchRoute).toMatch(/!user \|\| !isInternalTesterEmail\(user\.email\)/);
     expect(switchRoute).toContain('{ error: "Not found" }');
     expect(consolePage).toContain("notFound()");
+  });
+
+  it("réémet une session limitée au rôle du persona avant redirection", () => {
+    expect(switchRoute).toContain("getInternalPersonaContract");
+    expect(switchRoute).toContain("roles: [contract.spaceRole]");
+    expect(switchRoute).toContain("onboarded_map: { [contract.spaceRole]: true }");
+    expect(switchRoute).toContain("active_space: contract.spaceRole");
+    expect(switchRoute).toContain("internal_test_persona: persona");
+    expect(switchRoute).toContain("supabase.auth.refreshSession()");
+    expect(switchRoute).not.toContain("syncUserMetadata");
+  });
+
+  it("restaure le rôle étudiant normal à la sortie du mode persona", () => {
+    expect(switchRoute).toContain('roles: ["STUDENT"]');
+    expect(switchRoute).toContain("onboarded_map: { STUDENT: true }");
+    expect(switchRoute).toContain('active_space: "STUDENT"');
   });
 
   it("les enfants utilisent la session enfant signée existante", () => {
