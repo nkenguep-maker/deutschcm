@@ -29,6 +29,8 @@ export type InternalPersonaAppRole =
 export interface InternalPersonaAttributes {
   id: InternalPersonaId;
   spaceRole: InternalPersonaSpaceRole;
+  /** Compatibility alias used by the proxy's stale-session overlay. */
+  requiredSpaceRole: InternalPersonaSpaceRole;
   appRole: InternalPersonaAppRole;
   universe: InternalPersonaUniverse;
   destinationPath: "/admin" | "/teacher" | "/coach/racines" | "/center" | "/dashboard" | "/family";
@@ -40,6 +42,7 @@ export const INTERNAL_PERSONA_ATTRIBUTES = {
   super_admin: {
     id: "super_admin",
     spaceRole: "ADMIN",
+    requiredSpaceRole: "ADMIN",
     appRole: "YEMA_ADMIN",
     universe: null,
     destinationPath: "/admin",
@@ -49,6 +52,7 @@ export const INTERNAL_PERSONA_ATTRIBUTES = {
   teacher: {
     id: "teacher",
     spaceRole: "TEACHER",
+    requiredSpaceRole: "TEACHER",
     appRole: "TEACHER",
     universe: "MONDE",
     destinationPath: "/teacher",
@@ -58,6 +62,7 @@ export const INTERNAL_PERSONA_ATTRIBUTES = {
   coach: {
     id: "coach",
     spaceRole: "STUDENT",
+    requiredSpaceRole: "STUDENT",
     appRole: "RACINES_COACH",
     universe: "RACINES",
     destinationPath: "/coach/racines",
@@ -67,6 +72,7 @@ export const INTERNAL_PERSONA_ATTRIBUTES = {
   center_admin: {
     id: "center_admin",
     spaceRole: "CENTER",
+    requiredSpaceRole: "CENTER",
     appRole: "CENTER_ADMIN",
     universe: null,
     destinationPath: "/center",
@@ -76,6 +82,7 @@ export const INTERNAL_PERSONA_ATTRIBUTES = {
   student_monde: {
     id: "student_monde",
     spaceRole: "STUDENT",
+    requiredSpaceRole: "STUDENT",
     appRole: "LEARNER",
     universe: "MONDE",
     destinationPath: "/dashboard",
@@ -85,6 +92,7 @@ export const INTERNAL_PERSONA_ATTRIBUTES = {
   student_racines: {
     id: "student_racines",
     spaceRole: "STUDENT",
+    requiredSpaceRole: "STUDENT",
     appRole: "LEARNER",
     universe: "RACINES",
     destinationPath: "/dashboard",
@@ -94,6 +102,7 @@ export const INTERNAL_PERSONA_ATTRIBUTES = {
   family: {
     id: "family",
     spaceRole: "STUDENT",
+    requiredSpaceRole: "STUDENT",
     appRole: "PARENT",
     universe: null,
     destinationPath: "/family",
@@ -103,6 +112,7 @@ export const INTERNAL_PERSONA_ATTRIBUTES = {
   child_monde: {
     id: "child_monde",
     spaceRole: "STUDENT",
+    requiredSpaceRole: "STUDENT",
     appRole: null,
     universe: "MONDE",
     destinationPath: "/dashboard",
@@ -112,6 +122,7 @@ export const INTERNAL_PERSONA_ATTRIBUTES = {
   child_racines: {
     id: "child_racines",
     spaceRole: "STUDENT",
+    requiredSpaceRole: "STUDENT",
     appRole: null,
     universe: "RACINES",
     destinationPath: "/dashboard",
