@@ -14,10 +14,12 @@ export default async function QaPersonaPreviewPage({
   const { locale, persona } = await params;
   if (!isInternalPersonaId(persona)) notFound();
 
+  const loc = locale === "en" ? "en" : "fr";
   return (
     <InternalPersonaDashboard
       persona={persona}
-      locale={locale === "en" ? "en" : "fr"}
+      locale={loc}
+      baseHrefOverride={`/${loc}/qa/persona-preview/${persona}`}
     />
   );
 }
