@@ -16,7 +16,7 @@ export const INTERNAL_PERSONA_IDS = [
 export type InternalPersonaId = (typeof INTERNAL_PERSONA_IDS)[number];
 export type InternalPersonaSpaceRole = "STUDENT" | "TEACHER" | "CENTER" | "ADMIN";
 export type InternalPersonaUniverse = "MONDE" | "RACINES" | null;
-export type InternalPersonaAuthKind = "adult_session" | "child_session";
+export type InternalPersonaAuthKind = "session" | "child_session";
 export type InternalPersonaAppRole =
   | "LEARNER"
   | "PARENT"
@@ -27,76 +27,96 @@ export type InternalPersonaAppRole =
   | null;
 
 export interface InternalPersonaAttributes {
-  requiredSpaceRole: InternalPersonaSpaceRole;
+  id: InternalPersonaId;
+  spaceRole: InternalPersonaSpaceRole;
   appRole: InternalPersonaAppRole;
   universe: InternalPersonaUniverse;
-  destinationPath: string;
+  destinationPath: "/admin" | "/teacher" | "/coach/racines" | "/center" | "/dashboard" | "/family";
   authKind: InternalPersonaAuthKind;
+  requiredAttributes: readonly string[];
 }
 
 export const INTERNAL_PERSONA_ATTRIBUTES = {
   super_admin: {
-    requiredSpaceRole: "ADMIN",
+    id: "super_admin",
+    spaceRole: "ADMIN",
     appRole: "YEMA_ADMIN",
     universe: null,
     destinationPath: "/admin",
-    authKind: "adult_session",
+    authKind: "session",
+    requiredAttributes: ["ADMIN", "YEMA_ADMIN", "global admin dashboard"],
   },
   teacher: {
-    requiredSpaceRole: "TEACHER",
+    id: "teacher",
+    spaceRole: "TEACHER",
     appRole: "TEACHER",
     universe: "MONDE",
     destinationPath: "/teacher",
-    authKind: "adult_session",
+    authKind: "session",
+    requiredAttributes: ["TEACHER", "verified teacher", "center binding", "DEUTSCH"],
   },
   coach: {
-    requiredSpaceRole: "STUDENT",
+    id: "coach",
+    spaceRole: "STUDENT",
     appRole: "RACINES_COACH",
     universe: "RACINES",
     destinationPath: "/coach/racines",
-    authKind: "adult_session",
+    authKind: "session",
+    requiredAttributes: ["RACINES_COACH", "RACINES", "coach workspace"],
   },
   center_admin: {
-    requiredSpaceRole: "CENTER",
+    id: "center_admin",
+    spaceRole: "CENTER",
     appRole: "CENTER_ADMIN",
     universe: null,
     destinationPath: "/center",
-    authKind: "adult_session",
+    authKind: "session",
+    requiredAttributes: ["CENTER", "CENTER_ADMIN", "verified center binding"],
   },
   student_monde: {
-    requiredSpaceRole: "STUDENT",
+    id: "student_monde",
+    spaceRole: "STUDENT",
     appRole: "LEARNER",
     universe: "MONDE",
     destinationPath: "/dashboard",
-    authKind: "adult_session",
+    authKind: "session",
+    requiredAttributes: ["STUDENT", "LEARNER", "MONDE", "DEUTSCH", "A1"],
   },
   student_racines: {
-    requiredSpaceRole: "STUDENT",
+    id: "student_racines",
+    spaceRole: "STUDENT",
     appRole: "LEARNER",
     universe: "RACINES",
     destinationPath: "/dashboard",
-    authKind: "adult_session",
+    authKind: "session",
+    requiredAttributes: ["STUDENT", "LEARNER", "RACINES", "WOLOF", "E1"],
   },
   family: {
-    requiredSpaceRole: "STUDENT",
+    id: "family",
+    spaceRole: "STUDENT",
     appRole: "PARENT",
     universe: null,
     destinationPath: "/family",
-    authKind: "adult_session",
+    authKind: "session",
+    requiredAttributes: ["PARENT", "active household", "Monde child seat", "Racines family seats"],
   },
   child_monde: {
-    requiredSpaceRole: "STUDENT",
+    id: "child_monde",
+    spaceRole: "STUDENT",
     appRole: null,
     universe: "MONDE",
     destinationPath: "/dashboard",
     authKind: "child_session",
+    requiredAttributes: ["signed child session", "MONDE child", "DEUTSCH", "M1"],
   },
   child_racines: {
-    requiredSpaceRole: "STUDENT",
+    id: "child_racines",
+    spaceRole: "STUDENT",
     appRole: null,
     universe: "RACINES",
     destinationPath: "/dashboard",
     authKind: "child_session",
+    requiredAttributes: ["signed child session", "RACINES child", "WOLOF", "E1"],
   },
 } as const satisfies Record<InternalPersonaId, InternalPersonaAttributes>;
 
@@ -116,8 +136,10 @@ export function getInternalPersonaAttributes(persona: InternalPersonaId): Intern
   return INTERNAL_PERSONA_ATTRIBUTES[persona];
 }
 
+export const getInternalPersonaContract = getInternalPersonaAttributes;
+
 export function internalPersonaRequiredSpaceRole(persona: InternalPersonaId): InternalPersonaSpaceRole {
-  return INTERNAL_PERSONA_ATTRIBUTES[persona].requiredSpaceRole;
+  return INTERNAL_PERSONA_ATTRIBUTES[persona].spaceRole;
 }
 
 export function internalPersonaDestination(persona: InternalPersonaId, locale: string): string {
