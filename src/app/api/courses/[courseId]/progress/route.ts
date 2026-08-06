@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { computeMondeAccess } from "@/lib/monde";
 import { getCourseContent, getCourseLessonById } from "@/data/courses/registry";
+import { decideLessonProgress, type CourseProgressStatus } from "@/lib/course-content/validation";
 
 function error(code: string, message: string, status: number) {
   return NextResponse.json({ ok: false, code, error: message }, { status });
@@ -13,16 +14,36 @@ function scoreValue(value: unknown): number | null {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
+function countValue(value: unknown): number | null {
+  return typeof value === "number" && Number.isInteger(value) ? value : null;
+}
+
 export async function POST(request: Request, { params }: { params: Promise<{ courseId: string }> }) {
   try {
     const { courseId } = await params;
     const course = getCourseContent(courseId);
     if (!course) return error("COURSE_NOT_FOUND", "Course not found", 404);
 
-    const payload = await request.json().catch(() => null) as { lessonId?: unknown; score?: unknown } | null;
+    const payload = await request.json().catch(() => null) as {
+      lessonId?: unknown;
+      attemptedCount?: unknown;
+      correctCount?: unknown;
+      score?: unknown;
+    } | null;
     const lessonId = typeof payload?.lessonId === "string" ? payload.lessonId : "";
     const resolved = getCourseLessonById(courseId, lessonId);
     if (!resolved) return error("LESSON_NOT_FOUND", "Lesson not found", 404);
+
+    const totalCount = resolved.lesson.exercises.length;
+    const legacyScore = scoreValue(payload?.score);
+    const attemptedCount = countValue(payload?.attemptedCount) ?? (legacyScore !== null ? totalCount : Number.NaN);
+    const correctCount = countValue(payload?.correctCount) ?? (legacyScore !== null
+      ? totalCount === 0 ? 0 : Math.round((legacyScore / 100) * totalCount)
+      : Number.NaN);
+
+    const preliminary = decideLessonProgress(resolved.lesson, { attemptedCount, correctCount });
+    if (!preliminary.countsValid) return error("INVALID_ATTEMPT", "Invalid lesson attempt counts", 400);
+    if (!preliminary.readyToSubmit) return error("ATTEMPT_INCOMPLETE", "Complete every activity before submitting the lesson", 422);
 
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -64,11 +85,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ cou
 
     const existing = await prisma.moduleProgress.findUnique({
       where: { userId_moduleId: { userId: dbUser.id, moduleId: lessonId } },
-      select: { status: true, startedAt: true },
+      select: { status: true, score: true, startedAt: true, completedAt: true },
     });
-    const firstCompletion = existing?.status !== "COMPLETED";
-    const score = scoreValue(payload?.score);
+    const decision = decideLessonProgress(
+      resolved.lesson,
+      { attemptedCount, correctCount },
+      existing ? { status: existing.status as CourseProgressStatus, score: existing.score } : null,
+    );
     const now = new Date();
+    const completedAt = decision.status === "COMPLETED" ? existing?.completedAt ?? now : null;
 
     await prisma.$transaction(async (tx) => {
       await tx.moduleProgress.upsert({
@@ -76,30 +101,43 @@ export async function POST(request: Request, { params }: { params: Promise<{ cou
         create: {
           userId: dbUser.id,
           moduleId: lessonId,
-          status: "COMPLETED",
-          score,
+          status: decision.status,
+          score: decision.persistedScore,
           startedAt: now,
-          completedAt: now,
+          completedAt,
         },
         update: {
-          status: "COMPLETED",
-          score,
+          status: decision.status,
+          score: decision.persistedScore,
           startedAt: existing?.startedAt ?? now,
-          completedAt: now,
+          completedAt,
         },
       });
-      if (firstCompletion && resolved.lesson.xp > 0) {
-        await tx.user.update({ where: { id: dbUser.id }, data: { xpTotal: { increment: resolved.lesson.xp } } });
+      if (decision.xpAwarded > 0) {
+        await tx.user.update({ where: { id: dbUser.id }, data: { xpTotal: { increment: decision.xpAwarded } } });
       }
     });
+
+    const completionMessage = decision.completed
+      ? resolved.lesson.completionMessage
+      : `Tu as obtenu ${decision.score} %. Reprends les points à corriger pour atteindre ${decision.passScore} % et valider cette unité.`;
 
     return NextResponse.json({
       ok: true,
       courseId,
       lessonId,
-      score,
-      xpAwarded: firstCompletion ? resolved.lesson.xp : 0,
-      completionMessage: resolved.lesson.completionMessage,
+      score: decision.score,
+      passScore: decision.passScore,
+      attemptedCount: decision.attemptedCount,
+      correctCount: decision.correctCount,
+      totalCount: decision.totalCount,
+      status: decision.status,
+      completed: decision.completed,
+      passed: decision.passed,
+      reviewRecommended: decision.reviewRecommended,
+      firstCompletion: decision.firstCompletion,
+      xpAwarded: decision.xpAwarded,
+      completionMessage,
     });
   } catch (cause) {
     console.error("[course-progress] FAIL", cause);
