@@ -18,6 +18,7 @@ export default async function GermanA1LessonPreview({ params }: { params: Promis
       lesson={lesson}
       locale={locale}
       alreadyCompleted
+      initialScore={100}
       accessActive
       nextLesson={next ? { unitId: next.unit.id, lessonId: next.lesson.id, title: next.lesson.title } : null}
     />
