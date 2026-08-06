@@ -9,5 +9,6 @@ export default async function GermanA1UnitPreview({ params }: { params: Promise<
   const { locale, unitId } = await params;
   const unit = getCourseUnit(DE_A1_COURSE.course.id, unitId);
   if (!unit) notFound();
-  return <UnitOverview course={DE_A1_COURSE} unit={unit} progress={[]} accessStatus="ACTIVE" locale={locale} />;
+  const baseHref = `/${locale}/qa/course-preview/de-a1`;
+  return <UnitOverview course={DE_A1_COURSE} unit={unit} progress={[]} accessStatus="ACTIVE" locale={locale} baseHref={baseHref} unlockAll />;
 }
