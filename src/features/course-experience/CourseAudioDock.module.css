@@ -1,0 +1,339 @@
+.floatingButton {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 80;
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #d4ad6d;
+  border-radius: 999px;
+  padding: 0 18px;
+  background: #201b17;
+  color: #fff8ec;
+  font: inherit;
+  font-weight: 750;
+  box-shadow: 0 16px 38px rgba(32, 24, 17, 0.28);
+  cursor: pointer;
+}
+
+.dock {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 90;
+  width: min(430px, calc(100vw - 28px));
+  max-height: min(780px, calc(100vh - 40px));
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #cfb78f;
+  border-radius: 26px;
+  overflow: hidden;
+  background: #fffaf2;
+  color: #211b16;
+  box-shadow: 0 24px 70px rgba(35, 27, 19, 0.3);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 20px 20px 14px;
+  background: #241f1a;
+  color: #fff;
+}
+
+.header h2 {
+  margin: 5px 0 0;
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 23px;
+  line-height: 1.15;
+}
+
+.eyebrow {
+  color: #dfae61;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  letter-spacing: 0.13em;
+}
+
+.close {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  padding: 14px 16px 8px;
+  background: #f5ebdc;
+}
+
+.primary,
+.control,
+.textButton,
+.speed,
+.speedActive,
+.recordButton,
+.stopRecordButton {
+  min-height: 42px;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 720;
+  cursor: pointer;
+}
+
+.primary {
+  border: 0;
+  padding: 0 15px;
+  background: #29231e;
+  color: #fff;
+}
+
+.control {
+  border: 1px solid #bba589;
+  padding: 0 13px;
+  background: #fffaf2;
+  color: #352c24;
+}
+
+.primary:disabled,
+.control:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+
+.speedRow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px 12px;
+  background: #f5ebdc;
+  color: #65584c;
+  font-size: 13px;
+}
+
+.speed,
+.speedActive {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #bca688;
+}
+
+.speed {
+  background: transparent;
+  color: #5e5145;
+}
+
+.speedActive {
+  background: #a76f27;
+  border-color: #a76f27;
+  color: #fff;
+}
+
+.notice,
+.error {
+  margin: 0;
+  padding: 10px 16px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.notice {
+  background: #fff4d8;
+  color: #614919;
+}
+
+.error {
+  color: #8a312d;
+}
+
+.scrollArea {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px 16px 18px;
+}
+
+.section {
+  padding: 15px 0;
+  border-bottom: 1px solid #ded0bc;
+}
+
+.section:last-child {
+  border-bottom: 0;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 9px;
+}
+
+.sectionHead h3 {
+  margin: 0;
+  color: #241d18;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+}
+
+.textButton {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid #c7b28f;
+  background: transparent;
+  color: #7a5221;
+  font-size: 12px;
+}
+
+.itemList {
+  display: grid;
+  gap: 8px;
+}
+
+.audioItem {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  border: 1px solid #dacbb5;
+  border-radius: 15px;
+  padding: 10px;
+  background: #fffdf8;
+  color: #2b241e;
+  text-align: left;
+  cursor: pointer;
+}
+
+.audioItemActive {
+  border-color: #a86e25;
+  background: #f4e4cb;
+  box-shadow: inset 0 0 0 1px #a86e25;
+}
+
+.playIcon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #2b241e;
+  color: #fff;
+  font-size: 11px;
+}
+
+.audioItem strong,
+.german,
+.translation {
+  display: block;
+}
+
+.audioItem strong {
+  margin-bottom: 3px;
+  color: #81561f;
+  font-size: 12px;
+}
+
+.german {
+  color: #201a15;
+  font-weight: 720;
+  line-height: 1.4;
+}
+
+.translation {
+  margin-top: 3px;
+  color: #75695e;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.recordPrompt {
+  margin: 0 0 7px;
+  color: #2e261f;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.hint,
+.privacy {
+  color: #75695e;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.recordActions {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.recordButton,
+.stopRecordButton {
+  padding: 0 15px;
+}
+
+.recordButton {
+  border: 1px solid #9d322d;
+  background: #fff4f2;
+  color: #8d2d29;
+}
+
+.stopRecordButton {
+  border: 1px solid #8e2e2a;
+  background: #8e2e2a;
+  color: #fff;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.audioPreview {
+  width: 100%;
+  margin-top: 4px;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(142, 46, 42, 0.1); }
+  50% { box-shadow: 0 0 0 7px rgba(142, 46, 42, 0.12); }
+}
+
+@media (max-width: 620px) {
+  .floatingButton {
+    right: 12px;
+    bottom: 84px;
+  }
+
+  .dock {
+    right: 8px;
+    bottom: 74px;
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 90px);
+    border-radius: 22px;
+  }
+
+  .toolbar {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .primary {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stopRecordButton {
+    animation: none;
+  }
+}

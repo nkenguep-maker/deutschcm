@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCourseContent, getCourseLesson, getCourseLessonById, getCourseUnit, getNextCourseLesson } from "@/data/courses/registry";
 import { loadCourseViewer } from "@/lib/course-content/server";
-import { LessonExperience } from "@/features/course-experience/LessonExperience";
+import { AudioLessonExperience } from "@/features/course-experience/AudioLessonExperience";
 import styles from "@/features/course-experience/CourseExperience.module.css";
 
 export const dynamic = "force-dynamic";
@@ -45,7 +45,7 @@ export default async function LessonPage({ params }: { params: Promise<{ locale:
   const resolved = getCourseLessonById(courseId, lessonId);
   if (!resolved) notFound();
   return (
-    <LessonExperience
+    <AudioLessonExperience
       course={course}
       unit={unit}
       lesson={lesson}

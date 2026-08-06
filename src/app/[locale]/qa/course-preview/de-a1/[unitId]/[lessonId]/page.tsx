@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { DE_A1_COURSE, getCourseLesson, getCourseUnit, getNextCourseLesson } from "@/data/courses/registry";
-import { LessonExperience } from "@/features/course-experience/LessonExperience";
+import { AudioLessonExperience } from "@/features/course-experience/AudioLessonExperience";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ export default async function GermanA1LessonPreview({ params }: { params: Promis
   const next = getNextCourseLesson(DE_A1_COURSE.course.id, lessonId);
   const baseHref = `/${locale}/qa/course-preview/de-a1`;
   return (
-    <LessonExperience
+    <AudioLessonExperience
       course={DE_A1_COURSE}
       unit={unit}
       lesson={lesson}
