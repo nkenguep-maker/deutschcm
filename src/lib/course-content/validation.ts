@@ -1,6 +1,7 @@
 import type { CourseLesson } from "@/data/courses/types";
 
 export type CourseProgressStatus = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+export type SubmittedLessonStatus = "IN_PROGRESS" | "COMPLETED";
 
 export type LessonAttemptSummary = {
   totalCount: number;
@@ -16,7 +17,7 @@ export type LessonAttemptSummary = {
 };
 
 export type LessonProgressDecision = LessonAttemptSummary & {
-  status: CourseProgressStatus;
+  status: SubmittedLessonStatus;
   completed: boolean;
   firstCompletion: boolean;
   persistedScore: number;
