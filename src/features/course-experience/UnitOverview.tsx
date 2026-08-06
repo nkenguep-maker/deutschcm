@@ -8,24 +8,29 @@ export function UnitOverview({
   progress,
   accessStatus,
   locale,
+  baseHref,
+  unlockAll = false,
 }: {
   course: CourseContent;
   unit: CourseUnit;
   progress: CourseProgressRecord[];
   accessStatus: "ACTIVE" | "EXPIRED" | "NONE";
   locale: string;
+  baseHref?: string;
+  unlockAll?: boolean;
 }) {
   const completed = new Set(progress.filter((item) => item.status === "COMPLETED").map((item) => item.moduleId));
   const all = course.units.flatMap((item) => item.lessons);
   const currentId = all.find((lesson) => !completed.has(lesson.id))?.id ?? null;
   const canLearn = accessStatus === "ACTIVE";
+  const courseBaseHref = baseHref ?? `/${locale}/learn/${course.course.id}`;
 
   return (
     <main className={styles.page}>
       <div className={styles.shell}>
         <header className={styles.topbar}>
           <Link className={styles.brand} href={`/${locale}`}>YEMA</Link>
-          <Link className={styles.back} href={`/${locale}/learn/${course.course.id}`}>← Retour au cours</Link>
+          <Link className={styles.back} href={courseBaseHref}>← Retour au cours</Link>
         </header>
 
         <section className={styles.hero}>
@@ -52,7 +57,7 @@ export function UnitOverview({
               const globalIndex = all.findIndex((item) => item.id === lesson.id);
               const currentIndex = currentId ? all.findIndex((item) => item.id === currentId) : all.length;
               const isDone = completed.has(lesson.id);
-              const locked = !canLearn || (!isDone && globalIndex > currentIndex);
+              const locked = !canLearn || (!unlockAll && !isDone && globalIndex > currentIndex);
               const status = isDone ? "Maîtrisé" : lesson.id === currentId ? "En cours" : locked ? "Verrouillé" : "À commencer";
               return (
                 <article key={lesson.id} className={`${styles.lessonCard} ${locked ? styles.lessonLocked : ""}`}>
@@ -62,7 +67,7 @@ export function UnitOverview({
                     <h3>{lesson.title}</h3>
                     <div className={styles.lessonMeta}>{lesson.objective} · {lesson.durationMinutes} min · +{lesson.xp} XP</div>
                   </div>
-                  {locked ? <span className={styles.secondary}>{canLearn ? "Termine la leçon précédente" : "Accès requis"}</span> : <Link className={styles.secondary} href={`/${locale}/learn/${course.course.id}/${unit.id}/${lesson.id}`}>{isDone ? "Revoir" : lesson.primaryCta}</Link>}
+                  {locked ? <span className={styles.secondary}>{canLearn ? "Termine la leçon précédente" : "Accès requis"}</span> : <Link className={styles.secondary} href={`${courseBaseHref}/${unit.id}/${lesson.id}`}>{isDone ? "Revoir" : lesson.primaryCta}</Link>}
                 </article>
               );
             })}
