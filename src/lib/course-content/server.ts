@@ -1,0 +1,70 @@
+import "server-only";
+
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
+import { computeMondeAccess } from "@/lib/monde";
+import { getCourseContent, getCourseLessonIds } from "@/data/courses/registry";
+
+export type CourseViewer = {
+  userId: string;
+  fullName: string;
+  accessStatus: "ACTIVE" | "EXPIRED" | "NONE";
+  progress: Array<{
+    moduleId: string;
+    status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+    score: number | null;
+    completedAt: Date | null;
+  }>;
+};
+
+export async function loadCourseViewer(courseId: string, locale: string): Promise<CourseViewer> {
+  const course = getCourseContent(courseId);
+  if (!course) redirect(`/${locale}/dashboard`);
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const dbUser = await prisma.user.findUnique({
+    where: { supabaseId: user.id },
+    select: { id: true, fullName: true },
+  });
+  if (!dbUser) redirect(`/${locale}/onboarding`);
+
+  const learningPath = await prisma.learningPath.findFirst({
+    where: {
+      userId: dbUser.id,
+      universe: "MONDE",
+      language: "DEUTSCH",
+      status: "ACTIVE",
+    },
+    orderBy: { createdAt: "desc" },
+    select: { id: true },
+  });
+  if (!learningPath) redirect(`/${locale}/onboarding`);
+
+  const grants = await prisma.accessGrant.findMany({
+    where: {
+      OR: [
+        { beneficiaryType: "USER", beneficiaryId: dbUser.id },
+        { beneficiaryType: "LEARNING_PATH", beneficiaryId: learningPath.id },
+      ],
+    },
+    select: { startsAt: true, endsAt: true, status: true, metadata: true },
+  });
+  const access = computeMondeAccess(grants);
+
+  const lessonIds = getCourseLessonIds(courseId);
+  const progress = lessonIds.length === 0 ? [] : await prisma.moduleProgress.findMany({
+    where: { userId: dbUser.id, moduleId: { in: lessonIds } },
+    select: { moduleId: true, status: true, score: true, completedAt: true },
+  });
+
+  return {
+    userId: dbUser.id,
+    fullName: dbUser.fullName,
+    accessStatus: access.status,
+    progress,
+  };
+}

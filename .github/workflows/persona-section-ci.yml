@@ -1,8 +1,6 @@
-name: Persona section pages
+name: App validation
 
 on:
-  push:
-    branches: [fix/live-persona-section-pages]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -18,5 +16,5 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm install
-      - run: npm run test -- src/lib/__tests__/internalPersonaUiCoverage.test.ts
+      - run: npm run test -- src/lib/__tests__/internalPersonaUiCoverage.test.ts src/lib/__tests__/deA1CourseContent.test.ts
       - run: npm run build
