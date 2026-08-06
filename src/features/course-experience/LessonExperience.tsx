@@ -21,6 +21,7 @@ type Props = {
   initialScore?: number | null;
   accessActive: boolean;
   nextLesson: NextLesson;
+  baseHref?: string;
 };
 
 type LessonResult = {
@@ -316,22 +317,24 @@ function LessonResultPanel({
   lesson,
   unit,
   course,
-  locale,
   nextLesson,
   result,
   missedExercises,
   hasAttemptDetails,
+  baseHref,
   onRetry,
+  onReview,
 }: {
   lesson: CourseLesson;
   unit: CourseUnit;
   course: CourseContent;
-  locale: string;
   nextLesson: NextLesson;
   result: LessonResult;
   missedExercises: CourseExercise[];
   hasAttemptDetails: boolean;
+  baseHref: string;
   onRetry: () => void;
+  onReview: () => void;
 }) {
   const unitValidated = result.completed && lesson.phase === "Valide";
   const lastLesson = !nextLesson;
@@ -342,8 +345,8 @@ function LessonResultPanel({
     : "Mission à retravailler";
   const xpValue = result.firstCompletion ? `+${result.xpAwarded}` : result.completed ? `${lesson.xp}` : "0";
   const nextHref = nextLesson
-    ? `/${locale}/learn/${course.course.id}/${nextLesson.unitId}/${nextLesson.lessonId}`
-    : `/${locale}/learn/${course.course.id}`;
+    ? `${baseHref}/${nextLesson.unitId}/${nextLesson.lessonId}`
+    : baseHref;
 
   return (
     <section className={`${resultStyles.result} ${result.reviewRecommended ? resultStyles.resultReview : ""}`} aria-live="polite">
@@ -377,17 +380,20 @@ function LessonResultPanel({
         ) : (
           <button type="button" className={resultStyles.primaryAction} onClick={onRetry}>Reprendre les points à corriger</button>
         )}
-        <Link className={resultStyles.secondaryAction} href={`/${locale}/learn/${course.course.id}/${unit.id}`}>Retour à l’unité</Link>
+        {result.completed && !hasAttemptDetails ? <button type="button" className={resultStyles.secondaryAction} onClick={onReview}>Revoir les activités</button> : null}
+        <Link className={resultStyles.secondaryAction} href={`${baseHref}/${unit.id}`}>Retour à l’unité</Link>
       </div>
     </section>
   );
 }
 
-export function LessonExperience({ course, unit, lesson, locale, alreadyCompleted, initialScore, accessActive, nextLesson }: Props) {
+export function LessonExperience({ course, unit, lesson, locale, alreadyCompleted, initialScore, accessActive, nextLesson, baseHref }: Props) {
+  const courseBaseHref = baseHref ?? `/${locale}/learn/${course.course.id}`;
   const [answers, setAnswers] = useState<AnswerState>({});
   const [checked, setChecked] = useState<CheckState>({});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(alreadyCompleted);
+  const [reviewMode, setReviewMode] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [result, setResult] = useState<LessonResult | null>(() => {
     if (!alreadyCompleted) return null;
@@ -415,6 +421,10 @@ export function LessonExperience({ course, unit, lesson, locale, alreadyComplete
   const attempt = useMemo(() => evaluateLessonAttempt(lesson, attemptedCount, correctCount), [lesson, attemptedCount, correctCount]);
   const missedExercises = useMemo(() => lesson.exercises.filter((exercise) => checked[exercise.id] && !answerMatches(exercise, answers[exercise.id])), [answers, checked, lesson.exercises]);
   const hasAttemptDetails = Object.keys(checked).length > 0;
+  const showActivities = !result || hasAttemptDetails || reviewMode;
+  const displayedScore = result?.score ?? attempt.score;
+  const displayedAttempted = result?.attemptedCount ?? attemptedCount;
+  const displayedCorrect = result?.correctCount ?? correctCount;
 
   const resetExercise = (exerciseId: string) => {
     setAnswers((current) => {
@@ -427,6 +437,7 @@ export function LessonExperience({ course, unit, lesson, locale, alreadyComplete
       delete next[exerciseId];
       return next;
     });
+    setReviewMode(true);
     setResult(null);
     setSaveError(null);
   };
@@ -435,6 +446,16 @@ export function LessonExperience({ course, unit, lesson, locale, alreadyComplete
     const incorrectIds = new Set(missedExercises.map((exercise) => exercise.id));
     setAnswers((current) => Object.fromEntries(Object.entries(current).filter(([id]) => !incorrectIds.has(id))));
     setChecked((current) => Object.fromEntries(Object.entries(current).filter(([id]) => !incorrectIds.has(id))));
+    setReviewMode(true);
+    setResult(null);
+    setSaved(false);
+    setSaveError(null);
+  };
+
+  const reviewActivities = () => {
+    setAnswers({});
+    setChecked({});
+    setReviewMode(true);
     setResult(null);
     setSaved(false);
     setSaveError(null);
@@ -452,6 +473,7 @@ export function LessonExperience({ course, unit, lesson, locale, alreadyComplete
       });
       const payload = await response.json().catch(() => null) as (LessonResult & { error?: string }) | null;
       if (!response.ok || !payload?.ok) throw new Error(payload?.error ?? `HTTP ${response.status}`);
+      setReviewMode(false);
       setResult(payload);
       setSaved(payload.completed);
     } catch (cause) {
@@ -466,7 +488,7 @@ export function LessonExperience({ course, unit, lesson, locale, alreadyComplete
       <div className={styles.shell}>
         <header className={styles.topbar}>
           <Link className={styles.brand} href={`/${locale}`}>YEMA</Link>
-          <Link className={styles.back} href={`/${locale}/learn/${course.course.id}/${unit.id}`}>← Retour à l’unité</Link>
+          <Link className={styles.back} href={`${courseBaseHref}/${unit.id}`}>← Retour à l’unité</Link>
         </header>
 
         <section className={styles.lessonHero}>
@@ -479,27 +501,29 @@ export function LessonExperience({ course, unit, lesson, locale, alreadyComplete
         <div className={styles.lessonLayout} style={{ marginTop: 24 }}>
           <div className={styles.lessonMain}>
             {lesson.blocks.map((block, index) => <CourseBlockView key={`${block.type}-${index}`} block={block} unit={unit} />)}
-            <section className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <div><div className={styles.eyebrow}>Activités</div><h2 className={styles.sectionTitle}>À toi de jouer</h2></div>
-                <span>{attemptedCount}/{lesson.exercises.length} réalisées · {correctCount} réussies</span>
-              </div>
-              <div className={styles.lessonList}>
-                {lesson.exercises.map((exercise) => (
-                  <ExerciseView
-                    key={exercise.id}
-                    exercise={exercise}
-                    value={answers[exercise.id]}
-                    checked={Boolean(checked[exercise.id])}
-                    onChange={(value) => setAnswers((current) => ({ ...current, [exercise.id]: value }))}
-                    onCheck={() => setChecked((current) => ({ ...current, [exercise.id]: true }))}
-                    onRetry={() => resetExercise(exercise.id)}
-                  />
-                ))}
-              </div>
-            </section>
+            {showActivities ? (
+              <section className={styles.section}>
+                <div className={styles.sectionHeader}>
+                  <div><div className={styles.eyebrow}>Activités</div><h2 className={styles.sectionTitle}>À toi de jouer</h2></div>
+                  <span>{attemptedCount}/{lesson.exercises.length} réalisées · {correctCount} réussies</span>
+                </div>
+                <div className={styles.lessonList}>
+                  {lesson.exercises.map((exercise) => (
+                    <ExerciseView
+                      key={exercise.id}
+                      exercise={exercise}
+                      value={answers[exercise.id]}
+                      checked={Boolean(checked[exercise.id])}
+                      onChange={(value) => setAnswers((current) => ({ ...current, [exercise.id]: value }))}
+                      onCheck={() => setChecked((current) => ({ ...current, [exercise.id]: true }))}
+                      onRetry={() => resetExercise(exercise.id)}
+                    />
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
-            {result ? <LessonResultPanel lesson={lesson} unit={unit} course={course} locale={locale} nextLesson={nextLesson} result={result} missedExercises={missedExercises} hasAttemptDetails={hasAttemptDetails} onRetry={retryIncorrect} /> : null}
+            {result ? <LessonResultPanel lesson={lesson} unit={unit} course={course} nextLesson={nextLesson} result={result} missedExercises={missedExercises} hasAttemptDetails={hasAttemptDetails} baseHref={courseBaseHref} onRetry={retryIncorrect} onReview={reviewActivities} /> : null}
           </div>
 
           <aside className={styles.lessonAside}>
@@ -507,9 +531,9 @@ export function LessonExperience({ course, unit, lesson, locale, alreadyComplete
               <div className={styles.eyebrow}>{lesson.phase === "Valide" ? "Validation de l’unité" : "Progression de la leçon"}</div>
               <h3>{unit.finalMission}</h3>
               <p className={styles.muted}>{lesson.durationMinutes} min · +{lesson.xp} XP</p>
-              <div className={styles.progress}><span style={{ width: `${attempt.score}%` }} /></div>
-              <p>{attempt.score} % · {attemptedCount}/{lesson.exercises.length} activités réalisées</p>
-              {lesson.phase === "Valide" ? <p className={styles.muted}>{attempt.passScore} % requis pour valider l’unité.</p> : <p className={styles.muted}>Toutes les activités doivent être tentées. Le score est enregistré sans bloquer la suite.</p>}
+              <div className={styles.progress}><span style={{ width: `${displayedScore}%` }} /></div>
+              <p>{displayedScore} % · {displayedAttempted}/{lesson.exercises.length} activités réalisées · {displayedCorrect} réussies</p>
+              {lesson.phase === "Valide" ? <p className={styles.muted}>{getLessonPassScore(lesson)} % requis pour valider l’unité.</p> : <p className={styles.muted}>Toutes les activités doivent être tentées. Le score est enregistré sans bloquer la suite.</p>}
               {!accessActive ? <Link className={styles.primary} href={`/${locale}/offers`}>Activer le cours</Link> : !saved && !result ? <button type="button" className={styles.primary} disabled={saving || !attempt.readyToSubmit} onClick={completeLesson}>{saving ? "Enregistrement…" : lesson.phase === "Valide" ? "Voir mon résultat" : lesson.primaryCta}</button> : null}
               {saveError ? <div className={styles.feedback}>{saveError}</div> : null}
             </div>
