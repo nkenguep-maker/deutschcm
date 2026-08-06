@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   DashboardCard,
   DashboardEmptyState,
@@ -16,8 +16,11 @@ type Props = {
   accessStatus: MondeAccessStatus;
 };
 
+const OFFICIAL_A1_COURSE_ID = "monde-adulte-de-a1";
+
 export function CourseSection({ courses, accessStatus }: Props) {
   const t = useTranslations("yemaDashboards.studentMonde.course");
+  const locale = useLocale();
   const active = accessStatus === "ACTIVE";
 
   return (
@@ -32,41 +35,41 @@ export function CourseSection({ courses, accessStatus }: Props) {
         </DashboardCard>
       ) : (
         <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }}>
-          {courses.map((c) => {
-            const locked = c.status === "LOCKED" || !active;
-            const statusLbl =
-              c.status === "COMPLETED" ? t("status.completed") :
-              c.status === "IN_PROGRESS" ? t("status.inProgress") :
-              c.status === "OPEN" ? t("status.open") : t("status.locked");
-            const pct = c.totalModules === 0 ? 0 : (c.completedModules / c.totalModules) * 100;
+          {courses.map((course) => {
+            const locked = course.status === "LOCKED" || !active;
+            const statusLabel =
+              course.status === "COMPLETED" ? t("status.completed") :
+              course.status === "IN_PROGRESS" ? t("status.inProgress") :
+              course.status === "OPEN" ? t("status.open") : t("status.locked");
+            const percentage = course.totalModules === 0 ? 0 : (course.completedModules / course.totalModules) * 100;
             return (
-              <li key={c.id}>
+              <li key={course.id}>
                 <DashboardCard tone="surface" padded style={{ opacity: locked ? 0.6 : 1 }}>
                   <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
                         <span className="yema-mono" style={{ fontSize: 12, color: "var(--yema-text-muted)" }}>
-                          {String(c.index).padStart(2, "0")}
+                          U{course.index}
                         </span>
-                        <span style={{ fontSize: 15, fontWeight: 600, color: "var(--yema-text)" }}>{c.label}</span>
+                        <span style={{ fontSize: 15, fontWeight: 600, color: "var(--yema-text)" }}>{course.label}</span>
                       </div>
                       <div style={{ fontSize: 12, color: "var(--yema-text-muted)", marginTop: 4 }}>
-                        {t("modulesOf", { done: c.completedModules, total: c.totalModules })}
+                        {t("modulesOf", { done: course.completedModules, total: course.totalModules })}
                       </div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
                       <DashboardStatusChip
                         tone={
-                          c.status === "COMPLETED" ? "success" :
-                          c.status === "IN_PROGRESS" ? "gold" :
-                          c.status === "OPEN" ? "neutral" : "muted"
+                          course.status === "COMPLETED" ? "success" :
+                          course.status === "IN_PROGRESS" ? "gold" :
+                          course.status === "OPEN" ? "neutral" : "muted"
                         }
                       >
-                        {statusLbl}
+                        {statusLabel}
                       </DashboardStatusChip>
-                      {!locked && c.moduleIds[0] ? (
+                      {!locked ? (
                         <Link
-                          href={`/courses/${c.id}/modules/${c.moduleIds[0]}`}
+                          href={`/${locale}/learn/${OFFICIAL_A1_COURSE_ID}/${course.id}`}
                           style={{
                             fontSize: 12,
                             color: "var(--yema-gold-light)",
@@ -79,14 +82,14 @@ export function CourseSection({ courses, accessStatus }: Props) {
                             alignItems: "center",
                           }}
                         >
-                          {t("seeLesson")}
+                          {course.status === "COMPLETED" ? "Revoir l’unité" : t("seeLesson")}
                         </Link>
                       ) : null}
                     </div>
                   </div>
-                  {c.completedModules > 0 ? (
+                  {course.completedModules > 0 ? (
                     <div style={{ marginTop: 12 }}>
-                      <DashboardProgress value={pct} ariaLabel={c.label} />
+                      <DashboardProgress value={percentage} ariaLabel={course.label} />
                     </div>
                   ) : null}
                 </DashboardCard>
@@ -95,6 +98,14 @@ export function CourseSection({ courses, accessStatus }: Props) {
           })}
         </ul>
       )}
+      {active ? (
+        <Link
+          href={`/${locale}/learn/${OFFICIAL_A1_COURSE_ID}`}
+          style={{ alignSelf: "flex-start", color: "var(--yema-gold-light)", textDecoration: "none", fontWeight: 700, minHeight: 44, display: "inline-flex", alignItems: "center" }}
+        >
+          Ouvrir le parcours A1 complet →
+        </Link>
+      ) : null}
     </section>
   );
 }
