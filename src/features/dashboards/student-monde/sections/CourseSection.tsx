@@ -22,12 +22,13 @@ export function CourseSection({ courses, accessStatus }: Props) {
   const t = useTranslations("yemaDashboards.studentMonde.course");
   const locale = useLocale();
   const active = accessStatus === "ACTIVE";
+  const description = locale === "en" ? "Six communicative units and 36 lessons to complete German A1." : "Six unités communicatives et 36 leçons pour terminer l’allemand A1.";
 
   return (
     <section id="mon-cours" aria-labelledby="mon-cours-title" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <DashboardSectionHeader
         title={<span id="mon-cours-title">{t("title")}</span>}
-        description={t("description")}
+        description={description}
       />
       {courses.length === 0 ? (
         <DashboardCard>
@@ -103,7 +104,7 @@ export function CourseSection({ courses, accessStatus }: Props) {
           href={`/${locale}/learn/${OFFICIAL_A1_COURSE_ID}`}
           style={{ alignSelf: "flex-start", color: "var(--yema-gold-light)", textDecoration: "none", fontWeight: 700, minHeight: 44, display: "inline-flex", alignItems: "center" }}
         >
-          Ouvrir le parcours A1 complet →
+          {locale === "en" ? "Open the full A1 course →" : "Ouvrir le parcours A1 complet →"}
         </Link>
       ) : null}
     </section>
