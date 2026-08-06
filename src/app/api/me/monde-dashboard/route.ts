@@ -89,7 +89,7 @@ export async function GET() {
     const progressList = await prisma.moduleProgress.findMany({
       where: {
         userId: dbUser.id,
-        moduleId: { startsWith: "a1-beta-" },
+        moduleId: { startsWith: "de-a1-" },
       },
       select: { moduleId: true, status: true, completedAt: true, score: true },
     });
