@@ -16,6 +16,7 @@ export default async function LessonPage({ params }: { params: Promise<{ locale:
 
   const viewer = await loadCourseViewer(courseId, locale);
   const completed = new Set(viewer.progress.filter((item) => item.status === "COMPLETED").map((item) => item.moduleId));
+  const currentProgress = viewer.progress.find((item) => item.moduleId === lessonId) ?? null;
   const flat = course.units.flatMap((courseUnit) => courseUnit.lessons.map((courseLesson) => ({ unit: courseUnit, lesson: courseLesson })));
   const requestedIndex = flat.findIndex((item) => item.lesson.id === lessonId);
   const firstIncompleteIndex = flat.findIndex((item) => !completed.has(item.lesson.id));
@@ -50,6 +51,7 @@ export default async function LessonPage({ params }: { params: Promise<{ locale:
       lesson={lesson}
       locale={locale}
       alreadyCompleted={completed.has(lessonId)}
+      initialScore={currentProgress?.score ?? null}
       accessActive={viewer.accessStatus === "ACTIVE"}
       nextLesson={next ? { unitId: next.unit.id, lessonId: next.lesson.id, title: next.lesson.title } : null}
     />
