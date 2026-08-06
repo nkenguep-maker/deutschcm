@@ -126,6 +126,30 @@ export function buildLessonAudioContent(unit: CourseUnit, lesson: CourseLesson):
       });
     }
 
+    if (block.type === "grammarRef") {
+      unit.grammar.forEach((grammar, grammarIndex) => {
+        if (grammar.formula) {
+          addUnique(phrases, seenPhrases, {
+            id: `${lesson.id}-grammar-${grammarIndex}-formula`,
+            label: grammar.title,
+            text: grammar.formula,
+            kind: "phrase",
+            voiceSlot: 0,
+          });
+        }
+        grammar.examples.forEach((example, exampleIndex) => {
+          addUnique(phrases, seenPhrases, {
+            id: `${lesson.id}-grammar-${grammarIndex}-${exampleIndex}`,
+            label: grammar.title,
+            text: example.de,
+            translation: example.fr,
+            kind: "phrase",
+            voiceSlot: exampleIndex % 2 === 0 ? 0 : 1,
+          });
+        });
+      });
+    }
+
     if (block.type === "pronunciationRef") {
       unit.pronunciation.drills.forEach((drill, index) => {
         addUnique(pronunciation, seenPronunciation, {
@@ -138,7 +162,7 @@ export function buildLessonAudioContent(unit: CourseUnit, lesson: CourseLesson):
       });
     }
 
-    if (block.type !== "dialogueRef" && block.type !== "vocabularyRef" && block.type !== "pronunciationRef") {
+    if (!["dialogueRef", "vocabularyRef", "grammarRef", "pronunciationRef"].includes(block.type)) {
       collectGermanStrings(block, `${lesson.id}-block-${blockIndex}`, blockLabel(block), phrases, seenPhrases);
     }
   }
