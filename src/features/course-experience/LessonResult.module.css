@@ -1,0 +1,163 @@
+.result {
+  border: 1px solid #b98942;
+  border-radius: 26px;
+  background: #2b241d;
+  color: #fff;
+  padding: clamp(24px, 4vw, 36px);
+  display: grid;
+  gap: 22px;
+}
+
+.result h2,
+.result h3,
+.result p {
+  color: inherit;
+}
+
+.resultReview {
+  border-color: #b56a45;
+  background: #fff7ed;
+  color: #2a2018;
+}
+
+.resultEyebrow {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  font-size: 12px;
+  color: #dfae61;
+}
+
+.resultReview .resultEyebrow {
+  color: #95502f;
+}
+
+.resultTitle {
+  margin: 8px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 5vw, 50px);
+  line-height: 1.05;
+}
+
+.resultLead {
+  margin: 8px 0 0;
+  color: #d9cdbf;
+  line-height: 1.65;
+  max-width: 760px;
+}
+
+.resultReview .resultLead {
+  color: #67564a;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.resultReview .metric {
+  border-color: #dfc7b5;
+  background: #fff;
+}
+
+.metric strong {
+  display: block;
+  font-size: clamp(24px, 4vw, 34px);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.metric span {
+  color: #cfc2b3;
+  font-size: 13px;
+}
+
+.resultReview .metric span {
+  color: #726054;
+}
+
+.reviewBox {
+  border-radius: 18px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.resultReview .reviewBox {
+  background: #f4e6d8;
+}
+
+.reviewBox h3 {
+  margin: 0 0 10px;
+}
+
+.reviewList {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.primaryAction,
+.secondaryAction {
+  min-height: 50px;
+  border-radius: 999px;
+  padding: 0 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.primaryAction {
+  border: 0;
+  background: #dfae61;
+  color: #241f1a;
+}
+
+.secondaryAction {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: transparent;
+  color: #fff;
+}
+
+.resultReview .primaryAction {
+  background: #2b241d;
+  color: #fff;
+}
+
+.resultReview .secondaryAction {
+  border-color: #9c7e68;
+  color: #3a2c23;
+}
+
+.retryInline {
+  margin-top: 10px;
+}
+
+@media (max-width: 680px) {
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .actions,
+  .primaryAction,
+  .secondaryAction {
+    width: 100%;
+  }
+}

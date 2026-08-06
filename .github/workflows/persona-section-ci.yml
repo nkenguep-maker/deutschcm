@@ -16,5 +16,5 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm install
-      - run: npm run test -- src/lib/__tests__/internalPersonaUiCoverage.test.ts src/lib/__tests__/deA1CourseContent.test.ts
+      - run: npm run test -- src/lib/__tests__/internalPersonaUiCoverage.test.ts src/lib/__tests__/deA1CourseContent.test.ts src/lib/__tests__/deA1Unit1Validation.test.ts
       - run: npm run build

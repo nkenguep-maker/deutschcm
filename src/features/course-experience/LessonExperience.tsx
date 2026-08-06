@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { CourseBlock, CourseContent, CourseExercise, CourseLesson, CourseUnit } from "@/data/courses/types";
+import { evaluateLessonAttempt, getLessonPassScore } from "@/lib/course-content/validation";
 import styles from "./CourseExperience.module.css";
+import resultStyles from "./LessonResult.module.css";
 
 type AnswerState = Record<string, string | string[] | boolean>;
 type CheckState = Record<string, boolean>;
@@ -16,8 +18,26 @@ type Props = {
   lesson: CourseLesson;
   locale: string;
   alreadyCompleted: boolean;
+  initialScore?: number | null;
   accessActive: boolean;
   nextLesson: NextLesson;
+  baseHref?: string;
+};
+
+type LessonResult = {
+  ok: true;
+  score: number;
+  passScore: number;
+  attemptedCount: number;
+  correctCount: number;
+  totalCount: number;
+  status: "IN_PROGRESS" | "COMPLETED";
+  completed: boolean;
+  passed: boolean;
+  reviewRecommended: boolean;
+  firstCompletion: boolean;
+  xpAwarded: number;
+  completionMessage: string;
 };
 
 const phases = ["Comprends", "Pratique", "Produis", "Valide"] as const;
@@ -106,7 +126,7 @@ function CourseBlockView({ block, unit }: { block: CourseBlock; unit: CourseUnit
             </div>
           ))}
         </div>
-        <p className={styles.muted}>{"L’audio sera ajouté après validation des voix. Le script reste disponible."}</p>
+        <p className={styles.muted}>L’audio sera ajouté après validation des voix. Le script reste disponible.</p>
       </section>
     );
   }
@@ -193,18 +213,29 @@ function CourseBlockView({ block, unit }: { block: CourseBlock; unit: CourseUnit
   );
 }
 
+function ExerciseFeedback({ correct, feedback, onRetry }: { correct: boolean; feedback: string; onRetry: () => void }) {
+  return (
+    <div className={styles.feedback}>
+      <div>{feedback}</div>
+      {!correct ? <button type="button" className={`${styles.secondary} ${resultStyles.retryInline}`} onClick={onRetry}>Réessayer</button> : null}
+    </div>
+  );
+}
+
 function ExerciseView({
   exercise,
   value,
   checked,
   onChange,
   onCheck,
+  onRetry,
 }: {
   exercise: CourseExercise;
   value: string | string[] | boolean | undefined;
   checked: boolean;
   onChange: (value: string | string[] | boolean) => void;
   onCheck: () => void;
+  onRetry: () => void;
 }) {
   const correct = checked && answerMatches(exercise, value);
   const feedback = correct ? exercise.feedbackCorrect ?? "Bonne réponse." : exercise.feedbackIncorrect ?? exercise.hint ?? "Réessaie.";
@@ -219,7 +250,7 @@ function ExerciseView({
           const isWrong = checked && selected && !isRight;
           return <button type="button" key={choice} className={`${styles.choice} ${selected ? styles.choiceSelected : ""} ${isRight ? styles.choiceCorrect : ""} ${isWrong ? styles.choiceWrong : ""}`} onClick={() => !checked && onChange(choice)}>{choice}</button>;
         })}
-        {!checked ? <button type="button" className={styles.secondary} style={{ marginTop: 14 }} disabled={typeof value !== "string"} onClick={onCheck}>Vérifier</button> : <div className={styles.feedback}>{feedback}</div>}
+        {!checked ? <button type="button" className={styles.secondary} style={{ marginTop: 14 }} disabled={typeof value !== "string"} onClick={onCheck}>Vérifier</button> : <ExerciseFeedback correct={correct} feedback={feedback} onRetry={onRetry} />}
       </article>
     );
   }
@@ -230,7 +261,7 @@ function ExerciseView({
         <h3>{exercise.prompt}</h3>
         <input className={styles.input} value={typeof value === "string" ? value : ""} disabled={checked} onChange={(event) => onChange(event.target.value)} aria-label={exercise.prompt} />
         {exercise.hint && !checked ? <p className={styles.muted}>{exercise.hint}</p> : null}
-        {!checked ? <button type="button" className={styles.secondary} style={{ marginTop: 14 }} disabled={!value} onClick={onCheck}>Vérifier</button> : <div className={styles.feedback}>{feedback}</div>}
+        {!checked ? <button type="button" className={styles.secondary} style={{ marginTop: 14 }} disabled={!value} onClick={onCheck}>Vérifier</button> : <ExerciseFeedback correct={correct} feedback={feedback} onRetry={onRetry} />}
       </article>
     );
   }
@@ -243,7 +274,7 @@ function ExerciseView({
         <h3>{exercise.prompt}</h3>
         <div className={styles.tokenRow} style={{ minHeight: 48, marginBottom: 12 }}>{selected.map((token, index) => <button type="button" className={styles.token} key={`${token}-${index}`} disabled={checked} onClick={() => onChange(selected.filter((_, itemIndex) => itemIndex !== index))}>{token}</button>)}</div>
         <div className={styles.tokenRow}>{available.map((token, index) => <button type="button" className={styles.token} key={`${token}-${index}`} disabled={checked} onClick={() => onChange([...selected, token])}>{token}</button>)}</div>
-        {!checked ? <button type="button" className={styles.secondary} style={{ marginTop: 14 }} disabled={selected.length !== (exercise.tokens ?? []).length} onClick={onCheck}>Vérifier</button> : <div className={styles.feedback}>{feedback}</div>}
+        {!checked ? <button type="button" className={styles.secondary} style={{ marginTop: 14 }} disabled={selected.length !== (exercise.tokens ?? []).length} onClick={onCheck}>Vérifier</button> : <ExerciseFeedback correct={correct} feedback={feedback} onRetry={onRetry} />}
       </article>
     );
   }
@@ -257,7 +288,7 @@ function ExerciseView({
         <textarea className={styles.textarea} value={text} disabled={checked} onChange={(event) => onChange(event.target.value)} />
         <p className={styles.muted}>{wordCount(text)}/{minimum} mots minimum</p>
         {exercise.successCriteria ? <GenericList items={exercise.successCriteria} /> : null}
-        {!checked ? <button type="button" className={styles.secondary} disabled={wordCount(text) < minimum} onClick={onCheck}>Valider ma production</button> : <div className={styles.feedback}>{correct ? "Production enregistrée pour cette leçon." : feedback}</div>}
+        {!checked ? <button type="button" className={styles.secondary} disabled={wordCount(text) < minimum} onClick={onCheck}>Valider ma production</button> : <ExerciseFeedback correct={correct} feedback={correct ? "Production enregistrée pour cette leçon." : feedback} onRetry={onRetry} />}
       </article>
     );
   }
@@ -282,31 +313,171 @@ function ExerciseView({
   );
 }
 
-export function LessonExperience({ course, unit, lesson, locale, alreadyCompleted, accessActive, nextLesson }: Props) {
+function LessonResultPanel({
+  lesson,
+  unit,
+  course,
+  nextLesson,
+  result,
+  missedExercises,
+  hasAttemptDetails,
+  baseHref,
+  onRetry,
+  onReview,
+}: {
+  lesson: CourseLesson;
+  unit: CourseUnit;
+  course: CourseContent;
+  nextLesson: NextLesson;
+  result: LessonResult;
+  missedExercises: CourseExercise[];
+  hasAttemptDetails: boolean;
+  baseHref: string;
+  onRetry: () => void;
+  onReview: () => void;
+}) {
+  const unitValidated = result.completed && lesson.phase === "Valide";
+  const lastLesson = !nextLesson;
+  const title = result.completed
+    ? unitValidated
+      ? lastLesson ? `Niveau ${course.course.framework.level} terminé` : `Unité ${unit.order} validée`
+      : "Leçon terminée"
+    : "Mission à retravailler";
+  const xpValue = result.firstCompletion ? `+${result.xpAwarded}` : result.completed ? `${lesson.xp}` : "0";
+  const nextHref = nextLesson
+    ? `${baseHref}/${nextLesson.unitId}/${nextLesson.lessonId}`
+    : baseHref;
+
+  return (
+    <section className={`${resultStyles.result} ${result.reviewRecommended ? resultStyles.resultReview : ""}`} aria-live="polite">
+      <div>
+        <div className={resultStyles.resultEyebrow}>{result.reviewRecommended ? "Révision recommandée" : "Résultat enregistré"}</div>
+        <h2 className={resultStyles.resultTitle}>{title}</h2>
+        <p className={resultStyles.resultLead}>{result.completionMessage}</p>
+      </div>
+
+      <div className={resultStyles.metrics}>
+        <div className={resultStyles.metric}><strong>{result.score} %</strong><span>Score obtenu</span></div>
+        <div className={resultStyles.metric}><strong>{result.correctCount}/{result.totalCount}</strong><span>Activités réussies</span></div>
+        <div className={resultStyles.metric}><strong>{xpValue} XP</strong><span>{result.firstCompletion ? "XP gagnés" : "XP de la leçon"}</span></div>
+      </div>
+
+      <div className={resultStyles.reviewBox}>
+        <h3>Compétence travaillée</h3>
+        <p>{lesson.objective}</p>
+      </div>
+
+      {hasAttemptDetails && missedExercises.length > 0 ? (
+        <div className={resultStyles.reviewBox}>
+          <h3>{result.completed ? "À revoir sans bloquer ta progression" : `À corriger pour atteindre ${result.passScore} %`}</h3>
+          <ul className={resultStyles.reviewList}>{missedExercises.map((exercise) => <li key={exercise.id}>{exercise.prompt}</li>)}</ul>
+        </div>
+      ) : null}
+
+      <div className={resultStyles.actions}>
+        {result.completed ? (
+          <Link className={resultStyles.primaryAction} href={nextHref}>{nextLesson ? "Leçon suivante" : "Voir mon parcours"}</Link>
+        ) : (
+          <button type="button" className={resultStyles.primaryAction} onClick={onRetry}>Reprendre les points à corriger</button>
+        )}
+        {result.completed && !hasAttemptDetails ? <button type="button" className={resultStyles.secondaryAction} onClick={onReview}>Revoir les activités</button> : null}
+        <Link className={resultStyles.secondaryAction} href={`${baseHref}/${unit.id}`}>Retour à l’unité</Link>
+      </div>
+    </section>
+  );
+}
+
+export function LessonExperience({ course, unit, lesson, locale, alreadyCompleted, initialScore, accessActive, nextLesson, baseHref }: Props) {
+  const courseBaseHref = baseHref ?? `/${locale}/learn/${course.course.id}`;
   const [answers, setAnswers] = useState<AnswerState>({});
   const [checked, setChecked] = useState<CheckState>({});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(alreadyCompleted);
+  const [reviewMode, setReviewMode] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [result, setResult] = useState<LessonResult | null>(() => {
+    if (!alreadyCompleted) return null;
+    const totalCount = lesson.exercises.length;
+    const score = initialScore ?? 100;
+    return {
+      ok: true,
+      score,
+      passScore: getLessonPassScore(lesson),
+      attemptedCount: totalCount,
+      correctCount: totalCount === 0 ? 0 : Math.min(totalCount, Math.round((score / 100) * totalCount)),
+      totalCount,
+      status: "COMPLETED",
+      completed: true,
+      passed: true,
+      reviewRecommended: false,
+      firstCompletion: false,
+      xpAwarded: 0,
+      completionMessage: lesson.completionMessage,
+    };
+  });
 
-  const validCount = useMemo(() => lesson.exercises.filter((exercise) => checked[exercise.id] && answerMatches(exercise, answers[exercise.id])).length, [answers, checked, lesson.exercises]);
-  const allValid = lesson.exercises.length > 0 && validCount === lesson.exercises.length;
-  const score = lesson.exercises.length === 0 ? 100 : Math.round((validCount / lesson.exercises.length) * 100);
+  const attemptedCount = useMemo(() => lesson.exercises.filter((exercise) => checked[exercise.id]).length, [checked, lesson.exercises]);
+  const correctCount = useMemo(() => lesson.exercises.filter((exercise) => checked[exercise.id] && answerMatches(exercise, answers[exercise.id])).length, [answers, checked, lesson.exercises]);
+  const attempt = useMemo(() => evaluateLessonAttempt(lesson, attemptedCount, correctCount), [lesson, attemptedCount, correctCount]);
+  const missedExercises = useMemo(() => lesson.exercises.filter((exercise) => checked[exercise.id] && !answerMatches(exercise, answers[exercise.id])), [answers, checked, lesson.exercises]);
+  const hasAttemptDetails = Object.keys(checked).length > 0;
+  const showActivities = !result || hasAttemptDetails || reviewMode;
+  const displayedScore = result?.score ?? attempt.score;
+  const displayedAttempted = result?.attemptedCount ?? attemptedCount;
+  const displayedCorrect = result?.correctCount ?? correctCount;
+
+  const resetExercise = (exerciseId: string) => {
+    setAnswers((current) => {
+      const next = { ...current };
+      delete next[exerciseId];
+      return next;
+    });
+    setChecked((current) => {
+      const next = { ...current };
+      delete next[exerciseId];
+      return next;
+    });
+    setReviewMode(true);
+    setResult(null);
+    setSaveError(null);
+  };
+
+  const retryIncorrect = () => {
+    const incorrectIds = new Set(missedExercises.map((exercise) => exercise.id));
+    setAnswers((current) => Object.fromEntries(Object.entries(current).filter(([id]) => !incorrectIds.has(id))));
+    setChecked((current) => Object.fromEntries(Object.entries(current).filter(([id]) => !incorrectIds.has(id))));
+    setReviewMode(true);
+    setResult(null);
+    setSaved(false);
+    setSaveError(null);
+  };
+
+  const reviewActivities = () => {
+    setAnswers({});
+    setChecked({});
+    setReviewMode(true);
+    setResult(null);
+    setSaved(false);
+    setSaveError(null);
+  };
 
   const completeLesson = async () => {
-    if (!accessActive || (!allValid && !alreadyCompleted)) return;
+    if (!accessActive || !attempt.readyToSubmit) return;
     setSaving(true);
     setSaveError(null);
     try {
       const response = await fetch(`/api/courses/${course.course.id}/progress`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lessonId: lesson.id, score }),
+        body: JSON.stringify({ lessonId: lesson.id, attemptedCount, correctCount }),
       });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      setSaved(true);
-    } catch {
-      setSaveError(course.globalUiTexts.errorMessage ?? "La progression n’a pas pu être enregistrée.");
+      const payload = await response.json().catch(() => null) as (LessonResult & { error?: string }) | null;
+      if (!response.ok || !payload?.ok) throw new Error(payload?.error ?? `HTTP ${response.status}`);
+      setReviewMode(false);
+      setResult(payload);
+      setSaved(payload.completed);
+    } catch (cause) {
+      setSaveError(cause instanceof Error ? cause.message : course.globalUiTexts.errorMessage ?? "La progression n’a pas pu être enregistrée.");
     } finally {
       setSaving(false);
     }
@@ -317,7 +488,7 @@ export function LessonExperience({ course, unit, lesson, locale, alreadyComplete
       <div className={styles.shell}>
         <header className={styles.topbar}>
           <Link className={styles.brand} href={`/${locale}`}>YEMA</Link>
-          <Link className={styles.back} href={`/${locale}/learn/${course.course.id}/${unit.id}`}>← Retour à l’unité</Link>
+          <Link className={styles.back} href={`${courseBaseHref}/${unit.id}`}>← Retour à l’unité</Link>
         </header>
 
         <section className={styles.lessonHero}>
@@ -330,40 +501,40 @@ export function LessonExperience({ course, unit, lesson, locale, alreadyComplete
         <div className={styles.lessonLayout} style={{ marginTop: 24 }}>
           <div className={styles.lessonMain}>
             {lesson.blocks.map((block, index) => <CourseBlockView key={`${block.type}-${index}`} block={block} unit={unit} />)}
-            <section className={styles.section}>
-              <div className={styles.sectionHeader}><div><div className={styles.eyebrow}>Activités</div><h2 className={styles.sectionTitle}>À toi de jouer</h2></div><span>{validCount}/{lesson.exercises.length} réussies</span></div>
-              <div className={styles.lessonList}>
-                {lesson.exercises.map((exercise) => (
-                  <ExerciseView
-                    key={exercise.id}
-                    exercise={exercise}
-                    value={answers[exercise.id]}
-                    checked={Boolean(checked[exercise.id])}
-                    onChange={(value) => setAnswers((current) => ({ ...current, [exercise.id]: value }))}
-                    onCheck={() => setChecked((current) => ({ ...current, [exercise.id]: true }))}
-                  />
-                ))}
-              </div>
-            </section>
-
-            {(saved || alreadyCompleted) ? (
-              <section className={styles.completion}>
-                <div className={styles.eyebrow}>Leçon terminée · +{lesson.xp} XP</div>
-                <h2>{lesson.completionMessage}</h2>
-                <p>{nextLesson ? `Prochaine étape : ${nextLesson.title}` : "Tu as terminé la dernière leçon de ce niveau."}</p>
-                <Link className={styles.primary} href={nextLesson ? `/${locale}/learn/${course.course.id}/${nextLesson.unitId}/${nextLesson.lessonId}` : `/${locale}/learn/${course.course.id}`}>{nextLesson ? "Leçon suivante" : "Voir mon parcours"}</Link>
+            {showActivities ? (
+              <section className={styles.section}>
+                <div className={styles.sectionHeader}>
+                  <div><div className={styles.eyebrow}>Activités</div><h2 className={styles.sectionTitle}>À toi de jouer</h2></div>
+                  <span>{attemptedCount}/{lesson.exercises.length} réalisées · {correctCount} réussies</span>
+                </div>
+                <div className={styles.lessonList}>
+                  {lesson.exercises.map((exercise) => (
+                    <ExerciseView
+                      key={exercise.id}
+                      exercise={exercise}
+                      value={answers[exercise.id]}
+                      checked={Boolean(checked[exercise.id])}
+                      onChange={(value) => setAnswers((current) => ({ ...current, [exercise.id]: value }))}
+                      onCheck={() => setChecked((current) => ({ ...current, [exercise.id]: true }))}
+                      onRetry={() => resetExercise(exercise.id)}
+                    />
+                  ))}
+                </div>
               </section>
             ) : null}
+
+            {result ? <LessonResultPanel lesson={lesson} unit={unit} course={course} nextLesson={nextLesson} result={result} missedExercises={missedExercises} hasAttemptDetails={hasAttemptDetails} baseHref={courseBaseHref} onRetry={retryIncorrect} onReview={reviewActivities} /> : null}
           </div>
 
           <aside className={styles.lessonAside}>
             <div className={styles.card}>
-              <div className={styles.eyebrow}>Mission</div>
+              <div className={styles.eyebrow}>{lesson.phase === "Valide" ? "Validation de l’unité" : "Progression de la leçon"}</div>
               <h3>{unit.finalMission}</h3>
               <p className={styles.muted}>{lesson.durationMinutes} min · +{lesson.xp} XP</p>
-              <div className={styles.progress}><span style={{ width: `${score}%` }} /></div>
-              <p>{score} % des activités validées</p>
-              {!accessActive ? <Link className={styles.primary} href={`/${locale}/offers`}>Activer le cours</Link> : !saved ? <button type="button" className={styles.primary} disabled={saving || !allValid} onClick={completeLesson}>{saving ? "Enregistrement…" : lesson.primaryCta}</button> : null}
+              <div className={styles.progress}><span style={{ width: `${displayedScore}%` }} /></div>
+              <p>{displayedScore} % · {displayedAttempted}/{lesson.exercises.length} activités réalisées · {displayedCorrect} réussies</p>
+              {lesson.phase === "Valide" ? <p className={styles.muted}>{getLessonPassScore(lesson)} % requis pour valider l’unité.</p> : <p className={styles.muted}>Toutes les activités doivent être tentées. Le score est enregistré sans bloquer la suite.</p>}
+              {!accessActive ? <Link className={styles.primary} href={`/${locale}/offers`}>Activer le cours</Link> : !saved && !result ? <button type="button" className={styles.primary} disabled={saving || !attempt.readyToSubmit} onClick={completeLesson}>{saving ? "Enregistrement…" : lesson.phase === "Valide" ? "Voir mon résultat" : lesson.primaryCta}</button> : null}
               {saveError ? <div className={styles.feedback}>{saveError}</div> : null}
             </div>
             <div className={styles.card}>

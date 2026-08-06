@@ -11,6 +11,7 @@ export default async function GermanA1LessonPreview({ params }: { params: Promis
   const lesson = getCourseLesson(DE_A1_COURSE.course.id, unitId, lessonId);
   if (!unit || !lesson) notFound();
   const next = getNextCourseLesson(DE_A1_COURSE.course.id, lessonId);
+  const baseHref = `/${locale}/qa/course-preview/de-a1`;
   return (
     <LessonExperience
       course={DE_A1_COURSE}
@@ -18,7 +19,9 @@ export default async function GermanA1LessonPreview({ params }: { params: Promis
       lesson={lesson}
       locale={locale}
       alreadyCompleted
+      initialScore={100}
       accessActive
+      baseHref={baseHref}
       nextLesson={next ? { unitId: next.unit.id, lessonId: next.lesson.id, title: next.lesson.title } : null}
     />
   );
