@@ -31,25 +31,29 @@ export function CourseOverview({
   progress,
   accessStatus,
   locale,
+  baseHref,
 }: {
   course: CourseContent;
   progress: CourseProgressRecord[];
   accessStatus: "ACTIVE" | "EXPIRED" | "NONE";
   locale: string;
+  baseHref?: string;
 }) {
   const state = progressState(course, progress);
   const next = state.firstIncomplete
     ? course.units.flatMap((unit) => unit.lessons.map((lesson) => ({ unit, lesson }))).find((item) => item.lesson.id === state.firstIncomplete)
     : null;
   const canLearn = accessStatus === "ACTIVE";
-  const nextHref = next ? `/${locale}/learn/${course.course.id}/${next.unit.id}/${next.lesson.id}` : `/${locale}/dashboard/view/mon-cours`;
+  const courseBaseHref = baseHref ?? `/${locale}/learn/${course.course.id}`;
+  const nextHref = next ? `${courseBaseHref}/${next.unit.id}/${next.lesson.id}` : `/${locale}/dashboard/view/mon-cours`;
+  const isPreview = Boolean(baseHref);
 
   return (
     <main className={styles.page}>
       <div className={styles.shell}>
         <header className={styles.topbar}>
           <Link className={styles.brand} href={`/${locale}`}>YEMA</Link>
-          <Link className={styles.back} href={`/${locale}/dashboard/view/mon-cours`}>← Retour à mon espace</Link>
+          <Link className={styles.back} href={isPreview ? courseBaseHref : `/${locale}/dashboard/view/mon-cours`}>{isPreview ? "Aperçu du cours" : "← Retour à mon espace"}</Link>
         </header>
 
         <section className={styles.hero}>
@@ -88,7 +92,7 @@ export function CourseOverview({
               const status = state.unitStatuses.get(unit.id) ?? "LOCKED";
               const locked = status === "LOCKED" || !canLearn;
               const done = unit.lessons.filter((lesson) => state.completed.has(lesson.id)).length;
-              const href = `/${locale}/learn/${course.course.id}/${unit.id}`;
+              const href = `${courseBaseHref}/${unit.id}`;
               return (
                 <article key={unit.id} className={`${styles.unitCard} ${locked ? styles.unitCardLocked : ""}`}>
                   <div className={styles.unitTop}><span className={styles.mono}>U{unit.order}</span><span className={styles.status}>{statusLabel(status, course.course.dashboardStrings)}</span></div>
