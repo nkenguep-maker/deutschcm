@@ -4,7 +4,7 @@ import { BYV_CHILD_PAYLOAD } from "./byv.payload";
 import { LN_CHILD_PAYLOAD } from "./ln.payload";
 import type { ChildLesson, ChildUnit, YemaChildCourseContent } from "./types";
 
-const EXPECTED_LESSON_STAGES: Record<"monde" | "racines", string[]> = {
+const EXPECTED_SEQUENCE: Record<"monde" | "racines", string[]> = {
   monde: ["Écoute", "Choisis", "Répète", "Parle"],
   racines: ["Écoute", "Reconnais", "Répète", "Réponds"],
 };
@@ -51,11 +51,11 @@ function assertCourse(course: YemaChildCourseContent) {
     throw new Error(`${course.course.id}: expected 96 exercises`);
   }
 
-  const expectedStages = EXPECTED_LESSON_STAGES[course.course.track];
+  const expected = EXPECTED_SEQUENCE[course.course.track];
   for (const unit of course.units) {
     if (unit.lessons.length !== 4) throw new Error(`${unit.id}: expected 4 lessons`);
     const stages = unit.lessons.map((lesson) => lesson.stage);
-    if (stages.some((stage, index) => stage !== expectedStages[index])) {
+    if (stages.some((stage, index) => stage !== expected[index])) {
       throw new Error(`${unit.id}: invalid child learning sequence`);
     }
     for (const lesson of unit.lessons) {
