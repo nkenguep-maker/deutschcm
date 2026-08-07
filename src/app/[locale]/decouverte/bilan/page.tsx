@@ -30,7 +30,6 @@ export default async function DiscoveryBilan({ params }: Props) {
   const answers = readAnswers(lp);
   const progress = answers.discoveryProgress ?? [];
   if (progress.length < DISCOVERY_TOTAL) {
-    // Redirige vers la première leçon non-terminée
     const step = deriveFunnelStep({ hasSupabaseUser: true, learningPath: lp, hasActiveAccessGrant: false });
     redirect({ href: nextFunnelHref(step, { hasSupabaseUser: true, learningPath: lp, hasActiveAccessGrant: false }), locale });
     return null;
@@ -46,7 +45,7 @@ export default async function DiscoveryBilan({ params }: Props) {
     fr: {
       eye: "Le seuil est franchi.",
       title: langName ? `Tu as terminé les quatre cours de découverte en ${langName.toLowerCase()}.` : "Tu as terminé les quatre cours de découverte.",
-      sub: "Voici où tu en es. Tu peux maintenant choisir comment continuer.",
+      sub: "Voici où tu en es. Ton parcours peut maintenant continuer depuis ton espace.",
       universeLabel: "Univers",
       universeMonde: "Monde · le voyage",
       universeRacines: "Racines · la maison",
@@ -54,13 +53,13 @@ export default async function DiscoveryBilan({ params }: Props) {
       levelLabel: isMonde ? "Niveau de départ recommandé" : "Étape Racines",
       lessonsLabel: "Cours terminés",
       lessonsValue: `${DISCOVERY_TOTAL} sur ${DISCOVERY_TOTAL}`,
-      cta: "Découvrir les offres",
+      cta: isMonde ? "Continuer mon parcours" : "Ouvrir mon espace",
       changeLevel: "Corriger mon niveau",
     },
     en: {
       eye: "The threshold is crossed.",
       title: langName ? `You've finished the four discovery lessons in ${langName}.` : "You've finished the four discovery lessons.",
-      sub: "Here's where you are. You can now choose how to continue.",
+      sub: "Here's where you are. Your journey can now continue from your space.",
       universeLabel: "Universe",
       universeMonde: "World · the journey",
       universeRacines: "Roots · the home",
@@ -68,11 +67,12 @@ export default async function DiscoveryBilan({ params }: Props) {
       levelLabel: isMonde ? "Recommended starting level" : "Racines step",
       lessonsLabel: "Lessons completed",
       lessonsValue: `${DISCOVERY_TOTAL} of ${DISCOVERY_TOTAL}`,
-      cta: "See the offers",
+      cta: isMonde ? "Continue my journey" : "Open my space",
       changeLevel: "Change my level",
     },
   } as const;
   const c = copy[loc];
+  const continueHref = isMonde ? "/dashboard/view/mon-cours" : "/dashboard";
 
   return (
     <main style={{ maxWidth: 640, margin: "0 auto", padding: "40px 16px 96px" }}>
@@ -106,7 +106,7 @@ export default async function DiscoveryBilan({ params }: Props) {
       </dl>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "space-between", alignItems: "center" }}>
-        <Link href="/activation-intent" className="entry-cta entry-cta-primary" style={{ minHeight: 48 }}>
+        <Link href={continueHref} className="entry-cta entry-cta-primary" style={{ minHeight: 48 }}>
           {c.cta}
         </Link>
         <Link href="/onboarding" style={{ color: "var(--creme-mute)", fontSize: 13, textDecoration: "underline", minHeight: 44, display: "inline-flex", alignItems: "center" }}>
