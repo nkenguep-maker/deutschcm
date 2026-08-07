@@ -9,6 +9,7 @@ import medumbaU6 from "./byv/u6.json";
 import medumbaU7 from "./byv/u7.json";
 import medumbaU8 from "./byv/u8.json";
 import { LINGALA_E1_GZIP_BASE64 } from "./ln/encoded";
+import { LINGALA_E1_GZIP_BASE64_PREFIX } from "./ln/prefix";
 import {
   RACINES_E1_SEQUENCE,
   type RacinesEditorialGate,
@@ -31,9 +32,10 @@ export const medumbaE1 = combineCourse(medumbaMeta, [
   medumbaU5, medumbaU6, medumbaU7, medumbaU8,
 ]);
 
-// Lingala is kept as the exact uploaded source archive. Decoding happens only
-// on the server/build side; learner renderers receive a sanitized course view.
-export const lingalaE1 = decodeCourse(LINGALA_E1_GZIP_BASE64);
+// Lingala is kept as the exact uploaded source archive. The large encoded
+// payload is split into two source constants only to keep connector writes
+// reliable; concatenation restores the exact gzip/base64 stream.
+export const lingalaE1 = decodeCourse(LINGALA_E1_GZIP_BASE64_PREFIX + LINGALA_E1_GZIP_BASE64);
 
 export const racinesSoloCourses = {
   "racines-solo-byv-e1": medumbaE1,
