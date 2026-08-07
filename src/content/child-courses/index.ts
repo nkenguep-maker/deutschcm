@@ -1,5 +1,7 @@
 import { inflateSync } from "node:zlib";
-import { CHILD_COURSES_PAYLOAD } from "./payload";
+import { DE_CHILD_PAYLOAD } from "./de.payload";
+import { BYV_CHILD_PAYLOAD } from "./byv.payload";
+import { LN_CHILD_PAYLOAD } from "./ln.payload";
 import type { ChildLesson, ChildUnit, YemaChildCourseContent } from "./types";
 
 const EXPECTED_SEQUENCE: Record<"monde" | "racines", string[]> = {
@@ -7,10 +9,9 @@ const EXPECTED_SEQUENCE: Record<"monde" | "racines", string[]> = {
   racines: ["Écoute", "Reconnais", "Répète", "Réponds"],
 };
 
-function decodePayload(): YemaChildCourseContent[] {
-  const json = inflateSync(Buffer.from(CHILD_COURSES_PAYLOAD, "base64")).toString("utf8");
-  const parsed = JSON.parse(json) as Record<string, YemaChildCourseContent>;
-  return Object.values(parsed);
+function decodeCourse(payload: string): YemaChildCourseContent {
+  const json = inflateSync(Buffer.from(payload, "base64")).toString("utf8");
+  return JSON.parse(json) as YemaChildCourseContent;
 }
 
 function assertCourse(course: YemaChildCourseContent) {
@@ -49,7 +50,11 @@ function assertCourse(course: YemaChildCourseContent) {
   }
 }
 
-const decodedCourses = decodePayload();
+const decodedCourses = [
+  decodeCourse(DE_CHILD_PAYLOAD),
+  decodeCourse(BYV_CHILD_PAYLOAD),
+  decodeCourse(LN_CHILD_PAYLOAD),
+];
 for (const course of decodedCourses) assertCourse(course);
 
 export const childCourses = decodedCourses.sort((a, b) => a.course.id.localeCompare(b.course.id));
