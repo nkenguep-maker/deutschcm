@@ -5,7 +5,6 @@ import { RacinesUnitPreview } from "@/features/racines-course-experience/Racines
 export const dynamic = "force-dynamic";
 
 export default async function RacinesPilotUnitPage({ params }: { params: Promise<{ locale: string; courseId: string; unitId: string }> }) {
-  if (process.env.VERCEL_ENV === "production") notFound();
   const { locale, courseId, unitId } = await params;
   const course = getRacinesSoloCourse(courseId);
   const unit = getRacinesUnit(courseId, unitId);
