@@ -1,3 +1,4 @@
+import { gunzipSync } from "node:zlib";
 import medumbaMeta from "./byv/meta.json";
 import medumbaU1 from "./byv/u1.json";
 import medumbaU2 from "./byv/u2.json";
@@ -7,15 +8,7 @@ import medumbaU5 from "./byv/u5.json";
 import medumbaU6 from "./byv/u6.json";
 import medumbaU7 from "./byv/u7.json";
 import medumbaU8 from "./byv/u8.json";
-import lingalaMeta from "./ln/meta.json";
-import lingalaU1 from "./ln/u1.json";
-import lingalaU2 from "./ln/u2.json";
-import lingalaU3 from "./ln/u3.json";
-import lingalaU4 from "./ln/u4.json";
-import lingalaU5 from "./ln/u5.json";
-import lingalaU6 from "./ln/u6.json";
-import lingalaU7 from "./ln/u7.json";
-import lingalaU8 from "./ln/u8.json";
+import { LINGALA_E1_GZIP_BASE64 } from "./ln/encoded";
 import {
   RACINES_E1_SEQUENCE,
   type RacinesEditorialGate,
@@ -28,15 +21,19 @@ function combineCourse(meta: unknown, units: unknown[]): YemaRacinesCourseConten
   return { ...(meta as object), units } as unknown as YemaRacinesCourseContent;
 }
 
+function decodeCourse(encoded: string): YemaRacinesCourseContent {
+  const compressed = Buffer.from(encoded, "base64");
+  return JSON.parse(gunzipSync(compressed).toString("utf8")) as YemaRacinesCourseContent;
+}
+
 export const medumbaE1 = combineCourse(medumbaMeta, [
   medumbaU1, medumbaU2, medumbaU3, medumbaU4,
   medumbaU5, medumbaU6, medumbaU7, medumbaU8,
 ]);
 
-export const lingalaE1 = combineCourse(lingalaMeta, [
-  lingalaU1, lingalaU2, lingalaU3, lingalaU4,
-  lingalaU5, lingalaU6, lingalaU7, lingalaU8,
-]);
+// Lingala is kept as the exact uploaded source archive. Decoding happens only
+// on the server/build side; learner renderers receive a sanitized course view.
+export const lingalaE1 = decodeCourse(LINGALA_E1_GZIP_BASE64);
 
 export const racinesSoloCourses = {
   "racines-solo-byv-e1": medumbaE1,
