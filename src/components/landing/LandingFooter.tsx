@@ -1,13 +1,8 @@
-// LandingFooter · Sprint « Les mots de la maison ».
-// Trois colonnes :
-//   · La maison  · Langues, Méthode, Histoires
-//   · Les portes · Devenir enseignant·e, Pour les centres, Tarifs
-//   · La règle   · Confidentialité, Conditions, Contact
-// Sous les colonnes : slogan support « Toutes vos langues, une
-// seule maison. » + signature YEMA + disclaimer CEFR.
-// Le manifeste est parqué : page conservée pour réactivation
-// ultérieure mais aucun lien depuis nav ou footer.
+// LandingFooter · surface publique YEMA.
+// Les liens sont filtrés par la matrice release : une page PRIVATE/HIDDEN
+// reste disponible pour l'équipe mais n'est jamais promue depuis le footer.
 
+import { isPubliclyLinked, type PublicSurfaceId } from "@/lib/release/publicSurface";
 import { LandingBrand } from "./LandingBrand";
 
 type Labels = {
@@ -19,6 +14,16 @@ type Labels = {
   contact: string;
   disclaimer: string;
 };
+
+type FooterItem = {
+  label: string;
+  href: string;
+  surface?: PublicSurfaceId;
+};
+
+function publicItems(items: FooterItem[]): FooterItem[] {
+  return items.filter((item) => !item.surface || isPubliclyLinked(item.surface));
+}
 
 export function LandingFooter({
   locale,
@@ -33,24 +38,24 @@ export function LandingFooter({
 
   const colHome = {
     label: isEn ? "The house" : "La maison",
-    items: [
-      { label: isEn ? "Languages" : "Langues",      href: `/${locale}/langues` },
-      { label: isEn ? "Method" : "Méthode",         href: `/${locale}/methode` },
-    ],
+    items: publicItems([
+      { label: isEn ? "Languages" : "Langues", href: `/${locale}/langues`, surface: "languages" },
+      { label: isEn ? "Method" : "Méthode", href: `/${locale}/methode`, surface: "method" },
+    ]),
   };
   const colDoors = {
     label: isEn ? "The doors" : "Les portes",
-    items: [
-      { label: isEn ? "Become a teacher" : "Devenir enseignant·e", href: `/${locale}/enseignants` },
-      { label: isEn ? "For language centers" : "Pour les centres", href: `/${locale}/landing` },
-      { label: isEn ? "Pricing" : "Tarifs",                        href: `/${locale}/pricing` },
-    ],
+    items: publicItems([
+      { label: isEn ? "Become a teacher" : "Devenir enseignant·e", href: `/${locale}/enseignants`, surface: "teachers" },
+      { label: isEn ? "For language centers" : "Pour les centres", href: `/${locale}/landing`, surface: "centers" },
+      { label: isEn ? "Pricing" : "Tarifs", href: `/${locale}/pricing`, surface: "pricing" },
+    ]),
   };
   const colLaw = {
     label: isEn ? "The rule" : "La règle",
     items: [
       { label: labels.privacy, href: `/${locale}/privacy` },
-      { label: labels.terms,   href: `/${locale}/terms` },
+      { label: labels.terms, href: `/${locale}/terms` },
       { label: labels.contact, href: "mailto:hello@yema.app" },
     ],
   };
