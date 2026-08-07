@@ -136,3 +136,6 @@ export function ChildUnitPreview({ locale, course, unit }: { locale: string; cou
     </main>
   );
 }
+
+// Production release marker: forces the Git-integrated Vercel build for the game-first child experience.
+export const CHILD_GAME_PRODUCTION_RELEASE = "2026-08-07T13:39+02:00";
