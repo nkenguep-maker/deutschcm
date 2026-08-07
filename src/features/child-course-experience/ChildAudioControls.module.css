@@ -1,0 +1,79 @@
+.audioCard {
+  margin: 0 0 16px;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--brass, #b8873e) 30%, transparent);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(184, 135, 62, 0.11), rgba(184, 135, 62, 0.045));
+}
+
+.audioCard strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink, #2a1d10);
+  font-size: 15px;
+}
+
+.audioCard p {
+  margin: 0 0 12px;
+  color: var(--muted, #6f5f4f);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.listenButton {
+  width: 100%;
+  min-height: 58px;
+  border: 1px solid rgba(87, 56, 24, 0.14);
+  border-radius: 16px;
+  padding: 0 18px;
+  background: var(--brass, #b8873e);
+  color: #fffaf2;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 900;
+  box-shadow: 0 4px 0 rgba(105, 70, 28, 0.28);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+}
+
+.listenButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.listenButton:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(105, 70, 28, 0.28);
+}
+
+.listenButton:disabled {
+  opacity: 0.58;
+  cursor: wait;
+}
+
+.note,
+.error {
+  display: block;
+  margin-top: 10px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.note {
+  color: var(--muted, #6f5f4f);
+}
+
+.error {
+  color: #8b3d36;
+}
+
+@media (max-width: 480px) {
+  .audioCard {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .listenButton {
+    min-height: 56px;
+    font-size: 15px;
+  }
+}
