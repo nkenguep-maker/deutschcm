@@ -7,43 +7,15 @@ import styles from "./ChildPreview.module.css";
 
 type NextLesson = { unitId: string; lessonId: string; title: string } | null;
 type Progress = { completedLessonIds: string[]; xp: number };
+type Props = { locale: string; course: YemaChildCourseContent; unit: ChildUnit; lesson: ChildLesson; nextLesson: NextLesson };
 
-type Props = {
-  locale: string;
-  course: YemaChildCourseContent;
-  unit: ChildUnit;
-  lesson: ChildLesson;
-  nextLesson: NextLesson;
-};
+const OBJECTIVE_TYPES = new Set(["soundHunt", "oddOneOut", "pictureChoice", "pictureRecognition", "listenTap", "listenForWord"]);
 
-const OBJECTIVE_TYPES = new Set([
-  "soundHunt",
-  "oddOneOut",
-  "pictureChoice",
-  "pictureRecognition",
-  "listenTap",
-  "listenForWord",
-]);
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function asString(value: unknown): string {
-  return typeof value === "string" ? value : "";
-}
-
-function arrayRecords(value: unknown): Array<Record<string, unknown>> {
-  return Array.isArray(value) ? value.filter(isRecord) : [];
-}
-
-function progressKey(courseId: string) {
-  return `yema.prod.child.${courseId}`;
-}
-
-function emptyProgress(): Progress {
-  return { completedLessonIds: [], xp: 0 };
-}
+function isRecord(value: unknown): value is Record<string, unknown> { return typeof value === "object" && value !== null && !Array.isArray(value); }
+function asString(value: unknown): string { return typeof value === "string" ? value : ""; }
+function arrayRecords(value: unknown): Array<Record<string, unknown>> { return Array.isArray(value) ? value.filter(isRecord) : []; }
+function progressKey(courseId: string) { return `yema.prod.child.${courseId}`; }
+function emptyProgress(): Progress { return { completedLessonIds: [], xp: 0 }; }
 
 function readProgress(courseId: string): Progress {
   try {
@@ -51,29 +23,17 @@ function readProgress(courseId: string): Progress {
     if (!raw) return emptyProgress();
     const parsed = JSON.parse(raw) as Partial<Progress>;
     return {
-      completedLessonIds: Array.isArray(parsed.completedLessonIds)
-        ? parsed.completedLessonIds.filter((id): id is string => typeof id === "string")
-        : [],
+      completedLessonIds: Array.isArray(parsed.completedLessonIds) ? parsed.completedLessonIds.filter((id): id is string => typeof id === "string") : [],
       xp: typeof parsed.xp === "number" ? parsed.xp : 0,
     };
-  } catch {
-    return emptyProgress();
-  }
+  } catch { return emptyProgress(); }
 }
-
-function writeProgress(courseId: string, progress: Progress) {
-  try {
-    window.localStorage.setItem(progressKey(courseId), JSON.stringify(progress));
-  } catch {
-    // The production test still works if browser storage is blocked.
-  }
-}
+function writeProgress(courseId: string, progress: Progress) { try { window.localStorage.setItem(progressKey(courseId), JSON.stringify(progress)); } catch {} }
 
 function visualChoices(unit: ChildUnit): Array<{ id: string; label: string }> {
   const source = Array.isArray(unit.visualChoices) ? unit.visualChoices : Array.isArray(unit.visuals) ? unit.visuals : [];
   return source.filter(isRecord).map((item) => ({ id: asString(item.id), label: asString(item.label) })).filter((item) => item.id && item.label);
 }
-
 function exerciseChoices(exercise: ChildExercise, unit: ChildUnit): Array<{ value: string; label: string }> {
   if (Array.isArray(exercise.choices)) {
     return exercise.choices.map((choice) => {
@@ -82,22 +42,50 @@ function exerciseChoices(exercise: ChildExercise, unit: ChildUnit): Array<{ valu
       return { value: "", label: "" };
     }).filter((choice) => choice.value && choice.label);
   }
-  if (exercise.type === "listenTap" || exercise.type === "listenForWord") {
-    return visualChoices(unit).map((choice) => ({ value: choice.id, label: choice.label }));
-  }
+  if (exercise.type === "listenTap" || exercise.type === "listenForWord") return visualChoices(unit).map((choice) => ({ value: choice.id, label: choice.label }));
   return [];
 }
+function expectedAnswer(exercise: ChildExercise): string { return asString(exercise.answerId) || asString(exercise.answer) || asString(exercise.visualTargetId) || asString(exercise.visualId); }
+function targetText(exercise: ChildExercise): string { return asString(exercise.targetText) || asString(exercise.target) || asString(exercise.modelAnswer) || asString(exercise.childModelAnswer); }
+function canBrowserSpeak(languageCode: string) { return languageCode === "de"; }
 
-function expectedAnswer(exercise: ChildExercise): string {
-  return asString(exercise.answerId) || asString(exercise.answer) || asString(exercise.visualTargetId) || asString(exercise.visualId);
+function emojiFor(text: string) {
+  const t = text.toLowerCase();
+  const pairs: Array<[string[], string]> = [
+    [["hund", "chien", "dog"], "🐶"], [["katze", "chat", "cat"], "🐱"], [["löwe", "lion"], "🦁"], [["affe", "singe", "monkey"], "🐒"],
+    [["rot", "rouge", "red"], "🔴"], [["blau", "bleu", "blue"], "🔵"], [["grün", "vert", "green"], "🟢"], [["gelb", "jaune", "yellow"], "🟡"],
+    [["mama", "maman", "mère", "mother"], "👩"], [["papa", "père", "father"], "👨"], [["famil", "famille"], "👨‍👩‍👧"],
+    [["heureux", "happy", "froh"], "😄"], [["triste", "sad", "traurig"], "😢"], [["fâché", "angry", "wütend"], "😠"],
+    [["école", "schule", "school"], "🎒"], [["livre", "buch", "book"], "📘"], [["crayon", "stift", "pencil"], "✏️"],
+    [["bonjour", "hallo", "mbote"], "👋"], [["écoute", "listen"], "👂"], [["parle", "répète", "speak", "repeat"], "🗣️"],
+    [["anniversaire", "birthday"], "🎂"], [["un", "deux", "trois", "nombre", "count"], "🔢"], [["maison", "home"], "🏠"],
+  ];
+  for (const [keys, emoji] of pairs) if (keys.some((key) => t.includes(key))) return emoji;
+  return "✨";
 }
 
-function targetText(exercise: ChildExercise): string {
-  return asString(exercise.targetText) || asString(exercise.target) || asString(exercise.modelAnswer) || asString(exercise.childModelAnswer);
-}
-
-function canBrowserSpeak(languageCode: string) {
-  return languageCode === "de";
+function playChime(success: boolean) {
+  try {
+    const AudioCtx = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.08, ctx.currentTime + .02);
+    gain.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + .28);
+    gain.connect(ctx.destination);
+    const frequencies = success ? [523, 659, 784] : [330, 294];
+    frequencies.forEach((frequency, index) => {
+      const osc = ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.value = frequency;
+      osc.connect(gain);
+      const start = ctx.currentTime + index * .07;
+      osc.start(start);
+      osc.stop(start + .14);
+    });
+    window.setTimeout(() => void ctx.close(), 500);
+  } catch {}
 }
 
 export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }: Props) {
@@ -117,17 +105,13 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
   const courseId = course.course.id;
   const languageCode = course.course.learningLanguage.code;
   const base = `/${locale}/qa/child-course-preview/${courseId}`;
+  const isRacines = course.course.track === "racines";
 
-  useEffect(() => {
-    setSaved(readProgress(courseId));
-    return () => streamRef.current?.getTracks().forEach((track) => track.stop());
-  }, [courseId]);
+  useEffect(() => { setSaved(readProgress(courseId)); return () => streamRef.current?.getTracks().forEach((track) => track.stop()); }, [courseId]);
+  useEffect(() => () => { if (recordingUrl) URL.revokeObjectURL(recordingUrl); }, [recordingUrl]);
 
-  useEffect(() => () => {
-    if (recordingUrl) URL.revokeObjectURL(recordingUrl);
-  }, [recordingUrl]);
-
-  const attempted = useMemo(() => lesson.exercises.filter((exercise) => OBJECTIVE_TYPES.has(exercise.type) ? checked[exercise.id] : done[exercise.id]).length, [lesson.exercises, checked, done]);
+  const isObjectiveCorrect = (exercise: ChildExercise) => checked[exercise.id] === true && answers[exercise.id] === expectedAnswer(exercise);
+  const attempted = useMemo(() => lesson.exercises.filter((exercise) => OBJECTIVE_TYPES.has(exercise.type) ? checked[exercise.id] && answers[exercise.id] === expectedAnswer(exercise) : done[exercise.id]).length, [lesson.exercises, checked, answers, done]);
   const allAttempted = attempted === lesson.exercises.length;
   const alreadyCompleted = saved.completedLessonIds.includes(lesson.id);
   const activeExercise = lesson.exercises[Math.min(activeIndex, lesson.exercises.length - 1)];
@@ -137,17 +121,14 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "de-DE";
-    utterance.rate = 0.82;
+    utterance.rate = 0.78;
     window.speechSynthesis.speak(utterance);
   }
 
   async function startRecording() {
     setRecordingError(null);
     try {
-      if (!("MediaRecorder" in window) || !navigator.mediaDevices?.getUserMedia) {
-        setRecordingError("Le microphone n’est pas disponible dans ce navigateur.");
-        return;
-      }
+      if (!("MediaRecorder" in window) || !navigator.mediaDevices?.getUserMedia) { setRecordingError("Tu peux faire cette activité à voix haute sans enregistrer."); return; }
       if (recordingUrl) URL.revokeObjectURL(recordingUrl);
       setRecordingUrl(null);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -164,31 +145,31 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
       recorderRef.current = recorder;
       recorder.start();
       setRecording(true);
-    } catch {
-      setRecordingError("Le navigateur n’a pas autorisé le microphone. L’activité peut être faite à voix haute sans enregistrement.");
-    }
+    } catch { setRecordingError("Le micro n’est pas disponible. Dis simplement la phrase à voix haute."); }
   }
-
-  function stopRecording() {
-    if (recorderRef.current?.state && recorderRef.current.state !== "inactive") recorderRef.current.stop();
-    setRecording(false);
-  }
-
-  function markExerciseDone(exerciseId: string) {
-    setDone((current) => ({ ...current, [exerciseId]: true }));
-  }
+  function stopRecording() { if (recorderRef.current?.state && recorderRef.current.state !== "inactive") recorderRef.current.stop(); setRecording(false); }
+  function markExerciseDone(exerciseId: string) { setDone((current) => ({ ...current, [exerciseId]: true })); playChime(true); }
 
   function completeLesson() {
     if (!allAttempted && !alreadyCompleted) return;
     const current = readProgress(courseId);
     const first = !current.completedLessonIds.includes(lesson.id);
-    const next: Progress = {
-      completedLessonIds: first ? [...current.completedLessonIds, lesson.id] : current.completedLessonIds,
-      xp: first ? current.xp + lesson.xp : current.xp,
-    };
+    const next: Progress = { completedLessonIds: first ? [...current.completedLessonIds, lesson.id] : current.completedLessonIds, xp: first ? current.xp + lesson.xp : current.xp };
     writeProgress(courseId, next);
     setSaved(next);
     setSubmitted(true);
+    playChime(true);
+  }
+
+  function choose(exercise: ChildExercise, value: string) {
+    setAnswers((current) => ({ ...current, [exercise.id]: value }));
+    if (checked[exercise.id]) setChecked((current) => ({ ...current, [exercise.id]: false }));
+  }
+  function verify(exercise: ChildExercise) {
+    const selected = answers[exercise.id] ?? "";
+    if (!selected) return;
+    setChecked((current) => ({ ...current, [exercise.id]: true }));
+    playChime(selected === expectedAnswer(exercise));
   }
 
   function renderExercise(exercise: ChildExercise) {
@@ -197,38 +178,21 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
       const selected = answers[exercise.id] ?? "";
       const expected = expectedAnswer(exercise);
       const isChecked = checked[exercise.id] === true;
+      const correct = isObjectiveCorrect(exercise);
+      const heard = targetText(exercise) || expected;
       return (
         <>
-          {canBrowserSpeak(languageCode) && (targetText(exercise) || expected) ? (
-            <div className={styles.actions}>
-              <button className={styles.secondary} type="button" onClick={() => speak(targetText(exercise) || expected)}>🔊 Écouter · voix navigateur provisoire</button>
-            </div>
-          ) : null}
+          <div className={styles.visualPrompt} aria-hidden="true">{emojiFor(heard || exercise.prompt)}</div>
+          {canBrowserSpeak(languageCode) && heard ? <div className={styles.actions}><button className={styles.secondary} type="button" onClick={() => speak(heard)}>🔊 Écouter encore</button></div> : null}
           <div className={styles.bigActions}>
             {choices.map((choice) => {
               const selectedClass = selected === choice.value ? styles.choiceActive : "";
-              const checkedClass = isChecked
-                ? choice.value === expected
-                  ? styles.choiceCorrect
-                  : selected === choice.value
-                    ? styles.choiceWrong
-                    : ""
-                : "";
-              return (
-                <button key={choice.value} type="button" className={`${styles.choice} ${selectedClass} ${checkedClass}`} onClick={() => setAnswers((current) => ({ ...current, [exercise.id]: choice.value }))}>
-                  {choice.label}
-                </button>
-              );
+              const checkedClass = isChecked ? choice.value === expected ? styles.choiceCorrect : selected === choice.value ? styles.choiceWrong : "" : "";
+              return <button key={choice.value} type="button" className={`${styles.choice} ${selectedClass} ${checkedClass}`} onClick={() => choose(exercise, choice.value)}><span className={styles.choiceEmoji}>{emojiFor(choice.label)}</span>{choice.label}</button>;
             })}
           </div>
-          <div className={styles.actions}>
-            <button className={styles.primary} type="button" disabled={!selected} onClick={() => setChecked((current) => ({ ...current, [exercise.id]: true }))}>Vérifier</button>
-          </div>
-          {isChecked ? (
-            <div className={styles.feedback}>
-              {selected === expected ? asString(exercise.feedbackCorrect) || "Bravo !" : asString(exercise.feedbackIncorrect) || "Pas encore. Regarde et réessaie."}
-            </div>
-          ) : null}
+          {!correct ? <div className={styles.actions}><button className={styles.primary} type="button" disabled={!selected} onClick={() => verify(exercise)}>Vérifier</button></div> : null}
+          {isChecked ? <div className={`${styles.feedback} ${correct ? styles.feedbackSuccess : styles.feedbackTry}`}>{correct ? `🌟 ${asString(exercise.feedbackCorrect) || "Bravo ! Tu l’as trouvé !"}` : `💛 ${asString(exercise.feedbackIncorrect) || "Presque ! Regarde bien et essaie une autre réponse."}`}</div> : null}
         </>
       );
     }
@@ -238,82 +202,64 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
     const pairs = arrayRecords(exercise.pairs);
     const rounds = Array.isArray(exercise.rounds) ? exercise.rounds.filter((item): item is string => typeof item === "string") : [];
     const completed = done[exercise.id] === true;
+    const phrase = model || sequences.join(" · ");
     return (
       <>
-        {model ? <div className={styles.feedback}><strong>Modèle :</strong> {model}</div> : null}
-        {sequences.length ? <div className={styles.feedback}><strong>À dire :</strong> {sequences.join(" · ")}</div> : null}
-        {rounds.length ? <div className={styles.feedback}><strong>Jeu :</strong> {rounds.join(" · ")}</div> : null}
-        {pairs.length ? <div className={styles.feedback}><strong>Associations :</strong> {pairs.length} paires à réaliser ensemble.</div> : null}
-        {canBrowserSpeak(languageCode) && (model || sequences[0]) ? (
-          <div className={styles.actions}>
-            <button className={styles.secondary} type="button" onClick={() => speak(model || sequences.join(". "))}>🔊 Modèle navigateur provisoire</button>
-          </div>
-        ) : null}
+        <div className={styles.visualPrompt} aria-hidden="true">{emojiFor(phrase || exercise.prompt)}</div>
+        {model ? <div className={styles.feedback}><strong>🎯 Essaie de dire :</strong> {model}</div> : null}
+        {sequences.length ? <div className={styles.treasure}>🗣️ {sequences.join(" · ")}</div> : null}
+        {rounds.length ? <div className={styles.treasure}>🎲 {rounds.join(" · ")}</div> : null}
+        {pairs.length ? <div className={styles.treasure}>🧩 {pairs.length} associations à retrouver.</div> : null}
+        {canBrowserSpeak(languageCode) && phrase ? <div className={styles.actions}><button className={styles.secondary} type="button" onClick={() => speak(phrase)}>🔊 Écouter le modèle</button></div> : null}
         <div className={styles.recorder}>
-          <strong>Ma voix · privée sur cet appareil</strong>
-          <div className={styles.actions}>
-            {!recording
-              ? <button type="button" className={styles.secondary} onClick={startRecording}>● Enregistrer</button>
-              : <button type="button" className={styles.secondary} onClick={stopRecording}>■ J’ai fini</button>}
-            <button type="button" className={completed ? styles.primary : styles.secondary} onClick={() => markExerciseDone(exercise.id)}>{completed ? "Activité faite ✓" : "J’ai fait l’activité"}</button>
-          </div>
+          <strong>🎙️ À toi de parler</strong>
+          <p>Tu peux t’enregistrer pour t’écouter. Ta voix reste sur cet appareil.</p>
+          {!recording ? <button type="button" className={styles.recordButton} onClick={startRecording}>● Enregistrer ma voix</button> : <button type="button" className={`${styles.recordButton} ${styles.recording}`} onClick={stopRecording}>■ J’ai fini</button>}
           {recordingUrl ? <audio controls src={recordingUrl} aria-label="Écouter ma voix" /> : null}
           {recordingError ? <div className={styles.feedback}>{recordingError}</div> : null}
+          <div className={styles.actions}><button type="button" className={completed ? styles.primary : styles.secondary} onClick={() => markExerciseDone(exercise.id)}>{completed ? "🌟 C’est fait !" : "J’ai essayé à voix haute"}</button></div>
         </div>
       </>
     );
   }
 
-  const currentAttempted = activeExercise ? (OBJECTIVE_TYPES.has(activeExercise.type) ? checked[activeExercise.id] : done[activeExercise.id]) : false;
+  const currentAttempted = activeExercise ? (OBJECTIVE_TYPES.has(activeExercise.type) ? isObjectiveCorrect(activeExercise) : done[activeExercise.id]) : false;
+  const success = alreadyCompleted || submitted;
 
   return (
-    <main className={styles.page}>
+    <main className={styles.page} data-universe={isRacines ? "racines" : "monde"}>
       <div className={styles.shell}>
         <header className={styles.topbar}>
-          <Link className={styles.brand} href={`/${locale}`}>YEMA</Link>
-          <Link className={styles.back} href={`${base}/${unit.id}`}>← Mission {unit.order}</Link>
+          <Link className={styles.brand} href={`/${locale}`}><span className={styles.brandMark}>Y</span> YEMA KIDS</Link>
+          <Link className={styles.back} href={`${base}/${unit.id}`}>✕</Link>
         </header>
-        <div className={styles.notice}>
-          <strong>Test production · {course.course.learningLanguage.labelFr}</strong>
-          {languageCode === "de" ? "La voix de navigateur sert seulement au test d’interface ; elle ne remplace pas les futurs enregistrements natifs." : "Aucune synthèse vocale n’est utilisée : le script reste la référence de test jusqu’à l’arrivée des voix natives."}
-        </div>
+
         <section className={styles.hero}>
           <p className={styles.eyebrow}>{lesson.stage} · MISSION {unit.order}</p>
           <h1>{lesson.title}</h1>
           <p>{lesson.objective}</p>
-          <div className={styles.meta}>
-            <span className={styles.chip}>{lesson.durationMinutes} min</span>
-            <span className={styles.chip}>{lesson.xp} XP</span>
-            <span className={styles.chip}>{attempted}/3 activités</span>
-            <span className={styles.chip}>{saved.xp} XP total</span>
-          </div>
-          <div className={styles.progress}><span style={{ width: `${Math.round((attempted / 3) * 100)}%` }} /></div>
+          <div className={styles.meta}><span className={styles.chip}>⚡ {lesson.xp} XP</span><span className={styles.chip}>⭐ {saved.xp} total</span><span className={styles.chip}>{attempted}/3</span></div>
+          <div className={styles.progress}><span style={{ width: `${Math.round((attempted / lesson.exercises.length) * 100)}%` }} /></div>
         </section>
 
-        {activeExercise ? (
+        {activeExercise && !success ? (
           <section className={styles.exerciseShell}>
-            <p className={styles.eyebrow}>ACTIVITÉ {activeIndex + 1} / {lesson.exercises.length}</p>
+            <span className={styles.miniGuide} aria-hidden="true" />
+            <div className={styles.exerciseTop}><span className={styles.exerciseBadge}>ACTIVITÉ {activeIndex + 1} / {lesson.exercises.length}</span></div>
             <h2>{activeExercise.prompt}</h2>
             {renderExercise(activeExercise)}
             <div className={styles.actions}>
-              {activeIndex > 0 ? <button className={styles.secondary} type="button" onClick={() => setActiveIndex((index) => Math.max(0, index - 1))}>← Précédent</button> : null}
-              {activeIndex < lesson.exercises.length - 1 ? (
-                <button className={styles.primary} type="button" disabled={!currentAttempted} onClick={() => setActiveIndex((index) => Math.min(lesson.exercises.length - 1, index + 1))}>Suivant →</button>
-              ) : null}
+              {activeIndex > 0 ? <button className={styles.secondary} type="button" onClick={() => setActiveIndex((index) => Math.max(0, index - 1))}>← Retour</button> : null}
+              {activeIndex < lesson.exercises.length - 1 && currentAttempted ? <button className={styles.primary} type="button" onClick={() => setActiveIndex((index) => Math.min(lesson.exercises.length - 1, index + 1))}>Continuer →</button> : null}
             </div>
           </section>
         ) : null}
 
-        <section className={styles.result}>
-          <h2>{alreadyCompleted || submitted ? lesson.completionMessage : allAttempted ? "Mission prête !" : "Continue l’aventure"}</h2>
-          <p>Les activités orales sont enregistrables localement mais ne reçoivent aucune fausse note de prononciation.</p>
-          <div className={styles.actions}>
-            {!alreadyCompleted && !submitted ? <button type="button" className={styles.primary} disabled={!allAttempted} onClick={completeLesson}>Terminer · +{lesson.xp} XP</button> : null}
-            {(alreadyCompleted || submitted) && nextLesson ? <Link className={styles.primary} href={`${base}/${nextLesson.unitId}/${nextLesson.lessonId}`}>Suivant · {nextLesson.title} →</Link> : null}
-            {(alreadyCompleted || submitted) && !nextLesson ? <Link className={styles.primary} href={base}>Parcours terminé · revoir les missions</Link> : null}
-          </div>
-        </section>
-        <p className={styles.footer}>Production test · progression stockée localement dans ce navigateur.</p>
+        {!success && allAttempted ? <section className={styles.result}><h2>✨ Les 3 activités sont faites !</h2><p>Valide la petite mission pour gagner ta récompense.</p><div className={styles.actions}><button type="button" className={styles.primary} onClick={completeLesson}>Gagner +{lesson.xp} XP ⭐</button></div></section> : null}
+
+        {success ? <section className={`${styles.result} ${styles.resultSuccess}`}><h2>{lesson.completionMessage || "Bravo ! Mission réussie !"}</h2><p>Tu viens d’avancer sur ton chemin.</p><div className={styles.rewardBurst}><span>⭐</span><span>✨</span><span>🏆</span></div><div className={styles.actions}>{nextLesson ? <Link className={styles.primary} href={`${base}/${nextLesson.unitId}/${nextLesson.lessonId}`}>Prochaine étape →</Link> : <Link className={styles.primary} href={base}>Voir mon chemin →</Link>}</div></section> : null}
+
+        <p className={styles.footer}>YEMA Kids · version de test · aucune note automatique de prononciation.</p>
       </div>
     </main>
   );
