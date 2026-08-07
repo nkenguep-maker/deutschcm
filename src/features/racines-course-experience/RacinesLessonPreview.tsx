@@ -123,7 +123,7 @@ function isAttempted(
   if (exercise.type === "unitValidation") {
     const rubric = Array.isArray(exercise.rubric) ? exercise.rubric.filter(isRecord) : [];
     const scores = rubricScores[exercise.id] ?? {};
-    return oralDone[exercise.id] === true && rubric.every((item, index) => typeof scores[String(index)] === "number");
+    return oralDone[exercise.id] === true && rubric.every((_item, index) => typeof scores[String(index)] === "number");
   }
   return oralDone[exercise.id] === true;
 }
@@ -237,11 +237,11 @@ function MatchMeaningExercise({
   exercise: RacinesExercise;
   value: unknown;
   checked: boolean;
-  onChange: (value: Record<string, string>) => void;
+  onChange: (value: Record<string, unknown>) => void;
   onCheck: () => void;
 }) {
   const pairs = Array.isArray(exercise.pairs) ? exercise.pairs.filter(isRecord) : [];
-  const current = isRecord(value) ? value : {};
+  const current: Record<string, unknown> = isRecord(value) ? value : {};
   const meanings = pairs.map((pair) => asString(pair.fr)).filter(Boolean);
   const complete = pairs.every((pair) => typeof current[asString(pair.target)] === "string");
   const correct = checked && objectiveCorrect(exercise, current) === true;
