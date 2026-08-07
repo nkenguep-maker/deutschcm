@@ -17,6 +17,7 @@ import {
   isInternalTesterEmail,
 } from "@/lib/internalTest";
 import { hasInternalTestMarker } from "@/lib/internalTestProvisioning";
+import { isTechnicalBetaCourseAccessEnabled } from "@/lib/release/technicalBeta";
 
 function err(code: string, message: string, status: number) {
   return NextResponse.json({ error: message, code }, { status });
@@ -85,7 +86,12 @@ export async function GET() {
       },
       select: { startsAt: true, endsAt: true, status: true, metadata: true },
     });
-    const access = computeMondeAccess(grants);
+    const access = computeMondeAccess(grants, {
+      technicalBetaA1:
+        lp.language === "DEUTSCH" &&
+        (lp.currentLevel === null || lp.currentLevel === "A1") &&
+        isTechnicalBetaCourseAccessEnabled(),
+    });
 
     const progressList = await prisma.moduleProgress.findMany({
       where: {
