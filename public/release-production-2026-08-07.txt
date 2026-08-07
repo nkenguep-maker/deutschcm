@@ -1,0 +1,2 @@
+YEMA production release 2026-08-07
+Courses: monde-adulte-de-a1, racines-solo-byv-e1, racines-solo-ln-e1, monde-child-de-a1, racines-child-byv-e1, racines-child-ln-e1
