@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChildExercise, ChildLesson, ChildUnit, YemaChildCourseContent } from "@/content/child-courses/types";
+import audioStyles from "./ChildAudioControls.module.css";
 import styles from "./ChildPreview.module.css";
 
 type NextLesson = { unitId: string; lessonId: string; title: string } | null;
@@ -47,7 +48,24 @@ function exerciseChoices(exercise: ChildExercise, unit: ChildUnit): Array<{ valu
 }
 function expectedAnswer(exercise: ChildExercise): string { return asString(exercise.answerId) || asString(exercise.answer) || asString(exercise.visualTargetId) || asString(exercise.visualId); }
 function targetText(exercise: ChildExercise): string { return asString(exercise.targetText) || asString(exercise.target) || asString(exercise.modelAnswer) || asString(exercise.childModelAnswer); }
-function canBrowserSpeak(languageCode: string) { return languageCode === "de"; }
+function browserLanguage(languageCode: string) { return languageCode === "de" ? "de-DE" : languageCode === "ln" ? "ln-CD" : "byv-CM"; }
+function quotedTarget(prompt: string): string { return prompt.match(/«\s*([^»]+?)\s*»/u)?.[1]?.trim() ?? ""; }
+
+function exerciseAudioText(exercise: ChildExercise, unit: ChildUnit): string {
+  const audioSceneId = asString(exercise.audioSceneId);
+  if (audioSceneId && unit.audioScene?.id === audioSceneId) {
+    return unit.audioScene.lines.map((line) => asString(line.target)).filter(Boolean).join(". ");
+  }
+  const model = targetText(exercise);
+  if (model) return model;
+  const sequence = Array.isArray(exercise.sequence) ? exercise.sequence.filter((item): item is string => typeof item === "string") : [];
+  if (sequence.length) return sequence.join(". ");
+  const rounds = Array.isArray(exercise.rounds) ? exercise.rounds.filter((item): item is string => typeof item === "string") : [];
+  if (rounds.length) return rounds.join(". ");
+  const pairs = arrayRecords(exercise.pairs).map((pair) => asString(pair.word) || asString(pair.target)).filter(Boolean);
+  if (pairs.length) return pairs.join(". ");
+  return quotedTarget(exercise.prompt);
+}
 
 function emojiFor(text: string) {
   const t = text.toLowerCase();
@@ -98,16 +116,29 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
   const [recording, setRecording] = useState(false);
   const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
   const [recordingError, setRecordingError] = useState<string | null>(null);
+  const [audioBusyId, setAudioBusyId] = useState<string | null>(null);
+  const [audioPlayed, setAudioPlayed] = useState<Record<string, boolean>>({});
+  const [audioError, setAudioError] = useState<Record<string, string>>({});
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
+  const audioBlobUrlsRef = useRef<Record<string, string>>({});
 
   const courseId = course.course.id;
   const languageCode = course.course.learningLanguage.code;
   const base = `/${locale}/qa/child-course-preview/${courseId}`;
   const isRacines = course.course.track === "racines";
 
-  useEffect(() => { setSaved(readProgress(courseId)); return () => streamRef.current?.getTracks().forEach((track) => track.stop()); }, [courseId]);
+  useEffect(() => {
+    setSaved(readProgress(courseId));
+    return () => {
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      audioPlayerRef.current?.pause();
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      Object.values(audioBlobUrlsRef.current).forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [courseId]);
   useEffect(() => () => { if (recordingUrl) URL.revokeObjectURL(recordingUrl); }, [recordingUrl]);
 
   const isObjectiveCorrect = (exercise: ChildExercise) => checked[exercise.id] === true && answers[exercise.id] === expectedAnswer(exercise);
@@ -116,13 +147,70 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
   const alreadyCompleted = saved.completedLessonIds.includes(lesson.id);
   const activeExercise = lesson.exercises[Math.min(activeIndex, lesson.exercises.length - 1)];
 
-  function speak(text: string) {
-    if (!text || !canBrowserSpeak(languageCode) || !("speechSynthesis" in window)) return;
+  function markExerciseDone(exerciseId: string) {
+    setDone((current) => current[exerciseId] ? current : { ...current, [exerciseId]: true });
+    playChime(true);
+  }
+
+  function speakWithBrowser(text: string, exercise: ChildExercise, fallback = false): boolean {
+    if (!text || !("speechSynthesis" in window)) return false;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "de-DE";
-    utterance.rate = 0.78;
+    utterance.lang = browserLanguage(languageCode);
+    utterance.rate = 0.76;
+    utterance.onend = () => {
+      setAudioBusyId((current) => current === exercise.id ? null : current);
+      if (exercise.type === "listenOnly") markExerciseDone(exercise.id);
+    };
+    utterance.onerror = () => setAudioBusyId((current) => current === exercise.id ? null : current);
     window.speechSynthesis.speak(utterance);
+    setAudioPlayed((current) => ({ ...current, [exercise.id]: true }));
+    if (fallback && isRacines) {
+      setAudioError((current) => ({ ...current, [exercise.id]: "Voix système de secours : prononciation à valider avec un locuteur natif." }));
+    }
+    return true;
+  }
+
+  async function playExerciseAudio(exercise: ChildExercise) {
+    const text = exerciseAudioText(exercise, unit);
+    if (!text) {
+      setAudioError((current) => ({ ...current, [exercise.id]: "Le script audio de cette activité est manquant." }));
+      return;
+    }
+
+    setAudioError((current) => ({ ...current, [exercise.id]: "" }));
+    setAudioBusyId(exercise.id);
+    audioPlayerRef.current?.pause();
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+
+    if (languageCode === "de" && speakWithBrowser(text, exercise)) return;
+
+    try {
+      let url = audioBlobUrlsRef.current[exercise.id];
+      if (!url) {
+        const params = new URLSearchParams({ courseId, unitId: unit.id, lessonId: lesson.id, exerciseId: exercise.id });
+        const response = await fetch(`/api/qa/child-course-audio?${params.toString()}`);
+        if (!response.ok) throw new Error(`audio-${response.status}`);
+        const blob = await response.blob();
+        url = URL.createObjectURL(blob);
+        audioBlobUrlsRef.current[exercise.id] = url;
+      }
+
+      const player = new Audio(url);
+      audioPlayerRef.current = player;
+      player.onended = () => {
+        setAudioBusyId((current) => current === exercise.id ? null : current);
+        if (exercise.type === "listenOnly") markExerciseDone(exercise.id);
+      };
+      player.onerror = () => setAudioBusyId((current) => current === exercise.id ? null : current);
+      await player.play();
+      setAudioPlayed((current) => ({ ...current, [exercise.id]: true }));
+    } catch {
+      if (!speakWithBrowser(text, exercise, true)) {
+        setAudioBusyId(null);
+        setAudioError((current) => ({ ...current, [exercise.id]: "Impossible de lancer le son pour le moment. Réessaie dans un instant." }));
+      }
+    }
   }
 
   async function startRecording() {
@@ -148,7 +236,6 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
     } catch { setRecordingError("Le micro n’est pas disponible. Dis simplement la phrase à voix haute."); }
   }
   function stopRecording() { if (recorderRef.current?.state && recorderRef.current.state !== "inactive") recorderRef.current.stop(); setRecording(false); }
-  function markExerciseDone(exerciseId: string) { setDone((current) => ({ ...current, [exerciseId]: true })); playChime(true); }
 
   function completeLesson() {
     if (!allAttempted && !alreadyCompleted) return;
@@ -172,6 +259,24 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
     playChime(selected === expectedAnswer(exercise));
   }
 
+  function renderAudioControl(exercise: ChildExercise) {
+    const text = exerciseAudioText(exercise, unit);
+    if (!text) return null;
+    const busy = audioBusyId === exercise.id;
+    const replay = audioPlayed[exercise.id] === true;
+    const scene = asString(exercise.audioSceneId) === unit.audioScene?.id;
+    const label = busy ? "🔊 Lecture…" : replay ? "↻ Réécouter" : scene ? "▶ Écouter l’histoire" : "▶ Écouter le son";
+    return (
+      <div className={audioStyles.audioCard}>
+        <strong>🔊 D’abord, écoute</strong>
+        <p>{scene ? "Écoute la petite scène. Tu peux la relancer autant de fois que tu veux." : "Écoute le mot ou la phrase avant de répondre ou de répéter."}</p>
+        <button className={audioStyles.listenButton} type="button" disabled={busy} onClick={() => void playExerciseAudio(exercise)}>{label}</button>
+        {isRacines ? <small className={audioStyles.note}>Voix de test uniquement · l’audio natif et la prononciation restent à valider.</small> : null}
+        {audioError[exercise.id] ? <small className={audioStyles.error}>{audioError[exercise.id]}</small> : null}
+      </div>
+    );
+  }
+
   function renderExercise(exercise: ChildExercise) {
     if (OBJECTIVE_TYPES.has(exercise.type)) {
       const choices = exerciseChoices(exercise, unit);
@@ -179,11 +284,11 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
       const expected = expectedAnswer(exercise);
       const isChecked = checked[exercise.id] === true;
       const correct = isObjectiveCorrect(exercise);
-      const heard = targetText(exercise) || expected;
+      const heard = targetText(exercise) || quotedTarget(exercise.prompt) || expected;
       return (
         <>
+          {renderAudioControl(exercise)}
           <div className={styles.visualPrompt} aria-hidden="true">{emojiFor(heard || exercise.prompt)}</div>
-          {canBrowserSpeak(languageCode) && heard ? <div className={styles.actions}><button className={styles.secondary} type="button" onClick={() => speak(heard)}>🔊 Écouter encore</button></div> : null}
           <div className={styles.bigActions}>
             {choices.map((choice) => {
               const selectedClass = selected === choice.value ? styles.choiceActive : "";
@@ -202,15 +307,26 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
     const pairs = arrayRecords(exercise.pairs);
     const rounds = Array.isArray(exercise.rounds) ? exercise.rounds.filter((item): item is string => typeof item === "string") : [];
     const completed = done[exercise.id] === true;
-    const phrase = model || sequences.join(" · ");
+    const phrase = exerciseAudioText(exercise, unit);
+
+    if (exercise.type === "listenOnly") {
+      return (
+        <>
+          {renderAudioControl(exercise)}
+          <div className={styles.visualPrompt} aria-hidden="true">👂</div>
+          {completed ? <div className={`${styles.feedback} ${styles.feedbackSuccess}`}>🌟 C’est écouté ! Tu peux continuer.</div> : <div className={styles.feedback}>Le bouton devient une réécoute après la première lecture. L’activité se valide quand le son est terminé.</div>}
+        </>
+      );
+    }
+
     return (
       <>
+        {renderAudioControl(exercise)}
         <div className={styles.visualPrompt} aria-hidden="true">{emojiFor(phrase || exercise.prompt)}</div>
         {model ? <div className={styles.feedback}><strong>🎯 Essaie de dire :</strong> {model}</div> : null}
         {sequences.length ? <div className={styles.treasure}>🗣️ {sequences.join(" · ")}</div> : null}
         {rounds.length ? <div className={styles.treasure}>🎲 {rounds.join(" · ")}</div> : null}
         {pairs.length ? <div className={styles.treasure}>🧩 {pairs.length} associations à retrouver.</div> : null}
-        {canBrowserSpeak(languageCode) && phrase ? <div className={styles.actions}><button className={styles.secondary} type="button" onClick={() => speak(phrase)}>🔊 Écouter le modèle</button></div> : null}
         <div className={styles.recorder}>
           <strong>🎙️ À toi de parler</strong>
           <p>Tu peux t’enregistrer pour t’écouter. Ta voix reste sur cet appareil.</p>
