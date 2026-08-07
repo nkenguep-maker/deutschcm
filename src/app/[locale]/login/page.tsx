@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "@/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
@@ -57,8 +56,8 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawNext = searchParams.get("next");
-  const safeNext = sanitizeInternalNext(rawNext, "/dashboard");
   const locale = useLocale();
+  const safeNext = sanitizeInternalNext(rawNext, `/${locale}/dashboard`);
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
   const c = loc === "en" ? COPY_EN : COPY_FR;
   const tErr = useTranslations("auth.errors");
