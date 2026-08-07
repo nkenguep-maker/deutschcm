@@ -7,7 +7,7 @@ import { useState } from "react";
 import { BrandLockup } from "@/components/brand/BrandLockup";
 import { frTypo } from "@/components/landing/typo";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
-import { classifyAuthError, withTimeout } from "@/lib/authErrors";
+import { withTimeout } from "@/lib/authErrors";
 import { createClient } from "@/lib/supabase/client";
 
 const COPY = {
@@ -62,8 +62,7 @@ export default function ForgotPasswordPage() {
         10_000,
       );
       if (resetError) {
-        const key = classifyAuthError(resetError);
-        setError(key === "network" || key === "timeout" ? c.generic : c.generic);
+        setError(c.generic);
         return;
       }
       setSent(true);
