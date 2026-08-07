@@ -7,6 +7,7 @@ import { computeMondeAccess } from "@/lib/monde";
 import { getCourseContent, getCourseLessonIds } from "@/data/courses/registry";
 import type { MondePathwayVariant } from "@/data/courses/types";
 import { resolveMondePathwayVariant } from "@/lib/course-content/pathway";
+import { isTechnicalBetaCourseAccessEnabled } from "@/lib/release/technicalBeta";
 
 export type CourseViewer = {
   userId: string;
@@ -56,7 +57,9 @@ export async function loadCourseViewer(courseId: string, locale: string): Promis
     },
     select: { startsAt: true, endsAt: true, status: true, metadata: true },
   });
-  const access = computeMondeAccess(grants);
+  const access = computeMondeAccess(grants, {
+    technicalBetaA1: courseId === "monde-adulte-de-a1" && isTechnicalBetaCourseAccessEnabled(),
+  });
 
   const lessonIds = getCourseLessonIds(courseId);
   const progress = lessonIds.length === 0 ? [] : await prisma.moduleProgress.findMany({
