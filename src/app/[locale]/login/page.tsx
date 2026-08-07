@@ -140,7 +140,7 @@ export default function LoginPage() {
             </label>
 
             <div className="ens-form-error-actions">
-              <Link className="ens-form-error-link" href={`/${locale}/forgot-password${nextQuery}`}>
+              <Link className="ens-form-error-link" href={`/${locale}/auth/forgot-password${nextQuery}`}>
                 {applyTypo(c.forgotPassword)}
               </Link>
             </div>
