@@ -1,70 +1,196 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import {
-  DashboardButton,
-  DashboardButtonLink,
-  DashboardCard,
-  DashboardEmptyState,
-  DashboardHeader,
-  DashboardMobileHeader,
-  DashboardPageBoundary,
-  DashboardProgress,
-  DashboardSectionHeader,
-  DashboardShell,
-  DashboardSidebar,
-  DashboardStatusChip,
-  DashboardTabBar,
-} from "@/features/dashboards/shared";
-import { routeSectionNav, routeSectionTabs, sectionPageHref } from "@/features/dashboards/shared/sectionRouting";
-import { buildChildMondeNav, buildChildMondeMobileTabs } from "./nav";
+import { sectionPageHref } from "@/features/dashboards/shared/sectionRouting";
 import type { ChildData } from "./types";
+import game from "@/features/dashboards/child-game/ChildGameDashboard.module.css";
 
 type Props = { locale: "fr" | "en"; child: ChildData; activeSectionId?: string };
+type LocalProgress = { completedLessonIds: string[]; xp: number };
+
+const COURSE_ID = "monde-child-de-a1";
 const ALLOWED = new Set(["maison", "quete", "chemin", "missions", "recompense", "jeux", "histoires", "badges", "progression", "avec-adulte"]);
+
+function readProgress(): LocalProgress {
+  try {
+    const raw = window.localStorage.getItem(`yema.prod.child.${COURSE_ID}`);
+    if (!raw) return { completedLessonIds: [], xp: 0 };
+    const parsed = JSON.parse(raw) as Partial<LocalProgress>;
+    return {
+      completedLessonIds: Array.isArray(parsed.completedLessonIds) ? parsed.completedLessonIds.filter((id): id is string => typeof id === "string") : [],
+      xp: typeof parsed.xp === "number" ? parsed.xp : 0,
+    };
+  } catch {
+    return { completedLessonIds: [], xp: 0 };
+  }
+}
+
+function avatarEmoji(animal: string) {
+  const value = animal.toLowerCase();
+  if (value.includes("lion")) return "🦁";
+  if (value.includes("éléphant") || value.includes("elephant")) return "🐘";
+  if (value.includes("singe") || value.includes("monkey")) return "🐒";
+  if (value.includes("girafe")) return "🦒";
+  if (value.includes("chat") || value.includes("cat")) return "🐱";
+  if (value.includes("chien") || value.includes("dog")) return "🐶";
+  return "⭐";
+}
 
 export function ChildMondeDashboard({ locale, child, activeSectionId = "maison" }: Props) {
   const t = useTranslations("yemaDashboards.childMonde");
-  const tCommon = useTranslations("yemaDashboards.common");
-  const currentLocale = useLocale();
-  const baseHref = `/${currentLocale ?? locale}/dashboard`;
+  const currentLocale = useLocale() || locale;
+  const baseHref = `/${currentLocale}/dashboard`;
+  const courseHref = `/${currentLocale}/qa/child-course-preview/${COURSE_ID}`;
   const activeSection = ALLOWED.has(activeSectionId) ? activeSectionId : "maison";
-  const activeHref = sectionPageHref(baseHref, activeSection, "maison");
   const [exiting, setExiting] = useState(false);
+  const [progress, setProgress] = useState<LocalProgress>({ completedLessonIds: [], xp: 0 });
   const totalStars = child.langues.reduce((total, language) => total + (language.etoiles ?? 0), 0);
+  const completedCount = progress.completedLessonIds.length;
+  const progressPct = Math.min(100, Math.round((completedCount / 32) * 100));
+  const completedUnits = Math.floor(completedCount / 4);
+  const isFr = currentLocale === "fr";
+
+  useEffect(() => setProgress(readProgress()), []);
+
+  const copy = useMemo(() => isFr ? {
+    kicker: "TON AVENTURE DU JOUR",
+    hero: `Salut ${child.prenom} !`,
+    heroText: "Une petite mission, quelques minutes, et ton allemand grandit.",
+    quest: completedCount ? "Continue ton aventure" : "Ta première aventure t’attend",
+    questText: completedCount ? `Tu as déjà terminé ${completedCount} activités de leçon. Repars exactement où tu veux.` : "Commence avec les salutations. Écoute, touche, répète et gagne tes premières étoiles.",
+    play: completedCount ? "Continuer à jouer" : "Jouer maintenant",
+    path: "Ton chemin",
+    pathSub: `${completedUnits}/8 missions traversées`,
+    games: "Mini-jeux",
+    stories: "Histoires",
+    badges: "Trésors",
+    adult: "Avec un adulte",
+    progress: "Mon progrès",
+    comingTitle: "Cette zone se prépare !",
+    comingText: "Ton aventure principale est déjà jouable. Les nouveaux jeux arrivent ici au fil des prochaines missions.",
+    badgeText: totalStars ? `Tu as ${totalStars} étoiles dans ton profil.` : "Tes premiers trésors apparaîtront après tes missions.",
+    adultText: "Choisis une petite mission et montre à un adulte ce que tu sais dire.",
+  } : {
+    kicker: "TODAY'S ADVENTURE",
+    hero: `Hi ${child.prenom}!`,
+    heroText: "One short quest, a few minutes, and your German grows.",
+    quest: completedCount ? "Continue your adventure" : "Your first adventure is waiting",
+    questText: completedCount ? `You already finished ${completedCount} lesson activities. Jump back in whenever you like.` : "Start with greetings. Listen, tap, repeat and earn your first stars.",
+    play: completedCount ? "Keep playing" : "Play now",
+    path: "Your path",
+    pathSub: `${completedUnits}/8 missions cleared`,
+    games: "Mini-games",
+    stories: "Stories",
+    badges: "Treasures",
+    adult: "With an adult",
+    progress: "My progress",
+    comingTitle: "This zone is getting ready!",
+    comingText: "Your main adventure is already playable. New games will appear here with future missions.",
+    badgeText: totalStars ? `You have ${totalStars} stars on your profile.` : "Your first treasures will appear after your missions.",
+    adultText: "Pick a short mission and show an adult what you can say.",
+  }, [child.prenom, completedCount, completedUnits, isFr, totalStars]);
 
   const exitChildMode = async () => {
     setExiting(true);
     try { await fetch("/api/child-session", { method: "DELETE" }); }
-    finally { window.location.href = `/${currentLocale ?? locale}/login`; }
+    finally { window.location.href = `/${currentLocale}/login`; }
   };
 
-  const navGroups = routeSectionNav(buildChildMondeNav({ home: t("nav.home"), games: t("nav.games"), stories: t("nav.stories"), badges: t("nav.badges"), progression: t("nav.progression"), adultActivities: t("nav.adultActivities"), sectionLabel: t("sidebarSection") }, baseHref), baseHref, "maison");
-  const mobileTabs = routeSectionTabs(buildChildMondeMobileTabs({ home: t("mobileNav.home"), games: t("mobileNav.games"), stories: t("mobileNav.stories"), badges: t("mobileNav.badges") }, baseHref), baseHref, "maison");
-  const activeTab = ({ maison: "home", quete: "home", chemin: "home", missions: "home", recompense: "home", jeux: "games", histoires: "stories", badges: "badges", progression: "home", "avec-adulte": "home" } as Record<string, string>)[activeSection];
-  const personaLabel = t("personaLabel");
-  const sidebar = <DashboardSidebar groups={navGroups} activeHref={activeHref} personaLabel={personaLabel} personaSubtitle={t("sidebarSection")} brandHref={`/${currentLocale ?? locale}`} previewBadge={tCommon("previewBadge")} />;
-  const mobileHeader = <DashboardMobileHeader personaLabel={personaLabel} personaSubtitle={t("sidebarSection")} brandHref={`/${currentLocale ?? locale}`} />;
-  const headerActions = <div style={{ display: "inline-flex", gap: 8, alignItems: "center" }}><DashboardButtonLink href={`/${currentLocale ?? locale}/messages`} variant="secondary" size="sm" style={{ minHeight: 44 }}>{t("openMessages")}</DashboardButtonLink><DashboardButton variant="secondary" size="sm" onClick={exitChildMode} disabled={exiting}>{t("exitChildMode")}</DashboardButton></div>;
+  const href = (section: string) => sectionPageHref(baseHref, section, "maison");
 
   const home = (
-    <section id="maison" style={{ display: "grid", gap: 12 }}>
-      <DashboardSectionHeader title={t("home.title", { prenom: child.prenom })} />
-      <DashboardCard tone="gold"><div>{t("home.welcomeHint")}</div></DashboardCard>
-      <DashboardCard><h3>{t("home.starsTitle")}</h3>{totalStars > 0 ? <><div style={{ marginBottom: 8 }}>{t("home.starsCount", { stars: totalStars })}</div><DashboardProgress value={Math.min(totalStars, 20)} max={20} ariaLabel={t("home.starsTitle")} /></> : <DashboardEmptyState title={t("home.starsEmpty")} />}</DashboardCard>
-      <DashboardCard><h3>{t("home.nextActivityTitle")}</h3><DashboardEmptyState title={t("home.nextActivityEmpty")} /></DashboardCard>
-    </section>
+    <>
+      <section className={game.hero}>
+        <div>
+          <p className={game.kicker}>{copy.kicker}</p>
+          <h1>{copy.hero}</h1>
+          <p className={game.heroText}>{copy.heroText}</p>
+        </div>
+        <div className={game.mascot} aria-label={child.avatarAnimal || "YEMA"}>
+          <span className={game.mascotStar}>{avatarEmoji(child.avatarAnimal)}</span>
+          <span className={game.mascotMouth} />
+        </div>
+      </section>
+
+      <section className={game.quest}>
+        <div className={game.questHead}>
+          <div>
+            <p className={game.kicker}>⚡ {isFr ? "QUÊTE" : "QUEST"}</p>
+            <h2 className={game.questTitle}>{copy.quest}</h2>
+            <p className={game.questText}>{copy.questText}</p>
+          </div>
+          <div className={game.reward}>+ ⭐</div>
+        </div>
+        <div className={game.progressTrack} aria-label={copy.progress}><span className={game.progressFill} style={{ width: `${progressPct}%` }} /></div>
+        <Link className={game.cta} href={courseHref}>{copy.play} →</Link>
+      </section>
+
+      <section className={game.section}>
+        <div className={game.sectionHeader}><h2>{copy.path}</h2><span>{copy.pathSub}</span></div>
+        <div className={game.path}>
+          {Array.from({ length: 8 }, (_, index) => {
+            const unit = index + 1;
+            const done = completedUnits >= unit;
+            return (
+              <Link key={unit} className={`${game.pathNode} ${done ? game.pathNodeDone : ""}`} href={`${courseHref}/de-child-a1-u${unit}`}>
+                {done ? "✓" : unit}
+                <span className={game.pathLabel}>{isFr ? `Mission ${unit}` : `Mission ${unit}`}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className={game.section}>
+        <div className={game.menuGrid}>
+          <Link className={game.menuCard} href={href("jeux")}><span className={game.menuIcon}>🎮</span><strong>{copy.games}</strong><span>{isFr ? "Courtes activités à rejouer" : "Short activities to replay"}</span></Link>
+          <Link className={game.menuCard} href={href("histoires")}><span className={game.menuIcon}>📚</span><strong>{copy.stories}</strong><span>{isFr ? "Écoute et reconnais les mots" : "Listen and spot familiar words"}</span></Link>
+          <Link className={game.menuCard} href={href("badges")}><span className={game.menuIcon}>🏆</span><strong>{copy.badges}</strong><span>{copy.badgeText}</span></Link>
+          <Link className={game.menuCard} href={href("avec-adulte")}><span className={game.menuIcon}>🤝</span><strong>{copy.adult}</strong><span>{copy.adultText}</span></Link>
+        </div>
+      </section>
+    </>
   );
-  const emptySection = (id: string, title: string, description: string, empty: string, notice?: string) => <section id={id} style={{ display: "grid", gap: 12 }}><DashboardSectionHeader title={title} description={description} /><DashboardCard><DashboardEmptyState title={empty} description={notice} /></DashboardCard></section>;
+
+  const emptyGame = (icon: string, title: string, body: string) => (
+    <section className={game.emptyGame}><div><div className={game.emptyIcon}>{icon}</div><h2>{title}</h2><p>{body}</p><Link className={game.cta} href={courseHref}>{copy.play} →</Link></div></section>
+  );
+
   const content: Record<string, React.ReactNode> = {
     maison: home, quete: home, chemin: home, missions: home, recompense: home,
-    jeux: emptySection("jeux", t("games.title"), t("games.description"), t("games.empty")),
-    histoires: emptySection("histoires", t("stories.title"), t("stories.description"), t("stories.empty")),
-    badges: emptySection("badges", t("badges.title"), t("badges.description"), t("badges.empty"), t("badges.notPersistedNotice")),
-    progression: emptySection("progression", t("progression.title"), t("progression.description"), t("progression.notWiredNotice")),
-    "avec-adulte": emptySection("avec-adulte", t("adultActivities.title"), t("adultActivities.description"), t("adultActivities.empty")),
+    jeux: emptyGame("🎮", t("games.title"), copy.comingText),
+    histoires: emptyGame("📚", t("stories.title"), copy.comingText),
+    badges: emptyGame("🏆", t("badges.title"), copy.badgeText),
+    progression: emptyGame("🚀", copy.progress, `${completedCount}/32 · ${progress.xp} XP · ${progressPct}%`),
+    "avec-adulte": emptyGame("🤝", t("adultActivities.title"), copy.adultText),
   };
 
-  return <DashboardPageBoundary><DashboardShell sidebar={sidebar} mobileHeader={mobileHeader} tabBar={<DashboardTabBar tabs={mobileTabs} activeKey={activeTab} />} header={<DashboardHeader title={t("home.title", { prenom: child.prenom })} subtitle={totalStars > 0 ? t("meta", { stars: totalStars }) : t("metaMinimal")} actions={headerActions} meta={child.activeLangue ? <DashboardStatusChip tone="gold">{child.activeLangue}</DashboardStatusChip> : undefined} />}><div data-live-persona-section={activeSection}>{content[activeSection]}</div></DashboardShell></DashboardPageBoundary>;
+  const nav = [
+    { id: "maison", icon: "🏠", label: t("mobileNav.home") },
+    { id: "jeux", icon: "🎮", label: t("mobileNav.games") },
+    { id: "histoires", icon: "📚", label: t("mobileNav.stories") },
+    { id: "badges", icon: "🏆", label: t("mobileNav.badges") },
+  ];
+
+  return (
+    <main className={game.page} data-universe="monde">
+      <div className={game.shell}>
+        <header className={game.topbar}>
+          <Link className={game.brand} href={`/${currentLocale}`}><span className={game.brandMark}>Y</span> YEMA KIDS</Link>
+          <button className={game.exit} type="button" onClick={exitChildMode} disabled={exiting}>{exiting ? "…" : isFr ? "Sortir" : "Exit"}</button>
+        </header>
+        <div className={game.statusRow}>
+          <div className={game.statusPill}>⭐ {totalStars}</div>
+          <div className={game.statusPill}>⚡ {progress.xp} XP</div>
+          <div className={game.statusPill}>🗺️ {completedUnits}/8</div>
+        </div>
+        <div data-live-persona-section={activeSection}>{content[activeSection]}</div>
+      </div>
+      <nav className={game.bottomNav} aria-label={t("personaLabel")}>
+        {nav.map((item) => <Link key={item.id} href={href(item.id)} className={`${game.navItem} ${activeSection === item.id || (item.id === "maison" && ["quete","chemin","missions","recompense"].includes(activeSection)) ? game.navActive : ""}`}><b>{item.icon}</b><span>{item.label}</span></Link>)}
+      </nav>
+    </main>
+  );
 }
