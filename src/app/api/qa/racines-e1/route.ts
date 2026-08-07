@@ -4,10 +4,6 @@ import { lingalaE1, medumbaE1, isRacinesCoursePubliclyReady } from "@/content/ra
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  if (process.env.VERCEL_ENV === "production") {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-
   const courses = [medumbaE1, lingalaE1].map((course) => ({
     courseId: course.course.id,
     language: course.course.learningLanguage.labelFr,
