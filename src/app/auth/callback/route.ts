@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { Role } from "@prisma/client";
 import { syncUserMetadata, type SpaceRole } from "@/lib/roles";
 import { reconcileDbUser } from "@/lib/reconcileDbUser";
+import { sanitizeInternalNext } from "@/lib/authRedirect";
 
 const ROLE_MAP: Record<string, Role> = {
   STUDENT: Role.STUDENT,
@@ -12,10 +13,16 @@ const ROLE_MAP: Record<string, Role> = {
   ADMIN: Role.ADMIN,
 };
 
+function loginPathFor(next: string): string {
+  const locale = next.match(/^\/(fr|en)(?:\/|$)/)?.[1];
+  return locale ? `/${locale}/login` : "/login";
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  const rawNext = searchParams.get("next");
+  const next = sanitizeInternalNext(rawNext, "/dashboard");
 
   if (code) {
     const cookieStore = await cookies();
@@ -37,20 +44,15 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
-      return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+      return NextResponse.redirect(`${origin}${loginPathFor(next)}?error=auth_callback_failed`);
     }
 
-    // Get the authenticated user (fresh from Supabase, not just JWT)
     const { data: { user } } = await supabase.auth.getUser();
 
     if (user) {
       const metaRole = user.user_metadata?.role as string | undefined;
       const dbRole: Role = (metaRole && ROLE_MAP[metaRole]) ? ROLE_MAP[metaRole] : Role.STUDENT;
 
-      // Réconcilie via le mécanisme unique (idempotent, tolérant orphelines,
-      // race conditions et crée UserRole automatiquement).
-      // Si l'appel throw, on log mais on continue vers /login pour ne pas
-      // bloquer complètement l'utilisateur.
       let dbUser: Awaited<ReturnType<typeof reconcileDbUser>>["user"] | null = null;
       try {
         const res = await reconcileDbUser({
@@ -76,15 +78,8 @@ export async function GET(request: NextRequest) {
       const onboardingDone = dbUser?.onboardingDone ?? false;
       const cookieRole = metaRole || "STUDENT";
 
-      // Determine redirect destination.
-      // Règle : le param `next` fourni par le tunnel de signup est
-      // TOUJOURS respecté s'il pointe vers une route interne (préfixée /),
-      // qu'on soit onboardé ou pas. C'est le tunnel qui sait où il veut
-      // remettre l'utilisateur — le callback ne doit pas court-circuiter.
-      // Le fallback s'applique uniquement si `next` est absent ou pointe
-      // vers /dashboard (valeur par défaut historique = pas de contexte).
       let redirectUrl: string;
-      const nextIsMeaningful = !!next && next !== "/dashboard" && next.startsWith("/");
+      const nextIsMeaningful = next !== "/dashboard";
       if (nextIsMeaningful) {
         redirectUrl = next;
       } else if (onboardingDone) {
@@ -108,5 +103,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}${next}`);
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+  return NextResponse.redirect(`${origin}${loginPathFor(next)}?error=auth_callback_failed`);
 }

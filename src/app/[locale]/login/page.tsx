@@ -1,19 +1,14 @@
 "use client";
 
-// /login · Sprint 8 « La porte réduite ».
-// Fond --seuil-bg, le Y, une phrase, un formulaire sobre.
-// Réutilise les tokens du Seuil existant, sans respiration ambiante
-// (--dur-breath est réservé au seuil de la landing).
-
 import Link from "next/link";
-import { useRouter } from "@/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
 import { BrandLockup } from "@/components/brand/BrandLockup";
 import { classifyAuthError, withTimeout } from "@/lib/authErrors";
+import { sanitizeInternalNext } from "@/lib/authRedirect";
 
 interface Copy {
   kicker: string;
@@ -22,6 +17,7 @@ interface Copy {
   lede: string;
   fldEmail: string;
   fldPassword: string;
+  forgotPassword: string;
   submit: string;
   submitLoading: string;
   noAccount: string;
@@ -35,6 +31,7 @@ const COPY_FR: Copy = {
   lede: "Votre parcours vous attend là où vous l'avez laissé.",
   fldEmail: "Email",
   fldPassword: "Mot de passe",
+  forgotPassword: "Mot de passe oublié ?",
   submit: "Ouvrir ma maison",
   submitLoading: "Ouverture…",
   noAccount: "Pas encore de compte ?",
@@ -48,6 +45,7 @@ const COPY_EN: Copy = {
   lede: "Your path is waiting where you left it.",
   fldEmail: "Email",
   fldPassword: "Password",
+  forgotPassword: "Forgot your password?",
   submit: "Open my house",
   submitLoading: "Opening…",
   noAccount: "No account yet?",
@@ -57,8 +55,9 @@ const COPY_EN: Copy = {
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next");
+  const rawNext = searchParams.get("next");
   const locale = useLocale();
+  const safeNext = sanitizeInternalNext(rawNext, `/${locale}/dashboard`);
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
   const c = loc === "en" ? COPY_EN : COPY_FR;
   const tErr = useTranslations("auth.errors");
@@ -84,14 +83,11 @@ export default function LoginPage() {
         setErrorKey(classifyAuthError(signInError));
         return;
       }
-      router.push(next ?? "/dashboard");
+      router.push(safeNext);
       router.refresh();
     } catch (err) {
       setErrorKey(classifyAuthError(err));
     } finally {
-      // GARANTIE : le bouton se déverrouille TOUJOURS, quelle que soit
-      // l'issue. Sans ce finally, une exception synchrone ou async non
-      // catchée laisserait le bouton figé sur « Ouverture… » (bug prod).
       setLoading(false);
     }
   }
@@ -113,6 +109,7 @@ export default function LoginPage() {
 
   const errorMsg = errorKey ? applyTypo(tErr(errorKey)) : null;
   const showResend = errorKey === "email_not_confirmed" && email.length > 0;
+  const nextQuery = rawNext ? `?next=${encodeURIComponent(safeNext)}` : "";
 
   return (
     <div className="porte-seuil">
@@ -141,6 +138,12 @@ export default function LoginPage() {
               <input type="password" required autoComplete="current-password"
                      value={password} onChange={(e) => setPassword(e.target.value)} />
             </label>
+
+            <div className="ens-form-error-actions">
+              <Link className="ens-form-error-link" href={`/${locale}/auth/forgot-password${nextQuery}`}>
+                {applyTypo(c.forgotPassword)}
+              </Link>
+            </div>
 
             {errorMsg && (
               <div className="ens-form-error" role="alert" aria-live="polite">
@@ -191,7 +194,7 @@ export default function LoginPage() {
           <div className="porte-seuil-footer">
             <p>
               {applyTypo(c.noAccount)}{" "}
-              <Link href={`/${locale}/register`}>{applyTypo(c.register)}</Link>
+              <Link href={`/${locale}/register${nextQuery}`}>{applyTypo(c.register)}</Link>
             </p>
           </div>
         </div>
