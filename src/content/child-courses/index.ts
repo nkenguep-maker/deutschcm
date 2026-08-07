@@ -13,12 +13,22 @@ function parseCourse(bytes: Buffer): YemaChildCourseContent {
   return JSON.parse(bytes.toString("utf8")) as YemaChildCourseContent;
 }
 
-function decodeZlibCourse(payload: string): YemaChildCourseContent {
-  return parseCourse(inflateSync(Buffer.from(payload, "base64")));
+function decodeZlibCourse(name: string, payload: string): YemaChildCourseContent {
+  try {
+    return parseCourse(inflateSync(Buffer.from(payload, "base64")));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${name}: ${message}`);
+  }
 }
 
-function decodeBrotliCourse(payload: string): YemaChildCourseContent {
-  return parseCourse(brotliDecompressSync(Buffer.from(payload, "base64")));
+function decodeBrotliCourse(name: string, payload: string): YemaChildCourseContent {
+  try {
+    return parseCourse(brotliDecompressSync(Buffer.from(payload, "base64")));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${name}: ${message}`);
+  }
 }
 
 function assertCourse(course: YemaChildCourseContent) {
@@ -58,9 +68,9 @@ function assertCourse(course: YemaChildCourseContent) {
 }
 
 const decodedCourses = [
-  decodeZlibCourse(DE_CHILD_PAYLOAD),
-  decodeZlibCourse(BYV_CHILD_PAYLOAD),
-  decodeBrotliCourse(LN_CHILD_PAYLOAD),
+  decodeZlibCourse("monde-child-de-a1", DE_CHILD_PAYLOAD),
+  decodeZlibCourse("racines-child-byv-e1", BYV_CHILD_PAYLOAD),
+  decodeBrotliCourse("racines-child-ln-e1", LN_CHILD_PAYLOAD),
 ];
 for (const course of decodedCourses) assertCourse(course);
 
