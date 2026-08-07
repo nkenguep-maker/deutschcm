@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { BrandLockup } from "@/components/brand/BrandLockup";
 import { frTypo } from "@/components/landing/typo";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
-import { classifyAuthError, withTimeout } from "@/lib/authErrors";
+import { withTimeout } from "@/lib/authErrors";
 import { createClient } from "@/lib/supabase/client";
 
 const COPY = {
@@ -101,8 +101,7 @@ export default function ResetPasswordPage() {
         10_000,
       );
       if (updateError) {
-        const key = classifyAuthError(updateError);
-        setError(key === "network" || key === "timeout" ? c.generic : c.generic);
+        setError(c.generic);
         return;
       }
       setSuccess(true);
