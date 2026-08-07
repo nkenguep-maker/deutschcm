@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCourseContent, getCourseLesson, getCourseLessonById, getCourseUnit, getNextCourseLesson } from "@/data/courses/registry";
 import { loadCourseViewer } from "@/lib/course-content/server";
+import { resolveCourseLessonForPathway, resolveCourseUnitForPathway } from "@/lib/course-content/pathway";
 import { AudioLessonExperience } from "@/features/course-experience/AudioLessonExperience";
 import styles from "@/features/course-experience/CourseExperience.module.css";
 
@@ -44,11 +45,13 @@ export default async function LessonPage({ params }: { params: Promise<{ locale:
   const next = getNextCourseLesson(courseId, lessonId);
   const resolved = getCourseLessonById(courseId, lessonId);
   if (!resolved) notFound();
+  const resolvedUnit = resolveCourseUnitForPathway(unit, viewer.pathwayVariant);
+  const resolvedLesson = resolveCourseLessonForPathway(lesson, viewer.pathwayVariant);
   return (
     <AudioLessonExperience
       course={course}
-      unit={unit}
-      lesson={lesson}
+      unit={resolvedUnit}
+      lesson={resolvedLesson}
       locale={locale}
       alreadyCompleted={completed.has(lessonId)}
       initialScore={currentProgress?.score ?? null}
