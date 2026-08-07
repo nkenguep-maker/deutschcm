@@ -1,17 +1,24 @@
-import { inflateSync } from "node:zlib";
+import { brotliDecompressSync, inflateSync } from "node:zlib";
 import { DE_CHILD_PAYLOAD } from "./de.payload";
 import { BYV_CHILD_PAYLOAD } from "./byv.payload";
 import { LN_CHILD_PAYLOAD } from "./ln.payload";
 import type { ChildLesson, ChildUnit, YemaChildCourseContent } from "./types";
 
-const EXPECTED_SEQUENCE: Record<"monde" | "racines", string[]> = {
+const EXPECTED_LESSON_STAGES: Record<"monde" | "racines", string[]> = {
   monde: ["Écoute", "Choisis", "Répète", "Parle"],
   racines: ["Écoute", "Reconnais", "Répète", "Réponds"],
 };
 
-function decodeCourse(payload: string): YemaChildCourseContent {
-  const json = inflateSync(Buffer.from(payload, "base64")).toString("utf8");
-  return JSON.parse(json) as YemaChildCourseContent;
+function parseCourse(bytes: Buffer): YemaChildCourseContent {
+  return JSON.parse(bytes.toString("utf8")) as YemaChildCourseContent;
+}
+
+function decodeZlibCourse(payload: string): YemaChildCourseContent {
+  return parseCourse(inflateSync(Buffer.from(payload, "base64")));
+}
+
+function decodeBrotliCourse(payload: string): YemaChildCourseContent {
+  return parseCourse(brotliDecompressSync(Buffer.from(payload, "base64")));
 }
 
 function assertCourse(course: YemaChildCourseContent) {
@@ -34,11 +41,11 @@ function assertCourse(course: YemaChildCourseContent) {
     throw new Error(`${course.course.id}: expected 96 exercises`);
   }
 
-  const expected = EXPECTED_SEQUENCE[course.course.track];
+  const expectedStages = EXPECTED_LESSON_STAGES[course.course.track];
   for (const unit of course.units) {
     if (unit.lessons.length !== 4) throw new Error(`${unit.id}: expected 4 lessons`);
     const stages = unit.lessons.map((lesson) => lesson.stage);
-    if (stages.some((stage, index) => stage !== expected[index])) {
+    if (stages.some((stage, index) => stage !== expectedStages[index])) {
       throw new Error(`${unit.id}: invalid child learning sequence`);
     }
     for (const lesson of unit.lessons) {
@@ -51,9 +58,9 @@ function assertCourse(course: YemaChildCourseContent) {
 }
 
 const decodedCourses = [
-  decodeCourse(DE_CHILD_PAYLOAD),
-  decodeCourse(BYV_CHILD_PAYLOAD),
-  decodeCourse(LN_CHILD_PAYLOAD),
+  decodeZlibCourse(DE_CHILD_PAYLOAD),
+  decodeZlibCourse(BYV_CHILD_PAYLOAD),
+  decodeBrotliCourse(LN_CHILD_PAYLOAD),
 ];
 for (const course of decodedCourses) assertCourse(course);
 
