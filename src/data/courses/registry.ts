@@ -6,6 +6,7 @@ import deA1Unit4 from "@/data/courses/monde/adulte/de-a1/u4.json";
 import deA1Unit5 from "@/data/courses/monde/adulte/de-a1/u5.json";
 import deA1Unit6 from "@/data/courses/monde/adulte/de-a1/u6.json";
 import type { CourseContent, CourseLesson, CourseUnit } from "@/data/courses/types";
+import { assertPathwayPersonalizationIntegrity } from "@/lib/course-content/pathway";
 
 const deA1 = {
   ...deA1Meta,
@@ -65,6 +66,7 @@ export function assertCourseIntegrity(course: CourseContent): void {
       if (lesson.exercises.length === 0) throw new Error(`COURSE_EMPTY_LESSON:${lesson.id}`);
     }
   }
+  assertPathwayPersonalizationIntegrity(course);
 }
 
 assertCourseIntegrity(deA1);
