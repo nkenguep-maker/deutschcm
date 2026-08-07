@@ -10,6 +10,7 @@ import {
   nextIncompleteModule,
   overallProgress,
 } from "@/lib/monde";
+import { resolveMondePathwayVariant } from "@/lib/course-content/pathway";
 import {
   INTERNAL_TEST_COOKIE_NAME,
   isInternalPersonaId,
@@ -97,6 +98,7 @@ export async function GET() {
     const courses = buildA1CourseList(progressList);
     const next = nextIncompleteModule(progressList);
     const overallPct = overallProgress(courses);
+    const pathwayVariant = resolveMondePathwayVariant(lp.onboardingAnswers);
 
     return NextResponse.json({
       universe: "MONDE",
@@ -105,6 +107,7 @@ export async function GET() {
         id: lp.id,
         language: lp.language,
         currentLevel: lp.currentLevel,
+        pathwayVariant,
       },
       access,
       courses,

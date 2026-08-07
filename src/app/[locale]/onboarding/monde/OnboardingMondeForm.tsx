@@ -1,7 +1,7 @@
 "use client";
 
 // /onboarding/monde · Ambiance espresso/laiton, le voyage.
-// Deux étapes seulement · pourquoi + point de départ. La langue est
+// Deux étapes seulement · objectif de parcours + point de départ. La langue est
 // déjà connue via le plan choisi sur /pricing (deutsch au lancement).
 // Rappel de l'offre en haut si l'user vient d'un plan.
 //
@@ -19,8 +19,12 @@ import { BrandY } from "@/components/brand/BrandY";
 import { frTypo } from "@/components/landing/typo";
 import { classifyAuthError, withTimeout } from "@/lib/authErrors";
 
-type Why = "study" | "exam" | "envie";
+type PathwayChoice = "STUDIES" | "VISA" | "NATURALIZATION" | "TOURISM";
 type StartPoint = "beginner" | "some_basics" | "test";
+
+function isPathwayChoice(value: unknown): value is PathwayChoice {
+  return value === "STUDIES" || value === "VISA" || value === "NATURALIZATION" || value === "TOURISM";
+}
 
 const PLAN_LABEL_FR: Record<string, string> = {
   "passage-a1": "Le Passage · Allemand A1",
@@ -44,13 +48,14 @@ const COPY_FR = {
   finish: "Terminer",
   saving: "On enregistre…",
   contextPrefix: "Vous avez choisi",
-  s1Kicker: "Le pourquoi",
-  s1Title: "Pourquoi l'allemand ?",
-  s1Lede: "Pour adapter vos exemples et votre rythme. Vous pourrez changer plus tard.",
+  s1Kicker: "Votre objectif",
+  s1Title: "À quoi doit vous servir l'allemand ?",
+  s1Lede: "Le niveau reste le même pour tous. Nous adaptons une partie des situations et exemples à votre objectif.",
   whys: [
-    { id: "study" as Why, name: "Partir étudier ou travailler", desc: "Ausbildung, université, visa." },
-    { id: "exam" as Why, name: "Passer un examen officiel", desc: "Une note à obtenir, une date à tenir." },
-    { id: "envie" as Why, name: "Pour moi, par envie", desc: "Culture, voyage, curiosité." },
+    { id: "STUDIES" as PathwayChoice, name: "Études", desc: "Université, Ausbildung, vie de campus." },
+    { id: "VISA" as PathwayChoice, name: "Visa et démarches", desc: "Rendez-vous, formulaires et situations administratives." },
+    { id: "NATURALIZATION" as PathwayChoice, name: "Naturalisation", desc: "Objectif B1-B2, vie quotidienne et situations civiques." },
+    { id: "TOURISM" as PathwayChoice, name: "Tourisme et voyage", desc: "Hôtel, transport, restaurant et sorties." },
   ],
   s2Kicker: "Le point de départ",
   s2Title: "Où en êtes-vous ?",
@@ -60,7 +65,7 @@ const COPY_FR = {
     { id: "some_basics" as StartPoint, name: "J'ai déjà des bases", desc: "Quelques cours ou souvenirs de classe." },
     { id: "test" as StartPoint, name: "Faire un test de niveau rapide", desc: "Cinq minutes, on situe votre niveau." },
   ],
-  errNoWhy: "Choisissez un motif.",
+  errNoWhy: "Choisissez un objectif.",
   errNoStart: "Choisissez un point de départ.",
 } as const;
 
@@ -71,13 +76,14 @@ const COPY_EN = {
   finish: "Finish",
   saving: "Saving…",
   contextPrefix: "You picked",
-  s1Kicker: "The why",
-  s1Title: "Why German?",
-  s1Lede: "To adapt your examples and your rhythm. You can change later.",
+  s1Kicker: "Your goal",
+  s1Title: "What should German help you do?",
+  s1Lede: "The language level stays the same for everyone. We adapt part of the situations and examples to your goal.",
   whys: [
-    { id: "study" as Why, name: "Leave to study or work", desc: "Ausbildung, university, visa." },
-    { id: "exam" as Why, name: "Take an official exam", desc: "A score to get, a date to hold." },
-    { id: "envie" as Why, name: "For me, out of interest", desc: "Culture, travel, curiosity." },
+    { id: "STUDIES" as PathwayChoice, name: "Studies", desc: "University, Ausbildung and campus life." },
+    { id: "VISA" as PathwayChoice, name: "Visa and procedures", desc: "Appointments, forms and administrative situations." },
+    { id: "NATURALIZATION" as PathwayChoice, name: "Naturalization", desc: "B1-B2 goal, daily life and civic situations." },
+    { id: "TOURISM" as PathwayChoice, name: "Tourism and travel", desc: "Hotels, transport, restaurants and outings." },
   ],
   s2Kicker: "The starting point",
   s2Title: "Where are you now?",
@@ -87,7 +93,7 @@ const COPY_EN = {
     { id: "some_basics" as StartPoint, name: "I have some basics", desc: "A few classes or school memories." },
     { id: "test" as StartPoint, name: "Take a quick level test", desc: "Five minutes to place your level." },
   ],
-  errNoWhy: "Pick a reason.",
+  errNoWhy: "Pick a goal.",
   errNoStart: "Pick a starting point.",
 } as const;
 
@@ -95,7 +101,7 @@ const DRAFT_KEY = "yema.onboarding.monde.draft";
 
 interface Draft {
   step: 1 | 2;
-  why: Why | null;
+  why: PathwayChoice | null;
   startPoint: StartPoint | null;
 }
 
@@ -108,7 +114,7 @@ export function OnboardingMondeForm() {
   const t = (s: string) => (loc === "fr" ? frTypo(s) : s);
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [why, setWhy] = useState<Why | null>(null);
+  const [why, setWhy] = useState<PathwayChoice | null>(null);
   const [startPoint, setStartPoint] = useState<StartPoint | null>(null);
   const [planLabel, setPlanLabel] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -121,9 +127,11 @@ export function OnboardingMondeForm() {
     try {
       const raw = window.localStorage.getItem(DRAFT_KEY);
       if (!raw) return;
-      const d = JSON.parse(raw) as Draft;
+      const d = JSON.parse(raw) as Partial<Draft>;
+      // Les anciens drafts study/exam/envie sont volontairement ignorés : ils
+      // sont trop ambigus pour choisir automatiquement une nouvelle variante.
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (d.why) setWhy(d.why);
+      if (isPathwayChoice(d.why)) setWhy(d.why);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       if (d.startPoint) setStartPoint(d.startPoint);
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -165,37 +173,34 @@ export function OnboardingMondeForm() {
 
   async function handleFinish() {
     if (!startPoint) { setError(c.errNoStart); setErrorAction(null); return; }
-    // Sauvegarde AVANT d'appeler quoi que ce soit — si la session expire
-    // et qu'on doit rediriger vers /login, l'utilisateur retrouve tout.
     saveDraft();
     setSaving(true);
     setError(null);
     setErrorAction(null);
     try {
       const supabase = createClient();
-      // updateUser peut throw sur session invalide — on l'englobe dans withTimeout
-      // pour éviter le hang et bénéficier du finally.
       const { error: updateErr } = await withTimeout(
         supabase.auth.updateUser({
           data: {
             universe: "monde",
-            onboarding: { language: "deutsch", why, startPoint },
+            onboarding: { language: "deutsch", why, pathwayVariant: why, startPoint },
             activeLanguage: "deutsch",
           },
         }),
       );
       if (updateErr) {
-        // Si updateUser rate (session révoquée) : classifie + affiche
         const key = classifyAuthError(updateErr);
         showError(key);
         return;
       }
 
-      // POST /api/learning-paths — check res.ok explicit
-      const intentionMap: Record<string, string> = {
-        study: "VISA_DEPART",
-        exam: "SUR_PLACE",
-        envie: "SUR_PLACE",
+      // Intention reste le champ historique de haut niveau. La personnalisation
+      // précise vit dans onboardingAnswers.pathwayVariant, sans migration DB.
+      const intentionMap: Record<PathwayChoice, "VISA_DEPART" | "SUR_PLACE"> = {
+        STUDIES: "VISA_DEPART",
+        VISA: "VISA_DEPART",
+        NATURALIZATION: "SUR_PLACE",
+        TOURISM: "SUR_PLACE",
       };
       const lpRes = await withTimeout(fetch("/api/learning-paths", {
         method: "POST",
@@ -204,14 +209,12 @@ export function OnboardingMondeForm() {
           universe: "MONDE",
           language: "DEUTSCH",
           intention: why ? intentionMap[why] : undefined,
-          onboardingAnswers: { why, startPoint },
+          onboardingAnswers: { why, pathwayVariant: why, startPoint },
         }),
       }));
       if (lpRes.status === 401) { showError("session_expired"); return; }
       if (!lpRes.ok) { showError("finish_error"); return; }
 
-      // POST /api/onboarding/complete — c'est CET appel qui écrit
-      // onboarded_map[STUDENT]=true dans user_metadata (proxy le lit).
       const ocRes = await withTimeout(fetch("/api/onboarding/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -223,22 +226,13 @@ export function OnboardingMondeForm() {
       if (ocRes.status === 401) { showError("session_expired"); return; }
       if (!ocRes.ok) { showError("finish_error"); return; }
 
-      // Succès · aucun niveau CECR dérivé du startPoint (hardening §2).
-      // L'auto-évaluation réelle 5 options se joue sur /onboarding/monde/niveau,
-      // vers lequel le router /onboarding envoie automatiquement quand
-      // LANGUAGE_SELECTED. « test » reste un raccourci vers /test-niveau qui
-      // fixera le niveau et écrira selfAssessmentAnswer côté niveau screen.
       clearDraft();
       const dest = startPoint === "test" ? "/test-niveau" : "/onboarding";
       router.push(dest);
       router.refresh();
     } catch (err) {
-      // Réseau/timeout/exception JS → parseur unifié
       showError(classifyAuthError(err));
     } finally {
-      // GARANTIE : le bouton se déverrouille TOUJOURS, quelle que soit
-      // l'issue. Même si router.push a démarré, si la nav échoue on
-      // laisse le user retenter.
       setSaving(false);
     }
   }
@@ -246,7 +240,6 @@ export function OnboardingMondeForm() {
   function showError(key: string) {
     setError(t(tErr(key)));
     if (key === "session_expired") {
-      // Lien vers login avec next préservant l'URL onboarding actuelle
       const next = `/${locale}/onboarding/monde`;
       setErrorAction({
         label: t(tErr("session_expired_action")),

@@ -1,5 +1,9 @@
 export type LearningPhase = "Comprends" | "Pratique" | "Produis" | "Valide";
 
+export const MONDE_PATHWAY_VARIANTS = ["GENERAL", "STUDIES", "VISA", "NATURALIZATION", "TOURISM"] as const;
+export type MondePathwayVariant = (typeof MONDE_PATHWAY_VARIANTS)[number];
+export type PersonalizedMondePathwayVariant = Exclude<MondePathwayVariant, "GENERAL">;
+
 export type CourseBlock = {
   type: string;
   title?: string;
@@ -8,6 +12,26 @@ export type CourseBlock = {
   textFr?: string;
   instruction?: string;
   [key: string]: unknown;
+};
+
+/**
+ * Contextual layer for one Monde pathway.
+ *
+ * Deliberately constrained: pathway personalization can add examples and
+ * rewrite the wording of an exercise prompt, but it cannot change answers,
+ * scoring, XP, phase, order or any completion rule.
+ */
+export type CourseLessonPathwayVariant = {
+  label?: string;
+  context?: string;
+  contextBlocks?: CourseBlock[];
+  exercisePromptOverrides?: Record<string, string>;
+};
+
+export type CourseUnitPathwayVariant = {
+  label?: string;
+  situation?: string;
+  heroDescription?: string;
 };
 
 export type CourseExercise = {
@@ -41,6 +65,7 @@ export type CourseLesson = {
   blocks: CourseBlock[];
   exercises: CourseExercise[];
   completionMessage: string;
+  pathwayVariants?: Partial<Record<PersonalizedMondePathwayVariant, CourseLessonPathwayVariant>>;
 };
 
 export type CourseUnit = {
@@ -71,6 +96,7 @@ export type CourseUnit = {
   pronunciation: { focus: string; tips: string[]; drills: string[] };
   culture: { title: string; text: string };
   lessons: CourseLesson[];
+  pathwayVariants?: Partial<Record<PersonalizedMondePathwayVariant, CourseUnitPathwayVariant>>;
 };
 
 export type CourseMeta = {
@@ -95,6 +121,11 @@ export type CourseMeta = {
     unitCount: number;
     lessonCount: number;
     completionRule: string;
+    pathwayPersonalization?: {
+      /** Editorial target: at least this share remains canonical/common. */
+      coreShareTarget: number;
+      supportedVariants: PersonalizedMondePathwayVariant[];
+    };
     courseHero: {
       eyebrow: string;
       title: string;

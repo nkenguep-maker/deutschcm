@@ -5,11 +5,14 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { computeMondeAccess } from "@/lib/monde";
 import { getCourseContent, getCourseLessonIds } from "@/data/courses/registry";
+import type { MondePathwayVariant } from "@/data/courses/types";
+import { resolveMondePathwayVariant } from "@/lib/course-content/pathway";
 
 export type CourseViewer = {
   userId: string;
   fullName: string;
   accessStatus: "ACTIVE" | "EXPIRED" | "NONE";
+  pathwayVariant: MondePathwayVariant;
   progress: Array<{
     moduleId: string;
     status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
@@ -40,7 +43,7 @@ export async function loadCourseViewer(courseId: string, locale: string): Promis
       status: "ACTIVE",
     },
     orderBy: { createdAt: "desc" },
-    select: { id: true },
+    select: { id: true, onboardingAnswers: true },
   });
   if (!learningPath) redirect(`/${locale}/onboarding`);
 
@@ -65,6 +68,7 @@ export async function loadCourseViewer(courseId: string, locale: string): Promis
     userId: dbUser.id,
     fullName: dbUser.fullName,
     accessStatus: access.status,
+    pathwayVariant: resolveMondePathwayVariant(learningPath.onboardingAnswers),
     progress,
   };
 }
