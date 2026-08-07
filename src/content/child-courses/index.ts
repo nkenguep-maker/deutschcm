@@ -1,34 +1,16 @@
-import { brotliDecompressSync, inflateSync } from "node:zlib";
-import { DE_CHILD_PAYLOAD } from "./de.payload";
-import { BYV_CHILD_PAYLOAD } from "./byv.payload";
-import { LN_CHILD_PAYLOAD } from "./ln.payload";
+import { inflateSync } from "node:zlib";
+import { CHILD_COURSES_PAYLOAD } from "./payload";
 import type { ChildLesson, ChildUnit, YemaChildCourseContent } from "./types";
 
-const EXPECTED_LESSON_STAGES: Record<"monde" | "racines", string[]> = {
+const EXPECTED_SEQUENCE: Record<"monde" | "racines", string[]> = {
   monde: ["Écoute", "Choisis", "Répète", "Parle"],
   racines: ["Écoute", "Reconnais", "Répète", "Réponds"],
 };
 
-function parseCourse(bytes: Buffer): YemaChildCourseContent {
-  return JSON.parse(bytes.toString("utf8")) as YemaChildCourseContent;
-}
-
-function decodeZlibCourse(name: string, payload: string): YemaChildCourseContent {
-  try {
-    return parseCourse(inflateSync(Buffer.from(payload, "base64")));
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`${name}: ${message}`);
-  }
-}
-
-function decodeBrotliCourse(name: string, payload: string): YemaChildCourseContent {
-  try {
-    return parseCourse(brotliDecompressSync(Buffer.from(payload, "base64")));
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`${name}: ${message}`);
-  }
+function decodePayload(): YemaChildCourseContent[] {
+  const json = inflateSync(Buffer.from(CHILD_COURSES_PAYLOAD, "base64")).toString("utf8");
+  const parsed = JSON.parse(json) as Record<string, YemaChildCourseContent>;
+  return Object.values(parsed);
 }
 
 function assertCourse(course: YemaChildCourseContent) {
@@ -51,11 +33,11 @@ function assertCourse(course: YemaChildCourseContent) {
     throw new Error(`${course.course.id}: expected 96 exercises`);
   }
 
-  const expectedStages = EXPECTED_LESSON_STAGES[course.course.track];
+  const expected = EXPECTED_SEQUENCE[course.course.track];
   for (const unit of course.units) {
     if (unit.lessons.length !== 4) throw new Error(`${unit.id}: expected 4 lessons`);
     const stages = unit.lessons.map((lesson) => lesson.stage);
-    if (stages.some((stage, index) => stage !== expectedStages[index])) {
+    if (stages.some((stage, index) => stage !== expected[index])) {
       throw new Error(`${unit.id}: invalid child learning sequence`);
     }
     for (const lesson of unit.lessons) {
@@ -67,11 +49,7 @@ function assertCourse(course: YemaChildCourseContent) {
   }
 }
 
-const decodedCourses = [
-  decodeZlibCourse("monde-child-de-a1", DE_CHILD_PAYLOAD),
-  decodeZlibCourse("racines-child-byv-e1", BYV_CHILD_PAYLOAD),
-  decodeBrotliCourse("racines-child-ln-e1", LN_CHILD_PAYLOAD),
-];
+const decodedCourses = decodePayload();
 for (const course of decodedCourses) assertCourse(course);
 
 export const childCourses = decodedCourses.sort((a, b) => a.course.id.localeCompare(b.course.id));
