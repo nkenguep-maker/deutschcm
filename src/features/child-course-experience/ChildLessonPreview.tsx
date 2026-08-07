@@ -11,6 +11,7 @@ type Progress = { completedLessonIds: string[]; xp: number };
 type Props = { locale: string; course: YemaChildCourseContent; unit: ChildUnit; lesson: ChildLesson; nextLesson: NextLesson };
 
 const OBJECTIVE_TYPES = new Set(["soundHunt", "oddOneOut", "pictureChoice", "pictureRecognition", "listenTap", "listenForWord"]);
+const PURE_LISTEN_TYPES = new Set(["listenOnly", "listenTogether"]);
 
 function isRecord(value: unknown): value is Record<string, unknown> { return typeof value === "object" && value !== null && !Array.isArray(value); }
 function asString(value: unknown): string { return typeof value === "string" ? value : ""; }
@@ -160,7 +161,7 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
     utterance.rate = 0.76;
     utterance.onend = () => {
       setAudioBusyId((current) => current === exercise.id ? null : current);
-      if (exercise.type === "listenOnly") markExerciseDone(exercise.id);
+      if (PURE_LISTEN_TYPES.has(exercise.type)) markExerciseDone(exercise.id);
     };
     utterance.onerror = () => setAudioBusyId((current) => current === exercise.id ? null : current);
     window.speechSynthesis.speak(utterance);
@@ -200,7 +201,7 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
       audioPlayerRef.current = player;
       player.onended = () => {
         setAudioBusyId((current) => current === exercise.id ? null : current);
-        if (exercise.type === "listenOnly") markExerciseDone(exercise.id);
+        if (PURE_LISTEN_TYPES.has(exercise.type)) markExerciseDone(exercise.id);
       };
       player.onerror = () => setAudioBusyId((current) => current === exercise.id ? null : current);
       await player.play();
@@ -309,7 +310,7 @@ export function ChildLessonPreview({ locale, course, unit, lesson, nextLesson }:
     const completed = done[exercise.id] === true;
     const phrase = exerciseAudioText(exercise, unit);
 
-    if (exercise.type === "listenOnly") {
+    if (PURE_LISTEN_TYPES.has(exercise.type)) {
       return (
         <>
           {renderAudioControl(exercise)}
