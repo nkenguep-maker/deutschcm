@@ -3,25 +3,24 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { isPubliclyLinked, type PublicSurfaceId } from "@/lib/release/publicSurface";
 import { LandingBrand } from "./LandingBrand";
 
 type NavLabels = {
   features: string;    // "Langues"
   levels: string;      // "Méthode"
-  /** legacy — pointait vers /manifeste, désormais non rendu. */
+  /** legacy — conservé pour les pages existantes, mais filtré par la matrice release. */
   pricing?: string;
   centers: string;
   login: string;
   register: string;
   methode?: string;
   histoires?: string;
-  /** "Tarifs" — item final de la nav */
   tarifs?: string;
 };
 
 // LandingNav — desktop = liens horizontaux · mobile = burger + drawer.
-// Le drawer contient les liens nav, le toggle FR/EN, et les CTA
-// login/register. Escape pour fermer, clic sur backdrop, ou X.
+// La matrice PUBLIC_SURFACE décide quelles entrées peuvent être promues.
 function switchLocale(target: "fr" | "en", current: string) {
   if (target === current) return;
   document.cookie = `NEXT_LOCALE=${target}; path=/; max-age=31536000; SameSite=Lax`;
@@ -51,7 +50,6 @@ export function LandingNav({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Escape ferme le drawer + verrouille le scroll body quand ouvert.
   useEffect(() => {
     if (!menuOpen) {
       document.body.style.overflow = "";
@@ -71,20 +69,28 @@ export function LandingNav({
     };
   }, [menuOpen]);
 
-  // Focus le premier lien du drawer à l'ouverture (accessibilité)
   useEffect(() => {
     if (!menuOpen) return;
     const first = drawerRef.current?.querySelector<HTMLAnchorElement>("a, button");
     first?.focus();
   }, [menuOpen]);
 
-  const navItems = [
-    { label: labels.features,                                                 href: `/${locale}/langues` },
-    { label: labels.methode ?? labels.levels,                                 href: `/${locale}/methode` },
-    { label: labels.tarifs ?? (locale === "en" ? "Pricing" : "Tarifs"),       href: `/${locale}/pricing` },
+  const navCandidates: Array<{
+    surface: PublicSurfaceId;
+    label: string;
+    href: string;
+  }> = [
+    { surface: "languages", label: labels.features, href: `/${locale}/langues` },
+    { surface: "method", label: labels.methode ?? labels.levels, href: `/${locale}/methode` },
+    {
+      surface: "pricing",
+      label: labels.tarifs ?? labels.pricing ?? (locale === "en" ? "Pricing" : "Tarifs"),
+      href: `/${locale}/pricing`,
+    },
   ];
+  const navItems = navCandidates.filter((item) => isPubliclyLinked(item.surface));
 
-  const menuLabel = locale === "en" ? "Menu" : "Menu";
+  const menuLabel = "Menu";
   const closeLabel = locale === "en" ? "Close menu" : "Fermer le menu";
   const openLabel = locale === "en" ? "Open menu" : "Ouvrir le menu";
   const langLabel = locale === "en" ? "Interface language" : "Langue de l'interface";
@@ -154,7 +160,6 @@ export function LandingNav({
         </div>
       </nav>
 
-      {/* Drawer mobile · full-viewport, backdrop, links + FR/EN + CTAs */}
       {isMobile ? (
         <>
           <button
