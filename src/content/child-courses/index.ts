@@ -1,4 +1,4 @@
-import { brotliDecompressSync } from "node:zlib";
+import { inflateRawSync } from "node:zlib";
 import { CHILD_COURSES_PAYLOAD } from "./payload";
 import type { ChildLesson, ChildUnit, YemaChildCourseContent } from "./types";
 
@@ -8,7 +8,7 @@ const EXPECTED_SEQUENCE: Record<"monde" | "racines", string[]> = {
 };
 
 function decodePayload(): YemaChildCourseContent[] {
-  const json = brotliDecompressSync(Buffer.from(CHILD_COURSES_PAYLOAD, "base64")).toString("utf8");
+  const json = inflateRawSync(Buffer.from(CHILD_COURSES_PAYLOAD, "base64")).toString("utf8");
   const parsed = JSON.parse(json) as Record<string, YemaChildCourseContent>;
   return Object.values(parsed);
 }
