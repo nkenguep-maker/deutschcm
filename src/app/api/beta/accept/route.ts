@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
+import { createClient as createSupabaseAdmin, type SupabaseClient, type User as SupabaseUser } from "@supabase/supabase-js";
 import prisma from "@/lib/prisma";
 import {
   BetaInviteError,
@@ -18,6 +18,7 @@ import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const UNIVERSES = new Set(["monde", "racines"]);
+const AUTH_PAGE_SIZE = 200;
 
 function adminClient() {
   return createSupabaseAdmin(
@@ -25,6 +26,25 @@ function adminClient() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { persistSession: false, autoRefreshToken: false } },
   );
+}
+
+async function findRecoverableBetaOrphan(
+  admin: SupabaseClient,
+  email: string,
+): Promise<SupabaseUser | null> {
+  let page = 1;
+  while (true) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: AUTH_PAGE_SIZE });
+    if (error) throw error;
+
+    const exact = data.users.find((candidate) => normalizeInviteEmail(candidate.email ?? "") === email);
+    if (exact) {
+      const metadata = (exact.user_metadata ?? {}) as Record<string, unknown>;
+      return metadata.beta_invited === true ? exact : null;
+    }
+    if (data.users.length < AUTH_PAGE_SIZE) return null;
+    page += 1;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -134,23 +154,64 @@ export async function POST(request: NextRequest) {
       beta_invited: true,
     },
   });
-  if (createError || !data.user) {
+
+  let authUser = data.user;
+  let recoveredOrphan = false;
+  if (createError || !authUser) {
+    // A prior process may have crashed after Auth creation but before Prisma
+    // reconciliation. Recover only our own marked beta orphan. Never adopt or
+    // modify an arbitrary pre-existing Auth account.
+    try {
+      const orphan = await findRecoverableBetaOrphan(admin, email);
+      if (orphan) {
+        const dbOwner = await prisma.user.findUnique({
+          where: { supabaseId: orphan.id },
+          select: { id: true },
+        });
+        if (!dbOwner) {
+          const { data: recovered, error: recoverError } = await admin.auth.admin.updateUserById(orphan.id, {
+            password: input.password,
+            email_confirm: true,
+            user_metadata: {
+              ...(orphan.user_metadata ?? {}),
+              ...(fullName ? { full_name: fullName } : {}),
+              ...(universe ? { universe } : {}),
+              beta_invited: true,
+            },
+          });
+          if (!recoverError && recovered.user) {
+            authUser = recovered.user;
+            recoveredOrphan = true;
+          }
+        }
+      }
+    } catch (recoveryError) {
+      console.error("[beta/accept] orphan recovery lookup failed", recoveryError);
+    }
+  }
+
+  if (!authUser) {
     console.error("[beta/accept] auth creation failed", createError?.message ?? "missing user");
     await releaseBetaInvitationClaim(claim.id).catch(() => undefined);
     return NextResponse.json({ error: "Unable to create invited account" }, { status: 409 });
   }
 
   try {
-    await setBetaAccess({ supabaseId: data.user.id, enabled: true });
-    const reconciled = await reconcileAuthenticatedUser(data.user);
+    await setBetaAccess({ supabaseId: authUser.id, enabled: true });
+    const reconciled = await reconcileAuthenticatedUser(authUser);
     await finalizeBetaInvitation({ invitationId: claim.id, acceptedByUserId: reconciled.user.id });
   } catch (error) {
     console.error("[beta/accept] provisioning failed", error);
-    await admin.auth.admin.deleteUser(data.user.id).catch(() => undefined);
-    await prisma.user.deleteMany({ where: { supabaseId: data.user.id } }).catch(() => undefined);
+    // Both a newly-created Auth account and a recovered marked orphan belong to
+    // this beta provisioning attempt and have no pre-existing Prisma owner.
+    await admin.auth.admin.deleteUser(authUser.id).catch(() => undefined);
+    await prisma.user.deleteMany({ where: { supabaseId: authUser.id } }).catch(() => undefined);
     await releaseBetaInvitationClaim(claim.id).catch(() => undefined);
     return NextResponse.json({ error: "Unable to provision invited account" }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, status: "created", universe: universe ?? null }, { status: 201 });
+  return NextResponse.json(
+    { ok: true, status: recoveredOrphan ? "recovered" : "created", universe: universe ?? null },
+    { status: recoveredOrphan ? 200 : 201 },
+  );
 }
