@@ -21,6 +21,9 @@ import {
 const FOOTER_FR = { tagline: "L’Afrique parle. Toutes ses langues, enfin un lieu.", made: "L’Afrique parle. De Douala à Dakar, de Kinshasa à Abidjan.", legal: "Mentions légales", terms: "CGU", privacy: "Confidentialité", contact: "Contact", disclaimer: "YEMA Languages est une plateforme pan-africaine alignée CECRL pour les langues du monde. N’est affiliée à aucun organisme officiel d’examen." };
 const FOOTER_EN = { tagline: "Africa speaks. All its languages, at last one place.", made: "Africa speaks. From Douala to Dakar, from Kinshasa to Abidjan.", legal: "Legal", terms: "Terms", privacy: "Privacy", contact: "Contact", disclaimer: "YEMA Languages is a pan-African CEFR-aligned platform for world languages. Not affiliated with any official examination institute." };
 
+type AccountState = "checking" | "guest" | "student_monde" | "other";
+type AddonState = "idle" | "saving" | "saved" | "error";
+
 export default function PricingMondePage() {
   const locale = useLocale();
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
@@ -29,14 +32,51 @@ export default function PricingMondePage() {
   const [isMobile, setIsMobile] = useState(false);
   const [rail, setRail] = useState<Rail>("eur");
   const [level, setLevel] = useState<LevelId>("B1");
+  const [accountState, setAccountState] = useState<AccountState>("checking");
+  const [addonState, setAddonState] = useState<AddonState>("idle");
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
     setRail(detectDefaultRail());
     window.addEventListener("resize", check);
+
+    fetch("/api/me", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) {
+          setAccountState("guest");
+          return;
+        }
+        const me = await response.json() as { persona?: string; selectedAddons?: string[] };
+        if (me.persona === "student_monde") {
+          setAccountState("student_monde");
+          if (Array.isArray(me.selectedAddons) && me.selectedAddons.includes("roots-solo")) {
+            setAddonState("saved");
+          }
+        } else {
+          setAccountState("other");
+        }
+      })
+      .catch(() => setAccountState("guest"));
+
     return () => window.removeEventListener("resize", check);
   }, []);
+
+  async function saveRootsSoloIntent() {
+    if (accountState !== "student_monde" || addonState === "saving" || addonState === "saved") return;
+    setAddonState("saving");
+    try {
+      const response = await fetch("/api/account/offer-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ addon: "roots-solo" }),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      setAddonState("saved");
+    } catch {
+      setAddonState("error");
+    }
+  }
 
   const passagePlan = `passage-${level.toLowerCase()}`;
   const rootsSoloMonthly = AFRICAN_SOLO[rail].month;
@@ -147,9 +187,45 @@ export default function PricingMondePage() {
                 <span className="pricing-price-num">{fmtPriceUnit(rootsSoloMonthly, rail)}</span>
                 <span className="pricing-price-per">{loc === "fr" ? "/ mois" : "/ month"}</span>
               </div>
-              <Link href={`/${locale}/register?universe=monde&plan=${passagePlan}&addon=roots-solo`} className="pricing-cta pricing-cta-ghost">
-                {loc === "fr" ? "Choisir Monde + Racines Solo" : "Choose World + Roots Solo"} <span aria-hidden="true">→</span>
-              </Link>
+
+              {accountState === "student_monde" ? (
+                <div style={{ display: "grid", gap: 8 }}>
+                  <button
+                    type="button"
+                    className="pricing-cta pricing-cta-ghost"
+                    onClick={saveRootsSoloIntent}
+                    disabled={addonState === "saving" || addonState === "saved"}
+                  >
+                    {addonState === "saved"
+                      ? (loc === "fr" ? "Racines Solo ajouté à mon compte ✓" : "Roots Solo added to my account ✓")
+                      : addonState === "saving"
+                        ? (loc === "fr" ? "Enregistrement…" : "Saving…")
+                        : (loc === "fr" ? "Ajouter Racines Solo à mon compte" : "Add Roots Solo to my account")}
+                  </button>
+                  {addonState === "error" ? (
+                    <p className="pricing-founders" role="alert">
+                      {loc === "fr" ? "Impossible d’enregistrer l’option. Réessayez." : "Could not save the option. Please try again."}
+                    </p>
+                  ) : null}
+                  {addonState === "saved" ? (
+                    <p className="pricing-founders">
+                      {loc === "fr"
+                        ? "Option enregistrée. Aucun accès payant ni débit n’est créé tant que le checkout n’est pas activé."
+                        : "Option saved. No paid access or charge is created until checkout is enabled."}
+                    </p>
+                  ) : null}
+                </div>
+              ) : accountState === "other" ? (
+                <p className="pricing-founders">
+                  {loc === "fr"
+                    ? "Cette option s’ajoute directement à un compte Élève Monde."
+                    : "This add-on attaches directly to a World learner account."}
+                </p>
+              ) : (
+                <Link href={`/${locale}/register?universe=monde&plan=${passagePlan}&addon=roots-solo`} className="pricing-cta pricing-cta-ghost">
+                  {loc === "fr" ? "Choisir Monde + Racines Solo" : "Choose World + Roots Solo"} <span aria-hidden="true">→</span>
+                </Link>
+              )}
             </aside>
           </div>
         </section>
