@@ -27,8 +27,8 @@ export function OverviewSection({ data }: Props) {
     ? "Your Roots journey is configured."
     : "Ton parcours Racines est bien configuré.";
   const betaBody = locale === "en"
-    ? "The technical beta does not require a subscription. Your first activities will appear here as soon as they are connected to your profile."
-    : "La bêta technique ne demande aucun abonnement. Tes premières activités apparaîtront ici dès qu’elles seront branchées à ton profil.";
+    ? "The technical beta is open. Your first activities will appear here as soon as they are connected to your profile."
+    : "La bêta technique est ouverte. Tes premières activités apparaîtront ici dès qu’elles seront branchées à ton profil.";
 
   return (
     <section id="mon-tableau-de-bord" aria-labelledby="mon-tableau-de-bord-title" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
