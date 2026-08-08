@@ -75,7 +75,9 @@ export function CoachRacinesDashboard({ locale, activeSectionId = "accueil" }: P
   if (state.kind === "error") return shell(<DashboardErrorState title={t("error")} action={<button type="button" onClick={load}>{t("retry")}</button>} />, <DashboardHeader title={personaLabel} />);
 
   const { data, learners } = state;
-  const meta = t("meta", { activeCircles: data.stats.activeCircleCount, activeChildren: data.stats.activeChildProfileCount });
+  const counts = t("meta", { activeCircles: data.stats.activeCircleCount, activeChildren: data.stats.activeChildProfileCount });
+  const greeting = data.profile.fullName?.trim().split(/\s+/)[0] || personaLabel;
+  const meta = data.profile.city ? `${counts} · ${data.profile.city}` : counts;
   const overview = <CoachOverviewSection stats={data.stats} />;
   const content: Record<string, React.ReactNode> = {
     accueil: overview,
@@ -86,5 +88,8 @@ export function CoachRacinesDashboard({ locale, activeSectionId = "accueil" }: P
     notes: <CoachSessionNotesSection />,
   };
 
-  return shell(<div data-live-persona-section={activeSection}>{content[activeSection]}</div>, <DashboardHeader title={personaLabel} subtitle={meta} meta={<DashboardStatusChip tone="neutral">{data.actorRole}</DashboardStatusChip>} />);
+  return shell(
+    <div data-live-persona-section={activeSection}>{content[activeSection]}</div>,
+    <DashboardHeader title={greeting} subtitle={meta} meta={<DashboardStatusChip tone="neutral">{data.actorRole}</DashboardStatusChip>} />,
+  );
 }
