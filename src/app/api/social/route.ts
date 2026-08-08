@@ -20,6 +20,14 @@ async function getAuthDbUser() {
   return prisma.user.findUnique({ where: { supabaseId: user.id } });
 }
 
+function forbidden() {
+  return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+}
+
+function notFound() {
+  return NextResponse.json({ error: "Not found" }, { status: 404 });
+}
+
 // ── GET: notifications ────────────────────────────────────────────────────────
 export async function GET(request: NextRequest) {
   const user = await getAuthDbUser();
@@ -195,16 +203,32 @@ export async function POST(request: NextRequest) {
     const { toUserId, groupId, groupName, message } = body;
     if (!toUserId) return NextResponse.json({ error: "toUserId requis" }, { status: 400 });
 
+    let authorizedGroup: { id: string; name: string } | null = null;
+    if (groupId) {
+      authorizedGroup = await prisma.studentGroup.findFirst({
+        where: { id: groupId, creatorId: user.id, isActive: true },
+        select: { id: true, name: true },
+      });
+      if (!authorizedGroup) return forbidden();
+    }
+
+    const effectiveGroupName = authorizedGroup?.name ?? groupName ?? null;
     const invite = await prisma.studyGroupInvite.create({
-      data: { fromUserId: user.id, toUserId, groupId: groupId ?? null, groupName: groupName ?? null, message: message ?? null },
+      data: {
+        fromUserId: user.id,
+        toUserId,
+        groupId: authorizedGroup?.id ?? null,
+        groupName: effectiveGroupName,
+        message: message ?? null,
+      },
     });
     await prisma.notification.create({
       data: {
         userId: toUserId,
         title: "Invitation dans un groupe d'étude",
-        body: `${user.fullName} vous invite dans "${groupName ?? "un groupe"}".`,
+        body: `${user.fullName} vous invite dans "${effectiveGroupName ?? "un groupe"}".`,
         type: "group_invite",
-        metadata: { inviteId: invite.id, groupId, groupName, fromName: user.fullName },
+        metadata: { inviteId: invite.id, groupId: authorizedGroup?.id ?? null, groupName: effectiveGroupName, fromName: user.fullName },
       },
     });
     return NextResponse.json({ success: true, inviteId: invite.id });
@@ -212,23 +236,53 @@ export async function POST(request: NextRequest) {
 
   // ── Répondre à une demande / invitation ────────────────────────────────────
   if (action === "respond") {
-    const { requestId, inviteId, accept, classroomId } = body;
+    const { requestId, inviteId, accept } = body;
 
     if (requestId) {
-      const req = await prisma.classJoinRequest.update({
+      const req = await prisma.classJoinRequest.findUnique({
+        where: { id: requestId },
+        include: { fromUser: true },
+      });
+      if (!req) return notFound();
+      if (req.status !== "pending") return NextResponse.json({ error: "Demande déjà traitée" }, { status: 409 });
+
+      let classroom: { id: string; name: string } | null = null;
+      let group: { id: string; name: string } | null = null;
+
+      if (req.toClassroomId) {
+        const teacher = await prisma.teacher.findUnique({
+          where: { userId: user.id },
+          select: { id: true },
+        });
+        if (!teacher) return forbidden();
+
+        classroom = await prisma.classroom.findFirst({
+          where: { id: req.toClassroomId, teacherId: teacher.id },
+          select: { id: true, name: true },
+        });
+        if (!classroom) return forbidden();
+      } else if (req.toGroupId) {
+        group = await prisma.studentGroup.findFirst({
+          where: { id: req.toGroupId, creatorId: user.id, isActive: true },
+          select: { id: true, name: true },
+        });
+        if (!group) return forbidden();
+      } else {
+        return NextResponse.json({ error: "Demande sans destination" }, { status: 400 });
+      }
+
+      await prisma.classJoinRequest.update({
         where: { id: requestId },
         data: { status: accept ? "accepted" : "refused", respondedAt: new Date(), respondedBy: user.id },
-        include: { fromUser: true },
       });
 
       if (accept && req.toClassroomId) {
-        // Add student to classroom
         await prisma.classroomEnrollment.upsert({
           where: { classroomId_userId: { classroomId: req.toClassroomId, userId: req.fromUserId } },
           create: { classroomId: req.toClassroomId, userId: req.fromUserId },
           update: { isActive: true },
         });
-        // Connect as classmates
+
         const classmates = await prisma.classroomEnrollment.findMany({
           where: { classroomId: req.toClassroomId, isActive: true, userId: { not: req.fromUserId } },
           select: { userId: true },
@@ -244,30 +298,52 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      const classroom = classroomId ? await prisma.classroom.findUnique({ where: { id: req.toClassroomId ?? "" }, select: { name: true } }) : null;
+      if (accept && req.toGroupId) {
+        await prisma.studentGroupMember.upsert({
+          where: { groupId_userId: { groupId: req.toGroupId, userId: req.fromUserId } },
+          create: { groupId: req.toGroupId, userId: req.fromUserId },
+          update: { isActive: true },
+        });
+      }
+
+      const destinationKind = classroom ? "classe" : "groupe";
+      const destinationName = classroom?.name ?? group?.name ?? `le ${destinationKind}`;
       await prisma.notification.create({
         data: {
           userId: req.fromUserId,
           title: accept ? "Demande acceptée ✅" : "Demande refusée",
           body: accept
-            ? `Votre demande pour rejoindre ${classroom?.name ?? "la classe"} a été acceptée !`
-            : `Votre demande pour rejoindre ${classroom?.name ?? "la classe"} a été refusée.`,
+            ? `Votre demande pour rejoindre ${destinationName} a été acceptée !`
+            : `Votre demande pour rejoindre ${destinationName} a été refusée.`,
           type: accept ? "request_accepted" : "request_refused",
-          metadata: { classroomId: req.toClassroomId },
+          metadata: { classroomId: req.toClassroomId, groupId: req.toGroupId },
         },
       });
       return NextResponse.json({ success: true });
     }
 
     if (inviteId) {
-      const invite = await prisma.studyGroupInvite.update({
+      const invite = await prisma.studyGroupInvite.findUnique({ where: { id: inviteId } });
+      if (!invite || invite.toUserId !== user.id) return notFound();
+      if (invite.status !== "pending") return NextResponse.json({ error: "Invitation déjà traitée" }, { status: 409 });
+
+      let targetGroup: { id: string; name: string } | null = null;
+      if (invite.groupId) {
+        targetGroup = await prisma.studentGroup.findFirst({
+          where: { id: invite.groupId, isActive: true },
+          select: { id: true, name: true },
+        });
+        if (!targetGroup) return NextResponse.json({ error: "Groupe indisponible" }, { status: 409 });
+      }
+
+      await prisma.studyGroupInvite.update({
         where: { id: inviteId },
         data: { status: accept ? "accepted" : "refused" },
       });
-      if (accept && invite.groupId) {
+      if (accept && targetGroup) {
         await prisma.studentGroupMember.upsert({
-          where: { groupId_userId: { groupId: invite.groupId, userId: invite.toUserId } },
-          create: { groupId: invite.groupId, userId: invite.toUserId },
+          where: { groupId_userId: { groupId: targetGroup.id, userId: user.id } },
+          create: { groupId: targetGroup.id, userId: user.id },
           update: { isActive: true },
         });
       }
@@ -276,10 +352,10 @@ export async function POST(request: NextRequest) {
           userId: invite.fromUserId,
           title: accept ? "Invitation acceptée ✅" : "Invitation refusée",
           body: accept
-            ? `${user.fullName} a rejoint votre groupe "${invite.groupName ?? ""}".`
-            : `${user.fullName} a décliné l'invitation pour "${invite.groupName ?? ""}".`,
+            ? `${user.fullName} a rejoint votre groupe "${targetGroup?.name ?? invite.groupName ?? ""}".`
+            : `${user.fullName} a décliné l'invitation pour "${targetGroup?.name ?? invite.groupName ?? ""}".`,
           type: accept ? "invite_accepted" : "invite_refused",
-          metadata: { groupId: invite.groupId },
+          metadata: { groupId: targetGroup?.id ?? invite.groupId },
         },
       });
       return NextResponse.json({ success: true });
