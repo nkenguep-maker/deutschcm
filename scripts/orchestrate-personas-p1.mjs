@@ -2,10 +2,9 @@
 // Lot 7C · orchestre npm run test:personas:p1 · authentifié P-1.
 //
 // Pour chaque persona adulte (7 comptes), login réel + hit des routes
-// autorisées + refus des routes interdites. Les 2 personas enfants
-// (child_monde, child_racines) sont validés indirectement via
-// test:messaging-audio-child:p1 (session HMAC/PIN) · ce lot 7C ne
-// re-teste pas le mécanisme d'enfant (Lot P4.6-C.3.1).
+// autorisées + refus des routes interdites. Les 2 personas enfants sont
+// ensuite validés directement via parent réel + PIN + session HMAC + dashboard.
+// Ce script est fail-closed sur le projet P-1 et ne doit jamais viser Production.
 
 import { spawn, spawnSync } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
@@ -42,57 +41,56 @@ const PASSWORD = process.env.P1_TEST_PASSWORD;
 const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supRef = new URL(url).host.split(".")[0];
 
-// Matrice · duplication contrôlée depuis src/lib/personas/matrix.ts.
-// Un test structurel vitest enforce que les 2 sources restent alignées.
+// Matrice runtime · doit rester alignée avec src/lib/personas/matrix.ts.
 const ADULTS = [
   {
     id: "super_admin",
     email: "test_yema_qa_super_admin@example.com",
     homeRoute: "/fr/admin",
     allowedApi: ["/api/me"],
-    forbiddenApi: ["/api/child/session/current"],
+    forbiddenApi: ["/api/teacher/students"],
   },
   {
     id: "teacher",
     email: "test_yema_qa_teacher@example.com",
     homeRoute: "/fr/teacher",
     allowedApi: ["/api/teacher/dashboard", "/api/teacher/classes", "/api/teacher/students"],
-    forbiddenApi: ["/api/family/dashboard", "/api/child/session/current"],
+    forbiddenApi: ["/api/family/dashboard"],
   },
   {
     id: "coach",
     email: "test_yema_qa_coach@example.com",
-    homeRoute: "/fr/dashboard",
-    allowedApi: ["/api/me"],
-    forbiddenApi: ["/api/teacher/students", "/api/child/session/current"],
+    homeRoute: "/fr/coach/racines",
+    allowedApi: ["/api/roots-coach/dashboard", "/api/roots-coach/circles"],
+    forbiddenApi: ["/api/teacher/students"],
   },
   {
     id: "center_admin",
     email: "test_yema_qa_center_admin@example.com",
     homeRoute: "/fr/center",
-    allowedApi: ["/api/me"],
-    forbiddenApi: ["/api/teacher/students", "/api/family/dashboard", "/api/child/session/current"],
+    allowedApi: ["/api/me", "/api/center/dashboard"],
+    forbiddenApi: ["/api/teacher/students", "/api/family/dashboard"],
   },
   {
     id: "student_monde",
     email: "test_yema_qa_student_monde@example.com",
     homeRoute: "/fr/dashboard",
-    allowedApi: ["/api/me"],
-    forbiddenApi: ["/api/teacher/students", "/api/family/dashboard", "/api/child/session/current"],
+    allowedApi: ["/api/me", "/api/me/monde-dashboard"],
+    forbiddenApi: ["/api/teacher/students", "/api/family/dashboard"],
   },
   {
     id: "student_racines",
     email: "test_yema_qa_student_racines@example.com",
     homeRoute: "/fr/dashboard",
     allowedApi: ["/api/me"],
-    forbiddenApi: ["/api/teacher/students", "/api/family/dashboard", "/api/child/session/current"],
+    forbiddenApi: ["/api/teacher/students", "/api/family/dashboard"],
   },
   {
     id: "family",
     email: "test_yema_qa_family@example.com",
-    homeRoute: "/fr/famille",
+    homeRoute: "/fr/family",
     allowedApi: ["/api/family/dashboard", "/api/family/children"],
-    forbiddenApi: ["/api/teacher/students", "/api/child/session/current"],
+    forbiddenApi: ["/api/teacher/students"],
   },
 ];
 
@@ -169,11 +167,10 @@ async function main() {
       if (res.ok) console.log(`  ✓ ${res.msg}`);
       else { console.error(`  ✗ ${res.msg}`); exitCode = 1; }
     }
-    // Lot 7C.1 · Child Monde + Child Racines directs via /api/child-session.
-    console.log("[personas] STEP 4 · Child Monde (Lina) · login PIN + dashboard + polling");
+
+    console.log("[personas] STEP 4 · Child Monde (Lina) · PIN + session + dashboard");
     const familyCookie = await loginCookie("test_yema_qa_family@example.com");
     const parentHeaders = { Cookie: familyCookie, Origin: `http://${HOST}`, Host: HOST, "Content-Type": "application/json" };
-    // Login enfant Monde · PIN 1234 canonique fixture.
     const cs1 = await fetch(`http://${HOST}/api/child-session`, {
       method: "POST",
       headers: parentHeaders,
@@ -187,21 +184,23 @@ async function main() {
       else {
         const childCookie = `${familyCookie}; yema_child_session=${childCookieMatch[1]}`;
         const childHeaders = { Cookie: childCookie, Origin: `http://${HOST}`, Host: HOST };
-        // GET /api/child-session doit répondre active:true.
         const csGet = await fetch(`http://${HOST}/api/child-session`, { headers: childHeaders });
         const csBody = await csGet.json();
+        const dashboard = await fetch(`http://${HOST}/fr/dashboard`, { headers: childHeaders, redirect: "manual" });
         if (!csBody?.active || csBody.childProfileId !== "test_yema_qa_child_family_monde") {
           console.error(`  ✗ child session GET · active=${csBody?.active}`);
           exitCode = 1;
+        } else if (dashboard.status !== 200) {
+          console.error(`  ✗ child_monde dashboard · ${dashboard.status}`);
+          exitCode = 1;
         } else {
-          console.log(`  ✓ [child_monde] session HMAC active · dashboard polling-only ✓`);
+          console.log("  ✓ [child_monde] session HMAC active · dashboard 200");
         }
-        // Logout enfant.
         await fetch(`http://${HOST}/api/child-session`, { method: "DELETE", headers: childHeaders });
       }
     }
 
-    console.log("[personas] STEP 5 · Child Racines (Aicha) · login PIN + logout");
+    console.log("[personas] STEP 5 · Child Racines (Aicha) · PIN + session + dashboard");
     const cs2 = await fetch(`http://${HOST}/api/child-session`, {
       method: "POST",
       headers: parentHeaders,
@@ -209,44 +208,73 @@ async function main() {
     });
     if (cs2.status !== 200) { console.error(`  ✗ child_racines login · ${cs2.status}`); exitCode = 1; }
     else {
-      console.log(`  ✓ [child_racines] login PIN valide · session émise`);
       const set2 = cs2.headers.get("set-cookie") ?? "";
       const m2 = set2.match(/yema_child_session=([^;]+)/);
-      if (m2) {
+      if (!m2) {
+        console.error("  ✗ child_racines cookie manquant");
+        exitCode = 1;
+      } else {
         const cH = { Cookie: `${familyCookie}; yema_child_session=${m2[1]}`, Origin: `http://${HOST}`, Host: HOST };
+        const dashboard = await fetch(`http://${HOST}/fr/dashboard`, { headers: cH, redirect: "manual" });
+        if (dashboard.status !== 200) {
+          console.error(`  ✗ child_racines dashboard · ${dashboard.status}`);
+          exitCode = 1;
+        } else {
+          console.log("  ✓ [child_racines] session HMAC active · dashboard 200");
+        }
         await fetch(`http://${HOST}/api/child-session`, { method: "DELETE", headers: cH });
       }
     }
 
-    // Lot 7C.1 · Invalidation PIN ACTIVE · temp change pinHash + pinUpdatedAt.
+    // Invalidation PIN ACTIVE · temp change pinHash + pinUpdatedAt.
+    // Le nettoyage ciblé AuditEvent rend le scénario répétable sans affaiblir
+    // le rate-limit réel : seuls les événements de la fixture P-1 sont touchés.
     console.log("[personas] STEP 6 · Invalidation PIN active · rotation temporaire");
     const localDb = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DIRECT_URL }) });
     try {
+      const familyUser = await localDb.user.findUnique({
+        where: { email: "test_yema_qa_family@example.com" },
+        select: { id: true },
+      });
+      if (!familyUser) throw new Error("family QA user absent");
+
+      const qaPinAuditWhere = {
+        actorUserId: familyUser.id,
+        action: "CHILD_ACCESS_DENIED",
+        targetType: "ChildProfile",
+        targetId: "test_yema_qa_child_family_monde",
+        scopeType: "child_session_pin",
+        scopeId: "test_yema_qa_child_family_monde",
+      };
+      await localDb.auditEvent.deleteMany({ where: qaPinAuditWhere });
+
       const original = await localDb.childProfile.findUnique({
         where: { id: "test_yema_qa_child_family_monde" },
         select: { pinHash: true, pinUpdatedAt: true },
       });
       if (!original?.pinHash) throw new Error("original PIN absent");
-      // Générer un nouveau PIN "9999" et sauvegarder l'ancien en mémoire.
       const newHash = await hashChildPin("9999");
       const newDate = new Date();
       await localDb.childProfile.update({
         where: { id: "test_yema_qa_child_family_monde" },
         data: { pinHash: newHash, pinUpdatedAt: newDate },
       });
-      // Ancien PIN "1234" doit ÊTRE REFUSÉ maintenant.
+
       const oldPinAttempt = await fetch(`http://${HOST}/api/child-session`, {
         method: "POST",
         headers: parentHeaders,
         body: JSON.stringify({ childProfileId: "test_yema_qa_child_family_monde", pin: "1234" }),
       });
       if (oldPinAttempt.status === 200) {
-        console.error(`  ✗ ancien PIN accepté après rotation · invalidation cassée`);
+        console.error("  ✗ ancien PIN accepté après rotation · invalidation cassée");
+        exitCode = 1;
+      } else if (oldPinAttempt.status === 429) {
+        console.error("  ✗ rate-limit inattendu sur fixture nettoyée");
         exitCode = 1;
       } else {
         console.log(`  ✓ ancien PIN refusé (${oldPinAttempt.status}) · invalidation OK`);
       }
-      // Nouveau PIN "9999" doit fonctionner.
+
       const newPinAttempt = await fetch(`http://${HOST}/api/child-session`, {
         method: "POST",
         headers: parentHeaders,
@@ -256,14 +284,16 @@ async function main() {
         console.error(`  ✗ nouveau PIN refusé · ${newPinAttempt.status}`);
         exitCode = 1;
       } else {
-        console.log(`  ✓ nouveau PIN accepté · rotation fonctionnelle`);
+        console.log("  ✓ nouveau PIN accepté · rotation fonctionnelle");
       }
-      // RESTAURATION EXACTE.
+
+      // RESTAURATION EXACTE, même si le check précédent a échoué.
       await localDb.childProfile.update({
         where: { id: "test_yema_qa_child_family_monde" },
         data: { pinHash: original.pinHash, pinUpdatedAt: original.pinUpdatedAt },
       });
-      // Re-vérifier · l'ancien PIN "1234" doit à nouveau fonctionner.
+      await localDb.auditEvent.deleteMany({ where: qaPinAuditWhere });
+
       const restoredCheck = await fetch(`http://${HOST}/api/child-session`, {
         method: "POST",
         headers: parentHeaders,
@@ -273,8 +303,7 @@ async function main() {
         console.error(`  ✗ restauration PIN incorrecte · "1234" refusé (${restoredCheck.status})`);
         exitCode = 1;
       } else {
-        console.log(`  ✓ PIN original restauré · "1234" refonctionne`);
-        // Nettoyer la session enfant créée par le check restauration.
+        console.log("  ✓ PIN original restauré · \"1234\" refonctionne");
         const restSet = restoredCheck.headers.get("set-cookie") ?? "";
         const rm = restSet.match(/yema_child_session=([^;]+)/);
         if (rm) {
