@@ -23,8 +23,12 @@ describe("commercial surfaces · offers visible, payments deferred", () => {
     expect(page).toContain("addon=roots-solo");
     expect(page).toContain("AFRICAN_SOLO");
     expect(page).toContain("no charge is made today");
+    expect(page).toContain("until checkout is enabled");
     expect(page).not.toContain("stripe");
-    expect(page).not.toContain("checkout");
+    expect(page).not.toContain("/api/checkout");
+    expect(page).not.toContain("createCheckout");
+    expect(page).not.toContain("accessGrant.create");
+    expect(page).not.toContain("order.create");
   });
 
   it("renders Racines Solo, Family and coach pricing without triggering payment", () => {
@@ -36,7 +40,8 @@ describe("commercial surfaces · offers visible, payments deferred", () => {
     expect(page).toContain("racines-famille");
     expect(page).toContain("No payment is triggered today");
     expect(page).not.toContain("stripe");
-    expect(page).not.toContain("checkout");
+    expect(page).not.toContain("/api/checkout");
+    expect(page).not.toContain("createCheckout");
   });
 
   it("keeps the centralized pricing model intact", () => {
