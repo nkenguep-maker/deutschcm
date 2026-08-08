@@ -10,6 +10,7 @@ import { isMessagingEnabled } from "@/lib/flags";
 import { resolveMessagingActor } from "@/lib/messaging/actor";
 import { listConversationMessages } from "@/lib/messaging/conversations";
 import { sendMessage } from "@/lib/messaging/messages";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 
 export const dynamic = "force-dynamic";
 function notFound() { return NextResponse.json({ error: "Not found" }, { status: 404 }); }
@@ -48,6 +49,8 @@ export async function POST(
   ctx: { params: Promise<{ conversationId: string }> },
 ) {
   if (!isMessagingEnabled()) return notFound();
+  if (!isSameOriginRequest(req)) return forbidden("origin_mismatch");
+
   const actor = await resolveMessagingActor();
   if (!actor) return notFound();
   const { conversationId } = await ctx.params;
