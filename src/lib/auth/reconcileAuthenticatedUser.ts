@@ -3,7 +3,7 @@ import "server-only";
 import { Role } from "@prisma/client";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import prisma from "@/lib/prisma";
-import { reconcileDbUser } from "@/lib/reconcileDbUser";
+import { reconcileDbUser, ReconcileError } from "@/lib/reconcileDbUser";
 import { syncUserMetadata, type SpaceRole } from "@/lib/roles";
 
 /**
@@ -16,7 +16,7 @@ import { syncUserMetadata, type SpaceRole } from "@/lib/roles";
  */
 export async function reconcileAuthenticatedUser(authUser: SupabaseUser) {
   if (!authUser.email) {
-    return reconcileDbUser({ authUser, defaultRole: Role.STUDENT });
+    throw new ReconcileError("MISSING_EMAIL", "authUser without email");
   }
 
   const email = authUser.email.toLowerCase();
