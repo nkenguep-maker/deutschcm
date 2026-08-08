@@ -79,7 +79,12 @@
 
   async function main() {
     console.log("[final-browser] STEP 1 · fixtures QA");
-    spawnSync("node", ["scripts/test-baseline/yema-qa-fixtures.mjs"], { stdio: "inherit", env: process.env });
+    const fixtures = spawnSync("node", ["scripts/test-baseline/yema-qa-fixtures.mjs"], {
+      stdio: "inherit",
+      env: process.env,
+    });
+    if (fixtures.error) fail("1", `fixtures impossible à lancer · ${fixtures.error.message}`);
+    if (fixtures.status !== 0) fail("1", `fixtures exit ${fixtures.status ?? "unknown"}`);
 
     const ts = Date.now();
 
@@ -204,8 +209,9 @@
         YEMA_CHILD_SESSION_SECRET: hmacSecret,
       },
     });
-    if (pw.status !== 0) console.log(`  ⚠ Playwright exit ${pw.status} · certaines assertions peuvent avoir échoué`);
-    else console.log(`  ✓ Playwright tests all green`);
+    if (pw.error) fail("5", `Playwright impossible à lancer · ${pw.error.message}`);
+    if (pw.status !== 0) fail("5", `Playwright exit ${pw.status ?? "unknown"}`);
+    console.log(`  ✓ Playwright tests all green`);
 
     console.log("[final-browser] ALL DONE");
   }
