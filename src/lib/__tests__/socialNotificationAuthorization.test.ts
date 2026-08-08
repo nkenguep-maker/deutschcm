@@ -36,9 +36,9 @@ describe("P4.7 · social notifications authorization", () => {
   it("materializes accepted group join requests as memberships", () => {
     const socialRoute = read("src/app/api/social/route.ts");
 
-    expect(socialRoute).toContain("if (accept && req.toGroupId)");
+    expect(socialRoute).toContain("if (input.accept && req.toGroupId)");
     expect(socialRoute).toContain("prisma.studentGroupMember.upsert");
-    expect(socialRoute).toContain("groupId: req.toGroupId, userId: req.fromUserId");
+    expect(socialRoute).toMatch(/groupId_userId:\s*\{\s*groupId:\s*req\.toGroupId,\s*userId:\s*req\.fromUserId\s*\}/);
   });
 
   it("rate limits social writes from database history without a new counter store", () => {
@@ -72,7 +72,7 @@ describe("P4.7 · social notifications authorization", () => {
 
     expect(socialRoute).toContain("enrollment?.isActive");
     expect(socialRoute).toContain("membership?.isActive");
-    expect(socialRoute).toContain("toUserId === user.id");
+    expect(socialRoute).toContain("input.toUserId === user.id");
     expect(socialRoute).toContain("Invitation déjà envoyée");
   });
 });
