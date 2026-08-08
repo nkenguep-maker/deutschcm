@@ -23,10 +23,7 @@ describe("canonical registration → onboarding → persona home funnel", () => 
   it("offers six public adult personas while keeping Super Admin non-self-service", () => {
     const page = read("src/app/[locale]/onboarding/persona/page.tsx");
     const route = read("src/app/api/onboarding/persona/route.ts");
-
-    for (const persona of ["student_monde", "student_racines", "family", "teacher", "coach", "center_admin"]) {
-      expect(page).toContain(`id: "${persona}"`);
-    }
+    for (const persona of ["student_monde", "student_racines", "family", "teacher", "coach", "center_admin"]) expect(page).toContain(`id: "${persona}"`);
     expect(route).toContain('persona === "super_admin"');
     expect(route).toContain('bad("PERSONA_NOT_SELF_SERVICE", 403)');
   });
@@ -48,7 +45,6 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     const route = read("src/app/api/onboarding/persona/route.ts");
     const complete = read("src/app/api/onboarding/complete/route.ts");
     const legacy = read("src/app/api/onboarding/route.ts");
-
     expect(route).toContain("isInternalTestEnvironment()");
     expect(route).toContain("qaAutoApproved: true");
     expect(route).toContain('status: "PENDING"');
@@ -65,7 +61,6 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     const home = read("src/app/api/auth/home/route.ts");
     const dashboard = read("src/app/[locale]/dashboard/page.tsx");
     const onboarding = read("src/app/[locale]/onboarding/page.tsx");
-
     expect(login).toContain('/api/auth/home');
     expect(callback).toContain("resolvePersonaRuntime");
     expect(home).toContain("resolvePersonaRuntime");
@@ -81,7 +76,6 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     const center = read("src/app/[locale]/center/page.tsx");
     const coach = read("src/app/[locale]/coach/racines/page.tsx");
     const family = read("src/app/[locale]/family/page.tsx");
-
     for (const page of [teacher, center, coach, family]) {
       expect(page).toContain("resolvePersonaRuntime");
       expect(page).toContain("!runtime.onboarded");
@@ -93,7 +87,6 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     const familyPage = read("src/app/[locale]/onboarding/family/page.tsx");
     const children = read("src/app/api/family/children/route.ts");
     const seats = read("src/lib/family/seats.ts");
-
     expect(familyPage).toContain("pas une adresse e-mail");
     expect(familyPage).toContain("avatar");
     expect(familyPage).toContain("PIN enfant");
@@ -107,7 +100,6 @@ describe("canonical registration → onboarding → persona home funnel", () => 
   it("lets an existing Monde learner save Roots Solo on the same account without granting access", () => {
     const pricing = read("src/app/[locale]/pricing/monde/page.tsx");
     const intent = read("src/app/api/account/offer-intent/route.ts");
-
     expect(pricing).toContain('data-addon="roots-solo"');
     expect(pricing).toContain("/api/account/offer-intent");
     expect(pricing).toContain("Ajouter Racines Solo à mon compte");
@@ -123,13 +115,11 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     const teacher = read("src/app/[locale]/onboarding/teacher/page.tsx");
     const center = read("src/app/[locale]/onboarding/center/page.tsx");
     const legacyApi = read("src/app/api/onboarding/route.ts");
-
     expect(teacher).toContain('fetch("/api/me"');
     expect(teacher).toContain('fetch("/api/onboarding"');
     expect(teacher).toContain('fetch("/api/onboarding/complete"');
     expect(teacher).not.toContain("CENTERS =");
     expect(teacher).not.toContain("Institut Goethe Yaoundé");
-
     expect(center).toContain('fetch("/api/me"');
     expect(center).toContain('fetch("/api/onboarding"');
     expect(center).toContain('fetch("/api/onboarding/complete"');
@@ -137,16 +127,18 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     expect(center).not.toContain("PLAN_PRICES");
     expect(center).not.toContain("cardNumber");
     expect(center).not.toContain("transactionId");
-    expect(legacyApi).toContain("if (dbUser.centerId)");
-    expect(legacyApi).toContain("prisma.languageCenter.update");
-    expect(legacyApi).toContain("prisma.languageCenter.create");
+    expect(legacyApi).toContain("if (!dbUser.centerId)");
+    expect(legacyApi).toContain("dbUser.centerId");
+    expect(legacyApi).toContain("tx.languageCenter.update");
+    expect(legacyApi).toContain("tx.languageCenter.create");
+    expect(legacyApi).toContain("await prisma.$transaction");
+    expect(legacyApi).toContain("await tx.teacher.upsert");
   });
 
   it("prefills confirmed account identity into Family, Teacher and Coach onboarding", () => {
     const family = read("src/app/[locale]/onboarding/family/page.tsx");
     const teacher = read("src/app/[locale]/onboarding/teacher/page.tsx");
     const coach = read("src/app/[locale]/onboarding/coach/page.tsx");
-
     for (const page of [family, teacher, coach]) {
       expect(page).toContain('fetch("/api/me"');
       expect(page).toContain("firstName");
@@ -160,7 +152,6 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     const family = read("src/features/dashboards/family/FamilyDashboard.tsx");
     const teacher = read("src/features/dashboards/teacher/TeacherDashboard.tsx");
     const coach = read("src/features/dashboards/coach-racines/CoachRacinesDashboard.tsx");
-
     expect(monde).toContain("data.greetingName");
     expect(racines).toContain("data.greetingName");
     expect(family).toContain("data.guardian.fullName");
