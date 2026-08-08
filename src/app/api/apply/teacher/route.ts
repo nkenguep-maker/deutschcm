@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
       (request.nextUrl.searchParams.get("locale") ?? "fr") === "en" ? "en" : "fr";
 
     if (process.env.RESEND_API_KEY) {
-      Promise.allSettled([
+      await Promise.allSettled([
         sendEmail({
           to: ADMIN_EMAIL,
           subject: `[YEMA] Nouvelle demande enseignant·e · ${fullName}`,
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
           html: acknowledgeHtml(fullName, locale),
           from: "YEMA <noreply@deutschcm.vercel.app>",
         }),
-      ]).catch(() => undefined);
+      ]);
     }
 
     return NextResponse.json({ ok: true, id: app.id });
