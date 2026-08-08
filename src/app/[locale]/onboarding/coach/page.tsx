@@ -1,8 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { useRouter } from "@/navigation";
-import { useState } from "react";
 import { BrandY } from "@/components/brand/BrandY";
 
 export default function CoachOnboardingPage() {
@@ -16,6 +16,18 @@ export default function CoachOnboardingPage() {
   const [bio, setBio] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/me", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const me = await response.json() as { firstName?: string | null; lastName?: string | null; city?: string | null };
+        setFirstName((current) => current || me.firstName || "");
+        setLastName((current) => current || me.lastName || "");
+        setCity((current) => current || me.city || "");
+      })
+      .catch(() => undefined);
+  }, []);
 
   async function finish(event: React.FormEvent) {
     event.preventDefault();
@@ -73,8 +85,8 @@ export default function CoachOnboardingPage() {
           </h1>
           <p className="entry-lede">
             {loc === "en"
-              ? "These details stay attached to your YEMA identity and are reused when you sign in again."
-              : "Ces informations restent rattachées à votre identité YEMA et sont reprises à chaque reconnexion."}
+              ? "Your confirmed identity is reused here. These coach details stay attached to your YEMA account for later sign-ins."
+              : "Votre identité confirmée est reprise ici. Ces informations Coach restent rattachées à votre compte YEMA pour les prochaines connexions."}
           </p>
 
           <form onSubmit={finish} className="entry-form">
