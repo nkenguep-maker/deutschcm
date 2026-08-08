@@ -18,6 +18,15 @@ type NavLabels = {
   tarifs?: string;
 };
 
+const FOCUSABLE = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
+
 function switchLocale(target: "fr" | "en", current: string) {
   if (target === current) return;
   document.cookie = `NEXT_LOCALE=${target}; path=/; max-age=31536000; SameSite=Lax`;
@@ -32,15 +41,59 @@ export function LandingNav({ locale, labels, isMobile = false }: { locale: strin
   const drawerRef = useRef<HTMLDivElement>(null);
   const burgerRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => { const onScroll = () => setSolid(window.scrollY > 50); onScroll(); window.addEventListener("scroll", onScroll, { passive: true }); return () => window.removeEventListener("scroll", onScroll); }, []);
   useEffect(() => {
-    if (!menuOpen) { document.body.style.overflow = ""; return; }
+    const onScroll = () => setSolid(window.scrollY > 50);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!menuOpen) {
+      document.body.style.overflow = "";
+      return;
+    }
+
     document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setMenuOpen(false); burgerRef.current?.focus(); } };
+    const drawer = drawerRef.current;
+    const focusables = () => Array.from(drawer?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? [])
+      .filter((element) => !element.hasAttribute("disabled") && element.getAttribute("aria-hidden") !== "true");
+
+    focusables()[0]?.focus();
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setMenuOpen(false);
+        burgerRef.current?.focus();
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const items = focusables();
+      if (items.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (event.shiftKey && (active === first || !drawer?.contains(active))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (active === last || !drawer?.contains(active))) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
     window.addEventListener("keydown", onKey);
-    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
   }, [menuOpen]);
-  useEffect(() => { if (menuOpen) drawerRef.current?.querySelector<HTMLElement>("a, button")?.focus(); }, [menuOpen]);
 
   const navCandidates: Array<{ surface: PublicSurfaceId; label: string; href: string }> = [
     { surface: "languages", label: labels.features, href: `/${locale}/langues` },
@@ -65,6 +118,23 @@ export function LandingNav({ locale, labels, isMobile = false }: { locale: strin
         </> : <button ref={burgerRef} type="button" className="lnav-burger" onClick={() => setMenuOpen(true)} aria-label={openLabel} aria-expanded={menuOpen} aria-controls="lnav-drawer"><span className="lnav-burger-bar" aria-hidden="true" /><span className="lnav-burger-bar" aria-hidden="true" /><span className="lnav-burger-bar" aria-hidden="true" /></button>}
       </div>
     </nav>
-    {isMobile ? <><button type="button" className={`lnav-scrim ${menuOpen ? "open" : ""}`} aria-hidden="true" tabIndex={-1} onClick={() => setMenuOpen(false)} /><div ref={drawerRef} id="lnav-drawer" className={`lnav-drawer ${menuOpen ? "open" : ""}`} role="dialog" aria-modal="true" aria-label="Menu"><div className="lnav-drawer-head"><span className="lnav-drawer-eye">MENU</span><button type="button" className="lnav-drawer-close" onClick={() => setMenuOpen(false)} aria-label={closeLabel}><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" /></svg></button></div><ul className="lnav-drawer-links" role="list">{navItems.map((it) => <li key={it.href}><a href={it.href} onClick={() => setMenuOpen(false)}>{it.label}</a></li>)}</ul><div className="lnav-drawer-actions"><button type="button" className="lnav-drawer-cta lnav-drawer-cta-primary" onClick={() => { setMenuOpen(false); router.push(`/${locale}/register`); }}>{labels.register}</button><button type="button" className="lnav-drawer-cta lnav-drawer-cta-ghost" onClick={() => { setMenuOpen(false); router.push(`/${locale}/login`); }}>{labels.login}</button></div><div className="lnav-drawer-locale" role="group" aria-label={langLabel}><button type="button" className={`lnav-locale-btn ${locale === "fr" ? "active" : ""}`} onClick={() => switchLocale("fr", locale)} aria-pressed={locale === "fr"}>FR</button><button type="button" className={`lnav-locale-btn ${locale === "en" ? "active" : ""}`} onClick={() => switchLocale("en", locale)} aria-pressed={locale === "en"}>EN</button></div></div></> : null}
+    {isMobile ? <>
+      <button type="button" className={`lnav-scrim ${menuOpen ? "open" : ""}`} aria-hidden="true" tabIndex={-1} onClick={() => setMenuOpen(false)} />
+      <div
+        ref={drawerRef}
+        id="lnav-drawer"
+        className={`lnav-drawer ${menuOpen ? "open" : ""}`}
+        role="dialog"
+        aria-modal={menuOpen ? "true" : undefined}
+        aria-hidden={!menuOpen}
+        aria-label="Menu"
+        inert={!menuOpen}
+      >
+        <div className="lnav-drawer-head"><span className="lnav-drawer-eye">MENU</span><button type="button" className="lnav-drawer-close" onClick={() => { setMenuOpen(false); burgerRef.current?.focus(); }} aria-label={closeLabel}><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" /></svg></button></div>
+        <ul className="lnav-drawer-links" role="list">{navItems.map((it) => <li key={it.href}><a href={it.href} onClick={() => setMenuOpen(false)}>{it.label}</a></li>)}</ul>
+        <div className="lnav-drawer-actions"><button type="button" className="lnav-drawer-cta lnav-drawer-cta-primary" onClick={() => { setMenuOpen(false); router.push(`/${locale}/register`); }}>{labels.register}</button><button type="button" className="lnav-drawer-cta lnav-drawer-cta-ghost" onClick={() => { setMenuOpen(false); router.push(`/${locale}/login`); }}>{labels.login}</button></div>
+        <div className="lnav-drawer-locale" role="group" aria-label={langLabel}><button type="button" className={`lnav-locale-btn ${locale === "fr" ? "active" : ""}`} onClick={() => switchLocale("fr", locale)} aria-pressed={locale === "fr"}>FR</button><button type="button" className={`lnav-locale-btn ${locale === "en" ? "active" : ""}`} onClick={() => switchLocale("en", locale)} aria-pressed={locale === "en"}>EN</button></div>
+      </div>
+    </> : null}
   </>;
 }
