@@ -1,6 +1,13 @@
 export const INTERNAL_TEST_COOKIE_NAME = "yema_internal_persona";
 export const INTERNAL_TEST_COOKIE_MAX_AGE = 60 * 60 * 8;
 
+const INTERNAL_TEST_P1_REF = "kzzagbojjkivdzzcrmxn";
+const INTERNAL_TEST_FORBIDDEN_REFS = [
+  "sbjhvlrkbyjckdxujjsk",
+  "mamofhrurksyuuolucea",
+  "qggwvonfumuimjfsgpdz",
+];
+
 export const INTERNAL_PERSONA_IDS = [
   "super_admin",
   "teacher",
@@ -158,10 +165,28 @@ export function internalPersonaDestination(persona: InternalPersonaId, locale: s
   return `/${loc}${INTERNAL_PERSONA_ATTRIBUTES[persona].destinationPath}`;
 }
 
+/**
+ * A persona cookie is an authorization overlay. Even a historically valid
+ * cookie must become inert outside the canonical P-1 environment.
+ */
+export function isInternalPersonaRuntimeAllowed(): boolean {
+  if (process.env.VERCEL_ENV === "production") return false;
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  if (!supabaseUrl.includes(INTERNAL_TEST_P1_REF)) return false;
+  if (INTERNAL_TEST_FORBIDDEN_REFS.some((ref) => supabaseUrl.includes(ref))) return false;
+
+  return (
+    process.env.VERCEL_ENV === "preview" ||
+    process.env.P1_BASELINE_CONFIRMED_NOT_PRODUCTION === "true"
+  );
+}
+
 export function resolveInternalPersona(
   rawPersona: unknown,
   email: string | null | undefined,
 ): { id: InternalPersonaId; attributes: InternalPersonaAttributes } | null {
+  if (!isInternalPersonaRuntimeAllowed()) return null;
   if (!isInternalTesterEmail(email) || !isInternalPersonaId(rawPersona)) return null;
   return { id: rawPersona, attributes: getInternalPersonaAttributes(rawPersona) };
 }
