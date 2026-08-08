@@ -81,4 +81,15 @@ describe("closed beta invitation provisioning", () => {
     expect(page).toContain('fetch("/api/auth/sync", { method: "POST" })');
     expect(page).not.toContain("signInWithOAuth");
   });
+
+  it("keeps the admin invitation console admission-only", () => {
+    const page = read("src/app/[locale]/admin/beta/page.tsx");
+
+    expect(page).toContain('fetch("/api/admin/beta/invite"');
+    expect(page).toContain("navigator.clipboard.writeText");
+    expect(page).toContain("72 heures");
+    expect(page).not.toContain('value="TEACHER"');
+    expect(page).not.toContain('value="CENTER"');
+    expect(page).not.toContain('value="ADMIN"');
+  });
 });
