@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
+import {
+  hasReachedGroupInviteQuota,
+  hasReachedJoinRequestQuota,
+} from "@/lib/social/rateLimit";
 
 async function getAuthDbUser() {
   const cookieStore = await cookies();
@@ -26,6 +30,13 @@ function forbidden() {
 
 function notFound() {
   return NextResponse.json({ error: "Not found" }, { status: 404 });
+}
+
+function rateLimited() {
+  return NextResponse.json(
+    { error: "Too many requests", code: "social_rate_limited" },
+    { status: 429, headers: { "Retry-After": "3600" } }
+  );
 }
 
 // ── GET: notifications ────────────────────────────────────────────────────────
@@ -140,31 +151,43 @@ export async function POST(request: NextRequest) {
     const { classroomId, message } = body;
     if (!classroomId) return NextResponse.json({ error: "classroomId requis" }, { status: 400 });
 
+    const classroom = await prisma.classroom.findFirst({
+      where: { id: classroomId, isActive: true },
+      select: {
+        id: true,
+        name: true,
+        teacher: { select: { user: { select: { id: true } } } },
+      },
+    });
+    if (!classroom) return notFound();
+
+    const enrollment = await prisma.classroomEnrollment.findUnique({
+      where: { classroomId_userId: { classroomId, userId: user.id } },
+      select: { isActive: true },
+    });
+    if (enrollment?.isActive) {
+      return NextResponse.json({ error: "Déjà inscrit à cette classe" }, { status: 409 });
+    }
+
     const existing = await prisma.classJoinRequest.findFirst({
       where: { fromUserId: user.id, toClassroomId: classroomId, status: "pending" },
     });
     if (existing) return NextResponse.json({ error: "Demande déjà envoyée" }, { status: 409 });
+    if (await hasReachedJoinRequestQuota(user.id)) return rateLimited();
 
     const req = await prisma.classJoinRequest.create({
       data: { fromUserId: user.id, toClassroomId: classroomId, message: message ?? null },
     });
 
-    // Notify teacher
-    const classroom = await prisma.classroom.findUnique({
-      where: { id: classroomId },
-      include: { teacher: { include: { user: true } } },
+    await prisma.notification.create({
+      data: {
+        userId: classroom.teacher.user.id,
+        title: "Nouvelle demande d'inscription",
+        body: `${user.fullName} demande à rejoindre ${classroom.name}.`,
+        type: "join_request",
+        metadata: { requestId: req.id, classroomId, studentName: user.fullName },
+      },
     });
-    if (classroom?.teacher?.user) {
-      await prisma.notification.create({
-        data: {
-          userId: classroom.teacher.user.id,
-          title: "Nouvelle demande d'inscription",
-          body: `${user.fullName} demande à rejoindre ${classroom.name}.`,
-          type: "join_request",
-          metadata: { requestId: req.id, classroomId, studentName: user.fullName },
-        },
-      });
-    }
     return NextResponse.json({ success: true, requestId: req.id });
   }
 
@@ -173,28 +196,42 @@ export async function POST(request: NextRequest) {
     const { groupId, message } = body;
     if (!groupId) return NextResponse.json({ error: "groupId requis" }, { status: 400 });
 
+    const group = await prisma.studentGroup.findFirst({
+      where: { id: groupId, isActive: true },
+      select: { id: true, name: true, creatorId: true, creator: { select: { id: true } } },
+    });
+    if (!group) return notFound();
+    if (group.creatorId === user.id) {
+      return NextResponse.json({ error: "Vous possédez déjà ce groupe" }, { status: 409 });
+    }
+
+    const membership = await prisma.studentGroupMember.findUnique({
+      where: { groupId_userId: { groupId, userId: user.id } },
+      select: { isActive: true },
+    });
+    if (membership?.isActive) {
+      return NextResponse.json({ error: "Déjà membre de ce groupe" }, { status: 409 });
+    }
+
     const existing = await prisma.classJoinRequest.findFirst({
       where: { fromUserId: user.id, toGroupId: groupId, status: "pending" },
     });
     if (existing) return NextResponse.json({ error: "Demande déjà envoyée" }, { status: 409 });
+    if (await hasReachedJoinRequestQuota(user.id)) return rateLimited();
 
     const req = await prisma.classJoinRequest.create({
       data: { fromUserId: user.id, toGroupId: groupId, message: message ?? null },
     });
 
-    // Notify group creator
-    const group = await prisma.studentGroup.findUnique({ where: { id: groupId }, include: { creator: true } });
-    if (group?.creator) {
-      await prisma.notification.create({
-        data: {
-          userId: group.creator.id,
-          title: "Demande pour rejoindre votre groupe",
-          body: `${user.fullName} veut rejoindre "${group.name}".`,
-          type: "group_join_request",
-          metadata: { requestId: req.id, groupId, studentName: user.fullName },
-        },
-      });
-    }
+    await prisma.notification.create({
+      data: {
+        userId: group.creator.id,
+        title: "Demande pour rejoindre votre groupe",
+        body: `${user.fullName} veut rejoindre "${group.name}".`,
+        type: "group_join_request",
+        metadata: { requestId: req.id, groupId, studentName: user.fullName },
+      },
+    });
     return NextResponse.json({ success: true, requestId: req.id });
   }
 
@@ -202,6 +239,12 @@ export async function POST(request: NextRequest) {
   if (action === "invite-to-group") {
     const { toUserId, groupId, groupName, message } = body;
     if (!toUserId) return NextResponse.json({ error: "toUserId requis" }, { status: 400 });
+    if (toUserId === user.id) {
+      return NextResponse.json({ error: "Impossible de vous inviter vous-même" }, { status: 409 });
+    }
+
+    const invitedUser = await prisma.user.findUnique({ where: { id: toUserId }, select: { id: true } });
+    if (!invitedUser) return notFound();
 
     let authorizedGroup: { id: string; name: string } | null = null;
     if (groupId) {
@@ -210,7 +253,30 @@ export async function POST(request: NextRequest) {
         select: { id: true, name: true },
       });
       if (!authorizedGroup) return forbidden();
+
+      const membership = await prisma.studentGroupMember.findUnique({
+        where: { groupId_userId: { groupId: authorizedGroup.id, userId: toUserId } },
+        select: { isActive: true },
+      });
+      if (membership?.isActive) {
+        return NextResponse.json({ error: "Cet utilisateur est déjà membre" }, { status: 409 });
+      }
+
+      const existingInvite = await prisma.studyGroupInvite.findFirst({
+        where: {
+          fromUserId: user.id,
+          toUserId,
+          groupId: authorizedGroup.id,
+          status: "pending",
+        },
+        select: { id: true },
+      });
+      if (existingInvite) {
+        return NextResponse.json({ error: "Invitation déjà envoyée" }, { status: 409 });
+      }
     }
+
+    if (await hasReachedGroupInviteQuota(user.id)) return rateLimited();
 
     const effectiveGroupName = authorizedGroup?.name ?? groupName ?? null;
     const invite = await prisma.studyGroupInvite.create({
