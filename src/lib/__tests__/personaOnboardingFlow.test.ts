@@ -11,7 +11,8 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     expect(register).toContain("first_name: first");
     expect(register).toContain("last_name: last");
     expect(register).toContain("selected_plan: selectedPlan");
-    expect(register).toContain('selected_addons: rootsSoloSelected ? ["roots-solo"] : []');
+    expect(register).toContain('rootsCoachSelected = searchParams.get("addon") === "roots-coach"');
+    expect(register).toContain('selected_addons: selectedAddon ? [selectedAddon] : []');
     expect(register).toContain("teacher_addon_requested: teacherAddonRequested");
     expect(register).toContain('"racines-solo"');
     expect(register).toContain('"racines-famille"');
@@ -37,6 +38,7 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     expect(route).toContain('rawPlan === "racines-solo"');
     expect(route).toContain('rawPlan === "racines-famille"');
     expect(route).toContain('params.rawAddon === "roots-solo"');
+    expect(route).toContain('params.rawAddon === "roots-coach"');
     expect(route).toContain("Professional personas never inherit learner/family commercial intent");
     expect(route).toContain("plan: offer.selectedPlan");
   });
