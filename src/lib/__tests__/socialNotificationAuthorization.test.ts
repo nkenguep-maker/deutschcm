@@ -17,28 +17,51 @@ describe("P4.7 · social notifications authorization", () => {
 
   it("scopes class and group request responses to their owning actor", () => {
     const socialRoute = read("src/app/api/social/route.ts");
+    const responder = read("src/lib/social/respondJoinRequest.ts");
 
-    expect(socialRoute).toContain('req.status !== "pending"');
-    expect(socialRoute).toContain("teacherId: teacher.id");
-    expect(socialRoute).toContain("creatorId: user.id");
-    expect(socialRoute).toContain("if (!classroom) return forbidden()");
-    expect(socialRoute).toContain("if (!group) return forbidden()");
+    expect(socialRoute).toContain("respondToJoinRequest({");
+    expect(socialRoute).toContain("responderUserId: user.id");
+    expect(responder).toContain("where: { userId: params.responderUserId }");
+    expect(responder).toContain("teacherId: teacher.id");
+    expect(responder).toContain("creatorId: params.responderUserId");
+    expect(responder).toContain('reason: "forbidden"');
   });
 
   it("only lets the intended recipient answer an invitation", () => {
     const socialRoute = read("src/app/api/social/route.ts");
+    const responder = read("src/lib/social/respondJoinRequest.ts");
 
-    expect(socialRoute).toContain("invite.toUserId !== user.id");
-    expect(socialRoute).toContain('invite.status !== "pending"');
-    expect(socialRoute).toContain("userId: user.id");
+    expect(socialRoute).toContain("respondToGroupInvite({");
+    expect(responder).toContain("toUserId: params.responderUserId");
+    expect(responder).toContain('invite.status !== "pending"');
+    expect(responder).toContain("userId: params.responderUserId");
   });
 
-  it("materializes accepted group join requests as memberships", () => {
-    const socialRoute = read("src/app/api/social/route.ts");
+  it("materializes accepted group requests and invitations transactionally", () => {
+    const responder = read("src/lib/social/respondJoinRequest.ts");
 
-    expect(socialRoute).toContain("if (input.accept && req.toGroupId)");
-    expect(socialRoute).toContain("prisma.studentGroupMember.upsert");
-    expect(socialRoute).toMatch(/groupId_userId:\s*\{\s*groupId:\s*req\.toGroupId,\s*userId:\s*req\.fromUserId\s*\}/);
+    expect(responder).toContain("prisma.$transaction");
+    expect(responder).toContain("tx.studentGroupMember.upsert");
+    expect(responder).toMatch(/groupId_userId:\s*\{\s*groupId:\s*group\.id,\s*userId:\s*req\.fromUserId\s*\}/);
+    expect(responder).toMatch(/groupId_userId:\s*\{\s*groupId:\s*group\.id,\s*userId:\s*params\.responderUserId\s*\}/);
+    expect(responder).toContain('where: { id: invite.id, status: "pending", toUserId: params.responderUserId }');
+  });
+
+  it("serializes classroom acceptance and enforces capacity at decision time", () => {
+    const responder = read("src/lib/social/respondJoinRequest.ts");
+    const lock = responder.indexOf("pg_advisory_xact_lock(hashtextextended(${classroom.id}, 0))");
+    const count = responder.indexOf("tx.classroomEnrollment.count", lock);
+    const capacity = responder.indexOf("activeCount >= lockedClassroom.maxStudents", count);
+    const decide = responder.indexOf("tx.classJoinRequest.updateMany", capacity);
+    const enroll = responder.indexOf("tx.classroomEnrollment.upsert", decide);
+
+    expect(lock).toBeGreaterThan(-1);
+    expect(count).toBeGreaterThan(lock);
+    expect(capacity).toBeGreaterThan(count);
+    expect(decide).toBeGreaterThan(capacity);
+    expect(enroll).toBeGreaterThan(decide);
+    expect(responder).toContain('where: { id: req.id, status: "pending" }');
+    expect(responder).toContain('reason: "classroom_full"');
   });
 
   it("rate limits social writes from database history without a new counter store", () => {
