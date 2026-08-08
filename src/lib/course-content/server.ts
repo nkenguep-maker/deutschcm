@@ -44,7 +44,7 @@ export async function loadCourseViewer(courseId: string, locale: string): Promis
       status: "ACTIVE",
     },
     orderBy: { createdAt: "desc" },
-    select: { id: true, onboardingAnswers: true },
+    select: { id: true, currentLevel: true, onboardingAnswers: true },
   });
   if (!learningPath) redirect(`/${locale}/onboarding`);
 
@@ -57,9 +57,11 @@ export async function loadCourseViewer(courseId: string, locale: string): Promis
     },
     select: { startsAt: true, endsAt: true, status: true, metadata: true },
   });
-  const access = computeMondeAccess(grants, {
-    technicalBetaA1: courseId === "monde-adulte-de-a1" && isTechnicalBetaCourseAccessEnabled(),
-  });
+  const betaEligible =
+    courseId === "monde-adulte-de-a1" &&
+    (learningPath.currentLevel === null || learningPath.currentLevel === "A1") &&
+    isTechnicalBetaCourseAccessEnabled();
+  const access = computeMondeAccess(grants, { technicalBetaA1: betaEligible });
 
   const lessonIds = getCourseLessonIds(courseId);
   const progress = lessonIds.length === 0 ? [] : await prisma.moduleProgress.findMany({
