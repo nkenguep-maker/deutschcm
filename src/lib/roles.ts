@@ -141,18 +141,21 @@ export async function syncUserMetadata(params: {
   const { supabaseId, activeSpace } = params;
   const user = await prisma.user.findUnique({
     where: { supabaseId },
-    select: { id: true },
+    select: { id: true, role: true },
   });
   if (!user) return;
 
   const roles = await getUserRoles(user.id);
   const rolesList = roles.map((r) => r.role);
   const onboardedMap = Object.fromEntries(roles.map((r) => [r.role, r.onboarded]));
+  const trustedPrimary = user.role as SpaceRole;
 
   const chosenActive =
     activeSpace && rolesList.includes(activeSpace)
       ? activeSpace
-      : rolesList[0] ?? "STUDENT";
+      : rolesList.includes(trustedPrimary)
+        ? trustedPrimary
+        : rolesList[0] ?? "STUDENT";
 
   const admin = adminClient();
   const { data: current } = await admin.auth.admin.getUserById(supabaseId);
