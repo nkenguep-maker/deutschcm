@@ -140,4 +140,24 @@ describe("Persona dashboards · dedicated pages", () => {
     expect(courseSection).toContain('const statusLabel = locked');
     expect(courseSection).toContain('const statusTone = locked');
   });
+
+  it("keeps public metadata truthful and locale system states available", () => {
+    const layout = read("src/app/[locale]/layout.tsx");
+    const errorState = read("src/app/[locale]/error.tsx");
+    const loadingState = read("src/app/[locale]/loading.tsx");
+    const notFoundState = read("src/app/[locale]/not-found.tsx");
+
+    expect(layout).not.toContain("correction en direct");
+    expect(layout).not.toContain("live correction");
+    expect(layout).not.toContain("simulations réalistes");
+    expect(layout).not.toContain("realistic simulations");
+    expect(layout).toContain("premier parcours complet disponible est l'allemand A1");
+    expect(layout).toContain("first complete course currently available is German A1");
+
+    expect(errorState).toContain('onClick={reset}');
+    expect(errorState).toContain("useLocale");
+    expect(loadingState).toContain('aria-busy="true"');
+    expect(notFoundState).toContain("getLocale");
+    expect(notFoundState).toContain('href={`/${isEn ? "en" : "fr"}`}');
+  });
 });
