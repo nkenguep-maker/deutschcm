@@ -3,10 +3,16 @@ import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 import { reconcileAuthenticatedUser } from "@/lib/auth/reconcileAuthenticatedUser";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
+import { canReconcileClosedBetaIdentity } from "@/lib/beta/access";
 
 function loginPathFor(next: string): string {
   const locale = next.match(/^\/(fr|en)(?:\/|$)/)?.[1];
   return locale ? `/${locale}/login` : "/login";
+}
+
+function betaPathFor(next: string): string {
+  const locale = next.match(/^\/(fr|en)(?:\/|$)/)?.[1];
+  return locale ? `/${locale}/beta` : "/beta";
 }
 
 export async function GET(request: NextRequest) {
@@ -41,8 +47,20 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (user) {
-      let dbUser: Awaited<ReturnType<typeof reconcileAuthenticatedUser>>["user"] | null = null;
-      let activeSpace: "STUDENT" | "TEACHER" | "CENTER" | "ADMIN" = "STUDENT";
+      let admitted = false;
+      try {
+        admitted = await canReconcileClosedBetaIdentity(user);
+      } catch (admissionError) {
+        console.error("[auth/callback] beta admission lookup failed", admissionError);
+      }
+
+      if (!admitted) {
+        await supabase.auth.signOut().catch(() => undefined);
+        return NextResponse.redirect(`${origin}${betaPathFor(next)}`);
+      }
+
+      let dbUser: Awaited<ReturnType<typeof reconcileAuthenticatedUser>>["user"];
+      let activeSpace: "STUDENT" | "TEACHER" | "CENTER" | "ADMIN";
       try {
         const res = await reconcileAuthenticatedUser(user);
         dbUser = res.user;
@@ -55,9 +73,11 @@ export async function GET(request: NextRequest) {
         await supabase.auth.refreshSession();
       } catch (e) {
         console.error("[auth/callback] reconcileAuthenticatedUser FAIL", e);
+        await supabase.auth.signOut().catch(() => undefined);
+        return NextResponse.redirect(`${origin}${loginPathFor(next)}?error=auth_callback_failed`);
       }
 
-      const onboardingDone = dbUser?.onboardingDone ?? false;
+      const onboardingDone = dbUser.onboardingDone;
 
       let redirectUrl: string;
       const nextIsMeaningful = next !== "/dashboard";
