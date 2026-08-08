@@ -41,6 +41,7 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     expect(route).toContain('rawPlan === "racines-famille"');
     expect(route).toContain('params.rawAddon === "roots-solo"');
     expect(route).toContain("Professional personas never inherit learner/family commercial intent");
+    expect(route).toContain("plan: offer.selectedPlan");
   });
 
   it("never self-grants professional access in Production and enables QA-only activation on P-1", () => {
@@ -73,6 +74,19 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     expect(dashboard).toContain('runtime.persona !== "student_racines"');
     expect(onboarding).toContain('dbUser.userRoles[0]?.onboarded === true');
     expect(onboarding).toContain('href: "/dashboard"');
+  });
+
+  it("prevents direct dashboard URLs from bypassing incomplete adult onboarding", () => {
+    const teacher = read("src/app/[locale]/teacher/page.tsx");
+    const center = read("src/app/[locale]/center/page.tsx");
+    const coach = read("src/app/[locale]/coach/racines/page.tsx");
+    const family = read("src/app/[locale]/family/page.tsx");
+
+    for (const page of [teacher, center, coach, family]) {
+      expect(page).toContain("resolvePersonaRuntime");
+      expect(page).toContain("!runtime.onboarded");
+      expect(page).toContain("runtime.onboardingRoute");
+    }
   });
 
   it("keeps children email-less and attached to the Family guardian", () => {
