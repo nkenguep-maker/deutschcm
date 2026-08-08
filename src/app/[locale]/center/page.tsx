@@ -9,6 +9,8 @@ import CenterDashboardView from "@/components/center/CenterDashboardView";
 import { CenterDashboard } from "@/features/dashboards/center";
 import { InternalPersonaDashboard } from "@/features/dashboards/internal-test/InternalPersonaDashboard";
 import { resolveActiveInternalPersona } from "@/lib/internalPersonaPage";
+import { createClient } from "@/lib/supabase/server";
+import { resolvePersonaRuntime } from "@/lib/personas/runtime";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +25,21 @@ export default async function Page({
   const internalPersona = await resolveActiveInternalPersona(["center_admin"]);
   if (internalPersona) {
     return <InternalPersonaDashboard persona={internalPersona} locale={loc} />;
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
+
+  const runtime = await resolvePersonaRuntime({
+    supabaseId: user.id,
+    requestedPersona: user.user_metadata?.requested_persona,
+  });
+  if (runtime.persona && runtime.persona !== "center_admin") {
+    redirect(`/${locale}${runtime.onboarded ? runtime.homeRoute : runtime.onboardingRoute}`);
+  }
+  if (runtime.persona === "center_admin" && !runtime.onboarded) {
+    redirect(`/${locale}${runtime.onboardingRoute}`);
   }
 
   if (!isCenterRealDataActive()) {
