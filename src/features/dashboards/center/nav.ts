@@ -6,7 +6,6 @@ export function buildCenterNav(
     students: string;
     teachers: string;
     classes: string;
-    billing: string;
     messages: string;
     settings: string;
     sectionLabel?: string;
@@ -22,7 +21,6 @@ export function buildCenterNav(
         { key: "students", label: labels.students, href: `${baseHref}#eleves` },
         { key: "teachers", label: labels.teachers, href: `${baseHref}#enseignants` },
         { key: "classes", label: labels.classes, href: `${baseHref}#classes` },
-        { key: "billing", label: labels.billing, href: `${baseHref}#facturation` },
         { key: "messages", label: labels.messages, href: `${baseHref}#messages` },
         { key: "settings", label: labels.settings, href: `${baseHref}#parametres` },
       ],
@@ -35,7 +33,6 @@ export function buildCenterMobileTabs(
     overview: string;
     students: string;
     classes: string;
-    billing: string;
     messages: string;
   },
   baseHref: string,
@@ -44,7 +41,6 @@ export function buildCenterMobileTabs(
     { key: "overview", label: labels.overview, href: baseHref },
     { key: "students", label: labels.students, href: `${baseHref}#eleves` },
     { key: "classes", label: labels.classes, href: `${baseHref}#classes` },
-    { key: "billing", label: labels.billing, href: `${baseHref}#facturation` },
     { key: "messages", label: labels.messages, href: `${baseHref}#messages` },
   ];
 }
