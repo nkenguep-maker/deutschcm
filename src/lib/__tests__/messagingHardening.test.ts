@@ -37,8 +37,8 @@ describe("P4.7 · messaging hardening", () => {
     expect(messages).toContain("ownerUserId: true");
     expect(messages).toContain("ownerChildProfileId: true");
     expect(messages).toContain("conversationId: true");
-    expect(messages).toContain("asset?.ownerUserId === actor.userId");
-    expect(messages).toContain("asset?.ownerChildProfileId === actor.childProfileId");
+    expect(messages).toMatch(/asset\?\.ownerUserId\s*===\s*actor\.userId!?/);
+    expect(messages).toMatch(/asset\?\.ownerChildProfileId\s*===\s*actor\.childProfileId!?/);
     expect(messages).toContain("asset.conversationId !== input.conversationId");
     expect(messages).toContain('asset.status !== "READY"');
   });
