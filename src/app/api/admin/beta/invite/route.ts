@@ -88,7 +88,9 @@ export async function POST(request: NextRequest) {
   }
 
   const inviteUrl = new URL(`/${locale}/beta/accept`, request.nextUrl.origin);
-  inviteUrl.searchParams.set("token", token);
+  // URL fragments are never sent in HTTP requests or Referer headers. The
+  // client consumes this value locally, then removes it from browser history.
+  inviteUrl.hash = new URLSearchParams({ token }).toString();
 
   const copy = locale === "en"
     ? {
