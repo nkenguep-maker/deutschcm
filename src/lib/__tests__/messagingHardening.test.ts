@@ -43,7 +43,7 @@ describe("P4.7 · messaging hardening", () => {
     expect(messages).toContain('asset.status !== "READY"');
   });
 
-  it("refuses cross-conversation reply targets", () => {
+  it("refuses cross-conversation reply targets inside the server service", () => {
     const messages = read("src/lib/messaging/messages.ts");
 
     expect(messages).toContain("id: input.replyToMessageId");
@@ -59,7 +59,18 @@ describe("P4.7 · messaging hardening", () => {
     expect(messages).toContain("const MAX_IDEMPOTENCY_KEY_CHARS = 128");
     expect(messages).toContain('error: "text_too_long"');
     expect(messages).toContain('error: "idempotency_key_invalid"');
-    expect(route).toContain('"reply_target_invalid"');
     expect(route).toContain('"idempotency_key_invalid"');
+  });
+
+  it("keeps the generic JSON route text/guided-only", () => {
+    const route = read("src/app/api/messaging/conversations/[conversationId]/messages/route.ts");
+
+    expect(route).toContain('["TEXT", "GUIDED_PHRASE"]');
+    expect(route).not.toContain('"TEXT", "AUDIO"');
+    expect(route).not.toContain("audioAssetId:");
+    expect(route).not.toContain("cardType:");
+    expect(route).not.toContain("cardPayload:");
+    expect(route).not.toContain("replyToMessageId:");
+    expect(route).toContain("CARD et SYSTEM sont émis par");
   });
 });
