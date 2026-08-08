@@ -42,7 +42,7 @@ describe("P4.7 · classroom join approval hardening", () => {
   it("materializes enrollment only in the authorized teacher response path", () => {
     const social = read("src/app/api/social/route.ts");
 
-    expect(social).toContain("if (accept && req.toClassroomId)");
+    expect(social).toContain("if (input.accept && req.toClassroomId)");
     expect(social).toContain("prisma.classroomEnrollment.upsert");
     expect(social).toContain("teacherId: teacher.id");
   });
