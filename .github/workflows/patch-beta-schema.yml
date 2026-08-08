@@ -1,0 +1,54 @@
+name: Patch beta schema
+
+on:
+  push:
+    branches:
+      - fix/p4-7-social-notification-authz
+    paths:
+      - .github/workflows/patch-beta-schema.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/p4-7-social-notification-authz
+
+      - name: Add BetaInvitation model
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('prisma/schema.prisma')
+          text = path.read_text()
+          if 'model BetaInvitation {' in text:
+              print('BetaInvitation already present')
+          else:
+              marker = 'model User {\n'
+              if marker not in text:
+                  raise SystemExit('User model marker not found')
+              model = '''// ─── Closed beta · server-only invitation ledger ────────────────\nmodel BetaInvitation {\n  id               String           @id @default(cuid())\n  tokenHash        String           @unique\n  emailHash        String\n  status           InvitationStatus @default(PENDING)\n  issuedByUserId   String\n  acceptedByUserId String?\n  expiresAt        DateTime\n  acceptedAt       DateTime?\n  revokedAt        DateTime?\n  createdAt        DateTime         @default(now())\n\n  @@index([emailHash, status])\n  @@index([expiresAt])\n  @@index([issuedByUserId, createdAt])\n  @@map("beta_invitations")\n}\n\n'''
+              path.write_text(text.replace(marker, model + marker, 1))
+          PY
+
+      - name: Validate Prisma schema
+        run: npx prisma format --schema prisma/schema.prisma
+        env:
+          DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:65432/yema_ci
+
+      - name: Commit schema
+        shell: bash
+        run: |
+          if git diff --quiet -- prisma/schema.prisma; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add prisma/schema.prisma
+          git commit -m "feat(beta): model one-time invitations"
+          git push origin HEAD:fix/p4-7-social-notification-authz
