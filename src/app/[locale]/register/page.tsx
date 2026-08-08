@@ -145,7 +145,6 @@ export default function RegisterPage() {
       const options = {
         data: {
           full_name: fullName || null,
-          role: "STUDENT" as const,
           universe: universe ?? null,
         },
         emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizedOnboardingRoute)}`,
@@ -168,10 +167,17 @@ export default function RegisterPage() {
         document.cookie = "user_role=STUDENT;path=/;max-age=2592000";
         document.cookie = "active_space=STUDENT;path=/;max-age=2592000";
       } catch {
-        // L'auth Supabase reste la source de vérité si le cookie local échoue.
+        // Legacy display cookies only; authorization does not trust them.
       }
 
       if (data.session) {
+        const syncResponse = await fetch("/api/auth/sync", { method: "POST" });
+        if (!syncResponse.ok) {
+          await supabase.auth.signOut();
+          setError(errorFromKey("generic"));
+          return;
+        }
+        await supabase.auth.refreshSession();
         router.push(onboardingRoute);
         router.refresh();
         return;
