@@ -51,7 +51,7 @@ export default function LandingPage() {
             pricing: loc === "en" ? "Manifesto" : "Manifeste",
             centers: loc === "en" ? "Centers" : "Centres",
             login: tNav.login,
-            register: isMobile ? t.getStarted : tNav.register,
+            register: loc === "en" ? "Beta access" : "Accès bêta",
           }}
         />
 
@@ -79,7 +79,7 @@ export default function LandingPage() {
               : "Les suivants s'écrivent déjà."}
           />
 
-          {/* f) LA PORTE DU FOND — entrez, la maison est ouverte */}
+          {/* f) LA PORTE DU FOND — entrée bêta fermée */}
           <MaisonPorte locale={loc} />
         </main>
 
