@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 
 const REPO = resolve(__dirname, "../../..");
 const route = readFileSync(resolve(REPO, "src/app/api/apply/teacher/route.ts"), "utf8");
+const page = readFileSync(resolve(REPO, "src/app/[locale]/enseignants/page.tsx"), "utf8");
+const layout = readFileSync(resolve(REPO, "src/app/[locale]/enseignants/layout.tsx"), "utf8");
 
 describe("public teacher application hardening", () => {
   it("checks browser origin before parsing or writing", () => {
@@ -52,5 +54,22 @@ describe("public teacher application hardening", () => {
     expect(route).not.toContain("sous 48 heures");
     expect(route).toContain("after reviewing your application");
     expect(route).toContain("après examen de votre demande");
+  });
+
+  it("keeps the public teacher surface honest before payment activation", () => {
+    for (const source of [page, layout]) {
+      expect(source).not.toContain("sous quarante-huit heures");
+      expect(source).not.toContain("sous 48 heures");
+      expect(source).not.toContain("within 48 hours");
+      expect(source).not.toContain("rôle payé");
+      expect(source).not.toContain("paid, valued role");
+    }
+    expect(page).not.toContain("L'élève paie toujours la maison");
+    expect(page).not.toContain("The learner always pays the house");
+    expect(page).toContain("aucun paiement n'est encaissé");
+    expect(page).toContain("no payment is collected");
+    expect(page).toContain('navPricing: "Tarifs"');
+    expect(page).toContain('navPricing: "Pricing"');
+    expect(layout).toContain("after a teacher workspace is opened").toBeUndefined;
   });
 });
