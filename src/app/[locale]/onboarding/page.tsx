@@ -1,6 +1,6 @@
 // /[locale]/onboarding · canonical authenticated onboarding router.
 // Fresh accounts choose a persona first. Existing/in-progress learners resume
-// their Monde/Racines funnel from the database without losing progress.
+// their Monde/Racines funnel, while completed personas go straight home.
 
 import { redirect } from "@/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -25,7 +25,14 @@ export default async function OnboardingRouterPage({ params }: Props) {
 
   const dbUser = await prisma.user.findUnique({
     where: { supabaseId: user.id },
-    select: { id: true },
+    select: {
+      id: true,
+      userRoles: {
+        where: { role: "STUDENT", status: "ACTIVE" },
+        select: { onboarded: true },
+        take: 1,
+      },
+    },
   });
 
   if (dbUser) {
@@ -35,6 +42,15 @@ export default async function OnboardingRouterPage({ params }: Props) {
     });
 
     if (path) {
+      // Once the Student persona has completed onboarding, this route is no
+      // longer a discovery funnel entry. It is a stable return point that must
+      // reopen the learner dashboard. Explicit level-test routes bypass this
+      // router and remain available when the learner selected them.
+      if (dbUser.userRoles[0]?.onboarded === true) {
+        redirect({ href: "/dashboard", locale });
+        return null;
+      }
+
       const grantCount = await prisma.accessGrant.count({
         where: {
           status: "ACTIVE",
@@ -78,19 +94,15 @@ export default async function OnboardingRouterPage({ params }: Props) {
     }
   }
 
-  // Existing profiles (family/professional) and pending requests are resolved
-  // from trusted DB roles/app roles plus the non-authorizing persona preference.
   const runtime = await resolvePersonaRuntime({
     supabaseId: user.id,
     requestedPersona: user.user_metadata?.requested_persona,
   });
   if (runtime.persona) {
-    redirect({ href: runtime.onboardingRoute, locale });
+    redirect({ href: runtime.onboarded ? runtime.homeRoute : runtime.onboardingRoute, locale });
     return null;
   }
 
-  // Legacy register links may still carry an initial universe preference. Use
-  // it only to pre-route a learner; authorization never trusts this metadata.
   const metaUniverse = (user.user_metadata?.universe as string | undefined)?.toLowerCase();
   if (metaUniverse === "monde") {
     redirect({ href: "/onboarding/monde", locale });
