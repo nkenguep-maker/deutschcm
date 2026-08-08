@@ -61,6 +61,7 @@ jobs:
         run: >-
           npx vitest run
           src/lib/__tests__/socialNotificationAuthorization.test.ts
+          src/lib/__tests__/socialSurfaceHardening.test.ts
           src/lib/__tests__/messagingHardening.test.ts
           src/lib/__tests__/childPinRateLimit.test.ts
           src/lib/__tests__/requestOrigin.test.ts
