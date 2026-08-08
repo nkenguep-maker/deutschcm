@@ -25,7 +25,7 @@ describe("closed beta admission", () => {
     const proxy = read("src/proxy.ts");
 
     expect(proxy).toContain("params.authz.beta_access === true");
-    expect(proxy).toContain('roles.includes("ADMIN")');
+    expect(proxy).toContain('params.roles.includes("ADMIN")');
     expect(proxy).toContain("Boolean(params.internalPersona)");
     expect(proxy).toContain('error: "Closed beta access required"');
     expect(proxy).toContain("status: 403");
@@ -45,7 +45,7 @@ describe("closed beta admission", () => {
     const betaAccess = read("src/lib/beta/access.ts");
 
     expect(roles).toContain("...existing");
-    expect(betaAccess).toContain("current?.user?.app_metadata").or.toContain("data.user.app_metadata");
+    expect(betaAccess).toContain("data.user.app_metadata");
     expect(betaAccess).toContain("beta_access: params.enabled");
     expect(betaAccess).toContain("app_metadata:");
     expect(betaAccess).not.toContain("user_metadata:");
