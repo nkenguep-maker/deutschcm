@@ -1,0 +1,69 @@
+name: P4.7 Security CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - fix/p4-7-social-notification-authz
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p4-7-security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-security:
+    name: Static security and type checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Prisma generate parses DIRECT_URL but does not connect to it.
+      # This deliberately non-routable local URL prevents CI from ever
+      # reaching a Supabase environment during static checks.
+      DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:65432/yema_ci
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:65432/yema_ci
+      NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder
+      YEMA_CHILD_SESSION_SECRET: ci-only-non-production-secret-32bytes
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: TypeScript
+        run: npx tsc --noEmit
+
+      - name: P4.7 and persona structural tests
+        run: >-
+          npx vitest run
+          src/lib/__tests__/socialNotificationAuthorization.test.ts
+          src/lib/__tests__/messagingHardening.test.ts
+          src/lib/__tests__/childPinRateLimit.test.ts
+          src/lib/__tests__/requestOrigin.test.ts
+          src/lib/__tests__/rlsIdentityHardening.test.ts
+          src/lib/__tests__/classroomJoinHardening.test.ts
+          src/lib/__tests__/groupBetaHardening.test.ts
+          src/lib/__tests__/personasCanonicalRoutes.test.ts
+
+      - name: Ensure no production Supabase ref entered the workflow
+        shell: bash
+        run: |
+          if grep -R --line-number --fixed-strings 'sbjhvlrkbyjckdxujjsk' .github/workflows/p4-7-security-ci.yml; then
+            echo 'Production Supabase ref must never appear in this CI workflow.' >&2
+            exit 1
+          fi
