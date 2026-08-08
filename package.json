@@ -23,6 +23,7 @@
     "test:monde-context:p1": "node scripts/test-monde-context-p1.mjs",
     "capture:monde-context:p1": "node scripts/capture-monde-context-p1.mjs",
     "test:personas:p1": "node scripts/test-personas-p1.mjs",
+    "test:release-gate:p1": "node scripts/test-release-gate-p1.mjs",
     "test:entitlements:p1": "node scripts/test-entitlements-p1.mjs",
     "test:roots-adult-seats:p1": "tsx scripts/test-roots-adult-seats-p1.ts",
     "preflight:release:prod": "node scripts/preflight-release-prod.mjs",
