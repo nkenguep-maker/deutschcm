@@ -4,6 +4,7 @@
 // dans le bundle client.
 
 export type MondeAccessStatus = "ACTIVE" | "EXPIRED" | "NONE";
+export type MondeAccessSource = "GRANT" | "TECHNICAL_BETA";
 
 export interface MondeAccess {
   status: MondeAccessStatus;
@@ -11,6 +12,7 @@ export interface MondeAccess {
   endsAt: string | null;
   daysRemaining: number | null;
   level: string | null;
+  source?: MondeAccessSource;
 }
 
 export type MondeCourseStatus = "LOCKED" | "OPEN" | "IN_PROGRESS" | "COMPLETED";
@@ -32,7 +34,7 @@ export interface MondeDashboardData {
   access: MondeAccess;
   courses: MondeCourseSummary[];
   overallPct: number;
-  nextModule: { courseId: string; moduleId: string; label: string } | null;
+  nextModule: { courseId: MondeCourseId; moduleId: string; label: string } | null;
   greetingName: string | null;
   xpTotal?: number;
   // Lot 7A.1 · projection onboarding pour MondeIvoryOverview.
@@ -41,6 +43,8 @@ export interface MondeDashboardData {
     targetCity: string | null;
   };
 }
+
+export type MondeCourseId = string;
 
 export type MondeAssignmentStatus = "PUBLISHED" | "CLOSED";
 
