@@ -5,19 +5,60 @@ import { reconcileAuthenticatedUser } from "@/lib/auth/reconcileAuthenticatedUse
 import { sanitizeInternalNext } from "@/lib/authRedirect";
 import { isInternalTestEnvironment } from "@/lib/internalTestEnvironment";
 import { isSameOriginRequest } from "@/lib/security/requestOrigin";
-import { isAdultPersonaId, resolvePersonaRuntime } from "@/lib/personas/runtime";
+import { isAdultPersonaId, resolvePersonaRuntime, type AdultPersonaId } from "@/lib/personas/runtime";
 import { grantRole, syncUserMetadata } from "@/lib/roles";
 
-const PASSAGE_PLANS = new Set([
+const WORLD_PASSAGE_PLANS = new Set([
   "passage-a1",
   "passage-a2",
   "passage-b1",
   "passage-b2",
   "passage-c1",
 ]);
+const ROOTS_PLANS = new Set(["racines-solo", "racines-famille"]);
 
 function bad(code: string, status = 400) {
   return NextResponse.json({ error: code }, { status });
+}
+
+function compatibleOfferIntent(params: {
+  persona: AdultPersonaId;
+  rawPlan: unknown;
+  rawAddon: unknown;
+  rawTeacherAddon: unknown;
+}) {
+  const rawPlan = typeof params.rawPlan === "string" ? params.rawPlan : null;
+
+  if (params.persona === "student_monde") {
+    return {
+      selectedPlan: rawPlan && WORLD_PASSAGE_PLANS.has(rawPlan) ? rawPlan : null,
+      selectedAddon: params.rawAddon === "roots-solo" ? "roots-solo" : null,
+      teacherAddonRequested: params.rawTeacherAddon === true,
+    } as const;
+  }
+
+  if (params.persona === "student_racines") {
+    return {
+      selectedPlan: rawPlan === "racines-solo" && ROOTS_PLANS.has(rawPlan) ? rawPlan : null,
+      selectedAddon: null,
+      teacherAddonRequested: false,
+    } as const;
+  }
+
+  if (params.persona === "family") {
+    return {
+      selectedPlan: rawPlan === "racines-famille" && ROOTS_PLANS.has(rawPlan) ? rawPlan : null,
+      selectedAddon: null,
+      teacherAddonRequested: false,
+    } as const;
+  }
+
+  // Professional personas never inherit learner/family commercial intent.
+  return {
+    selectedPlan: null,
+    selectedAddon: null,
+    teacherAddonRequested: false,
+  } as const;
 }
 
 export async function POST(req: NextRequest) {
@@ -34,11 +75,12 @@ export async function POST(req: NextRequest) {
   if (!isAdultPersonaId(persona)) return bad("PERSONA_INVALID");
   if (persona === "super_admin") return bad("PERSONA_NOT_SELF_SERVICE", 403);
 
-  const selectedPlan = typeof body.selectedPlan === "string" && PASSAGE_PLANS.has(body.selectedPlan)
-    ? body.selectedPlan
-    : null;
-  const selectedAddon = body.selectedAddon === "roots-solo" ? "roots-solo" : null;
-  const teacherAddonRequested = body.teacherAddonRequested === true;
+  const offer = compatibleOfferIntent({
+    persona,
+    rawPlan: body.selectedPlan,
+    rawAddon: body.selectedAddon,
+    rawTeacherAddon: body.teacherAddonRequested,
+  });
   const postOnboardingNext = typeof body.postOnboardingNext === "string"
     ? sanitizeInternalNext(body.postOnboardingNext, "/dashboard")
     : null;
@@ -51,9 +93,9 @@ export async function POST(req: NextRequest) {
   const nextUserMetadata: Record<string, unknown> = {
     ...(user.user_metadata ?? {}),
     requested_persona: persona,
-    selected_plan: selectedPlan,
-    selected_addons: selectedAddon ? [selectedAddon] : [],
-    teacher_addon_requested: teacherAddonRequested,
+    selected_plan: offer.selectedPlan,
+    selected_addons: offer.selectedAddon ? [offer.selectedAddon] : [],
+    teacher_addon_requested: offer.teacherAddonRequested,
     post_onboarding_next: postOnboardingNext,
   };
 
@@ -69,9 +111,9 @@ export async function POST(req: NextRequest) {
     await syncUserMetadata({ supabaseId: user.id, activeSpace: "STUDENT" });
     return NextResponse.json({
       persona,
-      selectedPlan,
-      selectedAddons: selectedAddon ? [selectedAddon] : [],
-      teacherAddonRequested,
+      selectedPlan: offer.selectedPlan,
+      selectedAddons: offer.selectedAddon ? [offer.selectedAddon] : [],
+      teacherAddonRequested: offer.teacherAddonRequested,
       redirectTo: persona === "student_monde" ? "/onboarding/monde" : "/onboarding/racines",
     });
   }
@@ -85,7 +127,11 @@ export async function POST(req: NextRequest) {
     });
     await supabase.auth.updateUser({ data: nextUserMetadata });
     await syncUserMetadata({ supabaseId: user.id, activeSpace: "STUDENT" });
-    return NextResponse.json({ persona, redirectTo: "/onboarding/family" });
+    return NextResponse.json({
+      persona,
+      selectedPlan: offer.selectedPlan,
+      redirectTo: "/onboarding/family",
+    });
   }
 
   if (persona === "teacher" || persona === "center_admin") {
