@@ -1,16 +1,10 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import {
-  Callout,
-  H2,
-  LegalShell,
-  P,
-  Ul,
-} from "@/components/landing/LegalShell";
+import { Callout, H2, LegalShell, P, Ul } from "@/components/landing/LegalShell";
 
-const EFFECTIVE_DATE = "15 mai 2026";
-const EFFECTIVE_DATE_EN = "May 15, 2026";
+const EFFECTIVE_DATE = "8 août 2026";
+const EFFECTIVE_DATE_EN = "August 8, 2026";
 const CONTACT_EMAIL = "legal@yema.app";
 const COMPANY = "YEMA Languages";
 
@@ -21,251 +15,140 @@ export default function TermsPage() {
 
 function TermsEN() {
   return (
-    <LegalShell
-      locale="en"
-      eye="Legal"
-      title="Terms of Service"
-      effective={EFFECTIVE_DATE_EN}
-      updated={EFFECTIVE_DATE_EN}
-      contactEmail={CONTACT_EMAIL}
-      contactLine="Questions? Reach us at"
-    >
-      <P>
-        By accessing or using {COMPANY} (&quot;YEMA&quot;, &quot;the
-        platform&quot;), you agree to these Terms of Service. Please read them
-        carefully. If you do not agree, do not use the platform.
-      </P>
+    <LegalShell locale="en" eye="Legal" title="Terms of Service" effective={EFFECTIVE_DATE_EN} updated={EFFECTIVE_DATE_EN} contactEmail={CONTACT_EMAIL} contactLine="Questions? Reach us at">
+      <P>By accessing or using {COMPANY} (&quot;YEMA&quot;, &quot;the platform&quot;), you agree to these Terms. YEMA is currently operated as a closed beta and some features may change before broader release.</P>
+      <Callout variant="warning"><strong>Independent platform:</strong> YEMA is not an official examination body and is not affiliated with any state examination institute. YEMA learning journeys, scores or completion records do not themselves constitute an official diploma or exam result.</Callout>
 
-      <Callout variant="warning">
-        <strong>Important:</strong> {COMPANY} is an independent pan-African
-        language learning platform. It is not affiliated with, endorsed by, or
-        officially connected to any state examination institute. Completing
-        YEMA courses does not grant any official diploma or certification.
-      </Callout>
+      <H2>1. Adult accounts and family profiles</H2>
+      <P>An authenticated YEMA account must be created and controlled by a person who is legally able to enter into these Terms. A parent or guardian may create and manage child profiles under their adult account through the Family experience. Child profiles do not receive independent email/password accounts through that flow.</P>
+      <P>The adult account holder is responsible for the accuracy of information supplied for child profiles, for supervising their use of YEMA and for using available parent and PIN controls appropriately.</P>
 
-      <H2>1. Acceptance and eligibility</H2>
-      <P>
-        You must be at least 16 years old to use YEMA. By creating an account,
-        you confirm you meet this requirement and that the information you
-        provide is accurate.
-      </P>
+      <H2>2. Closed-beta access</H2>
+      <Ul items={[
+        "Closed-beta access may require a personal, time-limited invitation.",
+        "An invitation may be limited to the intended email address and may be single-use.",
+        "Access may be revoked or restricted when required for security, abuse prevention or beta operations.",
+        "Professional workspaces such as Teacher, Center or Roots Coach require the trusted approval or role assignment defined by YEMA; selecting a persona does not grant professional access by itself.",
+      ]} />
 
-      <H2>2. Account</H2>
-      <Ul
-        items={[
-          "You are responsible for maintaining the confidentiality of your account credentials.",
-          "You may not share your account or allow others to access it.",
-          `Notify us immediately at ${CONTACT_EMAIL} if you suspect unauthorized access.`,
-          "One account per person. Multiple accounts may be suspended.",
-        ]}
-      />
+      <H2>3. Account security</H2>
+      <Ul items={[
+        "Keep adult account credentials confidential and do not knowingly provide them to unauthorized people.",
+        "Use child-space PINs and family controls only for the child profiles you are authorized to manage.",
+        `Contact ${CONTACT_EMAIL} if you believe an account or protected space has been compromised.`,
+        "Do not impersonate another learner, parent, teacher, coach, center representative or YEMA administrator.",
+      ]} />
 
-      <H2>3. Free and paid plans</H2>
-      <P>
-        YEMA offers a free plan with access to A1 content of the current
-        chapter (German), and premium plans with expanded access. Paid
-        subscriptions are processed via Mobile Money (MTN MoMo / Orange Money).
-        Prices are displayed in XAF.
-      </P>
-      <Ul
-        items={[
-          "Subscriptions renew monthly unless cancelled.",
-          "No refunds after 48 hours of a billing period starting, except where required by law.",
-          "YEMA reserves the right to change pricing with 30 days notice.",
-        ]}
-      />
+      <H2>4. Offers and payments</H2>
+      <P>YEMA may display prices and commercial offers so users can understand the intended product. Online checkout and real payment processing are not currently activated in the closed beta. Selecting an offer, plan or add-on records interest or onboarding context only and does not create a paid subscription, payment, order or access entitlement.</P>
+      <P>Before real payments are enabled, YEMA will present the applicable payment provider, billing period, renewal, cancellation, refund and transaction terms before a user is charged. Current beta pages must not be interpreted as a completed payment contract.</P>
 
-      <H2>4. Acceptable use</H2>
+      <H2>5. Acceptable use</H2>
       <P>You agree not to:</P>
-      <Ul
-        items={[
-          "Use the platform for any unlawful purpose",
-          "Attempt to reverse-engineer, scrape, or copy platform content at scale",
-          "Share class access codes publicly or sell access to others",
-          "Upload content that is illegal, harmful, or infringes third-party rights",
-          "Impersonate teachers, centers, or platform staff",
-        ]}
-      />
+      <Ul items={[
+        "Use YEMA for unlawful, abusive or fraudulent activity.",
+        "Attempt to bypass authentication, workspace roles, child protections, class approvals or other access controls.",
+        "Scrape, extract or reproduce platform content at scale without authorization.",
+        "Share private class, group or invitation codes publicly where doing so would defeat their intended access control.",
+        "Upload or send content that is unlawful, harmful, threatening, exploitative or infringes third-party rights.",
+        "Use messaging or social features to harass, spam or mislead other users.",
+      ]} />
 
-      <H2>5. AI features and content</H2>
-      <P>
-        YEMA uses AI to generate learning content, correct writing, and
-        simulate scenarios. AI-generated content may contain errors. YEMA does
-        not guarantee the accuracy or completeness of AI outputs. Do not rely
-        solely on YEMA for official exam preparation without consulting
-        licensed educators.
-      </P>
+      <H2>6. Learning, AI and examination status</H2>
+      <P>YEMA may provide structured learning, exercises, feedback, simulations and AI-assisted features. AI-generated or automated feedback can contain errors and should not be treated as an official examination decision or professional guarantee. World-language journeys may be aligned to learning frameworks such as CEFR, but official exams and certifications remain the responsibility of independent examination bodies.</P>
+      <P>For African languages, YEMA may use its own progression and product terminology. Those internal scales are learning tools and are not represented as official national or international standards.</P>
 
-      <H2>6. World languages and no certification guarantee</H2>
-      <P>
-        YEMA prepares learners for CEFR-aligned world languages (A1–C1).
-        Official exams are issued by independent bodies. YEMA is not
-        affiliated with any of these organizations.
-      </P>
+      <H2>7. Teachers, coaches, centers and sessions</H2>
+      <P>Professional spaces are provided only to users with the required trusted role or approval. Classroom enrollments, coaching circles, family links and session records are scoped to the relevant authorized participants. A center workspace does not automatically override a teacher’s approval responsibilities where the product requires teacher approval.</P>
 
-      <H2>7. African languages and independent scale</H2>
-      <P>
-        For African languages, YEMA uses its own progression scale
-        (É1 Listen · É2 Voice · É3 Story · É4 Palaver · É5 Home). This scale
-        is proprietary and does not constitute an official standard.
-      </P>
+      <H2>8. User content, messages and audio</H2>
+      <P>You retain rights you hold in content you submit. You grant YEMA the limited rights necessary to receive, process, store, display and transmit that content for the operation, security and delivery of the feature you chose. Some audio may be processed transiently; messaging or other user-submitted audio may be stored when the feature requires it. Do not submit content you are not entitled to use.</P>
 
-      <H2>8. User content</H2>
-      <P>
-        When you submit content (text responses, audio recordings) through
-        YEMA features, you grant YEMA a limited, non-exclusive license to
-        process this content for the purpose of providing the service. Audio
-        is not stored after processing. You retain ownership of your content.
-      </P>
+      <H2>9. Beta availability</H2>
+      <P>Closed-beta software may contain incomplete features, defects or temporary interruptions. YEMA does not promise a numerical uptime or service-level commitment in these Terms. Features may be modified, limited or withdrawn as the product is tested and improved.</P>
 
-      <H2>9. Availability and modifications</H2>
-      <Ul
-        items={[
-          "YEMA is provided 'as is' during beta. We aim for 99% uptime but make no guarantees.",
-          "We may modify, suspend, or discontinue features with reasonable notice.",
-          "YEMA is currently in public beta — some features may be incomplete.",
-        ]}
-      />
+      <H2>10. Privacy</H2>
+      <P>Use of YEMA is also subject to the published Privacy Policy, including the rules applicable to family profiles, messaging and closed-beta operation.</P>
 
-      <H2>10. Limitation of liability</H2>
-      <P>
-        To the maximum extent permitted by law, {COMPANY} shall not be liable
-        for indirect, incidental, or consequential damages arising from your
-        use of the platform, including but not limited to failed visa
-        applications or exam results. Your use of YEMA is at your own risk.
-      </P>
+      <H2>11. Account and data requests</H2>
+      <P>You may contact <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> for account-related requests. Privacy and deletion requests may require identity verification and are handled according to the Privacy Policy and applicable law. These Terms do not promise an account-settings deletion control or a fixed deletion deadline unless such a control or deadline is actually provided.</P>
 
-      <H2>11. Governing law</H2>
-      <P>
-        These Terms are governed by the laws of Cameroon. Disputes shall be
-        resolved in the courts of Yaoundé, Cameroon, unless applicable law
-        requires otherwise.
-      </P>
+      <H2>12. Liability and applicable law</H2>
+      <P>To the extent permitted by applicable law, YEMA is not responsible for outcomes that depend on third parties, including official examination results, visa decisions, employment decisions or the conduct of independent users. Nothing in these Terms excludes rights or liabilities that cannot legally be excluded.</P>
+      <P>These Terms are governed subject to the laws applicable to YEMA and to the user. Mandatory consumer, child-protection, privacy or other statutory rights continue to apply where relevant.</P>
 
-      <H2>12. Account deletion</H2>
-      <P>
-        You may delete your account at any time from your settings. Upon
-        deletion, your personal data will be erased within 30 days as
-        described in our Privacy Policy.
-      </P>
-
-      <H2>13. Changes to these Terms</H2>
-      <P>
-        We may update these Terms. Material changes will be communicated by
-        email or in-app notification at least 14 days before they take effect.
-        Continued use constitutes acceptance.
-      </P>
+      <H2>13. Changes</H2>
+      <P>We may update these Terms as the closed beta and commercial product evolve. Material changes will be reflected in the published Terms and, where appropriate, communicated through the service or by email before they apply.</P>
     </LegalShell>
   );
 }
 
 function TermsFR() {
   return (
-    <LegalShell
-      locale="fr"
-      eye="Mentions légales"
-      title="Conditions d'utilisation"
-      effective={EFFECTIVE_DATE}
-      updated={EFFECTIVE_DATE}
-      contactEmail={CONTACT_EMAIL}
-      contactLine="Questions ? Contactez-nous à"
-    >
-      <P>
-        En accédant à {COMPANY} (&quot;YEMA&quot;, &quot;la plateforme&quot;),
-        vous acceptez les présentes Conditions d&apos;utilisation. Si vous
-        n&apos;êtes pas d&apos;accord, n&apos;utilisez pas la plateforme.
-      </P>
+    <LegalShell locale="fr" eye="Mentions légales" title="Conditions d'utilisation" effective={EFFECTIVE_DATE} updated={EFFECTIVE_DATE} contactEmail={CONTACT_EMAIL} contactLine="Questions ? Contactez-nous à">
+      <P>En accédant à {COMPANY} (&quot;YEMA&quot;, &quot;la plateforme&quot;), vous acceptez les présentes Conditions. YEMA fonctionne actuellement en bêta fermée et certaines fonctionnalités peuvent évoluer avant une ouverture plus large.</P>
+      <Callout variant="warning"><strong>Plateforme indépendante :</strong> YEMA n’est pas un organisme officiel d’examen et n’est affilié à aucun institut d’examen étatique. Les parcours, scores ou attestations internes YEMA ne constituent pas à eux seuls un diplôme officiel ni un résultat d’examen officiel.</Callout>
 
-      <Callout variant="warning">
-        <strong>Important :</strong> {COMPANY} est une plateforme pan-africaine
-        indépendante d&apos;apprentissage des langues. Elle n&apos;est
-        affiliée à aucun organisme officiel d&apos;examen. Compléter les cours
-        YEMA ne confère aucun diplôme officiel.
-      </Callout>
+      <H2>1. Comptes adultes et profils famille</H2>
+      <P>Un compte YEMA authentifié doit être créé et contrôlé par une personne juridiquement capable d’accepter les présentes Conditions. Un parent ou tuteur peut créer et gérer des profils enfants sous son compte adulte dans l’expérience Famille. Le parcours Famille ne crée pas de compte e-mail/mot de passe indépendant pour l’enfant.</P>
+      <P>Le titulaire adulte est responsable de l’exactitude des informations fournies pour les profils enfants, de la supervision de leur usage de YEMA et de l’utilisation appropriée des contrôles parentaux et PIN disponibles.</P>
 
-      <H2>1. Acceptation et éligibilité</H2>
-      <P>
-        Vous devez avoir au moins 16 ans pour utiliser YEMA. En créant un
-        compte, vous confirmez remplir cette condition et que les informations
-        fournies sont exactes.
-      </P>
+      <H2>2. Accès à la bêta fermée</H2>
+      <Ul items={[
+        "L’accès à la bêta fermée peut nécessiter une invitation personnelle et limitée dans le temps.",
+        "Une invitation peut être liée à l’adresse e-mail visée et être utilisable une seule fois.",
+        "L’accès peut être révoqué ou limité lorsque la sécurité, la prévention des abus ou les opérations de bêta le nécessitent.",
+        "Les espaces professionnels Enseignant, Centre ou Coach Racines exigent l’approbation ou le rôle de confiance prévu par YEMA ; choisir un persona ne suffit pas à s’accorder cet accès.",
+      ]} />
 
-      <H2>2. Compte</H2>
-      <Ul
-        items={[
-          "Vous êtes responsable de la confidentialité de vos identifiants.",
-          "Vous ne pouvez pas partager votre compte.",
-          `Signalez toute utilisation non autorisée à ${CONTACT_EMAIL}.`,
-          "Un seul compte par personne. Les comptes multiples peuvent être suspendus.",
-        ]}
-      />
+      <H2>3. Sécurité du compte</H2>
+      <Ul items={[
+        "Gardez les identifiants du compte adulte confidentiels et ne les communiquez pas à des personnes non autorisées.",
+        "Utilisez les PIN et contrôles famille uniquement pour les profils enfants que vous êtes autorisé à gérer.",
+        `Contactez ${CONTACT_EMAIL} si vous pensez qu’un compte ou un espace protégé a été compromis.`,
+        "N’usurpez pas l’identité d’un élève, parent, enseignant, coach, représentant de centre ou administrateur YEMA.",
+      ]} />
 
-      <H2>3. Plans gratuit et payants</H2>
-      <P>
-        YEMA propose un plan gratuit (A1 du chapitre en cours — l&apos;allemand)
-        et des plans premium. Les abonnements sont traités via Mobile Money
-        (MTN MoMo / Orange Money). Les prix sont en XAF.
-      </P>
-      <Ul
-        items={[
-          "Les abonnements se renouvellent mensuellement sauf résiliation.",
-          "Pas de remboursement après 48 h du début d'une période, sauf obligation légale.",
-          "YEMA se réserve le droit de modifier les tarifs avec 30 jours de préavis.",
-        ]}
-      />
+      <H2>4. Offres et paiements</H2>
+      <P>YEMA peut afficher des prix et offres commerciales afin de présenter le produit prévu. Le checkout en ligne et le paiement réel ne sont pas encore activés dans la bêta fermée. Choisir une offre, un plan ou un add-on enregistre uniquement une intention commerciale ou un contexte d’onboarding ; cela ne crée ni abonnement payant, ni paiement, ni commande, ni droit d’accès.</P>
+      <P>Avant d’activer les paiements réels, YEMA présentera le prestataire de paiement applicable ainsi que les conditions de facturation, renouvellement, résiliation, remboursement et transaction avant tout débit. Les pages actuelles de bêta ne doivent pas être interprétées comme un contrat de paiement finalisé.</P>
 
-      <H2>4. Utilisation acceptable</H2>
-      <Ul
-        items={[
-          "Ne pas utiliser la plateforme à des fins illégales.",
-          "Ne pas copier ou extraire le contenu de la plateforme à grande échelle.",
-          "Ne pas partager publiquement les codes de classe ou les revendre.",
-          "Ne pas télécharger de contenu illégal ou portant atteinte aux droits tiers.",
-        ]}
-      />
+      <H2>5. Utilisation acceptable</H2>
+      <P>Vous vous engagez notamment à ne pas :</P>
+      <Ul items={[
+        "Utiliser YEMA pour une activité illégale, abusive ou frauduleuse.",
+        "Contourner l’authentification, les rôles d’espace, protections enfant, approbations de classe ou autres contrôles d’accès.",
+        "Extraire ou reproduire massivement le contenu de la plateforme sans autorisation.",
+        "Partager publiquement des codes privés de classe, groupe ou invitation lorsqu’un tel partage neutralise le contrôle d’accès prévu.",
+        "Envoyer un contenu illégal, nuisible, menaçant, exploitant ou portant atteinte aux droits de tiers.",
+        "Utiliser la messagerie ou les fonctions sociales pour harceler, spammer ou tromper d’autres utilisateurs.",
+      ]} />
 
-      <H2>5. Fonctionnalités IA</H2>
-      <P>
-        YEMA utilise des APIs IA pour générer du contenu, corriger les écrits
-        et simuler des scénarios. Les contenus générés par IA peuvent contenir
-        des erreurs. YEMA ne garantit pas leur exactitude.
-      </P>
+      <H2>6. Apprentissage, IA et statut des examens</H2>
+      <P>YEMA peut proposer des parcours structurés, exercices, retours, simulations et fonctions assistées par IA. Les contenus ou retours automatisés peuvent comporter des erreurs et ne constituent pas une décision officielle d’examen ni une garantie professionnelle. Les parcours de langues du monde peuvent être alignés sur des cadres tels que le CECRL, mais les examens et certifications officiels relèvent d’organismes indépendants.</P>
+      <P>Pour les langues africaines, YEMA peut utiliser ses propres échelles et termes de progression. Ces échelles internes sont des outils pédagogiques et ne sont pas présentées comme des standards officiels nationaux ou internationaux.</P>
 
-      <H2>6. Langues du monde et absence de garantie de certification</H2>
-      <P>
-        YEMA prépare aux langues du monde alignées CECRL (A1–C1). Les
-        examens officiels sont délivrés par des organismes indépendants. YEMA
-        n&apos;est affilié à aucun de ces organismes.
-      </P>
+      <H2>7. Enseignants, coachs, centres et séances</H2>
+      <P>Les espaces professionnels sont accessibles uniquement aux utilisateurs disposant du rôle ou de l’approbation de confiance requis. Les inscriptions de classe, cercles de coaching, liens famille et séances sont limités aux participants autorisés. L’espace Centre ne remplace pas automatiquement la responsabilité d’approbation de l’enseignant lorsqu’elle est exigée par le produit.</P>
 
-      <H2>7. Langues africaines et échelle propre</H2>
-      <P>
-        Pour les langues africaines, YEMA utilise sa propre échelle de
-        progression (É1 Écoute · É2 Voix · É3 Récit · É4 Palabre · É5 Foyer).
-        Cette échelle est propriétaire et ne constitue pas un standard
-        officiel.
-      </P>
+      <H2>8. Contenus utilisateur, messages et audio</H2>
+      <P>Vous conservez les droits que vous détenez sur les contenus envoyés. Vous accordez à YEMA les droits limités nécessaires pour recevoir, traiter, stocker, afficher et transmettre ces contenus afin de fournir et sécuriser la fonctionnalité choisie. Certains audios peuvent être traités de manière transitoire ; les audios de messagerie ou autres contenus utilisateur peuvent être stockés lorsque la fonctionnalité le nécessite. N’envoyez pas de contenu que vous n’êtes pas autorisé à utiliser.</P>
 
-      <H2>8. Suppression de compte</H2>
-      <P>
-        Vous pouvez supprimer votre compte à tout moment depuis vos paramètres.
-        Vos données personnelles seront effacées dans les 30 jours suivant la
-        suppression, conformément à notre Politique de confidentialité.
-      </P>
+      <H2>9. Disponibilité de la bêta</H2>
+      <P>Un logiciel en bêta fermée peut contenir des fonctionnalités incomplètes, des défauts ou des interruptions temporaires. YEMA ne promet aucun taux de disponibilité chiffré ni SLA dans les présentes Conditions. Des fonctionnalités peuvent être modifiées, limitées ou retirées pendant les tests et l’amélioration du produit.</P>
 
-      <H2>9. Droit applicable</H2>
-      <P>
-        Les présentes Conditions sont régies par le droit camerounais. Les
-        litiges seront portés devant les tribunaux compétents de Yaoundé,
-        Cameroun.
-      </P>
+      <H2>10. Confidentialité</H2>
+      <P>L’utilisation de YEMA est également soumise à la Politique de confidentialité publiée, notamment pour les profils Famille, la messagerie et le fonctionnement de la bêta fermée.</P>
 
-      <H2>10. Modifications</H2>
-      <P>
-        Nous pouvons modifier ces Conditions. Les modifications importantes
-        seront communiquées 14 jours à l&apos;avance. La poursuite de
-        l&apos;utilisation vaut acceptation.
-      </P>
+      <H2>11. Demandes relatives au compte et aux données</H2>
+      <P>Vous pouvez contacter <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> pour les demandes liées au compte. Les demandes de confidentialité ou de suppression peuvent nécessiter une vérification d’identité et sont traitées conformément à la Politique de confidentialité et au droit applicable. Les présentes Conditions ne promettent ni bouton de suppression dans les paramètres ni délai fixe lorsqu’ils ne sont pas réellement fournis.</P>
+
+      <H2>12. Responsabilité et droit applicable</H2>
+      <P>Dans la mesure permise par le droit applicable, YEMA n’est pas responsable des décisions relevant de tiers, notamment résultats d’examens officiels, décisions de visa, décisions d’emploi ou comportement d’utilisateurs indépendants. Rien dans les présentes Conditions n’exclut les droits ou responsabilités qui ne peuvent légalement être exclus.</P>
+      <P>Les présentes Conditions s’appliquent sous réserve des lois applicables à YEMA et à l’utilisateur. Les droits impératifs en matière de consommation, protection des mineurs, confidentialité ou autres dispositions légales demeurent applicables lorsqu’ils le sont.</P>
+
+      <H2>13. Modifications</H2>
+      <P>Nous pouvons mettre à jour ces Conditions à mesure que la bêta fermée et le produit commercial évoluent. Les changements importants seront reflétés dans les Conditions publiées et, lorsque cela est approprié, communiqués dans le service ou par e-mail avant leur application.</P>
     </LegalShell>
   );
 }
