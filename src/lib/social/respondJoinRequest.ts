@@ -13,7 +13,14 @@ export type JoinRequestDecision =
     }
   | {
       ok: false;
-      reason: "not_found" | "not_pending" | "forbidden" | "invalid_destination" | "classroom_full" | "classroom_inactive";
+      reason:
+        | "not_found"
+        | "not_pending"
+        | "forbidden"
+        | "invalid_destination"
+        | "classroom_full"
+        | "classroom_inactive"
+        | "group_full";
     };
 
 export type GroupInviteDecision =
@@ -26,8 +33,40 @@ export type GroupInviteDecision =
     }
   | {
       ok: false;
-      reason: "not_found" | "not_pending" | "group_unavailable";
+      reason: "not_found" | "not_pending" | "group_unavailable" | "group_full";
     };
+
+async function groupHasCapacity(
+  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
+  groupId: string,
+  userId: string,
+): Promise<
+  | { ok: true; group: { id: string; name: string; maxMembers: number } }
+  | { ok: false; reason: "group_unavailable" | "group_full" }
+> {
+  await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${groupId}, 0))`;
+
+  const group = await tx.studentGroup.findFirst({
+    where: { id: groupId, isActive: true },
+    select: { id: true, name: true, maxMembers: true },
+  });
+  if (!group) return { ok: false, reason: "group_unavailable" };
+
+  const existingMembership = await tx.studentGroupMember.findUnique({
+    where: { groupId_userId: { groupId: group.id, userId } },
+    select: { isActive: true },
+  });
+  if (!existingMembership?.isActive) {
+    const activeCount = await tx.studentGroupMember.count({
+      where: { groupId: group.id, isActive: true },
+    });
+    if (activeCount >= group.maxMembers) {
+      return { ok: false, reason: "group_full" };
+    }
+  }
+
+  return { ok: true, group };
+}
 
 export async function respondToJoinRequest(params: {
   requestId: string;
@@ -62,8 +101,6 @@ export async function respondToJoinRequest(params: {
       if (!classroom) return { ok: false, reason: "forbidden" } as const;
 
       if (params.accept) {
-        // Serialize every acceptance for the same classroom so two concurrent
-        // requests cannot both observe the last free seat.
         await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${classroom.id}, 0))`;
 
         const lockedClassroom = await tx.classroom.findFirst({
@@ -144,11 +181,23 @@ export async function respondToJoinRequest(params: {
     }
 
     if (req.toGroupId) {
-      const group = await tx.studentGroup.findFirst({
+      const ownedGroup = await tx.studentGroup.findFirst({
         where: { id: req.toGroupId, creatorId: params.responderUserId, isActive: true },
         select: { id: true, name: true },
       });
-      if (!group) return { ok: false, reason: "forbidden" } as const;
+      if (!ownedGroup) return { ok: false, reason: "forbidden" } as const;
+
+      let group = ownedGroup;
+      if (params.accept) {
+        const capacity = await groupHasCapacity(tx, ownedGroup.id, req.fromUserId);
+        if (!capacity.ok) {
+          return {
+            ok: false,
+            reason: capacity.reason === "group_full" ? "group_full" : "forbidden",
+          } as const;
+        }
+        group = capacity.group;
+      }
 
       const decided = await tx.classJoinRequest.updateMany({
         where: { id: req.id, status: "pending" },
@@ -166,7 +215,7 @@ export async function respondToJoinRequest(params: {
             groupId_userId: { groupId: group.id, userId: req.fromUserId },
           },
           create: { groupId: group.id, userId: req.fromUserId },
-          update: { isActive: true },
+          update: { isActive: true, joinedAt: new Date() },
         });
       }
 
@@ -209,6 +258,13 @@ export async function respondToGroupInvite(params: {
     });
     if (!group) return { ok: false, reason: "group_unavailable" } as const;
 
+    let lockedGroup = group;
+    if (params.accept) {
+      const capacity = await groupHasCapacity(tx, group.id, params.responderUserId);
+      if (!capacity.ok) return { ok: false, reason: capacity.reason } as const;
+      lockedGroup = capacity.group;
+    }
+
     const decided = await tx.studyGroupInvite.updateMany({
       where: { id: invite.id, status: "pending", toUserId: params.responderUserId },
       data: { status: params.accept ? "accepted" : "refused" },
@@ -218,18 +274,18 @@ export async function respondToGroupInvite(params: {
     if (params.accept) {
       await tx.studentGroupMember.upsert({
         where: {
-          groupId_userId: { groupId: group.id, userId: params.responderUserId },
+          groupId_userId: { groupId: lockedGroup.id, userId: params.responderUserId },
         },
-        create: { groupId: group.id, userId: params.responderUserId },
-        update: { isActive: true },
+        create: { groupId: lockedGroup.id, userId: params.responderUserId },
+        update: { isActive: true, joinedAt: new Date() },
       });
     }
 
     return {
       ok: true,
       accepted: params.accept,
-      groupId: group.id,
-      groupName: group.name,
+      groupId: lockedGroup.id,
+      groupName: lockedGroup.name,
       inviterUserId: invite.fromUserId,
     } as const;
   });
