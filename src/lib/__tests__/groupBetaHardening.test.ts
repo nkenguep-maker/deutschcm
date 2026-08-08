@@ -55,4 +55,37 @@ describe("beta · study group hardening", () => {
     expect(route).not.toContain("Math.random");
     expect(route).toContain("generateUniqueGroupCode");
   });
+
+  it("creates the group and creator membership in one transaction", () => {
+    const route = read("src/app/api/group/route.ts");
+    const createBranch = route.slice(
+      route.indexOf('if (action === "create")'),
+      route.indexOf('if (action === "join")'),
+    );
+    const tx = createBranch.indexOf("prisma.$transaction");
+    const groupCreate = createBranch.indexOf("tx.studentGroup.create", tx);
+    const memberCreate = createBranch.indexOf("tx.studentGroupMember.create", groupCreate);
+
+    expect(tx).toBeGreaterThan(-1);
+    expect(groupCreate).toBeGreaterThan(tx);
+    expect(memberCreate).toBeGreaterThan(groupCreate);
+  });
+
+  it("serializes direct code joins and checks maxMembers before membership upsert", () => {
+    const route = read("src/app/api/group/route.ts");
+    const joinBranch = route.slice(route.indexOf('if (action === "join")'));
+    const tx = joinBranch.indexOf("prisma.$transaction");
+    const lock = joinBranch.indexOf("pg_advisory_xact_lock(hashtextextended(${target.id}, 0))", tx);
+    const count = joinBranch.indexOf("tx.studentGroupMember.count", lock);
+    const capacity = joinBranch.indexOf("activeCount >= group.maxMembers", count);
+    const upsert = joinBranch.indexOf("tx.studentGroupMember.upsert", capacity);
+
+    expect(tx).toBeGreaterThan(-1);
+    expect(lock).toBeGreaterThan(tx);
+    expect(count).toBeGreaterThan(lock);
+    expect(capacity).toBeGreaterThan(count);
+    expect(upsert).toBeGreaterThan(capacity);
+    expect(joinBranch).toContain('reason: "group_full"');
+    expect(joinBranch).toContain('code: "group_full"');
+  });
 });
