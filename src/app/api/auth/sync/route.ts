@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { reconcileAuthenticatedUser } from "@/lib/auth/reconcileAuthenticatedUser";
 import { ReconcileError } from "@/lib/reconcileDbUser";
+import { canReconcileClosedBetaIdentity } from "@/lib/beta/access";
 import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 
 export async function POST(request: NextRequest) {
@@ -19,6 +20,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    if (!(await canReconcileClosedBetaIdentity(user))) {
+      return NextResponse.json(
+        { error: "Closed beta access required", code: "beta_access_required" },
+        { status: 403 },
+      );
+    }
+
     const result = await reconcileAuthenticatedUser(user);
     return NextResponse.json({ ok: true, activeSpace: result.activeSpace });
   } catch (error) {
