@@ -90,5 +90,10 @@ export function FamilyDashboard({ locale, activeSectionId = "accueil" }: Props) 
   };
   const metaText = t("meta", { count: data.totalChildrenLinked });
   const accessMeta = data.adultAccess.hasAnyAdultAccess ? <DashboardStatusChip tone="gold">{[data.adultAccess.monde ? "Monde" : null, data.adultAccess.racines ? "Racines" : null].filter(Boolean).join(" · ")}</DashboardStatusChip> : undefined;
-  return shell(<div data-live-persona-section={activeSection}>{content[activeSection]}</div>, <DashboardHeader title={personaLabel} subtitle={metaText} meta={accessMeta} />);
+  const guardianFirstName = data.guardian.fullName?.trim().split(/\s+/)[0] || personaLabel;
+  const subtitle = data.guardian.city ? `${metaText} · ${data.guardian.city}` : metaText;
+  return shell(
+    <div data-live-persona-section={activeSection}>{content[activeSection]}</div>,
+    <DashboardHeader title={guardianFirstName} subtitle={subtitle} meta={accessMeta} />,
+  );
 }
