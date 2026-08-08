@@ -70,6 +70,7 @@ describe("public teacher application hardening", () => {
     expect(page).toContain("no payment is collected");
     expect(page).toContain('navPricing: "Tarifs"');
     expect(page).toContain('navPricing: "Pricing"');
-    expect(layout).toContain("after a teacher workspace is opened").toBeUndefined;
+    expect(layout).toContain("L'enseignant au centre. Découvrez l'espace enseignant YEMA");
+    expect(layout).toContain("The teacher at the center. Discover the YEMA teacher workspace");
   });
 });
