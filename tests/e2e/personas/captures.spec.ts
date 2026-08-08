@@ -63,6 +63,9 @@ for (const p of PERSONAS) {
   for (const vp of VIEWPORTS) {
     for (const locale of ["fr", "en"] as const) {
       test(`${p.id} · ${locale} · ${vp.name}`, async ({ page }) => {
+        const pageErrors: string[] = [];
+        page.on("pageerror", (error) => pageErrors.push(error.message));
+
         await loginViaSupabase(page, p.email, PASSWORD);
         await page.setViewportSize({ width: vp.width, height: vp.height });
         const route = `/${locale}${p.home}`;
@@ -72,10 +75,7 @@ for (const p of PERSONAS) {
         expect(new URL(page.url()).pathname, `${p.id} canonical route`).toBe(route);
 
         if ("marker" in p) {
-          await expect(
-            page.locator(`[data-yema-persona="${p.marker}"]`),
-            `${p.id} dashboard universe`,
-          ).toHaveCount(1);
+          await expect(page.locator(`[data-yema-persona="${p.marker}"]`), `${p.id} dashboard universe`).toHaveCount(1);
         }
 
         const h1Count = await page.locator("h1").count();
@@ -85,13 +85,12 @@ for (const p of PERSONAS) {
           const ALLOW = ["[data-overflow-ok]", ".marquee", "[role=marquee]", "[data-carousel]"];
           return els.filter((e) => {
             if (e.getBoundingClientRect().right <= w + 1) return false;
-            for (const sel of ALLOW) {
-              if (e.matches(sel) || e.closest(sel)) return false;
-            }
+            for (const sel of ALLOW) if (e.matches(sel) || e.closest(sel)) return false;
             return true;
           }).length;
         }, vp.width);
         expect(overflowing, `overflow ${p.id} ${vp.name} (elts non-scrollables > viewport)`).toBe(0);
+        expect(pageErrors, `${p.id} ${locale} ${vp.name} unhandled page errors`).toEqual([]);
 
         const path = file(p.id, vp.name, locale);
         await page.screenshot({ path, fullPage: true });
