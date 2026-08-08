@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "@/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
 import { BrandY } from "@/components/brand/BrandY";
@@ -12,6 +12,27 @@ import { classifyAuthError, withTimeout, type AuthErrorKey } from "@/lib/authErr
 import { sanitizeInternalNext } from "@/lib/authRedirect";
 
 type Universe = "monde" | "racines";
+
+type SelectedPlan =
+  | "passage-a1"
+  | "passage-a2"
+  | "passage-b1"
+  | "passage-b2"
+  | "passage-c1";
+
+const VALID_PASSAGE_PLANS = new Set<SelectedPlan>([
+  "passage-a1",
+  "passage-a2",
+  "passage-b1",
+  "passage-b2",
+  "passage-c1",
+]);
+
+function parsePassagePlan(value: string | null): SelectedPlan | null {
+  return value && VALID_PASSAGE_PLANS.has(value as SelectedPlan)
+    ? value as SelectedPlan
+    : null;
+}
 
 const COPY = {
   fr: {
@@ -77,11 +98,24 @@ export default function RegisterPage() {
   const universe: Universe | null = universeParam === "monde" || universeParam === "racines"
     ? universeParam
     : null;
+  const selectedPlan = parsePassagePlan(searchParams.get("plan"));
+  const rootsSoloSelected = searchParams.get("addon") === "roots-solo";
+  const teacherAddonRequested = searchParams.get("prof") === "1";
   const rawNext = searchParams.get("next");
   const safeNext = sanitizeInternalNext(rawNext, `/${locale}/dashboard`);
   const loginHref = rawNext
     ? `/${locale}/login?next=${encodeURIComponent(safeNext)}`
     : `/${locale}/login`;
+
+  const personaIntentQuery = useMemo(() => {
+    const params = new URLSearchParams();
+    if (selectedPlan) params.set("plan", selectedPlan);
+    if (rootsSoloSelected) params.set("addon", "roots-solo");
+    if (teacherAddonRequested) params.set("prof", "1");
+    if (rawNext) params.set("next", safeNext);
+    const suffix = params.toString();
+    return suffix ? `?${suffix}` : "";
+  }, [rawNext, rootsSoloSelected, safeNext, selectedPlan, teacherAddonRequested]);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -93,7 +127,8 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false);
 
   const errorFromKey = (key: AuthErrorKey): string => t(tErr(key));
-  const personaRoute = `/${locale}/onboarding/persona`;
+  const localizedPersonaRoute = `/${locale}/onboarding/persona${personaIntentQuery}`;
+  const appPersonaRoute = `/onboarding/persona${personaIntentQuery}`;
 
   useEffect(() => {
     document.querySelector<HTMLInputElement>("input[data-autofocus]")?.focus();
@@ -133,9 +168,12 @@ export default function RegisterPage() {
               first_name: first,
               last_name: last,
               universe: universe ?? null,
+              selected_plan: selectedPlan,
+              selected_addons: rootsSoloSelected ? ["roots-solo"] : [],
+              teacher_addon_requested: teacherAddonRequested,
               post_onboarding_next: rawNext ? safeNext : null,
             },
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(personaRoute)}`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizedPersonaRoute)}`,
           },
         }),
       );
@@ -153,7 +191,7 @@ export default function RegisterPage() {
           return;
         }
         await supabase.auth.refreshSession();
-        router.push("/onboarding/persona");
+        router.push(appPersonaRoute);
         router.refresh();
         return;
       }
@@ -171,7 +209,7 @@ export default function RegisterPage() {
     setGoogleLoading(true);
     try {
       const supabase = createClient();
-      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(personaRoute)}`;
+      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizedPersonaRoute)}`;
       const { error: oauthError } = await withTimeout(
         supabase.auth.signInWithOAuth({
           provider: "google",
@@ -210,6 +248,15 @@ export default function RegisterPage() {
               <p className="entry-kicker">{t(c.kicker).toUpperCase()}</p>
               <h1 className="entry-h">{t(c.title)}</h1>
               <p className="entry-lede">{t(c.lede)}</p>
+
+              {selectedPlan || rootsSoloSelected || teacherAddonRequested ? (
+                <div className="entry-context" role="note">
+                  <span className="entry-context-dot" aria-hidden="true" />
+                  <span className="entry-context-text">
+                    {loc === "en" ? "Your selected offer will be kept through onboarding." : "Votre choix d’offre sera conservé pendant l’onboarding."}
+                  </span>
+                </div>
+              ) : null}
 
               <form onSubmit={handleRegister} className="entry-form" noValidate>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
