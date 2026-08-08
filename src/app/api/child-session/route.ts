@@ -28,6 +28,7 @@ import {
   isChildPinRateLimited,
   recordInvalidChildPinAttempt,
 } from "@/lib/security/childPinRateLimit";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 import {
   CHILD_SESSION_COOKIE_NAME,
   CHILD_SESSION_TTL_SECONDS,
@@ -50,6 +51,8 @@ function pinRateLimited() {
 }
 
 export async function POST(req: NextRequest) {
+  if (!isSameOriginRequest(req)) return err("ORIGIN_MISMATCH", 403);
+
   // 1. Parent authentifié requis.
   const actor = await resolveFamilyGuardianActorOrNull();
   if (!actor) return err("UNAUTHORIZED", 401);
@@ -111,7 +114,9 @@ export async function GET() {
   return NextResponse.json({ active: true, childProfileId: check.payload.childProfileId });
 }
 
-export async function DELETE() {
+export async function DELETE(req: NextRequest) {
+  if (!isSameOriginRequest(req)) return err("ORIGIN_MISMATCH", 403);
+
   const jar = await cookies();
   jar.set(CHILD_SESSION_COOKIE_NAME, "", {
     httpOnly: true,
