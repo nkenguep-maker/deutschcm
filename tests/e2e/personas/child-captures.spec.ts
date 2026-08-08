@@ -1,6 +1,7 @@
 // QA personas · captures réelles Child Monde + Child Racines via session PIN.
 
 import { test, expect, type Page } from "playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 import { existsSync, mkdirSync } from "node:fs";
 
 const OUT = "captures/personas";
@@ -69,6 +70,20 @@ async function assertNoHorizontalOverflow(page: Page, width: number, label: stri
   expect(overflowing, `overflow ${label}`).toBe(0);
 }
 
+async function assertWcag(page: Page, label: string) {
+  const report = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  const violations = report.violations.map((violation) => ({
+    id: violation.id,
+    impact: violation.impact,
+    help: violation.help,
+    nodes: violation.nodes.length,
+    targets: violation.nodes.slice(0, 3).flatMap((node) => node.target),
+  }));
+  expect(violations, `${label} WCAG A/AA violations`).toEqual([]);
+}
+
 const CHILDREN = [
   { id: "child_monde", childProfileId: "test_yema_qa_child_family_monde", pin: "1234" },
   { id: "child_racines", childProfileId: "test_yema_qa_child_family_racines", pin: "5678" },
@@ -101,8 +116,12 @@ for (const child of CHILDREN) {
         expect(await page.locator("h1").count(), `h1 ${child.id}`).toBe(1);
         await assertNoHorizontalOverflow(page, viewport.width, `${child.id} ${viewport.name}`);
         expect(pageErrors, `${child.id} ${locale} ${viewport.name} unhandled page errors`).toEqual([]);
-        await page.screenshot({ path: file(child.id, viewport.name, locale), fullPage: true });
 
+        if (locale === "fr" && (viewport.name === "390" || viewport.name === "1440")) {
+          await assertWcag(page, `${child.id} ${viewport.name}`);
+        }
+
+        await page.screenshot({ path: file(child.id, viewport.name, locale), fullPage: true });
         await exitChildSession(page);
       });
     }
