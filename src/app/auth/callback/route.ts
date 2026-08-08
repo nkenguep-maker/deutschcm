@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { reconcileAuthenticatedUser } from "@/lib/auth/reconcileAuthenticatedUser";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
 import { canReconcileClosedBetaIdentity } from "@/lib/beta/access";
+import { resolvePersonaRuntime } from "@/lib/personas/runtime";
 
 function loginPathFor(next: string): string {
   const locale = next.match(/^\/(fr|en)(?:\/|$)/)?.[1];
@@ -23,7 +24,6 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const cookieStore = await cookies();
-
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -31,9 +31,7 @@ export async function GET(request: NextRequest) {
         cookies: {
           getAll() { return cookieStore.getAll(); },
           setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
+            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
           },
         },
       },
@@ -45,7 +43,6 @@ export async function GET(request: NextRequest) {
     }
 
     const { data: { user } } = await supabase.auth.getUser();
-
     if (user) {
       let admitted = false;
       try {
@@ -59,17 +56,15 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(`${origin}${betaPathFor(next)}`);
       }
 
-      let dbUser: Awaited<ReturnType<typeof reconcileAuthenticatedUser>>["user"];
       let activeSpace: "STUDENT" | "TEACHER" | "CENTER" | "ADMIN";
+      let onboardingDone = false;
       try {
         const res = await reconcileAuthenticatedUser(user);
-        dbUser = res.user;
         activeSpace = res.activeSpace;
+        onboardingDone = res.user.onboardingDone;
         if (res.path !== "matched_supabase_id") {
           console.info(`[auth/callback] reconcile path=${res.path} for supabaseId=${user.id}`);
         }
-        // The current access token predates the admin app_metadata write.
-        // Refresh once so the next protected request carries the signed mirror.
         await supabase.auth.refreshSession();
       } catch (e) {
         console.error("[auth/callback] reconcileAuthenticatedUser FAIL", e);
@@ -77,26 +72,19 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(`${origin}${loginPathFor(next)}?error=auth_callback_failed`);
       }
 
-      const onboardingDone = dbUser.onboardingDone;
-
       let redirectUrl: string;
       const nextIsMeaningful = next !== "/dashboard";
       if (nextIsMeaningful) {
         redirectUrl = next;
-      } else if (onboardingDone) {
-        redirectUrl = activeSpace === "ADMIN" ? "/admin"
-          : activeSpace === "TEACHER" ? "/teacher"
-          : activeSpace === "CENTER" ? "/center"
-          : "/dashboard";
       } else {
-        redirectUrl = activeSpace === "ADMIN" ? "/admin"
-          : activeSpace === "TEACHER" ? "/onboarding/teacher"
-          : activeSpace === "CENTER" ? "/onboarding/center"
-          : "/onboarding";
+        const runtime = await resolvePersonaRuntime({
+          supabaseId: user.id,
+          requestedPersona: user.user_metadata?.requested_persona,
+        });
+        redirectUrl = runtime.onboarded ? runtime.homeRoute : runtime.onboardingRoute;
       }
 
       const redirectResponse = NextResponse.redirect(`${origin}${redirectUrl}`);
-      // Legacy display cookie only. Authorization no longer reads this value.
       redirectResponse.cookies.set("user_role", activeSpace, { path: "/", maxAge: 2592000 });
       redirectResponse.cookies.set("onboarding_done", onboardingDone.toString(), { path: "/", maxAge: 2592000 });
       return redirectResponse;
