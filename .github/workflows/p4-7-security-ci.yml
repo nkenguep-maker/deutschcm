@@ -20,9 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      # Prisma generate parses DIRECT_URL but does not connect to it.
-      # This deliberately non-routable local URL prevents CI from ever
-      # reaching a Supabase environment during static checks.
       DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:65432/yema_ci
       DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:65432/yema_ci
       NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
@@ -73,6 +70,7 @@ jobs:
           src/lib/__tests__/centerApplicationHardening.test.ts
           src/lib/__tests__/closedBetaPublicSurface.test.ts
           src/lib/__tests__/securityHeaders.test.ts
+          src/lib/__tests__/internalTestEnvironmentGate.test.ts
 
       - name: Verify CI uses only placeholder infrastructure
         shell: bash
