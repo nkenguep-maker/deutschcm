@@ -42,13 +42,13 @@ async function loginViaSupabase(page: Page, email: string, password: string) {
 const PASSWORD = process.env.P1_TEST_PASSWORD!;
 
 const PERSONAS = [
-  { id: "super_admin",    email: "test_yema_qa_super_admin@example.com",    home: "/admin" },
-  { id: "teacher",        email: "test_yema_qa_teacher@example.com",        home: "/teacher" },
-  { id: "coach",          email: "test_yema_qa_coach@example.com",          home: "/dashboard" },
-  { id: "center_admin",   email: "test_yema_qa_center_admin@example.com",   home: "/center" },
-  { id: "student_monde",  email: "test_yema_qa_student_monde@example.com",  home: "/dashboard" },
+  { id: "super_admin",     email: "test_yema_qa_super_admin@example.com",     home: "/admin" },
+  { id: "teacher",         email: "test_yema_qa_teacher@example.com",         home: "/teacher" },
+  { id: "coach",           email: "test_yema_qa_coach@example.com",           home: "/coach/racines" },
+  { id: "center_admin",    email: "test_yema_qa_center_admin@example.com",    home: "/center" },
+  { id: "student_monde",   email: "test_yema_qa_student_monde@example.com",   home: "/dashboard" },
   { id: "student_racines", email: "test_yema_qa_student_racines@example.com", home: "/dashboard" },
-  { id: "family",         email: "test_yema_qa_family@example.com",         home: "/famille" },
+  { id: "family",          email: "test_yema_qa_family@example.com",          home: "/family" },
 ] as const;
 
 const VIEWPORTS = [
