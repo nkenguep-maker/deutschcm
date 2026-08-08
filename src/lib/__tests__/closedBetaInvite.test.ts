@@ -69,6 +69,17 @@ describe("closed beta invitation provisioning", () => {
     expect(route).toContain("invitationId: stored.id");
   });
 
+  it("keeps the raw token out of HTTP request URLs and Referer headers", () => {
+    const route = read("src/app/api/admin/beta/invite/route.ts");
+    const page = read("src/app/[locale]/beta/accept/page.tsx");
+
+    expect(route).toContain("inviteUrl.hash = new URLSearchParams({ token }).toString()");
+    expect(route).not.toContain('searchParams.set("token"');
+    expect(page).toContain("window.location.hash");
+    expect(page).toContain("window.history.replaceState");
+    expect(page).not.toContain("useSearchParams");
+  });
+
   it("verifies and atomically claims the token before any auth account creation", () => {
     const route = read("src/app/api/beta/accept/route.ts");
 
@@ -107,6 +118,7 @@ describe("closed beta invitation provisioning", () => {
 
   it("requires a password only for a genuinely new account", () => {
     const route = read("src/app/api/beta/accept/route.ts");
+    const page = read("src/app/[locale]/beta/accept/page.tsx");
     const existingLookup = route.indexOf("const existing = await prisma.user.findFirst");
     const passwordGuard = route.indexOf('if (typeof input.password !== "string" || input.password.length < 8)');
     const create = route.indexOf("admin.auth.admin.createUser");
@@ -114,6 +126,10 @@ describe("closed beta invitation provisioning", () => {
     expect(existingLookup).toBeGreaterThan(-1);
     expect(passwordGuard).toBeGreaterThan(existingLookup);
     expect(create).toBeGreaterThan(passwordGuard);
+    expect(route).toContain('code: "password_required"');
+    expect(page).toContain('payload?.code === "password_required"');
+    expect(page).toContain("nouveaux comptes uniquement");
+    expect(page).not.toContain('type="password" required');
   });
 
   it("compensates failed new-account provisioning and releases the claim", () => {
