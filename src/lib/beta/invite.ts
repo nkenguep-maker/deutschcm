@@ -46,6 +46,10 @@ export function hashInviteEmail(email: string): string {
   return createHash("sha256").update(normalizeInviteEmail(email), "utf8").digest("hex");
 }
 
+export function hashInviteToken(token: string): string {
+  return createHash("sha256").update(token, "utf8").digest("hex");
+}
+
 function encodePayload(payload: BetaInvitePayload): string {
   return Buffer.from(JSON.stringify(payload), "utf8").toString("base64url");
 }
