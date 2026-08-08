@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   DashboardCard,
   DashboardEmptyState,
@@ -15,12 +15,20 @@ type Props = {
 
 export function OverviewSection({ data }: Props) {
   const t = useTranslations("yemaDashboards.studentRacines.overview");
+  const locale = useLocale();
 
   const isFamilyEmpty = data.mode === "FAMILY" && data.household.childrenCount === 0;
   const showContentSoon =
     (!data.anyLanguageReady || data.langStatus !== "READY") &&
     data.mode !== "NO_ACCESS" &&
     !isFamilyEmpty;
+
+  const betaTitle = locale === "en"
+    ? "Your Roots journey is configured."
+    : "Ton parcours Racines est bien configuré.";
+  const betaBody = locale === "en"
+    ? "The technical beta does not require a subscription. Your first activities will appear here as soon as they are connected to your profile."
+    : "La bêta technique ne demande aucun abonnement. Tes premières activités apparaîtront ici dès qu’elles seront branchées à ton profil.";
 
   return (
     <section id="mon-tableau-de-bord" aria-labelledby="mon-tableau-de-bord-title" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -29,11 +37,10 @@ export function OverviewSection({ data }: Props) {
       />
 
       {data.mode === "NO_ACCESS" ? (
-        <DashboardCard>
+        <DashboardCard tone="gold">
           <DashboardEmptyState
-            title={t("noAccessTitle")}
-            description={t("noAccessBody")}
-            action={<DashboardButtonLink variant="primary" href="/activation-intent">{t("noAccessCta")}</DashboardButtonLink>}
+            title={betaTitle}
+            description={betaBody}
           />
         </DashboardCard>
       ) : null}
