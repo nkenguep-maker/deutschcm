@@ -13,15 +13,16 @@ describe("closed beta public surface", () => {
     expect(nav).toContain('router.push(`/${locale}/register`)');
   });
 
-  it("sends the final home CTA to register while the register layout owns the beta gate", () => {
+  it("sends the final home CTA to register and lets the proxy own the optional beta wall", () => {
     const door = read("src/components/maison/MaisonPorte.tsx");
-    const registerLayout = read("src/app/[locale]/register/layout.tsx");
+    const proxy = read("src/proxy.ts");
 
     expect(door).toContain('href={`/${locale}/register`}');
     expect(door).toContain('cta: "S’inscrire"');
     expect(door).toContain('cta: "Sign up"');
-    expect(registerLayout).toContain('process.env.YEMA_CLOSED_BETA_ENABLED === "true"');
-    expect(registerLayout).toContain('redirect(`/${safeLocale}/beta`)');
+    expect(proxy).toContain('process.env.YEMA_CLOSED_BETA_ENABLED === "true"');
+    expect(proxy).toContain('closedBeta && canonicalPath === "/register"');
+    expect(proxy).toContain('new URL(`/${locale}/beta`, request.url)');
   });
 
   it("removes the B2B commercial landing from the closed-beta public surface", () => {
