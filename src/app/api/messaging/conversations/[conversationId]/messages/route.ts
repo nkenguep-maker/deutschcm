@@ -1,6 +1,8 @@
 // P4.6-A · GET / POST /api/messaging/conversations/[conversationId]/messages
 // GET  : liste des messages (accès vérifié)
-// POST : envoi de message (kind + contenu validés server-side)
+// POST : envoi de message texte/guidé uniquement. L'audio passe par
+//        /api/messaging/conversations/[conversationId]/audio et les CARD/SYSTEM
+//        sont réservés aux actions serveur de domaine.
 
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -25,11 +27,6 @@ const BAD_REQUEST_DENIALS = new Set([
   "text_too_long",
   "guided_phrase_missing_or_inactive",
   "guided_phrase_wrong_scope",
-  "audio_disabled",
-  "audio_not_ready",
-  "card_type_missing_or_invalid",
-  "replies_disabled",
-  "reply_target_invalid",
   "idempotency_key_invalid",
 ]);
 
@@ -59,10 +56,10 @@ export async function POST(
   try { body = await req.json(); } catch { return badRequest("bad_json"); }
   const b = (body ?? {}) as Record<string, unknown>;
 
-  const kind = String(b.kind ?? "").toUpperCase() as
-    | "TEXT" | "AUDIO" | "GUIDED_PHRASE" | "CARD" | "SYSTEM";
-  if (!["TEXT", "AUDIO", "GUIDED_PHRASE", "CARD"].includes(kind)) {
-    // SYSTEM refusé côté client. Autres valeurs invalides.
+  const kind = String(b.kind ?? "").toUpperCase() as "TEXT" | "GUIDED_PHRASE";
+  if (!["TEXT", "GUIDED_PHRASE"].includes(kind)) {
+    // AUDIO a son endpoint multipart dédié. CARD et SYSTEM sont émis par
+    // des actions serveur de domaine, jamais par un payload client générique.
     return badRequest("invalid_kind");
   }
 
@@ -71,10 +68,6 @@ export async function POST(
     kind,
     body: typeof b.body === "string" ? b.body : null,
     guidedPhraseId: typeof b.guidedPhraseId === "string" ? b.guidedPhraseId : null,
-    audioAssetId: typeof b.audioAssetId === "string" ? b.audioAssetId : null,
-    cardType: (typeof b.cardType === "string" ? b.cardType : null) as never,
-    cardPayload: (b.cardPayload ?? null) as Record<string, unknown> | null,
-    replyToMessageId: typeof b.replyToMessageId === "string" ? b.replyToMessageId : null,
     idempotencyKey: typeof b.idempotencyKey === "string" ? b.idempotencyKey : null,
   });
 
