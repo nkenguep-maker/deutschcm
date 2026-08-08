@@ -9,6 +9,6 @@ export default async function CoursePage({ params }: { params: Promise<{ locale:
   const { locale, courseId } = await params;
   const course = getCourseContent(courseId);
   if (!course) notFound();
-  const viewer = await loadCourseViewer(courseId, locale);
+  const viewer = await loadCourseViewer(courseId, locale, `/${locale}/learn/${courseId}`);
   return <CourseOverview course={course} progress={viewer.progress} accessStatus={viewer.accessStatus} locale={locale} />;
 }
