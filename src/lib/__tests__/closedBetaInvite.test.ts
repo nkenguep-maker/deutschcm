@@ -105,8 +105,8 @@ describe("closed beta invitation provisioning", () => {
   it("never lets a beta invitation grant a privileged YEMA role", () => {
     const route = read("src/app/api/beta/accept/route.ts");
 
-    expect(route).toContain("reconcileAuthenticatedUser(data.user)");
-    expect(route).toContain("setBetaAccess({ supabaseId: data.user.id, enabled: true })");
+    expect(route).toContain("reconcileAuthenticatedUser(authUser)");
+    expect(route).toContain("setBetaAccess({ supabaseId: authUser.id, enabled: true })");
     expect(route).not.toContain('role: "ADMIN"');
     expect(route).not.toContain('role: "TEACHER"');
     expect(route).not.toContain('role: "CENTER"');
@@ -153,14 +153,26 @@ describe("closed beta invitation provisioning", () => {
     expect(page).not.toContain('type="password" required');
   });
 
+  it("recovers only beta-marked Auth orphans without a Prisma owner", () => {
+    const route = read("src/app/api/beta/accept/route.ts");
+
+    expect(route).toContain("findRecoverableBetaOrphan");
+    expect(route).toContain("metadata.beta_invited === true ? exact : null");
+    expect(route).toContain("normalizeInviteEmail(candidate.email ?? \"\") === email");
+    expect(route).toContain("where: { supabaseId: orphan.id }");
+    expect(route).toContain("if (!dbOwner)");
+    expect(route).toContain("admin.auth.admin.updateUserById(orphan.id");
+    expect(route).toContain('status: recoveredOrphan ? "recovered" : "created"');
+  });
+
   it("compensates failed new-account provisioning and releases the claim", () => {
     const route = read("src/app/api/beta/accept/route.ts");
 
     expect(route).toContain("email_confirm: true");
-    expect(route).toContain("admin.auth.admin.deleteUser(data.user.id)");
-    expect(route).toContain("prisma.user.deleteMany({ where: { supabaseId: data.user.id } })");
+    expect(route).toContain("admin.auth.admin.deleteUser(authUser.id)");
+    expect(route).toContain("prisma.user.deleteMany({ where: { supabaseId: authUser.id } })");
     expect(route).toContain("releaseBetaInvitationClaim(claim.id)");
-    expect(route).toContain('status: "created"');
+    expect(route).toContain('status: recoveredOrphan ? "recovered" : "created"');
   });
 
   it("lets an active DB admin revoke only an unused link", () => {
