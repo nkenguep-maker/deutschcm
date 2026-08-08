@@ -22,12 +22,24 @@ export default async function ClosedBetaPage({
             ? "Access is currently reserved for invited testers while we validate the experience, security and reliability before a wider launch."
             : "L’accès est actuellement réservé aux testeurs invités pendant que nous validons l’expérience, la sécurité et la fiabilité avant une ouverture plus large."}
         </p>
+
+        <div className="mt-7 rounded-2xl border border-[#d7b56d]/20 bg-[#d7b56d]/[0.06] p-5">
+          <p className="font-medium text-[#f7f1e8]">
+            {isEnglish ? "Have an invitation?" : "Vous avez reçu une invitation ?"}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-white/65">
+            {isEnglish
+              ? "Open the personal link sent by YEMA. It is tied to your email address, valid for 72 hours and can be used once. There is no public registration form during the closed beta."
+              : "Ouvrez le lien personnel envoyé par YEMA. Il est lié à votre adresse e-mail, valable 72 heures et utilisable une seule fois. Il n’y a pas de formulaire d’inscription public pendant la bêta fermée."}
+          </p>
+        </div>
+
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href={`/${locale}/login`}
             className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#d7b56d] px-6 py-3 font-medium text-[#0f0b07]"
           >
-            {isEnglish ? "I already have access" : "J’ai déjà un accès"}
+            {isEnglish ? "I already accepted my access" : "J’ai déjà accepté mon accès"}
           </Link>
           <Link
             href={`/${locale}`}
