@@ -6,13 +6,15 @@ const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
 
 describe("canonical registration → onboarding → persona home funnel", () => {
-  it("collects a real adult identity and preserves offer intent through confirmation", () => {
+  it("collects a real adult identity and preserves Monde/Racines offer intent through confirmation", () => {
     const register = read("src/app/[locale]/register/page.tsx");
     expect(register).toContain("first_name: first");
     expect(register).toContain("last_name: last");
     expect(register).toContain("selected_plan: selectedPlan");
     expect(register).toContain('selected_addons: rootsSoloSelected ? ["roots-solo"] : []');
     expect(register).toContain("teacher_addon_requested: teacherAddonRequested");
+    expect(register).toContain('"racines-solo"');
+    expect(register).toContain('"racines-famille"');
     expect(register).toContain("/onboarding/persona");
     expect(register).toContain("emailRedirectTo");
     expect(register).not.toContain("signUp({ phone:");
@@ -27,6 +29,18 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     }
     expect(route).toContain('persona === "super_admin"');
     expect(route).toContain('bad("PERSONA_NOT_SELF_SERVICE", 403)');
+  });
+
+  it("keeps commercial intent compatible with the persona selected in onboarding", () => {
+    const route = read("src/app/api/onboarding/persona/route.ts");
+    expect(route).toContain("function compatibleOfferIntent");
+    expect(route).toContain('params.persona === "student_monde"');
+    expect(route).toContain('params.persona === "student_racines"');
+    expect(route).toContain('params.persona === "family"');
+    expect(route).toContain('rawPlan === "racines-solo"');
+    expect(route).toContain('rawPlan === "racines-famille"');
+    expect(route).toContain('params.rawAddon === "roots-solo"');
+    expect(route).toContain("Professional personas never inherit learner/family commercial intent");
   });
 
   it("never self-grants professional access in Production and enables QA-only activation on P-1", () => {
@@ -49,6 +63,7 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     const callback = read("src/app/auth/callback/route.ts");
     const home = read("src/app/api/auth/home/route.ts");
     const dashboard = read("src/app/[locale]/dashboard/page.tsx");
+    const onboarding = read("src/app/[locale]/onboarding/page.tsx");
 
     expect(login).toContain('/api/auth/home');
     expect(callback).toContain("resolvePersonaRuntime");
@@ -56,6 +71,8 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     expect(dashboard).toContain("resolvePersonaRuntime");
     expect(dashboard).toContain('runtime.persona !== "student_monde"');
     expect(dashboard).toContain('runtime.persona !== "student_racines"');
+    expect(onboarding).toContain('dbUser.userRoles[0]?.onboarded === true');
+    expect(onboarding).toContain('href: "/dashboard"');
   });
 
   it("keeps children email-less and attached to the Family guardian", () => {
@@ -86,6 +103,41 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     expect(intent).toContain("accessGranted: false");
     expect(intent).not.toContain("accessGrant.create");
     expect(intent).not.toContain("order.create");
+  });
+
+  it("makes Teacher and Center onboarding complete without mocks or fake payment", () => {
+    const teacher = read("src/app/[locale]/onboarding/teacher/page.tsx");
+    const center = read("src/app/[locale]/onboarding/center/page.tsx");
+    const legacyApi = read("src/app/api/onboarding/route.ts");
+
+    expect(teacher).toContain('fetch("/api/me"');
+    expect(teacher).toContain('fetch("/api/onboarding"');
+    expect(teacher).toContain('fetch("/api/onboarding/complete"');
+    expect(teacher).not.toContain("CENTERS =");
+    expect(teacher).not.toContain("Institut Goethe Yaoundé");
+
+    expect(center).toContain('fetch("/api/me"');
+    expect(center).toContain('fetch("/api/onboarding"');
+    expect(center).toContain('fetch("/api/onboarding/complete"');
+    expect(center).toContain("Aucun paiement n’est demandé");
+    expect(center).not.toContain("PLAN_PRICES");
+    expect(center).not.toContain("cardNumber");
+    expect(center).not.toContain("transactionId");
+    expect(legacyApi).toContain("if (dbUser.centerId)");
+    expect(legacyApi).toContain("prisma.languageCenter.update");
+    expect(legacyApi).toContain("prisma.languageCenter.create");
+  });
+
+  it("prefills confirmed account identity into Family, Teacher and Coach onboarding", () => {
+    const family = read("src/app/[locale]/onboarding/family/page.tsx");
+    const teacher = read("src/app/[locale]/onboarding/teacher/page.tsx");
+    const coach = read("src/app/[locale]/onboarding/coach/page.tsx");
+
+    for (const page of [family, teacher, coach]) {
+      expect(page).toContain('fetch("/api/me"');
+      expect(page).toContain("firstName");
+      expect(page).toContain("lastName");
+    }
   });
 
   it("projects the saved identity into learner, Family, Teacher and Coach dashboards", () => {
