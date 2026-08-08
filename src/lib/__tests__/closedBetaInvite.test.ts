@@ -56,6 +56,16 @@ describe("closed beta invitation provisioning", () => {
     expect(store).not.toContain("email: params.email");
   });
 
+  it("recovers only stale incomplete claims instead of permanently burning an invite", () => {
+    const store = read("src/lib/beta/invitationStore.ts");
+
+    expect(store).toContain("const STALE_CLAIM_MS = 10 * 60 * 1000");
+    expect(store).toContain("acceptedByUserId: null");
+    expect(store).toContain("acceptedAt: { lte: new Date(now.getTime() - STALE_CLAIM_MS) }");
+    expect(store).toContain("revokedAt: null");
+    expect(store).toContain("expiresAt: { gt: now }");
+  });
+
   it("requires closed-beta mode and a real active admin before issuing a link", () => {
     const route = read("src/app/api/admin/beta/invite/route.ts");
 
@@ -114,6 +124,17 @@ describe("closed beta invitation provisioning", () => {
     expect(existingBranch).toContain("finalizeBetaInvitation");
     expect(existingBranch).not.toContain("password:");
     expect(existingBranch).not.toContain("grantRole(");
+  });
+
+  it("restores an existing account beta flag when ledger finalization fails", () => {
+    const access = read("src/lib/beta/access.ts");
+    const route = read("src/app/api/beta/accept/route.ts");
+
+    expect(access).toContain("const previousEnabled = existing.beta_access === true");
+    expect(access).toContain("return previousEnabled");
+    expect(route).toContain("previousBetaAccess = await setBetaAccess");
+    expect(route).toContain("enabled: previousBetaAccess");
+    expect(route).toContain("releaseBetaInvitationClaim(claim.id)");
   });
 
   it("requires a password only for a genuinely new account", () => {
