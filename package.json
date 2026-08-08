@@ -23,6 +23,7 @@
     "test:monde-context:p1": "node scripts/test-monde-context-p1.mjs",
     "capture:monde-context:p1": "node scripts/capture-monde-context-p1.mjs",
     "test:personas:p1": "node scripts/test-personas-p1.mjs",
+    "verify:persona-accounts:p1": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag on -- node scripts/verify-persona-accounts-p1.mjs",
     "test:release-gate:p1": "node scripts/test-release-gate-p1.mjs",
     "test:entitlements:p1": "node scripts/test-entitlements-p1.mjs",
     "test:roots-adult-seats:p1": "tsx scripts/test-roots-adult-seats-p1.ts",
@@ -77,14 +78,13 @@
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@types/react-dom": "^19.2.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "playwright": "^1.61.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.1",
     "typescript": "^5",
-    "vitest": "^4.1.10"
+    "vitest": "^4.0.16"
   }
 }
