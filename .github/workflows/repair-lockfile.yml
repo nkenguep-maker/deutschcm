@@ -1,4 +1,4 @@
-name: Repair lockfile
+name: Repair branch fixtures
 
 on:
   push:
@@ -30,15 +30,51 @@ jobs:
       - name: Regenerate lockfile only
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
 
-      - name: Commit repaired lockfile
+      - name: Move QA authorization fixture to app metadata
         shell: bash
         run: |
-          if git diff --quiet -- package-lock.json; then
-            echo "package-lock.json already synchronized"
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/test-baseline/yema-qa-fixtures.mjs")
+          text = path.read_text()
+          old = '''  const { data } = await admin.auth.admin.getUserById(supabaseId);
+            const existing = data?.user?.user_metadata ?? {};
+            await admin.auth.admin.updateUserById(supabaseId, {
+              user_metadata: {
+                ...existing, roles: rolesList,
+                onboarded_map: onboardedMap, active_space: activeSpace, fixture: "TEST_YEMA_QA",
+              },
+            });'''
+          new = '''  const { data } = await admin.auth.admin.getUserById(supabaseId);
+            const existingProfile = data?.user?.user_metadata ?? {};
+            const existingAuthz = data?.user?.app_metadata ?? {};
+            await admin.auth.admin.updateUserById(supabaseId, {
+              user_metadata: {
+                ...existingProfile,
+                fixture: "TEST_YEMA_QA",
+              },
+              app_metadata: {
+                ...existingAuthz,
+                roles: rolesList,
+                onboarded_map: onboardedMap,
+                active_space: activeSpace,
+              },
+            });'''
+          if old not in text:
+              raise SystemExit("expected QA metadata block not found")
+          path.write_text(text.replace(old, new, 1))
+          PY
+
+      - name: Commit repaired branch files
+        shell: bash
+        run: |
+          if git diff --quiet -- package-lock.json scripts/test-baseline/yema-qa-fixtures.mjs; then
+            echo "branch files already synchronized"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json
-          git commit -m "chore: synchronize npm lockfile"
+          git add package-lock.json scripts/test-baseline/yema-qa-fixtures.mjs
+          git commit -m "chore: align P-1 auth fixtures"
           git push origin HEAD:fix/p4-7-social-notification-authz
