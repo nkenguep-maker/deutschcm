@@ -39,7 +39,7 @@ export default function LandingPage() {
             pricing: loc === "en" ? "Pricing" : "Tarifs",
             centers: loc === "en" ? "Centers" : "Centres",
             login: tNav.login,
-            register: loc === "en" ? "Beta access" : "Accès bêta",
+            register: loc === "en" ? "Sign up" : "S’inscrire",
           }}
         />
         <main>
