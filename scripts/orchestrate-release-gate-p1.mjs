@@ -40,11 +40,15 @@ const steps = [
   { name: "TypeScript", cmd: "npx", args: ["tsc", "--noEmit"] },
   { name: "Next build", cmd: "npm", args: ["run", "build"] },
   // Run fixture provisioning as its own fail-closed gate. The persona runner
-  // also invokes this helper defensively, but historically did not inspect
-  // spawnSync.status; keeping it explicit here prevents a false-green release.
+  // also invokes this helper defensively; keeping it explicit prevents a
+  // false-green release when provisioning fails before runtime QA.
   { name: "QA persona fixtures", cmd: "node", args: ["scripts/test-baseline/yema-qa-fixtures.mjs"] },
   { name: "QA beta admission", cmd: "node", args: ["scripts/test-baseline/ensure-qa-beta-access-p1.mjs"] },
   { name: "9 personas runtime", cmd: "node", args: ["scripts/orchestrate-personas-p1.mjs"] },
+  // The legacy runtime checks accept <400 for the home route. This strict gate
+  // rejects redirects so a privileged persona cannot silently land in Solo or
+  // another workspace while the release remains green.
+  { name: "Canonical persona homes", cmd: "node", args: ["scripts/test-persona-home-routes-p1.mjs"] },
   { name: "9 personas visual", cmd: "node", args: ["scripts/orchestrate-personas-capture.mjs"] },
   { name: "Monde assignments E2E", cmd: "npm", args: ["run", "test:e2e:b2"] },
   { name: "Messaging Realtime", cmd: "npm", args: ["run", "test:messaging-realtime:p1"] },
