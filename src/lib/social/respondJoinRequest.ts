@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
 
 export type JoinRequestDecision =
@@ -37,7 +38,7 @@ export type GroupInviteDecision =
     };
 
 async function groupHasCapacity(
-  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
+  tx: Prisma.TransactionClient,
   groupId: string,
   userId: string,
 ): Promise<
