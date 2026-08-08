@@ -108,6 +108,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const admin = adminClient();
+
   // Existing YEMA accounts keep their password and roles. The invite only
   // grants signed beta admission; no password is required or changed here.
   const existing = await prisma.user.findFirst({
@@ -115,6 +117,19 @@ export async function POST(request: NextRequest) {
     select: { id: true, supabaseId: true },
   });
   if (existing) {
+    const { data: authIdentity, error: authIdentityError } = await admin.auth.admin.getUserById(existing.supabaseId);
+    if (
+      authIdentityError ||
+      !authIdentity.user ||
+      normalizeInviteEmail(authIdentity.user.email ?? "") !== email
+    ) {
+      await releaseBetaInvitationClaim(claim.id).catch(() => undefined);
+      return NextResponse.json(
+        { error: "Unable to activate invitation", code: "invite_identity_mismatch" },
+        { status: 409 },
+      );
+    }
+
     let previousBetaAccess: boolean | null = null;
     try {
       previousBetaAccess = await setBetaAccess({ supabaseId: existing.supabaseId, enabled: true });
@@ -141,7 +156,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const admin = adminClient();
   const fullName = typeof input.fullName === "string" ? input.fullName.trim().slice(0, 120) : "";
   const universe = typeof input.universe === "string" ? input.universe : undefined;
   const { data, error: createError } = await admin.auth.admin.createUser({
