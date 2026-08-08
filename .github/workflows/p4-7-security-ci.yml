@@ -45,7 +45,7 @@ jobs:
       - name: TypeScript
         run: npx tsc --noEmit
 
-      - name: P4.7, beta and persona structural tests
+      - name: P4.7, beta, persona and commercial structural tests
         run: >-
           npx vitest run
           src/lib/__tests__/socialNotificationAuthorization.test.ts
@@ -62,6 +62,7 @@ jobs:
           src/lib/__tests__/personasCanonicalRoutes.test.ts
           src/lib/__tests__/personaOnboardingFlow.test.ts
           src/lib/__tests__/publicPricingBetaGate.test.ts
+          src/lib/__tests__/centerCommercialClaims.test.ts
           src/lib/__tests__/authorizationTrustBoundary.test.ts
           src/lib/__tests__/closedBetaAdmission.test.ts
           src/lib/__tests__/closedBetaInvite.test.ts
