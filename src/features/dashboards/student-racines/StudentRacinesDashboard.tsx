@@ -86,7 +86,13 @@ export function StudentRacinesDashboard({ locale, activeSectionId = "accueil" }:
 
   const greeting = data.greetingName?.split(" ")[0] ?? t("studentRacines.greetingFallback");
   const meta = data.racinesStep ? t("studentRacines.metaLanguageStep", { step: data.racinesStep }) : t("studentRacines.metaLanguageOnly");
-  const modeLabel = data.mode === "SOLO" ? t("studentRacines.mode.solo") : data.mode === "FAMILY" ? t("studentRacines.mode.family") : data.mode === "NO_ACCESS" ? t("studentRacines.mode.noAccess") : t("studentRacines.mode.unknown");
+  const modeLabel = data.mode === "SOLO"
+    ? t("studentRacines.mode.solo")
+    : data.mode === "FAMILY"
+      ? t("studentRacines.mode.family")
+      : data.mode === "NO_ACCESS"
+        ? (currentLocale === "en" ? "Technical beta" : "Bêta technique")
+        : t("studentRacines.mode.unknown");
   const overview = <OverviewSection data={data} />;
   const content: Record<string, React.ReactNode> = {
     accueil: overview,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   DashboardButtonLink,
   DashboardCard,
@@ -17,6 +17,10 @@ type Props = {
 
 export function FamilyOverviewSection({ data }: Props) {
   const t = useTranslations("yemaDashboards.family.overview");
+  const locale = useLocale();
+  const noSeatLabel = locale === "en"
+    ? "Adding another child is temporarily unavailable during the beta."
+    : "L’ajout d’un autre profil enfant est temporairement indisponible pendant la bêta.";
 
   return (
     <section id="accueil" aria-labelledby="accueil-title" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -52,7 +56,7 @@ export function FamilyOverviewSection({ data }: Props) {
                   {t("addChildCta")}
                 </DashboardButtonLink>
               ) : (
-                <DashboardStatusChip tone="muted">{t("noSeatCta")}</DashboardStatusChip>
+                <DashboardStatusChip tone="muted">{noSeatLabel}</DashboardStatusChip>
               )
             }
           />

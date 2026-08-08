@@ -11,7 +11,7 @@ export default async function UnitPage({ params }: { params: Promise<{ locale: s
   const course = getCourseContent(courseId);
   const unit = getCourseUnit(courseId, unitId);
   if (!course || !unit) notFound();
-  const viewer = await loadCourseViewer(courseId, locale);
+  const viewer = await loadCourseViewer(courseId, locale, `/${locale}/learn/${courseId}/${unitId}`);
   const resolvedUnit = resolveCourseUnitForPathway(unit, viewer.pathwayVariant);
   return <UnitOverview course={course} unit={resolvedUnit} progress={viewer.progress} accessStatus={viewer.accessStatus} locale={locale} />;
 }

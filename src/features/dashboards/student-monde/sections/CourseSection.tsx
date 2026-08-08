@@ -38,10 +38,20 @@ export function CourseSection({ courses, accessStatus }: Props) {
         <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }}>
           {courses.map((course) => {
             const locked = course.status === "LOCKED" || !active;
-            const statusLabel =
-              course.status === "COMPLETED" ? t("status.completed") :
-              course.status === "IN_PROGRESS" ? t("status.inProgress") :
-              course.status === "OPEN" ? t("status.open") : t("status.locked");
+            const statusLabel = locked
+              ? t("status.locked")
+              : course.status === "COMPLETED"
+                ? t("status.completed")
+                : course.status === "IN_PROGRESS"
+                  ? t("status.inProgress")
+                  : t("status.open");
+            const statusTone = locked
+              ? "muted" as const
+              : course.status === "COMPLETED"
+                ? "success" as const
+                : course.status === "IN_PROGRESS"
+                  ? "gold" as const
+                  : "neutral" as const;
             const percentage = course.totalModules === 0 ? 0 : (course.completedModules / course.totalModules) * 100;
             return (
               <li key={course.id}>
@@ -59,15 +69,7 @@ export function CourseSection({ courses, accessStatus }: Props) {
                       </div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
-                      <DashboardStatusChip
-                        tone={
-                          course.status === "COMPLETED" ? "success" :
-                          course.status === "IN_PROGRESS" ? "gold" :
-                          course.status === "OPEN" ? "neutral" : "muted"
-                        }
-                      >
-                        {statusLabel}
-                      </DashboardStatusChip>
+                      <DashboardStatusChip tone={statusTone}>{statusLabel}</DashboardStatusChip>
                       {!locked ? (
                         <Link
                           href={`/${locale}/learn/${OFFICIAL_A1_COURSE_ID}/${course.id}`}

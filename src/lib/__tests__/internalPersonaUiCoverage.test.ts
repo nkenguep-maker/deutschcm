@@ -80,10 +80,12 @@ describe("Persona dashboards · dedicated pages", () => {
 
     const familyNav = read("src/features/dashboards/family/nav.ts");
     const familyDashboard = read("src/features/dashboards/family/FamilyDashboard.tsx");
+    const familyOverview = read("src/features/dashboards/family/sections/FamilyOverviewSection.tsx");
     expect(familyNav).not.toContain('key: "payments"');
     expect(familyNav).not.toContain("#paiements");
     expect(familyDashboard).not.toContain("FamilyPaymentsSection");
     expect(familyDashboard).not.toContain('"paiements"');
+    expect(familyOverview).not.toContain("noSeatCta");
 
     const centerNav = read("src/features/dashboards/center/nav.ts");
     const centerDashboard = read("src/features/dashboards/center/CenterDashboard.tsx");
@@ -93,9 +95,19 @@ describe("Persona dashboards · dedicated pages", () => {
     expect(centerDashboard).not.toContain('"factures"');
 
     const register = read("src/app/[locale]/register/page.tsx");
+    const registerLayout = read("src/app/[locale]/register/layout.tsx");
     expect(register).not.toContain('searchParams.get("plan")');
     expect(register).not.toContain('searchParams.get("prof")');
     expect(register).not.toContain("PLAN_LABEL_");
+    expect(registerLayout).not.toContain("credit card");
+    expect(registerLayout).not.toContain("carte bancaire");
+
+    const racinesOverview = read("src/features/dashboards/student-racines/sections/OverviewSection.tsx");
+    expect(racinesOverview).not.toContain("/activation-intent");
+    expect(racinesOverview).not.toContain("noAccessCta");
+
+    const lessonPage = read("src/app/[locale]/learn/[courseId]/[unitId]/[lessonId]/page.tsx");
+    expect(lessonPage).not.toContain("/offers");
   });
 
   it("keeps auth returns internal and A1 beta access non-persistent", () => {
@@ -107,5 +119,25 @@ describe("Persona dashboards · dedicated pages", () => {
     expect(betaAccess.status).toBe("ACTIVE");
     expect(betaAccess.level).toBe("A1");
     expect(betaAccess.source).toBe("TECHNICAL_BETA");
+
+    const mondeTypes = read("src/features/dashboards/student-monde/types.ts");
+    const mondeDashboard = read("src/features/dashboards/student-monde/StudentMondeDashboard.tsx");
+    expect(mondeTypes).toContain('"TECHNICAL_BETA"');
+    expect(mondeDashboard).toContain('data.access.source === "TECHNICAL_BETA"');
+  });
+
+  it("preserves exact protected course routes through login", () => {
+    const server = read("src/lib/course-content/server.ts");
+    const overview = read("src/app/[locale]/learn/[courseId]/page.tsx");
+    const unit = read("src/app/[locale]/learn/[courseId]/[unitId]/page.tsx");
+    const lesson = read("src/app/[locale]/learn/[courseId]/[unitId]/[lessonId]/page.tsx");
+    const courseSection = read("src/features/dashboards/student-monde/sections/CourseSection.tsx");
+
+    expect(server).toContain('login?next=${encodeURIComponent(returnPath)}');
+    expect(overview).toContain('`/${locale}/learn/${courseId}`');
+    expect(unit).toContain('`/${locale}/learn/${courseId}/${unitId}`');
+    expect(lesson).toContain('`/${locale}/learn/${courseId}/${unitId}/${lessonId}`');
+    expect(courseSection).toContain('const statusLabel = locked');
+    expect(courseSection).toContain('const statusTone = locked');
   });
 });
