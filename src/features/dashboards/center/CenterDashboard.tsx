@@ -102,7 +102,25 @@ export function CenterDashboard({ locale, activeSectionId = "centre" }: Props) {
   const teacherRows = teachers.length === 0 ? <DashboardCard><DashboardEmptyState title={t("teachers.empty")} /></DashboardCard> : <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 }}>{teachers.map((teacher) => <li key={teacher.id}><DashboardCard><div style={{ fontWeight: 600 }}>{teacher.fullName?.trim() || t("teachers.empty")}</div></DashboardCard></li>)}</ul>;
   const classRows = classes.length === 0 ? <DashboardCard><DashboardEmptyState title={t("classes.empty")} /></DashboardCard> : <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 }}>{classes.map((item) => <li key={item.id}><DashboardCard><div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}><div style={{ flex: 1 }}><div style={{ fontWeight: 600 }}>{item.name?.trim() || t("classes.empty")}</div><div style={{ marginTop: 5, display: "flex", gap: 6 }}>{item.level ? <DashboardStatusChip tone="muted">{t("classes.levelLabel", { level: item.level })}</DashboardStatusChip> : null}<DashboardStatusChip tone="neutral">{t("classes.studentsCount", { count: item.activeStudentCount })}</DashboardStatusChip></div></div>{item.name?.trim() ? <Link href={`${baseHref}/classes/${item.id}`} style={{ color: "var(--yema-gold-light)", textDecoration: "none" }}>{t("classes.openClass")}</Link> : null}</div></DashboardCard></li>)}</ul>;
   const messages = <section id="messages" aria-labelledby="center-messages-title" style={{ display: "grid", gap: 12 }}><DashboardSectionHeader title={<span id="center-messages-title">{t("messages.title")}</span>} /><DashboardCard><MessagesInboxLink /></DashboardCard></section>;
-  const settings = <section id="parametres" style={{ display: "grid", gap: 12 }}><DashboardSectionHeader title={t("settings.title")} description={t("settings.description")} /><DashboardCard><DashboardEmptyState title={t("settings.empty")} /></DashboardCard></section>;
+  const settings = (
+    <section id="parametres" aria-labelledby="center-settings-title" style={{ display: "grid", gap: 12 }}>
+      <DashboardSectionHeader title={<span id="center-settings-title">{t("settings.title")}</span>} description={t("settings.description")} />
+      <DashboardCard>
+        <div style={{ display: "grid", gap: 14 }}>
+          <div>
+            <div style={{ fontSize: 12, opacity: 0.72 }}>{locale === "en" ? "Center" : "Centre"}</div>
+            <div style={{ marginTop: 4, fontWeight: 650 }}>{centerName ?? t("metaMinimal")}</div>
+            {data.center?.city ? <div style={{ marginTop: 4, opacity: 0.78 }}>{data.center.city}</div> : null}
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <DashboardStatusChip tone="neutral">{t("overview.kpisTeachers")}: {stats.teacherCount}</DashboardStatusChip>
+            <DashboardStatusChip tone="neutral">{t("overview.kpisStudents")}: {stats.studentCount}</DashboardStatusChip>
+            <DashboardStatusChip tone="neutral">{t("overview.kpisClassrooms")}: {stats.classroomCount}</DashboardStatusChip>
+          </div>
+        </div>
+      </DashboardCard>
+    </section>
+  );
   const content: Record<string, React.ReactNode> = {
     centre: overview,
     "a-traiter": overview,
