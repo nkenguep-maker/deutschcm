@@ -1,8 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { useRouter } from "@/navigation";
-import { useState } from "react";
 import { BrandY } from "@/components/brand/BrandY";
 
 export default function FamilyOnboardingPage() {
@@ -15,6 +15,19 @@ export default function FamilyOnboardingPage() {
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/me", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const me = await response.json() as { firstName?: string | null; lastName?: string | null; phone?: string | null; city?: string | null };
+        setFirstName((current) => current || me.firstName || "");
+        setLastName((current) => current || me.lastName || "");
+        setPhone((current) => current || me.phone || "");
+        setCity((current) => current || me.city || "");
+      })
+      .catch(() => undefined);
+  }, []);
 
   async function finish(e: React.FormEvent) {
     e.preventDefault();
@@ -67,8 +80,8 @@ export default function FamilyOnboardingPage() {
           </h1>
           <p className="entry-lede">
             {loc === "en"
-              ? "Your children will be created inside this account. They will use an avatar and child PIN instead of an email address."
-              : "Vos enfants seront créés dans ce compte. Ils utiliseront un avatar et un PIN enfant, pas une adresse e-mail."}
+              ? "Your confirmed account details are reused here. Children are then created inside this account and use an avatar and child PIN instead of an email address."
+              : "Les informations de votre compte confirmé sont reprises ici. Vos enfants seront ensuite créés dans ce compte et utiliseront un avatar et un PIN enfant, pas une adresse e-mail."}
           </p>
 
           <form onSubmit={finish} className="entry-form">
