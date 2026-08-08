@@ -86,7 +86,7 @@ export function FamilyDashboard({ locale, activeSectionId = "accueil" }: Props) 
     "histoires-jeux": progression,
     seances: <FamilySessionsSection />,
     messages: <FamilyMessagesSection />,
-    parametres: <FamilySettingsSection />,
+    parametres: <FamilySettingsSection data={data} locale={locale} />,
   };
   const metaText = t("meta", { count: data.totalChildrenLinked });
   const accessMeta = data.adultAccess.hasAnyAdultAccess ? <DashboardStatusChip tone="gold">{[data.adultAccess.monde ? "Monde" : null, data.adultAccess.racines ? "Racines" : null].filter(Boolean).join(" · ")}</DashboardStatusChip> : undefined;
