@@ -1,6 +1,5 @@
 import "server-only";
 
-import { randomUUID } from "node:crypto";
 import prisma from "@/lib/prisma";
 import { hashInviteEmail, hashInviteToken } from "@/lib/beta/invite";
 
@@ -15,18 +14,15 @@ export async function storeBetaInvitation(params: {
   issuedByUserId: string;
   expiresAt: Date;
 }): Promise<StoredBetaInvitation> {
-  const id = randomUUID();
-  const tokenHash = hashInviteToken(params.token);
-  const emailHash = hashInviteEmail(params.email);
-
-  await prisma.$executeRaw`
-    INSERT INTO public.beta_invitations
-      (id, "tokenHash", "emailHash", status, "issuedByUserId", "expiresAt")
-    VALUES
-      (${id}, ${tokenHash}, ${emailHash}, 'PENDING'::public."InvitationStatus", ${params.issuedByUserId}, ${params.expiresAt})
-  `;
-
-  return { id, expiresAt: params.expiresAt };
+  return prisma.betaInvitation.create({
+    data: {
+      tokenHash: hashInviteToken(params.token),
+      emailHash: hashInviteEmail(params.email),
+      issuedByUserId: params.issuedByUserId,
+      expiresAt: params.expiresAt,
+    },
+    select: { id: true, expiresAt: true },
+  });
 }
 
 export async function claimBetaInvitation(params: {
@@ -38,57 +34,72 @@ export async function claimBetaInvitation(params: {
   const emailHash = hashInviteEmail(params.email);
   const now = params.now ?? new Date();
 
-  const rows = await prisma.$queryRaw<Array<{ id: string }>>`
-    UPDATE public.beta_invitations
-    SET status = 'ACCEPTED'::public."InvitationStatus",
-        "acceptedAt" = ${now}
-    WHERE "tokenHash" = ${tokenHash}
-      AND "emailHash" = ${emailHash}
-      AND status = 'PENDING'::public."InvitationStatus"
-      AND "expiresAt" > ${now}
-    RETURNING id
-  `;
+  const invitation = await prisma.betaInvitation.findUnique({
+    where: { tokenHash },
+    select: { id: true },
+  });
+  if (!invitation) return null;
 
-  return rows[0] ?? null;
+  const claim = await prisma.betaInvitation.updateMany({
+    where: {
+      id: invitation.id,
+      tokenHash,
+      emailHash,
+      status: "PENDING",
+      expiresAt: { gt: now },
+    },
+    data: {
+      status: "ACCEPTED",
+      acceptedAt: now,
+    },
+  });
+
+  return claim.count === 1 ? invitation : null;
 }
 
 export async function finalizeBetaInvitation(params: {
   invitationId: string;
   acceptedByUserId: string;
 }): Promise<void> {
-  const count = await prisma.$executeRaw`
-    UPDATE public.beta_invitations
-    SET "acceptedByUserId" = ${params.acceptedByUserId}
-    WHERE id = ${params.invitationId}
-      AND status = 'ACCEPTED'::public."InvitationStatus"
-      AND "acceptedByUserId" IS NULL
-  `;
-  if (count !== 1) throw new Error("beta_invitation_finalize_failed");
+  const result = await prisma.betaInvitation.updateMany({
+    where: {
+      id: params.invitationId,
+      status: "ACCEPTED",
+      acceptedByUserId: null,
+    },
+    data: { acceptedByUserId: params.acceptedByUserId },
+  });
+  if (result.count !== 1) throw new Error("beta_invitation_finalize_failed");
 }
 
 export async function releaseBetaInvitationClaim(invitationId: string): Promise<void> {
-  await prisma.$executeRaw`
-    UPDATE public.beta_invitations
-    SET status = 'PENDING'::public."InvitationStatus",
-        "acceptedAt" = NULL
-    WHERE id = ${invitationId}
-      AND status = 'ACCEPTED'::public."InvitationStatus"
-      AND "acceptedByUserId" IS NULL
-      AND "revokedAt" IS NULL
-  `;
+  await prisma.betaInvitation.updateMany({
+    where: {
+      id: invitationId,
+      status: "ACCEPTED",
+      acceptedByUserId: null,
+      revokedAt: null,
+    },
+    data: {
+      status: "PENDING",
+      acceptedAt: null,
+    },
+  });
 }
 
 export async function revokeBetaInvitation(params: {
   invitationId: string;
   now?: Date;
 }): Promise<boolean> {
-  const now = params.now ?? new Date();
-  const count = await prisma.$executeRaw`
-    UPDATE public.beta_invitations
-    SET status = 'REVOKED'::public."InvitationStatus",
-        "revokedAt" = ${now}
-    WHERE id = ${params.invitationId}
-      AND status = 'PENDING'::public."InvitationStatus"
-  `;
-  return count === 1;
+  const result = await prisma.betaInvitation.updateMany({
+    where: {
+      id: params.invitationId,
+      status: "PENDING",
+    },
+    data: {
+      status: "REVOKED",
+      revokedAt: params.now ?? new Date(),
+    },
+  });
+  return result.count === 1;
 }
