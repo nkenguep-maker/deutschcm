@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
 import { reconcileAuthenticatedUser } from "@/lib/auth/reconcileAuthenticatedUser";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
+import { isInternalTestEnvironment } from "@/lib/internalTestEnvironment";
 import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 import { isAdultPersonaId, resolvePersonaRuntime } from "@/lib/personas/runtime";
 import { grantRole, syncUserMetadata } from "@/lib/roles";
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest) {
     : null;
 
   const { user: dbUser } = await reconcileAuthenticatedUser(user);
+  const p1TechnicalQa = isInternalTestEnvironment();
 
   // These values describe UX/commercial intent only. Authorization and access
   // are still derived from DB roles + AccessGrants, never from user_metadata.
@@ -92,6 +94,20 @@ export async function POST(req: NextRequest) {
       where: { userId_role: { userId: dbUser.id, role } },
       select: { status: true },
     });
+
+    if (p1TechnicalQa) {
+      // P-1 only: separate QA accounts must be able to exercise the complete
+      // professional onboarding/dashboard. Production never enters this path.
+      await grantRole({ userId: dbUser.id, role });
+      await supabase.auth.updateUser({ data: nextUserMetadata });
+      await syncUserMetadata({ supabaseId: user.id, activeSpace: role });
+      return NextResponse.json({
+        persona,
+        qaAutoApproved: true,
+        redirectTo: persona === "teacher" ? "/onboarding/teacher" : "/onboarding/center",
+      });
+    }
+
     if (!roleRow) {
       await prisma.userRole.create({
         data: {
@@ -110,11 +126,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ persona, redirectTo: runtime.onboardingRoute });
   }
 
-  // RACINES_COACH has no pending AppRole state in the current schema. Persist
-  // only the non-authorizing request; trusted approval creates RACINES_COACH.
-  await supabase.auth.updateUser({ data: nextUserMetadata });
-  return NextResponse.json({
-    persona,
-    redirectTo: `/onboarding/pending?persona=${encodeURIComponent(persona)}`,
-  });
+  if (persona === "coach") {
+    if (p1TechnicalQa) {
+      await prisma.userAppRole.upsert({
+        where: { userId_role: { userId: dbUser.id, role: "RACINES_COACH" } },
+        create: { userId: dbUser.id, role: "RACINES_COACH" },
+        update: {},
+      });
+      await supabase.auth.updateUser({ data: nextUserMetadata });
+      await syncUserMetadata({ supabaseId: user.id, activeSpace: "STUDENT" });
+      return NextResponse.json({ persona, qaAutoApproved: true, redirectTo: "/onboarding/coach" });
+    }
+
+    // RACINES_COACH has no pending AppRole state in the current schema.
+    // Persist only the non-authorizing request; trusted approval creates it.
+    await supabase.auth.updateUser({ data: nextUserMetadata });
+    return NextResponse.json({
+      persona,
+      redirectTo: `/onboarding/pending?persona=${encodeURIComponent(persona)}`,
+    });
+  }
+
+  return bad("PERSONA_INVALID");
 }
