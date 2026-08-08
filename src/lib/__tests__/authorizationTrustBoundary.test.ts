@@ -53,4 +53,24 @@ describe("authorization trust boundary", () => {
     expect(register).toContain('fetch("/api/auth/sync", { method: "POST" })');
     expect(register).not.toContain('role: "STUDENT" as const');
   });
+
+  it("preserves the trusted primary DB role for historical multi-role users", () => {
+    const reconcile = read("src/lib/auth/reconcileAuthenticatedUser.ts");
+
+    expect(reconcile).toContain("const trustedPrimary = existing?.role");
+    expect(reconcile).toContain("primaryIsActive");
+    expect(reconcile).toContain("primaryIsActive\n      ? trustedPrimary");
+    expect(reconcile).toContain("markRoleOnboarded(result.user.id, activeSpace)");
+    expect(reconcile).toContain("existing?.onboardingDone");
+  });
+
+  it("protects privileged role mutations with same-origin and DB-admin checks", () => {
+    for (const path of ["src/app/api/roles/grant/route.ts", "src/app/api/roles/revoke/route.ts"]) {
+      const route = read(path);
+      expect(route).toContain("isSameOriginRequest(request)");
+      expect(route).toContain('role: "ADMIN"');
+      expect(route).toContain('status: "ACTIVE"');
+      expect(route).toContain('status: 403');
+    }
+  });
 });
