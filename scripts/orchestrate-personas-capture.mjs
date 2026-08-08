@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Lot 7C · orchestre npm run capture:personas:p1.
-// Playwright captures pour les 7 adultes × 3 viewports × 2 locales.
-// Enfants (Child Monde/Racines) capturés par les suites messaging existantes.
+// Playwright captures pour les 9 personas × 3 viewports × 2 locales.
+// Les deux enfants passent par une vraie session parent + PIN.
 
 import { spawn, spawnSync } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
@@ -48,7 +48,7 @@ async function main() {
 
   let captureCode = 1;
   try {
-    console.log("[personas-capture] STEP 3 · Playwright captures 7 personas");
+    console.log("[personas-capture] STEP 3 · Playwright captures 9 personas");
     const pw = spawnSync("npx", [
       "playwright", "test",
       "--config", "playwright.personas.config.ts",
