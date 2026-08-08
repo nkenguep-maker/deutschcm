@@ -39,11 +39,15 @@ describe("P4.7 · classroom join approval hardening", () => {
     expect(preview).toContain("code.length < 4 || code.length > 64");
   });
 
-  it("materializes enrollment only in the authorized teacher response path", () => {
+  it("materializes enrollment only in the authorized transactional response path", () => {
     const social = read("src/app/api/social/route.ts");
+    const responder = read("src/lib/social/respondJoinRequest.ts");
 
-    expect(social).toContain("if (input.accept && req.toClassroomId)");
-    expect(social).toContain("prisma.classroomEnrollment.upsert");
-    expect(social).toContain("teacherId: teacher.id");
+    expect(social).toContain("respondToJoinRequest({");
+    expect(responder).toContain("if (req.toClassroomId)");
+    expect(responder).toContain("teacherId: teacher.id");
+    expect(responder).toContain("tx.classroomEnrollment.upsert");
+    expect(responder).toContain('where: { id: req.id, status: "pending" }');
+    expect(responder).toContain("pg_advisory_xact_lock(hashtextextended(${classroom.id}, 0))");
   });
 });
