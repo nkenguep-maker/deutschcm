@@ -100,11 +100,18 @@ async function syncMetadata(supabaseId, appRole) {
   const rolesList = [activeSpace];
   const onboardedMap = { [activeSpace]: true };
   const { data } = await admin.auth.admin.getUserById(supabaseId);
-  const existing = data?.user?.user_metadata ?? {};
+  const existingProfile = data?.user?.user_metadata ?? {};
+  const existingAuthz = data?.user?.app_metadata ?? {};
   await admin.auth.admin.updateUserById(supabaseId, {
     user_metadata: {
-      ...existing, roles: rolesList,
-      onboarded_map: onboardedMap, active_space: activeSpace, fixture: "TEST_YEMA_QA",
+      ...existingProfile,
+      fixture: "TEST_YEMA_QA",
+    },
+    app_metadata: {
+      ...existingAuthz,
+      roles: rolesList,
+      onboarded_map: onboardedMap,
+      active_space: activeSpace,
     },
   });
 }
