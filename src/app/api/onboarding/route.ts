@@ -110,30 +110,43 @@ export async function POST(request: NextRequest) {
     if (typeof name !== "string" || !name.trim()) {
       return NextResponse.json({ error: "CENTER_NAME_REQUIRED" }, { status: 400 });
     }
-    let code = generateCenterCode(city ?? "CM");
-    while (await prisma.languageCenter.findUnique({ where: { code } })) {
-      code = generateCenterCode(city ?? "CM");
+
+    const centerData = {
+      name: name.trim(),
+      centerType: centerType ?? undefined,
+      foundedAt: foundedAt ? new Date(foundedAt) : undefined,
+      rccm: rccm ?? undefined,
+      logoUrl: logoUrl ?? undefined,
+      region: region ?? undefined,
+      city: city ?? "",
+      address: address ?? undefined,
+      phone: phone ?? undefined,
+      email: email ?? undefined,
+      website: website ?? undefined,
+      socialMedia: socialMedia ?? undefined,
+      openingHours: openingHours ?? undefined,
+    };
+
+    let center;
+    if (dbUser.centerId) {
+      center = await prisma.languageCenter.update({
+        where: { id: dbUser.centerId },
+        data: centerData,
+      });
+    } else {
+      let code = generateCenterCode(city ?? "CM");
+      while (await prisma.languageCenter.findUnique({ where: { code } })) {
+        code = generateCenterCode(city ?? "CM");
+      }
+      center = await prisma.languageCenter.create({
+        data: {
+          ...centerData,
+          maxAdmins: 5,
+          code,
+        },
+      });
     }
 
-    const center = await prisma.languageCenter.create({
-      data: {
-        name: name.trim(),
-        centerType: centerType ?? undefined,
-        foundedAt: foundedAt ? new Date(foundedAt) : undefined,
-        rccm: rccm ?? undefined,
-        logoUrl: logoUrl ?? undefined,
-        region: region ?? undefined,
-        city: city ?? "",
-        address: address ?? undefined,
-        phone: phone ?? undefined,
-        email: email ?? undefined,
-        website: website ?? undefined,
-        socialMedia: socialMedia ?? undefined,
-        openingHours: openingHours ?? undefined,
-        maxAdmins: 5,
-        code,
-      },
-    });
     await prisma.user.update({
       where: { id: dbUser.id },
       data: { role: "CENTER", centerId: center.id },
