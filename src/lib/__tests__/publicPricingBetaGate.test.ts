@@ -5,34 +5,37 @@ import { describe, expect, it } from "vitest";
 const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
 
-describe("closed beta · public pricing gate", () => {
-  it("routes the neutral threshold directly to universe registration", () => {
+describe("commercial surfaces · offers visible, payments deferred", () => {
+  it("routes the pricing threshold to the two commercial universes", () => {
     const threshold = read("src/app/[locale]/pricing/page.tsx");
-
-    expect(threshold).toContain('href={`/${locale}/register?universe=monde`}');
-    expect(threshold).toContain('href={`/${locale}/register?universe=racines`}');
-    expect(threshold).not.toContain('href={`/${locale}/pricing/monde`}');
-    expect(threshold).not.toContain('href={`/${locale}/pricing/racines`}');
+    expect(threshold).toContain('href={`/${locale}/pricing/monde`}');
+    expect(threshold).toContain('href={`/${locale}/pricing/racines`}');
   });
 
-  it.each(["monde", "racines"])(
-    "keeps /pricing/%s closed until the commercial phase",
-    (universe) => {
-      const page = read(`src/app/[locale]/pricing/${universe}/page.tsx`);
+  it("renders Monde prices and carries the selected offer into registration", () => {
+    const page = read("src/app/[locale]/pricing/monde/page.tsx");
+    expect(page).toContain("WORLD_PASSAGE_PRICES");
+    expect(page).toContain("WORLD_TEACHER_ADD");
+    expect(page).toContain("plan=passage-");
+    expect(page).toContain("no charge is made today");
+    expect(page).not.toContain("stripe");
+    expect(page).not.toContain("checkout");
+  });
 
-      expect(page).toContain('import { redirect } from "next/navigation"');
-      expect(page).toContain('redirect(`/${locale}/pricing`)');
-      expect(page).not.toContain("WORLD_PASSAGE_PRICES");
-      expect(page).not.toContain("AFRICAN_SOLO");
-      expect(page).not.toContain("RACINES_COACH_ADDON");
-      expect(page).not.toContain("Mobile Money");
-      expect(page).not.toContain("fmtPrice");
-    },
-  );
+  it("renders Racines Solo, Family and coach pricing without triggering payment", () => {
+    const page = read("src/app/[locale]/pricing/racines/page.tsx");
+    expect(page).toContain("AFRICAN_SOLO");
+    expect(page).toContain("AFRICAN_FAMILY");
+    expect(page).toContain("RACINES_COACH_ADDON");
+    expect(page).toContain("racines-solo");
+    expect(page).toContain("racines-famille");
+    expect(page).toContain("No payment is triggered today");
+    expect(page).not.toContain("stripe");
+    expect(page).not.toContain("checkout");
+  });
 
-  it("retains the commercial model for a later explicitly launched phase", () => {
+  it("keeps the centralized pricing model intact", () => {
     const pricingModel = read("src/lib/pricing.ts");
-
     expect(pricingModel).toContain("WORLD_PASSAGE_PRICES");
     expect(pricingModel).toContain("AFRICAN_SOLO");
     expect(pricingModel).toContain("AFRICAN_FAMILY");
