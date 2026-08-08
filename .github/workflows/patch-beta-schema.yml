@@ -1,23 +1,30 @@
 name: Patch beta schema
 
 on:
-  push:
-    branches:
-      - fix/p4-7-social-notification-authz
-    paths:
-      - .github/workflows/patch-beta-schema.yml
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
   patch:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/p4-7-social-notification-authz'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           ref: fix/p4-7-social-notification-authz
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Add BetaInvitation model
         shell: bash
