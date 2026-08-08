@@ -6,6 +6,7 @@ import {
   hasReachedGroupInviteQuota,
   hasReachedJoinRequestQuota,
 } from "@/lib/social/rateLimit";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 
 async function getAuthDbUser() {
   const cookieStore = await cookies();
@@ -140,15 +141,21 @@ export async function GET(request: NextRequest) {
 
 // ── POST: social actions ──────────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
+  if (!isSameOriginRequest(request)) return forbidden();
+
   const user = await getAuthDbUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await request.json();
-  const { action } = body as { action: string };
+  const body = await request.json().catch(() => null);
+  if (!body || typeof body !== "object") {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  const { action } = body as { action?: string };
+  if (!action) return NextResponse.json({ error: "action requis" }, { status: 400 });
 
   // ── Demander à rejoindre une classe ────────────────────────────────────────
   if (action === "request-join-class") {
-    const { classroomId, message } = body;
+    const { classroomId, message } = body as { classroomId?: string; message?: string | null };
     if (!classroomId) return NextResponse.json({ error: "classroomId requis" }, { status: 400 });
 
     const classroom = await prisma.classroom.findFirst({
@@ -193,7 +200,7 @@ export async function POST(request: NextRequest) {
 
   // ── Demander à rejoindre un groupe ─────────────────────────────────────────
   if (action === "request-join-group") {
-    const { groupId, message } = body;
+    const { groupId, message } = body as { groupId?: string; message?: string | null };
     if (!groupId) return NextResponse.json({ error: "groupId requis" }, { status: 400 });
 
     const group = await prisma.studentGroup.findFirst({
@@ -237,7 +244,12 @@ export async function POST(request: NextRequest) {
 
   // ── Inviter un élève dans un groupe ────────────────────────────────────────
   if (action === "invite-to-group") {
-    const { toUserId, groupId, groupName, message } = body;
+    const { toUserId, groupId, groupName, message } = body as {
+      toUserId?: string;
+      groupId?: string | null;
+      groupName?: string | null;
+      message?: string | null;
+    };
     if (!toUserId) return NextResponse.json({ error: "toUserId requis" }, { status: 400 });
     if (toUserId === user.id) {
       return NextResponse.json({ error: "Impossible de vous inviter vous-même" }, { status: 409 });
@@ -302,7 +314,11 @@ export async function POST(request: NextRequest) {
 
   // ── Répondre à une demande / invitation ────────────────────────────────────
   if (action === "respond") {
-    const { requestId, inviteId, accept } = body;
+    const { requestId, inviteId, accept } = body as {
+      requestId?: string | null;
+      inviteId?: string | null;
+      accept?: boolean;
+    };
 
     if (requestId) {
       const req = await prisma.classJoinRequest.findUnique({
@@ -435,6 +451,8 @@ export async function POST(request: NextRequest) {
 
 // ── PUT: mark notifications as read ──────────────────────────────────────────
 export async function PUT(request: NextRequest) {
+  if (!isSameOriginRequest(request)) return forbidden();
+
   const user = await getAuthDbUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
