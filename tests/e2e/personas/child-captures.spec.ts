@@ -103,9 +103,15 @@ for (const child of CHILDREN) {
         await page.setViewportSize({ width: viewport.width, height: viewport.height });
         await enterChildSession(page, child.childProfileId, child.pin);
 
-        const resp = await page.goto(`/${locale}/dashboard`);
+        const route = `/${locale}/dashboard`;
+        const resp = await page.goto(route);
         expect(resp?.status(), `${child.id} dashboard response`).toBe(200);
         await page.waitForLoadState("networkidle");
+        expect(new URL(page.url()).pathname, `${child.id} canonical route`).toBe(route);
+        await expect(
+          page.locator(`[data-yema-persona="${child.id}"]`),
+          `${child.id} dashboard universe`,
+        ).toHaveCount(1);
 
         expect(await page.locator("h1").count(), `h1 ${child.id}`).toBe(1);
         await assertNoHorizontalOverflow(page, viewport.width, `${child.id} ${viewport.name}`);
