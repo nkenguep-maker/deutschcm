@@ -15,6 +15,15 @@ describe("authorization trust boundary", () => {
     expect(roles).not.toMatch(/updateUserById[\s\S]*user_metadata:/);
   });
 
+  it("preserves the trusted primary DB role when metadata is re-synced without an explicit space", () => {
+    const roles = read("src/lib/roles.ts");
+
+    expect(roles).toContain("select: { id: true, role: true }");
+    expect(roles).toContain("const trustedPrimary = user.role as SpaceRole");
+    expect(roles).toContain("rolesList.includes(trustedPrimary)");
+    expect(roles).toContain("? trustedPrimary");
+  });
+
   it("proxy authorizes only from signed app_metadata", () => {
     const proxy = read("src/proxy.ts");
 
