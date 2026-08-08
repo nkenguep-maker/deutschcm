@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
   if (!dbUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json().catch(() => null);
-  if (!body || typeof body !== "object") {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
   const action = (body as { action?: unknown }).action;
@@ -153,28 +153,32 @@ export async function POST(request: NextRequest) {
     }
 
     const code = await generateUniqueGroupCode();
-    const group = await prisma.studentGroup.create({
-      data: {
-        name,
-        creatorId: dbUser.id,
-        code,
-        level: level && Object.values(DifficultyLevel).includes(level as DifficultyLevel)
-          ? level as DifficultyLevel
-          : undefined,
-        // Bêta technique : aucune transaction simulée, aucun droit payant.
-        isPaid: false,
-        priceXAF: 0,
-      },
-    });
+    const group = await prisma.$transaction(async (tx) => {
+      const created = await tx.studentGroup.create({
+        data: {
+          name,
+          creatorId: dbUser.id,
+          code,
+          level: level && Object.values(DifficultyLevel).includes(level as DifficultyLevel)
+            ? level as DifficultyLevel
+            : undefined,
+          // Bêta technique : aucune transaction simulée, aucun droit payant.
+          isPaid: false,
+          priceXAF: 0,
+        },
+      });
 
-    await prisma.studentGroupMember.create({
-      data: { groupId: group.id, userId: dbUser.id },
-    });
+      await tx.studentGroupMember.create({
+        data: { groupId: created.id, userId: dbUser.id },
+      });
 
-    // Legacy UI only: garde l'identification créateur, sans aucune donnée paiement.
-    await prisma.user.update({
-      where: { id: dbUser.id },
-      data: { studentType: "group_creator" },
+      // Legacy UI only: garde l'identification créateur, sans donnée paiement.
+      await tx.user.update({
+        where: { id: dbUser.id },
+        data: { studentType: "group_creator" },
+      });
+
+      return created;
     });
 
     await prisma.notification.create({
@@ -184,6 +188,8 @@ export async function POST(request: NextRequest) {
         body: `Votre groupe "${name}" a été créé pour la bêta. Code : ${code}.`,
         type: "group_created",
       },
+    }).catch((notificationError) => {
+      console.error("[group/create] notification failed", notificationError);
     });
 
     return NextResponse.json({ ok: true, group, code, beta: true }, { status: 201 });
@@ -197,30 +203,66 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Code requis" }, { status: 400 });
     }
 
-    const group = await prisma.studentGroup.findUnique({
-      where: { code },
-      include: {
-        members: { where: { isActive: true }, select: { userId: true } },
-        creator: { select: { fullName: true } },
-      },
+    const result = await prisma.$transaction(async (tx) => {
+      const target = await tx.studentGroup.findUnique({
+        where: { code },
+        select: { id: true },
+      });
+      if (!target) return { ok: false, reason: "not_found" } as const;
+
+      // The shared code can be used concurrently. Serialize every join for the
+      // same group so only one request can consume the final available seat.
+      await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${target.id}, 0))`;
+
+      const group = await tx.studentGroup.findUnique({
+        where: { id: target.id },
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          creatorId: true,
+          maxMembers: true,
+          isActive: true,
+          creator: { select: { fullName: true } },
+        },
+      });
+      if (!group || !group.isActive) return { ok: false, reason: "not_found" } as const;
+      if (group.creatorId === dbUser.id) return { ok: false, reason: "already_member" } as const;
+
+      const existingMembership = await tx.studentGroupMember.findUnique({
+        where: { groupId_userId: { groupId: group.id, userId: dbUser.id } },
+        select: { isActive: true },
+      });
+      if (existingMembership?.isActive) return { ok: false, reason: "already_member" } as const;
+
+      const activeCount = await tx.studentGroupMember.count({
+        where: { groupId: group.id, isActive: true },
+      });
+      if (activeCount >= group.maxMembers) return { ok: false, reason: "group_full" } as const;
+
+      await tx.studentGroupMember.upsert({
+        where: { groupId_userId: { groupId: group.id, userId: dbUser.id } },
+        create: { groupId: group.id, userId: dbUser.id },
+        update: { isActive: true, joinedAt: new Date() },
+      });
+
+      return { ok: true, group } as const;
     });
 
-    if (!group || !group.isActive) {
-      return NextResponse.json({ error: "Code invalide ou groupe inactif" }, { status: 404 });
-    }
-    if (group.members.length >= group.maxMembers) {
-      return NextResponse.json({ error: "Ce groupe est complet" }, { status: 409 });
-    }
-    if (group.creatorId === dbUser.id || group.members.some((m) => m.userId === dbUser.id)) {
+    if (!result.ok) {
+      if (result.reason === "not_found") {
+        return NextResponse.json({ error: "Code invalide ou groupe inactif" }, { status: 404 });
+      }
+      if (result.reason === "group_full") {
+        return NextResponse.json(
+          { error: "Ce groupe est complet", code: "group_full" },
+          { status: 409 },
+        );
+      }
       return NextResponse.json({ error: "Vous êtes déjà membre de ce groupe" }, { status: 409 });
     }
 
-    await prisma.studentGroupMember.upsert({
-      where: { groupId_userId: { groupId: group.id, userId: dbUser.id } },
-      create: { groupId: group.id, userId: dbUser.id },
-      update: { isActive: true, joinedAt: new Date() },
-    });
-
+    const group = result.group;
     await prisma.notification.create({
       data: {
         userId: group.creatorId,
@@ -228,6 +270,8 @@ export async function POST(request: NextRequest) {
         body: `${dbUser.fullName} a rejoint votre groupe "${group.name}".`,
         type: "group_member_joined",
       },
+    }).catch((notificationError) => {
+      console.error("[group/join] notification failed", notificationError);
     });
 
     return NextResponse.json({
