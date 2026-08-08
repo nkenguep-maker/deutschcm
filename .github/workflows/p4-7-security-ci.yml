@@ -56,6 +56,7 @@ jobs:
           src/lib/__tests__/socialPendingUniqueness.test.ts
           src/lib/__tests__/messagingHardening.test.ts
           src/lib/__tests__/childPinRateLimit.test.ts
+          src/lib/__tests__/childSessionCookieHardening.test.ts
           src/lib/__tests__/requestOrigin.test.ts
           src/lib/__tests__/rlsIdentityHardening.test.ts
           src/lib/__tests__/rlsPolicyConsolidation.test.ts
