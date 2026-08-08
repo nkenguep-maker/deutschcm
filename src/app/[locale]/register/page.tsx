@@ -18,20 +18,22 @@ type SelectedPlan =
   | "passage-a2"
   | "passage-b1"
   | "passage-b2"
-  | "passage-c1";
+  | "passage-c1"
+  | "racines-solo"
+  | "racines-famille";
 
-const VALID_PASSAGE_PLANS = new Set<SelectedPlan>([
+const VALID_PLANS = new Set<SelectedPlan>([
   "passage-a1",
   "passage-a2",
   "passage-b1",
   "passage-b2",
   "passage-c1",
+  "racines-solo",
+  "racines-famille",
 ]);
 
-function parsePassagePlan(value: string | null): SelectedPlan | null {
-  return value && VALID_PASSAGE_PLANS.has(value as SelectedPlan)
-    ? value as SelectedPlan
-    : null;
+function parseSelectedPlan(value: string | null): SelectedPlan | null {
+  return value && VALID_PLANS.has(value as SelectedPlan) ? value as SelectedPlan : null;
 }
 
 const COPY = {
@@ -98,7 +100,7 @@ export default function RegisterPage() {
   const universe: Universe | null = universeParam === "monde" || universeParam === "racines"
     ? universeParam
     : null;
-  const selectedPlan = parsePassagePlan(searchParams.get("plan"));
+  const selectedPlan = parseSelectedPlan(searchParams.get("plan"));
   const rootsSoloSelected = searchParams.get("addon") === "roots-solo";
   const teacherAddonRequested = searchParams.get("prof") === "1";
   const rawNext = searchParams.get("next");
