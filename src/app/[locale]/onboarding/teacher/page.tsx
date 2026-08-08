@@ -1,385 +1,128 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useLocale } from "next-intl";
 import { useRouter } from "@/navigation";
 import OnboardingProgress from "@/components/OnboardingProgress";
 import PhoneInput from "@/components/PhoneInput";
 
-const CITIES = [
-  "Yaoundé", "Douala", "Bafoussam", "Bamenda", "Garoua", "Maroua", "Ngaoundéré", "Bertoua", "Ebolowa", "Kribi",
-  "Abidjan", "Dakar", "Libreville", "Brazzaville", "Kinshasa", "Lomé", "Cotonou", "Niamey", "Bamako", "Ouagadougou",
-  "Paris", "Lyon", "Marseille", "Bruxelles", "Genève", "Berlin", "Munich", "Vienne", "Londres", "Montréal",
-  "Autre / Other",
-];
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
-const DIPLOMAS = ["Licence en linguistique", "Master FLE", "DAAD", "Magistère", "PhD Linguistique", "Baccalauréat + expérience", "Autre"];
 const DAYS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
-const SLOTS = ["matin", "apres-midi", "soir"];
-const SLOT_LABELS: Record<string, string> = { matin: "Matin", "apres-midi": "A-midi", soir: "Soir" };
+const STEPS = [{ label: "Profil" }, { label: "Expertise" }, { label: "Disponibilité" }];
 
-const STEPS = [
-  { label: "Profil" },
-  { label: "Expertise" },
-  { label: "Disponibilité" },
-  { label: "Centre" },
-];
-
-interface Availability { [day: string]: { [slot: string]: boolean } }
-
-interface Form {
-  firstName: string; lastName: string; dateOfBirth: string; gender: string;
-  phone: string; city: string; avatarUrl: string; bio: string;
-  levels: string[]; diploma: string; yearsExp: string; certifications: string;
-  maxStudents: string; hourlyRate: string;
-  availability: Availability;
-  centerSearch: string; centerId: string; centerName: string; independent: boolean;
+function inputStyle(): React.CSSProperties {
+  return { width: "100%", background: "rgba(244,235,220,.04)", border: "1px solid rgba(244,235,220,.12)", borderRadius: 10, padding: "12px 14px", color: "var(--creme)", fontSize: 14, outline: "none", boxSizing: "border-box", fontFamily: "inherit" };
 }
-
-const defaultAvailability = (): Availability => {
-  const a: Availability = {};
-  DAYS.forEach(d => { a[d] = {}; SLOTS.forEach(s => { a[d][s] = false; }); });
-  return a;
-};
-
-function inp(style?: React.CSSProperties): React.CSSProperties {
-  return {
-    width: "100%", background: "rgba(244, 235, 220, 0.04)", border: "1px solid rgba(244, 235, 220, 0.12)",
-    borderRadius: 10, padding: "12px 14px", color: "var(--creme)", fontSize: 14,
-    outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "border-color var(--dur-move)",
-    ...style,
-  };
-}
-
-const MOCK_CENTERS = [
-  { id: "c1", name: "Centre Deutsch Pro CM", city: "Yaoundé" },
-  { id: "c2", name: "Centre Yema Douala", city: "Douala" },
-  { id: "c3", name: "Alliance Francophone Bafoussam", city: "Bafoussam" },
-];
 
 export default function TeacherOnboardingPage() {
+  const locale = useLocale();
+  const loc = locale === "en" ? "en" : "fr";
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
-  const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({});
-  const [form, setForm] = useState<Form>({
-    firstName: "", lastName: "", dateOfBirth: "", gender: "",
-    phone: "", city: "", avatarUrl: "", bio: "",
-    levels: [], diploma: "", yearsExp: "", certifications: "",
-    maxStudents: "20", hourlyRate: "",
-    availability: defaultAvailability(),
-    centerSearch: "", centerId: "", centerName: "", independent: false,
-  });
+  const [error, setError] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [bio, setBio] = useState("");
+  const [levels, setLevels] = useState<string[]>([]);
+  const [diploma, setDiploma] = useState("");
+  const [yearsExp, setYearsExp] = useState("");
+  const [certifications, setCertifications] = useState("");
+  const [maxStudents, setMaxStudents] = useState("20");
+  const [days, setDays] = useState<string[]>([]);
 
-  const set = (k: keyof Form, v: unknown) => {
-    setForm(f => ({ ...f, [k]: v }));
-    setErrors(e => ({ ...e, [k]: "" }));
-  };
+  useEffect(() => {
+    fetch("/api/me", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const me = await response.json() as { firstName?: string | null; lastName?: string | null; phone?: string | null; city?: string | null };
+        setFirstName((current) => current || me.firstName || "");
+        setLastName((current) => current || me.lastName || "");
+        setPhone((current) => current || me.phone || "");
+        setCity((current) => current || me.city || "");
+      })
+      .catch(() => undefined);
+  }, []);
 
-  const toggleLevel = (l: string) => {
-    set("levels", form.levels.includes(l) ? form.levels.filter(x => x !== l) : [...form.levels, l]);
-  };
-  const toggleSlot = (day: string, slot: string) => {
-    const a = { ...form.availability, [day]: { ...form.availability[day], [slot]: !form.availability[day][slot] } };
-    set("availability", a);
-  };
+  const fullName = useMemo(() => `${firstName.trim()} ${lastName.trim()}`.trim(), [firstName, lastName]);
 
-  const validate = () => {
-    setErrors({});
-    return true;
-  };
+  function toggleLevel(level: string) { setLevels((current) => current.includes(level) ? current.filter((item) => item !== level) : [...current, level]); }
+  function toggleDay(day: string) { setDays((current) => current.includes(day) ? current.filter((item) => item !== day) : [...current, day]); }
 
-  const saveAndNext = async () => {
-    if (!validate()) return;
-    setSaving(true);
+  function validateCurrentStep(): boolean {
+    if (step === 0 && (!firstName.trim() || !lastName.trim())) { setError(loc === "en" ? "First and last name are required." : "Le prénom et le nom sont requis."); return false; }
+    if (step === 1 && levels.length === 0) { setError(loc === "en" ? "Choose at least one teaching level." : "Choisissez au moins un niveau enseigné."); return false; }
+    if (step === 2 && days.length === 0) { setError(loc === "en" ? "Choose at least one available day." : "Choisissez au moins un jour de disponibilité."); return false; }
+    setError(null); return true;
+  }
+
+  async function next() {
+    if (!validateCurrentStep()) return;
+    if (step < STEPS.length - 1) { setStep((value) => value + 1); return; }
+
+    setSaving(true); setError(null);
     try {
-      const res = await fetch("/api/onboarding", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "teacher",
-          fullName: `${form.firstName} ${form.lastName}`,
-          phone: form.phone, city: form.city, dateOfBirth: form.dateOfBirth,
-          gender: form.gender, avatarUrl: form.avatarUrl || undefined,
-          bio: form.bio, speciality: form.levels,
-          diploma: form.diploma || undefined,
-          yearsExp: form.yearsExp ? Number(form.yearsExp) : undefined,
-          certifications: form.certifications ? form.certifications.split(",").map(s => s.trim()) : [],
-          maxStudents: Number(form.maxStudents),
-          hourlyRate: form.hourlyRate ? Number(form.hourlyRate) : undefined,
-          availabilitySchedule: form.availability,
-          centerId: form.independent ? undefined : (form.centerId || undefined),
-        }),
+      const profileResponse = await fetch("/api/onboarding", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "teacher", fullName, phone: phone.trim() || undefined, city: city.trim() || undefined, bio: bio.trim(), speciality: levels, diploma: diploma.trim() || undefined, yearsExp: yearsExp ? Number(yearsExp) : undefined, certifications: certifications.split(",").map((value) => value.trim()).filter(Boolean), maxStudents: Math.max(1, Number(maxStudents) || 20), availabilitySchedule: { days } }),
       });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.error("[onboarding/teacher]", err);
-      }
-      if (step < STEPS.length - 1) {
-        setStep(s => s + 1);
-      } else {
-        await fetch("/api/onboarding/complete", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            role: "TEACHER",
-            profileData: {
-              fullName: `${form.firstName} ${form.lastName}`.trim(),
-              phone: form.phone,
-              city: form.city,
-              country: "Cameroun",
-              bio: form.bio,
-              qualifications: form.diploma,
-              teachingLevels: form.levels.join(","),
-              availability: JSON.stringify(form.availability),
-              centerName: form.centerName,
-            }
-          })
-        });
-        document.cookie = "onboarding_done=true;path=/;max-age=2592000";
-        router.push("/teacher");
-      }
-    } catch (err) {
-      console.error("[saveAndNext]", err);
-    } finally {
-      setSaving(false);
-    }
-  };
+      if (!profileResponse.ok) throw new Error("teacher_profile_failed");
 
-  const filteredCenters = MOCK_CENTERS.filter(c =>
-    c.name.toLowerCase().includes(form.centerSearch.toLowerCase()) ||
-    c.city.toLowerCase().includes(form.centerSearch.toLowerCase())
-  );
+      const completeResponse = await fetch("/api/onboarding/complete", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ persona: "teacher", role: "TEACHER", profileData: { firstName: firstName.trim(), lastName: lastName.trim(), fullName, phone: phone.trim() || undefined, city: city.trim() || undefined, bio: bio.trim() || undefined, qualifications: diploma.trim() || undefined, teachingLevels: levels.join(","), availability: JSON.stringify({ days }) } }),
+      });
+      const completed = await completeResponse.json().catch(() => ({}));
+      if (!completeResponse.ok || typeof completed.redirectTo !== "string") throw new Error(completed.code ?? "teacher_completion_failed");
+      router.push(completed.redirectTo); router.refresh();
+    } catch {
+      setError(loc === "en" ? "We could not finish your Teacher profile. Please try again." : "Nous n’avons pas pu terminer votre profil Enseignant. Réessayez.");
+    } finally { setSaving(false); }
+  }
 
   return (
     <main style={{ minHeight: "100vh", background: "var(--espresso)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <style>{`
-        input:focus, select:focus, textarea:focus { border-color: var(--brass) !important; }
-        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)} to { opacity:1; transform:translateY(0); } }
-        .fadeUp { animation: fadeUp var(--dur-moment) var(--ease-enter) forwards; }
-        select option { background: var(--espresso-2); color: var(--creme); }
-      `}</style>
-
-      <div style={{ width: "100%", maxWidth: 580 }} className="fadeUp">
+      <div style={{ width: "100%", maxWidth: 620 }}>
         <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <div style={{ fontSize: 34, marginBottom: 8 }}></div>
-          <h1 style={{ margin: 0, color: "var(--creme)", fontFamily: "var(--font-fraunces), Georgia, sans-serif", fontWeight: 800, fontSize: 22 }}>Profil Enseignant</h1>
-          <p style={{ margin: "6px 0 0", color: "rgba(244, 235, 220, 0.62)", fontSize: 13 }}>Renseignez vos informations pour accéder à votre espace enseignant</p>
+          <h1 style={{ margin: 0, color: "var(--creme)", fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: 26 }}>{loc === "en" ? "Teacher profile" : "Profil Enseignant"}</h1>
+          <p style={{ color: "rgba(244,235,220,.62)", fontSize: 13 }}>{loc === "en" ? "Your saved identity is reused here. Professional access remains server-verified." : "Votre identité enregistrée est reprise ici. L’accès professionnel reste vérifié côté serveur."}</p>
         </div>
-
         <OnboardingProgress steps={STEPS} current={step} />
-
-        <div style={{ background: "rgba(36, 24, 18, 0.85)", border: "1px solid rgba(244, 235, 220, 0.09)", borderRadius: 18, padding: 28 }}>
-
-          {/* ── Step 0 : Profil perso ── */}
-          {step === 0 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <h2 style={{ margin: 0, color: "var(--creme)", fontFamily: "var(--font-fraunces), Georgia, sans-serif", fontSize: 17 }}>Informations personnelles</h2>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div>
-                  <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>PRÉNOM <span style={{ color: "var(--creme-mute)", fontWeight: 400 }}>(recommandé)</span></label>
-                  <input value={form.firstName} onChange={e => set("firstName", e.target.value)} placeholder="Jean-Pierre" style={inp()} />
-                </div>
-                <div>
-                  <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>NOM <span style={{ color: "var(--creme-mute)", fontWeight: 400 }}>(recommandé)</span></label>
-                  <input value={form.lastName} onChange={e => set("lastName", e.target.value)} placeholder="Nkolo" style={inp()} />
-                </div>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div>
-                  <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>DATE DE NAISSANCE</label>
-                  <input type="date" aria-label="Date de naissance" value={form.dateOfBirth} onChange={e => set("dateOfBirth", e.target.value)} style={{ ...inp(), colorScheme: "dark" }} />
-                </div>
-                <div>
-                  <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>GENRE</label>
-                  <select aria-label="Genre" value={form.gender} onChange={e => set("gender", e.target.value)} style={{ ...inp(), appearance: "none" } as React.CSSProperties}>
-                    <option value="">Choisir...</option>
-                    <option value="M">Masculin</option>
-                    <option value="F">Féminin</option>
-                    <option value="N">Non binaire</option>
-                  </select>
-                </div>
-              </div>
-              <PhoneInput value={form.phone} onChange={v => set("phone", v)} />
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div>
-                  <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>VILLE</label>
-                  <select aria-label="Ville" value={form.city} onChange={e => set("city", e.target.value)} style={{ ...inp(), appearance: "none" } as React.CSSProperties}>
-                    <option value="">Sélectionner...</option>
-                    {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>PHOTO <span style={{ fontWeight: 400 }}>(optionnel)</span></label>
-                  <input value={form.avatarUrl} onChange={e => set("avatarUrl", e.target.value)} placeholder="URL photo" style={inp()} />
-                </div>
-              </div>
-              <div>
-                <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>BIO <span style={{ fontWeight: 400, color: "var(--creme-mute)" }}>(max 300 caractères)</span></label>
-                <textarea value={form.bio} onChange={e => set("bio", e.target.value)} placeholder="Présentez-vous en quelques phrases..." rows={3}
-                  style={{ ...inp(), resize: "none" } as React.CSSProperties} />
-                <div style={{ color: form.bio.length > 280 ? "#f59e0b" : "var(--creme-mute)", fontSize: 11, marginTop: 4, textAlign: "right" }}>{form.bio.length}/300</div>
-                {errors.bio && <div style={{ color: "#E5B4B7", fontSize: 11 }}>{errors.bio}</div>}
-              </div>
+        <section style={{ marginTop: 18, background: "rgba(36,24,18,.85)", border: "1px solid rgba(244,235,220,.09)", borderRadius: 18, padding: 28 }}>
+          {step === 0 ? <div style={{ display: "grid", gap: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <label><span className="entry-field-lbl">{loc === "en" ? "First name" : "Prénom"}</span><input style={inputStyle()} value={firstName} onChange={(e) => setFirstName(e.target.value)} autoComplete="given-name" /></label>
+              <label><span className="entry-field-lbl">{loc === "en" ? "Last name" : "Nom"}</span><input style={inputStyle()} value={lastName} onChange={(e) => setLastName(e.target.value)} autoComplete="family-name" /></label>
             </div>
-          )}
+            <PhoneInput value={phone} onChange={setPhone} />
+            <label><span className="entry-field-lbl">{loc === "en" ? "City" : "Ville"}</span><input style={inputStyle()} value={city} onChange={(e) => setCity(e.target.value)} autoComplete="address-level2" /></label>
+            <label><span className="entry-field-lbl">Bio</span><textarea style={{ ...inputStyle(), resize: "vertical" }} rows={4} maxLength={300} value={bio} onChange={(e) => setBio(e.target.value)} /></label>
+          </div> : null}
 
-          {/* ── Step 1 : Expertise ── */}
-          {step === 1 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-              <h2 style={{ margin: 0, color: "var(--creme)", fontFamily: "var(--font-fraunces), Georgia, sans-serif", fontSize: 17 }}>Expertise pédagogique</h2>
-              <div>
-                <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 8 }}>NIVEAUX ENSEIGNÉS *</label>
-                {errors.levels && <div style={{ color: "#E5B4B7", fontSize: 11, marginBottom: 6 }}>{errors.levels}</div>}
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {LEVELS.map(l => {
-                    const active = form.levels.includes(l);
-                    return (
-                      <button key={l} onClick={() => toggleLevel(l)} style={{
-                        padding: "8px 18px", borderRadius: 8, cursor: "pointer",
-                        background: active ? "rgba(184, 135, 62, 0.15)" : "rgba(244, 235, 220, 0.04)",
-                        border: `1px solid ${active ? "rgba(184, 135, 62, 0.4)" : "rgba(244, 235, 220, 0.09)"}`,
-                        color: active ? "var(--brass)" : "rgba(244, 235, 220, 0.72)", fontWeight: 700, fontSize: 13,
-                        transition: "all var(--dur-touch)",
-                      }}>{l}</button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div>
-                  <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>DIPLÔME</label>
-                  <select aria-label="diploma" value={form.diploma} onChange={e => set("diploma", e.target.value)} style={{ ...inp(), appearance: "none" } as React.CSSProperties}>
-                    <option value="">Sélectionner...</option>
-                    {DIPLOMAS.map(d => <option key={d} value={d}>{d}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>ANNÉES D'EXPÉRIENCE</label>
-                  <input type="number" min="0" max="50" value={form.yearsExp} onChange={e => set("yearsExp", e.target.value)} placeholder="ex: 5" style={inp()} />
-                </div>
-              </div>
-              <div>
-                <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>CERTIFICATIONS <span style={{ fontWeight: 400 }}>(séparées par virgule)</span></label>
-                <input value={form.certifications} onChange={e => set("certifications", e.target.value)} placeholder="ex: certifications officielles, diplômes, formations..." style={inp()} />
-              </div>
-              <div style={{ background: "rgba(244, 235, 220, 0.03)", border: "1px solid rgba(244, 235, 220, 0.06)", borderRadius: 10, padding: "14px 16px" }}>
-                <div style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, marginBottom: 4 }}>JUSTIFICATIFS</div>
-                <div style={{ color: "var(--creme-mute)", fontSize: 12 }}>Upload de diplômes — disponible après validation du compte</div>
-              </div>
+          {step === 1 ? <div style={{ display: "grid", gap: 16 }}>
+            <div><span className="entry-field-lbl">{loc === "en" ? "Teaching levels" : "Niveaux enseignés"}</span><div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>{LEVELS.map((level) => <button key={level} type="button" onClick={() => toggleLevel(level)} className="entry-cta entry-cta-ghost" style={{ width: "auto" }} aria-pressed={levels.includes(level)}>{level}</button>)}</div></div>
+            <label><span className="entry-field-lbl">{loc === "en" ? "Diploma / qualification" : "Diplôme / qualification"}</span><input style={inputStyle()} value={diploma} onChange={(e) => setDiploma(e.target.value)} /></label>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <label><span className="entry-field-lbl">{loc === "en" ? "Years of experience" : "Années d’expérience"}</span><input type="number" min={0} style={inputStyle()} value={yearsExp} onChange={(e) => setYearsExp(e.target.value)} /></label>
+              <label><span className="entry-field-lbl">{loc === "en" ? "Max learners" : "Maximum d’élèves"}</span><input type="number" min={1} style={inputStyle()} value={maxStudents} onChange={(e) => setMaxStudents(e.target.value)} /></label>
             </div>
-          )}
+            <label><span className="entry-field-lbl">Certifications</span><input style={inputStyle()} value={certifications} onChange={(e) => setCertifications(e.target.value)} placeholder={loc === "en" ? "Comma-separated" : "Séparées par des virgules"} /></label>
+          </div> : null}
 
-          {/* ── Step 2 : Disponibilité ── */}
-          {step === 2 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-              <h2 style={{ margin: 0, color: "var(--creme)", fontFamily: "var(--font-fraunces), Georgia, sans-serif", fontSize: 17 }}>Disponibilités & tarif</h2>
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr>
-                      <th style={{ color: "var(--creme-mute)", fontSize: 10, fontWeight: 600, textAlign: "left", padding: "0 0 8px", width: 80 }}>JOUR</th>
-                      {SLOTS.map(s => <th key={s} style={{ color: "var(--creme-mute)", fontSize: 10, fontWeight: 600, padding: "0 0 8px 8px", textAlign: "center" }}>{SLOT_LABELS[s]}</th>)}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {DAYS.map(day => (
-                      <tr key={day}>
-                        <td style={{ color: "rgba(255,255,255,0.55)", fontSize: 12, padding: "4px 0", fontWeight: 600 }}>{day}</td>
-                        {SLOTS.map(slot => {
-                          const on = form.availability[day]?.[slot];
-                          return (
-                            <td key={slot} style={{ padding: "4px 8px", textAlign: "center" }}>
-                              <button onClick={() => toggleSlot(day, slot)} style={{
-                                width: 36, height: 28, borderRadius: 6, cursor: "pointer",
-                                background: on ? "rgba(184, 135, 62, 0.2)" : "rgba(244, 235, 220, 0.04)",
-                                border: `1px solid ${on ? "rgba(184, 135, 62, 0.4)" : "rgba(244, 235, 220, 0.09)"}`,
-                                color: on ? "var(--brass)" : "var(--creme-mute)", fontSize: 12,
-                                transition: "all var(--dur-touch)",
-                              }}>{on ? "✓" : "—"}</button>
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div>
-                  <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>ÉLÈVES MAX / CLASSE</label>
-                  <input type="number" min="1" max="60" value={form.maxStudents} onChange={e => set("maxStudents", e.target.value)} style={inp()} />
-                </div>
-                <div>
-                  <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 5 }}>TARIF HORAIRE (XAF)</label>
-                  <input type="number" min="0" value={form.hourlyRate} onChange={e => set("hourlyRate", e.target.value)} placeholder="ex: 5000" style={inp()} />
-                </div>
-              </div>
-            </div>
-          )}
+          {step === 2 ? <div style={{ display: "grid", gap: 14 }}>
+            <p style={{ margin: 0, color: "rgba(244,235,220,.72)" }}>{loc === "en" ? "Which days can learners usually reach you?" : "Quels jours les apprenants peuvent-ils généralement vous retrouver ?"}</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>{DAYS.map((day) => <button key={day} type="button" onClick={() => toggleDay(day)} className="entry-cta entry-cta-ghost" style={{ width: "auto" }} aria-pressed={days.includes(day)}>{day}</button>)}</div>
+            <div className="entry-context" role="note"><span className="entry-context-dot" aria-hidden="true" /><span className="entry-context-text">{loc === "en" ? "Center association is handled through trusted Center/Teacher workflows, not a mocked center list." : "Le rattachement à un centre passe par les workflows Centre/Enseignant vérifiés, jamais par une liste de centres fictifs."}</span></div>
+          </div> : null}
 
-          {/* ── Step 3 : Centre ── */}
-          {step === 3 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <h2 style={{ margin: 0, color: "var(--creme)", fontFamily: "var(--font-fraunces), Georgia, sans-serif", fontSize: 17 }}>Rattachement au centre</h2>
-              <p style={{ margin: 0, color: "rgba(244, 235, 220, 0.62)", fontSize: 13 }}>Êtes-vous affilié à un centre de langues partenaire ?</p>
-
-              <button onClick={() => set("independent", !form.independent)} style={{
-                display: "flex", alignItems: "center", gap: 12, textAlign: "left",
-                background: form.independent ? "rgba(184, 135, 62, 0.08)" : "rgba(244, 235, 220, 0.03)",
-                border: `1px solid ${form.independent ? "rgba(184, 135, 62, 0.4)" : "rgba(244, 235, 220, 0.09)"}`,
-                borderRadius: 12, padding: "14px 16px", cursor: "pointer",
-              }}>
-                <span style={{ fontSize: 22 }}>🧑‍💻</span>
-                <div>
-                  <div style={{ color: form.independent ? "var(--brass)" : "var(--creme)", fontWeight: 700, fontSize: 14 }}>Je suis indépendant</div>
-                  <div style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 12 }}>Je gère mes propres élèves sans affiliation</div>
-                </div>
-                {form.independent && <span style={{ marginLeft: "auto", color: "var(--brass)" }}>✓</span>}
-              </button>
-
-              {!form.independent && (
-                <>
-                  <div>
-                    <label style={{ color: "rgba(244, 235, 220, 0.62)", fontSize: 11, fontWeight: 600, display: "block", marginBottom: 6 }}>RECHERCHER UN CENTRE</label>
-                    <input value={form.centerSearch} onChange={e => set("centerSearch", e.target.value)} placeholder="Nom du centre ou ville..." style={inp()} />
-                  </div>
-                  {errors.centerId && <div style={{ color: "#E5B4B7", fontSize: 11 }}>{errors.centerId}</div>}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    {filteredCenters.map(c => {
-                      const selected = form.centerId === c.id;
-                      return (
-                        <button key={c.id} onClick={() => { set("centerId", c.id); set("centerName", c.name); }} style={{
-                          display: "flex", alignItems: "center", gap: 12, textAlign: "left",
-                          background: selected ? "rgba(184, 135, 62, 0.08)" : "rgba(244, 235, 220, 0.02)",
-                          border: `1px solid ${selected ? "rgba(184, 135, 62, 0.3)" : "rgba(244, 235, 220, 0.06)"}`,
-                          borderRadius: 10, padding: "12px 14px", cursor: "pointer",
-                        }}>
-                          <span style={{ fontSize: 18 }}></span>
-                          <div>
-                            <div style={{ color: selected ? "var(--brass)" : "var(--creme)", fontWeight: 600, fontSize: 13 }}>{c.name}</div>
-                            <div style={{ color: "var(--creme-mute)", fontSize: 11 }}>{c.city}</div>
-                          </div>
-                          {selected && <span style={{ marginLeft: "auto", color: "var(--brass)" }}>✓</span>}
-                        </button>
-                      );
-                    })}
-                    {filteredCenters.length === 0 && <div style={{ color: "var(--creme-mute)", fontSize: 12, textAlign: "center", padding: "20px 0" }}>Aucun centre trouvé</div>}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Navigation */}
-          <div style={{ display: "flex", gap: 10, justifyContent: "space-between", marginTop: 24 }}>
-            {step > 0 ? (
-              <button onClick={() => setStep(s => s - 1)} style={{ background: "rgba(244, 235, 220, 0.04)", color: "rgba(244, 235, 220, 0.62)", border: "1px solid rgba(244, 235, 220, 0.09)", borderRadius: 10, padding: "12px 20px", cursor: "pointer", fontSize: 13 }}>← Précédent</button>
-            ) : <div />}
-            <button onClick={saveAndNext} disabled={saving} style={{ background: "var(--brass)", color: "var(--espresso)", border: "none", borderRadius: 10, padding: "12px 28px", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>
-              {saving ? "Sauvegarde..." : step === STEPS.length - 1 ? "Terminer →" : "Continuer →"}
-            </button>
+          {error ? <p className="entry-err" role="alert">{error}</p> : null}
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginTop: 24 }}>
+            <button type="button" className="entry-cta entry-cta-ghost" style={{ width: "auto" }} disabled={step === 0 || saving} onClick={() => setStep((value) => Math.max(0, value - 1))}>{loc === "en" ? "Back" : "Retour"}</button>
+            <button type="button" className="entry-cta entry-cta-primary" style={{ width: "auto" }} disabled={saving} onClick={next}>{saving ? (loc === "en" ? "Saving…" : "Enregistrement…") : step === STEPS.length - 1 ? (loc === "en" ? "Open my Teacher space" : "Ouvrir mon espace Enseignant") : (loc === "en" ? "Continue" : "Continuer")}</button>
           </div>
-        </div>
+        </section>
       </div>
     </main>
   );
