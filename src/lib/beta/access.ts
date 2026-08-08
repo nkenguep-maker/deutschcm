@@ -13,7 +13,7 @@ function adminClient() {
 export async function setBetaAccess(params: {
   supabaseId: string;
   enabled: boolean;
-}): Promise<void> {
+}): Promise<boolean> {
   const admin = adminClient();
   const { data, error: readError } = await admin.auth.admin.getUserById(params.supabaseId);
   if (readError || !data.user) {
@@ -21,6 +21,7 @@ export async function setBetaAccess(params: {
   }
 
   const existing = (data.user.app_metadata ?? {}) as Record<string, unknown>;
+  const previousEnabled = existing.beta_access === true;
   const { error: updateError } = await admin.auth.admin.updateUserById(params.supabaseId, {
     app_metadata: {
       ...existing,
@@ -29,4 +30,5 @@ export async function setBetaAccess(params: {
     },
   });
   if (updateError) throw updateError;
+  return previousEnabled;
 }
