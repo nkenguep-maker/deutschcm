@@ -20,10 +20,12 @@ export interface MondeAccess {
   endsAt: string | null;
   daysRemaining: number | null;
   level: MondeLevel | null;
+  source?: "GRANT" | "TECHNICAL_BETA";
 }
 
 export function computeMondeAccess(
   grants: Pick<AccessGrant, "startsAt" | "endsAt" | "status" | "metadata">[],
+  options?: { technicalBetaA1?: boolean },
 ): MondeAccess {
   const now = Date.now();
   const eligible = grants
@@ -41,6 +43,21 @@ export function computeMondeAccess(
       endsAt: active.endsAt ? new Date(active.endsAt).toISOString() : null,
       daysRemaining,
       level: extractLevel(active.metadata),
+      source: "GRANT",
+    };
+  }
+
+  // Bêta technique : ouvre uniquement le niveau A1 réellement prêt, sans
+  // écrire un entitlement commercial en base. Cette branche est calculée à
+  // la lecture et disparaît immédiatement lorsque le flag serveur est coupé.
+  if (options?.technicalBetaA1) {
+    return {
+      status: "ACTIVE",
+      startsAt: null,
+      endsAt: null,
+      daysRemaining: null,
+      level: "A1",
+      source: "TECHNICAL_BETA",
     };
   }
 
@@ -52,6 +69,7 @@ export function computeMondeAccess(
       endsAt: expired.endsAt ? new Date(expired.endsAt).toISOString() : null,
       daysRemaining: 0,
       level: extractLevel(expired.metadata),
+      source: "GRANT",
     };
   }
 
