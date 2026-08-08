@@ -2,6 +2,7 @@
 // par la suite enfant dédiée).
 
 import { test, expect, type Page } from "playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 
 const OUT = "captures/personas";
@@ -37,6 +38,20 @@ async function loginViaSupabase(page: Page, email: string, password: string) {
   await page.context().addCookies([
     { name: cookie, value, domain: host, path: "/", httpOnly: false, secure: false, sameSite: "Lax" },
   ]);
+}
+
+async function assertWcag(page: Page, label: string) {
+  const report = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  const violations = report.violations.map((violation) => ({
+    id: violation.id,
+    impact: violation.impact,
+    help: violation.help,
+    nodes: violation.nodes.length,
+    targets: violation.nodes.slice(0, 3).flatMap((node) => node.target),
+  }));
+  expect(violations, `${label} WCAG A/AA violations`).toEqual([]);
 }
 
 const PASSWORD = process.env.P1_TEST_PASSWORD!;
@@ -91,6 +106,13 @@ for (const p of PERSONAS) {
         }, vp.width);
         expect(overflowing, `overflow ${p.id} ${vp.name} (elts non-scrollables > viewport)`).toBe(0);
         expect(pageErrors, `${p.id} ${locale} ${vp.name} unhandled page errors`).toEqual([]);
+
+        // Accessibility is structural rather than copy-dependent. Scan both
+        // responsive extremes in FR to keep the release gate rigorous without
+        // tripling the already large persona matrix runtime.
+        if (locale === "fr" && (vp.name === "390" || vp.name === "1440")) {
+          await assertWcag(page, `${p.id} ${vp.name}`);
+        }
 
         const path = file(p.id, vp.name, locale);
         await page.screenshot({ path, fullPage: true });
