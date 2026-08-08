@@ -212,6 +212,13 @@ export async function proxy(request: NextRequest) {
     : pathname
   const locale = localePrefix ?? routing.defaultLocale
 
+  // Historical acquisition links used both French and English nouns. Keep
+  // those public and canonicalize them to the current B2B landing page without
+  // ever opening the private singular /center application space.
+  if (canonicalPath === "/centres" || canonicalPath === "/centers") {
+    return NextResponse.redirect(new URL(`/${locale}/landing`, request.url), 308)
+  }
+
   if (closedBeta && canonicalPath === "/register") {
     return NextResponse.redirect(new URL(`/${locale}/beta`, request.url))
   }
