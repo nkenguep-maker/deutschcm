@@ -1,9 +1,8 @@
 "use client";
 
-// /landing · Sprint 7 « Le comptoir » (B2B centres).
-// Un seul chiffre public : 30 jours gratuits sans engagement.
-// AUCUN tarif visible (les tarifs vivent dans /admin, jamais en public).
-// Seule porte : le formulaire de démo → /api/apply/center.
+// /landing · « Le comptoir » B2B centres.
+// Surface commerciale réelle : fonctionnalités, demande de démo et accès bêta.
+// Aucun checkout ni paiement en ligne n'est activé à ce stade.
 
 import { useLocale } from "next-intl";
 import { type FormEvent, useEffect, useState } from "react";
@@ -77,67 +76,67 @@ interface Copy {
 const COPY_FR: Copy = {
   navFeatures: "Langues",
   navLevels: "Méthode",
-  navPricing: "Manifeste",
+  navPricing: "Tarifs",
   navCenters: "Centres",
   navLogin: "Se connecter",
   navRegister: "Commencer",
 
   heroKicker: "Centres de langues",
-  heroTitle: "Vos élèves progressent.",
-  heroTitleEm: "Vous le prouvez.",
-  heroLede: "Un tableau clair pour vos classes, un rapport pour les parents, un accompagnement humain de la maison. Sans installation, sur téléphone.",
+  heroTitle: "Suivez vos classes.",
+  heroTitleEm: "Montrez leur progression.",
+  heroLede: "Un tableau clair pour vos classes, le suivi des élèves et un espace pour votre équipe. Sans installation, sur téléphone comme sur ordinateur.",
   heroCta: "Réserver une démo",
 
   painsKicker: "Ce qui vous ralentit",
   painsTitle: "Ce que la maison retire.",
   painsTitleEm: "De votre semaine.",
   pains: [
-    { title: "Les présences à la main.", body: "Feuilles perdues, corrections tardives, doublons — la présence devient un vrai relevé, en temps réel, partagé." },
-    { title: "Le décrochage invisible.", body: "L'élève absent·e trois séances de suite ne devrait pas être une découverte. Une alerte tombe avant qu'il soit tard." },
-    { title: "Des profs sans contenu prêt.", body: "Chaque prof reçoit une bibliothèque de leçons ouvertes, adaptées au niveau, prêtes à ouvrir en classe." },
-    { title: "Rien à montrer aux parents.", body: "Le rapport de progression est là, mis à jour, montrable — pas un fichier bricolé la veille." },
+    { title: "Les présences à la main.", body: "Feuilles perdues, corrections tardives, doublons — centralisez la vie de vos classes dans un seul espace." },
+    { title: "Le décrochage difficile à voir.", body: "Les données de classe et de progression donnent à votre équipe un point de repère commun pour suivre les élèves." },
+    { title: "Des outils dispersés pour les profs.", body: "L'espace enseignant centralise classes, devoirs, corrections et suivi des apprenants." },
+    { title: "Peu de visibilité pour les familles.", body: "Les données de progression disponibles peuvent être consultées depuis les espaces prévus pour le suivi." },
   ],
 
   solKicker: "La solution",
   solTitle: "Trois pas.",
   solTitleEm: "Un tableau clair.",
   solSteps: [
-    { title: "Le centre s'inscrit.", body: "Une démo, une signature, un code centre — la maison ouvre l'accès." },
-    { title: "Vos profs sont invités.", body: "Chaque enseignant·e reçoit son espace. Les classes se créent. Les leçons se choisissent." },
-    { title: "Les élèves rejoignent.", body: "Un code, une leçon — ils sont dans la classe, sur téléphone, tout de suite." },
+    { title: "Le centre rejoint YEMA.", body: "Après validation, le centre dispose de son espace et de son identité dans la plateforme." },
+    { title: "Vos profs sont invités.", body: "Chaque enseignant·e reçoit son espace. Les classes et les devoirs peuvent ensuite être gérés au même endroit." },
+    { title: "Les élèves rejoignent.", body: "Les élèves rejoignent une classe avec le parcours d'inscription et la validation prévus par leur enseignant·e." },
   ],
-  solNote: "Aucune installation. Fonctionne sur téléphone. Le tableau reste sur votre navigateur.",
+  solNote: "Aucune installation. Fonctionne dans le navigateur sur téléphone et ordinateur.",
 
-  proofKicker: "La preuve",
-  proofTitle: "Le rapport.",
-  proofTitleEm: "Que vous montrez aux parents.",
-  proofLede: "Une courbe qui monte. Une présence lisible. Un cap tenu. Le fichier que vous envoyiez en catastrophe la veille de la réunion — la maison le tient à jour tous les jours.",
+  proofKicker: "Le suivi",
+  proofTitle: "Une vue.",
+  proofTitleEm: "Pour piloter vos classes.",
+  proofLede: "Effectifs, classes, inscriptions et progression disponible sont réunis dans le même espace. Les informations s'enrichissent à mesure que vos élèves utilisent YEMA.",
 
   atoutKicker: "L'atout",
-  atoutTitle: "Deux choses.",
-  atoutTitleEm: "Qu'aucun autre ne donne.",
+  atoutTitle: "Deux univers.",
+  atoutTitleEm: "Dans la même maison.",
   atoutItems: [
-    "L'accompagnement humain — un référent de la maison, joignable, qui connaît votre centre.",
-    "Les langues africaines — pour les familles de diaspora, les héritages, les publics rares. Ni gadget, ni supplément.",
+    "Les langues du monde — avec des parcours structurés et un espace de classe pour les équipes pédagogiques.",
+    "Les langues africaines — avec des expériences distinctes pensées pour la transmission, les familles et les communautés.",
   ],
 
-  guaranteeKicker: "La garantie",
-  guaranteeTitle: "Trente jours gratuits.",
-  guaranteeTitleEm: "Sans engagement.",
-  guaranteeBody: "Si vos élèves ne progressent pas plus vite qu'avant, vous ne payez rien. Un seul chiffre public — le reste se dit en démo.",
+  guaranteeKicker: "Bêta fermée",
+  guaranteeTitle: "Accès accompagné.",
+  guaranteeTitleEm: "Sans paiement en ligne.",
+  guaranteeBody: "Les centres peuvent découvrir l'offre et demander une démo. L'activation commerciale et les moyens de paiement seront connectés dans un lot ultérieur.",
 
   formKicker: "Réserver une démo",
   formTitle: "Une démo courte.",
-  formTitleEm: "Un vrai référent.",
-  formLede: "Nous vous rappelons sous 48 heures pour organiser une démonstration adaptée à votre centre.",
+  formTitleEm: "Adaptée à votre centre.",
+  formLede: "Envoyez les coordonnées de votre centre. L'équipe YEMA vous contactera pour organiser une démonstration.",
   fldName: "Nom du centre",
   fldCity: "Ville",
   fldWa: "WhatsApp",
   fldEmail: "Email",
   submit: "Envoyer la demande",
   sentTitle: "Demande reçue.",
-  sentTitleEm: "Chaque centre de la maison est rencontré.",
-  sentBody: "Nous vous rappelons sous 48 heures.",
+  sentTitleEm: "Merci pour votre intérêt.",
+  sentBody: "Votre demande est enregistrée. L'équipe YEMA pourra vous recontacter pour organiser la démonstration.",
   error: "Quelque chose ne nous est pas parvenu. Réessayez.",
 
   footerTagline: "L'Afrique parle. Toutes ses langues — du monde et africaines, enfin un lieu.",
@@ -152,70 +151,70 @@ const COPY_FR: Copy = {
 const COPY_EN: Copy = {
   navFeatures: "Languages",
   navLevels: "Method",
-  navPricing: "Manifesto",
+  navPricing: "Pricing",
   navCenters: "Centers",
   navLogin: "Log in",
   navRegister: "Start",
 
   heroKicker: "Language centers",
-  heroTitle: "Your learners progress.",
-  heroTitleEm: "You prove it.",
-  heroLede: "A clear board for your classes, a report for the parents, a human referent from the house. No install, on phone.",
+  heroTitle: "Follow your classes.",
+  heroTitleEm: "Show their progress.",
+  heroLede: "A clear workspace for classes, learner follow-up and your team. No installation, on phone and desktop.",
   heroCta: "Book a demo",
 
   painsKicker: "What slows you down",
   painsTitle: "What the house takes.",
   painsTitleEm: "Off your week.",
   pains: [
-    { title: "Attendance by hand.", body: "Lost sheets, late corrections, duplicates — attendance becomes a real, real-time, shared record." },
-    { title: "Invisible drop-off.", body: "A learner missing three sessions shouldn't be a discovery. An alert arrives before it's late." },
-    { title: "Teachers without ready content.", body: "Every teacher gets a library of open lessons, level-adapted, ready to open in class." },
-    { title: "Nothing to show parents.", body: "The progress report is there, up to date, showable — not a file cobbled together the night before." },
+    { title: "Attendance by hand.", body: "Lost sheets, late corrections and duplicates — centralize day-to-day class operations in one workspace." },
+    { title: "Drop-off that is hard to see.", body: "Class and progress data give your team a shared reference point for learner follow-up." },
+    { title: "Scattered tools for teachers.", body: "The teacher workspace brings classes, assignments, corrections and learner follow-up together." },
+    { title: "Limited visibility for families.", body: "Available progress data can be viewed from the workspaces designed for learner follow-up." },
   ],
 
   solKicker: "The solution",
   solTitle: "Three steps.",
-  solTitleEm: "A clear board.",
+  solTitleEm: "One clear workspace.",
   solSteps: [
-    { title: "The center signs up.", body: "A demo, a signature, a center code — the house opens access." },
-    { title: "Your teachers are invited.", body: "Each teacher gets their space. Classes are created. Lessons are chosen." },
-    { title: "Learners join.", body: "A code, a lesson — they're in the class, on phone, right away." },
+    { title: "The center joins YEMA.", body: "After validation, the center gets its workspace and identity in the platform." },
+    { title: "Your teachers are invited.", body: "Each teacher gets their workspace. Classes and assignments can then be managed in one place." },
+    { title: "Learners join.", body: "Learners join a class through the enrollment flow and teacher approval designed for their class." },
   ],
-  solNote: "No install. Works on phone. The board stays in your browser.",
+  solNote: "No installation. Works in the browser on phone and desktop.",
 
-  proofKicker: "The proof",
-  proofTitle: "The report.",
-  proofTitleEm: "You show to parents.",
-  proofLede: "A curve that rises. A readable attendance. A cap held. The file you used to send in a panic the day before the meeting — the house keeps it up to date every day.",
+  proofKicker: "Follow-up",
+  proofTitle: "One view.",
+  proofTitleEm: "To run your classes.",
+  proofLede: "Learners, classes, enrollment requests and available progress are brought into the same workspace. The view becomes richer as learners use YEMA.",
 
   atoutKicker: "The edge",
-  atoutTitle: "Two things.",
-  atoutTitleEm: "No one else gives.",
+  atoutTitle: "Two universes.",
+  atoutTitleEm: "In the same house.",
   atoutItems: [
-    "Human support — a referent from the house, reachable, who knows your center.",
-    "Native African languages — for diaspora families, heritage, rare audiences. Not a gadget, not an add-on.",
+    "World languages — with structured journeys and classroom workspaces for teaching teams.",
+    "African languages — with distinct experiences designed for transmission, families and communities.",
   ],
 
-  guaranteeKicker: "The guarantee",
-  guaranteeTitle: "Thirty days free.",
-  guaranteeTitleEm: "No commitment.",
-  guaranteeBody: "If your learners don't progress faster than before, you don't pay. One public number — the rest is said in a demo.",
+  guaranteeKicker: "Closed beta",
+  guaranteeTitle: "Guided access.",
+  guaranteeTitleEm: "No online payment yet.",
+  guaranteeBody: "Centers can explore the offer and request a demo. Commercial activation and payment methods will be connected in a later delivery.",
 
   formKicker: "Book a demo",
   formTitle: "A short demo.",
-  formTitleEm: "A real referent.",
-  formLede: "We will call you back within 48 hours to organize a demo tailored to your center.",
+  formTitleEm: "Tailored to your center.",
+  formLede: "Send your center details. The YEMA team can then contact you to organize a demonstration.",
   fldName: "Center name",
   fldCity: "City",
   fldWa: "WhatsApp",
   fldEmail: "Email",
   submit: "Send request",
   sentTitle: "Request received.",
-  sentTitleEm: "Every center of the house is met.",
-  sentBody: "We will call you back within 48 hours.",
+  sentTitleEm: "Thank you for your interest.",
+  sentBody: "Your request has been recorded. The YEMA team can contact you to arrange the demonstration.",
   error: "Something didn't reach us. Try again.",
 
-  footerTagline: "Africa speaks. All its languages — foreign and native, at last one place.",
+  footerTagline: "Africa speaks. All its languages — world and African, at last one place.",
   footerMade: "Africa speaks. From Douala to Dakar, from Kinshasa to Abidjan.",
   footerLegal: "Legal",
   footerTerms: "Terms",
@@ -224,7 +223,6 @@ const COPY_EN: Copy = {
   footerDisclaimer: "YEMA Languages is a pan-African CEFR-aligned platform for world languages, and independent for African languages. Not affiliated with any official examination institute.",
 };
 
-// Icônes mono-trait laiton pour les 4 douleurs.
 function PainIcon({ idx }: { idx: number }) {
   const p = { width: 22, height: 22, viewBox: "0 0 22 22", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   if (idx === 0) return <svg {...p}><path d="M4 4h14v14H4z" /><path d="M4 8h14M8 4v14" /><path d="M11 12l2 2 3-3" /></svg>;
@@ -291,7 +289,6 @@ export default function B2BLandingPage() {
       />
 
       <main className="comptoir-page">
-        {/* HERO */}
         <section className="comptoir-hero">
           <div className="maison-container">
             <p className="maison-kicker">{t(c.heroKicker)}</p>
@@ -301,16 +298,13 @@ export default function B2BLandingPage() {
             <p className="chemin-hero-lede">{t(c.heroLede)}</p>
             <a href="#demo" className="maison-porte-cta">
               {t(c.heroCta)}
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                   stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"
-                   strokeLinejoin="round" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M3 8h10M9 4l4 4-4 4" />
               </svg>
             </a>
           </div>
         </section>
 
-        {/* 4 DOULEURS */}
         <section className="comptoir-pains" aria-labelledby="comptoir-pains-h">
           <div className="maison-container">
             <div className="maison-section-head">
@@ -322,9 +316,7 @@ export default function B2BLandingPage() {
             <div className="comptoir-pains-grid">
               {c.pains.map((p, i) => (
                 <article key={i} className="comptoir-pain">
-                  <div className="comptoir-pain-icon" aria-hidden="true">
-                    <PainIcon idx={i} />
-                  </div>
+                  <div className="comptoir-pain-icon" aria-hidden="true"><PainIcon idx={i} /></div>
                   <h3 className="comptoir-pain-h">{t(p.title)}</h3>
                   <p className="comptoir-pain-p">{t(p.body)}</p>
                 </article>
@@ -333,7 +325,6 @@ export default function B2BLandingPage() {
           </div>
         </section>
 
-        {/* SOLUTION · 3 étapes + placeholder dashboard */}
         <section className="comptoir-sol" aria-labelledby="comptoir-sol-h">
           <div className="maison-container">
             <div className="maison-section-head">
@@ -361,10 +352,7 @@ export default function B2BLandingPage() {
               {c.solSteps.map((s, i) => (
                 <li key={i} className="comptoir-step">
                   <span className="comptoir-step-num">{String(i + 1).padStart(2, "0")}</span>
-                  <div>
-                    <h3>{t(s.title)}</h3>
-                    <p>{t(s.body)}</p>
-                  </div>
+                  <div><h3>{t(s.title)}</h3><p>{t(s.body)}</p></div>
                 </li>
               ))}
             </ol>
@@ -373,7 +361,6 @@ export default function B2BLandingPage() {
           </div>
         </section>
 
-        {/* PREUVE · courbe placeholder */}
         <section className="comptoir-proof" aria-labelledby="comptoir-proof-h">
           <div className="maison-container comptoir-proof-inner">
             <div>
@@ -385,21 +372,14 @@ export default function B2BLandingPage() {
             </div>
             <div className="comptoir-proof-graph" aria-hidden="true">
               <svg viewBox="0 0 300 180" width="100%" height="100%">
-                <path d="M20 150 Q 60 130 90 110 T 160 70 T 260 30"
-                      stroke="var(--brass)" strokeWidth="2" fill="none" />
-                <path d="M20 150 Q 60 130 90 110 T 160 70 T 260 30 L 260 170 L 20 170 Z"
-                      fill="var(--brass-glow)" />
-                <g stroke="var(--creme-hair)" strokeWidth="0.5">
-                  <line x1="20" y1="30" x2="280" y2="30" />
-                  <line x1="20" y1="90" x2="280" y2="90" />
-                  <line x1="20" y1="150" x2="280" y2="150" />
-                </g>
+                <path d="M20 150 Q 60 130 90 110 T 160 70 T 260 30" stroke="var(--brass)" strokeWidth="2" fill="none" />
+                <path d="M20 150 Q 60 130 90 110 T 160 70 T 260 30 L 260 170 L 20 170 Z" fill="var(--brass-glow)" />
+                <g stroke="var(--creme-hair)" strokeWidth="0.5"><line x1="20" y1="30" x2="280" y2="30" /><line x1="20" y1="90" x2="280" y2="90" /><line x1="20" y1="150" x2="280" y2="150" /></g>
               </svg>
             </div>
           </div>
         </section>
 
-        {/* ATOUT · 2 items */}
         <section className="comptoir-atout" aria-labelledby="comptoir-atout-h">
           <div className="maison-container">
             <div className="maison-section-head">
@@ -408,92 +388,41 @@ export default function B2BLandingPage() {
                 {t(c.atoutTitle)} <em>{t(c.atoutTitleEm)}</em>
               </h2>
             </div>
-            <ul className="comptoir-atout-list" role="list">
-              {c.atoutItems.map((it) => (
-                <li key={it}>{t(it)}</li>
-              ))}
-            </ul>
+            <ul className="comptoir-atout-list" role="list">{c.atoutItems.map((it) => <li key={it}>{t(it)}</li>)}</ul>
           </div>
         </section>
 
-        {/* GARANTIE · le seul chiffre public */}
         <section className="comptoir-guarantee" aria-labelledby="comptoir-guarantee-h">
           <div className="maison-container">
             <p className="maison-kicker">{t(c.guaranteeKicker)}</p>
             <h2 id="comptoir-guarantee-h" className="maison-porte-h">
               {t(c.guaranteeTitle)} <em>{t(c.guaranteeTitleEm)}</em>
             </h2>
-            <p className="maison-lede" style={{ maxWidth: 640, marginLeft: "auto", marginRight: "auto" }}>
-              {t(c.guaranteeBody)}
-            </p>
+            <p className="maison-lede" style={{ maxWidth: 640, marginLeft: "auto", marginRight: "auto" }}>{t(c.guaranteeBody)}</p>
           </div>
         </section>
 
-        {/* FORMULAIRE DÉMO */}
         <section id="demo" className="ens-form" aria-labelledby="comptoir-form-h">
           <div className="maison-container">
             <div className="maison-section-head">
               <p className="maison-kicker">{t(c.formKicker)}</p>
-              <h2 id="comptoir-form-h" className="maison-h">
-                {t(c.formTitle)} <em>{t(c.formTitleEm)}</em>
-              </h2>
+              <h2 id="comptoir-form-h" className="maison-h">{t(c.formTitle)} <em>{t(c.formTitleEm)}</em></h2>
               <p className="maison-lede">{t(c.formLede)}</p>
             </div>
 
             {sent ? (
               <div className="ens-form-sent" role="status">
-                <h3 className="ens-form-sent-h">
-                  {t(c.sentTitle)} <em>{t(c.sentTitleEm)}</em>
-                </h3>
+                <h3 className="ens-form-sent-h">{t(c.sentTitle)} <em>{t(c.sentTitleEm)}</em></h3>
                 <p>{t(c.sentBody)}</p>
               </div>
             ) : (
               <form onSubmit={onSubmit} className="ens-form-body" noValidate>
-                <label className="ens-form-field">
-                  <span>{t(c.fldName)}</span>
-                  <input
-                    type="text"
-                    required
-                    autoComplete="organization"
-                    value={form.centerName}
-                    onChange={(e) => setForm({ ...form, centerName: e.target.value })}
-                  />
-                </label>
-                <label className="ens-form-field">
-                  <span>{t(c.fldCity)}</span>
-                  <input
-                    type="text"
-                    required
-                    autoComplete="address-level2"
-                    value={form.city}
-                    onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  />
-                </label>
-                <label className="ens-form-field">
-                  <span>{t(c.fldWa)}</span>
-                  <input
-                    type="tel"
-                    autoComplete="tel"
-                    value={form.whatsapp}
-                    onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-                  />
-                </label>
-                <label className="ens-form-field">
-                  <span>{t(c.fldEmail)}</span>
-                  <input
-                    type="email"
-                    required
-                    autoComplete="email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  />
-                </label>
+                <label className="ens-form-field"><span>{t(c.fldName)}</span><input type="text" required autoComplete="organization" value={form.centerName} onChange={(e) => setForm({ ...form, centerName: e.target.value })} /></label>
+                <label className="ens-form-field"><span>{t(c.fldCity)}</span><input type="text" required autoComplete="address-level2" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></label>
+                <label className="ens-form-field"><span>{t(c.fldWa)}</span><input type="tel" autoComplete="tel" value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} /></label>
+                <label className="ens-form-field"><span>{t(c.fldEmail)}</span><input type="email" required autoComplete="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></label>
                 {error ? <p className="ens-form-error" role="alert">{error}</p> : null}
-                <button type="submit" className="maison-porte-cta" disabled={sending}>
-                  {sending
-                    ? (loc === "en" ? "Sending…" : "Envoi en cours…")
-                    : t(c.submit)}
-                </button>
+                <button type="submit" className="maison-porte-cta" disabled={sending}>{sending ? (loc === "en" ? "Sending…" : "Envoi en cours…") : t(c.submit)}</button>
               </form>
             )}
           </div>
