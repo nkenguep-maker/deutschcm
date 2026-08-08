@@ -1,4 +1,41 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://deutschcm.vercel.app").replace(/\/$/, "");
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const lang = locale === "en" ? "en" : "fr";
+  const canonical = `${SITE_URL}/${lang}/beta`;
+
+  return {
+    title: lang === "en" ? "Closed beta — YEMA" : "Bêta fermée — YEMA",
+    description:
+      lang === "en"
+        ? "YEMA closed beta access is reserved for invited testers."
+        : "L’accès à la bêta fermée YEMA est réservé aux testeurs invités.",
+    alternates: {
+      canonical,
+      languages: {
+        fr: `${SITE_URL}/fr/beta`,
+        en: `${SITE_URL}/en/beta`,
+        "x-default": `${SITE_URL}/fr/beta`,
+      },
+    },
+    openGraph: {
+      url: canonical,
+      title: lang === "en" ? "Closed beta — YEMA" : "Bêta fermée — YEMA",
+      description:
+        lang === "en"
+          ? "Invitation-only access while YEMA validates the beta experience."
+          : "Accès sur invitation pendant la validation de l’expérience bêta YEMA.",
+    },
+  };
+}
 
 export default async function ClosedBetaPage({
   params,
