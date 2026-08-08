@@ -1,17 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
-import { Role } from "@prisma/client";
-import { syncUserMetadata, type SpaceRole } from "@/lib/roles";
-import { reconcileDbUser } from "@/lib/reconcileDbUser";
+import { reconcileAuthenticatedUser } from "@/lib/auth/reconcileAuthenticatedUser";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
-
-const ROLE_MAP: Record<string, Role> = {
-  STUDENT: Role.STUDENT,
-  TEACHER: Role.TEACHER,
-  CENTER: Role.CENTER,
-  ADMIN: Role.ADMIN,
-};
 
 function loginPathFor(next: string): string {
   const locale = next.match(/^\/(fr|en)(?:\/|$)/)?.[1];
@@ -39,7 +30,7 @@ export async function GET(request: NextRequest) {
             );
           },
         },
-      }
+      },
     );
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
@@ -50,52 +41,43 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (user) {
-      const metaRole = user.user_metadata?.role as string | undefined;
-      const dbRole: Role = (metaRole && ROLE_MAP[metaRole]) ? ROLE_MAP[metaRole] : Role.STUDENT;
-
-      let dbUser: Awaited<ReturnType<typeof reconcileDbUser>>["user"] | null = null;
+      let dbUser: Awaited<ReturnType<typeof reconcileAuthenticatedUser>>["user"] | null = null;
+      let activeSpace: "STUDENT" | "TEACHER" | "CENTER" | "ADMIN" = "STUDENT";
       try {
-        const res = await reconcileDbUser({
-          authUser: user,
-          defaultRole: dbRole as SpaceRole,
-        });
+        const res = await reconcileAuthenticatedUser(user);
         dbUser = res.user;
+        activeSpace = res.activeSpace;
         if (res.path !== "matched_supabase_id") {
           console.info(`[auth/callback] reconcile path=${res.path} for supabaseId=${user.id}`);
         }
+        // The current access token predates the admin app_metadata write.
+        // Refresh once so the next protected request carries the signed mirror.
+        await supabase.auth.refreshSession();
       } catch (e) {
-        console.error("[auth/callback] reconcileDbUser FAIL", e);
-      }
-
-      if (dbUser) {
-        try {
-          await syncUserMetadata({ supabaseId: user.id, activeSpace: dbRole as SpaceRole });
-        } catch (e) {
-          console.error("[auth/callback] syncUserMetadata FAIL", e);
-        }
+        console.error("[auth/callback] reconcileAuthenticatedUser FAIL", e);
       }
 
       const onboardingDone = dbUser?.onboardingDone ?? false;
-      const cookieRole = metaRole || "STUDENT";
 
       let redirectUrl: string;
       const nextIsMeaningful = next !== "/dashboard";
       if (nextIsMeaningful) {
         redirectUrl = next;
       } else if (onboardingDone) {
-        redirectUrl = dbRole === Role.ADMIN ? "/admin"
-          : dbRole === Role.TEACHER ? "/teacher"
-          : dbRole === Role.CENTER ? "/center"
+        redirectUrl = activeSpace === "ADMIN" ? "/admin"
+          : activeSpace === "TEACHER" ? "/teacher"
+          : activeSpace === "CENTER" ? "/center"
           : "/dashboard";
       } else {
-        redirectUrl = dbRole === Role.ADMIN ? "/admin"
-          : dbRole === Role.TEACHER ? "/onboarding/teacher"
-          : dbRole === Role.CENTER ? "/onboarding/center"
+        redirectUrl = activeSpace === "ADMIN" ? "/admin"
+          : activeSpace === "TEACHER" ? "/onboarding/teacher"
+          : activeSpace === "CENTER" ? "/onboarding/center"
           : "/onboarding";
       }
 
       const redirectResponse = NextResponse.redirect(`${origin}${redirectUrl}`);
-      redirectResponse.cookies.set("user_role", cookieRole, { path: "/", maxAge: 2592000 });
+      // Legacy display cookie only. Authorization no longer reads this value.
+      redirectResponse.cookies.set("user_role", activeSpace, { path: "/", maxAge: 2592000 });
       redirectResponse.cookies.set("onboarding_done", onboardingDone.toString(), { path: "/", maxAge: 2592000 });
       return redirectResponse;
     }
