@@ -15,7 +15,11 @@ export default async function LessonPage({ params }: { params: Promise<{ locale:
   const lesson = getCourseLesson(courseId, unitId, lessonId);
   if (!course || !unit || !lesson) notFound();
 
-  const viewer = await loadCourseViewer(courseId, locale);
+  const viewer = await loadCourseViewer(
+    courseId,
+    locale,
+    `/${locale}/learn/${courseId}/${unitId}/${lessonId}`,
+  );
   const completed = new Set(viewer.progress.filter((item) => item.status === "COMPLETED").map((item) => item.moduleId));
   const currentProgress = viewer.progress.find((item) => item.moduleId === lessonId) ?? null;
   const flat = course.units.flatMap((courseUnit) => courseUnit.lessons.map((courseLesson) => ({ unit: courseUnit, lesson: courseLesson })));
@@ -25,6 +29,7 @@ export default async function LessonPage({ params }: { params: Promise<{ locale:
 
   if (locked) {
     const current = firstIncompleteIndex >= 0 ? flat[firstIncompleteIndex] : null;
+    const accessActive = viewer.accessStatus === "ACTIVE";
     return (
       <main className={styles.page}>
         <div className={styles.shell}>
@@ -33,9 +38,21 @@ export default async function LessonPage({ params }: { params: Promise<{ locale:
             <Link className={styles.back} href={`/${locale}/learn/${courseId}/${unitId}`}>← Retour à l’unité</Link>
           </header>
           <section className={styles.state}>
-            <div className={styles.eyebrow}>{viewer.accessStatus === "ACTIVE" ? "Module verrouillé" : "Accès au cours requis"}</div>
-            <h1 className={styles.sectionTitle}>{viewer.accessStatus === "ACTIVE" ? course.globalUiTexts.lockedMessage : "Active ton accès pour commencer ce parcours."}</h1>
-            {viewer.accessStatus === "ACTIVE" && current ? <Link className={styles.primary} href={`/${locale}/learn/${courseId}/${current.unit.id}/${current.lesson.id}`}>Continuer la leçon actuelle</Link> : <Link className={styles.primary} href={`/${locale}/offers`}>Voir les offres</Link>}
+            <div className={styles.eyebrow}>{accessActive ? "Module verrouillé" : "Cours pas encore ouvert"}</div>
+            <h1 className={styles.sectionTitle}>
+              {accessActive
+                ? course.globalUiTexts.lockedMessage
+                : "Ce parcours n’est pas encore ouvert pour ce profil dans la bêta technique."}
+            </h1>
+            {accessActive && current ? (
+              <Link className={styles.primary} href={`/${locale}/learn/${courseId}/${current.unit.id}/${current.lesson.id}`}>
+                Continuer la leçon actuelle
+              </Link>
+            ) : (
+              <Link className={styles.primary} href={`/${locale}/dashboard/view/mon-cours`}>
+                Retour à mon cours
+              </Link>
+            )}
           </section>
         </div>
       </main>
