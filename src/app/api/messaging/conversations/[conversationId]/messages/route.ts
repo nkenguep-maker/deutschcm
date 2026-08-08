@@ -13,6 +13,25 @@ export const dynamic = "force-dynamic";
 function notFound() { return NextResponse.json({ error: "Not found" }, { status: 404 }); }
 function badRequest(code: string) { return NextResponse.json({ error: "Bad request", code }, { status: 400 }); }
 function forbidden(code: string) { return NextResponse.json({ error: "Forbidden", code }, { status: 403 }); }
+function rateLimited() {
+  return NextResponse.json(
+    { error: "Too many requests", code: "rate_limited" },
+    { status: 429, headers: { "Retry-After": "300" } },
+  );
+}
+
+const BAD_REQUEST_DENIALS = new Set([
+  "text_required_missing",
+  "text_too_long",
+  "guided_phrase_missing_or_inactive",
+  "guided_phrase_wrong_scope",
+  "audio_disabled",
+  "audio_not_ready",
+  "card_type_missing_or_invalid",
+  "replies_disabled",
+  "reply_target_invalid",
+  "idempotency_key_invalid",
+]);
 
 export async function GET(
   req: NextRequest,
@@ -63,6 +82,8 @@ export async function POST(
     if (result.error === "actor_not_allowed" || result.error === "conversation_not_found") {
       return notFound();
     }
+    if (result.error === "rate_limited") return rateLimited();
+    if (BAD_REQUEST_DENIALS.has(result.error)) return badRequest(result.error);
     return forbidden(result.error);
   }
   return NextResponse.json({ messageId: result.messageId }, { status: 201 });
