@@ -19,6 +19,7 @@ import {
   DashboardTabBar,
 } from "@/features/dashboards/shared";
 import { routeSectionNav, routeSectionTabs, sectionPageHref } from "@/features/dashboards/shared/sectionRouting";
+import { MessagesInboxLink } from "@/features/messaging/MessagesInboxLink";
 import { buildCenterNav, buildCenterMobileTabs } from "./nav";
 import type { CenterClassRow, CenterDashboardResponse, CenterStudentRow, CenterTeacherRow } from "./types";
 
@@ -100,7 +101,7 @@ export function CenterDashboard({ locale, activeSectionId = "centre" }: Props) {
   const studentRows = students.length === 0 ? <DashboardCard><DashboardEmptyState title={t("students.empty")} /></DashboardCard> : <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 }}>{students.map((student) => <li key={student.id}><DashboardCard><div style={{ fontWeight: 600 }}>{student.fullName?.trim() || t("students.empty")}</div>{student.level ? <div style={{ marginTop: 5 }}><DashboardStatusChip tone="muted">{t("students.levelLabel", { level: student.level })}</DashboardStatusChip></div> : null}</DashboardCard></li>)}</ul>;
   const teacherRows = teachers.length === 0 ? <DashboardCard><DashboardEmptyState title={t("teachers.empty")} /></DashboardCard> : <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 }}>{teachers.map((teacher) => <li key={teacher.id}><DashboardCard><div style={{ fontWeight: 600 }}>{teacher.fullName?.trim() || t("teachers.empty")}</div></DashboardCard></li>)}</ul>;
   const classRows = classes.length === 0 ? <DashboardCard><DashboardEmptyState title={t("classes.empty")} /></DashboardCard> : <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 }}>{classes.map((item) => <li key={item.id}><DashboardCard><div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}><div style={{ flex: 1 }}><div style={{ fontWeight: 600 }}>{item.name?.trim() || t("classes.empty")}</div><div style={{ marginTop: 5, display: "flex", gap: 6 }}>{item.level ? <DashboardStatusChip tone="muted">{t("classes.levelLabel", { level: item.level })}</DashboardStatusChip> : null}<DashboardStatusChip tone="neutral">{t("classes.studentsCount", { count: item.activeStudentCount })}</DashboardStatusChip></div></div>{item.name?.trim() ? <Link href={`${baseHref}/classes/${item.id}`} style={{ color: "var(--yema-gold-light)", textDecoration: "none" }}>{t("classes.openClass")}</Link> : null}</div></DashboardCard></li>)}</ul>;
-  const messages = <section id="messages" style={{ display: "grid", gap: 12 }}><DashboardSectionHeader title={t("messages.title")} /><DashboardCard><DashboardEmptyState title={t("messages.soon")} /></DashboardCard></section>;
+  const messages = <section id="messages" aria-labelledby="center-messages-title" style={{ display: "grid", gap: 12 }}><DashboardSectionHeader title={<span id="center-messages-title">{t("messages.title")}</span>} /><DashboardCard><MessagesInboxLink /></DashboardCard></section>;
   const settings = <section id="parametres" style={{ display: "grid", gap: 12 }}><DashboardSectionHeader title={t("settings.title")} description={t("settings.description")} /><DashboardCard><DashboardEmptyState title={t("settings.empty")} /></DashboardCard></section>;
   const content: Record<string, React.ReactNode> = {
     centre: overview,
