@@ -84,8 +84,6 @@ export default function LoginPage() {
         return;
       }
 
-      // Rebuild the authorization mirror from the database before any
-      // protected navigation. Caller-controlled user_metadata is ignored.
       const syncResponse = await fetch("/api/auth/sync", { method: "POST" });
       if (!syncResponse.ok) {
         await supabase.auth.signOut();
@@ -94,7 +92,19 @@ export default function LoginPage() {
       }
       await supabase.auth.refreshSession();
 
-      router.push(safeNext);
+      let destination = safeNext;
+      if (!rawNext) {
+        const homeResponse = await fetch("/api/auth/home", { cache: "no-store" });
+        const home = await homeResponse.json().catch(() => null) as { destination?: string } | null;
+        if (!homeResponse.ok || !home?.destination) {
+          await supabase.auth.signOut();
+          setErrorKey("generic");
+          return;
+        }
+        destination = `/${locale}${home.destination.startsWith("/") ? home.destination : `/${home.destination}`}`;
+      }
+
+      router.push(destination);
       router.refresh();
     } catch (err) {
       setErrorKey(classifyAuthError(err));
@@ -167,16 +177,10 @@ export default function LoginPage() {
                       </span>
                     ) : resendState === "error" ? (
                       <>
-                        <button
-                          type="button"
-                          className="ens-form-error-link"
-                          onClick={handleResendConfirmation}
-                        >
+                        <button type="button" className="ens-form-error-link" onClick={handleResendConfirmation}>
                           {applyTypo(tErr("email_not_confirmed_action"))}
                         </button>
-                        <span className="ens-form-error-hint">
-                          {applyTypo(tErr("email_not_confirmed_error"))}
-                        </span>
+                        <span className="ens-form-error-hint">{applyTypo(tErr("email_not_confirmed_error"))}</span>
                       </>
                     ) : (
                       <button
@@ -185,11 +189,7 @@ export default function LoginPage() {
                         onClick={handleResendConfirmation}
                         disabled={resendState === "sending"}
                       >
-                        {applyTypo(
-                          resendState === "sending"
-                            ? tErr("email_not_confirmed_action") + "…"
-                            : tErr("email_not_confirmed_action"),
-                        )}
+                        {applyTypo(resendState === "sending" ? tErr("email_not_confirmed_action") + "…" : tErr("email_not_confirmed_action"))}
                       </button>
                     )}
                   </div>
