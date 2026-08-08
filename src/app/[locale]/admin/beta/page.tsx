@@ -6,8 +6,10 @@ import { useState } from "react";
 
 interface InviteResponse {
   ok?: boolean;
+  invitationId?: string;
   inviteUrl?: string;
   emailSent?: boolean;
+  expiresAt?: string;
   expiresInSeconds?: number;
   error?: string;
 }
@@ -18,14 +20,17 @@ export default function AdminBetaPage() {
   const [email, setEmail] = useState("");
   const [inviteLocale, setInviteLocale] = useState<"fr" | "en">(locale === "en" ? "en" : "fr");
   const [loading, setLoading] = useState(false);
+  const [revoking, setRevoking] = useState(false);
   const [result, setResult] = useState<InviteResponse | null>(null);
   const [copied, setCopied] = useState(false);
+  const [revoked, setRevoked] = useState(false);
 
   async function createInvite(event: React.FormEvent) {
     event.preventDefault();
     setLoading(true);
     setResult(null);
     setCopied(false);
+    setRevoked(false);
     try {
       const response = await fetch("/api/admin/beta/invite", {
         method: "POST",
@@ -42,9 +47,27 @@ export default function AdminBetaPage() {
   }
 
   async function copyInvite() {
-    if (!result?.inviteUrl) return;
+    if (!result?.inviteUrl || revoked) return;
     await navigator.clipboard.writeText(result.inviteUrl);
     setCopied(true);
+  }
+
+  async function revokeInvite() {
+    if (!result?.invitationId || revoked) return;
+    setRevoking(true);
+    try {
+      const response = await fetch("/api/admin/beta/invite/revoke", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ invitationId: result.invitationId }),
+      });
+      if (response.ok) {
+        setRevoked(true);
+        setCopied(false);
+      }
+    } finally {
+      setRevoking(false);
+    }
   }
 
   return (
@@ -65,8 +88,8 @@ export default function AdminBetaPage() {
         <section className="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
           <p className="max-w-2xl leading-7 text-white/65">
             {isEnglish
-              ? "The link is valid for 72 hours, bound to the invited email and grants beta admission only. It never grants Teacher, Center or Admin privileges."
-              : "Le lien est valable 72 heures, lié à l’e-mail invité et n’accorde que l’accès bêta. Il n’accorde jamais les privilèges Enseignant, Centre ou Admin."}
+              ? "The link is valid for 72 hours, bound to the invited email, usable once and grants beta admission only. It never grants Teacher, Center or Admin privileges."
+              : "Le lien est valable 72 heures, lié à l’e-mail invité, utilisable une seule fois et n’accorde que l’accès bêta. Il n’accorde jamais les privilèges Enseignant, Centre ou Admin."}
           </p>
 
           <form onSubmit={createInvite} className="mt-7 grid gap-5 sm:grid-cols-[1fr_120px]">
@@ -113,20 +136,35 @@ export default function AdminBetaPage() {
           {result?.inviteUrl ? (
             <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-5">
               <p className="text-sm font-medium">
-                {result.emailSent
-                  ? (isEnglish ? "Email sent." : "E-mail envoyé.")
-                  : (isEnglish ? "Email delivery failed — use the fallback link below." : "L’envoi de l’e-mail a échoué — utilisez le lien de secours ci-dessous.")}
+                {revoked
+                  ? (isEnglish ? "Invitation revoked." : "Invitation révoquée.")
+                  : result.emailSent
+                    ? (isEnglish ? "Email sent." : "E-mail envoyé.")
+                    : (isEnglish ? "Email delivery failed — use the fallback link below." : "L’envoi de l’e-mail a échoué — utilisez le lien de secours ci-dessous.")}
               </p>
-              <p className="mt-3 break-all text-xs leading-6 text-white/55">{result.inviteUrl}</p>
-              <button
-                type="button"
-                onClick={copyInvite}
-                className="mt-4 min-h-11 rounded-full border border-white/15 px-5 py-2 text-sm"
-              >
-                {copied
-                  ? (isEnglish ? "Copied" : "Copié")
-                  : (isEnglish ? "Copy fallback link" : "Copier le lien de secours")}
-              </button>
+              {!revoked ? <p className="mt-3 break-all text-xs leading-6 text-white/55">{result.inviteUrl}</p> : null}
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={copyInvite}
+                  disabled={revoked}
+                  className="min-h-11 rounded-full border border-white/15 px-5 py-2 text-sm disabled:opacity-40"
+                >
+                  {copied
+                    ? (isEnglish ? "Copied" : "Copié")
+                    : (isEnglish ? "Copy fallback link" : "Copier le lien de secours")}
+                </button>
+                <button
+                  type="button"
+                  onClick={revokeInvite}
+                  disabled={revoked || revoking}
+                  className="min-h-11 rounded-full border border-red-300/25 px-5 py-2 text-sm text-red-100 disabled:opacity-40"
+                >
+                  {revoking
+                    ? (isEnglish ? "Revoking…" : "Révocation…")
+                    : (isEnglish ? "Revoke this link" : "Révoquer ce lien")}
+                </button>
+              </div>
             </div>
           ) : null}
         </section>
