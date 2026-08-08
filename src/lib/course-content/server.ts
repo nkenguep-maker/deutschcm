@@ -22,13 +22,19 @@ export type CourseViewer = {
   }>;
 };
 
-export async function loadCourseViewer(courseId: string, locale: string): Promise<CourseViewer> {
+export async function loadCourseViewer(
+  courseId: string,
+  locale: string,
+  returnPath = `/${locale}/learn/${courseId}`,
+): Promise<CourseViewer> {
   const course = getCourseContent(courseId);
   if (!course) redirect(`/${locale}/dashboard`);
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(`/${locale}/login`);
+  if (!user) {
+    redirect(`/${locale}/login?next=${encodeURIComponent(returnPath)}`);
+  }
 
   const dbUser = await prisma.user.findUnique({
     where: { supabaseId: user.id },
