@@ -31,13 +31,16 @@ describe("closed beta admission", () => {
     expect(proxy).toContain("status: 403");
   });
 
-  it("keeps only auth, beta and QA bootstrap APIs outside the admission wall", () => {
+  it("keeps only exact auth/beta bootstrap APIs plus QA outside the admission wall", () => {
     const proxy = read("src/proxy.ts");
 
-    expect(proxy).toContain('"/api/auth/"');
-    expect(proxy).toContain('"/api/beta/"');
-    expect(proxy).toContain('"/api/qa/"');
+    expect(proxy).toContain('"/api/auth/sync"');
+    expect(proxy).toContain('"/api/beta/accept"');
+    expect(proxy).toContain('pathname.startsWith("/api/qa/")');
+    expect(proxy).not.toContain('"/api/auth/",');
+    expect(proxy).not.toContain('"/api/beta/",');
     expect(proxy).not.toContain('"/api/admin/"');
+    expect(proxy).toContain("isClosedBetaApiBypass(pathname)");
   });
 
   it("preserves beta_access when role metadata is synchronized", () => {
