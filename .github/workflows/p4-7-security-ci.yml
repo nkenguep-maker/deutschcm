@@ -61,6 +61,7 @@ jobs:
           src/lib/__tests__/groupBetaHardening.test.ts
           src/lib/__tests__/groupLocalizationSurface.test.ts
           src/lib/__tests__/i18nLayoutPerformance.test.ts
+          src/lib/__tests__/legalSurfaceAccuracy.test.ts
           src/lib/__tests__/personasCanonicalRoutes.test.ts
           src/lib/__tests__/personaOnboardingFlow.test.ts
           src/lib/__tests__/publicPricingBetaGate.test.ts
