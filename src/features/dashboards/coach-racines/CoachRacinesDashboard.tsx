@@ -67,7 +67,7 @@ export function CoachRacinesDashboard({ locale, activeSectionId = "accueil" }: P
     { key: "sessionNotes", label: t("mobileNav.sessionNotes"), href: `${baseHref}#notes` },
   ];
   const tabs = routeSectionTabs(rawTabs, baseHref, "accueil");
-  const activeTab = ({ accueil: "overview", "seances-du-jour": "overview", apprenants: "learners", seances: "sessions", messages: "messages", notes: "sessionNotes" } as Record<string, string>)[activeSection];
+  const activeTab = ({ accueil: "overview", "seances-du-jour": "sessions", apprenants: "learners", seances: "sessions", messages: "messages", notes: "sessionNotes" } as Record<string, string>)[activeSection];
   const tabBar = <DashboardTabBar tabs={tabs} activeKey={activeTab} />;
   const shell = (body: React.ReactNode, header: React.ReactNode) => <DashboardPageBoundary><DashboardShell universe="racines" sidebar={sidebar} mobileHeader={mobileHeader} tabBar={tabBar} header={header}>{body}</DashboardShell></DashboardPageBoundary>;
 
@@ -79,11 +79,12 @@ export function CoachRacinesDashboard({ locale, activeSectionId = "accueil" }: P
   const greeting = data.profile.fullName?.trim().split(/\s+/)[0] || personaLabel;
   const meta = data.profile.city ? `${counts} · ${data.profile.city}` : counts;
   const overview = <CoachOverviewSection stats={data.stats} />;
+  const sessions = <CoachSessionsSection learners={learners} />;
   const content: Record<string, React.ReactNode> = {
     accueil: overview,
-    "seances-du-jour": overview,
+    "seances-du-jour": sessions,
     apprenants: <CoachLearnersSection learners={learners} loading={false} baseHref={baseHref} />,
-    seances: <CoachSessionsSection />,
+    seances: sessions,
     messages: <CoachMessagesSection />,
     notes: <CoachSessionNotesSection />,
   };
