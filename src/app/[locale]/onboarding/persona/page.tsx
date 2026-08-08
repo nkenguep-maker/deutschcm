@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/navigation";
 import { useState } from "react";
 import { BrandY } from "@/components/brand/BrandY";
@@ -75,6 +76,12 @@ export default function PersonaOnboardingPage() {
   const locale = useLocale();
   const loc = locale === "en" ? "en" : "fr";
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedPlan = searchParams.get("plan");
+  const selectedAddon = searchParams.get("addon");
+  const teacherAddonRequested = searchParams.get("prof") === "1";
+  const postOnboardingNext = searchParams.get("next");
+  const hasOfferIntent = Boolean(selectedPlan || selectedAddon || teacherAddonRequested);
   const [loading, setLoading] = useState<AdultPersonaId | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -85,7 +92,13 @@ export default function PersonaOnboardingPage() {
       const response = await fetch("/api/onboarding/persona", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ persona }),
+        body: JSON.stringify({
+          persona,
+          selectedPlan,
+          selectedAddon,
+          teacherAddonRequested,
+          postOnboardingNext,
+        }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || typeof data.redirectTo !== "string") {
@@ -116,6 +129,16 @@ export default function PersonaOnboardingPage() {
             ? "This choice determines your onboarding and the dashboard you will reopen every time you sign in."
             : "Ce choix détermine votre onboarding et le dashboard que vous retrouverez à chaque connexion."}
         </p>
+        {hasOfferIntent ? (
+          <div className="entry-context" role="note">
+            <span className="entry-context-dot" aria-hidden="true" />
+            <span className="entry-context-text">
+              {loc === "en"
+                ? "Your pricing selection is still attached to this account. No payment is triggered during onboarding."
+                : "Votre choix tarifaire reste attaché à ce compte. Aucun paiement n’est déclenché pendant l’onboarding."}
+            </span>
+          </div>
+        ) : null}
       </header>
 
       {error ? <p className="entry-err" role="alert">{error}</p> : null}
