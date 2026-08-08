@@ -39,17 +39,8 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Detect lockfile drift
-        id: lockfile
-        continue-on-error: true
-        run: npm ci --ignore-scripts --dry-run
-
-      - name: Report lockfile drift
-        if: steps.lockfile.outcome == 'failure'
-        run: echo 'package-lock.json is out of sync with package.json; using npm install for this security validation. Lock repair remains required before release.'
-
-      - name: Install dependencies for validation
-        run: npm install --no-audit --no-fund
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
 
       - name: Generate Prisma client
         run: npx prisma generate
@@ -57,7 +48,7 @@ jobs:
       - name: TypeScript
         run: npx tsc --noEmit
 
-      - name: P4.7 and persona structural tests
+      - name: P4.7, beta and persona structural tests
         run: >-
           npx vitest run
           src/lib/__tests__/socialNotificationAuthorization.test.ts
@@ -69,6 +60,7 @@ jobs:
           src/lib/__tests__/classroomJoinHardening.test.ts
           src/lib/__tests__/groupBetaHardening.test.ts
           src/lib/__tests__/personasCanonicalRoutes.test.ts
+          src/lib/__tests__/publicPricingBetaGate.test.ts
 
       - name: Verify CI uses only placeholder infrastructure
         shell: bash
