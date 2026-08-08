@@ -10,6 +10,13 @@ const migration = readFileSync(
   ),
   "utf8",
 );
+const realtimeInitplanMigration = readFileSync(
+  resolve(
+    REPO,
+    "prisma/migrations/20260808094837_p4_7_realtime_rls_initplan/migration.sql",
+  ),
+  "utf8",
+);
 const executableSql = migration
   .split("\n")
   .filter((line) => !line.trimStart().startsWith("--"))
@@ -44,6 +51,20 @@ describe("P4.7 · RLS identity hardening", () => {
     expect(migration).toContain("private.messaging_can_access_conversation(");
     expect(migration).toContain("private.messaging_is_inbox_owner(");
     expect(migration).toContain("private.messaging_topic_kind(realtime.topic())");
+  });
+
+  it("caches Realtime auth.uid per statement without changing policy scope", () => {
+    expect(realtimeInitplanMigration).toContain(
+      'DROP POLICY IF EXISTS "messaging_realtime_presence_send_authorized"',
+    );
+    expect(realtimeInitplanMigration).toContain(
+      'DROP POLICY IF EXISTS "messaging_realtime_receive_authorized"',
+    );
+    expect(realtimeInitplanMigration).toContain("(SELECT auth.uid())");
+    expect(realtimeInitplanMigration).toContain("private.messaging_can_access_conversation(");
+    expect(realtimeInitplanMigration).toContain("private.messaging_is_inbox_owner(");
+    expect(realtimeInitplanMigration).toContain("TO authenticated");
+    expect(realtimeInitplanMigration).not.toMatch(/(?<!SELECT )auth\.uid\(\)/);
   });
 
   it("keeps child profiles deny-by-default instead of relying on auth.role", () => {
