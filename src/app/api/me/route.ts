@@ -83,6 +83,9 @@ export async function GET() {
   const supportedLanguages = Array.isArray(user.user_metadata?.supportedLanguages)
     ? (user.user_metadata.supportedLanguages as string[])
     : [activeLanguage];
+  const selectedAddons = Array.isArray(user.user_metadata?.selected_addons)
+    ? user.user_metadata.selected_addons.filter((value: unknown): value is string => typeof value === "string")
+    : [];
 
   return NextResponse.json({
     id: dbUser.id,
@@ -104,6 +107,11 @@ export async function GET() {
     onboardingDone: dbUser.onboardingDone,
     activeLanguage,
     supportedLanguages,
+    selectedPlan: typeof user.user_metadata?.selected_plan === "string"
+      ? user.user_metadata.selected_plan
+      : null,
+    selectedAddons,
+    teacherAddonRequested: user.user_metadata?.teacher_addon_requested === true,
     cap: (user.user_metadata?.cap as string | undefined) ?? null,
     personalGoal: (user.user_metadata?.personalGoal as string | undefined) ?? null,
     availability: (user.user_metadata?.availability as string | undefined) ?? null,
