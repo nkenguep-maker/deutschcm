@@ -24,6 +24,11 @@ import { resolveFamilyGuardianActorOrNull } from "@/lib/family/actor";
 import { prisma } from "@/lib/prisma";
 import { verifyChildPin } from "@/lib/security/childPin";
 import {
+  childPinRateLimitConfig,
+  isChildPinRateLimited,
+  recordInvalidChildPinAttempt,
+} from "@/lib/security/childPinRateLimit";
+import {
   CHILD_SESSION_COOKIE_NAME,
   CHILD_SESSION_TTL_SECONDS,
   encodeChildSession,
@@ -34,6 +39,14 @@ export const dynamic = "force-dynamic";
 
 function err(code: string, status: number) {
   return NextResponse.json({ error: code }, { status });
+}
+
+function pinRateLimited() {
+  const retryAfter = childPinRateLimitConfig().windowMinutes * 60;
+  return NextResponse.json(
+    { error: "PIN_RATE_LIMITED" },
+    { status: 429, headers: { "Retry-After": String(retryAfter) } },
+  );
 }
 
 export async function POST(req: NextRequest) {
@@ -61,8 +74,16 @@ export async function POST(req: NextRequest) {
   if (!child) return err("NOT_FOUND", 404);
   if (!child.pinHash) return err("PIN_NOT_SET", 409);
 
+  // P4.7 · limite distribuée par parent + enfant. Les échecs sont comptés
+  // dans AuditEvent, jamais dans un compteur mémoire serverless.
+  if (await isChildPinRateLimited(actor.userId, child.id)) return pinRateLimited();
+
   const ok = await verifyChildPin(pin, child.pinHash);
-  if (!ok) return err("PIN_INVALID", 401);
+  if (!ok) {
+    const limited = await recordInvalidChildPinAttempt(actor.userId, child.id);
+    if (limited) return pinRateLimited();
+    return err("PIN_INVALID", 401);
+  }
 
   // 4. Émission cookie signé · version PIN incluse (Lot 5.1) pour
   // invalider automatiquement toute session antérieure après changement.
