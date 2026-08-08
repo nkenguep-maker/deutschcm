@@ -95,12 +95,19 @@ export async function POST(request: NextRequest) {
     select: { id: true, supabaseId: true },
   });
   if (existing) {
+    let previousBetaAccess: boolean | null = null;
     try {
-      await setBetaAccess({ supabaseId: existing.supabaseId, enabled: true });
+      previousBetaAccess = await setBetaAccess({ supabaseId: existing.supabaseId, enabled: true });
       await finalizeBetaInvitation({ invitationId: claim.id, acceptedByUserId: existing.id });
       return NextResponse.json({ ok: true, status: "existing" });
     } catch (error) {
       console.error("[beta/accept] existing account admission failed", error);
+      if (previousBetaAccess !== null) {
+        await setBetaAccess({
+          supabaseId: existing.supabaseId,
+          enabled: previousBetaAccess,
+        }).catch(() => undefined);
+      }
       await releaseBetaInvitationClaim(claim.id).catch(() => undefined);
       return NextResponse.json({ error: "Unable to activate invitation" }, { status: 409 });
     }
