@@ -57,6 +57,7 @@ jobs:
           src/lib/__tests__/childPinRateLimit.test.ts
           src/lib/__tests__/requestOrigin.test.ts
           src/lib/__tests__/rlsIdentityHardening.test.ts
+          src/lib/__tests__/rlsPolicyConsolidation.test.ts
           src/lib/__tests__/classroomJoinHardening.test.ts
           src/lib/__tests__/groupBetaHardening.test.ts
           src/lib/__tests__/personasCanonicalRoutes.test.ts
