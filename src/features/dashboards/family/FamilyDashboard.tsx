@@ -20,7 +20,6 @@ import { FamilyChildrenSection } from "./sections/FamilyChildrenSection";
 import { FamilyProgressionSection } from "./sections/FamilyProgressionSection";
 import { FamilySessionsSection } from "./sections/FamilySessionsSection";
 import { FamilyMessagesSection } from "./sections/FamilyMessagesSection";
-import { FamilyPaymentsSection } from "./sections/FamilyPaymentsSection";
 import { FamilySettingsSection } from "./sections/FamilySettingsSection";
 import type { FamilyDashboardResponse } from "./types";
 import type { FamilyChildActionsCopy } from "./FamilyChildActions";
@@ -33,7 +32,7 @@ async function fetchDashboard(): Promise<FamilyDashboardResponse> {
 
 type LoadState = { kind: "loading" } | { kind: "error" } | { kind: "ready"; data: FamilyDashboardResponse };
 type Props = { locale: "fr" | "en"; activeSectionId?: string };
-const ALLOWED = new Set(["accueil", "enfants", "progression", "activite-prioritaire", "histoires-jeux", "seances", "paiements", "messages", "parametres"]);
+const ALLOWED = new Set(["accueil", "enfants", "progression", "activite-prioritaire", "histoires-jeux", "seances", "messages", "parametres"]);
 
 export function FamilyDashboard({ locale, activeSectionId = "accueil" }: Props) {
   const t = useTranslations("yemaDashboards.family");
@@ -66,9 +65,9 @@ export function FamilyDashboard({ locale, activeSectionId = "accueil" }: Props) 
 
   const personaLabel = t("personaLabel");
   const personaSubtitle = t("personaSubtitle");
-  const navGroups = routeSectionNav(buildFamilyNav({ overview: t("nav.overview"), children: t("nav.children"), progression: t("nav.progression"), sessions: t("nav.sessions"), messages: t("nav.messages"), payments: t("nav.payments"), settings: t("nav.settings"), sectionLabel: t("sidebarSection") }, baseHref), baseHref, "accueil");
-  const mobileTabs = routeSectionTabs(buildFamilyMobileTabs({ overview: t("mobileNav.overview"), children: t("mobileNav.children"), progression: t("mobileNav.progression"), payments: t("mobileNav.payments"), messages: t("mobileNav.messages") }, baseHref), baseHref, "accueil");
-  const activeTab = ({ accueil: "overview", enfants: "children", progression: "progression", "activite-prioritaire": "progression", "histoires-jeux": "progression", seances: "overview", paiements: "payments", messages: "messages", parametres: "overview" } as Record<string, string>)[activeSection];
+  const navGroups = routeSectionNav(buildFamilyNav({ overview: t("nav.overview"), children: t("nav.children"), progression: t("nav.progression"), sessions: t("nav.sessions"), messages: t("nav.messages"), settings: t("nav.settings"), sectionLabel: t("sidebarSection") }, baseHref), baseHref, "accueil");
+  const mobileTabs = routeSectionTabs(buildFamilyMobileTabs({ overview: t("mobileNav.overview"), children: t("mobileNav.children"), progression: t("mobileNav.progression"), messages: t("mobileNav.messages") }, baseHref), baseHref, "accueil");
+  const activeTab = ({ accueil: "overview", enfants: "children", progression: "progression", "activite-prioritaire": "progression", "histoires-jeux": "progression", seances: "overview", messages: "messages", parametres: "overview" } as Record<string, string>)[activeSection];
   const sidebar = <DashboardSidebar groups={navGroups} activeHref={activeHref} personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${currentLocale ?? locale}`} previewBadge={tCommon("previewBadge")} />;
   const mobileHeader = <DashboardMobileHeader personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${currentLocale ?? locale}`} />;
   const tabBar = <DashboardTabBar tabs={mobileTabs} activeKey={activeTab} />;
@@ -87,7 +86,6 @@ export function FamilyDashboard({ locale, activeSectionId = "accueil" }: Props) 
     "histoires-jeux": progression,
     seances: <FamilySessionsSection />,
     messages: <FamilyMessagesSection />,
-    paiements: <FamilyPaymentsSection seats={data.seats} />,
     parametres: <FamilySettingsSection />,
   };
   const metaText = t("meta", { count: data.totalChildrenLinked });

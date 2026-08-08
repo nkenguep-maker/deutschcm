@@ -37,7 +37,7 @@ type LoadState =
   | { kind: "error" }
   | { kind: "ready"; data: CenterDashboardResponse; students: CenterStudentRow[]; teachers: CenterTeacherRow[]; classes: CenterClassRow[]; partialErrors: { students: boolean; teachers: boolean; classes: boolean } };
 type Props = { locale: "fr" | "en"; activeSectionId?: string };
-const ALLOWED = new Set(["centre", "a-traiter", "eleves", "enseignants", "classes", "facturation", "factures", "messages", "parametres"]);
+const ALLOWED = new Set(["centre", "a-traiter", "eleves", "enseignants", "classes", "messages", "parametres"]);
 
 export function CenterDashboard({ locale, activeSectionId = "centre" }: Props) {
   const t = useTranslations("yemaDashboards.center");
@@ -64,9 +64,9 @@ export function CenterDashboard({ locale, activeSectionId = "centre" }: Props) {
 
   const personaLabel = t("personaLabel");
   const personaSubtitle = t("personaSubtitle");
-  const navGroups = routeSectionNav(buildCenterNav({ overview: t("nav.overview"), students: t("nav.students"), teachers: t("nav.teachers"), classes: t("nav.classes"), billing: t("nav.billing"), messages: t("nav.messages"), settings: t("nav.settings"), sectionLabel: t("sidebarSection") }, baseHref), baseHref, "centre");
-  const mobileTabs = routeSectionTabs(buildCenterMobileTabs({ overview: t("mobileNav.overview"), students: t("mobileNav.students"), classes: t("mobileNav.classes"), billing: t("mobileNav.billing"), messages: t("mobileNav.messages") }, baseHref), baseHref, "centre");
-  const activeTab = ({ centre: "overview", "a-traiter": "overview", eleves: "students", enseignants: "overview", classes: "classes", facturation: "billing", factures: "billing", messages: "messages", parametres: "overview" } as Record<string, string>)[activeSection];
+  const navGroups = routeSectionNav(buildCenterNav({ overview: t("nav.overview"), students: t("nav.students"), teachers: t("nav.teachers"), classes: t("nav.classes"), messages: t("nav.messages"), settings: t("nav.settings"), sectionLabel: t("sidebarSection") }, baseHref), baseHref, "centre");
+  const mobileTabs = routeSectionTabs(buildCenterMobileTabs({ overview: t("mobileNav.overview"), students: t("mobileNav.students"), classes: t("mobileNav.classes"), messages: t("mobileNav.messages") }, baseHref), baseHref, "centre");
+  const activeTab = ({ centre: "overview", "a-traiter": "overview", eleves: "students", enseignants: "overview", classes: "classes", messages: "messages", parametres: "overview" } as Record<string, string>)[activeSection];
   const sidebar = <DashboardSidebar groups={navGroups} activeHref={activeHref} personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${currentLocale ?? locale}`} previewBadge={tCommon("previewBadge")} />;
   const mobileHeader = <DashboardMobileHeader personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${currentLocale ?? locale}`} />;
   const tabBar = <DashboardTabBar tabs={mobileTabs} activeKey={activeTab} />;
@@ -100,7 +100,6 @@ export function CenterDashboard({ locale, activeSectionId = "centre" }: Props) {
   const studentRows = students.length === 0 ? <DashboardCard><DashboardEmptyState title={t("students.empty")} /></DashboardCard> : <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 }}>{students.map((student) => <li key={student.id}><DashboardCard><div style={{ fontWeight: 600 }}>{student.fullName?.trim() || t("students.empty")}</div>{student.level ? <div style={{ marginTop: 5 }}><DashboardStatusChip tone="muted">{t("students.levelLabel", { level: student.level })}</DashboardStatusChip></div> : null}</DashboardCard></li>)}</ul>;
   const teacherRows = teachers.length === 0 ? <DashboardCard><DashboardEmptyState title={t("teachers.empty")} /></DashboardCard> : <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 }}>{teachers.map((teacher) => <li key={teacher.id}><DashboardCard><div style={{ fontWeight: 600 }}>{teacher.fullName?.trim() || t("teachers.empty")}</div></DashboardCard></li>)}</ul>;
   const classRows = classes.length === 0 ? <DashboardCard><DashboardEmptyState title={t("classes.empty")} /></DashboardCard> : <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 }}>{classes.map((item) => <li key={item.id}><DashboardCard><div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}><div style={{ flex: 1 }}><div style={{ fontWeight: 600 }}>{item.name?.trim() || t("classes.empty")}</div><div style={{ marginTop: 5, display: "flex", gap: 6 }}>{item.level ? <DashboardStatusChip tone="muted">{t("classes.levelLabel", { level: item.level })}</DashboardStatusChip> : null}<DashboardStatusChip tone="neutral">{t("classes.studentsCount", { count: item.activeStudentCount })}</DashboardStatusChip></div></div>{item.name?.trim() ? <Link href={`${baseHref}/classes/${item.id}`} style={{ color: "var(--yema-gold-light)", textDecoration: "none" }}>{t("classes.openClass")}</Link> : null}</div></DashboardCard></li>)}</ul>;
-  const billing = <section id="facturation" style={{ display: "grid", gap: 12 }}><DashboardSectionHeader title={t("billing.title")} description={t("billing.description")} /><DashboardCard><DashboardEmptyState title={t("billing.notWired")} description={t("billing.empty")} /></DashboardCard></section>;
   const messages = <section id="messages" style={{ display: "grid", gap: 12 }}><DashboardSectionHeader title={t("messages.title")} /><DashboardCard><DashboardEmptyState title={t("messages.soon")} /></DashboardCard></section>;
   const settings = <section id="parametres" style={{ display: "grid", gap: 12 }}><DashboardSectionHeader title={t("settings.title")} description={t("settings.description")} /><DashboardCard><DashboardEmptyState title={t("settings.empty")} /></DashboardCard></section>;
   const content: Record<string, React.ReactNode> = {
@@ -109,8 +108,6 @@ export function CenterDashboard({ locale, activeSectionId = "centre" }: Props) {
     eleves: listSection("eleves", t("students.title"), t("students.description"), partialErrors.students, t("students.loadFailed"), studentRows),
     enseignants: listSection("enseignants", t("teachers.title"), t("teachers.description"), partialErrors.teachers, t("teachers.loadFailed"), teacherRows),
     classes: listSection("classes", t("classes.title"), t("classes.description"), partialErrors.classes, t("classes.loadFailed"), classRows),
-    facturation: billing,
-    factures: billing,
     messages,
     parametres: settings,
   };

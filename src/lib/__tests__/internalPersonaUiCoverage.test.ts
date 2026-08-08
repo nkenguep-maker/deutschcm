@@ -3,6 +3,9 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { INTERNAL_PERSONA_IDS } from "@/lib/internalPersona";
 import { INTERNAL_PERSONA_UI_CONTRACTS } from "@/features/dashboards/internal-test/contracts";
+import { PUBLIC_SURFACE } from "@/lib/release/publicSurface";
+import { sanitizeInternalNext } from "@/lib/authRedirect";
+import { computeMondeAccess } from "@/lib/monde";
 
 const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
@@ -69,5 +72,40 @@ describe("Persona dashboards · dedicated pages", () => {
     expect(sectionPreview).toContain('process.env.VERCEL_ENV === "production"');
     expect(audit).toContain("data-persona-active-section");
     expect(audit).toContain("unexpectedSections");
+  });
+
+  it("keeps commercial surfaces out of the technical beta navigation", () => {
+    expect(PUBLIC_SURFACE.pricing.status).toBe("HIDDEN");
+    expect(PUBLIC_SURFACE.centers.status).toBe("PRIVATE");
+
+    const familyNav = read("src/features/dashboards/family/nav.ts");
+    const familyDashboard = read("src/features/dashboards/family/FamilyDashboard.tsx");
+    expect(familyNav).not.toContain('key: "payments"');
+    expect(familyNav).not.toContain("#paiements");
+    expect(familyDashboard).not.toContain("FamilyPaymentsSection");
+    expect(familyDashboard).not.toContain('"paiements"');
+
+    const centerNav = read("src/features/dashboards/center/nav.ts");
+    const centerDashboard = read("src/features/dashboards/center/CenterDashboard.tsx");
+    expect(centerNav).not.toContain('key: "billing"');
+    expect(centerNav).not.toContain("#facturation");
+    expect(centerDashboard).not.toContain('"facturation"');
+    expect(centerDashboard).not.toContain('"factures"');
+
+    const register = read("src/app/[locale]/register/page.tsx");
+    expect(register).not.toContain('searchParams.get("plan")');
+    expect(register).not.toContain('searchParams.get("prof")');
+    expect(register).not.toContain("PLAN_LABEL_");
+  });
+
+  it("keeps auth returns internal and A1 beta access non-persistent", () => {
+    expect(sanitizeInternalNext("/fr/dashboard", "/fallback")).toBe("/fr/dashboard");
+    expect(sanitizeInternalNext("https://example.com", "/fallback")).toBe("/fallback");
+    expect(sanitizeInternalNext("//example.com", "/fallback")).toBe("/fallback");
+
+    const betaAccess = computeMondeAccess([], { technicalBetaA1: true });
+    expect(betaAccess.status).toBe("ACTIVE");
+    expect(betaAccess.level).toBe("A1");
+    expect(betaAccess.source).toBe("TECHNICAL_BETA");
   });
 });
