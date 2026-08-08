@@ -1,177 +1,217 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "@/navigation";
 import Layout from "@/components/Layout";
 
-interface Member { id: string; fullName: string; germanLevel: string | null; xpTotal: number; streakDays: number; }
-interface Group { id: string; name: string; code: string; level?: string; maxMembers: number; isPaid: boolean; creator: { fullName: string; germanLevel: string | null }; members: { user: Member }[]; }
-interface Me { studentType?: string; }
+interface Member {
+  id: string;
+  fullName: string;
+  germanLevel: string | null;
+  xpTotal: number;
+  streakDays: number;
+}
 
-const LEVEL_COLORS: Record<string, string> = { A1: "#10b981", A2: "#34d399", B1: "#6366f1", B2: "#8b5cf6", C1: "#f59e0b" };
+interface Group {
+  id: string;
+  name: string;
+  code: string;
+  level?: string | null;
+  maxMembers: number;
+  creator: { fullName: string; germanLevel: string | null };
+  members: { user: Member }[];
+}
+
+interface Me {
+  studentType?: string;
+  groupId?: string;
+}
+
+const LEVEL_COLORS: Record<string, string> = {
+  A1: "#10b981",
+  A2: "#34d399",
+  B1: "#6366f1",
+  B2: "#8b5cf6",
+  C1: "#f59e0b",
+  C2: "#f97316",
+};
 
 export default function GroupPage() {
   const [group, setGroup] = useState<Group | null>(null);
   const [me, setMe] = useState<Me | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
-  const [tab, setTab] = useState<"members" | "activity" | "leaderboard">("members");
+  const [tab, setTab] = useState<"members" | "leaderboard">("members");
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/me").then(r => r.ok ? r.json() : null),
-    ]).then(([meData]) => {
-      setMe(meData);
-      if (meData?.groupId) {
-        fetch(`/api/group?id=${meData.groupId}`).then(r => r.ok ? r.json() : null).then(d => {
-          if (d?.group) setGroup(d.group);
-        });
+    let cancelled = false;
+    async function load() {
+      try {
+        const meRes = await fetch("/api/me");
+        if (!meRes.ok) throw new Error("me_failed");
+        const meData = await meRes.json() as Me;
+        if (cancelled) return;
+        setMe(meData);
+
+        if (meData.groupId) {
+          const groupRes = await fetch(`/api/group?id=${encodeURIComponent(meData.groupId)}`);
+          if (groupRes.ok) {
+            const data = await groupRes.json();
+            if (!cancelled) setGroup(data.group ?? null);
+          } else if (groupRes.status !== 404) {
+            throw new Error("group_failed");
+          }
+        }
+      } catch {
+        if (!cancelled) setError("Impossible de charger le groupe pour le moment.");
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    }
+    load();
+    return () => { cancelled = true; };
   }, []);
 
-  const copyCode = () => {
+  const members = group?.members.map((m) => m.user) ?? [];
+  const leaderboard = useMemo(
+    () => [...members].sort((a, b) => b.xpTotal - a.xpTotal),
+    [members],
+  );
+  const isCreator = me?.studentType === "group_creator";
+
+  const copyCode = async () => {
     if (!group) return;
-    navigator.clipboard.writeText(group.code);
+    await navigator.clipboard.writeText(group.code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const isCreator = me?.studentType === "group_creator";
-  const members = group?.members.map(m => m.user) ?? [];
-  const sorted = [...members].sort((a, b) => b.xpTotal - a.xpTotal);
-
-  if (loading) return (
-    <Layout title="Mon Groupe">
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 300 }}>
-        <div style={{ color: "rgba(255,255,255,0.3)" }}>Chargement...</div>
-      </div>
-    </Layout>
-  );
-
-  if (!group) return (
-    <Layout title="Groupe d'étude">
-      <div style={{ maxWidth: 560, margin: "40px auto", textAlign: "center" }}>
-        <div style={{ fontSize: 52, marginBottom: 20 }}>👥</div>
-        <h2 style={{ color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 22, margin: "0 0 10px" }}>
-          Vous n'avez pas encore de groupe
-        </h2>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 28px", lineHeight: 1.6 }}>
-          Créez votre propre groupe d'étude ou rejoignez-en un avec le code d'un ami.
-        </p>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-          <Link href="/group/create" style={{ background: "#10b981", color: "#fff", borderRadius: 12, padding: "13px 24px", fontWeight: 700, fontSize: 14, textDecoration: "none" }}>
-            + Créer un groupe — 1.500 XAF/mois
-          </Link>
-          <Link href="/group/join" style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "13px 24px", fontWeight: 600, fontSize: 14, textDecoration: "none" }}>
-            Rejoindre →
-          </Link>
+  if (loading) {
+    return (
+      <Layout title="Groupe d'étude">
+        <div aria-busy="true" style={{ minHeight: 300, display: "grid", placeItems: "center", color: "rgba(255,255,255,0.55)" }}>
+          Chargement du groupe…
         </div>
-      </div>
-    </Layout>
-  );
+      </Layout>
+    );
+  }
 
-  const lc = group.level ? (LEVEL_COLORS[group.level] ?? "#10b981") : "#10b981";
+  if (!group) {
+    return (
+      <Layout title="Groupe d'étude">
+        <main style={{ maxWidth: 620, margin: "48px auto", textAlign: "center", padding: "0 16px" }}>
+          <div style={{ fontSize: 52, marginBottom: 18 }}>👥</div>
+          <h2 style={{ color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 22, margin: "0 0 10px" }}>
+            Vous n'avez pas encore de groupe
+          </h2>
+          <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 14, margin: "0 auto 24px", lineHeight: 1.7, maxWidth: 480 }}>
+            Créez un groupe de bêta ou rejoignez celui d'un ami avec son code privé. Aucun paiement n'est demandé pendant la bêta technique.
+          </p>
+          {error && (
+            <div role="alert" style={{ color: "#fca5a5", marginBottom: 18, fontSize: 13 }}>
+              {error}
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            <Link href="/group/create" style={{ minHeight: 44, display: "inline-flex", alignItems: "center", background: "#10b981", color: "#fff", borderRadius: 12, padding: "0 22px", fontWeight: 800, fontSize: 14, textDecoration: "none" }}>
+              + Créer un groupe
+            </Link>
+            <Link href="/group/join" style={{ minHeight: 44, display: "inline-flex", alignItems: "center", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.72)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "0 22px", fontWeight: 700, fontSize: 14, textDecoration: "none" }}>
+              Rejoindre avec un code →
+            </Link>
+          </div>
+        </main>
+      </Layout>
+    );
+  }
+
+  const accent = group.level ? (LEVEL_COLORS[group.level] ?? "#10b981") : "#10b981";
+  const displayed = tab === "leaderboard" ? leaderboard : members;
 
   return (
     <Layout title={group.name}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');`}</style>
 
-      {/* Header */}
-      <div style={{ background: "rgba(13,17,23,0.85)", border: `1px solid ${lc}20`, borderTop: `3px solid ${lc}`, borderRadius: 16, padding: "24px 28px", marginBottom: 24 }}>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
-          <div style={{ flex: "1 1 240px", minWidth: 0 }}>
-            <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-              {group.level && <span style={{ background: `${lc}20`, color: lc, border: `1px solid ${lc}40`, borderRadius: 6, padding: "2px 9px", fontSize: 11, fontWeight: 800 }}>{group.level}</span>}
-              {isCreator && <span style={{ background: "rgba(99,102,241,0.15)", color: "#a5b4fc", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 6, padding: "2px 9px", fontSize: 11, fontWeight: 700 }}>👑 Chef de groupe</span>}
-            </div>
-            <h1 style={{ margin: "0 0 6px", color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 22, overflowWrap: "anywhere" }}>{group.name}</h1>
-            <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, overflowWrap: "anywhere" }}>
-              {members.length} / {group.maxMembers} membres · Créé par {group.creator.fullName}
-            </div>
-          </div>
-
-          {isCreator && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
-              <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 10, padding: "10px 14px", textAlign: "center" }}>
-                <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 10, marginBottom: 4 }}>Code du groupe</div>
-                <div style={{ color: "#10b981", fontFamily: "monospace", fontWeight: 700, fontSize: 14, letterSpacing: "0.05em" }}>{group.code}</div>
+      <main style={{ maxWidth: 920, margin: "0 auto" }}>
+        <section style={{ background: "rgba(13,17,23,0.86)", border: `1px solid ${accent}22`, borderTop: `3px solid ${accent}`, borderRadius: 16, padding: "22px 24px", marginBottom: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 18, flexWrap: "wrap", alignItems: "flex-start" }}>
+            <div style={{ minWidth: 0, flex: "1 1 260px" }}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+                {group.level && (
+                  <span style={{ background: `${accent}20`, color: accent, border: `1px solid ${accent}42`, borderRadius: 6, padding: "3px 9px", fontSize: 11, fontWeight: 800 }}>
+                    {group.level}
+                  </span>
+                )}
+                <span style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.62)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, padding: "3px 9px", fontSize: 11, fontWeight: 700 }}>
+                  Bêta technique
+                </span>
+                {isCreator && (
+                  <span style={{ background: "rgba(99,102,241,0.15)", color: "#c7d2fe", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 6, padding: "3px 9px", fontSize: 11, fontWeight: 700 }}>
+                    Créateur
+                  </span>
+                )}
               </div>
-              <button onClick={copyCode} style={{ background: copied ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.04)", color: copied ? "#10b981" : "rgba(255,255,255,0.4)", border: `1px solid ${copied ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, padding: "7px 14px", fontSize: 12, cursor: "pointer", fontWeight: 600, transition: "all var(--dur-move)" }}>
-                {copied ? "✓ Copié" : "📋 Copier le code"}
-              </button>
+              <h1 style={{ margin: "0 0 6px", color: "#f1f5f9", fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 24, overflowWrap: "anywhere" }}>
+                {group.name}
+              </h1>
+              <p style={{ margin: 0, color: "rgba(255,255,255,0.52)", fontSize: 13 }}>
+                {members.length} / {group.maxMembers} membres · créé par {group.creator.fullName}
+              </p>
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Tabs */}
-      <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: 4, marginBottom: 20, border: "1px solid rgba(255,255,255,0.06)" }}>
-        {(["members", "leaderboard", "activity"] as const).map(t => {
-          const labels = { members: "👥 Membres", leaderboard: "🏆 Classement", activity: "⚡ Activité" };
-          return (
-            <button key={t} onClick={() => setTab(t)} style={{ flex: 1, padding: "9px 16px", borderRadius: 9, border: "none", cursor: "pointer", fontWeight: tab === t ? 700 : 400, fontSize: 13, background: tab === t ? "rgba(16,185,129,0.12)" : "transparent", color: tab === t ? "#10b981" : "rgba(255,255,255,0.4)", transition: "all var(--dur-touch)" }}>
-              {labels[t]}
+            {isCreator && (
+              <div style={{ minWidth: 190 }}>
+                <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 10, padding: "9px 12px", textAlign: "center", marginBottom: 8 }}>
+                  <div style={{ color: "rgba(255,255,255,0.38)", fontSize: 10, marginBottom: 4 }}>Code privé</div>
+                  <div style={{ color: "#10b981", fontFamily: "monospace", fontWeight: 800, fontSize: 14, letterSpacing: "0.05em" }}>
+                    {group.code}
+                  </div>
+                </div>
+                <button onClick={copyCode} style={{ width: "100%", minHeight: 44, background: "rgba(255,255,255,0.05)", color: copied ? "#10b981" : "rgba(255,255,255,0.68)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 9, cursor: "pointer", fontWeight: 700 }}>
+                  {copied ? "✓ Copié" : "Copier le code"}
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <nav aria-label="Vue du groupe" style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: 4, marginBottom: 16, border: "1px solid rgba(255,255,255,0.06)" }}>
+          {(["members", "leaderboard"] as const).map((item) => (
+            <button
+              key={item}
+              onClick={() => setTab(item)}
+              aria-pressed={tab === item}
+              style={{ flex: 1, minHeight: 44, borderRadius: 9, border: "none", cursor: "pointer", fontWeight: tab === item ? 800 : 600, background: tab === item ? "rgba(16,185,129,0.12)" : "transparent", color: tab === item ? "#10b981" : "rgba(255,255,255,0.55)" }}
+            >
+              {item === "members" ? "👥 Membres" : "🏆 Classement"}
             </button>
-          );
-        })}
-      </div>
+          ))}
+        </nav>
 
-      {/* Members */}
-      {tab === "members" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {members.map((m, i) => (
-            <div key={m.id} style={{ background: "rgba(13,17,23,0.8)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981", fontWeight: 700, fontSize: 13 }}>
-                {m.fullName.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()}
+        <section aria-label={tab === "members" ? "Membres" : "Classement"} style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+          {displayed.map((member, index) => (
+            <article key={member.id} style={{ background: index === 0 && tab === "leaderboard" ? "rgba(234,179,8,0.07)" : "rgba(13,17,23,0.8)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "13px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 38, height: 38, flexShrink: 0, borderRadius: "50%", display: "grid", placeItems: "center", background: "rgba(16,185,129,0.12)", color: "#10b981", fontWeight: 800, fontSize: 12 }}>
+                {tab === "leaderboard" && index < 3
+                  ? ["🥇", "🥈", "🥉"][index]
+                  : member.fullName.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ color: "#f1f5f9", fontWeight: 600, fontSize: 14, overflowWrap: "anywhere" }}>{m.fullName} {i === 0 && isCreator ? <span style={{ fontSize: 11, color: "#f59e0b" }}>👑</span> : ""}</div>
-                <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 2 }}>{m.germanLevel ?? "?"} · {m.streakDays}🔥</div>
+                <div style={{ color: "#f1f5f9", fontWeight: 700, fontSize: 14, overflowWrap: "anywhere" }}>
+                  {member.fullName}
+                </div>
+                <div style={{ color: "rgba(255,255,255,0.36)", fontSize: 11, marginTop: 2 }}>
+                  {member.germanLevel ?? "Niveau non renseigné"} · {member.streakDays} jour{member.streakDays === 1 ? "" : "s"} de série
+                </div>
               </div>
-              <div style={{ color: "#10b981", fontWeight: 700, fontSize: 13, flexShrink: 0 }}>{m.xpTotal.toLocaleString()} XP</div>
-            </div>
+              <div style={{ color: "#10b981", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>
+                {member.xpTotal.toLocaleString()} XP
+              </div>
+            </article>
           ))}
-          {members.length < (group.maxMembers) && isCreator && (
-            <div style={{ background: "rgba(16,185,129,0.04)", border: "1px dashed rgba(16,185,129,0.2)", borderRadius: 12, padding: "20px", textAlign: "center" }}>
-              <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 13, marginBottom: 10 }}>
-                {group.maxMembers - members.length} place{group.maxMembers - members.length > 1 ? "s" : ""} disponible{group.maxMembers - members.length > 1 ? "s" : ""}
-              </div>
-              <button onClick={copyCode} style={{ background: "rgba(16,185,129,0.1)", color: "#10b981", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "8px 18px", cursor: "pointer", fontSize: 13, fontWeight: 600 }}>
-                Partager le code : {group.code}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Leaderboard */}
-      {tab === "leaderboard" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {sorted.map((m, i) => (
-            <div key={m.id} style={{ background: i === 0 ? "rgba(234,179,8,0.08)" : "rgba(13,17,23,0.8)", border: `1px solid ${i === 0 ? "rgba(234,179,8,0.2)" : "rgba(255,255,255,0.06)"}`, borderRadius: 12, padding: "12px 18px", display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 28, textAlign: "center", color: i === 0 ? "#eab308" : i === 1 ? "#94a3b8" : i === 2 ? "#b45309" : "rgba(255,255,255,0.3)", fontWeight: 700, fontSize: 14 }}>
-                {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ color: "#f1f5f9", fontWeight: 600, fontSize: 13 }}>{m.fullName}</div>
-                <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>{m.germanLevel ?? "?"} · {m.streakDays}🔥 streak</div>
-              </div>
-              <div style={{ color: "#10b981", fontWeight: 700, fontSize: 14 }}>{m.xpTotal.toLocaleString()} XP</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Activity */}
-      {tab === "activity" && (
-        <div style={{ background: "rgba(13,17,23,0.8)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: 24, textAlign: "center" }}>
-          <div style={{ fontSize: 36, marginBottom: 12 }}>⚡</div>
-          <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>Le fil d'activité sera disponible prochainement</div>
-          <div style={{ color: "rgba(255,255,255,0.2)", fontSize: 12, marginTop: 6 }}>Sessions d'étude, quiz complétés, badges obtenus...</div>
-        </div>
-      )}
+        </section>
+      </main>
     </Layout>
   );
 }
