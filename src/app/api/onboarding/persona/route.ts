@@ -40,7 +40,7 @@ function compatibleOfferIntent(params: {
   if (params.persona === "student_racines") {
     return {
       selectedPlan: rawPlan === "racines-solo" && ROOTS_PLANS.has(rawPlan) ? rawPlan : null,
-      selectedAddon: null,
+      selectedAddon: params.rawAddon === "roots-coach" ? "roots-coach" : null,
       teacherAddonRequested: false,
     } as const;
   }
@@ -48,7 +48,7 @@ function compatibleOfferIntent(params: {
   if (params.persona === "family") {
     return {
       selectedPlan: rawPlan === "racines-famille" && ROOTS_PLANS.has(rawPlan) ? rawPlan : null,
-      selectedAddon: null,
+      selectedAddon: params.rawAddon === "roots-coach" ? "roots-coach" : null,
       teacherAddonRequested: false,
     } as const;
   }
@@ -133,6 +133,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       persona,
       selectedPlan: offer.selectedPlan,
+      selectedAddons: offer.selectedAddon ? [offer.selectedAddon] : [],
       redirectTo: "/onboarding/family",
     });
   }
