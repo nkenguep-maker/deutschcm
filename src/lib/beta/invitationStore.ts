@@ -8,6 +8,8 @@ export interface StoredBetaInvitation {
   expiresAt: Date;
 }
 
+const STALE_CLAIM_MS = 10 * 60 * 1000;
+
 export async function storeBetaInvitation(params: {
   token: string;
   email: string;
@@ -39,6 +41,26 @@ export async function claimBetaInvitation(params: {
     select: { id: true },
   });
   if (!invitation) return null;
+
+  // A server crash after claiming but before finalization must not permanently
+  // burn a valid invitation. Only incomplete claims older than 10 minutes can
+  // be returned to PENDING, and only for the same token/email pair.
+  await prisma.betaInvitation.updateMany({
+    where: {
+      id: invitation.id,
+      tokenHash,
+      emailHash,
+      status: "ACCEPTED",
+      acceptedByUserId: null,
+      revokedAt: null,
+      acceptedAt: { lte: new Date(now.getTime() - STALE_CLAIM_MS) },
+      expiresAt: { gt: now },
+    },
+    data: {
+      status: "PENDING",
+      acceptedAt: null,
+    },
+  });
 
   const claim = await prisma.betaInvitation.updateMany({
     where: {
