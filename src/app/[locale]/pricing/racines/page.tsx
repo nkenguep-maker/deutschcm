@@ -129,8 +129,8 @@ export default function PricingRacinesPage() {
           <div className="maison-container">
             <p className="pricing-founders">
               {loc === "fr"
-                ? "Votre choix d’offre est conservé à l’inscription. Aucun paiement n’est déclenché aujourd’hui ; les moyens de paiement seront connectés ultérieurement."
-                : "Your offer choice is carried into registration. No payment is triggered today; payment methods will be connected later."}
+                ? "Lorsque l’inscription est ouverte, votre choix d’offre est transmis au parcours. Pendant la bêta fermée, l’accès reste sur invitation. Aucun paiement n’est déclenché aujourd’hui."
+                : "When registration is open, your offer choice is carried into the flow. During the closed beta, access remains invitation-only. No payment is triggered today."}
             </p>
           </div>
         </section>
