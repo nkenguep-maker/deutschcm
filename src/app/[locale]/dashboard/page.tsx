@@ -1,7 +1,7 @@
-// /dashboard · aiguillage par univers (P2, étendu P3).
-// Server component qui charge le LearningPath actif de l'utilisateur et
-// route Monde / Racines. En mode test interne Production, le persona actif
-// rend un jeu de démonstration complet et isolé du parcours réel.
+// /dashboard · student dashboard dispatcher.
+// Child sessions and P-1 internal personas are resolved first. Adult accounts
+// are then checked against the canonical persona runtime so Family, Coach,
+// Teacher, Center and Admin never fall through to an unrelated learner space.
 
 import { cookies } from "next/headers";
 import { redirect } from "@/navigation";
@@ -24,6 +24,7 @@ import {
   isInternalTesterEmail,
 } from "@/lib/internalTest";
 import { hasInternalTestMarker } from "@/lib/internalTestProvisioning";
+import { resolvePersonaRuntime } from "@/lib/personas/runtime";
 
 interface Props { params: Promise<{ locale: string }> }
 
@@ -86,11 +87,24 @@ export default async function DashboardPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) { redirect({ href: "/login", locale }); return null; }
 
+  const runtime = await resolvePersonaRuntime({
+    supabaseId: user.id,
+    requestedPersona: user.user_metadata?.requested_persona,
+  });
+  if (runtime.persona && runtime.persona !== "student_monde" && runtime.persona !== "student_racines") {
+    redirect({ href: runtime.onboarded ? runtime.homeRoute : runtime.onboardingRoute, locale });
+    return null;
+  }
+  if (runtime.persona && !runtime.onboarded) {
+    redirect({ href: runtime.onboardingRoute, locale });
+    return null;
+  }
+
   const dbUser = await prisma.user.findUnique({
     where: { supabaseId: user.id },
     select: { id: true },
   });
-  if (!dbUser) { redirect({ href: "/onboarding", locale }); return null; }
+  if (!dbUser) { redirect({ href: "/onboarding/persona", locale }); return null; }
 
   const paths = await prisma.learningPath.findMany({
     where: { userId: dbUser.id, status: "ACTIVE" },
@@ -112,10 +126,9 @@ export default async function DashboardPage({ params }: Props) {
       ?? paths.find((path) => path.universe === requestedUniverse)
     : paths.find((path) => !hasInternalTestMarker(path.onboardingAnswers)) ?? paths[0];
 
-  if (!lp) { redirect({ href: "/onboarding", locale }); return null; }
+  if (!lp) { redirect({ href: "/onboarding/persona", locale }); return null; }
 
   const useRedesign = isYemaDashboardRedesignActive();
-
   if (lp.universe === "MONDE") {
     if (useRedesign) {
       return (
