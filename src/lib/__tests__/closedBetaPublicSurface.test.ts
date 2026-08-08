@@ -6,19 +6,22 @@ const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
 
 describe("closed beta public surface", () => {
-  it("labels the public home entry as beta access instead of free signup", () => {
+  it("keeps the public home CTA on the canonical signup funnel", () => {
     const page = read("src/app/[locale]/page.tsx");
-    expect(page).toContain('register: loc === "en" ? "Beta access" : "Accès bêta"');
-    expect(page).not.toContain("tNav.register");
-    expect(page).not.toContain("t.getStarted");
+    const nav = read("src/components/landing/LandingNav.tsx");
+    expect(page).toContain('register: loc === "en" ? "Sign up" : "S’inscrire"');
+    expect(nav).toContain('router.push(`/${locale}/register`)');
   });
 
-  it("sends the final home CTA to the beta entrance", () => {
+  it("sends the final home CTA to register while the register layout owns the beta gate", () => {
     const door = read("src/components/maison/MaisonPorte.tsx");
-    expect(door).toContain('titleEm: "L’entrée est sur invitation."');
-    expect(door).toContain('titleEm: "Entry is by invitation."');
-    expect(door).toContain('href={`/${locale}/beta`}');
-    expect(door).not.toContain('href={`/${locale}/register`}');
+    const registerLayout = read("src/app/[locale]/register/layout.tsx");
+
+    expect(door).toContain('href={`/${locale}/register`}');
+    expect(door).toContain('cta: "S’inscrire"');
+    expect(door).toContain('cta: "Sign up"');
+    expect(registerLayout).toContain('process.env.YEMA_CLOSED_BETA_ENABLED === "true"');
+    expect(registerLayout).toContain('redirect(`/${safeLocale}/beta`)');
   });
 
   it("removes the B2B commercial landing from the closed-beta public surface", () => {
