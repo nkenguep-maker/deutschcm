@@ -136,7 +136,13 @@ export function StudentMondeDashboard({ locale, activeSectionId = "accueil" }: P
 
   const greeting = data.greetingName?.split(" ")[0] ?? t("studentMonde.greetingFallback");
   const meta = data.learningPath?.currentLevel ? t("studentMonde.metaLanguageLevel", { level: data.learningPath.currentLevel }) : t("studentMonde.metaLanguageLevelUnknown");
-  const accessLabel = data.access.status === "ACTIVE" ? t("studentMonde.access.active") : data.access.status === "EXPIRED" ? t("studentMonde.access.expired") : t("studentMonde.access.none");
+  const accessLabel = data.access.source === "TECHNICAL_BETA"
+    ? (currentLocale === "en" ? "Technical beta · A1" : "Bêta technique · A1")
+    : data.access.status === "ACTIVE"
+      ? t("studentMonde.access.active")
+      : data.access.status === "EXPIRED"
+        ? t("studentMonde.access.expired")
+        : (currentLocale === "en" ? "Course not open yet" : "Cours pas encore ouvert");
   const accessTone = data.access.status === "ACTIVE" ? "success" as const : data.access.status === "EXPIRED" ? "alert" as const : "muted" as const;
 
   const overview = (
