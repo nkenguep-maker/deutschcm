@@ -218,20 +218,27 @@
 
   async function runCleanup() {
     console.log("[final-browser] CLEANUP · restauration finally");
+    let cleanupFailed = false;
     while (cleanup.length) {
       try { await cleanup.pop()!(); }
-      catch (e) { console.error(`  · cleanup fail · ${(e as Error).message}`); }
+      catch (e) {
+        cleanupFailed = true;
+        console.error(`  · cleanup fail · ${(e as Error).message}`);
+      }
     }
     const leakUsers = await db.user.count({ where: { email: { startsWith: "temp_gate8i_" } } });
     const leakChildren = await db.childProfile.count({ where: { id: { startsWith: "test_yema_qa_gate8i_" } } });
     const leakCircles = await db.circle.count({ where: { id: { startsWith: "test_yema_qa_gate8i_" } } });
     const leakHouseholds = await db.household.count({ where: { id: { startsWith: "test_yema_qa_gate8i_" } } });
     const leakGrants = await db.accessGrant.count({ where: { id: { startsWith: "test_yema_qa_gate8i_" } } });
-    if (leakUsers + leakChildren + leakCircles + leakHouseholds + leakGrants > 0) {
-      console.error(`  · WARN · résidus · users=${leakUsers} children=${leakChildren} circles=${leakCircles} households=${leakHouseholds} grants=${leakGrants}`);
+    const leakCount = leakUsers + leakChildren + leakCircles + leakHouseholds + leakGrants;
+    if (leakCount > 0) {
+      cleanupFailed = true;
+      console.error(`  · FAIL · résidus · users=${leakUsers} children=${leakChildren} circles=${leakCircles} households=${leakHouseholds} grants=${leakGrants}`);
     } else {
       console.log("  · aucun résidu temp ✓");
     }
+    if (cleanupFailed) process.exitCode = 1;
   }
 
   try {
