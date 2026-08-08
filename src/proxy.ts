@@ -32,11 +32,20 @@ const PUBLIC_ROUTES = [
   "/qa",
 ]
 
-const CLOSED_BETA_API_BYPASS_PREFIXES = [
-  "/api/auth/",
-  "/api/beta/",
-  "/api/qa/",
-]
+// Admission bootstrap is deliberately narrow. Future /api/auth/* or
+// /api/beta/* routes must pass the normal beta wall unless explicitly reviewed.
+const CLOSED_BETA_API_BYPASS_EXACT = new Set([
+  "/api/auth/sync",
+  "/api/beta/accept",
+])
+
+function isClosedBetaApiBypass(pathname: string): boolean {
+  return (
+    CLOSED_BETA_API_BYPASS_EXACT.has(pathname) ||
+    pathname === "/api/qa" ||
+    pathname.startsWith("/api/qa/")
+  )
+}
 
 const PROTECTED_ROUTES: Record<string, SpaceRole[]> = {
   "/onboarding/teacher": ["TEACHER", "ADMIN"],
@@ -174,10 +183,10 @@ export async function proxy(request: NextRequest) {
   }
 
   // API admission boundary for authenticated direct callers. Anonymous calls
-  // continue to each route's own auth/public contract. Auth/beta/QA bootstrap
-  // endpoints remain reachable so a user can establish or repair admission.
+  // continue to each route's own auth/public contract. Only the exact auth/beta
+  // bootstrap endpoints and fail-closed QA endpoints bypass this admission wall.
   if (pathname.startsWith("/api")) {
-    if (!closedBeta || CLOSED_BETA_API_BYPASS_PREFIXES.some(prefix => pathname.startsWith(prefix))) {
+    if (!closedBeta || isClosedBetaApiBypass(pathname)) {
       return NextResponse.next()
     }
 
