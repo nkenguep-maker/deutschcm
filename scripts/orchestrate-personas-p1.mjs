@@ -117,17 +117,14 @@ async function checkPersona(HOST, persona) {
   const label = `[${persona.id}]`;
   const cookie = await loginCookie(persona.email);
   const H = { Cookie: cookie, Origin: `http://${HOST}`, Host: HOST };
-  // Home route · doit répondre 200 ou 307 (jamais 401/403/500).
   const home = await fetch(`http://${HOST}${persona.homeRoute}`, { headers: H, redirect: "manual" });
   if (home.status >= 400) return { ok: false, msg: `${label} home ${persona.homeRoute} → ${home.status}` };
-  // Allowed API · au moins 1 doit répondre 200.
   let anyAllowedOk = false;
   for (const path of persona.allowedApi) {
     const r = await fetch(`http://${HOST}${path}`, { headers: H });
     if (r.status === 200) anyAllowedOk = true;
   }
   if (!anyAllowedOk) return { ok: false, msg: `${label} aucune route autorisée n'a répondu 200` };
-  // Forbidden API · TOUTES doivent répondre >= 400 (jamais 200).
   for (const path of persona.forbiddenApi) {
     const r = await fetch(`http://${HOST}${path}`, { headers: H });
     if (r.status === 200) return { ok: false, msg: `${label} forbidden ${path} → 200 (isolation cassée)` };
@@ -139,9 +136,7 @@ async function main() {
   console.log("[personas] STEP 1 · fixtures QA idempotentes");
   spawnSync("node", ["scripts/test-baseline/yema-qa-fixtures.mjs"], { stdio: "inherit", env: process.env });
 
-  console.log(`[personas] STEP 2 · next start port ${PORT} (redesign flag ON · HMAC secret injected)`);
-  // Lot 7C.1 · redesign flag pour éviter 2 h1 legacy.
-  // + HMAC secret pour child-session (sinon SECRET_UNAVAILABLE 500).
+  console.log(`[personas] STEP 2 · next start port ${PORT} (9 personas · workspaces P-1 ON)`);
   const hmacSecret = process.env.YEMA_CHILD_SESSION_SECRET
     ?? process.env.SUPABASE_JWT_SECRET
     ?? randomBytes(32).toString("base64");
@@ -151,6 +146,13 @@ async function main() {
       ...process.env,
       YEMA_DASHBOARD_REDESIGN_ENABLED: "true",
       YEMA_CHILD_SESSION_SECRET: hmacSecret,
+      // Overrides P-1 persona-only · le wrapper général garde volontairement
+      // Coach/Centre OFF pour ses tests Monde. Ici on teste leurs personas.
+      YEMA_CENTER_REAL_DATA_ENABLED: "true",
+      YEMA_CENTER_RLS_CONFIRMED: "true",
+      YEMA_COACH_WORKSPACE_ENABLED: "true",
+      YEMA_ROOTS_COACH_RLS_CONFIRMED: "true",
+      YEMA_CIRCLE_ENABLED: "true",
     },
   });
   let ready = false;
@@ -226,9 +228,6 @@ async function main() {
       }
     }
 
-    // Invalidation PIN ACTIVE · temp change pinHash + pinUpdatedAt.
-    // Le nettoyage ciblé AuditEvent rend le scénario répétable sans affaiblir
-    // le rate-limit réel : seuls les événements de la fixture P-1 sont touchés.
     console.log("[personas] STEP 6 · Invalidation PIN active · rotation temporaire");
     const localDb = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DIRECT_URL }) });
     try {
@@ -287,7 +286,6 @@ async function main() {
         console.log("  ✓ nouveau PIN accepté · rotation fonctionnelle");
       }
 
-      // RESTAURATION EXACTE, même si le check précédent a échoué.
       await localDb.childProfile.update({
         where: { id: "test_yema_qa_child_family_monde" },
         data: { pinHash: original.pinHash, pinUpdatedAt: original.pinUpdatedAt },
