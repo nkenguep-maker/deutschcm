@@ -20,9 +20,14 @@ export async function storeBetaInvitation(params: {
   const now = new Date();
 
   return prisma.$transaction(async (tx) => {
+    // Serialize invite issuance for the same opaque email hash. Without this
+    // transaction-scoped advisory lock, two concurrent admins could both see
+    // no PENDING row, then each create a valid token at READ COMMITTED.
+    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${emailHash}, 0))`;
+
     // A new invite supersedes any older unused link for the same address.
-    // This keeps the closed-beta admission surface to one live PENDING token
-    // per email without storing the plaintext address.
+    // The lock above makes the one-live-PENDING-token invariant concurrency
+    // safe without storing the plaintext address or adding a partial index.
     await tx.betaInvitation.updateMany({
       where: {
         emailHash,
