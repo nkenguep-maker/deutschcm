@@ -25,14 +25,14 @@ describe("center commercial surface before payment integration", () => {
     expect(page).not.toMatch(/Orange Money/i);
   });
 
-  it("keeps the commercial entry useful without fabricating checkout", () => {
+  it("keeps the commercial entry useful without executable payment plumbing", () => {
     const page = read("src/app/[locale]/landing/page.tsx");
 
     expect(page).toContain("/api/apply/center");
     expect(page).toContain("Réserver une démo");
     expect(page).toContain("Book a demo");
-    expect(page).not.toContain("checkout");
     expect(page).not.toContain("paymentIntent");
     expect(page).not.toContain("transactionId");
+    expect(page).not.toContain("createCheckoutSession");
   });
 });
