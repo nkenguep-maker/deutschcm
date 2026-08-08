@@ -20,6 +20,7 @@ export interface AdminEnvSummary {
   projectRef: string | null;
   nodeEnv: string | null;
   qaModeEnabled: boolean;
+  closedBetaEnabled: boolean;
   qaSessionMaxMinutes: number;
   flags: Array<{ key: string; enabled: boolean }>;
 }
