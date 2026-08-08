@@ -126,6 +126,18 @@ describe("closed beta invitation provisioning", () => {
     expect(existingBranch).not.toContain("grantRole(");
   });
 
+  it("requires the invited email to still match the linked Supabase Auth identity", () => {
+    const route = read("src/app/api/beta/accept/route.ts");
+
+    expect(route).toContain("admin.auth.admin.getUserById(existing.supabaseId)");
+    expect(route).toContain('normalizeInviteEmail(authIdentity.user.email ?? "") !== email');
+    expect(route).toContain('code: "invite_identity_mismatch"');
+    const mismatch = route.indexOf('code: "invite_identity_mismatch"');
+    const grantExisting = route.indexOf("previousBetaAccess = await setBetaAccess");
+    expect(mismatch).toBeGreaterThan(-1);
+    expect(grantExisting).toBeGreaterThan(mismatch);
+  });
+
   it("restores an existing account beta flag when ledger finalization fails", () => {
     const access = read("src/lib/beta/access.ts");
     const route = read("src/app/api/beta/accept/route.ts");
