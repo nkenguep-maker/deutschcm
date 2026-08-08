@@ -1,5 +1,5 @@
 // Lot 7C · captures 7 personas adultes (child_monde/child_racines couverts
-// par les suites messaging existantes).
+// par la suite enfant dédiée).
 
 import { test, expect, type Page } from "playwright/test";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
@@ -46,8 +46,8 @@ const PERSONAS = [
   { id: "teacher",         email: "test_yema_qa_teacher@example.com",         home: "/teacher" },
   { id: "coach",           email: "test_yema_qa_coach@example.com",           home: "/coach/racines" },
   { id: "center_admin",    email: "test_yema_qa_center_admin@example.com",    home: "/center" },
-  { id: "student_monde",   email: "test_yema_qa_student_monde@example.com",   home: "/dashboard" },
-  { id: "student_racines", email: "test_yema_qa_student_racines@example.com", home: "/dashboard" },
+  { id: "student_monde",   email: "test_yema_qa_student_monde@example.com",   home: "/dashboard", marker: "student_monde" },
+  { id: "student_racines", email: "test_yema_qa_student_racines@example.com", home: "/dashboard", marker: "student_racines" },
   { id: "family",          email: "test_yema_qa_family@example.com",          home: "/family" },
 ] as const;
 
@@ -67,22 +67,24 @@ for (const p of PERSONAS) {
         await page.setViewportSize({ width: vp.width, height: vp.height });
         const route = `/${locale}${p.home}`;
         const resp = await page.goto(route);
+        expect(resp?.status(), `${p.id} response ${route}`).toBe(200);
         await page.waitForLoadState("networkidle");
-        const path = file(p.id, vp.name, locale);
-        await page.screenshot({ path, fullPage: true });
-        manifest.push(`${vp.name}\t${locale}\t${p.id}\t${route}\t${resp?.status() ?? "?"}`);
-        // Lot 7C.2 · strict h1 === 1 sans tolérance · fix appliqué
-        // dans DashboardMonde/DashboardRacines (h1 legacy → h2).
+        expect(new URL(page.url()).pathname, `${p.id} canonical route`).toBe(route);
+
+        if ("marker" in p) {
+          await expect(
+            page.locator(`[data-yema-persona="${p.marker}"]`),
+            `${p.id} dashboard universe`,
+          ).toHaveCount(1);
+        }
+
         const h1Count = await page.locator("h1").count();
         expect(h1Count, `h1 count ${p.id} ${vp.name}`).toBe(1);
-        // Lot 7C.2 · overflow strict · éléments hors viewport ignorés
-        // uniquement si contenus dans un sélecteur explicitement scrollable
-        // (marquee/carousel/data-overflow-ok). Aucune tolérance numérique.
+
         const overflowing = await page.$$eval("*", (els, w) => {
           const ALLOW = ["[data-overflow-ok]", ".marquee", "[role=marquee]", "[data-carousel]"];
           return els.filter((e) => {
             if (e.getBoundingClientRect().right <= w + 1) return false;
-            // Ignorer si l'élément OU un ancêtre matche une exception ciblée.
             for (const sel of ALLOW) {
               if (e.matches(sel) || e.closest(sel)) return false;
             }
@@ -90,6 +92,10 @@ for (const p of PERSONAS) {
           }).length;
         }, vp.width);
         expect(overflowing, `overflow ${p.id} ${vp.name} (elts non-scrollables > viewport)`).toBe(0);
+
+        const path = file(p.id, vp.name, locale);
+        await page.screenshot({ path, fullPage: true });
+        manifest.push(`${vp.name}\t${locale}\t${p.id}\t${route}\t${resp?.status() ?? "?"}`);
       });
     }
   }
