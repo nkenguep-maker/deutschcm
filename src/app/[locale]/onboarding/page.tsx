@@ -23,6 +23,22 @@ export default async function OnboardingRouterPage({ params }: Props) {
     return null;
   }
 
+  // Resolve the trusted persona before looking at learner paths. Family,
+  // Teacher, Coach, Center and Admin accounts may legitimately retain an old
+  // Student/LearningPath history; that must never pull them back into Solo.
+  const runtime = await resolvePersonaRuntime({
+    supabaseId: user.id,
+    requestedPersona: user.user_metadata?.requested_persona,
+  });
+  if (
+    runtime.persona &&
+    runtime.persona !== "student_monde" &&
+    runtime.persona !== "student_racines"
+  ) {
+    redirect({ href: runtime.onboarded ? runtime.homeRoute : runtime.onboardingRoute, locale });
+    return null;
+  }
+
   const dbUser = await prisma.user.findUnique({
     where: { supabaseId: user.id },
     select: {
@@ -94,10 +110,6 @@ export default async function OnboardingRouterPage({ params }: Props) {
     }
   }
 
-  const runtime = await resolvePersonaRuntime({
-    supabaseId: user.id,
-    requestedPersona: user.user_metadata?.requested_persona,
-  });
   if (runtime.persona) {
     redirect({ href: runtime.onboarded ? runtime.homeRoute : runtime.onboardingRoute, locale });
     return null;
