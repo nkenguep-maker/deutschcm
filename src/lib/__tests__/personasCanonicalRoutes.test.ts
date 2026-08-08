@@ -40,8 +40,8 @@ describe("QA · canonical nine-persona routes", () => {
     expect(runtime).toContain("test_yema_qa_child_family_monde");
     expect(runtime).toContain("test_yema_qa_child_family_racines");
     expect(runtime).toContain("/api/child-session");
-    expect(runtime).toMatch(/child_monde.*dashboard 200/s);
-    expect(runtime).toMatch(/child_racines.*dashboard 200/s);
+    expect(runtime).toMatch(/child_monde[\s\S]*dashboard 200/);
+    expect(runtime).toMatch(/child_racines[\s\S]*dashboard 200/);
     expect(runtime).toContain("auditEvent.deleteMany");
   });
 
