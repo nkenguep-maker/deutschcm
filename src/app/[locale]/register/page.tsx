@@ -102,6 +102,7 @@ export default function RegisterPage() {
     : null;
   const selectedPlan = parseSelectedPlan(searchParams.get("plan"));
   const rootsSoloSelected = searchParams.get("addon") === "roots-solo";
+  const rootsCoachSelected = searchParams.get("addon") === "roots-coach";
   const teacherAddonRequested = searchParams.get("prof") === "1";
   const rawNext = searchParams.get("next");
   const safeNext = sanitizeInternalNext(rawNext, `/${locale}/dashboard`);
@@ -113,11 +114,12 @@ export default function RegisterPage() {
     const params = new URLSearchParams();
     if (selectedPlan) params.set("plan", selectedPlan);
     if (rootsSoloSelected) params.set("addon", "roots-solo");
+    else if (rootsCoachSelected) params.set("addon", "roots-coach");
     if (teacherAddonRequested) params.set("prof", "1");
     if (rawNext) params.set("next", safeNext);
     const suffix = params.toString();
     return suffix ? `?${suffix}` : "";
-  }, [rawNext, rootsSoloSelected, safeNext, selectedPlan, teacherAddonRequested]);
+  }, [rawNext, rootsCoachSelected, rootsSoloSelected, safeNext, selectedPlan, teacherAddonRequested]);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -160,6 +162,7 @@ export default function RegisterPage() {
     try {
       const supabase = createClient();
       const fullName = `${first} ${last}`;
+      const selectedAddon = rootsSoloSelected ? "roots-solo" : rootsCoachSelected ? "roots-coach" : null;
       const { data, error: signUpError } = await withTimeout(
         supabase.auth.signUp({
           email: normalizedEmail,
@@ -171,7 +174,7 @@ export default function RegisterPage() {
               last_name: last,
               universe: universe ?? null,
               selected_plan: selectedPlan,
-              selected_addons: rootsSoloSelected ? ["roots-solo"] : [],
+              selected_addons: selectedAddon ? [selectedAddon] : [],
               teacher_addon_requested: teacherAddonRequested,
               post_onboarding_next: rawNext ? safeNext : null,
             },
@@ -251,7 +254,7 @@ export default function RegisterPage() {
               <h1 className="entry-h">{t(c.title)}</h1>
               <p className="entry-lede">{t(c.lede)}</p>
 
-              {selectedPlan || rootsSoloSelected || teacherAddonRequested ? (
+              {selectedPlan || rootsSoloSelected || rootsCoachSelected || teacherAddonRequested ? (
                 <div className="entry-context" role="note">
                   <span className="entry-context-dot" aria-hidden="true" />
                   <span className="entry-context-text">
