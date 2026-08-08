@@ -108,7 +108,10 @@ export async function POST(request: NextRequest) {
 
   if (typeof input.password !== "string" || input.password.length < 8) {
     await releaseBetaInvitationClaim(claim.id).catch(() => undefined);
-    return NextResponse.json({ error: "Password required for new account" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Password required for new account", code: "password_required" },
+      { status: 400 },
+    );
   }
 
   const admin = adminClient();
