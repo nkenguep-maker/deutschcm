@@ -27,6 +27,10 @@ import { hasInternalTestMarker } from "@/lib/internalTestProvisioning";
 
 interface Props { params: Promise<{ locale: string }> }
 
+function PersonaBoundary({ persona, children }: { persona: string; children: React.ReactNode }) {
+  return <div data-yema-persona={persona}>{children}</div>;
+}
+
 export default async function DashboardPage({ params }: Props) {
   const { locale } = await params;
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
@@ -38,7 +42,11 @@ export default async function DashboardPage({ params }: Props) {
     "child_racines",
   ]);
   if (internalPersona) {
-    return <InternalPersonaDashboard persona={internalPersona} locale={loc} />;
+    return (
+      <PersonaBoundary persona={internalPersona}>
+        <InternalPersonaDashboard persona={internalPersona} locale={loc} />
+      </PersonaBoundary>
+    );
   }
 
   const childSession = await resolveActiveChildSession();
@@ -61,9 +69,17 @@ export default async function DashboardPage({ params }: Props) {
         })),
     };
     if (childSession.universe === "RACINES") {
-      return <ChildRacinesDashboard locale={loc} child={childData} />;
+      return (
+        <PersonaBoundary persona="child_racines">
+          <ChildRacinesDashboard locale={loc} child={childData} />
+        </PersonaBoundary>
+      );
     }
-    return <ChildMondeDashboard locale={loc} child={childData} />;
+    return (
+      <PersonaBoundary persona="child_monde">
+        <ChildMondeDashboard locale={loc} child={childData} />
+      </PersonaBoundary>
+    );
   }
 
   const supabase = await createClient();
@@ -101,18 +117,34 @@ export default async function DashboardPage({ params }: Props) {
   const useRedesign = isYemaDashboardRedesignActive();
 
   if (lp.universe === "MONDE") {
-    if (useRedesign) return <StudentMondeDashboard locale={loc} />;
+    if (useRedesign) {
+      return (
+        <PersonaBoundary persona="student_monde">
+          <StudentMondeDashboard locale={loc} />
+        </PersonaBoundary>
+      );
+    }
     return (
-      <Layout title="Monde">
-        <DashboardMonde locale={loc} />
-      </Layout>
+      <PersonaBoundary persona="student_monde">
+        <Layout title="Monde">
+          <DashboardMonde locale={loc} />
+        </Layout>
+      </PersonaBoundary>
     );
   }
 
-  if (useRedesign) return <StudentRacinesDashboard locale={loc} />;
+  if (useRedesign) {
+    return (
+      <PersonaBoundary persona="student_racines">
+        <StudentRacinesDashboard locale={loc} />
+      </PersonaBoundary>
+    );
+  }
   return (
-    <Layout title={loc === "en" ? "Roots" : "Racines"}>
-      <DashboardRacines locale={loc} />
-    </Layout>
+    <PersonaBoundary persona="student_racines">
+      <Layout title={loc === "en" ? "Roots" : "Racines"}>
+        <DashboardRacines locale={loc} />
+      </Layout>
+    </PersonaBoundary>
   );
 }
