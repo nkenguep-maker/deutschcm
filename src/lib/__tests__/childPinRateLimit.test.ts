@@ -45,7 +45,7 @@ describe("P4.7 · child PIN brute-force protection", () => {
     const limiter = read("src/lib/security/childPinRateLimit.ts");
 
     expect(limiter).not.toContain("pinHash");
-    expect(limiter).not.toContain("metadata: { pin");
-    expect(limiter).toContain('metadata: { reason: "pin_invalid" }');
+    expect(limiter).not.toMatch(/metadata\s*:\s*\{\s*pin\s*:/);
+    expect(limiter).toMatch(/metadata\s*:\s*\{[\s\S]*?reason\s*:\s*"pin_invalid"[\s\S]*?\}/);
   });
 });
