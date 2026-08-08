@@ -113,10 +113,11 @@ export default async function LocaleLayout({
     notFound()
   }
 
-  const messages = (await import(`../../../messages/${locale}.json`)).default
-
+  // next-intl inherits locale/messages from src/i18n/request.ts when this
+  // provider is rendered by a Server Component. Avoid importing the same
+  // locale JSON a second time in the layout.
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <NextIntlClientProvider>
       <QaTestBar />
       <TestSpaceBar />
       {children}
