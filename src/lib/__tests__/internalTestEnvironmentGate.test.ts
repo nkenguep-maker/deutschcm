@@ -17,6 +17,19 @@ describe("internal persona tooling environment gate", () => {
     expect(gate).toContain("FORBIDDEN_REFS");
   });
 
+  it("makes stale persona cookies inert outside the same P-1 runtime gate", () => {
+    const persona = read("src/lib/internalPersona.ts");
+    const runtimeGate = persona.indexOf("export function isInternalPersonaRuntimeAllowed");
+    const resolver = persona.indexOf("export function resolveInternalPersona");
+    const resolverGate = persona.indexOf("if (!isInternalPersonaRuntimeAllowed()) return null", resolver);
+
+    expect(runtimeGate).toBeGreaterThan(-1);
+    expect(persona).toContain('process.env.VERCEL_ENV === "production"');
+    expect(persona).toContain('INTERNAL_TEST_P1_REF = "kzzagbojjkivdzzcrmxn"');
+    expect(persona).toContain("INTERNAL_TEST_FORBIDDEN_REFS");
+    expect(resolverGate).toBeGreaterThan(resolver);
+  });
+
   it("gates the mutation endpoint before form parsing, auth or fixture writes", () => {
     const route = read("src/app/api/internal-test/switch-persona/route.ts");
     const envGate = route.indexOf("isInternalTestEnvironment()");
