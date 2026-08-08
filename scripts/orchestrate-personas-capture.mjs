@@ -27,7 +27,12 @@ if (!process.env.P1_TEST_PASSWORD) fail(0, "P1_TEST_PASSWORD absent", 2);
 
 async function main() {
   console.log("[personas-capture] STEP 1 · fixtures QA");
-  spawnSync("node", ["scripts/test-baseline/yema-qa-fixtures.mjs"], { stdio: "inherit", env: process.env });
+  const fixtures = spawnSync("node", ["scripts/test-baseline/yema-qa-fixtures.mjs"], {
+    stdio: "inherit",
+    env: process.env,
+  });
+  if (fixtures.error) fail(1, `fixtures impossibles à lancer · ${fixtures.error.message}`);
+  if (fixtures.status !== 0) fail(1, `fixtures QA en échec · exit ${fixtures.status ?? "unknown"}`);
 
   console.log(`[personas-capture] STEP 2 · next start port ${PORT} (9 personas · workspaces P-1 ON)`);
   const hmacSecret = process.env.YEMA_CHILD_SESSION_SECRET
@@ -64,7 +69,12 @@ async function main() {
         PLAYWRIGHT_BASE_URL: `http://127.0.0.1:${PORT}`,
       },
     });
-    captureCode = pw.status ?? 1;
+    if (pw.error) {
+      console.error(`[personas-capture] Playwright impossible à lancer · ${pw.error.message}`);
+      captureCode = 1;
+    } else {
+      captureCode = pw.status ?? 1;
+    }
   } finally {
     server.kill("SIGTERM");
   }
