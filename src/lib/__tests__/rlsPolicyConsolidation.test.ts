@@ -41,7 +41,9 @@ describe("P4.5 · permissive SELECT policy consolidation", () => {
   });
 
   it("preserves published-only restrictions for student and parent branches", () => {
-    expect(migration.match(/status = 'PUBLISHED'/g)?.length).toBe(3);
+    // assignments, assignment feedback, circle assignments and circle feedback
+    // each keep the original PUBLISHED-only branch.
+    expect(migration.match(/status = 'PUBLISHED'/g)?.length).toBe(4);
     expect(migration).toContain("FOR SELECT TO authenticated");
   });
 });
