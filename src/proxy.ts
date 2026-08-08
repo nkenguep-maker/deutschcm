@@ -14,8 +14,13 @@ import {
 
 type SpaceRole = "STUDENT" | "TEACHER" | "CENTER" | "ADMIN"
 
+type AuthUserProjection = {
+  email?: string | null
+  app_metadata?: Record<string, unknown>
+}
+
 const PUBLIC_ROUTES = [
-  "/", "/login", "/register", "/pricing",
+  "/", "/login", "/register", "/pricing", "/beta",
   "/discover", "/auth",
   "/hoeren/demo", "/schreiben/demo",
   "/quiz/demo", "/video/preview",
@@ -25,6 +30,12 @@ const PUBLIC_ROUTES = [
   "/simulateur",
   "/activation",
   "/qa",
+]
+
+const CLOSED_BETA_API_BYPASS_PREFIXES = [
+  "/api/auth/",
+  "/api/beta/",
+  "/api/qa/",
 ]
 
 const PROTECTED_ROUTES: Record<string, SpaceRole[]> = {
@@ -48,6 +59,57 @@ const PROTECTED_ROUTES: Record<string, SpaceRole[]> = {
   "/famille": ["STUDENT", "ADMIN"],
   "/decouverte": ["STUDENT"],
   "/activation-intent": ["STUDENT"],
+}
+
+function isClosedBetaEnabled(): boolean {
+  return process.env.YEMA_CLOSED_BETA_ENABLED === "true"
+}
+
+function rolesFromAuthz(authz: Record<string, unknown>): SpaceRole[] {
+  const raw = Array.isArray(authz.roles) ? (authz.roles as string[]) : []
+  return raw.filter(
+    r => ["STUDENT", "TEACHER", "CENTER", "ADMIN"].includes(r),
+  ) as SpaceRole[]
+}
+
+function betaAccessAllowed(params: {
+  authz: Record<string, unknown>
+  roles: SpaceRole[]
+  internalPersona: ReturnType<typeof resolveInternalPersona>
+}): boolean {
+  return (
+    params.authz.beta_access === true ||
+    params.roles.includes("ADMIN") ||
+    Boolean(params.internalPersona)
+  )
+}
+
+async function readAuthenticatedUser(request: NextRequest, response: NextResponse): Promise<AuthUserProjection | null> {
+  const hasSession = request.cookies.getAll().some(c =>
+    /^sb-.+-auth-token(\.\d+)?$/.test(c.name),
+  )
+  if (!hasSession) return null
+
+  try {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return request.cookies.getAll() },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options)
+            })
+          },
+        },
+      },
+    )
+    const { data } = await supabase.auth.getUser()
+    return data.user
+  } catch {
+    return null
+  }
 }
 
 function spaceForPath(pathname: string): SpaceRole | null {
@@ -93,6 +155,7 @@ const intlMiddleware = createMiddleware(routing)
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const closedBeta = isClosedBetaEnabled()
 
   const dupLocale = pathname.match(/^\/(fr|en)\/(fr|en)(\/.*)?$/)
   if (dupLocale) {
@@ -104,11 +167,34 @@ export async function proxy(request: NextRequest) {
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
-    pathname.startsWith("/api") ||
     pathname.startsWith("/auth") ||
     (pathname.includes(".") && !pathname.startsWith("/api"))
   ) {
     return NextResponse.next()
+  }
+
+  // API admission boundary for authenticated direct callers. Anonymous calls
+  // continue to each route's own auth/public contract. Auth/beta/QA bootstrap
+  // endpoints remain reachable so a user can establish or repair admission.
+  if (pathname.startsWith("/api")) {
+    if (!closedBeta || CLOSED_BETA_API_BYPASS_PREFIXES.some(prefix => pathname.startsWith(prefix))) {
+      return NextResponse.next()
+    }
+
+    const response = NextResponse.next()
+    const user = await readAuthenticatedUser(request, response)
+    if (!user) return response
+
+    const authz = user.app_metadata ?? {}
+    const roles = rolesFromAuthz(authz)
+    const internalPersona = resolveInternalPersona(
+      request.cookies.get(INTERNAL_TEST_COOKIE_NAME)?.value,
+      user.email,
+    )
+    if (!betaAccessAllowed({ authz, roles, internalPersona })) {
+      return NextResponse.json({ error: "Closed beta access required" }, { status: 403 })
+    }
+    return response
   }
 
   const localePrefix = routing.locales.find(l => pathname === `/${l}` || pathname.startsWith(`/${l}/`))
@@ -116,6 +202,10 @@ export async function proxy(request: NextRequest) {
     ? pathname === `/${localePrefix}` ? "/" : pathname.slice(`/${localePrefix}`.length)
     : pathname
   const locale = localePrefix ?? routing.defaultLocale
+
+  if (closedBeta && canonicalPath === "/register") {
+    return NextResponse.redirect(new URL(`/${locale}/beta`, request.url))
+  }
 
   if (PUBLIC_ROUTES.some(r => canonicalPath === r || canonicalPath.startsWith(r + "/"))) {
     return intlMiddleware(request)
@@ -133,52 +223,19 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  const hasSession = request.cookies.getAll().some(c =>
-    /^sb-.+-auth-token(\.\d+)?$/.test(c.name),
-  )
-  if (!hasSession) {
-    if (canonicalPath === "/test-niveau") {
-      return NextResponse.redirect(new URL(`/${locale}/register?next=/${locale}/test-niveau`, request.url))
-    }
-    return loginRedirect()
-  }
-
-  let user: {
-    email?: string | null
-    app_metadata?: Record<string, unknown>
-  } | null = null
-  try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() { return request.cookies.getAll() },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options)
-            })
-          },
-        },
-      },
-    )
-    const { data } = await supabase.auth.getUser()
-    user = data.user
-  } catch {
-    return loginRedirect()
-  }
-
+  const user = await readAuthenticatedUser(request, response)
   if (!user) {
+    if (canonicalPath === "/test-niveau") {
+      const target = closedBeta ? `/${locale}/beta` : `/${locale}/register?next=/${locale}/test-niveau`
+      return NextResponse.redirect(new URL(target, request.url))
+    }
     return loginRedirect()
   }
 
   // Authorization is read only from signed app_metadata. Supabase users can
   // edit user_metadata themselves, so it must never grant a route capability.
   const authz = user.app_metadata ?? {}
-  const authzRoles = Array.isArray(authz.roles) ? (authz.roles as string[]) : []
-  let roles = authzRoles.filter(
-    r => ["STUDENT", "TEACHER", "CENTER", "ADMIN"].includes(r),
-  ) as SpaceRole[]
+  let roles = rolesFromAuthz(authz)
 
   // QA-only overlay: HttpOnly cookie + verified owner email, fail-closed in
   // resolveInternalPersona. This never comes from general user input.
@@ -189,6 +246,10 @@ export async function proxy(request: NextRequest) {
   const personaSpace = internalPersona?.attributes.requiredSpaceRole
   if (personaSpace && !roles.includes(personaSpace)) {
     roles = [...roles, personaSpace]
+  }
+
+  if (closedBeta && !betaAccessAllowed({ authz, roles, internalPersona })) {
+    return NextResponse.redirect(new URL(`/${locale}/beta`, request.url))
   }
 
   if (roles.length === 0) {
