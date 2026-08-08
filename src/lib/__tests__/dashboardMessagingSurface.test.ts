@@ -11,11 +11,22 @@ describe("dashboard messaging surfaces", () => {
       "src/features/dashboards/family/sections/FamilyMessagesSection.tsx",
       "src/features/dashboards/teacher/sections/TeacherMessagesSection.tsx",
       "src/features/dashboards/coach-racines/sections/CoachMessagesSection.tsx",
+      "src/features/dashboards/center/CenterDashboard.tsx",
     ]) {
       const source = read(path);
       expect(source).toContain("MessagesInboxLink");
-      expect(source).not.toContain('t("soon")');
     }
+
+    for (const path of [
+      "src/features/dashboards/family/sections/FamilyMessagesSection.tsx",
+      "src/features/dashboards/teacher/sections/TeacherMessagesSection.tsx",
+      "src/features/dashboards/coach-racines/sections/CoachMessagesSection.tsx",
+    ]) {
+      expect(read(path)).not.toContain('t("soon")');
+    }
+
+    const center = read("src/features/dashboards/center/CenterDashboard.tsx");
+    expect(center).not.toContain('DashboardEmptyState title={t("messages.soon")}');
 
     const inbox = read("src/features/messaging/MessagesInboxLink.tsx");
     expect(inbox).toContain('t("featureDisabled")');
