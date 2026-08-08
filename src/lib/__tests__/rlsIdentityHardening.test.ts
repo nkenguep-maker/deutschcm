@@ -21,6 +21,10 @@ const executableSql = migration
   .split("\n")
   .filter((line) => !line.trimStart().startsWith("--"))
   .join("\n");
+const executableRealtimeSql = realtimeInitplanMigration
+  .split("\n")
+  .filter((line) => !line.trimStart().startsWith("--"))
+  .join("\n");
 
 describe("P4.7 · RLS identity hardening", () => {
   it("moves internal authorization helpers outside the exposed public schema", () => {
@@ -60,11 +64,11 @@ describe("P4.7 · RLS identity hardening", () => {
     expect(realtimeInitplanMigration).toContain(
       'DROP POLICY IF EXISTS "messaging_realtime_receive_authorized"',
     );
-    expect(realtimeInitplanMigration).toContain("(SELECT auth.uid())");
-    expect(realtimeInitplanMigration).toContain("private.messaging_can_access_conversation(");
-    expect(realtimeInitplanMigration).toContain("private.messaging_is_inbox_owner(");
-    expect(realtimeInitplanMigration).toContain("TO authenticated");
-    expect(realtimeInitplanMigration).not.toMatch(/(?<!SELECT )auth\.uid\(\)/);
+    expect(executableRealtimeSql).toContain("(SELECT auth.uid())");
+    expect(executableRealtimeSql).toContain("private.messaging_can_access_conversation(");
+    expect(executableRealtimeSql).toContain("private.messaging_is_inbox_owner(");
+    expect(executableRealtimeSql).toContain("TO authenticated");
+    expect(executableRealtimeSql).not.toMatch(/(?<!SELECT )auth\.uid\(\)/);
   });
 
   it("keeps child profiles deny-by-default instead of relying on auth.role", () => {
