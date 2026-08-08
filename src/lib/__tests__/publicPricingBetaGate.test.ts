@@ -12,11 +12,16 @@ describe("commercial surfaces · offers visible, payments deferred", () => {
     expect(threshold).toContain('href={`/${locale}/pricing/racines`}');
   });
 
-  it("renders Monde prices and carries the selected offer into registration", () => {
+  it("renders Monde prices and carries Passage + optional add-ons into registration", () => {
     const page = read("src/app/[locale]/pricing/monde/page.tsx");
     expect(page).toContain("WORLD_PASSAGE_PRICES");
     expect(page).toContain("WORLD_TEACHER_ADD");
-    expect(page).toContain("plan=passage-");
+    expect(page).toContain('const passagePlan = `passage-${level.toLowerCase()}`');
+    expect(page).toContain("plan=${passagePlan}");
+    expect(page).toContain("prof=1");
+    expect(page).toContain('data-addon="roots-solo"');
+    expect(page).toContain("addon=roots-solo");
+    expect(page).toContain("AFRICAN_SOLO");
     expect(page).toContain("no charge is made today");
     expect(page).not.toContain("stripe");
     expect(page).not.toContain("checkout");
