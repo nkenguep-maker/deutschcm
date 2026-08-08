@@ -10,6 +10,10 @@ const migration = readFileSync(
   ),
   "utf8",
 );
+const executableSql = migration
+  .split("\n")
+  .filter((line) => !line.trimStart().startsWith("--"))
+  .join("\n");
 
 describe("P4.7 · RLS identity hardening", () => {
   it("moves internal authorization helpers outside the exposed public schema", () => {
@@ -44,6 +48,6 @@ describe("P4.7 · RLS identity hardening", () => {
 
   it("keeps child profiles deny-by-default instead of relying on auth.role", () => {
     expect(migration).toContain('DROP POLICY IF EXISTS "child_profiles_service_only"');
-    expect(migration).not.toContain("auth.role()");
+    expect(executableSql).not.toContain("auth.role()");
   });
 });
