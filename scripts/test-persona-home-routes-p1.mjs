@@ -3,7 +3,8 @@
 // A persona home is valid only when the canonical route itself returns 200.
 // Redirects (3xx) are failures: they usually mean the active space/persona
 // resolved to another workspace, which is exactly the regression this gate
-// exists to catch.
+// exists to catch. Student dashboards must additionally expose the resolved
+// universe marker so Monde and Racines cannot both false-green on /dashboard.
 
 import { spawn } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
@@ -31,14 +32,15 @@ if (!anon) fail(0, "NEXT_PUBLIC_SUPABASE_ANON_KEY absent", 2);
 
 const supRef = new URL(url).host.split(".")[0];
 const ADULTS = [
-  ["super_admin", "test_yema_qa_super_admin@example.com", "/fr/admin"],
-  ["teacher", "test_yema_qa_teacher@example.com", "/fr/teacher"],
-  ["coach", "test_yema_qa_coach@example.com", "/fr/coach/racines"],
-  ["center_admin", "test_yema_qa_center_admin@example.com", "/fr/center"],
-  ["student_monde", "test_yema_qa_student_monde@example.com", "/fr/dashboard"],
-  ["student_racines", "test_yema_qa_student_racines@example.com", "/fr/dashboard"],
-  ["family", "test_yema_qa_family@example.com", "/fr/family"],
+  ["super_admin", "test_yema_qa_super_admin@example.com", "/admin", null],
+  ["teacher", "test_yema_qa_teacher@example.com", "/teacher", null],
+  ["coach", "test_yema_qa_coach@example.com", "/coach/racines", null],
+  ["center_admin", "test_yema_qa_center_admin@example.com", "/center", null],
+  ["student_monde", "test_yema_qa_student_monde@example.com", "/dashboard", "student_monde"],
+  ["student_racines", "test_yema_qa_student_racines@example.com", "/dashboard", "student_racines"],
+  ["family", "test_yema_qa_family@example.com", "/family", null],
 ];
+const LOCALES = ["fr", "en"];
 
 async function loginCookie(email) {
   const response = await fetch(`${url}/auth/v1/token?grant_type=password`, {
@@ -86,18 +88,31 @@ async function main() {
   const host = `127.0.0.1:${PORT}`;
   let failed = false;
   try {
-    for (const [id, email, route] of ADULTS) {
+    for (const [id, email, routeSuffix, expectedPersona] of ADULTS) {
       const cookie = await loginCookie(email);
-      const response = await fetch(`http://${host}${route}`, {
-        headers: { Cookie: cookie, Origin: `http://${host}`, Host: host },
-        redirect: "manual",
-      });
-      if (response.status !== 200) {
-        const location = response.headers.get("location");
-        console.error(`  ✗ ${id} · ${route} → ${response.status}${location ? ` · location=${location}` : ""}`);
-        failed = true;
-      } else {
-        console.log(`  ✓ ${id} · ${route} → 200`);
+      for (const locale of LOCALES) {
+        const route = `/${locale}${routeSuffix}`;
+        const response = await fetch(`http://${host}${route}`, {
+          headers: { Cookie: cookie, Origin: `http://${host}`, Host: host },
+          redirect: "manual",
+        });
+        if (response.status !== 200) {
+          const location = response.headers.get("location");
+          console.error(`  ✗ ${id} · ${route} → ${response.status}${location ? ` · location=${location}` : ""}`);
+          failed = true;
+          continue;
+        }
+
+        if (expectedPersona) {
+          const html = await response.text();
+          const marker = `data-yema-persona=\"${expectedPersona}\"`;
+          if (!html.includes(marker)) {
+            console.error(`  ✗ ${id} · ${route} → 200 mais marker ${expectedPersona} absent`);
+            failed = true;
+            continue;
+          }
+        }
+        console.log(`  ✓ ${id} · ${route} → 200${expectedPersona ? ` · ${expectedPersona}` : ""}`);
       }
     }
   } finally {
@@ -105,8 +120,8 @@ async function main() {
     await sleep(500);
   }
 
-  if (failed) fail(2, "une ou plusieurs routes persona redirigent ou échouent");
-  console.log("[persona-home] ALL GREEN · canonical persona homes return 200");
+  if (failed) fail(2, "une ou plusieurs routes persona redirigent, échouent ou résolvent le mauvais univers");
+  console.log("[persona-home] ALL GREEN · FR/EN persona homes and student universes are canonical");
 }
 
 main().catch((error) => fail("?", error.message));
