@@ -17,7 +17,6 @@ async function loginFamily(page: Page) {
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   const password = process.env.P1_TEST_PASSWORD!;
   const supRef = new URL(url).host.split(".")[0];
-
   const r = await page.request.post(`${url}/auth/v1/token?grant_type=password`, {
     headers: { apikey: anon, "Content-Type": "application/json" },
     data: { email: "test_yema_qa_family@example.com", password },
@@ -32,7 +31,6 @@ async function loginFamily(page: Page) {
     refresh_token: s.refresh_token,
     user: s.user,
   };
-
   const host = new URL(process.env.PLAYWRIGHT_BASE_URL!).hostname;
   await page.context().addCookies([{
     name: `sb-${supRef}-auth-token`,
@@ -48,10 +46,7 @@ async function loginFamily(page: Page) {
 async function enterChildSession(page: Page, childProfileId: string, pin: string) {
   const base = new URL(process.env.PLAYWRIGHT_BASE_URL!);
   const r = await page.request.post(`${base.origin}/api/child-session`, {
-    headers: {
-      Origin: base.origin,
-      "Content-Type": "application/json",
-    },
+    headers: { Origin: base.origin, "Content-Type": "application/json" },
     data: { childProfileId, pin },
   });
   expect(r.status(), `child session ${childProfileId}`).toBe(200);
@@ -59,9 +54,7 @@ async function enterChildSession(page: Page, childProfileId: string, pin: string
 
 async function exitChildSession(page: Page) {
   const base = new URL(process.env.PLAYWRIGHT_BASE_URL!);
-  const r = await page.request.delete(`${base.origin}/api/child-session`, {
-    headers: { Origin: base.origin },
-  });
+  const r = await page.request.delete(`${base.origin}/api/child-session`, { headers: { Origin: base.origin } });
   expect(r.status(), "child session logout").toBe(200);
 }
 
@@ -77,16 +70,8 @@ async function assertNoHorizontalOverflow(page: Page, width: number, label: stri
 }
 
 const CHILDREN = [
-  {
-    id: "child_monde",
-    childProfileId: "test_yema_qa_child_family_monde",
-    pin: "1234",
-  },
-  {
-    id: "child_racines",
-    childProfileId: "test_yema_qa_child_family_racines",
-    pin: "5678",
-  },
+  { id: "child_monde", childProfileId: "test_yema_qa_child_family_monde", pin: "1234" },
+  { id: "child_racines", childProfileId: "test_yema_qa_child_family_racines", pin: "5678" },
 ] as const;
 
 const VIEWPORTS = [
@@ -99,6 +84,9 @@ for (const child of CHILDREN) {
   for (const viewport of VIEWPORTS) {
     for (const locale of ["fr", "en"] as const) {
       test(`${child.id} · ${locale} · ${viewport.name}`, async ({ page }) => {
+        const pageErrors: string[] = [];
+        page.on("pageerror", (error) => pageErrors.push(error.message));
+
         await loginFamily(page);
         await page.setViewportSize({ width: viewport.width, height: viewport.height });
         await enterChildSession(page, child.childProfileId, child.pin);
@@ -108,13 +96,11 @@ for (const child of CHILDREN) {
         expect(resp?.status(), `${child.id} dashboard response`).toBe(200);
         await page.waitForLoadState("networkidle");
         expect(new URL(page.url()).pathname, `${child.id} canonical route`).toBe(route);
-        await expect(
-          page.locator(`[data-yema-persona="${child.id}"]`),
-          `${child.id} dashboard universe`,
-        ).toHaveCount(1);
+        await expect(page.locator(`[data-yema-persona="${child.id}"]`), `${child.id} dashboard universe`).toHaveCount(1);
 
         expect(await page.locator("h1").count(), `h1 ${child.id}`).toBe(1);
         await assertNoHorizontalOverflow(page, viewport.width, `${child.id} ${viewport.name}`);
+        expect(pageErrors, `${child.id} ${locale} ${viewport.name} unhandled page errors`).toEqual([]);
         await page.screenshot({ path: file(child.id, viewport.name, locale), fullPage: true });
 
         await exitChildSession(page);
