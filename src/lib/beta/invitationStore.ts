@@ -25,13 +25,17 @@ export async function storeBetaInvitation(params: {
     // no PENDING row, then each create a valid token at READ COMMITTED.
     await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${emailHash}, 0))`;
 
-    // A new invite supersedes any older unused link for the same address.
-    // The lock above makes the one-live-PENDING-token invariant concurrency
-    // safe without storing the plaintext address or adding a partial index.
+    // A new invite supersedes every older link that has not been fully bound
+    // to a user yet. This includes an in-flight ACCEPTED claim: if that older
+    // request later fails, releaseBetaInvitationClaim must not resurrect it
+    // beside the replacement token.
     await tx.betaInvitation.updateMany({
       where: {
         emailHash,
-        status: "PENDING",
+        OR: [
+          { status: "PENDING" },
+          { status: "ACCEPTED", acceptedByUserId: null },
+        ],
       },
       data: {
         status: "REVOKED",
@@ -68,7 +72,8 @@ export async function claimBetaInvitation(params: {
 
   // A server crash after claiming but before finalization must not permanently
   // burn a valid invitation. Only incomplete claims older than 10 minutes can
-  // be returned to PENDING, and only for the same token/email pair.
+  // be returned to PENDING, and only for the same token/email pair. A newer
+  // invitation marks an older claim REVOKED, so it cannot be recovered here.
   await prisma.betaInvitation.updateMany({
     where: {
       id: invitation.id,
