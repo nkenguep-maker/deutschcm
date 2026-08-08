@@ -12,7 +12,8 @@ describe("P4.7 · child PIN brute-force protection", () => {
     expect(limiter).toContain("prisma.auditEvent.count");
     expect(limiter).toContain("tx.auditEvent.create");
     expect(limiter).toContain('action: "CHILD_ACCESS_DENIED"');
-    expect(limiter).toContain('scopeType: "child_session_pin"');
+    expect(limiter).toContain('const PIN_SCOPE_TYPE = "child_session_pin"');
+    expect(limiter).toContain("scopeType: PIN_SCOPE_TYPE");
     expect(limiter).toContain("createdAt: { gte: windowStart() }");
     expect(limiter).toContain("YEMA_CHILD_PIN_MAX_ATTEMPTS");
     expect(limiter).toContain("YEMA_CHILD_PIN_WINDOW_MINUTES");
