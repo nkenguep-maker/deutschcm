@@ -40,4 +40,39 @@ describe("P4.7 · social notifications authorization", () => {
     expect(socialRoute).toContain("prisma.studentGroupMember.upsert");
     expect(socialRoute).toContain("groupId: req.toGroupId, userId: req.fromUserId");
   });
+
+  it("rate limits social writes from database history without a new counter store", () => {
+    const rateLimit = read("src/lib/social/rateLimit.ts");
+    const socialRoute = read("src/app/api/social/route.ts");
+
+    expect(rateLimit).toContain("prisma.classJoinRequest.count");
+    expect(rateLimit).toContain("prisma.studyGroupInvite.count");
+    expect(rateLimit).toContain("createdAt: { gte: since }");
+    expect(rateLimit).toContain("YEMA_SOCIAL_JOIN_REQUESTS_PER_HOUR");
+    expect(rateLimit).toContain("YEMA_SOCIAL_GROUP_INVITES_PER_HOUR");
+    expect(socialRoute).toContain("hasReachedJoinRequestQuota(user.id)");
+    expect(socialRoute).toContain("hasReachedGroupInviteQuota(user.id)");
+    expect(socialRoute).toContain('code: "social_rate_limited"');
+    expect(socialRoute).toContain("status: 429");
+    expect(socialRoute).toContain('"Retry-After": "3600"');
+  });
+
+  it("validates social destinations before creating requests or invitations", () => {
+    const socialRoute = read("src/app/api/social/route.ts");
+
+    const classLookup = socialRoute.indexOf("const classroom = await prisma.classroom.findFirst");
+    const classCreate = socialRoute.indexOf("const req = await prisma.classJoinRequest.create", classLookup);
+    expect(classLookup).toBeGreaterThan(-1);
+    expect(classCreate).toBeGreaterThan(classLookup);
+
+    const groupLookup = socialRoute.indexOf("const group = await prisma.studentGroup.findFirst");
+    const groupCreate = socialRoute.indexOf("const req = await prisma.classJoinRequest.create", groupLookup);
+    expect(groupLookup).toBeGreaterThan(-1);
+    expect(groupCreate).toBeGreaterThan(groupLookup);
+
+    expect(socialRoute).toContain("enrollment?.isActive");
+    expect(socialRoute).toContain("membership?.isActive");
+    expect(socialRoute).toContain("toUserId === user.id");
+    expect(socialRoute).toContain("Invitation déjà envoyée");
+  });
 });
