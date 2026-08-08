@@ -16,14 +16,33 @@ export async function storeBetaInvitation(params: {
   issuedByUserId: string;
   expiresAt: Date;
 }): Promise<StoredBetaInvitation> {
-  return prisma.betaInvitation.create({
-    data: {
-      tokenHash: hashInviteToken(params.token),
-      emailHash: hashInviteEmail(params.email),
-      issuedByUserId: params.issuedByUserId,
-      expiresAt: params.expiresAt,
-    },
-    select: { id: true, expiresAt: true },
+  const emailHash = hashInviteEmail(params.email);
+  const now = new Date();
+
+  return prisma.$transaction(async (tx) => {
+    // A new invite supersedes any older unused link for the same address.
+    // This keeps the closed-beta admission surface to one live PENDING token
+    // per email without storing the plaintext address.
+    await tx.betaInvitation.updateMany({
+      where: {
+        emailHash,
+        status: "PENDING",
+      },
+      data: {
+        status: "REVOKED",
+        revokedAt: now,
+      },
+    });
+
+    return tx.betaInvitation.create({
+      data: {
+        tokenHash: hashInviteToken(params.token),
+        emailHash,
+        issuedByUserId: params.issuedByUserId,
+        expiresAt: params.expiresAt,
+      },
+      select: { id: true, expiresAt: true },
+    });
   });
 }
 
