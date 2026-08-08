@@ -77,7 +77,7 @@ export default function PricingChoicePage() {
           <div className="maison-container">
             <div className="pricing-seuil-doors">
               <Link
-                href={`/${locale}/pricing/monde`}
+                href={`/${locale}/register?universe=monde`}
                 className="pricing-door pricing-door-monde"
                 aria-label={`${c.doorMonde.title} · ${c.doorMonde.cta}`}
               >
@@ -91,7 +91,7 @@ export default function PricingChoicePage() {
               </Link>
 
               <Link
-                href={`/${locale}/pricing/racines`}
+                href={`/${locale}/register?universe=racines`}
                 className="pricing-door pricing-door-racines"
                 aria-label={`${c.doorRacines.title} · ${c.doorRacines.cta}`}
               >
