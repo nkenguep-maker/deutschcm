@@ -1,23 +1,19 @@
 "use client";
 
-// /register · La porte d'entrée YEMA · commune aux deux univers.
-// Accepte ?universe=monde|racines et ?plan=<slug> depuis /pricing.
-// Après signup, route vers /onboarding/{universe} · si aucun univers,
-// renvoie sur /pricing pour choisir une porte d'entrée.
-//
-// Un seul champ email/téléphone (auto-détection · +237… vs email).
-// Google OAuth optionnel · si non configuré côté Supabase, le bouton
-// affiche une erreur douce sans casser le flow.
+// /register · porte d'entrée publique YEMA.
+// L'inscription ne dépend d'aucun plan commercial : l'utilisateur crée son
+// compte puis passe par l'onboarding Monde/Racines avant d'ouvrir son espace.
 
 import Link from "next/link";
 import { useRouter } from "@/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
 import { BrandY } from "@/components/brand/BrandY";
 import { classifyAuthError, withTimeout, type AuthErrorKey } from "@/lib/authErrors";
+import { sanitizeInternalNext } from "@/lib/authRedirect";
 
 type Universe = "monde" | "racines";
 
@@ -25,9 +21,9 @@ const COPY_FR = {
   brand: "YEMA",
   kicker: "L'entrée",
   title: "Créer votre compte.",
-  lede: "Gratuit pour goûter, avant tout paiement.",
-  contextMonde: (plan: string) => `Vous avez choisi ${plan}.`,
-  contextRacines: (plan: string) => `Vous avez choisi ${plan}.`,
+  lede: "Commencez votre parcours YEMA et reprenez-le sur n’importe quel appareil.",
+  contextMonde: "Vous entrez par l’univers Monde.",
+  contextRacines: "Vous entrez par l’univers Racines.",
   fldName: "Nom",
   fldContact: "E-mail ou téléphone",
   fldContactHint: "Format e-mail (nom@domaine) ou téléphone (+237…).",
@@ -40,24 +36,21 @@ const COPY_FR = {
   googleUnavailable: "Google n'est pas encore branché.",
   errPassword: "Mot de passe · au moins huit caractères.",
   errContactEmpty: "Un e-mail ou un numéro, pour vous retrouver.",
-  errContactInvalid: "Ce numéro n'a pas l'air complet.",
-  errEmailInvalid: "Cet e-mail n'a pas l'air valide.",
-  errExists: "Cet e-mail a déjà un compte. Se connecter ?",
-  errGeneric: "Un souci de connexion. Réessayez dans un instant.",
+  errContactInvalid: "Ce n'est ni un e-mail ni un numéro valide.",
   loginPrompt: "Déjà un compte ?",
   loginCta: "Se connecter",
   legal: "En créant votre compte, vous acceptez nos conditions et notre politique de confidentialité.",
   successTitle: "Vérifiez votre boîte.",
-  successBody: "Nous vous avons envoyé un lien pour confirmer votre inscription.",
+  successBody: "Nous vous avons envoyé un lien pour confirmer votre inscription. Votre parcours commencera juste après.",
 } as const;
 
 const COPY_EN = {
   brand: "YEMA",
   kicker: "The entrance",
   title: "Create your account.",
-  lede: "Free to taste, before any payment.",
-  contextMonde: (plan: string) => `You picked ${plan}.`,
-  contextRacines: (plan: string) => `You picked ${plan}.`,
+  lede: "Start your YEMA journey and pick it up again on any device.",
+  contextMonde: "You’re entering through the World universe.",
+  contextRacines: "You’re entering through the Roots universe.",
   fldName: "Name",
   fldContact: "Email or phone",
   fldContactHint: "Email format (name@domain) or phone (+237…).",
@@ -69,44 +62,22 @@ const COPY_EN = {
   google: "Continue with Google",
   googleUnavailable: "Google isn't wired up yet.",
   errPassword: "Password · at least eight characters.",
-  errContactEmpty: "An email or a phone, to find you again.",
-  errContactInvalid: "This number doesn't look complete.",
-  errEmailInvalid: "This email doesn't look valid.",
-  errExists: "This email already has an account. Sign in?",
-  errGeneric: "A connection hiccup. Try again in a moment.",
+  errContactEmpty: "An email or a phone, so we can find you again.",
+  errContactInvalid: "That doesn't look like a valid email or phone number.",
   loginPrompt: "Already have an account?",
   loginCta: "Sign in",
   legal: "By creating your account, you accept our terms and privacy policy.",
   successTitle: "Check your inbox.",
-  successBody: "We sent you a link to confirm your registration.",
+  successBody: "We sent you a link to confirm your registration. Your journey starts right after that.",
 } as const;
 
-const PLAN_LABEL_FR: Record<string, string> = {
-  "passage-a1": "Le Passage · Allemand A1",
-  "passage-a2": "Le Passage · Allemand A2",
-  "passage-b1": "Le Passage · Allemand B1",
-  "passage-b2": "Le Passage · Allemand B2",
-  "passage-c1": "Le Passage · Allemand C1",
-  "racines-solo": "Solo · une personne, une langue",
-  "racines-famille": "Famille · deux adultes et jusqu'à quatre enfants",
-};
-const PLAN_LABEL_EN: Record<string, string> = {
-  "passage-a1": "The Passage · German A1",
-  "passage-a2": "The Passage · German A2",
-  "passage-b1": "The Passage · German B1",
-  "passage-b2": "The Passage · German B2",
-  "passage-c1": "The Passage · German C1",
-  "racines-solo": "Solo · one person, one language",
-  "racines-famille": "Family · two adults and up to four children",
-};
-
-/** Détecte si la valeur ressemble à un téléphone (+237… ou digits). */
-function isPhoneLike(v: string): boolean {
-  const s = v.trim().replace(/[\s-]/g, "");
-  return /^\+?\d{7,}$/.test(s);
+function isPhoneLike(value: string): boolean {
+  const normalized = value.trim().replace(/[\s-]/g, "");
+  return /^\+?\d{7,}$/.test(normalized);
 }
-function isEmailLike(v: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
+function isEmailLike(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
 
 export default function RegisterPage() {
@@ -115,20 +86,16 @@ export default function RegisterPage() {
   const locale = useLocale();
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
   const c = loc === "en" ? COPY_EN : COPY_FR;
-  const t = (s: string) => (loc === "fr" ? frTypo(s) : s);
+  const t = (value: string) => (loc === "fr" ? frTypo(value) : value);
 
   const universeParam = searchParams.get("universe");
   const universe: Universe | null =
     universeParam === "monde" || universeParam === "racines" ? universeParam : null;
-  const plan = searchParams.get("plan") ?? "";
-  const prof = searchParams.get("prof") === "1";
-
-  const planLabel = useMemo(() => {
-    const map = loc === "en" ? PLAN_LABEL_EN : PLAN_LABEL_FR;
-    const base = map[plan] ?? "";
-    if (base && prof) return loc === "en" ? `${base} + teacher` : `${base} + professeur`;
-    return base;
-  }, [plan, prof, loc]);
+  const rawNext = searchParams.get("next");
+  const safeNext = sanitizeInternalNext(rawNext, `/${locale}/dashboard`);
+  const loginHref = rawNext
+    ? `/${locale}/login?next=${encodeURIComponent(safeNext)}`
+    : `/${locale}/login`;
 
   const [fullName, setFullName] = useState("");
   const [contact, setContact] = useState("");
@@ -138,37 +105,37 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const tErr = useTranslations("auth.errors");
-  /** Renvoie le libellé i18n pour une clé d'erreur classifiée. */
   const errorFromKey = (key: AuthErrorKey): string => t(tErr(key));
 
-  // Auto-focus premier champ visible au mount (accessibilité)
   useEffect(() => {
-    const el = document.querySelector<HTMLInputElement>("input[data-autofocus]");
-    el?.focus();
+    document.querySelector<HTMLInputElement>("input[data-autofocus]")?.focus();
   }, []);
 
-  // Après signup, on va TOUJOURS dans le tunnel d'onboarding.
-  // - Si univers connu (register?universe=monde|racines) : direct vers la bonne page.
-  // - Sinon : /onboarding est un router qui demande l'univers puis dirige.
-  //   (Ancien comportement : /pricing → boucle publique, l'user perdait le fil.)
   const onboardingRoute = universe === "racines"
     ? "/onboarding/racines"
     : universe === "monde"
       ? "/onboarding/monde"
       : "/onboarding";
+  const localizedOnboardingRoute = `/${locale}${onboardingRoute}`;
 
-  async function handleRegister(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleRegister(event: React.FormEvent) {
+    event.preventDefault();
     setError(null);
 
     const trimmed = contact.trim();
-    if (!trimmed) { setError(c.errContactEmpty); return; }
-    if (password.length < 8) { setError(c.errPassword); return; }
+    if (!trimmed) {
+      setError(t(c.errContactEmpty));
+      return;
+    }
+    if (password.length < 8) {
+      setError(t(c.errPassword));
+      return;
+    }
 
     const usePhone = isPhoneLike(trimmed);
     const useEmail = isEmailLike(trimmed);
     if (!usePhone && !useEmail) {
-      setError(loc === "en" ? "That doesn't look like an email or a phone." : "Ce n'est ni un e-mail ni un numéro.");
+      setError(t(c.errContactInvalid));
       return;
     }
 
@@ -180,12 +147,8 @@ export default function RegisterPage() {
           full_name: fullName || null,
           role: "STUDENT" as const,
           universe: universe ?? null,
-          plan: plan || null,
-          prof,
         },
-        // Callback URL est ABSOLU (pas next-intl) · on passe le chemin
-        // complet avec locale pour que le handler redirige correctement.
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/${locale}${onboardingRoute}`)}`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizedOnboardingRoute)}`,
       };
 
       const credentials = usePhone
@@ -201,28 +164,23 @@ export default function RegisterPage() {
         return;
       }
 
-      // Cookie rôle pour le middleware (ne bloque pas si échec)
       try {
-        document.cookie = `user_role=STUDENT;path=/;max-age=2592000`;
-        document.cookie = `active_space=STUDENT;path=/;max-age=2592000`;
-      } catch { /* ok */ }
+        document.cookie = "user_role=STUDENT;path=/;max-age=2592000";
+        document.cookie = "active_space=STUDENT;path=/;max-age=2592000";
+      } catch {
+        // L'auth Supabase reste la source de vérité si le cookie local échoue.
+      }
 
       if (data.session) {
-        // Session immédiate (téléphone confirmation sms, ou email confirmé).
-        // Router de @/navigation AJOUTE déjà la locale · on passe un
-        // chemin NU pour éviter /fr/fr/onboarding/…
         router.push(onboardingRoute);
         router.refresh();
-        return; // navigating away — loading reste on exprès (page part)
+        return;
       }
-      // Sinon on montre l'écran « vérifiez votre boîte »
+
       setSuccess(true);
-    } catch (err) {
-      // Réseau, timeout, exception JS : chemin unique de classification.
-      setError(errorFromKey(classifyAuthError(err)));
+    } catch (registerError) {
+      setError(errorFromKey(classifyAuthError(registerError)));
     } finally {
-      // GARANTIE : le bouton se déverrouille TOUJOURS (sauf navigation
-      // réussie où la page se démonte de toute façon).
       setLoading(false);
     }
   }
@@ -230,42 +188,33 @@ export default function RegisterPage() {
   async function handleGoogle() {
     setError(null);
     setGoogleLoading(true);
+
     try {
       const supabase = createClient();
-      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/${locale}${onboardingRoute}`)}`;
-      const params = new URLSearchParams();
-      if (universe) params.set("universe", universe);
-      if (plan) params.set("plan", plan);
-      if (prof) params.set("prof", "1");
+      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizedOnboardingRoute)}`;
       const { error: oauthError } = await withTimeout(
         supabase.auth.signInWithOAuth({
           provider: "google",
           options: {
-            redirectTo: `${redirectTo}${params.toString() ? `&${params.toString()}` : ""}`,
+            redirectTo,
             queryParams: { access_type: "offline", prompt: "consent" },
           },
         }),
       );
-      if (oauthError) {
-        // Erreur OAuth explicite (provider non configuré, redirect_uri invalide, etc.)
-        // → message spécifique Google, pas le parseur générique.
-        setError(c.googleUnavailable);
-      }
-      // Redirect géré par Supabase · loading reste on jusqu'à la navigation
-    } catch (err) {
-      // Réseau/timeout → message contextuel réseau (pas googleUnavailable
-      // qui laisse penser à un défaut de config)
-      const key = classifyAuthError(err);
-      setError(key === "network" || key === "timeout" ? errorFromKey(key) : c.googleUnavailable);
+      if (oauthError) setError(t(c.googleUnavailable));
+    } catch (oauthError) {
+      const key = classifyAuthError(oauthError);
+      setError(key === "network" || key === "timeout" ? errorFromKey(key) : t(c.googleUnavailable));
     } finally {
-      // Google OAuth : si l'appel a réussi, la page va rediriger → le
-      // finally exécute quand même setGoogleLoading(false) mais la page
-      // se démonte peu après. Si l'appel a échoué, on récupère la main.
       setGoogleLoading(false);
     }
   }
 
-  const universeClass = universe === "racines" ? "entry-universe-racines" : universe === "monde" ? "entry-universe-monde" : "";
+  const universeClass = universe === "racines"
+    ? "entry-universe-racines"
+    : universe === "monde"
+      ? "entry-universe-monde"
+      : "";
 
   return (
     <div className={`entry-page ${universeClass}`} data-universe={universe ?? "none"}>
@@ -275,7 +224,7 @@ export default function RegisterPage() {
         </Link>
         <p className="entry-header-alt">
           {t(c.loginPrompt)}{" "}
-          <Link href={`/${locale}/login`} className="entry-header-link">{t(c.loginCta)}</Link>
+          <Link href={loginHref} className="entry-header-link">{t(c.loginCta)}</Link>
         </p>
       </header>
 
@@ -292,13 +241,11 @@ export default function RegisterPage() {
               <h1 className="entry-h">{t(c.title)}</h1>
               <p className="entry-lede">{t(c.lede)}</p>
 
-              {planLabel ? (
+              {universe ? (
                 <div className="entry-context" role="note">
                   <span className="entry-context-dot" aria-hidden="true" />
                   <span className="entry-context-text">
-                    {universe === "racines"
-                      ? t(c.contextRacines(planLabel))
-                      : t(c.contextMonde(planLabel))}
+                    {t(universe === "racines" ? c.contextRacines : c.contextMonde)}
                   </span>
                 </div>
               ) : null}
@@ -310,7 +257,7 @@ export default function RegisterPage() {
                     type="text"
                     autoComplete="name"
                     value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
+                    onChange={(event) => setFullName(event.target.value)}
                     className="entry-input"
                     data-autofocus
                   />
@@ -324,7 +271,7 @@ export default function RegisterPage() {
                     required
                     autoComplete="username"
                     value={contact}
-                    onChange={(e) => setContact(e.target.value)}
+                    onChange={(event) => setContact(event.target.value)}
                     className="entry-input"
                     aria-describedby="contact-hint"
                   />
@@ -339,7 +286,7 @@ export default function RegisterPage() {
                     autoComplete="new-password"
                     minLength={8}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(event) => setPassword(event.target.value)}
                     className="entry-input"
                     aria-describedby="password-hint"
                   />
