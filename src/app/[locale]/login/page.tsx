@@ -83,6 +83,17 @@ export default function LoginPage() {
         setErrorKey(classifyAuthError(signInError));
         return;
       }
+
+      // Rebuild the authorization mirror from the database before any
+      // protected navigation. Caller-controlled user_metadata is ignored.
+      const syncResponse = await fetch("/api/auth/sync", { method: "POST" });
+      if (!syncResponse.ok) {
+        await supabase.auth.signOut();
+        setErrorKey("generic");
+        return;
+      }
+      await supabase.auth.refreshSession();
+
       router.push(safeNext);
       router.refresh();
     } catch (err) {
