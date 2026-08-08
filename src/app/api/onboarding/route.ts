@@ -127,30 +127,51 @@ export async function POST(request: NextRequest) {
       openingHours: openingHours ?? undefined,
     };
 
-    let center;
-    if (dbUser.centerId) {
-      center = await prisma.languageCenter.update({
-        where: { id: dbUser.centerId },
-        data: centerData,
-      });
-    } else {
-      let code = generateCenterCode(city ?? "CM");
-      while (await prisma.languageCenter.findUnique({ where: { code } })) {
-        code = generateCenterCode(city ?? "CM");
+    let generatedCode: string | null = null;
+    if (!dbUser.centerId) {
+      generatedCode = generateCenterCode(city ?? "CM");
+      while (await prisma.languageCenter.findUnique({ where: { code: generatedCode } })) {
+        generatedCode = generateCenterCode(city ?? "CM");
       }
-      center = await prisma.languageCenter.create({
-        data: {
-          ...centerData,
-          maxAdmins: 5,
-          code,
-        },
-      });
     }
 
-    await prisma.user.update({
-      where: { id: dbUser.id },
-      data: { role: "CENTER", centerId: center.id },
+    const center = await prisma.$transaction(async (tx) => {
+      const savedCenter = dbUser.centerId
+        ? await tx.languageCenter.update({
+            where: { id: dbUser.centerId },
+            data: centerData,
+          })
+        : await tx.languageCenter.create({
+            data: {
+              ...centerData,
+              maxAdmins: 5,
+              code: generatedCode!,
+            },
+          });
+
+      await tx.user.update({
+        where: { id: dbUser.id },
+        data: { role: "CENTER", centerId: savedCenter.id },
+      });
+
+      // Center authorization currently derives center membership from the
+      // private Teacher binding table. Keep that binding atomic with center
+      // creation/update so a successful onboarding can always resolve /center.
+      await tx.teacher.upsert({
+        where: { userId: dbUser.id },
+        create: {
+          userId: dbUser.id,
+          bio: "",
+          speciality: [],
+          languages: [],
+          centerId: savedCenter.id,
+        },
+        update: { centerId: savedCenter.id },
+      });
+
+      return savedCenter;
     });
+
     return NextResponse.json({ center });
   }
 
