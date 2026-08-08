@@ -20,12 +20,12 @@ const META = {
     ogTitle: "Yema Languages — Apprenez, préparez-vous, appartenez",
     twitterTitle: "Yema — apprenez une langue, préparez votre projet",
     description:
-      "Une plateforme indépendante alignée CECRL, ouverte aux langues africaines et aux langues du monde. Premier chapitre : l'allemand.",
+      "Yema réunit des parcours de langues du monde et de langues africaines dans une même maison d'apprentissage. Le premier parcours complet disponible est l'allemand A1.",
     ogDescription:
-      "Yema — apprenez, préparez-vous, appartenez. Interactif, correction en direct, simulations réalistes. Premier chapitre : l'allemand.",
+      "Yema réunit langues du monde et langues africaines dans des parcours distincts, avec progression sauvegardée et expériences adaptées à chaque univers.",
     twitterDescription:
-      "Apprenez une langue, préparez votre projet, appartenez à la maison. On commence par l'allemand.",
-    ogImageAlt: "Yema Languages — langues du monde et africaines, apprentissage aligné CECRL",
+      "Langues du monde, langues africaines, une seule maison. Commencez par les parcours actuellement disponibles sur Yema.",
+    ogImageAlt: "Yema Languages — langues du monde et africaines",
     ogLocale: "fr_FR",
   },
   en: {
@@ -33,12 +33,12 @@ const META = {
     ogTitle: "Yema Languages — Learn, prepare, belong",
     twitterTitle: "Yema — learn a language, prepare your journey",
     description:
-      "An independent CEFR-aligned platform, open to African languages and to world ones. First chapter: German.",
+      "Yema brings world-language and African-language journeys into one learning home. The first complete course currently available is German A1.",
     ogDescription:
-      "Yema — learn, prepare, belong. Interactive, live correction, realistic simulations. First chapter: German.",
+      "Yema brings world languages and African languages into distinct learning journeys with saved progress and experiences adapted to each universe.",
     twitterDescription:
-      "Learn a language, prepare your journey, belong to the house. We start with German.",
-    ogImageAlt: "Yema Languages — world and African languages, CEFR-aligned learning",
+      "World languages, African languages, one home. Start with the journeys currently available on Yema.",
+    ogImageAlt: "Yema Languages — world and African languages",
     ogLocale: "en_US",
   },
 } as const
@@ -79,17 +79,12 @@ export async function generateMetadata({
       siteName: "Yema",
       title: m.ogTitle,
       description: m.ogDescription,
-      // OG image localisée · /fr/opengraph-image vs /en/opengraph-image.
-      // Next génère la route par locale grâce à opengraph-image.tsx
-      // dans [locale]/ — il faut la cibler explicitement, sinon on
-      // hérite du /opengraph-image racine qui n'existe pas.
       images: [{ url: `/${key}/opengraph-image`, width: 1200, height: 630, alt: m.ogImageAlt }],
     },
     twitter: {
       card: "summary_large_image",
       title: m.twitterTitle,
       description: m.twitterDescription,
-      // Même image locale que OG — Twitter s'aligne sur la carte OG.
       images: [`/${key}/opengraph-image`],
       creator: "@yema",
     },
