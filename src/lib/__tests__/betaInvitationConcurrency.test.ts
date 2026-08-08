@@ -16,8 +16,32 @@ describe("closed beta invitation concurrency", () => {
     expect(lock).toBeGreaterThan(transaction);
     expect(revoke).toBeGreaterThan(lock);
     expect(create).toBeGreaterThan(revoke);
-    expect(store).toContain('status: "PENDING"');
-    expect(store).toContain('status: "REVOKED"');
     expect(store).toContain("emailHash");
+  });
+
+  it("supersedes pending tokens and in-flight unfinalized claims", () => {
+    const issuance = store.slice(
+      store.indexOf("export async function storeBetaInvitation"),
+      store.indexOf("export async function claimBetaInvitation"),
+    );
+
+    expect(issuance).toContain('{ status: "PENDING" }');
+    expect(issuance).toContain('{ status: "ACCEPTED", acceptedByUserId: null }');
+    expect(issuance).toContain('status: "REVOKED"');
+    expect(issuance).toContain("revokedAt: now");
+  });
+
+  it("never resurrects a superseded claim during release or stale recovery", () => {
+    const release = store.slice(
+      store.indexOf("export async function releaseBetaInvitationClaim"),
+      store.indexOf("export async function revokeBetaInvitation"),
+    );
+    const claim = store.slice(
+      store.indexOf("export async function claimBetaInvitation"),
+      store.indexOf("export async function finalizeBetaInvitation"),
+    );
+
+    expect(release).toContain("revokedAt: null");
+    expect(claim).toContain("revokedAt: null");
   });
 });
