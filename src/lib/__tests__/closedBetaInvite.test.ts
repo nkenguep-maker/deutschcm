@@ -45,15 +45,31 @@ describe("closed beta invitation provisioning", () => {
   it("stores only hashes and claims a pending invitation atomically", () => {
     const store = read("src/lib/beta/invitationStore.ts");
 
-    expect(store).toContain("prisma.betaInvitation.create");
+    expect(store).toContain("prisma.$transaction");
+    expect(store).toContain("tx.betaInvitation.create");
     expect(store).toContain("tokenHash: hashInviteToken(params.token)");
-    expect(store).toContain("emailHash: hashInviteEmail(params.email)");
+    expect(store).toContain("emailHash");
     expect(store).toContain("prisma.betaInvitation.updateMany");
     expect(store).toContain('status: "PENDING"');
     expect(store).toContain('status: "ACCEPTED"');
     expect(store).toContain("claim.count === 1");
     expect(store).not.toContain("token: params.token");
     expect(store).not.toContain("email: params.email");
+  });
+
+  it("keeps at most one pending invitation for each hashed email", () => {
+    const store = read("src/lib/beta/invitationStore.ts");
+    const transactionStart = store.indexOf("return prisma.$transaction");
+    const revokeOld = store.indexOf("await tx.betaInvitation.updateMany", transactionStart);
+    const createNew = store.indexOf("return tx.betaInvitation.create", transactionStart);
+
+    expect(transactionStart).toBeGreaterThan(-1);
+    expect(revokeOld).toBeGreaterThan(transactionStart);
+    expect(createNew).toBeGreaterThan(revokeOld);
+    expect(store.slice(revokeOld, createNew)).toContain("emailHash");
+    expect(store.slice(revokeOld, createNew)).toContain('status: "PENDING"');
+    expect(store.slice(revokeOld, createNew)).toContain('status: "REVOKED"');
+    expect(store.slice(revokeOld, createNew)).toContain("revokedAt: now");
   });
 
   it("recovers only stale incomplete claims instead of permanently burning an invite", () => {
