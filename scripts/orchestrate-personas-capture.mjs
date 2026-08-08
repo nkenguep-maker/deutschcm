@@ -21,7 +21,7 @@ function fail(step, msg, code = 1) {
 }
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-if (!url || !url.includes(P1_REF)) fail(0, `URL non-P1`);
+if (!url || !url.includes(P1_REF)) fail(0, "URL non-P1");
 for (const b of BLOCKED) if (url.includes(b)) fail(0, `blocklisted ${b}`);
 if (!process.env.P1_TEST_PASSWORD) fail(0, "P1_TEST_PASSWORD absent", 2);
 
@@ -29,7 +29,7 @@ async function main() {
   console.log("[personas-capture] STEP 1 · fixtures QA");
   spawnSync("node", ["scripts/test-baseline/yema-qa-fixtures.mjs"], { stdio: "inherit", env: process.env });
 
-  console.log(`[personas-capture] STEP 2 · next start port ${PORT} (redesign flag ON · HMAC injected)`);
+  console.log(`[personas-capture] STEP 2 · next start port ${PORT} (9 personas · workspaces P-1 ON)`);
   const hmacSecret = process.env.YEMA_CHILD_SESSION_SECRET
     ?? process.env.SUPABASE_JWT_SECRET
     ?? randomBytes(32).toString("base64");
@@ -39,6 +39,11 @@ async function main() {
       ...process.env,
       YEMA_DASHBOARD_REDESIGN_ENABLED: "true",
       YEMA_CHILD_SESSION_SECRET: hmacSecret,
+      YEMA_CENTER_REAL_DATA_ENABLED: "true",
+      YEMA_CENTER_RLS_CONFIRMED: "true",
+      YEMA_COACH_WORKSPACE_ENABLED: "true",
+      YEMA_ROOTS_COACH_RLS_CONFIRMED: "true",
+      YEMA_CIRCLE_ENABLED: "true",
     },
   });
   let ready = false;
