@@ -116,11 +116,12 @@ export async function resolvePersonaRuntime(params: {
   }
 
   if (appRoles.has("RACINES_COACH")) {
+    const onboarded = user.onboardingDone;
     return {
       persona: "coach",
       homeRoute: "/coach/racines",
-      onboardingRoute: "/coach/racines",
-      onboarded: user.onboardingDone,
+      onboardingRoute: onboarded ? "/coach/racines" : "/onboarding/coach",
+      onboarded,
       universe: "RACINES",
     };
   }
