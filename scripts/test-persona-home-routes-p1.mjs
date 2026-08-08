@@ -3,10 +3,11 @@
 // A persona home is valid only when the canonical route itself returns 200.
 // Redirects (3xx) are failures: they usually mean the active space/persona
 // resolved to another workspace, which is exactly the regression this gate
-// exists to catch. Student dashboards must additionally expose the resolved
-// universe marker so Monde and Racines cannot both false-green on /dashboard.
+// exists to catch. Dashboard personas must additionally expose the resolved
+// universe marker so Monde and Racines cannot false-green on /dashboard.
 
 import { spawn } from "node:child_process";
+import { randomBytes } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
 
 const P1_REF = "kzzagbojjkivdzzcrmxn";
@@ -40,6 +41,10 @@ const ADULTS = [
   ["student_racines", "test_yema_qa_student_racines@example.com", "/dashboard", "student_racines"],
   ["family", "test_yema_qa_family@example.com", "/family", null],
 ];
+const CHILDREN = [
+  ["child_monde", "test_yema_qa_child_family_monde", "1234", "child_monde"],
+  ["child_racines", "test_yema_qa_child_family_racines", "5678", "child_racines"],
+];
 const LOCALES = ["fr", "en"];
 
 async function loginCookie(email) {
@@ -61,11 +66,36 @@ async function loginCookie(email) {
   return `sb-${supRef}-auth-token=base64-${Buffer.from(JSON.stringify(payload)).toString("base64")}`;
 }
 
+async function assertDashboardPersona(host, cookie, id, locale, expectedPersona) {
+  const route = `/${locale}/dashboard`;
+  const response = await fetch(`http://${host}${route}`, {
+    headers: { Cookie: cookie, Origin: `http://${host}`, Host: host },
+    redirect: "manual",
+  });
+  if (response.status !== 200) {
+    const location = response.headers.get("location");
+    console.error(`  ✗ ${id} · ${route} → ${response.status}${location ? ` · location=${location}` : ""}`);
+    return false;
+  }
+  const html = await response.text();
+  const marker = `data-yema-persona=\"${expectedPersona}\"`;
+  if (!html.includes(marker)) {
+    console.error(`  ✗ ${id} · ${route} → 200 mais marker ${expectedPersona} absent`);
+    return false;
+  }
+  console.log(`  ✓ ${id} · ${route} → 200 · ${expectedPersona}`);
+  return true;
+}
+
 async function main() {
+  const hmacSecret = process.env.YEMA_CHILD_SESSION_SECRET
+    ?? process.env.SUPABASE_JWT_SECRET
+    ?? randomBytes(32).toString("base64");
   const server = spawn("npx", ["next", "start", "-p", PORT], {
     stdio: ["ignore", "pipe", "inherit"],
     env: {
       ...process.env,
+      YEMA_CHILD_SESSION_SECRET: hmacSecret,
       YEMA_DASHBOARD_REDESIGN_ENABLED: "true",
       YEMA_CENTER_REAL_DATA_ENABLED: "true",
       YEMA_CENTER_RLS_CONFIRMED: "true",
@@ -91,6 +121,10 @@ async function main() {
     for (const [id, email, routeSuffix, expectedPersona] of ADULTS) {
       const cookie = await loginCookie(email);
       for (const locale of LOCALES) {
+        if (expectedPersona) {
+          if (!(await assertDashboardPersona(host, cookie, id, locale, expectedPersona))) failed = true;
+          continue;
+        }
         const route = `/${locale}${routeSuffix}`;
         const response = await fetch(`http://${host}${route}`, {
           headers: { Cookie: cookie, Origin: `http://${host}`, Host: host },
@@ -100,20 +134,45 @@ async function main() {
           const location = response.headers.get("location");
           console.error(`  ✗ ${id} · ${route} → ${response.status}${location ? ` · location=${location}` : ""}`);
           failed = true;
-          continue;
+        } else {
+          console.log(`  ✓ ${id} · ${route} → 200`);
         }
-
-        if (expectedPersona) {
-          const html = await response.text();
-          const marker = `data-yema-persona=\"${expectedPersona}\"`;
-          if (!html.includes(marker)) {
-            console.error(`  ✗ ${id} · ${route} → 200 mais marker ${expectedPersona} absent`);
-            failed = true;
-            continue;
-          }
-        }
-        console.log(`  ✓ ${id} · ${route} → 200${expectedPersona ? ` · ${expectedPersona}` : ""}`);
       }
+    }
+
+    const familyCookie = await loginCookie("test_yema_qa_family@example.com");
+    const parentHeaders = {
+      Cookie: familyCookie,
+      Origin: `http://${host}`,
+      Host: host,
+      "Content-Type": "application/json",
+    };
+    for (const [id, childProfileId, pin, expectedPersona] of CHILDREN) {
+      const login = await fetch(`http://${host}/api/child-session`, {
+        method: "POST",
+        headers: parentHeaders,
+        body: JSON.stringify({ childProfileId, pin }),
+      });
+      if (login.status !== 200) {
+        console.error(`  ✗ ${id} · child-session → ${login.status}`);
+        failed = true;
+        continue;
+      }
+      const setCookie = login.headers.get("set-cookie") ?? "";
+      const match = setCookie.match(/yema_child_session=([^;]+)/);
+      if (!match) {
+        console.error(`  ✗ ${id} · yema_child_session cookie manquant`);
+        failed = true;
+        continue;
+      }
+      const childCookie = `${familyCookie}; yema_child_session=${match[1]}`;
+      for (const locale of LOCALES) {
+        if (!(await assertDashboardPersona(host, childCookie, id, locale, expectedPersona))) failed = true;
+      }
+      await fetch(`http://${host}/api/child-session`, {
+        method: "DELETE",
+        headers: { Cookie: childCookie, Origin: `http://${host}`, Host: host },
+      });
     }
   } finally {
     server.kill("SIGTERM");
@@ -121,7 +180,7 @@ async function main() {
   }
 
   if (failed) fail(2, "une ou plusieurs routes persona redirigent, échouent ou résolvent le mauvais univers");
-  console.log("[persona-home] ALL GREEN · FR/EN persona homes and student universes are canonical");
+  console.log("[persona-home] ALL GREEN · 9 personas FR/EN and dashboard universes are canonical");
 }
 
 main().catch((error) => fail("?", error.message));
