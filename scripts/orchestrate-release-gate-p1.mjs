@@ -39,6 +39,10 @@ const steps = [
   { name: "Vitest", cmd: "npm", args: ["test"] },
   { name: "TypeScript", cmd: "npx", args: ["tsc", "--noEmit"] },
   { name: "Next build", cmd: "npm", args: ["run", "build"] },
+  // Run fixture provisioning as its own fail-closed gate. The persona runner
+  // also invokes this helper defensively, but historically did not inspect
+  // spawnSync.status; keeping it explicit here prevents a false-green release.
+  { name: "QA persona fixtures", cmd: "node", args: ["scripts/test-baseline/yema-qa-fixtures.mjs"] },
   { name: "QA beta admission", cmd: "node", args: ["scripts/test-baseline/ensure-qa-beta-access-p1.mjs"] },
   { name: "9 personas runtime", cmd: "node", args: ["scripts/orchestrate-personas-p1.mjs"] },
   { name: "9 personas visual", cmd: "node", args: ["scripts/orchestrate-personas-capture.mjs"] },
