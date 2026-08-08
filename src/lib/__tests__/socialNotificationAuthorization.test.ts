@@ -42,8 +42,8 @@ describe("P4.7 · social notifications authorization", () => {
 
     expect(responder).toContain("prisma.$transaction");
     expect(responder).toContain("tx.studentGroupMember.upsert");
-    expect(responder).toMatch(/groupId_userId:\s*\{\s*groupId:\s*group\.id,\s*userId:\s*req\.fromUserId\s*\}/);
-    expect(responder).toMatch(/groupId_userId:\s*\{\s*groupId:\s*group\.id,\s*userId:\s*params\.responderUserId\s*\}/);
+    expect(responder).toContain("groupId_userId: { groupId: group.id, userId: req.fromUserId }");
+    expect(responder).toContain("groupId_userId: { groupId: lockedGroup.id, userId: params.responderUserId }");
     expect(responder).toContain('where: { id: invite.id, status: "pending", toUserId: params.responderUserId }');
   });
 
@@ -62,6 +62,22 @@ describe("P4.7 · social notifications authorization", () => {
     expect(enroll).toBeGreaterThan(decide);
     expect(responder).toContain('where: { id: req.id, status: "pending" }');
     expect(responder).toContain('reason: "classroom_full"');
+  });
+
+  it("serializes group membership materialization and enforces maxMembers", () => {
+    const responder = read("src/lib/social/respondJoinRequest.ts");
+    const helper = responder.indexOf("async function groupHasCapacity");
+    const lock = responder.indexOf("pg_advisory_xact_lock(hashtextextended(${groupId}, 0))", helper);
+    const count = responder.indexOf("tx.studentGroupMember.count", lock);
+    const capacity = responder.indexOf("activeCount >= group.maxMembers", count);
+
+    expect(helper).toBeGreaterThan(-1);
+    expect(lock).toBeGreaterThan(helper);
+    expect(count).toBeGreaterThan(lock);
+    expect(capacity).toBeGreaterThan(count);
+    expect(responder).toContain('reason: "group_full"');
+    expect(responder).toContain("groupHasCapacity(tx, ownedGroup.id, req.fromUserId)");
+    expect(responder).toContain("groupHasCapacity(tx, group.id, params.responderUserId)");
   });
 
   it("rate limits social writes from database history without a new counter store", () => {
