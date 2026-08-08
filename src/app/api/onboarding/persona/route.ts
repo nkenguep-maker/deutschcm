@@ -94,6 +94,9 @@ export async function POST(req: NextRequest) {
     ...(user.user_metadata ?? {}),
     requested_persona: persona,
     selected_plan: offer.selectedPlan,
+    // Compatibility alias for the existing Monde/Racines onboarding labels.
+    // It carries presentation intent only and is never trusted for access.
+    plan: offer.selectedPlan,
     selected_addons: offer.selectedAddon ? [offer.selectedAddon] : [],
     teacher_addon_requested: offer.teacherAddonRequested,
     post_onboarding_next: postOnboardingNext,
