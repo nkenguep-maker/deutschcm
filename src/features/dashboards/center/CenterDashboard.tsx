@@ -21,6 +21,7 @@ import {
 import { routeSectionNav, routeSectionTabs, sectionPageHref } from "@/features/dashboards/shared/sectionRouting";
 import { MessagesInboxLink } from "@/features/messaging/MessagesInboxLink";
 import { buildCenterNav, buildCenterMobileTabs } from "./nav";
+import { CenterPendingSection } from "./sections/CenterPendingSection";
 import type { CenterClassRow, CenterDashboardResponse, CenterStudentRow, CenterTeacherRow } from "./types";
 
 async function fetchJson<T>(url: string): Promise<T> {
@@ -123,7 +124,7 @@ export function CenterDashboard({ locale, activeSectionId = "centre" }: Props) {
   );
   const content: Record<string, React.ReactNode> = {
     centre: overview,
-    "a-traiter": overview,
+    "a-traiter": <CenterPendingSection baseHref={baseHref} locale={locale} />,
     eleves: listSection("eleves", t("students.title"), t("students.description"), partialErrors.students, t("students.loadFailed"), studentRows),
     enseignants: listSection("enseignants", t("teachers.title"), t("teachers.description"), partialErrors.teachers, t("teachers.loadFailed"), teacherRows),
     classes: listSection("classes", t("classes.title"), t("classes.description"), partialErrors.classes, t("classes.loadFailed"), classRows),
