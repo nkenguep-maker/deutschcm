@@ -97,7 +97,9 @@ export async function POST(req: NextRequest) {
   jar.set(CHILD_SESSION_COOKIE_NAME, cookieValue, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    // The child session is used only inside YEMA. It never participates in an
+    // OAuth/cross-site callback, so Strict is safer than the previous Lax mode.
+    sameSite: "strict",
     path: "/",
     maxAge: CHILD_SESSION_TTL_SECONDS,
   });
@@ -121,7 +123,7 @@ export async function DELETE(req: NextRequest) {
   jar.set(CHILD_SESSION_COOKIE_NAME, "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "strict",
     path: "/",
     maxAge: 0,
   });
