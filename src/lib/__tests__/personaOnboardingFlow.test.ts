@@ -66,7 +66,8 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     expect(familyPage).toContain("pas une adresse e-mail");
     expect(familyPage).toContain("avatar");
     expect(familyPage).toContain("PIN enfant");
-    expect(children).toContain("parentUserId: actor.userId");
+    expect(children).toContain("resolveFamilyGuardianActorOrNull");
+    expect(children).toContain("parentUserId: guard.parentId");
     expect(children).not.toContain("body.email");
     expect(seats).toContain("P1_TECHNICAL_BETA_CHILD_WORLD");
     expect(seats).toContain('process.env.VERCEL_ENV === "production"');
