@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 // Safety wrapper for the authenticated 9-persona P-1 runner.
-// It makes fixture provisioning fail-closed and always attempts to restore
+// It makes fixture provisioning fail-closed, aligns only the exact canonical
+// adult QA credentials with P1_TEST_PASSWORD, and always attempts to restore
 // idempotent QA fixtures after provisioning/runtime failures.
 
 import { spawnSync } from "node:child_process";
 
 const FIXTURE_SCRIPT = "scripts/test-baseline/yema-qa-fixtures.mjs";
+const PASSWORD_ALIGN_SCRIPT = "scripts/test-baseline/align-yema-qa-passwords-p1.mjs";
 const PERSONA_SCRIPT = "scripts/orchestrate-personas-p1.mjs";
 const ADULT_PERSONAS_VERIFY_SCRIPT = "scripts/verify-adult-persona-routes-p1.mjs";
 const CHILD_RACINES_VERIFY_SCRIPT = "scripts/verify-child-racines-session-p1.mjs";
@@ -42,6 +44,14 @@ if (failed(prep)) {
   console.error(`[personas-safe] FAIL · fixture provisioning failed (${describeResult(prep)})`);
   const recovery = attemptFixtureRecovery("provisioning failure");
   process.exit(failed(recovery) ? (recovery.status ?? 1) : (prep.status ?? 1));
+}
+
+console.log("[personas-safe] PREP · align and verify canonical adult QA credentials");
+const credentials = runNode(PASSWORD_ALIGN_SCRIPT);
+if (failed(credentials)) {
+  console.error(`[personas-safe] FAIL · credential alignment failed (${describeResult(credentials)})`);
+  const recovery = attemptFixtureRecovery("credential alignment failure");
+  process.exit(failed(recovery) ? (recovery.status ?? 1) : (credentials.status ?? 1));
 }
 
 let personaResult;
