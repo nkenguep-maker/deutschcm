@@ -21,6 +21,13 @@ describe("P-1 persona QA runner safety", () => {
     );
   });
 
+  it("attempts idempotent fixture recovery after provisioning failure", () => {
+    expect(safeRunner).toContain("attemptFixtureRecovery");
+    expect(safeRunner).toContain('attemptFixtureRecovery("provisioning failure")');
+    expect(safeRunner).toContain("fixture recovery failed");
+    expect(safeRunner).toMatch(/recovery\.status !== 0/);
+  });
+
   it("always restores idempotent P-1 fixtures after the persona process", () => {
     expect(safeRunner).toContain("finally {");
     expect(safeRunner).toContain("CLEANUP · restore idempotent P-1 fixtures");
@@ -28,9 +35,10 @@ describe("P-1 persona QA runner safety", () => {
     expect(safeRunner).toMatch(/cleanupResult = runNode\(FIXTURE_SCRIPT\)/);
   });
 
-  it("propagates both persona and cleanup failures instead of reporting a false green", () => {
+  it("propagates provisioning, persona, cleanup and recovery failures instead of reporting a false green", () => {
     expect(safeRunner).toMatch(/if \(cleanupResult\.status !== 0\)/);
     expect(safeRunner).toMatch(/if \(personaResult\.status !== 0\)/);
+    expect(safeRunner).toMatch(/recovery\.status !== 0/);
     expect(safeRunner).toContain("persona QA passed and fixtures restored");
   });
 });
