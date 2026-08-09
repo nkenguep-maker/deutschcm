@@ -6,6 +6,7 @@ const REPO = resolve(__dirname, "../../..");
 const entry = readFileSync(resolve(REPO, "scripts/test-personas-p1.mjs"), "utf8");
 const safeRunner = readFileSync(resolve(REPO, "scripts/orchestrate-personas-safe-p1.mjs"), "utf8");
 const personaRunner = readFileSync(resolve(REPO, "scripts/orchestrate-personas-p1.mjs"), "utf8");
+const adultPersonaVerifier = readFileSync(resolve(REPO, "scripts/verify-adult-persona-routes-p1.mjs"), "utf8");
 const childRacinesVerifier = readFileSync(resolve(REPO, "scripts/verify-child-racines-session-p1.mjs"), "utf8");
 
 describe("P-1 persona QA runner safety", () => {
@@ -46,6 +47,18 @@ describe("P-1 persona QA runner safety", () => {
     expect(safeRunner).toMatch(/cleanupResult = runNode\(FIXTURE_SCRIPT\)/);
   });
 
+  it("requires every expected adult allowed route before reporting green", () => {
+    expect(safeRunner).toContain('ADULT_PERSONAS_VERIFY_SCRIPT = "scripts/verify-adult-persona-routes-p1.mjs"');
+    expect(safeRunner).toContain("adult persona route verification failed");
+    expect(adultPersonaVerifier).toContain('P1_REF = "kzzagbojjkivdzzcrmxn"');
+    expect(adultPersonaVerifier).toContain("P1_TEST_PASSWORD absent");
+    expect(adultPersonaVerifier).toContain("for (const path of persona.allowedApi)");
+    expect(adultPersonaVerifier).toContain("response.status !== 200");
+    expect(adultPersonaVerifier).toContain("for (const path of persona.forbiddenApi)");
+    expect(adultPersonaVerifier).toContain("response.status === 200");
+    expect(adultPersonaVerifier).toContain("7/7 adult personas require every allowed route");
+  });
+
   it("requires an explicit Child Racines identity assertion before reporting green", () => {
     expect(safeRunner).toContain('CHILD_RACINES_VERIFY_SCRIPT = "scripts/verify-child-racines-session-p1.mjs"');
     expect(safeRunner).toContain("Child Racines session verification failed");
@@ -57,11 +70,12 @@ describe("P-1 persona QA runner safety", () => {
     expect(childRacinesVerifier).toContain('method: "DELETE"');
   });
 
-  it("propagates provisioning, persona, Child Racines, cleanup and recovery failures instead of reporting a false green", () => {
+  it("propagates provisioning, persona, adult-route, Child Racines, cleanup and recovery failures instead of reporting a false green", () => {
     expect(safeRunner).toContain("failed(cleanupResult)");
     expect(safeRunner).toContain("failed(personaResult)");
+    expect(safeRunner).toContain("failed(adultRoutesResult)");
     expect(safeRunner).toContain("failed(childRacinesResult)");
     expect(safeRunner).toContain("failed(recovery)");
-    expect(safeRunner).toContain("persona QA passed, Child Racines identity verified and fixtures restored");
+    expect(safeRunner).toContain("all adult routes verified, Child Racines identity verified and fixtures restored");
   });
 });
