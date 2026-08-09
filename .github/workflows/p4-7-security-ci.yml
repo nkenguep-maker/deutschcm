@@ -64,6 +64,7 @@ jobs:
           src/lib/__tests__/legalSurfaceAccuracy.test.ts
           src/lib/__tests__/personasCanonicalRoutes.test.ts
           src/lib/__tests__/personaOnboardingFlow.test.ts
+          src/lib/__tests__/personaQaRunnerSafety.test.ts
           src/lib/__tests__/publicPricingBetaGate.test.ts
           src/lib/__tests__/centerCommercialClaims.test.ts
           src/lib/__tests__/authorizationTrustBoundary.test.ts
