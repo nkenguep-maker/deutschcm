@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 const REPO = resolve(__dirname, "../../..");
 const entry = readFileSync(resolve(REPO, "scripts/test-personas-p1.mjs"), "utf8");
 const safeRunner = readFileSync(resolve(REPO, "scripts/orchestrate-personas-safe-p1.mjs"), "utf8");
+const personaRunner = readFileSync(resolve(REPO, "scripts/orchestrate-personas-p1.mjs"), "utf8");
 
 describe("P-1 persona QA runner safety", () => {
   it("routes the authenticated gate through the fail-closed fixture wrapper", () => {
@@ -18,6 +19,15 @@ describe("P-1 persona QA runner safety", () => {
     expect(safeRunner).toMatch(/if \(prep\.status !== 0\)/);
     expect(safeRunner.indexOf("fixture provisioning failed")).toBeLessThan(
       safeRunner.indexOf("authenticated 9-persona QA"),
+    );
+  });
+
+  it("fails closed if the inner persona runner fixture provisioning fails", () => {
+    expect(personaRunner).toContain("const fixturePrep = spawnSync");
+    expect(personaRunner).toMatch(/fixturePrep\.error \|\| fixturePrep\.signal \|\| fixturePrep\.status !== 0/);
+    expect(personaRunner).toContain("fixture provisioning failed");
+    expect(personaRunner.indexOf("fixture provisioning failed")).toBeLessThan(
+      personaRunner.indexOf("next start port"),
     );
   });
 
