@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 
 const FIXTURE_SCRIPT = "scripts/test-baseline/yema-qa-fixtures.mjs";
 const PERSONA_SCRIPT = "scripts/orchestrate-personas-p1.mjs";
+const ADULT_PERSONAS_VERIFY_SCRIPT = "scripts/verify-adult-persona-routes-p1.mjs";
 const CHILD_RACINES_VERIFY_SCRIPT = "scripts/verify-child-racines-session-p1.mjs";
 
 function runNode(script) {
@@ -44,6 +45,7 @@ if (failed(prep)) {
 }
 
 let personaResult;
+let adultRoutesResult;
 let childRacinesResult;
 let cleanupResult;
 try {
@@ -51,6 +53,11 @@ try {
   personaResult = runNode(PERSONA_SCRIPT);
 
   if (!failed(personaResult)) {
+    console.log("[personas-safe] VERIFY · all allowed routes for 7 adult personas");
+    adultRoutesResult = runNode(ADULT_PERSONAS_VERIFY_SCRIPT);
+  }
+
+  if (!failed(personaResult) && !failed(adultRoutesResult)) {
     console.log("[personas-safe] VERIFY · Child Racines session identity");
     childRacinesResult = runNode(CHILD_RACINES_VERIFY_SCRIPT);
   }
@@ -69,9 +76,14 @@ if (failed(personaResult)) {
   process.exit(personaResult?.status ?? 1);
 }
 
+if (failed(adultRoutesResult)) {
+  console.error(`[personas-safe] FAIL · adult persona route verification failed (${describeResult(adultRoutesResult)})`);
+  process.exit(adultRoutesResult?.status ?? 1);
+}
+
 if (failed(childRacinesResult)) {
   console.error(`[personas-safe] FAIL · Child Racines session verification failed (${describeResult(childRacinesResult)})`);
   process.exit(childRacinesResult?.status ?? 1);
 }
 
-console.log("[personas-safe] OK · persona QA passed, Child Racines identity verified and fixtures restored");
+console.log("[personas-safe] OK · persona QA passed, all adult routes verified, Child Racines identity verified and fixtures restored");
