@@ -24,6 +24,6 @@ if (!process.env.P1_TEST_PASSWORD) die(2, "MISSING P1_TEST_PASSWORD · NON-SKIPP
 const child = spawn("node", [
   "scripts/test-baseline/run-p4-5-b2-p1.mjs",
   "--flag", "on", "--",
-  "node", "scripts/orchestrate-personas-p1.mjs",
+  "node", "scripts/orchestrate-personas-safe-p1.mjs",
 ], { stdio: "inherit", env: process.env });
 child.on("exit", (code) => process.exit(code ?? 1));
