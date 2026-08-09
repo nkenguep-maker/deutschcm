@@ -134,7 +134,12 @@ async function checkPersona(HOST, persona) {
 
 async function main() {
   console.log("[personas] STEP 1 · fixtures QA idempotentes");
-  spawnSync("node", ["scripts/test-baseline/yema-qa-fixtures.mjs"], { stdio: "inherit", env: process.env });
+  const fixturePrep = spawnSync("node", ["scripts/test-baseline/yema-qa-fixtures.mjs"], { stdio: "inherit", env: process.env });
+  if (fixturePrep.error || fixturePrep.signal || fixturePrep.status !== 0) {
+    const detail = fixturePrep.error?.message
+      ?? (fixturePrep.signal ? `signal ${fixturePrep.signal}` : `exit ${fixturePrep.status ?? "unknown"}`);
+    fail(1, `fixture provisioning failed · ${detail}`);
+  }
 
   console.log(`[personas] STEP 2 · next start port ${PORT} (9 personas · workspaces P-1 ON)`);
   const hmacSecret = process.env.YEMA_CHILD_SESSION_SECRET
