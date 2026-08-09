@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 
 const FIXTURE_SCRIPT = "scripts/test-baseline/yema-qa-fixtures.mjs";
 const PERSONA_SCRIPT = "scripts/orchestrate-personas-p1.mjs";
+const CHILD_RACINES_VERIFY_SCRIPT = "scripts/verify-child-racines-session-p1.mjs";
 
 function runNode(script) {
   return spawnSync("node", [script], {
@@ -21,10 +22,14 @@ function describeResult(result) {
   return `exit ${result.status ?? "unknown"}`;
 }
 
+function failed(result) {
+  return Boolean(result?.error || result?.signal || result?.status !== 0);
+}
+
 function attemptFixtureRecovery(context) {
   console.log(`[personas-safe] RECOVERY · restore idempotent P-1 fixtures after ${context}`);
   const recovery = runNode(FIXTURE_SCRIPT);
-  if (recovery.status !== 0) {
+  if (failed(recovery)) {
     console.error(`[personas-safe] FAIL · fixture recovery failed (${describeResult(recovery)})`);
   }
   return recovery;
@@ -32,30 +37,41 @@ function attemptFixtureRecovery(context) {
 
 console.log("[personas-safe] PREP · provision fixtures P-1");
 const prep = runNode(FIXTURE_SCRIPT);
-if (prep.status !== 0) {
+if (failed(prep)) {
   console.error(`[personas-safe] FAIL · fixture provisioning failed (${describeResult(prep)})`);
   const recovery = attemptFixtureRecovery("provisioning failure");
-  process.exit(recovery.status !== 0 ? (recovery.status ?? 1) : (prep.status ?? 1));
+  process.exit(failed(recovery) ? (recovery.status ?? 1) : (prep.status ?? 1));
 }
 
 let personaResult;
+let childRacinesResult;
 let cleanupResult;
 try {
   console.log("[personas-safe] RUN · authenticated 9-persona QA");
   personaResult = runNode(PERSONA_SCRIPT);
+
+  if (!failed(personaResult)) {
+    console.log("[personas-safe] VERIFY · Child Racines session identity");
+    childRacinesResult = runNode(CHILD_RACINES_VERIFY_SCRIPT);
+  }
 } finally {
   console.log("[personas-safe] CLEANUP · restore idempotent P-1 fixtures");
   cleanupResult = runNode(FIXTURE_SCRIPT);
 }
 
-if (cleanupResult.status !== 0) {
+if (failed(cleanupResult)) {
   console.error(`[personas-safe] FAIL · fixture restoration failed (${describeResult(cleanupResult)})`);
   process.exit(cleanupResult.status ?? 1);
 }
 
-if (personaResult.status !== 0) {
+if (failed(personaResult)) {
   console.error(`[personas-safe] FAIL · persona QA failed (${describeResult(personaResult)})`);
-  process.exit(personaResult.status ?? 1);
+  process.exit(personaResult?.status ?? 1);
 }
 
-console.log("[personas-safe] OK · persona QA passed and fixtures restored");
+if (failed(childRacinesResult)) {
+  console.error(`[personas-safe] FAIL · Child Racines session verification failed (${describeResult(childRacinesResult)})`);
+  process.exit(childRacinesResult?.status ?? 1);
+}
+
+console.log("[personas-safe] OK · persona QA passed, Child Racines identity verified and fixtures restored");
