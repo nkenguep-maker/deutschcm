@@ -5,6 +5,9 @@
 // - refuses every target except the dedicated P-1 project via _common.mjs;
 // - only touches the exact TEST_YEMA_QA adult fixture emails below;
 // - never logs the password;
+// - preflights every account before the first password mutation;
+// - attempts every exact account even if one rotation fails, then retries only
+//   transient failures once so a single error cannot leave later personas stale;
 // - verifies every rotated credential with a real password sign-in before exit.
 
 import { createClient } from "@supabase/supabase-js";
@@ -59,28 +62,60 @@ async function listExpectedUsers() {
   return found;
 }
 
-async function main() {
-  console.log("[qa-passwords] PREP · locating canonical P-1 adult personas");
-  const users = await listExpectedUsers();
+function preflightUsers(users) {
   const missing = EXPECTED_EMAILS.filter((email) => !users.has(email));
   if (missing.length) {
     throw new Error(`REFUSED: missing canonical QA users after fixture provisioning: ${missing.join(", ")}`);
   }
 
-  console.log(`[qa-passwords] ROTATE · ${EXPECTED_EMAILS.length} exact P-1 QA accounts`);
   for (const email of EXPECTED_EMAILS) {
-    const user = users.get(email);
-    const fixtureMarker = user.user_metadata?.fixture;
+    const fixtureMarker = users.get(email)?.user_metadata?.fixture;
     if (fixtureMarker !== "TEST_YEMA_QA") {
       throw new Error(`REFUSED: ${email} lacks TEST_YEMA_QA fixture marker.`);
     }
-
-    const { error } = await admin.auth.admin.updateUserById(user.id, {
-      password,
-      email_confirm: true,
-    });
-    if (error) throw new Error(`updateUserById ${email}: ${error.message}`);
   }
+}
+
+async function rotateCredential(email, user) {
+  const { error } = await admin.auth.admin.updateUserById(user.id, {
+    password,
+    email_confirm: true,
+  });
+  return error ?? null;
+}
+
+async function rotateAllWithRetry(users) {
+  let failedEmails = [];
+
+  for (const email of EXPECTED_EMAILS) {
+    const error = await rotateCredential(email, users.get(email));
+    if (error) failedEmails.push(email);
+  }
+
+  if (!failedEmails.length) return;
+
+  console.warn(`[qa-passwords] RETRY · ${failedEmails.length} credential rotation(s) failed transiently`);
+  const retryFailures = [];
+  for (const email of failedEmails) {
+    const error = await rotateCredential(email, users.get(email));
+    if (error) retryFailures.push(email);
+  }
+
+  failedEmails = retryFailures;
+  if (failedEmails.length) {
+    throw new Error(`credential rotation failed after retry for: ${failedEmails.join(", ")}`);
+  }
+}
+
+async function main() {
+  console.log("[qa-passwords] PREP · locating canonical P-1 adult personas");
+  const users = await listExpectedUsers();
+
+  // Fail before the first mutation if any identity/fixture invariant is wrong.
+  preflightUsers(users);
+
+  console.log(`[qa-passwords] ROTATE · ${EXPECTED_EMAILS.length} exact P-1 QA accounts`);
+  await rotateAllWithRetry(users);
 
   console.log("[qa-passwords] VERIFY · real password login for every adult persona");
   for (const email of EXPECTED_EMAILS) {
