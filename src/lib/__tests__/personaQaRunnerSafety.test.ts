@@ -8,6 +8,7 @@ const safeRunner = readFileSync(resolve(REPO, "scripts/orchestrate-personas-safe
 const personaRunner = readFileSync(resolve(REPO, "scripts/orchestrate-personas-p1.mjs"), "utf8");
 const adultPersonaVerifier = readFileSync(resolve(REPO, "scripts/verify-adult-persona-routes-p1.mjs"), "utf8");
 const childRacinesVerifier = readFileSync(resolve(REPO, "scripts/verify-child-racines-session-p1.mjs"), "utf8");
+const credentialAligner = readFileSync(resolve(REPO, "scripts/test-baseline/align-yema-qa-passwords-p1.mjs"), "utf8");
 
 describe("P-1 persona QA runner safety", () => {
   it("routes the authenticated gate through the fail-closed fixture wrapper", () => {
@@ -45,6 +46,17 @@ describe("P-1 persona QA runner safety", () => {
     expect(safeRunner).toContain("CLEANUP · restore idempotent P-1 fixtures");
     expect(safeRunner).toContain("fixture restoration failed");
     expect(safeRunner).toMatch(/cleanupResult = runNode\(FIXTURE_SCRIPT\)/);
+  });
+
+  it("preflights all exact QA accounts before rotating credentials and retries transient rotation failures", () => {
+    expect(credentialAligner).toContain("preflightUsers(users)");
+    expect(credentialAligner.indexOf("preflightUsers(users)")).toBeLessThan(
+      credentialAligner.indexOf("rotateAllWithRetry(users)"),
+    );
+    expect(credentialAligner).toContain('fixtureMarker !== "TEST_YEMA_QA"');
+    expect(credentialAligner).toContain("RETRY · ${failedEmails.length} credential rotation(s) failed transiently");
+    expect(credentialAligner).toContain("credential rotation failed after retry for:");
+    expect(credentialAligner).toContain("signInWithPassword");
   });
 
   it("requires every expected adult allowed route before reporting green", () => {
