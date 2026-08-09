@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Safety wrapper for the authenticated 9-persona P-1 runner.
 // It makes fixture provisioning fail-closed and always attempts to restore
-// idempotent QA fixtures after the runtime suite, including failure/signal paths.
+// idempotent QA fixtures after provisioning/runtime failures.
 
 import { spawnSync } from "node:child_process";
 
@@ -21,11 +21,21 @@ function describeResult(result) {
   return `exit ${result.status ?? "unknown"}`;
 }
 
+function attemptFixtureRecovery(context) {
+  console.log(`[personas-safe] RECOVERY · restore idempotent P-1 fixtures after ${context}`);
+  const recovery = runNode(FIXTURE_SCRIPT);
+  if (recovery.status !== 0) {
+    console.error(`[personas-safe] FAIL · fixture recovery failed (${describeResult(recovery)})`);
+  }
+  return recovery;
+}
+
 console.log("[personas-safe] PREP · provision fixtures P-1");
 const prep = runNode(FIXTURE_SCRIPT);
 if (prep.status !== 0) {
   console.error(`[personas-safe] FAIL · fixture provisioning failed (${describeResult(prep)})`);
-  process.exit(prep.status ?? 1);
+  const recovery = attemptFixtureRecovery("provisioning failure");
+  process.exit(recovery.status !== 0 ? (recovery.status ?? 1) : (prep.status ?? 1));
 }
 
 let personaResult;
