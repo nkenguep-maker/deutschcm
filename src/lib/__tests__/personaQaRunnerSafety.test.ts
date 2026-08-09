@@ -6,6 +6,7 @@ const REPO = resolve(__dirname, "../../..");
 const entry = readFileSync(resolve(REPO, "scripts/test-personas-p1.mjs"), "utf8");
 const safeRunner = readFileSync(resolve(REPO, "scripts/orchestrate-personas-safe-p1.mjs"), "utf8");
 const personaRunner = readFileSync(resolve(REPO, "scripts/orchestrate-personas-p1.mjs"), "utf8");
+const childRacinesVerifier = readFileSync(resolve(REPO, "scripts/verify-child-racines-session-p1.mjs"), "utf8");
 
 describe("P-1 persona QA runner safety", () => {
   it("routes the authenticated gate through the fail-closed fixture wrapper", () => {
@@ -16,7 +17,7 @@ describe("P-1 persona QA runner safety", () => {
 
   it("fails before persona execution when fixture provisioning fails", () => {
     expect(safeRunner).toContain("fixture provisioning failed");
-    expect(safeRunner).toMatch(/if \(prep\.status !== 0\)/);
+    expect(safeRunner).toContain("failed(prep)");
     expect(safeRunner.indexOf("fixture provisioning failed")).toBeLessThan(
       safeRunner.indexOf("authenticated 9-persona QA"),
     );
@@ -35,7 +36,7 @@ describe("P-1 persona QA runner safety", () => {
     expect(safeRunner).toContain("attemptFixtureRecovery");
     expect(safeRunner).toContain('attemptFixtureRecovery("provisioning failure")');
     expect(safeRunner).toContain("fixture recovery failed");
-    expect(safeRunner).toMatch(/recovery\.status !== 0/);
+    expect(safeRunner).toContain("failed(recovery)");
   });
 
   it("always restores idempotent P-1 fixtures after the persona process", () => {
@@ -45,10 +46,22 @@ describe("P-1 persona QA runner safety", () => {
     expect(safeRunner).toMatch(/cleanupResult = runNode\(FIXTURE_SCRIPT\)/);
   });
 
-  it("propagates provisioning, persona, cleanup and recovery failures instead of reporting a false green", () => {
-    expect(safeRunner).toMatch(/if \(cleanupResult\.status !== 0\)/);
-    expect(safeRunner).toMatch(/if \(personaResult\.status !== 0\)/);
-    expect(safeRunner).toMatch(/recovery\.status !== 0/);
-    expect(safeRunner).toContain("persona QA passed and fixtures restored");
+  it("requires an explicit Child Racines identity assertion before reporting green", () => {
+    expect(safeRunner).toContain('CHILD_RACINES_VERIFY_SCRIPT = "scripts/verify-child-racines-session-p1.mjs"');
+    expect(safeRunner).toContain("Child Racines session verification failed");
+    expect(childRacinesVerifier).toContain('const CHILD_ID = "test_yema_qa_child_family_racines"');
+    expect(childRacinesVerifier).toContain("/api/child-session");
+    expect(childRacinesVerifier).toContain("sessionBody?.active");
+    expect(childRacinesVerifier).toContain("sessionBody.childProfileId !== CHILD_ID");
+    expect(childRacinesVerifier).toContain("dashboard.status !== 200");
+    expect(childRacinesVerifier).toContain('method: "DELETE"');
+  });
+
+  it("propagates provisioning, persona, Child Racines, cleanup and recovery failures instead of reporting a false green", () => {
+    expect(safeRunner).toContain("failed(cleanupResult)");
+    expect(safeRunner).toContain("failed(personaResult)");
+    expect(safeRunner).toContain("failed(childRacinesResult)");
+    expect(safeRunner).toContain("failed(recovery)");
+    expect(safeRunner).toContain("persona QA passed, Child Racines identity verified and fixtures restored");
   });
 });
