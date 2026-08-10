@@ -1334,13 +1334,13 @@ describe("Release Canonicalization · /family + /center/stats + QA fail-closed +
     expect(proxy).toMatch(/pathname\.startsWith\("\/famille"\)/);
   });
 
-  it("Personas matrix · family + child_* pointent vers /fr/family (canonique)", () => {
+  it("Personas matrix · family et enfants pointent vers leurs destinations canoniques", () => {
     const matrix = readRepo("src/lib/personas/matrix.ts");
     // family homeRoute = /fr/family
     expect(matrix).toMatch(/id:\s*"family"[\s\S]{0,300}homeRoute:\s*"\/fr\/family"/);
-    // child_monde + child_racines · homeRoute canonique /fr/family (plus /famille/enfant)
-    expect(matrix).toMatch(/id:\s*"child_monde"[\s\S]{0,300}homeRoute:\s*"\/fr\/family"/);
-    expect(matrix).toMatch(/id:\s*"child_racines"[\s\S]{0,300}homeRoute:\s*"\/fr\/family"/);
+    // Les enfants arrivent sur le dashboard après ouverture de la session PIN.
+    expect(matrix).toMatch(/id:\s*"child_monde"[\s\S]{0,300}homeRoute:\s*"\/fr\/dashboard"/);
+    expect(matrix).toMatch(/id:\s*"child_racines"[\s\S]{0,300}homeRoute:\s*"\/fr\/dashboard"/);
     // Aucune référence résiduelle à /fr/famille dans les homeRoutes.
     expect(matrix).not.toMatch(/homeRoute:\s*"\/fr\/famille/);
   });
