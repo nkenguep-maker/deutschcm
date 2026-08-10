@@ -14,13 +14,20 @@ afterEach(() => {
 });
 
 describe("internal persona gate parity", () => {
-  it("allows exact P-1 in local and Preview runtimes", () => {
+  it("allows exact P-1 in confirmed local and Preview runtimes", () => {
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", P1);
     vi.stubEnv("VERCEL_ENV", "");
+    vi.stubEnv("P1_BASELINE_CONFIRMED_NOT_PRODUCTION", "true");
     expectParity(true);
 
     vi.stubEnv("VERCEL_ENV", "preview");
     expectParity(true);
+  });
+
+  it("refuses unconfirmed local P-1 in both gates", () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", P1);
+    vi.stubEnv("VERCEL_ENV", "");
+    expectParity(false);
   });
 
   it("refuses Production regardless of the Supabase URL", () => {

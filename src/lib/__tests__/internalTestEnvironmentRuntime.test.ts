@@ -8,10 +8,17 @@ afterEach(() => {
 });
 
 describe("internal persona runtime gate", () => {
-  it("allows the exact P-1 URL in a local runner without extra shell flags", () => {
+  it("allows the exact P-1 URL in a locally confirmed P-1 runner", () => {
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", P1);
     vi.stubEnv("VERCEL_ENV", "");
+    vi.stubEnv("P1_BASELINE_CONFIRMED_NOT_PRODUCTION", "true");
     expect(isInternalTestEnvironment()).toBe(true);
+  });
+
+  it("refuses a local P-1 URL without explicit non-Production confirmation", () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", P1);
+    vi.stubEnv("VERCEL_ENV", "");
+    expect(isInternalTestEnvironment()).toBe(false);
   });
 
   it("allows the exact P-1 URL on Vercel Preview", () => {

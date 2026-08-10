@@ -163,17 +163,26 @@ describe("guided-phrases · sécurité univers enfant", () => {
   });
 });
 
-describe("MessagesInboxLink · self-hide quand flag off (404)", () => {
+describe("MessagesInboxLink · etat explicite quand flag off (404)", () => {
   const src = read("features/messaging/MessagesInboxLink.tsx");
 
-  it("fetch unread-summary et masque si 404 ou erreur", () => {
+  it("fetch unread-summary et marque la fonctionnalite indisponible si 404 ou erreur", () => {
     expect(src).toMatch(/fetch\("\/api\/messaging\/unread-summary"/);
     expect(src).toMatch(/if \(r\.status === 404\)/);
     expect(src).toMatch(/setAvailable\(false\)/);
   });
 
-  it("retourne null quand available !== true", () => {
-    expect(src).toMatch(/if \(available !== true\) return null/);
+  it("affiche un statut accessible quand la fonctionnalite est indisponible", () => {
+    expect(src).toMatch(/if \(available === false\)/);
+    expect(src).toMatch(/role="status"/);
+    expect(src).toContain('t("featureDisabled")');
+  });
+
+  it("ne rend le CTA de messagerie qu'apres disponibilite confirmee", () => {
+    const readyState = src.indexOf("if (available === false)");
+    const cta = src.indexOf("href={`/${locale}/messages`}");
+    expect(readyState).toBeGreaterThan(-1);
+    expect(cta).toBeGreaterThan(readyState);
   });
 
   it("CTA vers /[locale]/messages localisé", () => {

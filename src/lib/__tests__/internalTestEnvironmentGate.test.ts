@@ -14,7 +14,9 @@ describe("internal persona tooling environment gate", () => {
     expect(gate).toContain("return false");
     expect(gate).toContain("P1_BASELINE_CONFIRMED_NOT_PRODUCTION");
     expect(gate).toContain('process.env.VERCEL_ENV === "preview"');
-    expect(gate).toContain("FORBIDDEN_REFS");
+    expect(gate).toContain("function isCanonicalP1SupabaseUrl");
+    expect(gate).toContain('url.protocol === "https:"');
+    expect(gate).toContain('url.hostname === `${P1_REF}.supabase.co`');
   });
 
   it("makes stale persona cookies inert outside the same P-1 runtime gate", () => {
@@ -26,7 +28,9 @@ describe("internal persona tooling environment gate", () => {
     expect(runtimeGate).toBeGreaterThan(-1);
     expect(persona).toContain('process.env.VERCEL_ENV === "production"');
     expect(persona).toContain('INTERNAL_TEST_P1_REF = "kzzagbojjkivdzzcrmxn"');
-    expect(persona).toContain("INTERNAL_TEST_FORBIDDEN_REFS");
+    expect(persona).toContain("function isCanonicalP1SupabaseUrl");
+    expect(persona).toContain('url.hostname === `${INTERNAL_TEST_P1_REF}.supabase.co`');
+    expect(persona).toContain("P1_BASELINE_CONFIRMED_NOT_PRODUCTION");
     expect(resolverGate).toBeGreaterThan(resolver);
   });
 
