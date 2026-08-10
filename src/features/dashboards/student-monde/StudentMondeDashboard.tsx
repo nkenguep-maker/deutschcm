@@ -145,6 +145,8 @@ export function StudentMondeDashboard({ locale, activeSectionId = "accueil" }: P
         : (currentLocale === "en" ? "Course not open yet" : "Cours pas encore ouvert");
   const accessTone = data.access.status === "ACTIVE" ? "success" as const : data.access.status === "EXPIRED" ? "alert" as const : "muted" as const;
 
+  // Lot 7A.2: completed is an explicit état pédagogique; an expired
+  // entitlement alone must never mark a learner's path as completed.
   const overview = (
     <MondeIvoryOverview input={{ learningGoal: data.onboarding?.learningGoal ?? null, targetCity: data.onboarding?.targetCity ?? null, targetDate: null, progressPct: data.overallPct ?? 0, completed: false, level: data.learningPath?.currentLevel ?? null }} />
   );
