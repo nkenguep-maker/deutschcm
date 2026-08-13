@@ -2,7 +2,7 @@
 
 ## Mission
 
-Bring YEMA to closed beta, then prepare Production only after every gate is proven green.
+Bring YEMA to an open beta on Preview, then prepare Production only after every gate is proven green.
 
 ## Non-Negotiable Production Rules
 
@@ -63,12 +63,18 @@ Follow this order strictly:
 
 1. Canonicalize Vercel.
 2. Finish P4.7 security, RLS, and CI.
-3. Run real QA for 9 personas with `signInWithPassword()`.
-4. Run E2E coverage for onboarding, invitations, beta, auth callback, child switch, notifications, social, messaging, and approvals.
+3. Validate open-beta acquisition: public registration, email confirmation, auth callback, onboarding, and first dashboard.
+4. Run E2E coverage for logout, child switch, notifications, social, messaging, approvals, and the public onboarding funnel.
 5. Validate accessibility, responsive behavior, performance, mobile, Lighthouse, WCAG, focus, and keyboard.
-6. Validate closed beta invitations, expiration, revoke, replay, and onboarding.
+6. Run real QA for 9 personas with `signInWithPassword()`.
 7. Validate commercial work: Stripe, entitlements, webhooks, and plans.
 8. Work on pedagogical content only after everything above is complete.
+
+## Open Beta Mode
+
+- Public registration is the intended Preview experience.
+- Keep `YEMA_CLOSED_BETA_ENABLED` unset or `false` in Preview while open beta is active.
+- The closed-beta invitation flow remains dormant and must not gate public signup, callback reconciliation, or onboarding unless the server-only flag is explicitly set to `true`.
 
 ## Persona QA
 
@@ -110,7 +116,7 @@ Already implemented in PR `#29`; do not break these:
 
 Current blocker:
 
-- Real QA runtime needs aligned QA accounts or a new QA account set, then real login execution.
+- Real QA runtime still needs aligned QA accounts or a new QA account set. This is a later gate and does not block the public open-beta funnel.
 
 ## Iteration Rule
 

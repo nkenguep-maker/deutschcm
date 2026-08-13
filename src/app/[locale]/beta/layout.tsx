@@ -1,23 +1,31 @@
 import type { Metadata } from "next";
+import { isClosedBetaEnabled } from "@/lib/beta/invite";
 
-export const metadata: Metadata = {
-  robots: {
-    index: false,
-    follow: false,
-    nocache: true,
-    googleBot: {
-      index: false,
-      follow: false,
-      noarchive: true,
-      nosnippet: true,
-      noimageindex: true,
-    },
-  },
-};
+export function generateMetadata(): Metadata {
+  if (isClosedBetaEnabled()) {
+    return {
+      robots: {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: {
+          index: false,
+          follow: false,
+          noarchive: true,
+          nosnippet: true,
+          noimageindex: true,
+        },
+      },
+    };
+  }
 
-// Invitation pages must never become static/cached artifacts. The actual token
-// lives only in the URL fragment and is removed from browser history client-side,
-// but keeping the route dynamic avoids serving stale admission UI during beta.
+  return {
+    robots: { index: true, follow: true },
+  };
+}
+
+// The access state depends on a server-only flag. Keep it dynamic so an open
+// registration page is never served as a stale invitation-only page, or vice versa.
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
