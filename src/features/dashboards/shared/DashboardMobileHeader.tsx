@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { YemaWordmark } from "./YemaWordmark";
+import { DashboardSignOutButton } from "./DashboardSignOutButton";
 
 type Props = {
   personaLabel: string;
@@ -19,6 +20,7 @@ export function DashboardMobileHeader({
   const localeBase = brandHref === "/" ? "" : brandHref.replace(/\/$/, "");
   const offersHref = `${localeBase}/offers` || "/offers";
   const offersLabel = brandHref.startsWith("/en") ? "Offers" : "Offres";
+  const locale = brandHref.startsWith("/en") ? "en" : "fr";
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -70,6 +72,7 @@ export function DashboardMobileHeader({
           {offersLabel}
         </Link>
       ) : null}
+      {!isChildPersona ? <DashboardSignOutButton locale={locale} compact /> : null}
       {right ? <div style={{ flexShrink: 0 }}>{right}</div> : null}
     </div>
   );
