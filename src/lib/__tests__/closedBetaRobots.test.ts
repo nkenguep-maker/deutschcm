@@ -5,12 +5,14 @@ import { describe, expect, it } from "vitest";
 const REPO = resolve(__dirname, "../../..");
 const layout = readFileSync(resolve(REPO, "src/app/[locale]/beta/layout.tsx"), "utf8");
 
-describe("closed beta search visibility", () => {
-  it("keeps beta and invitation routes out of search indexes", () => {
-    expect(layout).toContain("export const metadata");
+describe("beta search visibility", () => {
+  it("keeps invitation mode private while allowing the open-beta entry point to be indexed", () => {
+    expect(layout).toContain("export function generateMetadata");
+    expect(layout).toContain("isClosedBetaEnabled()");
     expect(layout).toContain("robots:");
     expect(layout).toContain("index: false");
     expect(layout).toContain("follow: false");
     expect(layout).toContain("nocache: true");
+    expect(layout).toContain("robots: { index: true, follow: true }");
   });
 });
