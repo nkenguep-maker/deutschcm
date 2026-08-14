@@ -85,6 +85,19 @@ export async function POST(req: NextRequest) {
     && MONDE_PATHWAY_VARIANTS.has(body.pathwayVariant)
     ? body.pathwayVariant
     : null;
+  const rawLanguageId = typeof body.languageId === "string" ? body.languageId : null;
+  const requestedLanguage = persona === "student_monde"
+    ? (rawLanguageId ?? "deutsch")
+    : persona === "student_racines" || persona === "family"
+      ? (rawLanguageId ?? "wolof")
+      : null;
+
+  if (
+    (persona === "student_monde" && requestedLanguage !== "deutsch") ||
+    ((persona === "student_racines" || persona === "family") && requestedLanguage !== "wolof")
+  ) {
+    return bad("LANGUAGE_INVALID");
+  }
 
   const offer = compatibleOfferIntent({
     persona,
@@ -111,6 +124,7 @@ export async function POST(req: NextRequest) {
     selected_addons: offer.selectedAddon ? [offer.selectedAddon] : [],
     teacher_addon_requested: offer.teacherAddonRequested,
     post_onboarding_next: postOnboardingNext,
+    ...(requestedLanguage ? { requested_language: requestedLanguage } : {}),
   };
 
   if (persona === "student_monde" && pathwayVariant) {

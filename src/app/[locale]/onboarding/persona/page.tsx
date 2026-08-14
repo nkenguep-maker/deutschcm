@@ -8,6 +8,7 @@ import {
   GraduationCap,
   HeartHandshake,
   Home,
+  Languages,
   Landmark,
   Plane,
   UserRound,
@@ -22,8 +23,9 @@ import { useOnboardingSelectionMode } from "@/components/onboarding/OnboardingPr
 import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import type { AdultPersonaId } from "@/lib/personas/runtime";
 
-type Stage = "start" | "world" | "roots" | "professional";
+type Stage = "start" | "world-language" | "world" | "roots-language" | "roots" | "professional";
 type PathwayVariant = "STUDIES" | "VISA" | "NATURALIZATION" | "TOURISM";
+type LearningLanguageId = "deutsch" | "wolof";
 const PRECONFIRMATION_DRAFT_KEY = "yema.preconfirmation.journey";
 
 type Card = {
@@ -38,6 +40,7 @@ type Card = {
   persona?: Exclude<AdultPersonaId, "super_admin">;
   nextStage?: Exclude<Stage, "start">;
   pathwayVariant?: PathwayVariant;
+  languageId?: LearningLanguageId;
   tone: "world" | "roots" | "professional";
 };
 
@@ -51,7 +54,7 @@ const START_CARDS: readonly Card[] = [
     titleEn: "A world language",
     bodyFr: "Pour les études, le travail, une installation ou un voyage.",
     bodyEn: "For studies, work, moving abroad or travel.",
-    nextStage: "world",
+    nextStage: "world-language",
     tone: "world",
   },
   {
@@ -63,7 +66,7 @@ const START_CARDS: readonly Card[] = [
     titleEn: "A family language",
     bodyFr: "Pour vous, ou pour la transmettre à vos enfants.",
     bodyEn: "For yourself, or to pass it on to your children.",
-    nextStage: "roots",
+    nextStage: "roots-language",
     tone: "roots",
   },
   {
@@ -77,6 +80,38 @@ const START_CARDS: readonly Card[] = [
     bodyEn: "To teach, coach, or represent a learning center.",
     nextStage: "professional",
     tone: "professional",
+  },
+];
+
+const WORLD_LANGUAGE_CARDS: readonly Card[] = [
+  {
+    id: "deutsch",
+    icon: Languages,
+    eyebrowFr: "DE · Monde",
+    eyebrowEn: "DE · World",
+    titleFr: "Allemand",
+    titleEn: "German",
+    bodyFr: "Disponible maintenant, du niveau A1 jusqu’aux parcours avancés.",
+    bodyEn: "Available now, from A1 through advanced journeys.",
+    languageId: "deutsch",
+    nextStage: "world",
+    tone: "world",
+  },
+];
+
+const ROOTS_LANGUAGE_CARDS: readonly Card[] = [
+  {
+    id: "wolof",
+    icon: Languages,
+    eyebrowFr: "WO · Racines",
+    eyebrowEn: "WO · Roots",
+    titleFr: "Wolof",
+    titleEn: "Wolof",
+    bodyFr: "Le parcours Racines actuellement proposé en bêta.",
+    bodyEn: "The Roots journey currently offered in beta.",
+    languageId: "wolof",
+    nextStage: "roots",
+    tone: "roots",
   },
 ];
 
@@ -202,26 +237,51 @@ const PROFESSIONAL_CARDS: readonly Card[] = [
 ];
 
 function cardsFor(stage: Stage): readonly Card[] {
+  if (stage === "world-language") return WORLD_LANGUAGE_CARDS;
   if (stage === "world") return WORLD_CARDS;
+  if (stage === "roots-language") return ROOTS_LANGUAGE_CARDS;
   if (stage === "roots") return ROOTS_CARDS;
   if (stage === "professional") return PROFESSIONAL_CARDS;
   return START_CARDS;
 }
 
-function cardFromPreconfirmationDraft(value: unknown): Card | null {
+function cardFromPreconfirmationDraft(value: unknown): { card: Card; languageId: LearningLanguageId | null } | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const draft = value as { persona?: unknown; pathwayVariant?: unknown };
-  return [...WORLD_CARDS, ...ROOTS_CARDS, ...PROFESSIONAL_CARDS].find((card) =>
+  const draft = value as { persona?: unknown; pathwayVariant?: unknown; languageId?: unknown };
+  const card = [...WORLD_CARDS, ...ROOTS_CARDS, ...PROFESSIONAL_CARDS].find((card) =>
     card.persona === draft.persona && card.pathwayVariant === draft.pathwayVariant,
-  ) ?? null;
+  );
+  if (!card) return null;
+
+  const defaultLanguage = card.persona === "student_monde"
+    ? "deutsch"
+    : card.persona === "student_racines" || card.persona === "family"
+      ? "wolof"
+      : null;
+  const languageId = draft.languageId === "deutsch" || draft.languageId === "wolof"
+    ? draft.languageId
+    : defaultLanguage;
+  if (card.persona === "student_monde" && languageId !== "deutsch") return null;
+  if ((card.persona === "student_racines" || card.persona === "family") && languageId !== "wolof") return null;
+  return { card, languageId };
 }
 
 function copyFor(stage: Stage, locale: "fr" | "en") {
   const english = locale === "en";
+  if (stage === "world-language") {
+    return english
+      ? { kicker: "Your language", title: "Which language would you like to learn?", body: "Choose your language before tailoring your journey." }
+      : { kicker: "Votre langue", title: "Quelle langue souhaitez-vous apprendre ?", body: "Choisissez votre langue avant de personnaliser votre parcours." };
+  }
   if (stage === "world") {
     return english
-      ? { kicker: "Your project", title: "What should German help you do?", body: "We will adapt situations and examples to this goal." }
-      : { kicker: "Votre projet", title: "À quoi doit vous servir l’allemand ?", body: "Nous adapterons les situations et les exemples à ce projet." };
+      ? { kicker: "Your project", title: "What should this language help you do?", body: "We will adapt situations and examples to this goal." }
+      : { kicker: "Votre projet", title: "À quoi doit vous servir cette langue ?", body: "Nous adapterons les situations et les exemples à ce projet." };
+  }
+  if (stage === "roots-language") {
+    return english
+      ? { kicker: "Your language", title: "Which language would you like to reconnect with?", body: "Choose the language before shaping your Roots journey." }
+      : { kicker: "Votre langue", title: "Quelle langue souhaitez-vous retrouver ?", body: "Choisissez votre langue avant de dessiner votre parcours Racines." };
   }
   if (stage === "roots") {
     return english
@@ -255,31 +315,43 @@ export default function PersonaOnboardingPage() {
   const [loading, setLoading] = useState<AdultPersonaId | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [previewChoice, setPreviewChoice] = useState<Card | null>(null);
+  const [learningLanguage, setLearningLanguage] = useState<LearningLanguageId | null>(null);
   const preconfirmationReplayRef = useRef(false);
   const copy = copyFor(stage, loc);
   const cards = cardsFor(stage);
-  const greetingPool = stage === "world" ? "world" : stage === "roots" ? "sources" : "all";
+  const greetingPool = stage === "world" || stage === "world-language"
+    ? "world"
+    : stage === "roots" || stage === "roots-language"
+      ? "sources"
+      : "all";
 
   useEffect(() => {
     if (selectionMode !== "live" || preconfirmationReplayRef.current) return;
     try {
       const raw = window.localStorage.getItem(PRECONFIRMATION_DRAFT_KEY);
       if (!raw) return;
-      const card = cardFromPreconfirmationDraft(JSON.parse(raw));
-      if (!card) {
+      const draft = cardFromPreconfirmationDraft(JSON.parse(raw));
+      if (!draft) {
         window.localStorage.removeItem(PRECONFIRMATION_DRAFT_KEY);
         return;
       }
       preconfirmationReplayRef.current = true;
-      void choose(card);
+      void choose(draft.card, draft.languageId);
     } catch {
       window.localStorage.removeItem(PRECONFIRMATION_DRAFT_KEY);
     }
+    // The draft is intentionally replayed only when this mode mounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectionMode]);
 
-  async function choose(card: Card) {
+  async function choose(card: Card, languageId: LearningLanguageId | null = learningLanguage) {
     if (card.nextStage) {
       setError(null);
+      if (card.languageId) {
+        setLearningLanguage(card.languageId);
+      } else if (card.id === "world" || card.id === "roots" || card.id === "professional") {
+        setLearningLanguage(null);
+      }
       setStage(card.nextStage);
       return;
     }
@@ -293,7 +365,7 @@ export default function PersonaOnboardingPage() {
     if (preconfirmation) {
       window.localStorage.setItem(
         PRECONFIRMATION_DRAFT_KEY,
-        JSON.stringify({ persona: card.persona, pathwayVariant: card.pathwayVariant }),
+        JSON.stringify({ persona: card.persona, pathwayVariant: card.pathwayVariant, languageId }),
       );
       setPreviewChoice(card);
       return;
@@ -308,6 +380,7 @@ export default function PersonaOnboardingPage() {
         body: JSON.stringify({
           persona: card.persona,
           pathwayVariant: card.pathwayVariant,
+          languageId,
           selectedPlan,
           selectedAddon,
           teacherAddonRequested,
@@ -332,7 +405,7 @@ export default function PersonaOnboardingPage() {
   }
 
   return (
-    <main className={`onboarding-router ${stage === "roots" ? "onboarding-router-roots" : ""}`}>
+    <main className={`onboarding-router ${stage === "roots" || stage === "roots-language" ? "onboarding-router-roots" : ""}`}>
       <SeuilGreetings locale={loc} visibleCount={3} pool={greetingPool} variant="entry" />
       <header className="onboarding-router-head">
         <div className="onboarding-router-brand-row">
@@ -340,7 +413,14 @@ export default function PersonaOnboardingPage() {
             <button
               type="button"
               className="onboarding-router-back"
-              onClick={() => { setError(null); setStage("start"); }}
+              onClick={() => {
+                setError(null);
+                setStage(
+                  stage === "world" ? "world-language" :
+                  stage === "roots" ? "roots-language" :
+                  "start",
+                );
+              }}
               aria-label={loc === "en" ? "Back to journey choices" : "Retour aux choix de parcours"}
               title={loc === "en" ? "Back" : "Retour"}
             >

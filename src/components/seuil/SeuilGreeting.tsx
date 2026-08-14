@@ -160,7 +160,9 @@ export function SeuilGreetings({
       aria-label={interactive ? (locale === "en" ? "Greetings" : "Salutations") : undefined}
     >
       {Array.from({ length: slotCount }, (_, i) => {
-        const item = items[wordIdx[i]];
+        // Le pool peut changer quand l'utilisateur passe de l'univers commun
+        // à Monde ou Racines. L'index précédent reste alors borné au pool actif.
+        const item = items[wordIdx[i] % items.length];
         // Chaque slot démarre son cycle à un point différent.
         // Offset négatif = déjà en cours au mount → un est en
         // émergence, un en vie, un en effacement, un endormi.
