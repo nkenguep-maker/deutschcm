@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "@/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
@@ -147,6 +147,7 @@ export default function RegisterPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const successHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const errorFromKey = (key: AuthErrorKey): string => t(tErr(key));
   const localizedPersonaRoute = `/${locale}/onboarding/persona${personaIntentQuery}`;
@@ -155,6 +156,10 @@ export default function RegisterPage() {
   useEffect(() => {
     document.querySelector<HTMLInputElement>("input[data-autofocus]")?.focus();
   }, []);
+
+  useEffect(() => {
+    if (success) successHeadingRef.current?.focus();
+  }, [success]);
 
   async function handleRegister(event: React.FormEvent) {
     event.preventDefault();
@@ -263,7 +268,7 @@ export default function RegisterPage() {
         <div className="entry-card">
           {success ? (
             <div className="entry-success">
-              <h1 className="entry-h">{t(c.successTitle)}</h1>
+              <h1 ref={successHeadingRef} className="entry-h" tabIndex={-1}>{t(c.successTitle)}</h1>
               <p className="entry-lede">{t(c.successBody)}</p>
               <div className="entry-success-actions">
                 <Link href={loginHref} className="entry-cta entry-cta-primary">{t(c.successLogin)}</Link>
