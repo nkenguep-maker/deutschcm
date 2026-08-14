@@ -47,4 +47,14 @@ describe("public accessibility structure", () => {
     expect(css).toContain(".ens-form-error-link {");
     expect(css).toContain("color: var(--brass);");
   });
+
+  it("keeps decorative greetings either readable or hidden", () => {
+    const css = read("src/app/globals.css");
+
+    expect(css).toContain("10%, 45% {");
+    expect(css).toContain("opacity: 0.85;");
+    expect(css).toContain("visibility: hidden;");
+    expect(css).not.toContain("opacity: 0.04;");
+    expect(css).not.toContain("opacity: 0.10;");
+  });
 });
