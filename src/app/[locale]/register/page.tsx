@@ -66,8 +66,9 @@ const COPY = {
     legalMiddle: " et notre ",
     legalPrivacy: "politique de confidentialité.",
     successTitle: "Vérifiez votre boîte.",
-    successBody: "Confirmez votre e-mail. Ensuite YEMA vous demandera votre persona et terminera votre onboarding.",
-    successLogin: "Continuer après confirmation",
+    successBody: "Votre lien de confirmation est en route. Vous pouvez déjà préparer votre parcours.",
+    successContinue: "Préparer mon parcours",
+    successLogin: "J’ai confirmé mon adresse",
     successChangeEmail: "Corriger mon adresse",
     resend: "Renvoyer l’e-mail de confirmation",
     resending: "Nouvel envoi en cours…",
@@ -101,8 +102,9 @@ const COPY = {
     legalMiddle: " and ",
     legalPrivacy: "privacy policy.",
     successTitle: "Check your inbox.",
-    successBody: "Confirm your email. YEMA will then ask for your persona and complete your onboarding.",
-    successLogin: "Continue after confirmation",
+    successBody: "Your confirmation link is on its way. You can already prepare your journey.",
+    successContinue: "Prepare my journey",
+    successLogin: "I confirmed my email",
     successChangeEmail: "Correct my email",
     resend: "Resend confirmation email",
     resending: "Requesting a new email…",
@@ -166,6 +168,7 @@ export default function RegisterPage() {
   const errorFromKey = (key: AuthErrorKey): string => t(tErr(key));
   const localizedPersonaRoute = `/${locale}/onboarding/persona${personaIntentQuery}`;
   const appPersonaRoute = `/onboarding/persona${personaIntentQuery}`;
+  const preconfirmationOnboardingHref = `/${locale}/pre-onboarding${personaIntentQuery}`;
 
   useEffect(() => {
     document.querySelector<HTMLInputElement>("input[data-autofocus]")?.focus();
@@ -319,7 +322,8 @@ export default function RegisterPage() {
               <p className="entry-lede">{t(c.successBody)}</p>
               <p className="entry-success-help">{t(c.resendHelp)}</p>
               <div className="entry-success-actions">
-                <Link href={loginHref} className="entry-cta entry-cta-primary">{t(c.successLogin)}</Link>
+                <Link href={preconfirmationOnboardingHref} className="entry-cta entry-cta-primary">{t(c.successContinue)}</Link>
+                <Link href={loginHref} className="entry-cta entry-cta-ghost">{t(c.successLogin)}</Link>
                 <button
                   type="button"
                   className="entry-cta entry-cta-ghost"

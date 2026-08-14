@@ -16,14 +16,15 @@ import {
 import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BrandY } from "@/components/brand/BrandY";
-import { useOnboardingPreview } from "@/components/onboarding/OnboardingPreviewContext";
+import { useOnboardingSelectionMode } from "@/components/onboarding/OnboardingPreviewContext";
 import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import type { AdultPersonaId } from "@/lib/personas/runtime";
 
 type Stage = "start" | "world" | "roots" | "professional";
 type PathwayVariant = "STUDIES" | "VISA" | "NATURALIZATION" | "TOURISM";
+const PRECONFIRMATION_DRAFT_KEY = "yema.preconfirmation.journey";
 
 type Card = {
   id: string;
@@ -207,6 +208,14 @@ function cardsFor(stage: Stage): readonly Card[] {
   return START_CARDS;
 }
 
+function cardFromPreconfirmationDraft(value: unknown): Card | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const draft = value as { persona?: unknown; pathwayVariant?: unknown };
+  return [...WORLD_CARDS, ...ROOTS_CARDS, ...PROFESSIONAL_CARDS].find((card) =>
+    card.persona === draft.persona && card.pathwayVariant === draft.pathwayVariant,
+  ) ?? null;
+}
+
 function copyFor(stage: Stage, locale: "fr" | "en") {
   const english = locale === "en";
   if (stage === "world") {
@@ -234,7 +243,9 @@ export default function PersonaOnboardingPage() {
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
   const router = useRouter();
   const searchParams = useSearchParams();
-  const preview = useOnboardingPreview();
+  const selectionMode = useOnboardingSelectionMode();
+  const preview = selectionMode === "preview";
+  const preconfirmation = selectionMode === "preconfirmation";
   const selectedPlan = searchParams.get("plan");
   const selectedAddon = searchParams.get("addon");
   const teacherAddonRequested = searchParams.get("prof") === "1";
@@ -244,9 +255,27 @@ export default function PersonaOnboardingPage() {
   const [loading, setLoading] = useState<AdultPersonaId | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [previewChoice, setPreviewChoice] = useState<Card | null>(null);
+  const preconfirmationReplayRef = useRef(false);
   const copy = copyFor(stage, loc);
   const cards = cardsFor(stage);
   const greetingPool = stage === "world" ? "world" : stage === "roots" ? "sources" : "all";
+
+  useEffect(() => {
+    if (selectionMode !== "live" || preconfirmationReplayRef.current) return;
+    try {
+      const raw = window.localStorage.getItem(PRECONFIRMATION_DRAFT_KEY);
+      if (!raw) return;
+      const card = cardFromPreconfirmationDraft(JSON.parse(raw));
+      if (!card) {
+        window.localStorage.removeItem(PRECONFIRMATION_DRAFT_KEY);
+        return;
+      }
+      preconfirmationReplayRef.current = true;
+      void choose(card);
+    } catch {
+      window.localStorage.removeItem(PRECONFIRMATION_DRAFT_KEY);
+    }
+  }, [selectionMode]);
 
   async function choose(card: Card) {
     if (card.nextStage) {
@@ -257,6 +286,15 @@ export default function PersonaOnboardingPage() {
     if (!card.persona) return;
 
     if (preview) {
+      setPreviewChoice(card);
+      return;
+    }
+
+    if (preconfirmation) {
+      window.localStorage.setItem(
+        PRECONFIRMATION_DRAFT_KEY,
+        JSON.stringify({ persona: card.persona, pathwayVariant: card.pathwayVariant }),
+      );
       setPreviewChoice(card);
       return;
     }
@@ -280,6 +318,7 @@ export default function PersonaOnboardingPage() {
       if (!response.ok || typeof data.redirectTo !== "string") {
         throw new Error("persona_selection_failed");
       }
+      window.localStorage.removeItem(PRECONFIRMATION_DRAFT_KEY);
       router.push(data.redirectTo);
       router.refresh();
     } catch {
@@ -328,9 +367,17 @@ export default function PersonaOnboardingPage() {
 
       {error ? <p className="entry-err" role="alert">{error}</p> : null}
 
-      {preview ? (
+      {preview || preconfirmation ? (
         <p className="onboarding-router-preview" role="status">
-          {previewChoice
+          {preconfirmation
+            ? (previewChoice
+              ? (loc === "en"
+                ? `${previewChoice.titleEn} is ready. Confirm your email to start with this journey.`
+                : `${previewChoice.titleFr} est prêt. Confirmez votre e-mail pour démarrer avec ce parcours.`)
+              : (loc === "en"
+                ? "Prepare your journey now. Your choices will be applied after email confirmation."
+                : "Préparez votre parcours maintenant. Vos choix seront appliqués après confirmation de l’e-mail."))
+            : previewChoice
             ? (loc === "en"
               ? `${previewChoice.titleEn} selected. In the live journey, this opens the next tailored step.`
               : `${previewChoice.titleFr} sélectionné. Dans le parcours réel, cela ouvre la prochaine étape adaptée.`)

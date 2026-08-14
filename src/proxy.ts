@@ -25,6 +25,7 @@ const PUBLIC_ROUTES = [
   "/hoeren/demo", "/schreiben/demo",
   "/quiz/demo", "/video/preview",
   "/preview/onboarding",
+  "/pre-onboarding",
   "/privacy", "/terms", "/landing",
   "/goodbye", "/teacher/goodbye",
   "/methode", "/histoires", "/manifeste", "/langues", "/enseignants", "/setup-role",

@@ -2,16 +2,26 @@
 
 import { createContext, useContext, type ReactNode } from "react";
 
-const OnboardingPreviewContext = createContext(false);
+export type OnboardingSelectionMode = "live" | "preview" | "preconfirmation";
+
+const OnboardingSelectionContext = createContext<OnboardingSelectionMode>("live");
 
 export function OnboardingPreviewProvider({ children }: { children: ReactNode }) {
   return (
-    <OnboardingPreviewContext.Provider value>
+    <OnboardingSelectionContext.Provider value="preview">
       {children}
-    </OnboardingPreviewContext.Provider>
+    </OnboardingSelectionContext.Provider>
   );
 }
 
-export function useOnboardingPreview() {
-  return useContext(OnboardingPreviewContext);
+export function PreconfirmationOnboardingProvider({ children }: { children: ReactNode }) {
+  return (
+    <OnboardingSelectionContext.Provider value="preconfirmation">
+      {children}
+    </OnboardingSelectionContext.Provider>
+  );
+}
+
+export function useOnboardingSelectionMode() {
+  return useContext(OnboardingSelectionContext);
 }
