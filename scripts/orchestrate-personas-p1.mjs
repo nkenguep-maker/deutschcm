@@ -146,7 +146,7 @@ async function main() {
     ?? process.env.SUPABASE_JWT_SECRET
     ?? randomBytes(32).toString("base64");
   const server = spawn("npx", ["next", "start", "-p", PORT], {
-    stdio: ["ignore", "pipe", "inherit"],
+    stdio: ["ignore", "pipe", "pipe"],
     env: {
       ...process.env,
       YEMA_DASHBOARD_REDESIGN_ENABLED: "true",
@@ -161,9 +161,21 @@ async function main() {
     },
   });
   let ready = false;
-  server.stdout.on("data", (b) => { if (/Ready|ready in|Started/i.test(b.toString())) ready = true; });
+  let serverOutput = "";
+  const collectServerOutput = (b) => {
+    serverOutput = `${serverOutput}${b.toString()}`.slice(-4_000);
+  };
+  server.stdout.on("data", (b) => {
+    collectServerOutput(b);
+    if (/Ready|ready in|Started/i.test(b.toString())) ready = true;
+  });
+  server.stderr.on("data", collectServerOutput);
   for (let i = 0; i < 30 && !ready; i++) await sleep(1000);
-  if (!ready) { server.kill("SIGTERM"); fail(2, "server not ready"); }
+  if (!ready) {
+    server.kill("SIGTERM");
+    const detail = serverOutput.trim().replace(/\s+/g, " ").slice(-1_000);
+    fail(2, `server not ready${detail ? ` · ${detail}` : ""}`);
+  }
 
   // next start uses localhost as its canonical request origin. Keep the
   // synthetic browser Origin identical so the real CSRF guard is exercised.

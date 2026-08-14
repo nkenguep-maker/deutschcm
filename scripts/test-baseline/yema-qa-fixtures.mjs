@@ -11,6 +11,7 @@ import { assertNonProduction, getTestPassword } from "./_common.mjs";
 import { createClient } from "@supabase/supabase-js";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import pg from "pg";
 import { randomBytes, scrypt as _scrypt } from "node:crypto";
 import { promisify } from "node:util";
 
@@ -29,14 +30,37 @@ async function hashChildPin(pin) {
 
 assertNonProduction();
 const PASSWORD = getTestPassword();
+const FIXTURE_NETWORK_TIMEOUT_MS = 20_000;
+const FIXTURE_RUNTIME_DEADLINE_MS = 90_000;
+const fixtureDeadline = setTimeout(() => {
+  console.error("QA fixture deadline exceeded before P-1 provisioning completed");
+  process.exit(1);
+}, FIXTURE_RUNTIME_DEADLINE_MS);
+
+// Fixture scripts must fail clearly when the P-1 network is unavailable.
+// Preserve an upstream abort signal when the Supabase client supplies one.
+function fetchWithTimeout(input, init = {}) {
+  const timeoutSignal = AbortSignal.timeout(FIXTURE_NETWORK_TIMEOUT_MS);
+  const signal = init.signal
+    ? AbortSignal.any([init.signal, timeoutSignal])
+    : timeoutSignal;
+  return fetch(input, { ...init, signal });
+}
 
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY,
-  { auth: { persistSession: false, autoRefreshToken: false } },
+  {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: fetchWithTimeout },
+  },
 );
+const dbPool = new pg.Pool({
+  connectionString: process.env.DIRECT_URL,
+  connectionTimeoutMillis: FIXTURE_NETWORK_TIMEOUT_MS,
+});
 const db = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: process.env.DIRECT_URL }),
+  adapter: new PrismaPg(dbPool, { disposeExternalPool: true }),
   log: ["error"],
 });
 
@@ -536,8 +560,11 @@ async function main() {
   return summary;
 }
 
-main().catch(async (e) => {
-  console.error(e);
-  try { await db.$disconnect(); } catch {}
-  process.exit(1);
-});
+main()
+  .then(() => clearTimeout(fixtureDeadline))
+  .catch(async (e) => {
+    clearTimeout(fixtureDeadline);
+    console.error(e);
+    try { await db.$disconnect(); } catch {}
+    process.exit(1);
+  });

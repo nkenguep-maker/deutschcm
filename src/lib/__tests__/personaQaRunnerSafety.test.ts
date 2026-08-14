@@ -9,6 +9,7 @@ const personaRunner = readFileSync(resolve(REPO, "scripts/orchestrate-personas-p
 const adultPersonaVerifier = readFileSync(resolve(REPO, "scripts/verify-adult-persona-routes-p1.mjs"), "utf8");
 const childRacinesVerifier = readFileSync(resolve(REPO, "scripts/verify-child-racines-session-p1.mjs"), "utf8");
 const credentialAligner = readFileSync(resolve(REPO, "scripts/test-baseline/align-yema-qa-passwords-p1.mjs"), "utf8");
+const fixtures = readFileSync(resolve(REPO, "scripts/test-baseline/yema-qa-fixtures.mjs"), "utf8");
 
 describe("P-1 persona QA runner safety", () => {
   it("routes the authenticated gate through the fail-closed fixture wrapper", () => {
@@ -35,11 +36,30 @@ describe("P-1 persona QA runner safety", () => {
     );
   });
 
+  it("reports the captured Next startup log when the production server is not ready", () => {
+    expect(personaRunner).toContain('stdio: ["ignore", "pipe", "pipe"]');
+    expect(personaRunner).toContain("let serverOutput = \"\";");
+    expect(personaRunner).toContain("server.stderr.on(\"data\", collectServerOutput)");
+    expect(personaRunner).toContain("server not ready${detail ? ` · ${detail}` : \"\"}");
+  });
+
   it("attempts idempotent fixture recovery after provisioning failure", () => {
     expect(safeRunner).toContain("attemptFixtureRecovery");
     expect(safeRunner).toContain('attemptFixtureRecovery("provisioning failure")');
     expect(safeRunner).toContain("fixture recovery failed");
     expect(safeRunner).toContain("failed(recovery)");
+  });
+
+  it("bounds P-1 fixture Auth and database connections when the network is unavailable", () => {
+    expect(fixtures).toContain("const FIXTURE_NETWORK_TIMEOUT_MS = 20_000;");
+    expect(fixtures).toContain("const FIXTURE_RUNTIME_DEADLINE_MS = 90_000;");
+    expect(fixtures).toContain("AbortSignal.timeout(FIXTURE_NETWORK_TIMEOUT_MS)");
+    expect(fixtures).toContain("global: { fetch: fetchWithTimeout }");
+    expect(fixtures).toContain("connectionTimeoutMillis: FIXTURE_NETWORK_TIMEOUT_MS");
+    expect(fixtures).toContain("disposeExternalPool: true");
+    expect(fixtures).toContain("QA fixture deadline exceeded before P-1 provisioning completed");
+    expect(safeRunner).toContain("const FIXTURE_PROCESS_TIMEOUT_MS = 120_000;");
+    expect(safeRunner).toContain("timeout: FIXTURE_PROCESS_TIMEOUT_MS");
   });
 
   it("always restores idempotent P-1 fixtures after the persona process", () => {

@@ -35,6 +35,8 @@ import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
 const P1_REF = "kzzagbojjkivdzzcrmxn";
+const QA_FIXTURE_SCRIPT = "scripts/test-baseline/yema-qa-fixtures.mjs";
+const QA_FIXTURE_TIMEOUT_MS = 120_000;
 const FORBIDDEN_REFS = [
   "sbjhvlrkbyjckdxujjsk", // deutschcm PROD
   "mamofhrurksyuuolucea", // ancien dev
@@ -315,7 +317,7 @@ function main() {
   // Next 16 peut forcer une recharge malgré ce marqueur. Le preload fait
   // apparaître les .env conventionnels comme absents, sans toucher au fichier
   // local et sans empêcher l'environnement P-1 déjà injecté ci-dessus.
-  childEnv.NODE_OPTIONS = `--require=${resolve("scripts/test-baseline/block-next-local-env.cjs")}`;
+  childEnv.NODE_OPTIONS = `--require="${resolve("scripts/test-baseline/block-next-local-env.cjs")}"`;
   // Bloc final · vérifier une dernière fois qu'aucune value ne contient
   // un ref forbidden (defense-in-depth contre une fuite de env parent).
   assertNoForbiddenSubstring(childEnv);
@@ -324,6 +326,9 @@ function main() {
   const res = spawnSync(bin, rest, {
     env: childEnv,
     stdio: "inherit",
+    ...(bin === "node" && rest.includes(QA_FIXTURE_SCRIPT)
+      ? { timeout: QA_FIXTURE_TIMEOUT_MS, killSignal: "SIGTERM" }
+      : {}),
   });
   if (res.error) fatal(`child spawn error: ${res.error.message}`);
   process.exit(res.status ?? 0);
