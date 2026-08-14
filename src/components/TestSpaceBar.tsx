@@ -26,6 +26,9 @@ const SPACES: Array<{
   { role: "ADMIN",   route: "/admin",     labelFR: "Admin",        labelEN: "Admin" },
 ];
 
+const APP_PREFIXES = ["/dashboard", "/courses", "/progress", "/simulateur",
+  "/settings", "/teacher", "/center", "/admin", "/discover", "/test-niveau"];
+
 export function TestSpaceBar() {
   const [roles, setRoles] = useState<SpaceRole[] | null>(null);
   const [active, setActive] = useState<SpaceRole | null>(null);
@@ -33,11 +36,11 @@ export function TestSpaceBar() {
   const locale = useLocale();
 
   useEffect(() => {
-    // Skip fetch sur les pages publiques post-auth (goodbye, login, register…)
-    // où l'user n'a par définition pas de session · évite un 401 console.
+    // Les pages publiques ne chargent jamais l'identité de session. Cela évite
+    // un 401 inutile et garde leur console propre pour les vrais visiteurs.
     const noLocale = pathname.replace(/^\/(fr|en)/, "") || "/";
-    const publicPost = ["/goodbye", "/teacher/goodbye", "/login", "/register"];
-    if (publicPost.some((p) => noLocale === p || noLocale.startsWith(p + "/"))) {
+    const isAppRoute = APP_PREFIXES.some((p) => noLocale === p || noLocale.startsWith(p + "/"));
+    if (!isAppRoute) {
       setRoles([]);
       return;
     }
@@ -90,8 +93,6 @@ export function TestSpaceBar() {
   // login, pages légales, etc.). La barre est un outil de test intra-app —
   // pas un élément d'accueil.
   const noLocale = pathname.replace(/^\/(fr|en)/, "") || "/";
-  const APP_PREFIXES = ["/dashboard", "/courses", "/progress", "/simulateur",
-    "/settings", "/teacher", "/center", "/admin", "/discover", "/test-niveau"];
   const isAppRoute = APP_PREFIXES.some((p) => noLocale === p || noLocale.startsWith(p + "/"));
   if (!isAppRoute) return null;
 

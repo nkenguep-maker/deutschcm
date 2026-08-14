@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import { routing } from "@/i18n/routing"
 import { TestSpaceBar } from "@/components/TestSpaceBar"
 import { QaTestBar } from "@/components/qa/QaTestBar"
+import { isQaModeActive } from "@/lib/qa/config"
 
 // SEO · métadonnées localisées par locale. Le canonique et les
 // alternates hreflang pointent vers l'URL locale (jamais la racine)
@@ -112,13 +113,14 @@ export default async function LocaleLayout({
   if (!routing.locales.includes(locale as "fr" | "en")) {
     notFound()
   }
+  const qaModeActive = isQaModeActive()
 
   // next-intl inherits locale/messages from src/i18n/request.ts when this
   // provider is rendered by a Server Component. Avoid importing the same
   // locale JSON a second time in the layout.
   return (
     <NextIntlClientProvider>
-      <QaTestBar />
+      {qaModeActive ? <QaTestBar /> : null}
       <TestSpaceBar />
       {children}
     </NextIntlClientProvider>

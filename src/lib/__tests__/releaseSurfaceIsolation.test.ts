@@ -38,4 +38,16 @@ describe("open beta public surface", () => {
     expect(register).not.toContain("PLAN_LABEL_");
     expect(register).not.toContain("avant tout paiement");
   });
+
+  it("does not boot QA or account probes on public pages", () => {
+    const layout = read("src/app/[locale]/layout.tsx");
+    const testSpaceBar = read("src/components/TestSpaceBar.tsx");
+
+    expect(layout).toContain('import { isQaModeActive } from "@/lib/qa/config"');
+    expect(layout).toContain("const qaModeActive = isQaModeActive()");
+    expect(layout).toContain("{qaModeActive ? <QaTestBar /> : null}");
+    expect(testSpaceBar).toContain("const APP_PREFIXES =");
+    expect(testSpaceBar).toContain("if (!isAppRoute) {");
+    expect(testSpaceBar).not.toContain("const publicPost =");
+  });
 });
