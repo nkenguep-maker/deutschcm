@@ -72,7 +72,7 @@ for (const p of PUBLIC_PAGES) {
       expect(resp?.status(), `${p.name} HTTP status`).toBeLessThan(400);
 
       const { violations } = await new AxeBuilder({ page })
-        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "experimental"])
         .analyze();
 
       expect(violations, `${p.name} ${vp.name} doit respecter WCAG A/AA`).toEqual([]);

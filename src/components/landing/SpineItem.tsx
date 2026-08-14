@@ -44,6 +44,7 @@ export function SpineItem({
   selected = false,
 }: SpineItemProps) {
   const interactive = Boolean(onEnter || onFocus || onSelect);
+  const accessibleLabel = label ? undefined : ariaLabel ?? code;
 
   const content = (
     <>
@@ -64,7 +65,7 @@ export function SpineItem({
           type="button"
           className="spine-item-button"
           aria-pressed={selected}
-          aria-label={ariaLabel ?? `${code} — ${label}`}
+          aria-label={accessibleLabel}
           aria-describedby={ariaDescribedBy}
           onMouseEnter={onEnter}
           onMouseLeave={onLeave}
