@@ -8,6 +8,16 @@
 import { test, expect } from "playwright/test";
 import { PERSONAS, FIXTURE_IDS } from "./personas";
 
+async function expectCanonicalNotFound(page: import("playwright/test").Page, response: import("playwright/test").Response | null) {
+  // App Router may stream `notFound()` with HTTP 200. In that case the rendered
+  // 404 boundary and `noindex` are the security-relevant contract.
+  if (response?.status() === 404) return;
+
+  expect(response?.status()).toBe(200);
+  await expect(page.getByRole("heading", { level: 1, name: /La porte que vous cherchez|The door you are looking for/i })).toBeVisible();
+  await expect(page.locator("meta[name='robots']")).toHaveAttribute("content", /noindex/i);
+}
+
 test.describe.configure({ mode: "serial" });
 test.use({ storageState: PERSONAS.studentRemoved.storageStateFile });
 
@@ -21,11 +31,11 @@ test("Student REMOVED · liste vide (aucun assignment)", async ({ page }) => {
 
 test("Student REMOVED · accès direct assignment A · not-found", async ({ page }) => {
   const resp = await page.goto(`/fr/student/assignments/${FIXTURE_IDS.asmPubA}`);
-  expect(resp?.status()).toBe(404);
+  await expectCanonicalNotFound(page, resp);
 });
 
 test("Student REMOVED · accès direct submission A (Student A) · not-found", async ({ page }) => {
   // La submission appartient à Student A · student_removed n'y a jamais eu accès.
   const resp = await page.goto(`/fr/student/submissions/${FIXTURE_IDS.subDraftA}`);
-  expect(resp?.status()).toBe(404);
+  await expectCanonicalNotFound(page, resp);
 });
