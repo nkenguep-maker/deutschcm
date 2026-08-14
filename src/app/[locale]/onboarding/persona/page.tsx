@@ -21,6 +21,7 @@ import { useEffect, useRef, useState } from "react";
 import { BrandY } from "@/components/brand/BrandY";
 import { useOnboardingSelectionMode } from "@/components/onboarding/OnboardingPreviewContext";
 import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
+import { FOREIGN, NATIVE } from "@/lib/languages";
 import type { AdultPersonaId } from "@/lib/personas/runtime";
 
 type Stage = "start" | "world-language" | "world" | "roots-language" | "roots" | "professional";
@@ -41,6 +42,7 @@ type Card = {
   nextStage?: Exclude<Stage, "start">;
   pathwayVariant?: PathwayVariant;
   languageId?: LearningLanguageId;
+  available?: boolean;
   tone: "world" | "roots" | "professional";
 };
 
@@ -83,37 +85,47 @@ const START_CARDS: readonly Card[] = [
   },
 ];
 
-const WORLD_LANGUAGE_CARDS: readonly Card[] = [
-  {
-    id: "deutsch",
+const WORLD_LANGUAGE_CARDS: readonly Card[] = FOREIGN.map((language) => {
+  const available = language.id === "deutsch";
+  return {
+    id: language.id,
     icon: Languages,
-    eyebrowFr: "DE · Monde",
-    eyebrowEn: "DE · World",
-    titleFr: "Allemand",
-    titleEn: "German",
-    bodyFr: "Disponible maintenant, du niveau A1 jusqu’aux parcours avancés.",
-    bodyEn: "Available now, from A1 through advanced journeys.",
-    languageId: "deutsch",
-    nextStage: "world",
-    tone: "world",
-  },
-];
+    eyebrowFr: `${language.code} · ${available ? "Disponible" : "Bientôt"}`,
+    eyebrowEn: `${language.code} · ${available ? "Available" : "Coming soon"}`,
+    titleFr: language.name,
+    titleEn: language.nameEn,
+    bodyFr: available
+      ? "Disponible maintenant, du niveau A1 jusqu’aux parcours avancés."
+      : "Cette langue arrive prochainement dans YEMA.",
+    bodyEn: available
+      ? "Available now, from A1 through advanced journeys."
+      : "This language is coming to YEMA soon.",
+    ...(available ? { languageId: "deutsch" as const, nextStage: "world" as const } : {}),
+    available,
+    tone: "world" as const,
+  };
+});
 
-const ROOTS_LANGUAGE_CARDS: readonly Card[] = [
-  {
-    id: "wolof",
+const ROOTS_LANGUAGE_CARDS: readonly Card[] = NATIVE.map((language) => {
+  const available = language.id === "wolof";
+  return {
+    id: language.id,
     icon: Languages,
-    eyebrowFr: "WO · Racines",
-    eyebrowEn: "WO · Roots",
-    titleFr: "Wolof",
-    titleEn: "Wolof",
-    bodyFr: "Le parcours Racines actuellement proposé en bêta.",
-    bodyEn: "The Roots journey currently offered in beta.",
-    languageId: "wolof",
-    nextStage: "roots",
-    tone: "roots",
-  },
-];
+    eyebrowFr: `${language.code} · ${available ? "Bêta" : "Bientôt"}`,
+    eyebrowEn: `${language.code} · ${available ? "Beta" : "Coming soon"}`,
+    titleFr: language.name,
+    titleEn: language.nameEn,
+    bodyFr: available
+      ? "Le parcours Racines actuellement proposé en bêta."
+      : "Cette langue arrive prochainement dans YEMA.",
+    bodyEn: available
+      ? "The Roots journey currently offered in beta."
+      : "This language is coming to YEMA soon.",
+    ...(available ? { languageId: "wolof" as const, nextStage: "roots" as const } : {}),
+    available,
+    tone: "roots" as const,
+  };
+});
 
 const WORLD_CARDS: readonly Card[] = [
   {
@@ -271,7 +283,7 @@ function copyFor(stage: Stage, locale: "fr" | "en") {
   if (stage === "world-language") {
     return english
       ? { kicker: "Your language", title: "Which language would you like to learn?", body: "Choose your language before tailoring your journey." }
-      : { kicker: "Votre langue", title: "Quelle langue souhaitez-vous apprendre ?", body: "Choisissez votre langue avant de personnaliser votre parcours." };
+      : { kicker: "Votre langue", title: "Quelle langue souhaitez-vous apprendre ?", body: "Choisissez votre langue avant de personnaliser votre parcours. Les prochaines langues sont déjà visibles." };
   }
   if (stage === "world") {
     return english
@@ -281,7 +293,7 @@ function copyFor(stage: Stage, locale: "fr" | "en") {
   if (stage === "roots-language") {
     return english
       ? { kicker: "Your language", title: "Which language would you like to reconnect with?", body: "Choose the language before shaping your Roots journey." }
-      : { kicker: "Votre langue", title: "Quelle langue souhaitez-vous retrouver ?", body: "Choisissez votre langue avant de dessiner votre parcours Racines." };
+      : { kicker: "Votre langue", title: "Quelle langue souhaitez-vous retrouver ?", body: "Choisissez votre langue avant de dessiner votre parcours Racines. Les prochaines langues sont déjà visibles." };
   }
   if (stage === "roots") {
     return english
@@ -478,9 +490,9 @@ export default function PersonaOnboardingPage() {
             <button
               key={card.id}
               type="button"
-              className={`onboarding-router-porte onboarding-router-porte-${card.tone}`}
+              className={`onboarding-router-porte onboarding-router-porte-${card.tone} ${card.available === false ? "onboarding-router-porte-coming" : ""}`}
               onClick={() => choose(card)}
-              disabled={loading !== null}
+              disabled={loading !== null || card.available === false}
             >
               <Icon className="onboarding-router-porte-icon" size={22} strokeWidth={1.65} aria-hidden="true" />
               <span className="onboarding-router-porte-eyebrow">
