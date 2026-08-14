@@ -70,6 +70,11 @@ async function main() {
     "node",
     ["scripts/test-baseline/align-yema-qa-passwords-p1.mjs"],
   );
+  await runGate(
+    "P-1 catalogue pricing alignment",
+    "npx",
+    ["tsx", "scripts/verify-catalog-prices-p1.ts"],
+  );
 
   console.log("[entitlements] STEP 1 · catalogue produits présent");
   const codes = ["PASSAGE", "ROOTS_SOLO", "ROOTS_FAMILY", "FAMILY_WORLD", "CHILD_WORLD_SINGLE"];

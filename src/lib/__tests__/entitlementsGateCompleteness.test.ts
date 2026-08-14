@@ -35,4 +35,11 @@ describe("P-1 entitlements gate completeness", () => {
       orchestrator.indexOf("STEP 1 · catalogue produits présent"),
     );
   });
+
+  it("verifies runtime catalogue prices before entitlement checks", () => {
+    expect(orchestrator).toContain('"scripts/verify-catalog-prices-p1.ts"');
+    expect(orchestrator.indexOf("P-1 catalogue pricing alignment")).toBeLessThan(
+      orchestrator.indexOf("STEP 1 · catalogue produits présent"),
+    );
+  });
 });

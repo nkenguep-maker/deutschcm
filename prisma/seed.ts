@@ -6,6 +6,16 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
+import { toMinorUnits } from "../src/lib/payments/money";
+import {
+  AFRICAN_FAMILY,
+  AFRICAN_SOLO,
+  LEVELS,
+  RACINES_COACH_ADDON,
+  RACINES_COACH_OPERATIONAL,
+  WORLD_PASSAGE_PRICES,
+  WORLD_TEACHER_ADD,
+} from "../src/lib/pricing";
 import type {
   ProductCode,
   BillingType,
@@ -38,29 +48,21 @@ type ProductDef = {
   capabilities: Capability[];
 };
 
-const PASSAGE_LEVELS: Array<{
-  level: CefrLevel;
-  xaf: number;
-  eur: number;
-}> = [
-  { level: "A1", xaf: 49_000, eur: 75 },
-  { level: "A2", xaf: 54_000, eur: 78 },
-  { level: "B1", xaf: 58_000, eur: 85 },
-  { level: "B2", xaf: 64_000, eur: 99 },
-  { level: "C1", xaf: 72_000, eur: 119 },
-];
+// ProductVariant.amount, Order.total/unitAmount and Payment.amount always use
+// the currency's minor unit: cents for EUR, whole francs for zero-decimal XAF.
+const eur = (value: string) => toMinorUnits(value, "EUR");
 
-const TEACHER_ADDON_LEVELS: Array<{
-  level: CefrLevel;
-  xaf: number;
-  eur: number;
-}> = [
-  { level: "A1", xaf: 30_000, eur: 45 },
-  { level: "A2", xaf: 40_000, eur: 60 },
-  { level: "B1", xaf: 50_000, eur: 75 },
-  { level: "B2", xaf: 60_000, eur: 90 },
-  { level: "C1", xaf: 75_000, eur: 115 },
-];
+const PASSAGE_LEVELS: Array<{ level: CefrLevel; xaf: number; eur: number }> = LEVELS.map((level) => ({
+  level,
+  xaf: WORLD_PASSAGE_PRICES[level].fcfa,
+  eur: eur(String(WORLD_PASSAGE_PRICES[level].eur)),
+}));
+
+const TEACHER_ADDON_LEVELS: Array<{ level: CefrLevel; xaf: number; eur: number }> = LEVELS.map((level) => ({
+  level,
+  xaf: WORLD_TEACHER_ADD[level].fcfa,
+  eur: eur(String(WORLD_TEACHER_ADD[level].eur)),
+}));
 
 const CATALOG: ProductDef[] = [
   {
@@ -108,12 +110,11 @@ const CATALOG: ProductDef[] = [
     universe: "RACINES",
     billingType: "SUBSCRIPTION",
     isActive: true,
-    // Simulé par grants à durée en V1 (pas encore de vrai récurrent)
     variants: [
-      { language: "WOLOF", currency: "XAF", amount: 3_500, durationDays: 30 },
-      { language: "WOLOF", currency: "XAF", amount: 35_000, durationDays: 365 },
-      { language: "WOLOF", currency: "EUR", amount: 990, durationDays: 30 },   // 9,90 en centimes
-      { language: "WOLOF", currency: "EUR", amount: 99, durationDays: 365 },   // 99 EUR
+      { language: "WOLOF", currency: "XAF", amount: AFRICAN_SOLO.fcfa.month, durationDays: 30 },
+      { language: "WOLOF", currency: "XAF", amount: AFRICAN_SOLO.fcfa.year, durationDays: 365 },
+      { language: "WOLOF", currency: "EUR", amount: eur(String(AFRICAN_SOLO.eur.month)), durationDays: 30 },
+      { language: "WOLOF", currency: "EUR", amount: eur(String(AFRICAN_SOLO.eur.year)), durationDays: 365 },
     ],
     capabilities: ["COURSE_ACCESS", "VEILLEE_CONTENT"],
   },
@@ -123,10 +124,10 @@ const CATALOG: ProductDef[] = [
     billingType: "SUBSCRIPTION",
     isActive: true,
     variants: [
-      { language: "WOLOF", currency: "XAF", amount: 9_900, durationDays: 30 },
-      { language: "WOLOF", currency: "XAF", amount: 99_000, durationDays: 365 },
-      { language: "WOLOF", currency: "EUR", amount: 1_990, durationDays: 30 }, // 19,90 en centimes
-      { language: "WOLOF", currency: "EUR", amount: 149, durationDays: 365 },
+      { language: "WOLOF", currency: "XAF", amount: AFRICAN_FAMILY.fcfa.month, durationDays: 30 },
+      { language: "WOLOF", currency: "XAF", amount: AFRICAN_FAMILY.fcfa.year, durationDays: 365 },
+      { language: "WOLOF", currency: "EUR", amount: eur(String(AFRICAN_FAMILY.eur.month)), durationDays: 30 },
+      { language: "WOLOF", currency: "EUR", amount: eur(String(AFRICAN_FAMILY.eur.year)), durationDays: 365 },
     ],
     capabilities: ["COURSE_ACCESS", "VEILLEE_CONTENT", "CHILD_PROFILES"],
   },
@@ -134,11 +135,10 @@ const CATALOG: ProductDef[] = [
     code: "ROOTS_FOLLOWUP_ADDON",
     universe: "RACINES",
     billingType: "ONE_TIME",
-    isActive: true,
-    // Add-on suivi : prix indicatif V1 (à ajuster). Prérequis SOLO/FAMILY actif.
+    isActive: RACINES_COACH_OPERATIONAL,
     variants: [
-      { language: "WOLOF", currency: "XAF", amount: 15_000, durationDays: 30 },
-      { language: "WOLOF", currency: "EUR", amount: 25, durationDays: 30 },
+      { language: "WOLOF", currency: "XAF", amount: RACINES_COACH_ADDON.fcfa, durationDays: 30 },
+      { language: "WOLOF", currency: "EUR", amount: eur(String(RACINES_COACH_ADDON.eur)), durationDays: 30 },
     ],
     capabilities: ["CLASSROOM", "THREAD_POST", "HOMEWORK"],
   },
@@ -159,10 +159,10 @@ const CATALOG: ProductDef[] = [
     isActive: true,
     // Un seul siège Enfant Monde. Prix V1 alignés sur la courbe ROOTS_SOLO.
     variants: [
-      { language: "DEUTSCH", currency: "XAF", amount: 3_500, durationDays: 30 },
-      { language: "DEUTSCH", currency: "XAF", amount: 35_000, durationDays: 365 },
-      { language: "DEUTSCH", currency: "EUR", amount: 990, durationDays: 30 },
-      { language: "DEUTSCH", currency: "EUR", amount: 99, durationDays: 365 },
+      { language: "DEUTSCH", currency: "XAF", amount: AFRICAN_SOLO.fcfa.month, durationDays: 30 },
+      { language: "DEUTSCH", currency: "XAF", amount: AFRICAN_SOLO.fcfa.year, durationDays: 365 },
+      { language: "DEUTSCH", currency: "EUR", amount: eur(String(AFRICAN_SOLO.eur.month)), durationDays: 30 },
+      { language: "DEUTSCH", currency: "EUR", amount: eur(String(AFRICAN_SOLO.eur.year)), durationDays: 365 },
     ],
     capabilities: ["COURSE_ACCESS", "CHILD_PROFILES"],
   },
@@ -173,10 +173,10 @@ const CATALOG: ProductDef[] = [
     isActive: true,
     // Jusqu'à 3 sièges Enfant Monde. Prix V1 alignés sur ROOTS_FAMILY.
     variants: [
-      { language: "DEUTSCH", currency: "XAF", amount: 9_900, durationDays: 30 },
-      { language: "DEUTSCH", currency: "XAF", amount: 99_000, durationDays: 365 },
-      { language: "DEUTSCH", currency: "EUR", amount: 1_990, durationDays: 30 },
-      { language: "DEUTSCH", currency: "EUR", amount: 149, durationDays: 365 },
+      { language: "DEUTSCH", currency: "XAF", amount: AFRICAN_FAMILY.fcfa.month, durationDays: 30 },
+      { language: "DEUTSCH", currency: "XAF", amount: AFRICAN_FAMILY.fcfa.year, durationDays: 365 },
+      { language: "DEUTSCH", currency: "EUR", amount: eur(String(AFRICAN_FAMILY.eur.month)), durationDays: 30 },
+      { language: "DEUTSCH", currency: "EUR", amount: eur(String(AFRICAN_FAMILY.eur.year)), durationDays: 365 },
     ],
     capabilities: ["COURSE_ACCESS", "CHILD_PROFILES"],
   },
