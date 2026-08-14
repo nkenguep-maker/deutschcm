@@ -11,11 +11,13 @@ const PASSWORD_ALIGN_SCRIPT = "scripts/test-baseline/align-yema-qa-passwords-p1.
 const PERSONA_SCRIPT = "scripts/orchestrate-personas-p1.mjs";
 const ADULT_PERSONAS_VERIFY_SCRIPT = "scripts/verify-adult-persona-routes-p1.mjs";
 const CHILD_RACINES_VERIFY_SCRIPT = "scripts/verify-child-racines-session-p1.mjs";
+const FIXTURE_PROCESS_TIMEOUT_MS = 120_000;
 
 function runNode(script) {
   return spawnSync("node", [script], {
     stdio: "inherit",
     env: process.env,
+    ...(script === FIXTURE_SCRIPT ? { timeout: FIXTURE_PROCESS_TIMEOUT_MS } : {}),
   });
 }
 
