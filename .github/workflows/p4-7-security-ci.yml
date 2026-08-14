@@ -78,6 +78,8 @@ jobs:
           src/lib/__tests__/closedBetaPublicSurface.test.ts
           src/lib/__tests__/securityHeaders.test.ts
           src/lib/__tests__/internalTestEnvironmentGate.test.ts
+          src/lib/__tests__/databaseIntegration.test.ts
+          src/features/dashboards/__tests__/signOut.test.ts
 
       - name: Verify CI uses only placeholder infrastructure
         shell: bash

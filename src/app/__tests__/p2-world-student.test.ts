@@ -15,8 +15,8 @@ describe("/dashboard · aiguillage par univers (P2)", () => {
     expect(src).toMatch(/DashboardRacines/);
     expect(src).toMatch(/lp\.universe === "MONDE"/);
   });
-  it("redirige vers /onboarding si aucun LP", () => {
-    expect(src).toMatch(/redirect\(\{\s*href:\s*"\/onboarding"/);
+  it("redirige vers la selection de persona si aucun LP", () => {
+    expect(src).toMatch(/redirect\(\{\s*href:\s*"\/onboarding\/persona"/);
   });
 });
 

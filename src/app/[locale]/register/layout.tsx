@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { routing } from "@/i18n/routing";
 import { buildPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -20,6 +22,21 @@ export async function generateMetadata({
   };
 }
 
-export default function RegisterLayout({ children }: { children: React.ReactNode }) {
+export default async function RegisterLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const safeLocale = routing.locales.includes(locale as (typeof routing.locales)[number])
+    ? locale
+    : routing.defaultLocale;
+
+  if (process.env.YEMA_CLOSED_BETA_ENABLED === "true") {
+    redirect(`/${safeLocale}/beta`);
+  }
+
   return children;
 }

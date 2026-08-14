@@ -6,10 +6,10 @@ import { PUBLIC_SURFACE } from "@/lib/release/publicSurface";
 const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
 
-describe("technical beta surface isolation", () => {
-  it("keeps pricing hidden and centers private on the public surface", () => {
-    expect(PUBLIC_SURFACE.pricing.status).toBe("HIDDEN");
-    expect(PUBLIC_SURFACE.centers.status).toBe("PRIVATE");
+describe("open beta public surface", () => {
+  it("keeps public offers live and centers explicitly in beta", () => {
+    expect(PUBLIC_SURFACE.pricing.status).toBe("LIVE");
+    expect(PUBLIC_SURFACE.centers.status).toBe("BETA");
   });
 
   it("does not expose payment navigation in the family dashboard", () => {
@@ -30,10 +30,11 @@ describe("technical beta surface isolation", () => {
     expect(dashboard).not.toContain('"factures"');
   });
 
-  it("keeps public registration independent from plan parameters", () => {
+  it("carries a selected offer through public registration without payment claims", () => {
     const register = read("src/app/[locale]/register/page.tsx");
-    expect(register).not.toContain('searchParams.get("plan")');
-    expect(register).not.toContain('searchParams.get("prof")');
+    expect(register).toContain('searchParams.get("plan")');
+    expect(register).toContain('searchParams.get("prof")');
+    expect(register).toContain("selected_plan: selectedPlan");
     expect(register).not.toContain("PLAN_LABEL_");
     expect(register).not.toContain("avant tout paiement");
   });

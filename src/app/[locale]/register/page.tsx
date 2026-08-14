@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useRouter } from "@/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
 import { BrandY } from "@/components/brand/BrandY";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import { classifyAuthError, withTimeout, type AuthErrorKey } from "@/lib/authErrors";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
 
@@ -32,6 +34,8 @@ const VALID_PLANS = new Set<SelectedPlan>([
   "racines-famille",
 ]);
 
+const GOOGLE_AUTH_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true";
+
 function parseSelectedPlan(value: string | null): SelectedPlan | null {
   return value && VALID_PLANS.has(value as SelectedPlan) ? value as SelectedPlan : null;
 }
@@ -46,6 +50,8 @@ const COPY = {
     email: "E-mail",
     password: "Mot de passe",
     passwordHint: "Au moins huit caractères.",
+    showPassword: "Afficher le mot de passe",
+    hidePassword: "Masquer le mot de passe",
     submit: "Créer mon compte",
     loading: "On ouvre la porte…",
     google: "Continuer avec Google",
@@ -55,9 +61,21 @@ const COPY = {
     passwordInvalid: "Le mot de passe doit contenir au moins huit caractères.",
     loginPrompt: "Déjà un compte ?",
     loginCta: "Se connecter",
-    legal: "En créant votre compte, vous acceptez nos conditions et notre politique de confidentialité.",
+    legalBefore: "En créant votre compte, vous acceptez nos ",
+    legalTerms: "conditions d’utilisation",
+    legalMiddle: " et notre ",
+    legalPrivacy: "politique de confidentialité.",
     successTitle: "Vérifiez votre boîte.",
-    successBody: "Confirmez votre e-mail. Ensuite YEMA vous demandera votre persona et terminera votre onboarding.",
+    successBody: "Votre lien de confirmation est en route. Vous pouvez déjà préparer votre parcours.",
+    successContinue: "Préparer mon parcours",
+    successLogin: "J’ai confirmé mon adresse",
+    successChangeEmail: "Corriger mon adresse",
+    resend: "Renvoyer l’e-mail de confirmation",
+    resending: "Nouvel envoi en cours…",
+    resendHelp: "Regardez aussi dans les indésirables.",
+    resendSent: "Un nouveau lien a été demandé. Vérifiez votre boîte de réception.",
+    resendRateLimited: "Trop de demandes pour le moment. Attendez un peu avant de réessayer.",
+    resendError: "Le nouvel e-mail n’a pas pu être demandé. Réessayez dans un instant.",
   },
   en: {
     kicker: "The entrance",
@@ -68,6 +86,8 @@ const COPY = {
     email: "Email",
     password: "Password",
     passwordHint: "At least eight characters.",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
     submit: "Create my account",
     loading: "Opening the door…",
     google: "Continue with Google",
@@ -77,9 +97,21 @@ const COPY = {
     passwordInvalid: "Your password must contain at least eight characters.",
     loginPrompt: "Already have an account?",
     loginCta: "Sign in",
-    legal: "By creating your account, you accept our terms and privacy policy.",
+    legalBefore: "By creating your account, you accept our ",
+    legalTerms: "terms of use",
+    legalMiddle: " and ",
+    legalPrivacy: "privacy policy.",
     successTitle: "Check your inbox.",
-    successBody: "Confirm your email. YEMA will then ask for your persona and complete your onboarding.",
+    successBody: "Your confirmation link is on its way. You can already prepare your journey.",
+    successContinue: "Prepare my journey",
+    successLogin: "I confirmed my email",
+    successChangeEmail: "Correct my email",
+    resend: "Resend confirmation email",
+    resending: "Requesting a new email…",
+    resendHelp: "Please check your spam folder too.",
+    resendSent: "A new link was requested. Check your inbox.",
+    resendRateLimited: "Too many requests for now. Please wait a little before trying again.",
+    resendError: "We could not request a new email. Please try again shortly.",
   },
 } as const;
 
@@ -125,22 +157,31 @@ export default function RegisterPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [resendState, setResendState] = useState<"idle" | "sending" | "sent" | "rate_limited" | "error">("idle");
+  const successHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const errorFromKey = (key: AuthErrorKey): string => t(tErr(key));
   const localizedPersonaRoute = `/${locale}/onboarding/persona${personaIntentQuery}`;
   const appPersonaRoute = `/onboarding/persona${personaIntentQuery}`;
+  const preconfirmationOnboardingHref = `/${locale}/pre-onboarding${personaIntentQuery}`;
 
   useEffect(() => {
     document.querySelector<HTMLInputElement>("input[data-autofocus]")?.focus();
   }, []);
 
+  useEffect(() => {
+    if (success) successHeadingRef.current?.focus();
+  }, [success]);
+
   async function handleRegister(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
+    setResendState("idle");
 
     const first = firstName.trim();
     const last = lastName.trim();
@@ -230,8 +271,40 @@ export default function RegisterPage() {
     }
   }
 
+  async function handleResendConfirmation() {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!isEmailLike(normalizedEmail)) return;
+
+    setResendState("sending");
+    try {
+      const supabase = createClient();
+      const { error: resendError } = await withTimeout(
+        supabase.auth.resend({
+          type: "signup",
+          email: normalizedEmail,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizedPersonaRoute)}`,
+          },
+        }),
+      );
+      if (resendError) {
+        setResendState(classifyAuthError(resendError) === "rate_limited" ? "rate_limited" : "error");
+        return;
+      }
+      setResendState("sent");
+    } catch (resendError) {
+      setResendState(classifyAuthError(resendError) === "rate_limited" ? "rate_limited" : "error");
+    }
+  }
+
   return (
     <div className={`entry-page ${universe === "racines" ? "entry-universe-racines" : universe === "monde" ? "entry-universe-monde" : ""}`}>
+      <SeuilGreetings
+        locale={loc}
+        visibleCount={3}
+        pool={universe === "monde" ? "world" : universe === "racines" ? "sources" : "all"}
+        variant="entry"
+      />
       <header className="entry-header">
         <Link href={`/${locale}`} className="entry-brand" aria-label="YEMA">
           <BrandY variant={universe === "racines" ? "sources" : "world"} state="static" size={36} />
@@ -245,8 +318,29 @@ export default function RegisterPage() {
         <div className="entry-card">
           {success ? (
             <div className="entry-success">
-              <h1 className="entry-h">{t(c.successTitle)}</h1>
+              <h1 ref={successHeadingRef} className="entry-h" tabIndex={-1}>{t(c.successTitle)}</h1>
               <p className="entry-lede">{t(c.successBody)}</p>
+              <p className="entry-success-help">{t(c.resendHelp)}</p>
+              <div className="entry-success-actions">
+                <Link href={preconfirmationOnboardingHref} className="entry-cta entry-cta-primary">{t(c.successContinue)}</Link>
+                <Link href={loginHref} className="entry-cta entry-cta-ghost">{t(c.successLogin)}</Link>
+                <button
+                  type="button"
+                  className="entry-cta entry-cta-ghost"
+                  onClick={handleResendConfirmation}
+                  disabled={resendState === "sending"}
+                >
+                  {t(resendState === "sending" ? c.resending : c.resend)}
+                </button>
+                <button type="button" className="entry-cta entry-cta-ghost" onClick={() => { setResendState("idle"); setSuccess(false); }}>
+                  {t(c.successChangeEmail)}
+                </button>
+              </div>
+              {resendState !== "idle" && resendState !== "sending" ? (
+                <p className={`entry-success-feedback ${resendState === "sent" ? "is-success" : "is-error"}`} role="status">
+                  {t(resendState === "sent" ? c.resendSent : resendState === "rate_limited" ? c.resendRateLimited : c.resendError)}
+                </p>
+              ) : null}
             </div>
           ) : (
             <>
@@ -282,7 +376,18 @@ export default function RegisterPage() {
 
                 <label className="entry-field">
                   <span className="entry-field-lbl">{t(c.password)}</span>
-                  <input type="password" autoComplete="new-password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className="entry-input" required />
+                  <span className="entry-password-wrap">
+                    <input type={passwordVisible ? "text" : "password"} autoComplete="new-password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className="entry-input" required />
+                    <button
+                      type="button"
+                      className="entry-password-toggle"
+                      onClick={() => setPasswordVisible((visible) => !visible)}
+                      aria-label={t(passwordVisible ? c.hidePassword : c.showPassword)}
+                      title={t(passwordVisible ? c.hidePassword : c.showPassword)}
+                    >
+                      {passwordVisible ? <EyeOff size={17} aria-hidden="true" /> : <Eye size={17} aria-hidden="true" />}
+                    </button>
+                  </span>
                   <span className="entry-field-hint">{t(c.passwordHint)}</span>
                 </label>
 
@@ -290,14 +395,23 @@ export default function RegisterPage() {
                 <button type="submit" className="entry-cta entry-cta-primary" disabled={loading}>
                   {loading ? t(c.loading) : t(c.submit)}
                 </button>
-                <div className="entry-sep" aria-hidden="true"><span>{loc === "en" ? "or" : "ou"}</span></div>
-                <button type="button" className="entry-cta entry-cta-ghost" onClick={handleGoogle} disabled={googleLoading || loading}>
-                  <span className="entry-google-dot" aria-hidden="true" />
-                  {t(c.google)}
-                </button>
+                {GOOGLE_AUTH_ENABLED ? (
+                  <>
+                    <div className="entry-sep" aria-hidden="true"><span>{loc === "en" ? "or" : "ou"}</span></div>
+                    <button type="button" className="entry-cta entry-cta-ghost" onClick={handleGoogle} disabled={googleLoading || loading}>
+                      <span className="entry-google-dot" aria-hidden="true" />
+                      {t(c.google)}
+                    </button>
+                  </>
+                ) : null}
               </form>
 
-              <p className="entry-legal">{t(c.legal)}</p>
+              <p className="entry-legal">
+                {t(c.legalBefore)}
+                <Link href={`/${locale}/terms`} className="entry-legal-link">{t(c.legalTerms)}</Link>
+                {t(c.legalMiddle)}
+                <Link href={`/${locale}/privacy`} className="entry-legal-link">{t(c.legalPrivacy)}</Link>
+              </p>
             </>
           )}
         </div>

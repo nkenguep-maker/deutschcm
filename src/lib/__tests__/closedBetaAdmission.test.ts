@@ -72,4 +72,17 @@ describe("closed beta admission", () => {
     expect(page).toContain("testeurs invités");
     expect(page).not.toMatch(/99\s*€|149\s*€|Mobile Money|remboursement/i);
   });
+
+  it("keeps public registration available whenever closed beta is disabled", () => {
+    const page = read("src/app/[locale]/beta/page.tsx");
+    const layout = read("src/app/[locale]/beta/layout.tsx");
+    const access = read("src/lib/beta/access.ts");
+
+    expect(page).toContain("isClosedBetaEnabled()");
+    expect(page).toContain('href={`/${locale}/register`}');
+    expect(page).toContain("Bêta ouverte");
+    expect(layout).toContain("isClosedBetaEnabled()");
+    expect(layout).toContain("robots: { index: true, follow: true }");
+    expect(access).toContain("if (!isClosedBetaEnabled()) return true");
+  });
 });

@@ -3,8 +3,8 @@
 import { useLocale } from "next-intl";
 import { Callout, H2, LegalShell, P, Ul } from "@/components/landing/LegalShell";
 
-const EFFECTIVE_DATE = "8 août 2026";
-const EFFECTIVE_DATE_EN = "August 8, 2026";
+const EFFECTIVE_DATE = "14 août 2026";
+const EFFECTIVE_DATE_EN = "August 14, 2026";
 const CONTACT_EMAIL = "privacy@yema.app";
 const COMPANY = "YEMA Languages";
 
@@ -16,8 +16,8 @@ export default function PrivacyPage() {
 function PrivacyEN() {
   return (
     <LegalShell locale="en" eye="Legal" title="Privacy Policy" effective={EFFECTIVE_DATE_EN} updated={EFFECTIVE_DATE_EN} contactEmail={CONTACT_EMAIL} contactLine="Questions or requests? Reach us at">
-      <P>{COMPANY} (&quot;YEMA&quot;, &quot;we&quot;, &quot;us&quot;) explains here how personal data is handled in the current closed-beta product. We apply applicable data-protection requirements and will update this notice when materially new processing, including online payments, is introduced.</P>
-      <Callout variant="info"><strong>Current status:</strong> YEMA is operating as a closed beta. Online payment is not currently activated.</Callout>
+      <P>{COMPANY} (&quot;YEMA&quot;, &quot;we&quot;, &quot;us&quot;) explains here how personal data is handled in the current open-beta product. We apply applicable data-protection requirements and will update this notice when materially new processing, including online payments, is introduced.</P>
+      <Callout variant="info"><strong>Current status:</strong> YEMA is operating as an open beta. Online payment is not currently activated.</Callout>
 
       <H2>1. Data we may process</H2>
       <Ul items={[
@@ -32,7 +32,7 @@ function PrivacyEN() {
       <H2>2. How we use data</H2>
       <Ul items={[
         "Authenticate users and route them to the correct YEMA workspace.",
-        "Provide learning, family, classroom, coaching, messaging and closed-beta features.",
+        "Provide learning, family, classroom, coaching, messaging and open-beta features.",
         "Protect accounts and the platform against abuse, fraud and unauthorized access.",
         "Operate invitations, support requests and service-related communications.",
         "Improve product reliability and understand feature usage using the telemetry that is actually enabled.",
@@ -50,14 +50,14 @@ function PrivacyEN() {
       <P>We do not sell personal data. We may use infrastructure and service providers such as authentication/database, hosting, email or AI providers where a feature requires them. We share only the information reasonably necessary to operate that feature. Learning or class information may also be visible to an authorized teacher, coach, parent/guardian or center representative according to the workspace and permissions involved.</P>
 
       <H2>6. Payments</H2>
-      <P>Online payments are not currently activated. YEMA does not currently ask users to complete a live checkout in the closed-beta product. Before payment processing is enabled, the relevant checkout, provider information and any additional privacy terms will be presented and this notice will be updated where required.</P>
+      <P>Online payments are not currently activated. YEMA does not currently ask users to complete a live checkout in the open-beta product. Before payment processing is enabled, the relevant checkout, provider information and any additional privacy terms will be presented and this notice will be updated where required.</P>
 
       <H2>7. Retention and deletion</H2>
       <P>We retain data only for as long as reasonably necessary for the feature, account, security, legal or operational purpose involved. Different categories may have different retention needs. We do not promise a fixed deletion or retention period here unless that period is actually implemented for the relevant feature.</P>
       <P>To request access, correction, deletion or another applicable privacy right, contact <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. We may need to verify the requester before acting on account or child-profile data.</P>
 
       <H2>8. Cookies and authentication</H2>
-      <P>YEMA uses session and security mechanisms required for authentication and protected workspaces. Additional analytics or optional technologies are used only when enabled for the product. We do not describe advertising tracking as part of the current closed-beta product.</P>
+      <P>YEMA uses session and security mechanisms required for authentication and protected workspaces. Additional analytics or optional technologies are used only when enabled for the product. We do not describe advertising tracking as part of the current open-beta product.</P>
 
       <H2>9. Security</H2>
       <P>YEMA uses technical and organizational controls including authenticated access, role checks, scoped server-side authorization and security logging for sensitive operations. No online system can guarantee absolute security.</P>
@@ -71,8 +71,8 @@ function PrivacyEN() {
 function PrivacyFR() {
   return (
     <LegalShell locale="fr" eye="Mentions légales" title="Politique de confidentialité" effective={EFFECTIVE_DATE} updated={EFFECTIVE_DATE} contactEmail={CONTACT_EMAIL} contactLine="Questions ou demandes ? Contactez-nous à">
-      <P>{COMPANY} (&quot;YEMA&quot;, &quot;nous&quot;) explique ici comment les données personnelles sont traitées dans le produit actuellement disponible en bêta fermée. Nous appliquons les exigences de protection des données qui nous sont applicables et mettrons cette notice à jour lors de l’introduction de traitements matériels nouveaux, notamment les paiements en ligne.</P>
-      <Callout variant="info"><strong>Statut actuel :</strong> YEMA fonctionne en bêta fermée. Le paiement en ligne n’est pas activé à ce jour.</Callout>
+      <P>{COMPANY} (&quot;YEMA&quot;, &quot;nous&quot;) explique ici comment les données personnelles sont traitées dans le produit actuellement disponible en bêta ouverte. Nous appliquons les exigences de protection des données qui nous sont applicables et mettrons cette notice à jour lors de l’introduction de traitements matériels nouveaux, notamment les paiements en ligne.</P>
+      <Callout variant="info"><strong>Statut actuel :</strong> YEMA fonctionne en bêta ouverte. Le paiement en ligne n’est pas activé à ce jour.</Callout>
 
       <H2>1. Données que nous pouvons traiter</H2>
       <Ul items={[
@@ -87,7 +87,7 @@ function PrivacyFR() {
       <H2>2. Utilisation des données</H2>
       <Ul items={[
         "Authentifier les utilisateurs et les orienter vers le bon espace YEMA.",
-        "Fournir les fonctions d’apprentissage, famille, classe, coaching, messagerie et bêta fermée.",
+        "Fournir les fonctions d’apprentissage, famille, classe, coaching, messagerie et bêta ouverte.",
         "Protéger les comptes et la plateforme contre les abus, la fraude et les accès non autorisés.",
         "Gérer les invitations, demandes de support et communications liées au service.",
         "Améliorer la fiabilité du produit et comprendre l’usage des fonctionnalités à partir de la télémétrie réellement activée.",
@@ -105,14 +105,14 @@ function PrivacyFR() {
       <P>Nous ne vendons pas les données personnelles. Nous pouvons utiliser des prestataires d’authentification/base de données, d’hébergement, d’e-mail ou d’IA lorsqu’une fonctionnalité le nécessite. Nous ne partageons que les informations raisonnablement nécessaires au fonctionnement de cette fonctionnalité. Les informations d’apprentissage ou de classe peuvent aussi être visibles par un enseignant, coach, parent/tuteur ou représentant de centre autorisé selon l’espace et les permissions concernés.</P>
 
       <H2>6. Paiements</H2>
-      <P>Les paiements en ligne ne sont pas encore activés. YEMA ne demande actuellement aucun checkout réel dans le produit en bêta fermée. Avant l’activation du paiement, le parcours de checkout, les informations du prestataire et les éventuelles conditions de confidentialité supplémentaires seront présentés et cette notice sera mise à jour si nécessaire.</P>
+      <P>Les paiements en ligne ne sont pas encore activés. YEMA ne demande actuellement aucun checkout réel dans le produit en bêta ouverte. Avant l’activation du paiement, le parcours de checkout, les informations du prestataire et les éventuelles conditions de confidentialité supplémentaires seront présentés et cette notice sera mise à jour si nécessaire.</P>
 
       <H2>7. Conservation et suppression</H2>
       <P>Nous conservons les données pendant une durée raisonnablement nécessaire à la fonctionnalité, au compte, à la sécurité, aux obligations légales ou au fonctionnement du service. Les catégories de données peuvent avoir des besoins différents. Nous ne promettons pas ici un délai fixe de conservation ou de suppression lorsqu’il n’est pas effectivement implémenté pour la fonctionnalité concernée.</P>
       <P>Pour demander l’accès, la rectification, la suppression ou exercer un autre droit applicable, contactez <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Nous pouvons vérifier l’identité du demandeur avant d’agir sur les données d’un compte ou d’un profil enfant.</P>
 
       <H2>8. Cookies et authentification</H2>
-      <P>YEMA utilise les mécanismes de session et de sécurité nécessaires à l’authentification et aux espaces protégés. Les technologies analytiques ou optionnelles ne sont utilisées que lorsqu’elles sont effectivement activées. Nous ne présentons pas de suivi publicitaire comme faisant partie de la bêta fermée actuelle.</P>
+      <P>YEMA utilise les mécanismes de session et de sécurité nécessaires à l’authentification et aux espaces protégés. Les technologies analytiques ou optionnelles ne sont utilisées que lorsqu’elles sont effectivement activées. Nous ne présentons pas de suivi publicitaire comme faisant partie de la bêta ouverte actuelle.</P>
 
       <H2>9. Sécurité</H2>
       <P>YEMA utilise des mesures techniques et organisationnelles comprenant l’accès authentifié, des contrôles de rôles, des autorisations serveur limitées au bon périmètre et la journalisation d’opérations sensibles. Aucun service en ligne ne peut garantir une sécurité absolue.</P>

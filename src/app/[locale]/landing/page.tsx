@@ -120,10 +120,10 @@ const COPY_FR: Copy = {
     "Les langues africaines — avec des expériences distinctes pensées pour la transmission, les familles et les communautés.",
   ],
 
-  guaranteeKicker: "Bêta fermée",
-  guaranteeTitle: "Accès accompagné.",
+  guaranteeKicker: "Bêta ouverte",
+  guaranteeTitle: "Inscription ouverte.",
   guaranteeTitleEm: "Sans paiement en ligne.",
-  guaranteeBody: "Les centres peuvent découvrir l'offre et demander une démo. L'activation commerciale et les moyens de paiement seront connectés dans un lot ultérieur.",
+  guaranteeBody: "Créez votre compte, choisissez votre parcours et commencez votre onboarding. Les espaces professionnels restent soumis à leur validation prévue.",
 
   formKicker: "Réserver une démo",
   formTitle: "Une démo courte.",
@@ -195,10 +195,10 @@ const COPY_EN: Copy = {
     "African languages — with distinct experiences designed for transmission, families and communities.",
   ],
 
-  guaranteeKicker: "Closed beta",
-  guaranteeTitle: "Guided access.",
+  guaranteeKicker: "Open beta",
+  guaranteeTitle: "Registration is open.",
   guaranteeTitleEm: "No online payment yet.",
-  guaranteeBody: "Centers can explore the offer and request a demo. Commercial activation and payment methods will be connected in a later delivery.",
+  guaranteeBody: "Create your account, choose your path and start onboarding. Professional workspaces remain subject to their required approval.",
 
   formKicker: "Book a demo",
   formTitle: "A short demo.",

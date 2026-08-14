@@ -3,6 +3,7 @@
 // This deliberately verifies the child-session identity, not only a 200 dashboard.
 
 import { spawn } from "node:child_process";
+import { randomBytes } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
 
 const P1_REF = "kzzagbojjkivdzzcrmxn";
@@ -53,6 +54,9 @@ async function loginCookie() {
 }
 
 async function main() {
+  const childSessionSecret = process.env.YEMA_CHILD_SESSION_SECRET
+    ?? process.env.SUPABASE_JWT_SECRET
+    ?? randomBytes(32).toString("base64");
   const server = spawn("npx", ["next", "start", "-p", PORT], {
     stdio: ["ignore", "pipe", "inherit"],
     env: {
@@ -63,6 +67,7 @@ async function main() {
       YEMA_COACH_WORKSPACE_ENABLED: "true",
       YEMA_ROOTS_COACH_RLS_CONFIRMED: "true",
       YEMA_CIRCLE_ENABLED: "true",
+      YEMA_CHILD_SESSION_SECRET: childSessionSecret,
     },
   });
 
@@ -75,7 +80,8 @@ async function main() {
     for (let i = 0; i < 30 && !ready && server.exitCode == null; i++) await sleep(1000);
     if (!ready) throw new Error(`server not ready${server.exitCode == null ? "" : ` · exit ${server.exitCode}`}`);
 
-    const host = `127.0.0.1:${PORT}`;
+    // Match Next's canonical local origin; do not bypass the CSRF guard.
+    const host = `localhost:${PORT}`;
     const familyCookie = await loginCookie();
     const parentHeaders = {
       Cookie: familyCookie,

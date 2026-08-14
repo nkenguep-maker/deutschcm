@@ -84,7 +84,7 @@ export function StudyGroupPage() {
                 {isCreator ? <span className="yema-mono">{en ? "Creator" : "Créateur"}</span> : null}
               </div>
               <h1 style={{ margin: "0 0 6px", overflowWrap: "anywhere" }}>{group.name}</h1>
-              <p style={{ margin: 0, color: "var(--yema-text-muted)" }}>{members.length} / {group.maxMembers} {en ? "members" : "membres"} · {en ? "created by" : "créé par"} {group.creator.fullName}</p>
+              <p style={{ margin: 0, color: "var(--yema-text-muted)", overflowWrap: "anywhere" }}>{members.length} / {group.maxMembers} {en ? "members" : "membres"} · {en ? "created by" : "créé par"} {group.creator.fullName}</p>
             </div>
             {isCreator ? <div style={{ minWidth: 190 }}><div className="yema-mono" style={{ padding: 12, border: "1px solid rgba(16,185,129,.25)", borderRadius: 10, textAlign: "center" }}>{group.code}</div><button type="button" onClick={copyCode} style={{ marginTop: 8, width: "100%", minHeight: 44 }}>{copied ? (en ? "✓ Copied" : "✓ Copié") : (en ? "Copy private code" : "Copier le code privé")}</button></div> : null}
           </div>

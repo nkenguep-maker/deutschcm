@@ -35,13 +35,16 @@ export interface GreetingItem {
   territory: "world" | "sources";
 }
 
-// Pool des salutations · UNIQUEMENT les 10 natales africaines validées.
-// Les langues d'interface (Bonjour, Hello, Hola…) ne murmurent pas ici :
-// le seuil est le vestibule des voix africaines, jamais l'inverse.
+// Les écrans Monde, Racines et communs choisissent chacun leur répertoire.
+// Le pool commun alterne volontairement les deux univers dès les premiers slots.
 export const GREETINGS: readonly GreetingItem[] = [
+  { id: "good-morning", word: "Good morning", language: "anglais", languageEn: "English", country: "Royaume-Uni", countryEn: "United Kingdom", langTag: "en", territory: "world" },
   { id: "mbolo",     word: "Mbolo",     language: "ewondo",       languageEn: "Ewondo",       country: "Cameroun",           countryEn: "Cameroon",              langTag: "ewo", territory: "sources" },
+  { id: "guten-tag", word: "Guten Tag", language: "allemand",     languageEn: "German",        country: "Allemagne",          countryEn: "Germany",               langTag: "de", territory: "world" },
   { id: "nangadef",  word: "Na nga def", language: "wolof",        languageEn: "Wolof",        country: "Sénégal",            countryEn: "Senegal",               langTag: "wol", territory: "sources" },
+  { id: "bonjour",   word: "Bonjour",   language: "français",     languageEn: "French",        country: "France",             countryEn: "France",                langTag: "fr", territory: "world" },
   { id: "mbote",     word: "Mbote",     language: "lingala",      languageEn: "Lingala",      country: "RDC",                countryEn: "DRC",                   langTag: "lin", territory: "sources" },
+  { id: "hola",      word: "Hola",      language: "espagnol",     languageEn: "Spanish",       country: "Espagne",            countryEn: "Spain",                 langTag: "es", territory: "world" },
   { id: "jambo",     word: "Jambo",     language: "swahili",      languageEn: "Swahili",      country: "Kenya · Tanzanie",   countryEn: "Kenya · Tanzania",      langTag: "swa", territory: "sources" },
   { id: "enle",      word: "Ẹ n lẹ",    language: "yorùbá",       languageEn: "Yoruba",       country: "Nigeria",            countryEn: "Nigeria",               langTag: "yor", territory: "sources" },
   { id: "sannu",     word: "Sannu",     language: "haoussa",      languageEn: "Hausa",        country: "Niger · Nigeria",    countryEn: "Niger · Nigeria",       langTag: "hau", territory: "sources" },
@@ -60,6 +63,8 @@ interface SeuilGreetingsProps {
    *  Utilisé sur /langues pour aligner les salutations avec le
    *  territoire de la section. */
   pool?: "all" | "world" | "sources";
+  /** Landing keeps the listening interaction; entry flows use a decorative layer. */
+  variant?: "landing" | "entry";
 }
 
 const POSITIONS = ["p0", "p1", "p2", "p3"] as const;
@@ -72,7 +77,9 @@ export function SeuilGreetings({
   locale,
   visibleCount = 4,
   pool = "all",
+  variant = "landing",
 }: SeuilGreetingsProps) {
+  const interactive = variant === "landing";
   // Filtre le pool si territoire imposé (pages world / sources).
   const items = useMemo(() => {
     if (pool === "world") return GREETINGS.filter((g) => g.territory === "world");
@@ -148,11 +155,14 @@ export function SeuilGreetings({
 
   return (
     <div
-      className="seuil-greetings"
-      aria-label={locale === "en" ? "African greetings" : "Salutations africaines"}
+      className={`seuil-greetings ${variant === "entry" ? "seuil-greetings-entry" : ""}`}
+      aria-hidden={interactive ? undefined : true}
+      aria-label={interactive ? (locale === "en" ? "Greetings" : "Salutations") : undefined}
     >
       {Array.from({ length: slotCount }, (_, i) => {
-        const item = items[wordIdx[i]];
+        // Le pool peut changer quand l'utilisateur passe de l'univers commun
+        // à Monde ou Racines. L'index précédent reste alors borné au pool actif.
+        const item = items[wordIdx[i] % items.length];
         // Chaque slot démarre son cycle à un point différent.
         // Offset négatif = déjà en cours au mount → un est en
         // émergence, un en vie, un en effacement, un endormi.
@@ -160,24 +170,48 @@ export function SeuilGreetings({
         const style: React.CSSProperties = reduced
           ? {}
           : { animationDelay: `${offset}ms` };
+        const greetingContent = (
+          <>
+            <span className="seuil-greeting-word">{item.word}</span>
+            <span className="seuil-greeting-meta">
+              {(locale === "en" ? item.languageEn : item.language)} ·{" "}
+              {(locale === "en" ? item.countryEn : item.country)}
+            </span>
+          </>
+        );
+
+        const className = `seuil-greeting seuil-greeting-${POSITIONS[i]} ${
+          playing === item.id ? "playing" : ""
+        } ${interactive && item.territory !== "sources" ? "seuil-greeting-static" : ""}`;
+
+        // Les voix Racines disposent de leurs enregistrements audio. Les mots
+        // Monde restent des éléments visuels, même sur le seuil interactif.
+        if (!interactive || item.territory !== "sources") {
+          return (
+            <span
+              key={i}
+              className={className}
+              style={style}
+              onAnimationIteration={() => handleIteration(i)}
+              lang={item.langTag}
+            >
+              {greetingContent}
+            </span>
+          );
+        }
+
         return (
           <button
             key={i}
             type="button"
-            className={`seuil-greeting seuil-greeting-${POSITIONS[i]} ${
-              playing === item.id ? "playing" : ""
-            }`}
+            className={className}
             style={style}
             onAnimationIteration={() => handleIteration(i)}
             onClick={() => handlePick(item)}
             aria-label={ariaLabel(item)}
             lang={item.langTag}
           >
-            <span className="seuil-greeting-word">{item.word}</span>
-            <span className="seuil-greeting-meta">
-              {(locale === "en" ? item.languageEn : item.language)} ·{" "}
-              {(locale === "en" ? item.countryEn : item.country)}
-            </span>
+            {greetingContent}
           </button>
         );
       })}

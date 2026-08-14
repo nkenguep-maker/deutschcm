@@ -9,66 +9,59 @@ import {
   canAccessModule,
   a1IsCourseReady,
 } from "../monde";
+import { DE_A1_COURSE } from "@/data/courses/registry";
+
+const a1Units = DE_A1_COURSE.units;
+const firstUnit = a1Units[0];
+const completed = (lessonIds: string[]) => lessonIds.map((moduleId) => ({ moduleId, status: "COMPLETED" as const }));
 
 describe("buildA1CourseList · verrouillage séquentiel", () => {
   it("premier cours ouvert par défaut, autres verrouillés", () => {
     const list = buildA1CourseList([]);
-    expect(list).toHaveLength(5);
+    expect(list).toHaveLength(a1Units.length);
     expect(list[0].status).toBe("OPEN");
-    for (let i = 1; i < 5; i++) expect(list[i].status).toBe("LOCKED");
+    for (let i = 1; i < a1Units.length; i++) expect(list[i].status).toBe("LOCKED");
   });
 
   it("cours 1 complet → cours 2 ouvert", () => {
-    const done = [
-      "a1-beta-1-lesen", "a1-beta-1-hoeren", "a1-beta-1-sprechen",
-      "a1-beta-1-schreiben", "a1-beta-1-quiz",
-    ].map((moduleId) => ({ moduleId, status: "COMPLETED" as const }));
+    const done = completed(firstUnit.lessons.map((lesson) => lesson.id));
     const list = buildA1CourseList(done);
     expect(list[0].status).toBe("COMPLETED");
-    expect(list[0].completedModules).toBe(5);
+    expect(list[0].completedModules).toBe(firstUnit.lessons.length);
     expect(list[1].status).toBe("OPEN");
     expect(list[2].status).toBe("LOCKED");
   });
 
   it("cours 1 partiel → status IN_PROGRESS · cours 2 verrouillé", () => {
-    const done = [
-      { moduleId: "a1-beta-1-lesen", status: "COMPLETED" as const },
-      { moduleId: "a1-beta-1-hoeren", status: "COMPLETED" as const },
-    ];
+    const done = completed(firstUnit.lessons.slice(0, 2).map((lesson) => lesson.id));
     const list = buildA1CourseList(done);
     expect(list[0].status).toBe("IN_PROGRESS");
     expect(list[0].completedModules).toBe(2);
     expect(list[1].status).toBe("LOCKED");
   });
 
-  it("aucun cours a1-1 dans la liste (a1-beta uniquement)", () => {
+  it("reprend exactement les unités du registre A1 officiel", () => {
     const list = buildA1CourseList([]);
-    expect(list.map((s) => s.id)).toEqual(["a1-beta-1", "a1-beta-2", "a1-beta-3", "a1-beta-4", "a1-beta-5"]);
+    expect(list.map((summary) => summary.id)).toEqual(a1Units.map((unit) => unit.id));
   });
 });
 
 describe("nextIncompleteModule", () => {
   it("null quand tout est terminé", () => {
-    const allIds: string[] = [];
-    for (let i = 1; i <= 5; i++) {
-      for (const type of ["lesen", "hoeren", "sprechen", "schreiben", "quiz"]) {
-        allIds.push(`a1-beta-${i}-${type}`);
-      }
-    }
-    const done = allIds.map((moduleId) => ({ moduleId, status: "COMPLETED" as const }));
+    const done = completed(a1Units.flatMap((unit) => unit.lessons.map((lesson) => lesson.id)));
     expect(nextIncompleteModule(done)).toBeNull();
   });
 
   it("renvoie le premier module du cours 1 quand aucun progress", () => {
     const next = nextIncompleteModule([]);
-    expect(next?.courseId).toBe("a1-beta-1");
-    expect(next?.moduleId).toBe("a1-beta-1-lesen");
+    expect(next?.courseId).toBe(firstUnit.id);
+    expect(next?.moduleId).toBe(firstUnit.lessons[0].id);
   });
 
   it("ne pointe pas sur un cours verrouillé", () => {
     // Progress vide → cours 2 verrouillé → next doit pointer sur cours 1
     const next = nextIncompleteModule([]);
-    expect(next?.courseId).toBe("a1-beta-1");
+    expect(next?.courseId).toBe(firstUnit.id);
   });
 });
 
@@ -76,12 +69,10 @@ describe("overallProgress", () => {
   it("0% quand aucun progrès", () => {
     expect(overallProgress(buildA1CourseList([]))).toBe(0);
   });
-  it("20% quand 5 modules sur 25 terminés (1 cours)", () => {
-    const done = [
-      "a1-beta-1-lesen", "a1-beta-1-hoeren", "a1-beta-1-sprechen",
-      "a1-beta-1-schreiben", "a1-beta-1-quiz",
-    ].map((moduleId) => ({ moduleId, status: "COMPLETED" as const }));
-    expect(overallProgress(buildA1CourseList(done))).toBe(20);
+  it("reflète la part réelle de la première unité dans le catalogue", () => {
+    const done = completed(firstUnit.lessons.map((lesson) => lesson.id));
+    const totalLessons = a1Units.reduce((sum, unit) => sum + unit.lessons.length, 0);
+    expect(overallProgress(buildA1CourseList(done))).toBe(Math.round((firstUnit.lessons.length / totalLessons) * 100));
   });
 });
 

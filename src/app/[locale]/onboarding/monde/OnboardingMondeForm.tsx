@@ -16,6 +16,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { BrandY } from "@/components/brand/BrandY";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import { frTypo } from "@/components/landing/typo";
 import { classifyAuthError, withTimeout } from "@/lib/authErrors";
 
@@ -53,7 +54,7 @@ const COPY_FR = {
   s1Lede: "Le niveau reste le même pour tous. Nous adaptons une partie des situations et exemples à votre objectif.",
   whys: [
     { id: "STUDIES" as PathwayChoice, name: "Études", desc: "Université, Ausbildung, vie de campus." },
-    { id: "VISA" as PathwayChoice, name: "Visa et démarches", desc: "Rendez-vous, formulaires et situations administratives." },
+    { id: "VISA" as PathwayChoice, name: "Travailler ou m’installer", desc: "Emploi, rendez-vous, formulaires et démarches." },
     { id: "NATURALIZATION" as PathwayChoice, name: "Naturalisation", desc: "Objectif B1-B2, vie quotidienne et situations civiques." },
     { id: "TOURISM" as PathwayChoice, name: "Tourisme et voyage", desc: "Hôtel, transport, restaurant et sorties." },
   ],
@@ -81,7 +82,7 @@ const COPY_EN = {
   s1Lede: "The language level stays the same for everyone. We adapt part of the situations and examples to your goal.",
   whys: [
     { id: "STUDIES" as PathwayChoice, name: "Studies", desc: "University, Ausbildung and campus life." },
-    { id: "VISA" as PathwayChoice, name: "Visa and procedures", desc: "Appointments, forms and administrative situations." },
+    { id: "VISA" as PathwayChoice, name: "Work or move abroad", desc: "Work, appointments, forms and procedures." },
     { id: "NATURALIZATION" as PathwayChoice, name: "Naturalization", desc: "B1-B2 goal, daily life and civic situations." },
     { id: "TOURISM" as PathwayChoice, name: "Tourism and travel", desc: "Hotels, transport, restaurants and outings." },
   ],
@@ -137,6 +138,18 @@ export function OnboardingMondeForm() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       if (d.step === 2) setStep(2);
     } catch { /* draft corrompu, on ignore */ }
+  }, []);
+
+  // Le sélecteur d'entrée connaît déjà le projet de l'apprenant : on garde
+  // ce choix en un tap et on arrive directement à la dernière question.
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      const variant = (data.user?.user_metadata as { pathway_variant?: unknown })?.pathway_variant;
+      if (!isPathwayChoice(variant)) return;
+      setWhy((current) => current ?? variant);
+      setStep((current) => current === 1 ? 2 : current);
+    }).catch(() => { /* silent: the standard two-step path remains available */ });
   }, []);
 
   // Récupère le plan depuis user_metadata (posé au signup).
@@ -252,6 +265,7 @@ export function OnboardingMondeForm() {
 
   return (
     <div className="entry-page entry-universe-monde" data-universe="monde">
+      <SeuilGreetings locale={loc} visibleCount={3} pool="world" variant="entry" />
       <header className="entry-header">
         <Link href={`/${locale}`} className="entry-brand" aria-label="YEMA">
           <BrandY variant="world" state="static" size={36} />

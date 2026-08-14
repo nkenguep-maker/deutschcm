@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   INTERNAL_PERSONA_ATTRIBUTES,
   INTERNAL_PERSONA_IDS,
@@ -25,6 +25,16 @@ const EXPECTED = {
 } as const;
 
 describe("Production internal personas · exact attribute matrix", () => {
+  beforeEach(() => {
+    vi.stubEnv("VERCEL_ENV", "");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://kzzagbojjkivdzzcrmxn.supabase.co");
+    vi.stubEnv("P1_BASELINE_CONFIRMED_NOT_PRODUCTION", "true");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("covers exactly the nine personas", () => {
     expect(INTERNAL_PERSONA_IDS).toEqual(Object.keys(EXPECTED));
   });

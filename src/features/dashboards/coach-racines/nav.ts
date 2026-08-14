@@ -16,10 +16,10 @@ export function buildCoachRacinesNav(
     label: labels.sectionLabel,
     items: [
       { key: "overview", label: labels.overview, href: baseHref },
-      { key: "learners", label: labels.learners, href: `${baseHref}#apprenants` },
+      { key: "learners", label: labels.learners, href: `${baseHref}#mes-apprenants` },
       { key: "sessions", label: labels.sessions, href: `${baseHref}#seances` },
       { key: "messages", label: labels.messages, href: `${baseHref}#messages` },
-      { key: "sessionNotes", label: labels.sessionNotes, href: `${baseHref}#notes` },
+      { key: "sessionNotes", label: labels.sessionNotes, href: `${baseHref}#notes-de-seance` },
     ],
   }];
 }

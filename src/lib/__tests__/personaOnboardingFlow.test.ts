@@ -24,7 +24,7 @@ describe("canonical registration → onboarding → persona home funnel", () => 
   it("offers six public adult personas while keeping Super Admin non-self-service", () => {
     const page = read("src/app/[locale]/onboarding/persona/page.tsx");
     const route = read("src/app/api/onboarding/persona/route.ts");
-    for (const persona of ["student_monde", "student_racines", "family", "teacher", "coach", "center_admin"]) expect(page).toContain(`id: "${persona}"`);
+    for (const persona of ["student_monde", "student_racines", "family", "teacher", "coach", "center_admin"]) expect(page).toContain(`persona: "${persona}"`);
     expect(route).toContain('persona === "super_admin"');
     expect(route).toContain('bad("PERSONA_NOT_SELF_SERVICE", 403)');
   });

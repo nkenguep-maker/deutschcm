@@ -9,12 +9,14 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { getEntitlements, validateAddonPurchase } from "@/lib/entitlements";
 import { createGrant } from "@/lib/entitlements/grants";
 import { canAddAdult, canAddDependent } from "@/lib/entitlements/household";
+import { shouldRunDatabaseIntegrationTests } from "@/lib/__tests__/databaseIntegration";
 
 const adapter = new PrismaPg({ connectionString: process.env.DIRECT_URL! });
 const db = new PrismaClient({ adapter, log: ["error"] });
 
 const TAG = `ent_test_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 const uid = (label: string) => `${TAG}_${label}`;
+const describeDatabase = shouldRunDatabaseIntegrationTests() ? describe : describe.skip;
 
 // Contexte partagé
 let passageA1Xaf: string;
@@ -34,52 +36,49 @@ async function makeUser(label: string) {
   });
 }
 
-beforeAll(async () => {
-  // Récupère les variants issus du seed (fixtures partagées)
-  const passageProd = await db.product.findUnique({ where: { code: "PASSAGE" } });
-  const teacherProd = await db.product.findUnique({ where: { code: "TEACHER_ADDON" } });
-  const soloProd = await db.product.findUnique({ where: { code: "ROOTS_SOLO" } });
-  const familyProd = await db.product.findUnique({ where: { code: "ROOTS_FAMILY" } });
-  if (!passageProd || !teacherProd || !soloProd || !familyProd) {
-    throw new Error("Seed manquant. Lance : npx tsx prisma/seed.ts");
-  }
+describeDatabase("getEntitlements", () => {
+  beforeAll(async () => {
+    const passageProd = await db.product.findUnique({ where: { code: "PASSAGE" } });
+    const teacherProd = await db.product.findUnique({ where: { code: "TEACHER_ADDON" } });
+    const soloProd = await db.product.findUnique({ where: { code: "ROOTS_SOLO" } });
+    const familyProd = await db.product.findUnique({ where: { code: "ROOTS_FAMILY" } });
+    if (!passageProd || !teacherProd || !soloProd || !familyProd) {
+      throw new Error("Seed manquant. Lance : npx tsx prisma/seed.ts");
+    }
 
-  const passageA1 = await db.productVariant.findFirst({
-    where: { productId: passageProd.id, language: "DEUTSCH", level: "A1", currency: "XAF" },
+    const passageA1 = await db.productVariant.findFirst({
+      where: { productId: passageProd.id, language: "DEUTSCH", level: "A1", currency: "XAF" },
+    });
+    const passageB1 = await db.productVariant.findFirst({
+      where: { productId: passageProd.id, language: "DEUTSCH", level: "B1", currency: "XAF" },
+    });
+    const teacherA1 = await db.productVariant.findFirst({
+      where: { productId: teacherProd.id, language: "DEUTSCH", level: "A1", currency: "XAF" },
+    });
+    const solo = await db.productVariant.findFirst({
+      where: { productId: soloProd.id, currency: "XAF", durationDays: 365 },
+    });
+    const family = await db.productVariant.findFirst({
+      where: { productId: familyProd.id, currency: "XAF", durationDays: 365 },
+    });
+    passageA1Xaf = passageA1!.id;
+    passageB1Xaf = passageB1!.id;
+    teacherA1Xaf = teacherA1!.id;
+    rootsSoloYearXaf = solo!.id;
+    rootsFamilyYearXaf = family!.id;
   });
-  const passageB1 = await db.productVariant.findFirst({
-    where: { productId: passageProd.id, language: "DEUTSCH", level: "B1", currency: "XAF" },
-  });
-  const teacherA1 = await db.productVariant.findFirst({
-    where: { productId: teacherProd.id, language: "DEUTSCH", level: "A1", currency: "XAF" },
-  });
-  const solo = await db.productVariant.findFirst({
-    where: { productId: soloProd.id, currency: "XAF", durationDays: 365 },
-  });
-  const family = await db.productVariant.findFirst({
-    where: { productId: familyProd.id, currency: "XAF", durationDays: 365 },
-  });
-  passageA1Xaf = passageA1!.id;
-  passageB1Xaf = passageB1!.id;
-  teacherA1Xaf = teacherA1!.id;
-  rootsSoloYearXaf = solo!.id;
-  rootsFamilyYearXaf = family!.id;
-});
 
-afterAll(async () => {
-  // Cleanup ciblé : tout ce qui a le TAG dans l'id.
-  await db.accessGrant.deleteMany({ where: { sourceId: { startsWith: TAG } } });
-  await db.dependentProfile.deleteMany({ where: { householdId: { startsWith: TAG } } });
-  await db.householdMembership.deleteMany({ where: { householdId: { startsWith: TAG } } });
-  await db.household.deleteMany({ where: { id: { startsWith: TAG } } });
-  await db.learningPath.deleteMany({ where: { userId: { startsWith: TAG } } });
-  await db.userAppRole.deleteMany({ where: { userId: { startsWith: TAG } } });
-  await db.userRole.deleteMany({ where: { userId: { startsWith: TAG } } });
-  await db.user.deleteMany({ where: { id: { startsWith: TAG } } });
-  await db.$disconnect();
-});
-
-describe("getEntitlements", () => {
+  afterAll(async () => {
+    await db.accessGrant.deleteMany({ where: { sourceId: { startsWith: TAG } } });
+    await db.dependentProfile.deleteMany({ where: { householdId: { startsWith: TAG } } });
+    await db.householdMembership.deleteMany({ where: { householdId: { startsWith: TAG } } });
+    await db.household.deleteMany({ where: { id: { startsWith: TAG } } });
+    await db.learningPath.deleteMany({ where: { userId: { startsWith: TAG } } });
+    await db.userAppRole.deleteMany({ where: { userId: { startsWith: TAG } } });
+    await db.userRole.deleteMany({ where: { userId: { startsWith: TAG } } });
+    await db.user.deleteMany({ where: { id: { startsWith: TAG } } });
+    await db.$disconnect();
+  });
   it("Passage A1 payé → COURSE_ACCESS allowed sur le bon parcours, denied sur un autre parcours/langue", async () => {
     const u = await makeUser("u1");
     const pathDe = await db.learningPath.create({

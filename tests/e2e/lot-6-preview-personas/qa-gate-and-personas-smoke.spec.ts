@@ -26,6 +26,8 @@ const PUBLIC_PAGES = [
   { name: "landing-fr", path: "/fr" },
   { name: "landing-en", path: "/en" },
   { name: "login-fr", path: "/fr/login" },
+  { name: "open-beta-fr", path: "/fr/beta" },
+  { name: "register-fr", path: "/fr/register" },
 ];
 
 // Endpoints QA qui doivent renvoyer 404 par défaut (gate off si la Preview
@@ -65,6 +67,20 @@ for (const p of PUBLIC_PAGES) {
     });
   }
 }
+
+test("open beta entry point reaches public registration by keyboard", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const response = await page.goto("/fr/beta", { waitUntil: "load", timeout: 30_000 });
+  expect(response?.status(), "open beta HTTP status").toBe(200);
+
+  const registerLink = page.locator('a[href="/fr/register"]');
+  await expect(registerLink).toBeVisible();
+  await registerLink.focus();
+  await expect(registerLink).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/fr\/register$/);
+  await expect(page.locator("form")).toBeVisible();
+});
 
 test.describe("QA endpoints · gate 404 stable", () => {
   for (const url of QA_ENDPOINTS) {

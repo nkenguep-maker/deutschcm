@@ -5,6 +5,7 @@ import { useLocale } from "next-intl";
 import { useRouter } from "@/navigation";
 import OnboardingProgress from "@/components/OnboardingProgress";
 import PhoneInput from "@/components/PhoneInput";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 
 const CENTER_TYPES = ["École de langues privée", "Centre culturel", "Institut académique", "Organisme de formation", "Centre communautaire", "Alliance", "Autre"];
 const STEPS = [{ label: "Centre" }, { label: "Contact" }, { label: "Confirmation" }];
@@ -123,7 +124,8 @@ export default function CenterOnboardingPage() {
   }
 
   return (
-    <main style={{ minHeight: "100vh", background: "var(--espresso)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+    <main className="onboarding-professional-shell" style={{ minHeight: "100vh", background: "var(--espresso)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <SeuilGreetings locale={loc} visibleCount={3} pool="all" variant="entry" />
       <div style={{ width: "100%", maxWidth: 640 }}>
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <h1 style={{ margin: 0, color: "var(--creme)", fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: 26 }}>{loc === "en" ? "Set up your Center" : "Configurer votre Centre"}</h1>
