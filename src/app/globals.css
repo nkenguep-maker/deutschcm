@@ -368,7 +368,7 @@ button, [role="button"] {
 }
 .lnav-locale-btn:hover { color: var(--creme); }
 .lnav-locale-btn.active {
-  color: var(--brass);
+  color: var(--creme);
   background: var(--brass-glow);
 }
 .lnav-locale-btn:focus-visible {
@@ -678,21 +678,28 @@ button, [role="button"] {
 }
 
 /* L'item · grid 34px + 1fr, gap STRUCTUREL 12px, baselines alignées */
-.spine-item {
+.spine-item-button,
+.spine-item-static {
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr);
   column-gap: 12px;
   align-items: baseline;
   min-height: 28px;
-  outline: none;
+  width: 100%;
+  text-align: left;
 }
-.spine-item[role="button"] { cursor: pointer; }
-.spine-item[role="button"]:focus-visible {
+.spine-item-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.spine-item-button:focus-visible {
   outline: 2px solid var(--brass);
   outline-offset: 4px;
   border-radius: 4px;
 }
-.spine-item[role="button"]:hover .spine-label { color: var(--creme); }
+.spine-item-button:hover .spine-label { color: var(--creme); }
 
 /* Colonne 1 · le code, JetBrains Mono 500 12px letter-spacing 0.04em laiton */
 .spine-code {

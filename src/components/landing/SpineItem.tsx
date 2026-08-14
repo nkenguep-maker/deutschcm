@@ -7,11 +7,8 @@
 //     <span className="spine-label">{label}</span>     col 2 · 1fr
 //   </li>
 //
-// Le <li> lui-même est le grid container — pas de <button> imbriqué,
-// pas de display:contents piégeux. Si l'item est interactif, on pose
-// role="button" + tabIndex 0 + onKeyDown pour Enter/Space.
-
-import type { KeyboardEvent } from "react";
+// Chaque item reste un <li> sémantique. L'interaction est portée par un
+// vrai <button> interne afin de conserver les comportements clavier natifs.
 
 export type SpineStatus = "done" | "on" | "next";
 
@@ -48,14 +45,12 @@ export function SpineItem({
 }: SpineItemProps) {
   const interactive = Boolean(onEnter || onFocus || onSelect);
 
-  const handleKey = (e: KeyboardEvent<HTMLLIElement>) => {
-    if (!interactive) return;
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      onSelect?.();
-      onFocus?.();
-    }
-  };
+  const content = (
+    <>
+      <span className="spine-code">{code}</span>
+      <span className="spine-label">{label}</span>
+    </>
+  );
 
   return (
     <li
@@ -63,20 +58,25 @@ export function SpineItem({
       data-status={status}
       data-selected={selected ? "true" : undefined}
       aria-current={status === "on" ? "step" : undefined}
-      aria-pressed={interactive && selected ? true : undefined}
-      role={interactive ? "button" : undefined}
-      tabIndex={interactive ? 0 : undefined}
-      aria-label={interactive ? (ariaLabel ?? `${code} — ${label}`) : undefined}
-      aria-describedby={interactive ? ariaDescribedBy : undefined}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      onClick={onSelect}
-      onKeyDown={handleKey}
     >
-      <span className="spine-code">{code}</span>
-      <span className="spine-label">{label}</span>
+      {interactive ? (
+        <button
+          type="button"
+          className="spine-item-button"
+          aria-pressed={selected}
+          aria-label={ariaLabel ?? `${code} — ${label}`}
+          aria-describedby={ariaDescribedBy}
+          onMouseEnter={onEnter}
+          onMouseLeave={onLeave}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          onClick={onSelect}
+        >
+          {content}
+        </button>
+      ) : (
+        <span className="spine-item-static">{content}</span>
+      )}
     </li>
   );
 }

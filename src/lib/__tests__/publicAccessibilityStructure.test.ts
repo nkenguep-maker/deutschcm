@@ -9,10 +9,13 @@ describe("public accessibility structure", () => {
   it("keeps decorative spine bars out of semantic lists", () => {
     const cefr = read("src/components/landing/CefrSpine.tsx");
     const yema = read("src/components/landing/YemaSpine.tsx");
+    const item = read("src/components/landing/SpineItem.tsx");
     const css = read("src/app/globals.css");
 
     expect(cefr).not.toContain('className="spine-bar"');
     expect(yema).not.toContain('className="spine-bar"');
+    expect(item).toContain('className="spine-item-button"');
+    expect(item).not.toContain('role={interactive ? "button" : undefined}');
     expect(css).toContain(".spine-list::before");
     expect(css).toContain(".spine-list::after");
   });
