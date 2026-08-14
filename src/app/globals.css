@@ -13016,7 +13016,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-family: var(--font-jetbrains, monospace);
   font-size: 10px;
   letter-spacing: 0.18em;
-  color: var(--brass);
+  color: #d2a45d;
   text-transform: uppercase;
 }
 .methode-example-quote {

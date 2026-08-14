@@ -37,7 +37,10 @@ const report = { base: BASE, when: new Date().toISOString(), pages: [] };
 for (const p of PAGES) {
   const url = `${BASE}${p.path}`;
   try {
-    await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+    const response = await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+    if (!response || !response.ok()) {
+      throw new Error(`expected a public 2xx response, received ${response?.status() ?? "no response"}`);
+    }
     await page.waitForTimeout(600);
 
     const res = await new AxeBuilder({ page })
