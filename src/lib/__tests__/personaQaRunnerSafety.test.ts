@@ -10,6 +10,7 @@ const adultPersonaVerifier = readFileSync(resolve(REPO, "scripts/verify-adult-pe
 const childRacinesVerifier = readFileSync(resolve(REPO, "scripts/verify-child-racines-session-p1.mjs"), "utf8");
 const credentialAligner = readFileSync(resolve(REPO, "scripts/test-baseline/align-yema-qa-passwords-p1.mjs"), "utf8");
 const fixtures = readFileSync(resolve(REPO, "scripts/test-baseline/yema-qa-fixtures.mjs"), "utf8");
+const securityWorkflow = readFileSync(resolve(REPO, ".github/workflows/p4-7-security-ci.yml"), "utf8");
 
 describe("P-1 persona QA runner safety", () => {
   it("routes the authenticated gate through the fail-closed fixture wrapper", () => {
@@ -83,6 +84,11 @@ describe("P-1 persona QA runner safety", () => {
   it("uses Supabase signInWithPassword for every runtime persona session", () => {
     expect(personaRunner).toContain("auth.auth.signInWithPassword({ email, password: PASSWORD })");
     expect(personaRunner).not.toContain("/auth/v1/token?grant_type=password");
+  });
+
+  it("runs the P-1 runner and Preview verifier regression tests in P4.7 CI", () => {
+    expect(securityWorkflow).toContain("src/lib/__tests__/p1WrapperPathSpaces.test.ts");
+    expect(securityWorkflow).toContain("src/lib/__tests__/previewPersonaVerifierSafety.test.ts");
   });
 
   it("requires every expected adult allowed route before reporting green", () => {
