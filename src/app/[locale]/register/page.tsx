@@ -32,6 +32,8 @@ const VALID_PLANS = new Set<SelectedPlan>([
   "racines-famille",
 ]);
 
+const GOOGLE_AUTH_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true";
+
 function parseSelectedPlan(value: string | null): SelectedPlan | null {
   return value && VALID_PLANS.has(value as SelectedPlan) ? value as SelectedPlan : null;
 }
@@ -290,11 +292,15 @@ export default function RegisterPage() {
                 <button type="submit" className="entry-cta entry-cta-primary" disabled={loading}>
                   {loading ? t(c.loading) : t(c.submit)}
                 </button>
-                <div className="entry-sep" aria-hidden="true"><span>{loc === "en" ? "or" : "ou"}</span></div>
-                <button type="button" className="entry-cta entry-cta-ghost" onClick={handleGoogle} disabled={googleLoading || loading}>
-                  <span className="entry-google-dot" aria-hidden="true" />
-                  {t(c.google)}
-                </button>
+                {GOOGLE_AUTH_ENABLED ? (
+                  <>
+                    <div className="entry-sep" aria-hidden="true"><span>{loc === "en" ? "or" : "ou"}</span></div>
+                    <button type="button" className="entry-cta entry-cta-ghost" onClick={handleGoogle} disabled={googleLoading || loading}>
+                      <span className="entry-google-dot" aria-hidden="true" />
+                      {t(c.google)}
+                    </button>
+                  </>
+                ) : null}
               </form>
 
               <p className="entry-legal">{t(c.legal)}</p>
