@@ -50,4 +50,12 @@ describe("open beta public surface", () => {
     expect(testSpaceBar).toContain("if (!isAppRoute) {");
     expect(testSpaceBar).not.toContain("const publicPost =");
   });
+
+  it("defers the authentication SDK until a registration action needs it", () => {
+    const register = read("src/app/[locale]/register/page.tsx");
+
+    expect(register).toContain('await import("@/lib/supabase/client")');
+    expect(register).toContain("await getSupabaseClient()");
+    expect(register).not.toContain('import { createClient } from "@/lib/supabase/client"');
+  });
 });

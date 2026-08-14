@@ -6,7 +6,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
 import { BrandY } from "@/components/brand/BrandY";
 import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
@@ -119,6 +118,11 @@ function isEmailLike(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
 
+async function getSupabaseClient() {
+  const { createClient } = await import("@/lib/supabase/client");
+  return createClient();
+}
+
 export default function RegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -201,7 +205,7 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      const supabase = createClient();
+      const supabase = await getSupabaseClient();
       const fullName = `${first} ${last}`;
       const selectedAddon = rootsSoloSelected ? "roots-solo" : rootsCoachSelected ? "roots-coach" : null;
       const { data, error: signUpError } = await withTimeout(
@@ -254,7 +258,7 @@ export default function RegisterPage() {
     setError(null);
     setGoogleLoading(true);
     try {
-      const supabase = createClient();
+      const supabase = await getSupabaseClient();
       const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizedPersonaRoute)}`;
       const { error: oauthError } = await withTimeout(
         supabase.auth.signInWithOAuth({
@@ -277,7 +281,7 @@ export default function RegisterPage() {
 
     setResendState("sending");
     try {
-      const supabase = createClient();
+      const supabase = await getSupabaseClient();
       const { error: resendError } = await withTimeout(
         supabase.auth.resend({
           type: "signup",
