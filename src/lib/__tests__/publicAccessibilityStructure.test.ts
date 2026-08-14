@@ -29,4 +29,13 @@ describe("public accessibility structure", () => {
       expect(greeting).not.toContain(`langTag: "${obsoleteTag}"`);
     }
   });
+
+  it("keeps the language catalogue heading hierarchy continuous", () => {
+    const catalogue = read("src/app/[locale]/langues/page.tsx");
+
+    expect(catalogue).toContain('headingLevel: 2');
+    expect(catalogue).toContain('headingLevel: 3');
+    expect(catalogue).toContain('const Heading = headingLevel === 2 ? "h2" : "h3"');
+    expect(catalogue).not.toContain('<h1 className="maison-h">\n                {t(c.sourcesTitle)}');
+  });
 });

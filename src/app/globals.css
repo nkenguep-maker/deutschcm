@@ -13298,7 +13298,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: var(--brass);
+  color: #d2a45d;
   background: var(--brass-glow);
 }
 .langue-card-body {
