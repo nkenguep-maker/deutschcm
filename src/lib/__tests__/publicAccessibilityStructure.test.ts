@@ -38,4 +38,13 @@ describe("public accessibility structure", () => {
     expect(catalogue).toContain('const Heading = headingLevel === 2 ? "h2" : "h3"');
     expect(catalogue).not.toContain('<h1 className="maison-h">\n                {t(c.sourcesTitle)}');
   });
+
+  it("keeps authentication links distinguishable and readable", () => {
+    const css = read("src/app/globals.css");
+
+    expect(css).toContain(".porte-seuil-footer a {");
+    expect(css).toContain("text-decoration: underline;");
+    expect(css).toContain(".ens-form-error-link {");
+    expect(css).toContain("color: var(--brass);");
+  });
 });

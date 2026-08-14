@@ -10384,7 +10384,9 @@ body.foyer-switching .foyer {
 }
 .porte-seuil-footer a {
   color: var(--brass);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 .porte-404-y {
@@ -12882,7 +12884,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   background: transparent;
   border: none;
   padding: 0;
-  color: var(--oxblood);
+  color: var(--brass);
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
