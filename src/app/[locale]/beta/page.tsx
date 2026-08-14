@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import { isClosedBetaEnabled } from "@/lib/beta/invite";
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://deutschcm.vercel.app").replace(/\/$/, "");
@@ -54,8 +55,9 @@ export default async function BetaAccessPage({
 
   if (!closedBeta) {
     return (
-      <main className="min-h-screen bg-[#0f0b07] text-[#f7f1e8] px-6 py-16 flex items-center justify-center">
-        <section className="w-full max-w-2xl rounded-3xl border border-white/10 bg-white/[0.03] p-8 sm:p-12">
+      <main className="beta-access min-h-screen bg-[#0f0b07] text-[#f7f1e8] px-6 py-16 flex items-center justify-center">
+        <SeuilGreetings locale={isEnglish ? "en" : "fr"} visibleCount={3} variant="entry" />
+        <section className="beta-access-card w-full max-w-2xl rounded-3xl border border-white/10 bg-white/[0.03] p-8 sm:p-12">
           <p className="text-xs uppercase tracking-[0.22em] text-[#d7b56d]">
             {isEnglish ? "Open beta" : "Bêta ouverte"}
           </p>
@@ -87,8 +89,9 @@ export default async function BetaAccessPage({
   }
 
   return (
-    <main className="min-h-screen bg-[#0f0b07] text-[#f7f1e8] px-6 py-16 flex items-center justify-center">
-      <section className="w-full max-w-2xl rounded-3xl border border-white/10 bg-white/[0.03] p-8 sm:p-12">
+    <main className="beta-access min-h-screen bg-[#0f0b07] text-[#f7f1e8] px-6 py-16 flex items-center justify-center">
+      <SeuilGreetings locale={isEnglish ? "en" : "fr"} visibleCount={3} variant="entry" />
+      <section className="beta-access-card w-full max-w-2xl rounded-3xl border border-white/10 bg-white/[0.03] p-8 sm:p-12">
         <p className="text-xs uppercase tracking-[0.22em] text-[#d7b56d]">
           {isEnglish ? "Closed beta" : "Bêta fermée"}
         </p>

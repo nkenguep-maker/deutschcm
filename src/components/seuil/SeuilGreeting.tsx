@@ -60,6 +60,8 @@ interface SeuilGreetingsProps {
    *  Utilisé sur /langues pour aligner les salutations avec le
    *  territoire de la section. */
   pool?: "all" | "world" | "sources";
+  /** Landing keeps the listening interaction; entry flows use a decorative layer. */
+  variant?: "landing" | "entry";
 }
 
 const POSITIONS = ["p0", "p1", "p2", "p3"] as const;
@@ -72,7 +74,9 @@ export function SeuilGreetings({
   locale,
   visibleCount = 4,
   pool = "all",
+  variant = "landing",
 }: SeuilGreetingsProps) {
+  const interactive = variant === "landing";
   // Filtre le pool si territoire imposé (pages world / sources).
   const items = useMemo(() => {
     if (pool === "world") return GREETINGS.filter((g) => g.territory === "world");
@@ -148,8 +152,9 @@ export function SeuilGreetings({
 
   return (
     <div
-      className="seuil-greetings"
-      aria-label={locale === "en" ? "African greetings" : "Salutations africaines"}
+      className={`seuil-greetings ${variant === "entry" ? "seuil-greetings-entry" : ""}`}
+      aria-hidden={interactive ? undefined : true}
+      aria-label={interactive ? (locale === "en" ? "African greetings" : "Salutations africaines") : undefined}
     >
       {Array.from({ length: slotCount }, (_, i) => {
         const item = items[wordIdx[i]];
@@ -160,24 +165,46 @@ export function SeuilGreetings({
         const style: React.CSSProperties = reduced
           ? {}
           : { animationDelay: `${offset}ms` };
+        const greetingContent = (
+          <>
+            <span className="seuil-greeting-word">{item.word}</span>
+            <span className="seuil-greeting-meta">
+              {(locale === "en" ? item.languageEn : item.language)} ·{" "}
+              {(locale === "en" ? item.countryEn : item.country)}
+            </span>
+          </>
+        );
+
+        const className = `seuil-greeting seuil-greeting-${POSITIONS[i]} ${
+          playing === item.id ? "playing" : ""
+        }`;
+
+        if (!interactive) {
+          return (
+            <span
+              key={i}
+              className={className}
+              style={style}
+              onAnimationIteration={() => handleIteration(i)}
+              lang={item.langTag}
+            >
+              {greetingContent}
+            </span>
+          );
+        }
+
         return (
           <button
             key={i}
             type="button"
-            className={`seuil-greeting seuil-greeting-${POSITIONS[i]} ${
-              playing === item.id ? "playing" : ""
-            }`}
+            className={className}
             style={style}
             onAnimationIteration={() => handleIteration(i)}
             onClick={() => handlePick(item)}
             aria-label={ariaLabel(item)}
             lang={item.langTag}
           >
-            <span className="seuil-greeting-word">{item.word}</span>
-            <span className="seuil-greeting-meta">
-              {(locale === "en" ? item.languageEn : item.language)} ·{" "}
-              {(locale === "en" ? item.countryEn : item.country)}
-            </span>
+            {greetingContent}
           </button>
         );
       })}

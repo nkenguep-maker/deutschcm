@@ -7,6 +7,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
 import { BrandLockup } from "@/components/brand/BrandLockup";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import { classifyAuthError, withTimeout } from "@/lib/authErrors";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
 
@@ -134,6 +135,7 @@ export default function LoginPage() {
 
   return (
     <div className="porte-seuil">
+      <SeuilGreetings locale={loc} visibleCount={3} variant="entry" />
       <header className="porte-header">
         <Link href={`/${locale}`} className="porte-brand">
           <BrandLockup orientation="horizontal" variant="world" state="static" size={28} />

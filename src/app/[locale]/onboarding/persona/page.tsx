@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/navigation";
 import { useState } from "react";
 import { BrandY } from "@/components/brand/BrandY";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import type { AdultPersonaId } from "@/lib/personas/runtime";
 
 const OPTIONS: Array<{
@@ -118,6 +119,7 @@ export default function PersonaOnboardingPage() {
 
   return (
     <main className="onboarding-router">
+      <SeuilGreetings locale={loc} visibleCount={3} variant="entry" />
       <header className="onboarding-router-head">
         <BrandY variant="world" state="static" size={72} />
         <p className="entry-kicker">{loc === "en" ? "Your YEMA space" : "Votre espace YEMA"}</p>

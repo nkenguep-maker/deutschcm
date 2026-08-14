@@ -9,6 +9,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
 import { BrandY } from "@/components/brand/BrandY";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import { classifyAuthError, withTimeout, type AuthErrorKey } from "@/lib/authErrors";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
 
@@ -255,6 +256,7 @@ export default function RegisterPage() {
 
   return (
     <div className={`entry-page ${universe === "racines" ? "entry-universe-racines" : universe === "monde" ? "entry-universe-monde" : ""}`}>
+      <SeuilGreetings locale={loc} visibleCount={3} variant="entry" />
       <header className="entry-header">
         <Link href={`/${locale}`} className="entry-brand" aria-label="YEMA">
           <BrandY variant={universe === "racines" ? "sources" : "world"} state="static" size={36} />
