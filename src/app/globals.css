@@ -14828,7 +14828,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 }
 
 /* ═══════════════════════════════════════════════
-   /onboarding · router (2 portes) — écran de secours si aucun signal
+   /onboarding · choix de parcours — deux décisions, jamais un formulaire long
    ═══════════════════════════════════════════════ */
 .onboarding-router {
   min-height: 100dvh;
@@ -14856,6 +14856,30 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   text-align: center;
   max-width: 420px;
 }
+.onboarding-router-brand-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+}
+.onboarding-router-brand-row > :nth-child(2) { justify-self: center; }
+.onboarding-router-back,
+.onboarding-router-back-space {
+  width: 36px;
+  height: 36px;
+}
+.onboarding-router-back {
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--creme-hair);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--creme-soft);
+  cursor: pointer;
+}
+.onboarding-router-back:hover { color: var(--creme); border-color: var(--brass-edge); }
+.onboarding-router-back:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
 .onboarding-router-titre {
   font-family: var(--font-fraunces), Georgia, serif;
   font-weight: 500;
@@ -14872,8 +14896,8 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   margin: 0;
 }
 .onboarding-router-portes {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 14px;
   width: 100%;
   max-width: 420px;
@@ -14887,10 +14911,17 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   background: rgba(244, 235, 220, 0.03);
   border: 1px solid var(--creme-hair);
   text-decoration: none;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
   transition: background var(--dur-touch) var(--ease-enter),
               border-color var(--dur-touch) var(--ease-enter),
               transform var(--dur-touch) var(--ease-enter);
 }
+.onboarding-router-porte:disabled { cursor: wait; opacity: 0.72; }
+.onboarding-router-porte-icon { color: var(--brass); margin-bottom: 4px; }
+.onboarding-router-porte-roots .onboarding-router-porte-icon { color: #C9843F; }
 .onboarding-router-porte:hover {
   background: rgba(184, 135, 62, 0.06);
   border-color: var(--brass-edge);
@@ -14930,10 +14961,12 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 
 @media (min-width: 720px) {
   .onboarding-router-portes {
-    flex-direction: row;
-    max-width: 720px;
+    max-width: 740px;
   }
-  .onboarding-router-porte { flex: 1; }
+  .onboarding-router-portes-start,
+  .onboarding-router-portes-professional { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 960px; }
+  .onboarding-router-portes-world { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .onboarding-router-portes-roots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (prefers-reduced-motion: reduce) {
   .onboarding-router-porte { transition: none !important; }

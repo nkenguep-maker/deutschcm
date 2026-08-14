@@ -16,6 +16,12 @@ const WORLD_PASSAGE_PLANS = new Set([
   "passage-c1",
 ]);
 const ROOTS_PLANS = new Set(["racines-solo", "racines-famille"]);
+const MONDE_PATHWAY_VARIANTS = new Set([
+  "STUDIES",
+  "VISA",
+  "NATURALIZATION",
+  "TOURISM",
+]);
 
 function bad(code: string, status = 400) {
   return NextResponse.json({ error: code }, { status });
@@ -75,6 +81,11 @@ export async function POST(req: NextRequest) {
   if (!isAdultPersonaId(persona)) return bad("PERSONA_INVALID");
   if (persona === "super_admin") return bad("PERSONA_NOT_SELF_SERVICE", 403);
 
+  const pathwayVariant = typeof body.pathwayVariant === "string"
+    && MONDE_PATHWAY_VARIANTS.has(body.pathwayVariant)
+    ? body.pathwayVariant
+    : null;
+
   const offer = compatibleOfferIntent({
     persona,
     rawPlan: body.selectedPlan,
@@ -101,6 +112,10 @@ export async function POST(req: NextRequest) {
     teacher_addon_requested: offer.teacherAddonRequested,
     post_onboarding_next: postOnboardingNext,
   };
+
+  if (persona === "student_monde" && pathwayVariant) {
+    nextUserMetadata.pathway_variant = pathwayVariant;
+  }
 
   if (persona === "student_monde" || persona === "student_racines") {
     await grantRole({ userId: dbUser.id, role: "STUDENT" });
