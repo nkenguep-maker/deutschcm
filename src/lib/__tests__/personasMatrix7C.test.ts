@@ -1096,7 +1096,9 @@ describe("Gate 8A · CHILD_WORLD_SINGLE + ROOTS adulte 3 · tests actifs orchest
 
   it("STEP 12 · ROOTS adulte 3e via service canonique assignAdultRootsSeat", () => {
     expect(src).toMatch(/ROOTS_FAMILY 3e adulte via assignAdultRootsSeat/);
-    expect(src).toMatch(/assignAdultRootsSeat contient household_seats_exhausted/);
+    expect(src).toContain('["tsx", "scripts/test-roots-adult-seats-p1.ts"]');
+    expect(src).toMatch(/3e adulte refusé, siège libéré réutilisable et non-membre refusé/);
+    expect(src).not.toMatch(/test actif 3e adulte différé/);
   });
 
   it("cleanup CHILD_WORLD_SINGLE grant temporaire dans finally", () => {

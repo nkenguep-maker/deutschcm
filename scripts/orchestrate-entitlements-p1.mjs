@@ -26,6 +26,16 @@ const PORT = process.env.YEMA_ENTITLEMENTS_PORT || "3260";
 function fail(msg, code = 1) {
   console.error(`[entitlements] FAIL · ${msg}`);
   process.exitCode = code;
+  throw new Error(msg);
+}
+
+async function runGate(name, command, args) {
+  const code = await new Promise((resolve, reject) => {
+    const child = spawn(command, args, { stdio: "inherit", env: process.env });
+    child.on("error", reject);
+    child.on("exit", (exitCode) => resolve(exitCode ?? 1));
+  });
+  if (code !== 0) fail(`${name} · exit=${code}`);
 }
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -54,6 +64,13 @@ async function loginCookie(email) {
 }
 
 async function main() {
+  console.log("[entitlements] PREP · alignement des identifiants QA P-1");
+  await runGate(
+    "P-1 QA credential alignment",
+    "node",
+    ["scripts/test-baseline/align-yema-qa-passwords-p1.mjs"],
+  );
+
   console.log("[entitlements] STEP 1 · catalogue produits présent");
   const codes = ["PASSAGE", "ROOTS_SOLO", "ROOTS_FAMILY", "FAMILY_WORLD", "CHILD_WORLD_SINGLE"];
   const products = await db.product.findMany({ where: { code: { in: codes } }, select: { code: true } });
@@ -126,7 +143,7 @@ async function main() {
   // pas les sièges ROOTS_FAMILY (4 Racines). Le 4e enfant Monde doit
   // être refusé même si des sièges Racines restent libres.
   const familyCookie = await loginCookie("test_yema_qa_family@example.com");
-  const H = { Cookie: familyCookie, Origin: `http://${HOST}`, Host: HOST, "Content-Type": "application/json" };
+  const H = { Cookie: familyCookie, "Content-Type": "application/json" };
   const mondeBefore = await db.childProfile.count({ where: { parentUserId: familyUser.id, universe: "MONDE" } });
   const racinesBefore = await db.childProfile.count({ where: { parentUserId: familyUser.id, universe: "RACINES" } });
   console.log(`  · ${mondeBefore} Monde + ${racinesBefore} Racines actuels`);
@@ -142,7 +159,7 @@ async function main() {
         learningGoal: "STUDIES", universe: "MONDE",
       }),
     });
-    if (r.status !== 200) fail(`ajout Monde temp échoue · ${r.status}`);
+    if (r.status !== 200) fail(`ajout Monde temp échoue · ${r.status} · ${await r.text()}`);
     const body = await r.json();
     tempMondeIds.push(body.child.id);
     cleanup.push(async () => { try { await db.childProfile.delete({ where: { id: body.child.id } }); } catch {} });
@@ -219,7 +236,7 @@ async function main() {
 
   console.log("[entitlements] STEP 8 · Isolation Super Admin · pas d'accès Family child");
   const superCookie = await loginCookie("test_yema_qa_super_admin@example.com");
-  const sH = { Cookie: superCookie, Origin: `http://${HOST}`, Host: HOST };
+  const sH = { Cookie: superCookie };
   // Super Admin ne doit PAS pouvoir consulter le dashboard Family (route STUDENT).
   // /api/family/dashboard exige un guardian, Super Admin n'en est pas un.
   const supFam = await fetch(`http://${HOST}/api/family/dashboard`, { headers: sH });
@@ -275,7 +292,7 @@ async function main() {
   cleanup.push(async () => { try { await db.accessGrant.delete({ where: { id: cwsGrantId } }); } catch {} });
   // Family2 a déjà Nina (Monde universe TRAVEL) · capacity mondeChildren=1 · used=1 · 2e refusé.
   const family2Cookie = await loginCookie("test_yema_qa_family2@example.com");
-  const f2H = { Cookie: family2Cookie, Origin: `http://${HOST}`, Host: HOST, "Content-Type": "application/json" };
+  const f2H = { Cookie: family2Cookie, "Content-Type": "application/json" };
   const cwsAttempt = await fetch(`http://${HOST}/api/family/children`, {
     method: "POST", headers: f2H,
     body: JSON.stringify({
@@ -292,30 +309,12 @@ async function main() {
 
   // Gate 8A · ROOTS_FAMILY 3e adulte refusé via service canonique.
   console.log("[entitlements] STEP 12 · ROOTS_FAMILY 3e adulte via assignAdultRootsSeat");
-  // family_household a ROOTS_FAMILY + 1 siège adulte (Family owner).
-  // On tente d'assigner à un user externe (student_monde) qui n'est PAS
-  // membre du household · doit être refusé avec user_is_not_household_member.
-  const studentMonde = await db.user.findUnique({
-    where: { email: "test_yema_qa_student_monde@example.com" },
-    select: { id: true },
-  });
-  if (!studentMonde) fail("student_monde absent");
-  // Note · assignAdultRootsSeat vit dans lib/family/adultSeats.ts · appel
-  // depuis un .mjs Node natif nécessiterait tsx ou compilation. Test lu
-  // directement au niveau DB · le comportement canonique est validé par
-  // les tests structurels vitest (interface exhaustive du service).
-  const currentSeats = await db.accessGrant.count({
-    where: {
-      beneficiaryType: "USER", sourceType: "SUBSCRIPTION",
-      sourceId: "test_yema_qa_household_family", status: "ACTIVE",
-      productVariant: { product: { code: "ROOTS_FAMILY" } },
-    },
-  });
-  if (currentSeats >= 2) fail(`plafond adultes déjà atteint (${currentSeats}) · impossible de tester le 3e`);
-  console.log(`  · ${currentSeats} sièges adultes actuels · cap=2`);
-  // Test structural · le service refuse non-membre.
-  console.log(`  ✓ assignAdultRootsSeat contient household_seats_exhausted (verify src)`);
-  console.log(`  · test actif 3e adulte différé · scope temporel (nécessite 2 memberships temp + call service)`);
+  await runGate(
+    "ROOTS_FAMILY adult seats",
+    "npx",
+    ["tsx", "scripts/test-roots-adult-seats-p1.ts"],
+  );
+  console.log("  ✓ 3e adulte refusé, siège libéré réutilisable et non-membre refusé");
 
   console.log("[entitlements] STEP 13 · Caps commerciaux PAR UNIVERS (Gate 8A)");
   console.log(`  · FAMILY_WORLD → 3 Monde ✓ (Lot 7C.4 preuve active)`);

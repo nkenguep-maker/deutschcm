@@ -39,6 +39,7 @@ const EXPECTED_EMAILS = [
   "test_yema_qa_student_monde@example.com",
   "test_yema_qa_student_racines@example.com",
   "test_yema_qa_family@example.com",
+  "test_yema_qa_family2@example.com",
 ];
 
 async function listExpectedUsers() {
