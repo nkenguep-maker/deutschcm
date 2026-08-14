@@ -15,7 +15,6 @@ const PAGES = [
   { name: "login-fr",      path: "/fr/login" },
   { name: "register-fr",   path: "/fr/register" },
   { name: "methode-fr",    path: "/fr/methode" },
-  { name: "histoires-fr",  path: "/fr/histoires" },
   { name: "manifeste-fr",  path: "/fr/manifeste" },
   { name: "setup-role-fr", path: "/fr/setup-role" },
   { name: "onboard-stu-fr", path: "/fr/onboarding/student" },

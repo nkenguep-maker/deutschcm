@@ -11,4 +11,8 @@ describe("public axe audit safety", () => {
     expect(audit).toContain("!response || !response.ok()");
     expect(audit).toContain("expected a public 2xx response");
   });
+
+  it("audits only public routes that have a rendered surface", () => {
+    expect(audit).not.toContain('path: "/fr/histoires"');
+  });
 });
