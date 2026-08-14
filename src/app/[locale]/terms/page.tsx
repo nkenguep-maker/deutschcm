@@ -3,8 +3,8 @@
 import { useLocale } from "next-intl";
 import { Callout, H2, LegalShell, P, Ul } from "@/components/landing/LegalShell";
 
-const EFFECTIVE_DATE = "8 août 2026";
-const EFFECTIVE_DATE_EN = "August 8, 2026";
+const EFFECTIVE_DATE = "14 août 2026";
+const EFFECTIVE_DATE_EN = "August 14, 2026";
 const CONTACT_EMAIL = "legal@yema.app";
 const COMPANY = "YEMA Languages";
 
@@ -16,17 +16,17 @@ export default function TermsPage() {
 function TermsEN() {
   return (
     <LegalShell locale="en" eye="Legal" title="Terms of Service" effective={EFFECTIVE_DATE_EN} updated={EFFECTIVE_DATE_EN} contactEmail={CONTACT_EMAIL} contactLine="Questions? Reach us at">
-      <P>By accessing or using {COMPANY} (&quot;YEMA&quot;, &quot;the platform&quot;), you agree to these Terms. YEMA is currently operated as a closed beta and some features may change before broader release.</P>
+      <P>By accessing or using {COMPANY} (&quot;YEMA&quot;, &quot;the platform&quot;), you agree to these Terms. YEMA is currently operated as an open beta and some features may change before broader release.</P>
       <Callout variant="warning"><strong>Independent platform:</strong> YEMA is not an official examination body and is not affiliated with any state examination institute. YEMA learning journeys, scores or completion records do not themselves constitute an official diploma or exam result.</Callout>
 
       <H2>1. Adult accounts and family profiles</H2>
       <P>An authenticated YEMA account must be created and controlled by a person who is legally able to enter into these Terms. A parent or guardian may create and manage child profiles under their adult account through the Family experience. Child profiles do not receive independent email/password accounts through that flow.</P>
       <P>The adult account holder is responsible for the accuracy of information supplied for child profiles, for supervising their use of YEMA and for using available parent and PIN controls appropriately.</P>
 
-      <H2>2. Closed-beta access</H2>
+      <H2>2. Open-beta access</H2>
       <Ul items={[
-        "Closed-beta access may require a personal, time-limited invitation.",
-        "An invitation may be limited to the intended email address and may be single-use.",
+        "Anyone eligible to use YEMA may create an account through the public registration flow.",
+        "Some access paths may still use a personal, time-limited invitation when that is required for the relevant feature or workspace.",
         "Access may be revoked or restricted when required for security, abuse prevention or beta operations.",
         "Professional workspaces such as Teacher, Center or Roots Coach require the trusted approval or role assignment defined by YEMA; selecting a persona does not grant professional access by itself.",
       ]} />
@@ -40,7 +40,7 @@ function TermsEN() {
       ]} />
 
       <H2>4. Offers and payments</H2>
-      <P>YEMA may display prices and commercial offers so users can understand the intended product. Online checkout and real payment processing are not currently activated in the closed beta. Selecting an offer, plan or add-on records interest or onboarding context only and does not create a paid subscription, payment, order or access entitlement.</P>
+      <P>YEMA may display prices and commercial offers so users can understand the intended product. Online checkout and real payment processing are not currently activated in the open beta. Selecting an offer, plan or add-on records interest or onboarding context only and does not create a paid subscription, payment, order or access entitlement.</P>
       <P>Before real payments are enabled, YEMA will present the applicable payment provider, billing period, renewal, cancellation, refund and transaction terms before a user is charged. Current beta pages must not be interpreted as a completed payment contract.</P>
 
       <H2>5. Acceptable use</H2>
@@ -65,10 +65,10 @@ function TermsEN() {
       <P>You retain rights you hold in content you submit. You grant YEMA the limited rights necessary to receive, process, store, display and transmit that content for the operation, security and delivery of the feature you chose. Some audio may be processed transiently; messaging or other user-submitted audio may be stored when the feature requires it. Do not submit content you are not entitled to use.</P>
 
       <H2>9. Beta availability</H2>
-      <P>Closed-beta software may contain incomplete features, defects or temporary interruptions. YEMA does not promise a numerical uptime or service-level commitment in these Terms. Features may be modified, limited or withdrawn as the product is tested and improved.</P>
+      <P>Open-beta software may contain incomplete features, defects or temporary interruptions. YEMA does not promise a numerical uptime or service-level commitment in these Terms. Features may be modified, limited or withdrawn as the product is tested and improved.</P>
 
       <H2>10. Privacy</H2>
-      <P>Use of YEMA is also subject to the published Privacy Policy, including the rules applicable to family profiles, messaging and closed-beta operation.</P>
+      <P>Use of YEMA is also subject to the published Privacy Policy, including the rules applicable to family profiles, messaging and open-beta operation.</P>
 
       <H2>11. Account and data requests</H2>
       <P>You may contact <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> for account-related requests. Privacy and deletion requests may require identity verification and are handled according to the Privacy Policy and applicable law. These Terms do not promise an account-settings deletion control or a fixed deletion deadline unless such a control or deadline is actually provided.</P>
@@ -78,7 +78,7 @@ function TermsEN() {
       <P>These Terms are governed subject to the laws applicable to YEMA and to the user. Mandatory consumer, child-protection, privacy or other statutory rights continue to apply where relevant.</P>
 
       <H2>13. Changes</H2>
-      <P>We may update these Terms as the closed beta and commercial product evolve. Material changes will be reflected in the published Terms and, where appropriate, communicated through the service or by email before they apply.</P>
+      <P>We may update these Terms as the open beta and commercial product evolve. Material changes will be reflected in the published Terms and, where appropriate, communicated through the service or by email before they apply.</P>
     </LegalShell>
   );
 }
@@ -86,17 +86,17 @@ function TermsEN() {
 function TermsFR() {
   return (
     <LegalShell locale="fr" eye="Mentions légales" title="Conditions d'utilisation" effective={EFFECTIVE_DATE} updated={EFFECTIVE_DATE} contactEmail={CONTACT_EMAIL} contactLine="Questions ? Contactez-nous à">
-      <P>En accédant à {COMPANY} (&quot;YEMA&quot;, &quot;la plateforme&quot;), vous acceptez les présentes Conditions. YEMA fonctionne actuellement en bêta fermée et certaines fonctionnalités peuvent évoluer avant une ouverture plus large.</P>
+      <P>En accédant à {COMPANY} (&quot;YEMA&quot;, &quot;la plateforme&quot;), vous acceptez les présentes Conditions. YEMA fonctionne actuellement en bêta ouverte et certaines fonctionnalités peuvent évoluer avant une ouverture plus large.</P>
       <Callout variant="warning"><strong>Plateforme indépendante :</strong> YEMA n’est pas un organisme officiel d’examen et n’est affilié à aucun institut d’examen étatique. Les parcours, scores ou attestations internes YEMA ne constituent pas à eux seuls un diplôme officiel ni un résultat d’examen officiel.</Callout>
 
       <H2>1. Comptes adultes et profils famille</H2>
       <P>Un compte YEMA authentifié doit être créé et contrôlé par une personne juridiquement capable d’accepter les présentes Conditions. Un parent ou tuteur peut créer et gérer des profils enfants sous son compte adulte dans l’expérience Famille. Le parcours Famille ne crée pas de compte e-mail/mot de passe indépendant pour l’enfant.</P>
       <P>Le titulaire adulte est responsable de l’exactitude des informations fournies pour les profils enfants, de la supervision de leur usage de YEMA et de l’utilisation appropriée des contrôles parentaux et PIN disponibles.</P>
 
-      <H2>2. Accès à la bêta fermée</H2>
+      <H2>2. Accès à la bêta ouverte</H2>
       <Ul items={[
-        "L’accès à la bêta fermée peut nécessiter une invitation personnelle et limitée dans le temps.",
-        "Une invitation peut être liée à l’adresse e-mail visée et être utilisable une seule fois.",
+        "Toute personne éligible à YEMA peut créer un compte via le parcours d’inscription publique.",
+        "Certains parcours peuvent toujours utiliser une invitation personnelle et limitée dans le temps lorsqu’elle est requise pour la fonctionnalité ou l’espace concerné.",
         "L’accès peut être révoqué ou limité lorsque la sécurité, la prévention des abus ou les opérations de bêta le nécessitent.",
         "Les espaces professionnels Enseignant, Centre ou Coach Racines exigent l’approbation ou le rôle de confiance prévu par YEMA ; choisir un persona ne suffit pas à s’accorder cet accès.",
       ]} />
@@ -110,7 +110,7 @@ function TermsFR() {
       ]} />
 
       <H2>4. Offres et paiements</H2>
-      <P>YEMA peut afficher des prix et offres commerciales afin de présenter le produit prévu. Le checkout en ligne et le paiement réel ne sont pas encore activés dans la bêta fermée. Choisir une offre, un plan ou un add-on enregistre uniquement une intention commerciale ou un contexte d’onboarding ; cela ne crée ni abonnement payant, ni paiement, ni commande, ni droit d’accès.</P>
+      <P>YEMA peut afficher des prix et offres commerciales afin de présenter le produit prévu. Le checkout en ligne et le paiement réel ne sont pas encore activés dans la bêta ouverte. Choisir une offre, un plan ou un add-on enregistre uniquement une intention commerciale ou un contexte d’onboarding ; cela ne crée ni abonnement payant, ni paiement, ni commande, ni droit d’accès.</P>
       <P>Avant d’activer les paiements réels, YEMA présentera le prestataire de paiement applicable ainsi que les conditions de facturation, renouvellement, résiliation, remboursement et transaction avant tout débit. Les pages actuelles de bêta ne doivent pas être interprétées comme un contrat de paiement finalisé.</P>
 
       <H2>5. Utilisation acceptable</H2>
@@ -135,10 +135,10 @@ function TermsFR() {
       <P>Vous conservez les droits que vous détenez sur les contenus envoyés. Vous accordez à YEMA les droits limités nécessaires pour recevoir, traiter, stocker, afficher et transmettre ces contenus afin de fournir et sécuriser la fonctionnalité choisie. Certains audios peuvent être traités de manière transitoire ; les audios de messagerie ou autres contenus utilisateur peuvent être stockés lorsque la fonctionnalité le nécessite. N’envoyez pas de contenu que vous n’êtes pas autorisé à utiliser.</P>
 
       <H2>9. Disponibilité de la bêta</H2>
-      <P>Un logiciel en bêta fermée peut contenir des fonctionnalités incomplètes, des défauts ou des interruptions temporaires. YEMA ne promet aucun taux de disponibilité chiffré ni SLA dans les présentes Conditions. Des fonctionnalités peuvent être modifiées, limitées ou retirées pendant les tests et l’amélioration du produit.</P>
+      <P>Un logiciel en bêta ouverte peut contenir des fonctionnalités incomplètes, des défauts ou des interruptions temporaires. YEMA ne promet aucun taux de disponibilité chiffré ni SLA dans les présentes Conditions. Des fonctionnalités peuvent être modifiées, limitées ou retirées pendant les tests et l’amélioration du produit.</P>
 
       <H2>10. Confidentialité</H2>
-      <P>L’utilisation de YEMA est également soumise à la Politique de confidentialité publiée, notamment pour les profils Famille, la messagerie et le fonctionnement de la bêta fermée.</P>
+      <P>L’utilisation de YEMA est également soumise à la Politique de confidentialité publiée, notamment pour les profils Famille, la messagerie et le fonctionnement de la bêta ouverte.</P>
 
       <H2>11. Demandes relatives au compte et aux données</H2>
       <P>Vous pouvez contacter <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> pour les demandes liées au compte. Les demandes de confidentialité ou de suppression peuvent nécessiter une vérification d’identité et sont traitées conformément à la Politique de confidentialité et au droit applicable. Les présentes Conditions ne promettent ni bouton de suppression dans les paramètres ni délai fixe lorsqu’ils ne sont pas réellement fournis.</P>
@@ -148,7 +148,7 @@ function TermsFR() {
       <P>Les présentes Conditions s’appliquent sous réserve des lois applicables à YEMA et à l’utilisateur. Les droits impératifs en matière de consommation, protection des mineurs, confidentialité ou autres dispositions légales demeurent applicables lorsqu’ils le sont.</P>
 
       <H2>13. Modifications</H2>
-      <P>Nous pouvons mettre à jour ces Conditions à mesure que la bêta fermée et le produit commercial évoluent. Les changements importants seront reflétés dans les Conditions publiées et, lorsque cela est approprié, communiqués dans le service ou par e-mail avant leur application.</P>
+      <P>Nous pouvons mettre à jour ces Conditions à mesure que la bêta ouverte et le produit commercial évoluent. Les changements importants seront reflétés dans les Conditions publiées et, lorsque cela est approprié, communiqués dans le service ou par e-mail avant leur application.</P>
     </LegalShell>
   );
 }
