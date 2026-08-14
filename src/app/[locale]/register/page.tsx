@@ -66,6 +66,8 @@ const COPY = {
     legalPrivacy: "politique de confidentialité.",
     successTitle: "Vérifiez votre boîte.",
     successBody: "Confirmez votre e-mail. Ensuite YEMA vous demandera votre persona et terminera votre onboarding.",
+    successLogin: "Continuer après confirmation",
+    successChangeEmail: "Corriger mon adresse",
   },
   en: {
     kicker: "The entrance",
@@ -93,6 +95,8 @@ const COPY = {
     legalPrivacy: "privacy policy.",
     successTitle: "Check your inbox.",
     successBody: "Confirm your email. YEMA will then ask for your persona and complete your onboarding.",
+    successLogin: "Continue after confirmation",
+    successChangeEmail: "Correct my email",
   },
 } as const;
 
@@ -261,6 +265,12 @@ export default function RegisterPage() {
             <div className="entry-success">
               <h1 className="entry-h">{t(c.successTitle)}</h1>
               <p className="entry-lede">{t(c.successBody)}</p>
+              <div className="entry-success-actions">
+                <Link href={loginHref} className="entry-cta entry-cta-primary">{t(c.successLogin)}</Link>
+                <button type="button" className="entry-cta entry-cta-ghost" onClick={() => setSuccess(false)}>
+                  {t(c.successChangeEmail)}
+                </button>
+              </div>
             </div>
           ) : (
             <>

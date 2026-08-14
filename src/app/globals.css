@@ -14444,6 +14444,7 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 }
 
 .entry-success { text-align: center; padding: 20px 0; }
+.entry-success-actions { display: grid; gap: 10px; margin-top: 28px; }
 
 @media (max-width: 640px) {
   .entry-card { padding: 28px 22px 24px; border-radius: 16px; }
