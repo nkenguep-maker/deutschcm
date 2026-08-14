@@ -165,7 +165,9 @@ async function main() {
   for (let i = 0; i < 30 && !ready; i++) await sleep(1000);
   if (!ready) { server.kill("SIGTERM"); fail(2, "server not ready"); }
 
-  const HOST = `127.0.0.1:${PORT}`;
+  // next start uses localhost as its canonical request origin. Keep the
+  // synthetic browser Origin identical so the real CSRF guard is exercised.
+  const HOST = `localhost:${PORT}`;
   let exitCode = 0;
   try {
     console.log("[personas] STEP 3 · check 7 personas adultes");

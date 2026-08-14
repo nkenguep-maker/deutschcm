@@ -87,11 +87,22 @@ describe("Lot 7C · matrice cohérente avec fixtures QA (yema-qa-fixtures.mjs)",
 });
 
 describe("Lot 7C · orchestrateurs P-1 fail-closed", () => {
-  it("test:personas:p1 refuse URL non-P-1 + exige P1_TEST_PASSWORD", () => {
+  it("le wrapper P-1 empêche Next.js de recharger .env.local", () => {
+    const src = readRepo("scripts/test-baseline/run-p4-5-b2-p1.mjs");
+    expect(src).toMatch(/childEnv\.__NEXT_PROCESSED_ENV\s*=\s*"true"/);
+    expect(src).toMatch(/NODE_OPTIONS.*block-next-local-env/);
+    const blocker = readRepo("scripts/test-baseline/block-next-local-env.cjs");
+    expect(blocker).toMatch(/nextEnvFile/);
+    expect(blocker).toMatch(/error\.code = "ENOENT"/);
+  });
+
+  it("test:personas:p1 délègue le chargement et les refus P-1 au wrapper strict", () => {
     const src = readRepo("scripts/test-personas-p1.mjs");
-    expect(src).toMatch(/kzzagbojjkivdzzcrmxn/);
-    expect(src).toMatch(/sbjhvlrkbyjckdxujjsk/);
-    expect(src).toMatch(/MISSING P1_TEST_PASSWORD/);
+    expect(src).toMatch(/scripts\/test-baseline\/run-p4-5-b2-p1\.mjs/);
+    expect(src).not.toMatch(/process\.env\.NEXT_PUBLIC_SUPABASE_URL/);
+    const wrapper = readRepo("scripts/test-baseline/run-p4-5-b2-p1.mjs");
+    expect(wrapper).toMatch(/kzzagbojjkivdzzcrmxn/);
+    expect(wrapper).toMatch(/P1_TEST_PASSWORD/);
   });
 
   it("test:entitlements:p1 refuse URL non-P-1 + exige SUPABASE_SERVICE_ROLE_KEY", () => {

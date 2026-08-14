@@ -32,6 +32,7 @@
 
 import { readFileSync, existsSync, statSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { resolve } from "node:path";
 
 const P1_REF = "kzzagbojjkivdzzcrmxn";
 const FORBIDDEN_REFS = [
@@ -307,6 +308,14 @@ function main() {
   const childEnv = {};
   for (const k of passthrough) if (process.env[k]) childEnv[k] = process.env[k];
   for (const [k, v] of Object.entries(dotenv)) childEnv[k] = v;
+  // Next.js charge normalement .env.local au démarrage. Le wrapper vient déjà
+  // de construire et vérifier l'environnement P-1 complet : signaler à Next
+  // qu'il est traité empêche toute lecture implicite d'un fichier local.
+  childEnv.__NEXT_PROCESSED_ENV = "true";
+  // Next 16 peut forcer une recharge malgré ce marqueur. Le preload fait
+  // apparaître les .env conventionnels comme absents, sans toucher au fichier
+  // local et sans empêcher l'environnement P-1 déjà injecté ci-dessus.
+  childEnv.NODE_OPTIONS = `--require=${resolve("scripts/test-baseline/block-next-local-env.cjs")}`;
   // Bloc final · vérifier une dernière fois qu'aucune value ne contient
   // un ref forbidden (defense-in-depth contre une fuite de env parent).
   assertNoForbiddenSubstring(childEnv);

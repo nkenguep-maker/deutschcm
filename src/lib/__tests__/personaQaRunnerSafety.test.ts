@@ -13,8 +13,9 @@ const credentialAligner = readFileSync(resolve(REPO, "scripts/test-baseline/alig
 describe("P-1 persona QA runner safety", () => {
   it("routes the authenticated gate through the fail-closed fixture wrapper", () => {
     expect(entry).toContain('"node", "scripts/orchestrate-personas-safe-p1.mjs"');
-    expect(entry).toContain('P1_REF = "kzzagbojjkivdzzcrmxn"');
-    expect(entry).toContain("MISSING P1_TEST_PASSWORD");
+    expect(entry).toContain('"scripts/test-baseline/run-p4-5-b2-p1.mjs"');
+    expect(entry).not.toContain("process.env.NEXT_PUBLIC_SUPABASE_URL");
+    expect(safeRunner).toContain("scripts/test-baseline/align-yema-qa-passwords-p1.mjs");
   });
 
   it("fails before persona execution when fixture provisioning fails", () => {
@@ -80,6 +81,17 @@ describe("P-1 persona QA runner safety", () => {
     expect(childRacinesVerifier).toContain("sessionBody.childProfileId !== CHILD_ID");
     expect(childRacinesVerifier).toContain("dashboard.status !== 200");
     expect(childRacinesVerifier).toContain('method: "DELETE"');
+  });
+
+  it("uses Next's canonical localhost origin for child mutation checks", () => {
+    expect(personaRunner).toContain('const HOST = `localhost:${PORT}`');
+    expect(childRacinesVerifier).toContain('const host = `localhost:${PORT}`');
+    expect(personaRunner).toContain("isolation cassée");
+  });
+
+  it("gives the standalone Child Racines verifier an ephemeral session secret", () => {
+    expect(childRacinesVerifier).toContain('randomBytes(32).toString("base64")');
+    expect(childRacinesVerifier).toContain("YEMA_CHILD_SESSION_SECRET: childSessionSecret");
   });
 
   it("propagates provisioning, persona, adult-route, Child Racines, cleanup and recovery failures instead of reporting a false green", () => {
