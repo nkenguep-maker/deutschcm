@@ -650,24 +650,23 @@ button, [role="button"] {
 }
 
 /* La barre · absolue à gauche du contenu, ne prend pas de place dans
-   le grid des items. Filet clair + span de peinte laiton par-dessus. */
-.spine-bar {
+   le grid des items. Les pseudo-éléments la gardent hors de la liste. */
+.spine-list::before,
+.spine-list::after {
+  content: "";
   position: absolute;
   left: 0;
   top: 4px;
-  bottom: 4px;
   width: 1.5px;
-  background: var(--creme-hair);
   pointer-events: none;
 }
-.spine-bar-fill {
-  position: absolute;
-  left: 0;
-  top: 4px;
+.spine-list::before {
+  bottom: 4px;
+  background: var(--creme-hair);
+}
+.spine-list::after {
   height: calc(var(--spine-paint, 25%) * 1);
-  width: 1.5px;
   background: var(--brass);
-  pointer-events: none;
   animation: spine-paint-in var(--dur-moment) var(--ease-enter) both;
 }
 @keyframes spine-paint-in {
@@ -675,7 +674,7 @@ button, [role="button"] {
   to   { height: var(--spine-paint, 25%); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .spine-bar-fill { animation: none; }
+  .spine-list::after { animation: none; }
 }
 
 /* L'item · grid 34px + 1fr, gap STRUCTUREL 12px, baselines alignées */

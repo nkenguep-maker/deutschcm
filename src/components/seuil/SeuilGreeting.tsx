@@ -41,17 +41,17 @@ export const GREETINGS: readonly GreetingItem[] = [
   { id: "good-morning", word: "Good morning", language: "anglais", languageEn: "English", country: "Royaume-Uni", countryEn: "United Kingdom", langTag: "en", territory: "world" },
   { id: "mbolo",     word: "Mbolo",     language: "ewondo",       languageEn: "Ewondo",       country: "Cameroun",           countryEn: "Cameroon",              langTag: "ewo", territory: "sources" },
   { id: "guten-tag", word: "Guten Tag", language: "allemand",     languageEn: "German",        country: "Allemagne",          countryEn: "Germany",               langTag: "de", territory: "world" },
-  { id: "nangadef",  word: "Na nga def", language: "wolof",        languageEn: "Wolof",        country: "Sénégal",            countryEn: "Senegal",               langTag: "wol", territory: "sources" },
+  { id: "nangadef",  word: "Na nga def", language: "wolof",        languageEn: "Wolof",        country: "Sénégal",            countryEn: "Senegal",               langTag: "wo", territory: "sources" },
   { id: "bonjour",   word: "Bonjour",   language: "français",     languageEn: "French",        country: "France",             countryEn: "France",                langTag: "fr", territory: "world" },
-  { id: "mbote",     word: "Mbote",     language: "lingala",      languageEn: "Lingala",      country: "RDC",                countryEn: "DRC",                   langTag: "lin", territory: "sources" },
+  { id: "mbote",     word: "Mbote",     language: "lingala",      languageEn: "Lingala",      country: "RDC",                countryEn: "DRC",                   langTag: "ln", territory: "sources" },
   { id: "hola",      word: "Hola",      language: "espagnol",     languageEn: "Spanish",       country: "Espagne",            countryEn: "Spain",                 langTag: "es", territory: "world" },
-  { id: "jambo",     word: "Jambo",     language: "swahili",      languageEn: "Swahili",      country: "Kenya · Tanzanie",   countryEn: "Kenya · Tanzania",      langTag: "swa", territory: "sources" },
-  { id: "enle",      word: "Ẹ n lẹ",    language: "yorùbá",       languageEn: "Yoruba",       country: "Nigeria",            countryEn: "Nigeria",               langTag: "yor", territory: "sources" },
-  { id: "sannu",     word: "Sannu",     language: "haoussa",      languageEn: "Hausa",        country: "Niger · Nigeria",    countryEn: "Niger · Nigeria",       langTag: "hau", territory: "sources" },
-  { id: "akwaaba",   word: "Akwaaba",   language: "twi",          languageEn: "Twi",          country: "Ghana",              countryEn: "Ghana",                 langTag: "twi", territory: "sources" },
-  { id: "muraho",    word: "Muraho",    language: "kinyarwanda",  languageEn: "Kinyarwanda",  country: "Rwanda",             countryEn: "Rwanda",                langTag: "kin", territory: "sources" },
-  { id: "selam",     word: "Selam",     language: "amharique",    languageEn: "Amharic",      country: "Éthiopie",           countryEn: "Ethiopia",              langTag: "amh", territory: "sources" },
-  { id: "sawubona",  word: "Sawubona",  language: "zoulou",       languageEn: "Zulu",         country: "Afrique du Sud",     countryEn: "South Africa",          langTag: "zul", territory: "sources" },
+  { id: "jambo",     word: "Jambo",     language: "swahili",      languageEn: "Swahili",      country: "Kenya · Tanzanie",   countryEn: "Kenya · Tanzania",      langTag: "sw", territory: "sources" },
+  { id: "enle",      word: "Ẹ n lẹ",    language: "yorùbá",       languageEn: "Yoruba",       country: "Nigeria",            countryEn: "Nigeria",               langTag: "yo", territory: "sources" },
+  { id: "sannu",     word: "Sannu",     language: "haoussa",      languageEn: "Hausa",        country: "Niger · Nigeria",    countryEn: "Niger · Nigeria",       langTag: "ha", territory: "sources" },
+  { id: "akwaaba",   word: "Akwaaba",   language: "twi",          languageEn: "Twi",          country: "Ghana",              countryEn: "Ghana",                 langTag: "tw", territory: "sources" },
+  { id: "muraho",    word: "Muraho",    language: "kinyarwanda",  languageEn: "Kinyarwanda",  country: "Rwanda",             countryEn: "Rwanda",                langTag: "rw", territory: "sources" },
+  { id: "selam",     word: "Selam",     language: "amharique",    languageEn: "Amharic",      country: "Éthiopie",           countryEn: "Ethiopia",              langTag: "am", territory: "sources" },
+  { id: "sawubona",  word: "Sawubona",  language: "zoulou",       languageEn: "Zulu",         country: "Afrique du Sud",     countryEn: "South Africa",          langTag: "zu", territory: "sources" },
 ] as const;
 
 interface SeuilGreetingsProps {
@@ -172,7 +172,7 @@ export function SeuilGreetings({
           : { animationDelay: `${offset}ms` };
         const greetingContent = (
           <>
-            <span className="seuil-greeting-word">{item.word}</span>
+            <span className="seuil-greeting-word" lang={item.langTag}>{item.word}</span>
             <span className="seuil-greeting-meta">
               {(locale === "en" ? item.languageEn : item.language)} ·{" "}
               {(locale === "en" ? item.countryEn : item.country)}
@@ -193,7 +193,6 @@ export function SeuilGreetings({
               className={className}
               style={style}
               onAnimationIteration={() => handleIteration(i)}
-              lang={item.langTag}
             >
               {greetingContent}
             </span>
@@ -209,7 +208,6 @@ export function SeuilGreetings({
             onAnimationIteration={() => handleIteration(i)}
             onClick={() => handlePick(item)}
             aria-label={ariaLabel(item)}
-            lang={item.langTag}
           >
             {greetingContent}
           </button>

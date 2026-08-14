@@ -144,9 +144,6 @@ export function CefrSpine({
           : `CEFR progression — current level ${current}`}
         onMouseLeave={() => { setHovered(null); emitDetail(null); }}
       >
-        <span className="spine-bar" aria-hidden="true" />
-        <span className="spine-bar-fill" aria-hidden="true" />
-
         {LEVELS.map((lvl, i) => {
           const status: SpineStatus = i < currentIdx ? "done" : i === currentIdx ? "on" : "next";
           const meta = LEVEL_META[lvl][langKey];
