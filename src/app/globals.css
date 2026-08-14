@@ -14892,6 +14892,15 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   position: relative;
   z-index: 1;
 }
+.onboarding-router .seuil-greetings-entry {
+  inset: 0 0 auto;
+  height: 180px;
+  overflow: hidden;
+}
+.onboarding-router .seuil-greeting-p0 { top: 22px; left: 5%; }
+.onboarding-router .seuil-greeting-p1 { top: 54px; right: 5%; }
+.onboarding-router .seuil-greeting-p2,
+.onboarding-router .seuil-greeting-p3 { display: none; }
 .onboarding-professional-shell {
   position: relative;
   isolation: isolate;

@@ -418,7 +418,7 @@ export default function PersonaOnboardingPage() {
 
   return (
     <main className={`onboarding-router ${stage === "roots" || stage === "roots-language" ? "onboarding-router-roots" : ""}`}>
-      <SeuilGreetings locale={loc} visibleCount={3} pool={greetingPool} variant="entry" />
+      <SeuilGreetings locale={loc} visibleCount={2} pool={greetingPool} variant="entry" />
       <header className="onboarding-router-head">
         <div className="onboarding-router-brand-row">
           {stage !== "start" ? (
