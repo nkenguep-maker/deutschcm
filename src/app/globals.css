@@ -7321,8 +7321,15 @@ body:has(.test-space-bar) { padding-top: 34px; }
   pointer-events: none;
   cursor: default;
 }
+.seuil-greeting-static {
+  pointer-events: none;
+  cursor: default;
+}
 .seuil-greetings-entry .seuil-greeting-word {
   text-shadow: 0 2px 22px rgba(15, 11, 7, 0.48);
+}
+.entry-universe-racines .seuil-greetings-entry .seuil-greeting-word {
+  color: #C9843F;
 }
 .beta-access {
   position: relative;
@@ -14882,6 +14889,15 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 }
 .onboarding-router-roots .seuil-greeting-word { color: #C9843F; }
 .onboarding-router > :not(.seuil-greetings-entry) {
+  position: relative;
+  z-index: 1;
+}
+.onboarding-professional-shell {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.onboarding-professional-shell > :not(.seuil-greetings-entry) {
   position: relative;
   z-index: 1;
 }

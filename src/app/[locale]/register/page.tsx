@@ -296,7 +296,12 @@ export default function RegisterPage() {
 
   return (
     <div className={`entry-page ${universe === "racines" ? "entry-universe-racines" : universe === "monde" ? "entry-universe-monde" : ""}`}>
-      <SeuilGreetings locale={loc} visibleCount={3} variant="entry" />
+      <SeuilGreetings
+        locale={loc}
+        visibleCount={3}
+        pool={universe === "monde" ? "world" : universe === "racines" ? "sources" : "all"}
+        variant="entry"
+      />
       <header className="entry-header">
         <Link href={`/${locale}`} className="entry-brand" aria-label="YEMA">
           <BrandY variant={universe === "racines" ? "sources" : "world"} state="static" size={36} />

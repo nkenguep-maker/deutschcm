@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { useRouter } from "@/navigation";
 import { BrandY } from "@/components/brand/BrandY";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 
 export default function CoachOnboardingPage() {
   const locale = useLocale();
@@ -76,6 +77,7 @@ export default function CoachOnboardingPage() {
 
   return (
     <main className="entry-page entry-universe-racines" data-universe="racines">
+      <SeuilGreetings locale={loc} visibleCount={3} pool="sources" variant="entry" />
       <div className="entry-main">
         <div className="entry-card entry-card-onboarding">
           <BrandY variant="sources" state="static" size={52} />

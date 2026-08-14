@@ -246,6 +246,7 @@ export default function PersonaOnboardingPage() {
   const [previewChoice, setPreviewChoice] = useState<Card | null>(null);
   const copy = copyFor(stage, loc);
   const cards = cardsFor(stage);
+  const greetingPool = stage === "world" ? "world" : stage === "roots" ? "sources" : "all";
 
   async function choose(card: Card) {
     if (card.nextStage) {
@@ -293,7 +294,7 @@ export default function PersonaOnboardingPage() {
 
   return (
     <main className={`onboarding-router ${stage === "roots" ? "onboarding-router-roots" : ""}`}>
-      <SeuilGreetings locale={loc} visibleCount={3} variant="entry" />
+      <SeuilGreetings locale={loc} visibleCount={3} pool={greetingPool} variant="entry" />
       <header className="onboarding-router-head">
         <div className="onboarding-router-brand-row">
           {stage !== "start" ? (

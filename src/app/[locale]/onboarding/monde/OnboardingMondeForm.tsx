@@ -16,6 +16,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { BrandY } from "@/components/brand/BrandY";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import { frTypo } from "@/components/landing/typo";
 import { classifyAuthError, withTimeout } from "@/lib/authErrors";
 
@@ -264,6 +265,7 @@ export function OnboardingMondeForm() {
 
   return (
     <div className="entry-page entry-universe-monde" data-universe="monde">
+      <SeuilGreetings locale={loc} visibleCount={3} pool="world" variant="entry" />
       <header className="entry-header">
         <Link href={`/${locale}`} className="entry-brand" aria-label="YEMA">
           <BrandY variant="world" state="static" size={36} />

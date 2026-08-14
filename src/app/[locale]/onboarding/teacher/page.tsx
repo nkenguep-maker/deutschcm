@@ -5,6 +5,7 @@ import { useLocale } from "next-intl";
 import { useRouter } from "@/navigation";
 import OnboardingProgress from "@/components/OnboardingProgress";
 import PhoneInput from "@/components/PhoneInput";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const DAYS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
@@ -83,7 +84,8 @@ export default function TeacherOnboardingPage() {
   }
 
   return (
-    <main style={{ minHeight: "100vh", background: "var(--espresso)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+    <main className="onboarding-professional-shell" style={{ minHeight: "100vh", background: "var(--espresso)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <SeuilGreetings locale={loc} visibleCount={3} pool="world" variant="entry" />
       <div style={{ width: "100%", maxWidth: 620 }}>
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <h1 style={{ margin: 0, color: "var(--creme)", fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: 26 }}>{loc === "en" ? "Teacher profile" : "Profil Enseignant"}</h1>

@@ -35,13 +35,16 @@ export interface GreetingItem {
   territory: "world" | "sources";
 }
 
-// Pool des salutations · UNIQUEMENT les 10 natales africaines validées.
-// Les langues d'interface (Bonjour, Hello, Hola…) ne murmurent pas ici :
-// le seuil est le vestibule des voix africaines, jamais l'inverse.
+// Les écrans Monde, Racines et communs choisissent chacun leur répertoire.
+// Le pool commun alterne volontairement les deux univers dès les premiers slots.
 export const GREETINGS: readonly GreetingItem[] = [
+  { id: "good-morning", word: "Good morning", language: "anglais", languageEn: "English", country: "Royaume-Uni", countryEn: "United Kingdom", langTag: "en", territory: "world" },
   { id: "mbolo",     word: "Mbolo",     language: "ewondo",       languageEn: "Ewondo",       country: "Cameroun",           countryEn: "Cameroon",              langTag: "ewo", territory: "sources" },
+  { id: "guten-tag", word: "Guten Tag", language: "allemand",     languageEn: "German",        country: "Allemagne",          countryEn: "Germany",               langTag: "de", territory: "world" },
   { id: "nangadef",  word: "Na nga def", language: "wolof",        languageEn: "Wolof",        country: "Sénégal",            countryEn: "Senegal",               langTag: "wol", territory: "sources" },
+  { id: "bonjour",   word: "Bonjour",   language: "français",     languageEn: "French",        country: "France",             countryEn: "France",                langTag: "fr", territory: "world" },
   { id: "mbote",     word: "Mbote",     language: "lingala",      languageEn: "Lingala",      country: "RDC",                countryEn: "DRC",                   langTag: "lin", territory: "sources" },
+  { id: "hola",      word: "Hola",      language: "espagnol",     languageEn: "Spanish",       country: "Espagne",            countryEn: "Spain",                 langTag: "es", territory: "world" },
   { id: "jambo",     word: "Jambo",     language: "swahili",      languageEn: "Swahili",      country: "Kenya · Tanzanie",   countryEn: "Kenya · Tanzania",      langTag: "swa", territory: "sources" },
   { id: "enle",      word: "Ẹ n lẹ",    language: "yorùbá",       languageEn: "Yoruba",       country: "Nigeria",            countryEn: "Nigeria",               langTag: "yor", territory: "sources" },
   { id: "sannu",     word: "Sannu",     language: "haoussa",      languageEn: "Hausa",        country: "Niger · Nigeria",    countryEn: "Niger · Nigeria",       langTag: "hau", territory: "sources" },
@@ -154,7 +157,7 @@ export function SeuilGreetings({
     <div
       className={`seuil-greetings ${variant === "entry" ? "seuil-greetings-entry" : ""}`}
       aria-hidden={interactive ? undefined : true}
-      aria-label={interactive ? (locale === "en" ? "African greetings" : "Salutations africaines") : undefined}
+      aria-label={interactive ? (locale === "en" ? "Greetings" : "Salutations") : undefined}
     >
       {Array.from({ length: slotCount }, (_, i) => {
         const item = items[wordIdx[i]];
@@ -177,9 +180,11 @@ export function SeuilGreetings({
 
         const className = `seuil-greeting seuil-greeting-${POSITIONS[i]} ${
           playing === item.id ? "playing" : ""
-        }`;
+        } ${interactive && item.territory !== "sources" ? "seuil-greeting-static" : ""}`;
 
-        if (!interactive) {
+        // Les voix Racines disposent de leurs enregistrements audio. Les mots
+        // Monde restent des éléments visuels, même sur le seuil interactif.
+        if (!interactive || item.territory !== "sources") {
           return (
             <span
               key={i}
