@@ -33,8 +33,9 @@ describe("public accessibility structure", () => {
   it("keeps the language catalogue heading hierarchy continuous", () => {
     const catalogue = read("src/app/[locale]/langues/page.tsx");
 
-    expect(catalogue).toContain('headingLevel: 2');
-    expect(catalogue).toContain('headingLevel: 3');
+    expect(catalogue).toContain('headingLevel: 2 | 3');
+    expect(catalogue).toContain('headingLevel={2}');
+    expect(catalogue).toContain('headingLevel={3}');
     expect(catalogue).toContain('const Heading = headingLevel === 2 ? "h2" : "h3"');
     expect(catalogue).not.toContain('<h1 className="maison-h">\n                {t(c.sourcesTitle)}');
   });
@@ -50,11 +51,12 @@ describe("public accessibility structure", () => {
 
   it("keeps decorative greetings either readable or hidden", () => {
     const css = read("src/app/globals.css");
+    const greetingAnimation = css.match(/@keyframes seuil-greeting-breath \{[\s\S]*?\n\}/)?.[0];
 
-    expect(css).toContain("10%, 45% {");
-    expect(css).toContain("opacity: 0.85;");
-    expect(css).toContain("visibility: hidden;");
-    expect(css).not.toContain("opacity: 0.04;");
-    expect(css).not.toContain("opacity: 0.10;");
+    expect(greetingAnimation).toContain("10%, 45% {");
+    expect(greetingAnimation).toContain("opacity: 0.85;");
+    expect(greetingAnimation).toContain("visibility: hidden;");
+    expect(greetingAnimation).not.toContain("opacity: 0.04;");
+    expect(greetingAnimation).not.toContain("opacity: 0.10;");
   });
 });
