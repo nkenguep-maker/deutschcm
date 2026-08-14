@@ -69,6 +69,12 @@ const COPY = {
     successBody: "Confirmez votre e-mail. Ensuite YEMA vous demandera votre persona et terminera votre onboarding.",
     successLogin: "Continuer après confirmation",
     successChangeEmail: "Corriger mon adresse",
+    resend: "Renvoyer l’e-mail de confirmation",
+    resending: "Nouvel envoi en cours…",
+    resendHelp: "Regardez aussi dans les indésirables.",
+    resendSent: "Un nouveau lien a été demandé. Vérifiez votre boîte de réception.",
+    resendRateLimited: "Trop de demandes pour le moment. Attendez un peu avant de réessayer.",
+    resendError: "Le nouvel e-mail n’a pas pu être demandé. Réessayez dans un instant.",
   },
   en: {
     kicker: "The entrance",
@@ -98,6 +104,12 @@ const COPY = {
     successBody: "Confirm your email. YEMA will then ask for your persona and complete your onboarding.",
     successLogin: "Continue after confirmation",
     successChangeEmail: "Correct my email",
+    resend: "Resend confirmation email",
+    resending: "Requesting a new email…",
+    resendHelp: "Please check your spam folder too.",
+    resendSent: "A new link was requested. Check your inbox.",
+    resendRateLimited: "Too many requests for now. Please wait a little before trying again.",
+    resendError: "We could not request a new email. Please try again shortly.",
   },
 } as const;
 
@@ -148,6 +160,7 @@ export default function RegisterPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [resendState, setResendState] = useState<"idle" | "sending" | "sent" | "rate_limited" | "error">("idle");
   const successHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const errorFromKey = (key: AuthErrorKey): string => t(tErr(key));
@@ -165,6 +178,7 @@ export default function RegisterPage() {
   async function handleRegister(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
+    setResendState("idle");
 
     const first = firstName.trim();
     const last = lastName.trim();
@@ -254,6 +268,32 @@ export default function RegisterPage() {
     }
   }
 
+  async function handleResendConfirmation() {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!isEmailLike(normalizedEmail)) return;
+
+    setResendState("sending");
+    try {
+      const supabase = createClient();
+      const { error: resendError } = await withTimeout(
+        supabase.auth.resend({
+          type: "signup",
+          email: normalizedEmail,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizedPersonaRoute)}`,
+          },
+        }),
+      );
+      if (resendError) {
+        setResendState(classifyAuthError(resendError) === "rate_limited" ? "rate_limited" : "error");
+        return;
+      }
+      setResendState("sent");
+    } catch (resendError) {
+      setResendState(classifyAuthError(resendError) === "rate_limited" ? "rate_limited" : "error");
+    }
+  }
+
   return (
     <div className={`entry-page ${universe === "racines" ? "entry-universe-racines" : universe === "monde" ? "entry-universe-monde" : ""}`}>
       <SeuilGreetings locale={loc} visibleCount={3} variant="entry" />
@@ -272,12 +312,26 @@ export default function RegisterPage() {
             <div className="entry-success">
               <h1 ref={successHeadingRef} className="entry-h" tabIndex={-1}>{t(c.successTitle)}</h1>
               <p className="entry-lede">{t(c.successBody)}</p>
+              <p className="entry-success-help">{t(c.resendHelp)}</p>
               <div className="entry-success-actions">
                 <Link href={loginHref} className="entry-cta entry-cta-primary">{t(c.successLogin)}</Link>
-                <button type="button" className="entry-cta entry-cta-ghost" onClick={() => setSuccess(false)}>
+                <button
+                  type="button"
+                  className="entry-cta entry-cta-ghost"
+                  onClick={handleResendConfirmation}
+                  disabled={resendState === "sending"}
+                >
+                  {t(resendState === "sending" ? c.resending : c.resend)}
+                </button>
+                <button type="button" className="entry-cta entry-cta-ghost" onClick={() => { setResendState("idle"); setSuccess(false); }}>
                   {t(c.successChangeEmail)}
                 </button>
               </div>
+              {resendState !== "idle" && resendState !== "sending" ? (
+                <p className={`entry-success-feedback ${resendState === "sent" ? "is-success" : "is-error"}`} role="status">
+                  {t(resendState === "sent" ? c.resendSent : resendState === "rate_limited" ? c.resendRateLimited : c.resendError)}
+                </p>
+              ) : null}
             </div>
           ) : (
             <>

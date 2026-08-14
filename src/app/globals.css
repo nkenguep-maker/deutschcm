@@ -14476,6 +14476,20 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 
 .entry-success { text-align: center; padding: 20px 0; }
 .entry-success-actions { display: grid; gap: 10px; margin-top: 28px; }
+.entry-success-help {
+  margin: 12px 0 0;
+  color: var(--creme-mute);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 13px;
+}
+.entry-success-feedback {
+  margin: 16px 0 0;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.entry-success-feedback.is-success { color: #b9d8a5; }
+.entry-success-feedback.is-error { color: #f0b4a0; }
 
 @media (max-width: 640px) {
   .entry-card { padding: 28px 22px 24px; border-radius: 16px; }
