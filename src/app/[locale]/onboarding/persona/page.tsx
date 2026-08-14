@@ -14,7 +14,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { useLocale } from "next-intl";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "@/navigation";
 import { useState } from "react";
 import { BrandY } from "@/components/brand/BrandY";
@@ -232,7 +232,9 @@ export default function PersonaOnboardingPage() {
   const locale = useLocale();
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const preview = pathname.endsWith("/preview/onboarding");
   const selectedPlan = searchParams.get("plan");
   const selectedAddon = searchParams.get("addon");
   const teacherAddonRequested = searchParams.get("prof") === "1";
@@ -241,6 +243,7 @@ export default function PersonaOnboardingPage() {
   const [stage, setStage] = useState<Stage>("start");
   const [loading, setLoading] = useState<AdultPersonaId | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [previewChoice, setPreviewChoice] = useState<Card | null>(null);
   const copy = copyFor(stage, loc);
   const cards = cardsFor(stage);
 
@@ -251,6 +254,11 @@ export default function PersonaOnboardingPage() {
       return;
     }
     if (!card.persona) return;
+
+    if (preview) {
+      setPreviewChoice(card);
+      return;
+    }
 
     setLoading(card.persona);
     setError(null);
@@ -318,6 +326,18 @@ export default function PersonaOnboardingPage() {
       </header>
 
       {error ? <p className="entry-err" role="alert">{error}</p> : null}
+
+      {preview ? (
+        <p className="onboarding-router-preview" role="status">
+          {previewChoice
+            ? (loc === "en"
+              ? `${previewChoice.titleEn} selected. In the live journey, this opens the next tailored step.`
+              : `${previewChoice.titleFr} sélectionné. Dans le parcours réel, cela ouvre la prochaine étape adaptée.`)
+            : (loc === "en"
+              ? "Preview mode: explore the choices freely. No account is created."
+              : "Mode aperçu : explorez librement les choix. Aucun compte n’est créé.")}
+        </p>
+      ) : null}
 
       <section
         className={`onboarding-router-portes onboarding-router-portes-${stage}`}

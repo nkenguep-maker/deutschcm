@@ -14916,6 +14916,15 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   width: 100%;
   max-width: 420px;
 }
+.onboarding-router-preview {
+  width: min(420px, 100%);
+  margin: -12px 0 0;
+  color: var(--creme-mute);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
 .onboarding-router-porte {
   display: flex;
   flex-direction: column;
