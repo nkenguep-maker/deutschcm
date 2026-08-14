@@ -14,10 +14,11 @@ import {
   UsersRound,
 } from "lucide-react";
 import { useLocale } from "next-intl";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/navigation";
 import { useState } from "react";
 import { BrandY } from "@/components/brand/BrandY";
+import { useOnboardingPreview } from "@/components/onboarding/OnboardingPreviewContext";
 import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import type { AdultPersonaId } from "@/lib/personas/runtime";
 
@@ -232,9 +233,8 @@ export default function PersonaOnboardingPage() {
   const locale = useLocale();
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
   const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const preview = pathname.endsWith("/preview/onboarding");
+  const preview = useOnboardingPreview();
   const selectedPlan = searchParams.get("plan");
   const selectedAddon = searchParams.get("addon");
   const teacherAddonRequested = searchParams.get("prof") === "1";
