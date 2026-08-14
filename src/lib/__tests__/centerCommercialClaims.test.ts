@@ -11,8 +11,8 @@ describe("center commercial surface before payment integration", () => {
 
     expect(page).toContain("Sans paiement en ligne");
     expect(page).toContain("No online payment yet");
-    expect(page).toContain("moyens de paiement seront connectés dans un lot ultérieur");
-    expect(page).toContain("payment methods will be connected in a later delivery");
+    expect(page).not.toContain("moyens de paiement seront connectés dans un lot ultérieur");
+    expect(page).not.toContain("payment methods will be connected in a later delivery");
 
     expect(page).not.toMatch(/sous 48 heures/i);
     expect(page).not.toMatch(/within 48 hours/i);

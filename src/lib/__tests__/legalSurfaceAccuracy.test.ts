@@ -6,13 +6,13 @@ const ROOT = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(ROOT, path), "utf8");
 
 describe("public legal surfaces match the current product", () => {
-  it("describes closed beta, family child profiles and deferred payments accurately", () => {
+  it("describes open beta, family child profiles and deferred payments accurately", () => {
     const privacy = read("src/app/[locale]/privacy/page.tsx");
     const terms = read("src/app/[locale]/terms/page.tsx");
     const combined = `${privacy}\n${terms}`;
 
-    expect(privacy).toContain("closed beta");
-    expect(privacy).toContain("bêta fermée");
+    expect(privacy).toContain("open beta");
+    expect(privacy).toContain("bêta ouverte");
     expect(privacy).toContain("child profiles");
     expect(privacy).toContain("profils enfants");
     expect(privacy).toContain("Online payments are not currently activated");
@@ -29,6 +29,8 @@ describe("public legal surfaces match the current product", () => {
       "MTN MoMo",
       "Orange Money",
       "public beta",
+      "closed beta",
+      "bêta fermée",
       "at least 16 years old",
       "au moins 16 ans",
       "Audio is not stored after processing",
