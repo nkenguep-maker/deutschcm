@@ -80,6 +80,11 @@ describe("P-1 persona QA runner safety", () => {
     expect(credentialAligner).toContain("signInWithPassword");
   });
 
+  it("uses Supabase signInWithPassword for every runtime persona session", () => {
+    expect(personaRunner).toContain("auth.auth.signInWithPassword({ email, password: PASSWORD })");
+    expect(personaRunner).not.toContain("/auth/v1/token?grant_type=password");
+  });
+
   it("requires every expected adult allowed route before reporting green", () => {
     expect(safeRunner).toContain('ADULT_PERSONAS_VERIFY_SCRIPT = "scripts/verify-adult-persona-routes-p1.mjs"');
     expect(safeRunner).toContain("adult persona route verification failed");

@@ -10,6 +10,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { createClient } from "@supabase/supabase-js";
 import { scrypt as _scrypt, randomBytes } from "node:crypto";
 import { promisify } from "node:util";
 const scryptAsync = promisify(_scrypt);
@@ -40,6 +41,9 @@ if (!process.env.P1_TEST_PASSWORD) fail(0, "P1_TEST_PASSWORD absent", 2);
 const PASSWORD = process.env.P1_TEST_PASSWORD;
 const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supRef = new URL(url).host.split(".")[0];
+const auth = createClient(url, anon, {
+  auth: { persistSession: false, autoRefreshToken: false },
+});
 
 // Matrice runtime · doit rester alignée avec src/lib/personas/matrix.ts.
 const ADULTS = [
@@ -95,13 +99,9 @@ const ADULTS = [
 ];
 
 async function loginCookie(email) {
-  const r = await fetch(`${url}/auth/v1/token?grant_type=password`, {
-    method: "POST",
-    headers: { apikey: anon, "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password: PASSWORD }),
-  });
-  if (!r.ok) throw new Error(`login ${email} · ${r.status}`);
-  const s = await r.json();
+  const { data, error } = await auth.auth.signInWithPassword({ email, password: PASSWORD });
+  if (error || !data.session) throw new Error(`login ${email} · ${error?.message ?? "session missing"}`);
+  const s = data.session;
   const payload = {
     access_token: s.access_token,
     token_type: s.token_type,
