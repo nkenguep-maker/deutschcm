@@ -14346,6 +14346,14 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   color: var(--creme-mute);
   text-align: center;
 }
+.entry-legal-link {
+  color: var(--creme);
+  text-decoration: underline;
+  text-decoration-color: var(--brass-edge);
+  text-underline-offset: 3px;
+}
+.entry-legal-link:hover { color: var(--brass); text-decoration-color: currentColor; }
+.entry-legal-link:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; border-radius: 2px; }
 
 .entry-choices {
   list-style: none;
@@ -14872,4 +14880,3 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 @media (prefers-reduced-motion: reduce) {
   .onboarding-router-porte { transition: none !important; }
 }
-

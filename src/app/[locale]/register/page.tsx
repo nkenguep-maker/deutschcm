@@ -57,7 +57,10 @@ const COPY = {
     passwordInvalid: "Le mot de passe doit contenir au moins huit caractères.",
     loginPrompt: "Déjà un compte ?",
     loginCta: "Se connecter",
-    legal: "En créant votre compte, vous acceptez nos conditions et notre politique de confidentialité.",
+    legalBefore: "En créant votre compte, vous acceptez nos ",
+    legalTerms: "conditions d’utilisation",
+    legalMiddle: " et notre ",
+    legalPrivacy: "politique de confidentialité.",
     successTitle: "Vérifiez votre boîte.",
     successBody: "Confirmez votre e-mail. Ensuite YEMA vous demandera votre persona et terminera votre onboarding.",
   },
@@ -79,7 +82,10 @@ const COPY = {
     passwordInvalid: "Your password must contain at least eight characters.",
     loginPrompt: "Already have an account?",
     loginCta: "Sign in",
-    legal: "By creating your account, you accept our terms and privacy policy.",
+    legalBefore: "By creating your account, you accept our ",
+    legalTerms: "terms of use",
+    legalMiddle: " and ",
+    legalPrivacy: "privacy policy.",
     successTitle: "Check your inbox.",
     successBody: "Confirm your email. YEMA will then ask for your persona and complete your onboarding.",
   },
@@ -303,7 +309,12 @@ export default function RegisterPage() {
                 ) : null}
               </form>
 
-              <p className="entry-legal">{t(c.legal)}</p>
+              <p className="entry-legal">
+                {t(c.legalBefore)}
+                <Link href={`/${locale}/terms`} className="entry-legal-link">{t(c.legalTerms)}</Link>
+                {t(c.legalMiddle)}
+                <Link href={`/${locale}/privacy`} className="entry-legal-link">{t(c.legalPrivacy)}</Link>
+              </p>
             </>
           )}
         </div>
