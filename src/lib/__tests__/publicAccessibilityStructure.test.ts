@@ -49,6 +49,14 @@ describe("public accessibility structure", () => {
     expect(css).toContain("color: var(--brass);");
   });
 
+  it("keeps the visible landing scroll hint readable", () => {
+    const css = read("src/app/globals.css");
+    const scrollHint = css.match(/\.seuil-scroll-hint \{[\s\S]*?\n\}/)?.[0];
+
+    expect(scrollHint).toContain("color: var(--creme-mute);");
+    expect(scrollHint).not.toContain("color: var(--creme-faint);");
+  });
+
   it("keeps decorative greetings either readable or hidden", () => {
     const css = read("src/app/globals.css");
     const greetingAnimation = css.match(/@keyframes seuil-greeting-breath \{[\s\S]*?\n\}/)?.[0];

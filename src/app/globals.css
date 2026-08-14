@@ -7185,8 +7185,8 @@ body:has(.test-space-bar) { padding-top: 34px; }
 .seuil-act-hero > * {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 1200ms var(--ease-enter) var(--stagger, 0ms),
-              transform 1200ms var(--ease-enter) var(--stagger, 0ms);
+  transition: opacity 700ms var(--ease-enter) var(--stagger, 0ms),
+              transform 700ms var(--ease-enter) var(--stagger, 0ms);
   will-change: opacity, transform;
   margin: 0;
 }
@@ -7216,8 +7216,8 @@ body:has(.test-space-bar) { padding-top: 34px; }
   display: block;
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 1200ms var(--ease-enter) var(--stagger, 0ms),
-              transform 1200ms var(--ease-enter) var(--stagger, 0ms);
+  transition: opacity 700ms var(--ease-enter) var(--stagger, 0ms),
+              transform 700ms var(--ease-enter) var(--stagger, 0ms);
 }
 .seuil-act-hero.in .seuil-hero-line {
   opacity: 1;
@@ -7297,11 +7297,11 @@ body:has(.test-space-bar) { padding-top: 34px; }
   font-family: var(--font-jetbrains, monospace);
   font-size: 10px;
   letter-spacing: 0.24em;
-  color: var(--creme-faint);
+  color: var(--creme-mute);
   text-transform: uppercase;
   margin: 0;
   opacity: 0;
-  transition: opacity var(--dur-moment) var(--ease-enter) 4200ms;
+  transition: opacity var(--dur-moment) var(--ease-enter) 1200ms;
 }
 .seuil.in-final .seuil-scroll-hint { opacity: 1; }
 
