@@ -5,6 +5,7 @@ import { useRouter } from "@/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
 import { BrandY } from "@/components/brand/BrandY";
@@ -48,6 +49,8 @@ const COPY = {
     email: "E-mail",
     password: "Mot de passe",
     passwordHint: "Au moins huit caractères.",
+    showPassword: "Afficher le mot de passe",
+    hidePassword: "Masquer le mot de passe",
     submit: "Créer mon compte",
     loading: "On ouvre la porte…",
     google: "Continuer avec Google",
@@ -73,6 +76,8 @@ const COPY = {
     email: "Email",
     password: "Password",
     passwordHint: "At least eight characters.",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
     submit: "Create my account",
     loading: "Opening the door…",
     google: "Continue with Google",
@@ -133,6 +138,7 @@ export default function RegisterPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -290,7 +296,18 @@ export default function RegisterPage() {
 
                 <label className="entry-field">
                   <span className="entry-field-lbl">{t(c.password)}</span>
-                  <input type="password" autoComplete="new-password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className="entry-input" required />
+                  <span className="entry-password-wrap">
+                    <input type={passwordVisible ? "text" : "password"} autoComplete="new-password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className="entry-input" required />
+                    <button
+                      type="button"
+                      className="entry-password-toggle"
+                      onClick={() => setPasswordVisible((visible) => !visible)}
+                      aria-label={t(passwordVisible ? c.hidePassword : c.showPassword)}
+                      title={t(passwordVisible ? c.hidePassword : c.showPassword)}
+                    >
+                      {passwordVisible ? <EyeOff size={17} aria-hidden="true" /> : <Eye size={17} aria-hidden="true" />}
+                    </button>
+                  </span>
                   <span className="entry-field-hint">{t(c.passwordHint)}</span>
                 </label>
 

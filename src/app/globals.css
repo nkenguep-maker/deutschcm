@@ -14261,6 +14261,25 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 .entry-input:hover { border-color: rgba(244, 235, 220, 0.14); }
 .entry-input:focus { outline: none; border-color: var(--brass); background: rgba(0, 0, 0, 0.24); }
 .entry-input:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.entry-password-wrap { position: relative; display: block; }
+.entry-password-wrap .entry-input { width: 100%; padding-right: 48px; }
+.entry-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--creme-mute);
+  cursor: pointer;
+}
+.entry-password-toggle:hover { color: var(--creme); background: rgba(244, 235, 220, 0.06); }
+.entry-password-toggle:focus-visible { outline: 2px solid var(--brass); outline-offset: 1px; }
 .entry-field-hint { font-family: var(--font-manrope), system-ui, sans-serif; font-size: 12px; color: var(--creme-mute); line-height: 1.4; }
 .entry-err {
   margin: 4px 0 0;
