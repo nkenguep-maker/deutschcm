@@ -28,6 +28,7 @@ const PUBLIC_PAGES = [
   { name: "login-fr", path: "/fr/login" },
   { name: "open-beta-fr", path: "/fr/beta" },
   { name: "register-fr", path: "/fr/register" },
+  { name: "pre-onboarding-fr", path: "/fr/pre-onboarding" },
 ];
 
 // Endpoints QA qui doivent renvoyer 404 par défaut (gate off si la Preview
@@ -80,6 +81,40 @@ test("open beta entry point reaches public registration by keyboard", async ({ p
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/fr\/register$/);
   await expect(page.locator("form")).toBeVisible();
+});
+
+test("preconfirmation onboarding records a World journey without authentication", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const response = await page.goto("/fr/pre-onboarding", { waitUntil: "load", timeout: 30_000 });
+  expect(response?.status(), "pre-onboarding HTTP status").toBe(200);
+
+  await page.getByRole("button", { name: /Une langue du monde/ }).click();
+  await expect(page.getByRole("heading", { name: "Quelle langue souhaitez-vous apprendre ?" })).toBeVisible();
+  await page.getByRole("button", { name: /Allemand/ }).click();
+  await expect(page.getByRole("heading", { name: "À quoi doit vous servir cette langue ?" })).toBeVisible();
+  await page.getByRole("button", { name: /Voyager/ }).click();
+
+  await expect(page.getByRole("status")).toContainText("Voyager est prêt");
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("yema.preconfirmation.journey"))).toBe(
+    JSON.stringify({ persona: "student_monde", pathwayVariant: "TOURISM", languageId: "deutsch" }),
+  );
+});
+
+test("preconfirmation onboarding records a Roots family journey and keeps coming languages unavailable", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/fr/pre-onboarding", { waitUntil: "load", timeout: 30_000 });
+
+  await page.getByRole("button", { name: /Une langue de famille/ }).click();
+  await expect(page.getByRole("heading", { name: "Quelle langue souhaitez-vous retrouver ?" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Bassa/ })).toBeDisabled();
+  await page.getByRole("button", { name: /Wolof/ }).click();
+  await expect(page.getByRole("heading", { name: "Pour qui commence ce parcours ?" })).toBeVisible();
+  await page.getByRole("button", { name: /Pour ma famille/ }).click();
+
+  await expect(page.getByRole("status")).toContainText("Pour ma famille est prêt");
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("yema.preconfirmation.journey"))).toBe(
+    JSON.stringify({ persona: "family", languageId: "wolof" }),
+  );
 });
 
 test.describe("QA endpoints · gate 404 stable", () => {
