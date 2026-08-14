@@ -14858,6 +14858,29 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
   isolation: isolate;
   overflow: hidden;
 }
+.onboarding-router-roots {
+  background:
+    radial-gradient(ellipse 75% 45% at 15% 0%, rgba(240, 206, 139, 0.10), transparent 55%),
+    radial-gradient(ellipse 55% 40% at 90% 8%, rgba(201, 132, 63, 0.14), transparent 55%),
+    var(--terre);
+}
+.onboarding-router-roots .entry-kicker,
+.onboarding-router-roots .onboarding-router-porte-eyebrow,
+.onboarding-router-roots .onboarding-router-porte-icon {
+  color: #C9843F;
+}
+.onboarding-router-roots .onboarding-router-porte {
+  background: rgba(71, 39, 24, 0.32);
+  border-color: rgba(201, 132, 63, 0.28);
+}
+.onboarding-router-roots .onboarding-router-porte:hover {
+  background: rgba(201, 132, 63, 0.12);
+  border-color: rgba(201, 132, 63, 0.58);
+}
+.onboarding-router-roots .onboarding-router-porte:focus-visible {
+  outline-color: #C9843F;
+}
+.onboarding-router-roots .seuil-greeting-word { color: #C9843F; }
 .onboarding-router > :not(.seuil-greetings-entry) {
   position: relative;
   z-index: 1;
