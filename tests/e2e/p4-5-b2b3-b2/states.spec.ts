@@ -12,7 +12,11 @@ async function expectCanonicalNotFound(page: import("playwright/test").Page, res
 
   expect(response?.status()).toBe(200);
   await expect(page.getByRole("heading", { level: 1, name: /La porte que vous cherchez|The door you are looking for/i })).toBeVisible();
-  await expect(page.locator("meta[name='robots']")).toHaveAttribute("content", /noindex/i);
+  const robotsContents = await page.locator("meta[name='robots']").evaluateAll((elements) =>
+    elements.map((element) => element.getAttribute("content")?.toLowerCase() ?? ""),
+  );
+  expect(robotsContents).toContainEqual(expect.stringMatching(/noindex/));
+  expect(robotsContents).not.toContainEqual(expect.stringMatching(/(^|,\s*)index(?:\s*,|$)/));
 }
 
 test.describe("État anonymous · redirect /login", () => {

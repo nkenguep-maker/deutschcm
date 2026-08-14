@@ -89,7 +89,6 @@ export async function generateMetadata({
       images: [`/${key}/opengraph-image`],
       creator: "@yema",
     },
-    robots: { index: true, follow: true },
     alternates: {
       canonical: url,
       languages: {
