@@ -16,7 +16,10 @@
 import { defineConfig, devices } from "playwright/test";
 
 const PORT = process.env.PLAYWRIGHT_PORT || "3100";
-const BASE_URL = `http://127.0.0.1:${PORT}`;
+// Next canonise l'origine locale sur localhost. Les mutations protégées par
+// isSameOriginRequest() doivent donc y être jouées, sinon le navigateur
+// envoie Origin: http://127.0.0.1:<port> et le garde-fou refuse à raison.
+const BASE_URL = `http://localhost:${PORT}`;
 
 // Le pattern des specs est ajusté via la variable PW_TESTMATCH pour permettre
 // une invocation ciblée (flag-off vs reste). Défaut · tous sauf flag-off.

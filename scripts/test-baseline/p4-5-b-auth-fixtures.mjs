@@ -85,19 +85,25 @@ async function syncPrismaSupabaseId(email, supabaseId) {
 }
 
 async function syncAuthMetadata(supabaseId, role) {
-  // Miroir user_metadata pour que le proxy Next reconnaisse le rôle +
-  // l'état onboardé + l'espace actif. Sans ceci, redirect /setup-role ou
-  // /onboarding sur toutes les pages Teacher/Student. Cf. p4-3a-fixtures
-  // pour le pattern canonique.
+  // Le proxy lit exclusivement app_metadata, réservé à l'admin API. Garder
+  // user_metadata à jour est utile pour l'UI, mais ne peut jamais autoriser
+  // une route. Les fixtures Prisma créent le miroir user_roles correspondant.
   const { data } = await admin.auth.admin.getUserById(supabaseId);
-  const existing = data?.user?.user_metadata ?? {};
+  const existingUserMetadata = data?.user?.user_metadata ?? {};
+  const existingAppMetadata = data?.user?.app_metadata ?? {};
   await admin.auth.admin.updateUserById(supabaseId, {
     user_metadata: {
-      ...existing,
+      ...existingUserMetadata,
       roles: [role],
       onboarded_map: { [role]: true },
       active_space: role,
       fixture: "TEST_P4_5_B",
+    },
+    app_metadata: {
+      ...existingAppMetadata,
+      roles: [role],
+      onboarded_map: { [role]: true },
+      active_space: role,
     },
   });
 }
