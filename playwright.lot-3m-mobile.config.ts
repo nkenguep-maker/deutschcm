@@ -5,7 +5,8 @@
 import { defineConfig, devices } from "playwright/test";
 
 const PORT = process.env.PLAYWRIGHT_PORT || "3110";
-const BASE_URL = `http://127.0.0.1:${PORT}`;
+const CUSTOM_BASE = process.env.PLAYWRIGHT_BASE_URL;
+const BASE_URL = CUSTOM_BASE || `http://127.0.0.1:${PORT}`;
 
 // Flag off suffit — les pages publiques ne dépendent pas du redesign flag.
 const webServerCommand = [
@@ -41,12 +42,14 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
-  webServer: {
-    command: webServerCommand,
-    port: Number(PORT),
-    timeout: 120_000,
-    reuseExistingServer: false,
-    stdout: "ignore",
-    stderr: "pipe",
-  },
+  ...(!CUSTOM_BASE ? {
+    webServer: {
+      command: webServerCommand,
+      port: Number(PORT),
+      timeout: 120_000,
+      reuseExistingServer: false,
+      stdout: "ignore",
+      stderr: "pipe",
+    },
+  } : {}),
 });

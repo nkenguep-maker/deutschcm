@@ -68,8 +68,9 @@ for (const p of PUBLIC_PAGES) {
         viewport: { width: vp.width, height: vp.height },
       });
       const page = await context.newPage();
-      const resp = await page.goto(p.path, { waitUntil: "networkidle", timeout: 20_000 });
+      const resp = await page.goto(p.path, { waitUntil: "load", timeout: 20_000 });
       expect(resp?.status(), `${p.name} HTTP status`).toBeLessThan(400);
+      await page.evaluate(() => document.fonts.ready);
 
       const { violations } = await new AxeBuilder({ page })
         .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "experimental"])
