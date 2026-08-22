@@ -6,6 +6,7 @@ import { sanitizeOptionalInternalNext } from "@/lib/authRedirect";
 import { hasActiveRole, markRoleOnboarded, syncUserMetadata, type SpaceRole } from "@/lib/roles";
 import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 import { isAdultPersonaId, resolvePersonaRuntime, type AdultPersonaId } from "@/lib/personas/runtime";
+import { assertSupabaseResult } from "@/lib/supabase/assertResult";
 
 function err(code: string, message: string, status: number, detail?: unknown) {
   return NextResponse.json({ error: message, code, ...(detail ? { detail } : {}) }, { status });
@@ -128,7 +129,8 @@ export async function POST(req: NextRequest) {
       ...(typeof body.availability === "string" ? { availability: body.availability } : {}),
       post_onboarding_next: null,
     };
-    await supabase.auth.updateUser({ data: metadataPatch });
+    const metadataResult = await supabase.auth.updateUser({ data: metadataPatch });
+    assertSupabaseResult(metadataResult, "auth.updateUser.onboardingComplete");
     await syncUserMetadata({ supabaseId: user.id, activeSpace: effectiveRole });
 
     const runtime = await resolvePersonaRuntime({

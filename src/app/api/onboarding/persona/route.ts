@@ -7,6 +7,7 @@ import { isInternalTestEnvironment } from "@/lib/internalTestEnvironment";
 import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 import { isAdultPersonaId, resolvePersonaRuntime, type AdultPersonaId } from "@/lib/personas/runtime";
 import { grantRole, syncUserMetadata } from "@/lib/roles";
+import { assertSupabaseResult } from "@/lib/supabase/assertResult";
 
 const WORLD_PASSAGE_PLANS = new Set([
   "passage-a1",
@@ -22,6 +23,14 @@ const MONDE_PATHWAY_VARIANTS = new Set([
   "NATURALIZATION",
   "TOURISM",
 ]);
+
+async function updateJourneyMetadata(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  data: Record<string, unknown>,
+) {
+  const result = await supabase.auth.updateUser({ data });
+  assertSupabaseResult(result, "auth.updateUser.onboardingPersona");
+}
 
 function bad(code: string, status = 400) {
   return NextResponse.json({ error: code }, { status });
@@ -139,7 +148,7 @@ export async function POST(req: NextRequest) {
       update: {},
     });
     nextUserMetadata.universe = persona === "student_monde" ? "monde" : "racines";
-    await supabase.auth.updateUser({ data: nextUserMetadata });
+    await updateJourneyMetadata(supabase, nextUserMetadata);
     await syncUserMetadata({ supabaseId: user.id, activeSpace: "STUDENT" });
     return NextResponse.json({
       persona,
@@ -157,7 +166,7 @@ export async function POST(req: NextRequest) {
       create: { userId: dbUser.id, role: "PARENT" },
       update: {},
     });
-    await supabase.auth.updateUser({ data: nextUserMetadata });
+    await updateJourneyMetadata(supabase, nextUserMetadata);
     await syncUserMetadata({ supabaseId: user.id, activeSpace: "STUDENT" });
     return NextResponse.json({
       persona,
@@ -178,7 +187,7 @@ export async function POST(req: NextRequest) {
       // P-1 only: separate QA accounts must be able to exercise the complete
       // professional onboarding/dashboard. Production never enters this path.
       await grantRole({ userId: dbUser.id, role });
-      await supabase.auth.updateUser({ data: nextUserMetadata });
+      await updateJourneyMetadata(supabase, nextUserMetadata);
       await syncUserMetadata({ supabaseId: user.id, activeSpace: role });
       return NextResponse.json({
         persona,
@@ -197,7 +206,7 @@ export async function POST(req: NextRequest) {
         },
       });
     }
-    await supabase.auth.updateUser({ data: nextUserMetadata });
+    await updateJourneyMetadata(supabase, nextUserMetadata);
     const runtime = await resolvePersonaRuntime({
       supabaseId: user.id,
       requestedPersona: persona,
@@ -212,14 +221,14 @@ export async function POST(req: NextRequest) {
         create: { userId: dbUser.id, role: "RACINES_COACH" },
         update: {},
       });
-      await supabase.auth.updateUser({ data: nextUserMetadata });
+      await updateJourneyMetadata(supabase, nextUserMetadata);
       await syncUserMetadata({ supabaseId: user.id, activeSpace: "STUDENT" });
       return NextResponse.json({ persona, qaAutoApproved: true, redirectTo: "/onboarding/coach" });
     }
 
     // RACINES_COACH has no pending AppRole state in the current schema.
     // Persist only the non-authorizing request; trusted approval creates it.
-    await supabase.auth.updateUser({ data: nextUserMetadata });
+    await updateJourneyMetadata(supabase, nextUserMetadata);
     return NextResponse.json({
       persona,
       redirectTo: `/onboarding/pending?persona=${encodeURIComponent(persona)}`,

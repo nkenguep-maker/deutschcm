@@ -1,5 +1,6 @@
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import prisma from "@/lib/prisma";
+import { assertSupabaseResult, SupabaseOperationError } from "@/lib/supabase/assertResult";
 import type { Role } from "@prisma/client";
 
 // Multi-rôles YEMA — source de vérité = table user_roles (Prisma).
@@ -158,10 +159,15 @@ export async function syncUserMetadata(params: {
         : rolesList[0] ?? "STUDENT";
 
   const admin = adminClient();
-  const { data: current } = await admin.auth.admin.getUserById(supabaseId);
+  const currentResult = await admin.auth.admin.getUserById(supabaseId);
+  assertSupabaseResult(currentResult, "auth.admin.getUserById");
+  const current = currentResult.data;
+  if (!current.user) {
+    throw new SupabaseOperationError("auth.admin.getUserById", "AUTH_USER_NOT_FOUND");
+  }
   const existing = (current?.user?.app_metadata ?? {}) as Record<string, unknown>;
 
-  await admin.auth.admin.updateUserById(supabaseId, {
+  const updateResult = await admin.auth.admin.updateUserById(supabaseId, {
     app_metadata: {
       ...existing,
       roles: rolesList,
@@ -169,4 +175,5 @@ export async function syncUserMetadata(params: {
       active_space: chosenActive,
     },
   });
+  assertSupabaseResult(updateResult, "auth.admin.updateUserById");
 }

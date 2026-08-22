@@ -57,6 +57,17 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     expect(monde).not.toContain('startPoint === "test" ? "/test-niveau" : "/onboarding"');
   });
 
+  it("fails closed when Supabase refuses onboarding metadata writes", () => {
+    const persona = read("src/app/api/onboarding/persona/route.ts");
+    const complete = read("src/app/api/onboarding/complete/route.ts");
+    const roles = read("src/lib/roles.ts");
+
+    expect(persona).toContain("assertSupabaseResult(result");
+    expect(complete).toContain("assertSupabaseResult(metadataResult");
+    expect(roles).toContain("assertSupabaseResult(currentResult");
+    expect(roles).toContain("assertSupabaseResult(updateResult");
+  });
+
   it("offers six public adult personas while keeping Super Admin non-self-service", () => {
     const page = read("src/app/[locale]/onboarding/persona/page.tsx");
     const route = read("src/app/api/onboarding/persona/route.ts");
