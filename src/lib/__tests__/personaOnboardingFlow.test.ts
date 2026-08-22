@@ -35,6 +35,15 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     expect(complete).toContain("/login?next=");
   });
 
+  it("keeps the prepared journey when confirmation email is resent from login", () => {
+    const login = read("src/app/[locale]/login/page.tsx");
+
+    expect(login).toContain('supabase.auth.resend({');
+    expect(login).toContain('email: normalizedEmail');
+    expect(login).toContain('emailRedirectTo: `${window.location.origin}/auth/callback?next=');
+    expect(login).toContain("encodeURIComponent(safeNext)");
+  });
+
   it("offers six public adult personas while keeping Super Admin non-self-service", () => {
     const page = read("src/app/[locale]/onboarding/persona/page.tsx");
     const route = read("src/app/api/onboarding/persona/route.ts");

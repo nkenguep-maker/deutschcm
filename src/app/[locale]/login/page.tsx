@@ -115,12 +115,19 @@ export default function LoginPage() {
   }
 
   async function handleResendConfirmation() {
-    if (!email) return;
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) return;
     setResendState("sending");
     try {
       const supabase = createClient();
       const { error: resendError } = await withTimeout(
-        supabase.auth.resend({ type: "signup", email }),
+        supabase.auth.resend({
+          type: "signup",
+          email: normalizedEmail,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`,
+          },
+        }),
         10_000,
       );
       setResendState(resendError ? "error" : "sent");
