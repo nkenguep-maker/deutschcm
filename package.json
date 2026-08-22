@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:a11y-responsive:p1": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag off -- npx playwright test -c playwright.lot-3m-mobile.config.ts",
+    "test:open-beta-signup:p1": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag off -- node scripts/test-open-beta-signup-p1.mjs",
     "test:e2e:b2:build": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag on -- npm run build",
     "test:e2e:b2": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag on -- node scripts/orchestrate-e2e-b2-p1.mjs --flag on",
     "test:e2e:b2:flag-off": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag off -- node scripts/orchestrate-e2e-b2-p1.mjs --flag off",
