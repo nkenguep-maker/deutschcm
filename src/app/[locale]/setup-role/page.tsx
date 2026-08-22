@@ -55,8 +55,8 @@ export default function SetupRolePage() {
           </h1>
           <p className="lonboard-sub">
             {locale === "en"
-              ? "Teacher and center roles are granted through a verified invitation during the closed beta."
-              : "Pendant la bêta fermée, les rôles Enseignant et Centre sont accordés par invitation vérifiée."}
+              ? "Teacher and center roles are granted after a verified application."
+              : "Les rôles Enseignant et Centre sont accordés après vérification de la demande."}
           </p>
 
           {error ? <div className="lonboard-error" role="alert">{error}</div> : null}

@@ -11,4 +11,16 @@ describe("setup-role authentication boundary", () => {
     expect(publicRoutes).not.toContain('"/setup-role"');
     expect(source).toContain('if (canonicalPath === "/setup-role") return response');
   });
+
+  it("describes verified role applications without closed-beta copy", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/app/[locale]/setup-role/page.tsx"),
+      "utf8",
+    );
+
+    expect(source).not.toContain("bêta fermée");
+    expect(source).not.toContain("closed beta");
+    expect(source).toContain("après vérification de la demande");
+    expect(source).toContain("after a verified application");
+  });
 });
