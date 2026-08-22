@@ -4,6 +4,10 @@ import { describe, expect, it } from "vitest";
 import { toMinorUnits } from "@/lib/payments/money";
 
 const seed = readFileSync(resolve(__dirname, "../../../prisma/seed.ts"), "utf8");
+const paymentSimulator = readFileSync(
+  resolve(__dirname, "../../app/api/internal-test/simulate-payment/route.ts"),
+  "utf8",
+);
 
 describe("payment money contract", () => {
   it("stores EUR catalogue amounts in cents", () => {
@@ -36,5 +40,12 @@ describe("payment money contract", () => {
     expect(seed).toContain("AFRICAN_FAMILY");
     expect(seed).toContain("RACINES_COACH_ADDON");
     expect(seed).toMatch(/code: "ROOTS_FOLLOWUP_ADDON"[\s\S]*isActive: RACINES_COACH_OPERATIONAL/);
+  });
+
+  it("uses the same minor-unit conversion in internal payment simulations", () => {
+    expect(paymentSimulator).toContain('import { toMinorUnits } from "@/lib/payments/money"');
+    expect(paymentSimulator).toMatch(/WORLD_PASSAGE_PRICES[\s\S]*toMinorUnits|toMinorUnits[\s\S]*WORLD_PASSAGE_PRICES/);
+    expect(paymentSimulator).toMatch(/WORLD_TEACHER_ADD[\s\S]*toMinorUnits|toMinorUnits[\s\S]*WORLD_TEACHER_ADD/);
+    expect(paymentSimulator).not.toContain("Math.round(value * 100)");
   });
 });
