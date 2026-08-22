@@ -25,6 +25,10 @@ const PUBLIC_PAGES = [
   { name: "register-fr", path: "/fr/register" },
   { name: "pre-onboarding-fr", path: "/fr/pre-onboarding" },
   { name: "beta-fr", path: "/fr/beta" },
+  { name: "terms-fr", path: "/fr/terms" },
+  { name: "terms-en", path: "/en/terms" },
+  { name: "privacy-fr", path: "/fr/privacy" },
+  { name: "privacy-en", path: "/en/privacy" },
 ];
 
 const ACCESSIBILITY_VIEWPORTS = [
