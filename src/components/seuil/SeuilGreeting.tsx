@@ -3,10 +3,10 @@
 // SeuilGreeting — les langues murmurent dans les murs du seuil.
 //
 // Chaque emplacement (slot) a sa propre vie autonome, décalée des
-// autres. Elles n'apparaissent JAMAIS ensemble : l'une émerge, une
-// autre est déjà pleine, une troisième s'efface, une quatrième est
-// endormie. Cycle de 12s par slot, offset -3s entre chaque, pour un
-// souffle continu autour de la séquence centrale.
+// autres. Selon le nombre de slots, une ou deux voix sont déjà lisibles
+// au premier paint pendant que les autres restent endormies. Cycle de
+// 12s par slot, réparti régulièrement pour un souffle continu autour de
+// la séquence centrale.
 //
 // Le cycle CSS gère l'apparition/vie/effacement. Le JS n'incrémente
 // que le mot affiché à chaque itération d'animation (via
@@ -72,6 +72,10 @@ const POSITIONS = ["p0", "p1", "p2", "p3"] as const;
  *  d'une seule salutation. Le prod ne change pas — CSS var --seuil-greet-cycle
  *  doit rester en phase avec ce nombre. */
 const CYCLE_MS = 12000;
+
+export function greetingAnimationDelay(slot: number, slotCount: number): number {
+  return -Math.round(((slot + 1) * CYCLE_MS) / (slotCount + 1));
+}
 
 export function SeuilGreetings({
   locale,
@@ -163,10 +167,10 @@ export function SeuilGreetings({
         // Le pool peut changer quand l'utilisateur passe de l'univers commun
         // à Monde ou Racines. L'index précédent reste alors borné au pool actif.
         const item = items[wordIdx[i] % items.length];
-        // Chaque slot démarre son cycle à un point différent.
-        // Offset négatif = déjà en cours au mount → un est en
-        // émergence, un en vie, un en effacement, un endormi.
-        const offset = -Math.round((i * CYCLE_MS) / slotCount);
+        // Le premier slot démarre dans la phase visible pour éviter qu'une
+        // salutation tardive devienne le LCP; les autres restent répartis
+        // sur le reste du cycle.
+        const offset = greetingAnimationDelay(i, slotCount);
         const style: React.CSSProperties = reduced
           ? {}
           : { animationDelay: `${offset}ms` };

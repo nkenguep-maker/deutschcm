@@ -7332,6 +7332,7 @@ body:has(.test-space-bar) { padding-top: 34px; }
   cursor: default;
 }
 .seuil-greetings-entry .seuil-greeting-word {
+  font-family: Georgia, serif;
   text-shadow: 0 2px 22px rgba(15, 11, 7, 0.48);
 }
 .entry-universe-racines .seuil-greetings-entry .seuil-greeting-word {
