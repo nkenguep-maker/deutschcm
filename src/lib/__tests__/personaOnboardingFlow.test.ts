@@ -22,15 +22,20 @@ describe("canonical registration → onboarding → persona home funnel", () => 
   });
 
   it("redirects a prepared pre-confirmation journey instead of leaving the user stuck", () => {
+    const register = read("src/app/[locale]/register/page.tsx");
     const persona = read("src/app/[locale]/onboarding/persona/page.tsx");
     const complete = read("src/app/[locale]/pre-onboarding/complete/page.tsx");
-    const draftSave = persona.indexOf("window.localStorage.setItem(");
+    const draftSave = persona.indexOf("createPreconfirmationJourneyDraft");
     const completionRedirect = persona.indexOf('router.replace(`/pre-onboarding/complete');
 
     expect(draftSave).toBeGreaterThan(-1);
     expect(completionRedirect).toBeGreaterThan(draftSave);
+    expect(register).toContain("createPreconfirmationIdentity(data.user.id)");
+    expect(persona).toContain("parsePreconfirmationJourneyDraft(raw, data.user.id)");
+    expect(persona).toContain("clearPreconfirmationStorage()");
     expect(complete).toContain("confirm your email address");
     expect(complete).toContain("Confirmez maintenant votre adresse e-mail");
+    expect(complete).toContain("enregistré sur cet appareil pendant sept jours");
     expect(complete).toContain("/onboarding/persona");
     expect(complete).toContain("/login?next=");
   });

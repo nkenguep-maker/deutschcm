@@ -11,6 +11,11 @@ import { BrandY } from "@/components/brand/BrandY";
 import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import { classifyAuthError, withTimeout, type AuthErrorKey } from "@/lib/authErrors";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
+import {
+  createPreconfirmationIdentity,
+  PRECONFIRMATION_DRAFT_KEY,
+  PRECONFIRMATION_IDENTITY_KEY,
+} from "@/lib/preconfirmationJourney";
 
 type Universe = "monde" | "racines";
 
@@ -121,6 +126,15 @@ function isEmailLike(value: string): boolean {
 async function getSupabaseClient() {
   const { createClient } = await import("@/lib/supabase/client");
   return createClient();
+}
+
+function clearPreconfirmationStorage() {
+  try {
+    window.localStorage.removeItem(PRECONFIRMATION_DRAFT_KEY);
+    window.localStorage.removeItem(PRECONFIRMATION_IDENTITY_KEY);
+  } catch {
+    // Registration must remain available when browser storage is disabled.
+  }
 }
 
 export default function RegisterPage() {
@@ -234,6 +248,7 @@ export default function RegisterPage() {
       }
 
       if (data.session) {
+        clearPreconfirmationStorage();
         const syncResponse = await fetch("/api/auth/sync", { method: "POST" });
         if (!syncResponse.ok) {
           await supabase.auth.signOut();
@@ -246,6 +261,17 @@ export default function RegisterPage() {
         return;
       }
 
+      if (data.user?.id) {
+        try {
+          window.localStorage.removeItem(PRECONFIRMATION_DRAFT_KEY);
+          window.localStorage.setItem(
+            PRECONFIRMATION_IDENTITY_KEY,
+            JSON.stringify(createPreconfirmationIdentity(data.user.id)),
+          );
+        } catch {
+          // The confirmation flow still works without same-device draft recovery.
+        }
+      }
       setSuccess(true);
     } catch (registerError) {
       setError(errorFromKey(classifyAuthError(registerError)));
@@ -336,7 +362,15 @@ export default function RegisterPage() {
                 >
                   {t(resendState === "sending" ? c.resending : c.resend)}
                 </button>
-                <button type="button" className="entry-cta entry-cta-ghost" onClick={() => { setResendState("idle"); setSuccess(false); }}>
+                <button
+                  type="button"
+                  className="entry-cta entry-cta-ghost"
+                  onClick={() => {
+                    clearPreconfirmationStorage();
+                    setResendState("idle");
+                    setSuccess(false);
+                  }}
+                >
                   {t(c.successChangeEmail)}
                 </button>
               </div>

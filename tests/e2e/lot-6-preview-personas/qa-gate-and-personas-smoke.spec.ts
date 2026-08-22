@@ -94,10 +94,20 @@ test("preconfirmation onboarding records a World journey without authentication"
   await expect(page.getByRole("heading", { name: "À quoi doit vous servir cette langue ?" })).toBeVisible();
   await page.getByRole("button", { name: /Voyager/ }).click();
 
-  await expect(page.getByRole("status")).toContainText("Voyager est prêt");
-  await expect.poll(() => page.evaluate(() => localStorage.getItem("yema.preconfirmation.journey"))).toBe(
-    JSON.stringify({ persona: "student_monde", pathwayVariant: "TOURISM", languageId: "deutsch" }),
-  );
+  await expect(page).toHaveURL(/\/fr\/pre-onboarding\/complete$/);
+  await expect(page.getByRole("heading", { name: "Votre parcours est prêt." })).toBeVisible();
+  const worldDraft = await page.evaluate(() => {
+    const raw = localStorage.getItem("yema.preconfirmation.journey");
+    return raw ? JSON.parse(raw) : null;
+  });
+  expect(worldDraft).toMatchObject({
+    version: 1,
+    authUserId: null,
+    persona: "student_monde",
+    pathwayVariant: "TOURISM",
+    languageId: "deutsch",
+  });
+  expect(typeof worldDraft?.createdAt).toBe("number");
 });
 
 test("preconfirmation onboarding records a Roots family journey and keeps coming languages unavailable", async ({ page }) => {
@@ -111,10 +121,19 @@ test("preconfirmation onboarding records a Roots family journey and keeps coming
   await expect(page.getByRole("heading", { name: "Pour qui commence ce parcours ?" })).toBeVisible();
   await page.getByRole("button", { name: /Pour ma famille/ }).click();
 
-  await expect(page.getByRole("status")).toContainText("Pour ma famille est prêt");
-  await expect.poll(() => page.evaluate(() => localStorage.getItem("yema.preconfirmation.journey"))).toBe(
-    JSON.stringify({ persona: "family", languageId: "wolof" }),
-  );
+  await expect(page).toHaveURL(/\/fr\/pre-onboarding\/complete$/);
+  await expect(page.getByRole("heading", { name: "Votre parcours est prêt." })).toBeVisible();
+  const rootsDraft = await page.evaluate(() => {
+    const raw = localStorage.getItem("yema.preconfirmation.journey");
+    return raw ? JSON.parse(raw) : null;
+  });
+  expect(rootsDraft).toMatchObject({
+    version: 1,
+    authUserId: null,
+    persona: "family",
+    languageId: "wolof",
+  });
+  expect(typeof rootsDraft?.createdAt).toBe("number");
 });
 
 test.describe("QA endpoints · gate 404 stable", () => {

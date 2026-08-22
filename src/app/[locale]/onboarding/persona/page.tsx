@@ -24,11 +24,17 @@ import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
 import { FOREIGN, NATIVE } from "@/lib/languages";
 import type { AdultPersonaId } from "@/lib/personas/runtime";
+import {
+  createPreconfirmationJourneyDraft,
+  parsePreconfirmationIdentity,
+  parsePreconfirmationJourneyDraft,
+  PRECONFIRMATION_DRAFT_KEY,
+  PRECONFIRMATION_IDENTITY_KEY,
+} from "@/lib/preconfirmationJourney";
 
 type Stage = "start" | "world-language" | "world" | "roots-language" | "roots" | "professional";
 type PathwayVariant = "STUDIES" | "VISA" | "NATURALIZATION" | "TOURISM";
 type LearningLanguageId = "deutsch" | "wolof";
-const PRECONFIRMATION_DRAFT_KEY = "yema.preconfirmation.journey";
 
 type Card = {
   id: string;
@@ -279,6 +285,15 @@ function cardFromPreconfirmationDraft(value: unknown): { card: Card; languageId:
   return { card, languageId };
 }
 
+function clearPreconfirmationStorage() {
+  try {
+    window.localStorage.removeItem(PRECONFIRMATION_DRAFT_KEY);
+    window.localStorage.removeItem(PRECONFIRMATION_IDENTITY_KEY);
+  } catch {
+    // Onboarding remains usable when browser storage is disabled.
+  }
+}
+
 function copyFor(stage: Stage, locale: "fr" | "en") {
   const english = locale === "en";
   if (stage === "world-language") {
@@ -340,19 +355,37 @@ export default function PersonaOnboardingPage() {
 
   useEffect(() => {
     if (selectionMode !== "live" || preconfirmationReplayRef.current) return;
-    try {
-      const raw = window.localStorage.getItem(PRECONFIRMATION_DRAFT_KEY);
-      if (!raw) return;
-      const draft = cardFromPreconfirmationDraft(JSON.parse(raw));
-      if (!draft) {
-        window.localStorage.removeItem(PRECONFIRMATION_DRAFT_KEY);
+    let cancelled = false;
+
+    async function replayOwnedDraft() {
+      let raw: string | null;
+      try {
+        raw = window.localStorage.getItem(PRECONFIRMATION_DRAFT_KEY);
+      } catch {
         return;
       }
-      preconfirmationReplayRef.current = true;
-      void choose(draft.card, draft.languageId);
-    } catch {
-      window.localStorage.removeItem(PRECONFIRMATION_DRAFT_KEY);
+      if (!raw) return;
+
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const { data, error: userError } = await createClient().auth.getUser();
+        if (cancelled || userError || !data.user) return;
+
+        const ownedDraft = parsePreconfirmationJourneyDraft(raw, data.user.id);
+        const selection = ownedDraft ? cardFromPreconfirmationDraft(ownedDraft) : null;
+        if (!selection) {
+          clearPreconfirmationStorage();
+          return;
+        }
+        preconfirmationReplayRef.current = true;
+        void choose(selection.card, selection.languageId);
+      } catch {
+        // A transient Auth failure must not destroy a valid local draft.
+      }
     }
+
+    void replayOwnedDraft();
+    return () => { cancelled = true; };
     // The draft is intentionally replayed only when this mode mounts.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectionMode]);
@@ -376,10 +409,19 @@ export default function PersonaOnboardingPage() {
     }
 
     if (preconfirmation) {
-      window.localStorage.setItem(
-        PRECONFIRMATION_DRAFT_KEY,
-        JSON.stringify({ persona: card.persona, pathwayVariant: card.pathwayVariant, languageId }),
-      );
+      try {
+        const identity = parsePreconfirmationIdentity(
+          window.localStorage.getItem(PRECONFIRMATION_IDENTITY_KEY),
+        );
+        const draft = createPreconfirmationJourneyDraft(identity, {
+          persona: card.persona,
+          pathwayVariant: card.pathwayVariant,
+          languageId,
+        });
+        window.localStorage.setItem(PRECONFIRMATION_DRAFT_KEY, JSON.stringify(draft));
+      } catch {
+        // Continue to confirmation even if this browser blocks local storage.
+      }
 
       const completionParams = new URLSearchParams();
       if (selectedPlan) completionParams.set("plan", selectedPlan);
@@ -416,7 +458,7 @@ export default function PersonaOnboardingPage() {
       if (!response.ok || typeof data.redirectTo !== "string") {
         throw new Error("persona_selection_failed");
       }
-      window.localStorage.removeItem(PRECONFIRMATION_DRAFT_KEY);
+      clearPreconfirmationStorage();
       router.push(data.redirectTo);
       router.refresh();
     } catch {
