@@ -133,9 +133,7 @@ export function OnboardingMondeForm() {
       // sont trop ambigus pour choisir automatiquement une nouvelle variante.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       if (isPathwayChoice(d.why)) setWhy(d.why);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (d.startPoint) setStartPoint(d.startPoint);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (d.step === 2) setStep(2);
     } catch { /* draft corrompu, on ignore */ }
   }, []);
@@ -239,8 +237,15 @@ export function OnboardingMondeForm() {
       if (ocRes.status === 401) { showError("session_expired"); return; }
       if (!ocRes.ok) { showError("finish_error"); return; }
 
+      const ocBody = await ocRes.json().catch(() => ({} as {
+        redirectTo?: string;
+        postOnboardingRedirectApplied?: boolean;
+      }));
       clearDraft();
-      const dest = startPoint === "test" ? "/test-niveau" : "/onboarding";
+      const apiDestination = typeof ocBody.redirectTo === "string" ? ocBody.redirectTo : "/dashboard";
+      const dest = !ocBody.postOnboardingRedirectApplied && startPoint === "test"
+        ? "/test-niveau"
+        : apiDestination;
       router.push(dest);
       router.refresh();
     } catch (err) {

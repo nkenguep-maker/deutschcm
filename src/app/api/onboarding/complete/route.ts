@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { reconcileDbUser } from "@/lib/reconcileDbUser";
+import { sanitizeOptionalInternalNext } from "@/lib/authRedirect";
 import { hasActiveRole, markRoleOnboarded, syncUserMetadata, type SpaceRole } from "@/lib/roles";
 import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 import { isAdultPersonaId, resolvePersonaRuntime, type AdultPersonaId } from "@/lib/personas/runtime";
@@ -30,6 +31,7 @@ export async function POST(req: NextRequest) {
       return err("VALIDATION_ERROR", "Invalid role", 400);
     }
     const persona: AdultPersonaId | null = isAdultPersonaId(body.persona) ? body.persona : null;
+    const rawPostOnboardingNext = profileString(user.user_metadata?.post_onboarding_next);
     const profileData = body.profileData && typeof body.profileData === "object"
       ? body.profileData as Record<string, unknown>
       : {};
@@ -124,6 +126,7 @@ export async function POST(req: NextRequest) {
       ...(typeof body.cap === "string" ? { cap: body.cap } : {}),
       ...(typeof body.personalGoal === "string" ? { personalGoal: body.personalGoal } : {}),
       ...(typeof body.availability === "string" ? { availability: body.availability } : {}),
+      post_onboarding_next: null,
     };
     await supabase.auth.updateUser({ data: metadataPatch });
     await syncUserMetadata({ supabaseId: user.id, activeSpace: effectiveRole });
@@ -132,13 +135,16 @@ export async function POST(req: NextRequest) {
       supabaseId: user.id,
       requestedPersona: persona ?? user.user_metadata?.requested_persona,
     });
-    const redirectTo = runtime.homeRoute;
+    const safePostOnboardingNext = sanitizeOptionalInternalNext(rawPostOnboardingNext);
+    const postOnboardingRedirectApplied = Boolean(safePostOnboardingNext);
+    const redirectTo = safePostOnboardingNext || runtime.homeRoute;
 
     const response = NextResponse.json({
       success: true,
       userId: dbUser.id,
       persona: runtime.persona,
       redirectTo,
+      postOnboardingRedirectApplied,
     });
     response.cookies.set("onboarding_done", "true", { path: "/", maxAge: 2592000, sameSite: "lax" });
     response.cookies.set("active_space", effectiveRole, { path: "/", maxAge: 2592000, sameSite: "lax" });

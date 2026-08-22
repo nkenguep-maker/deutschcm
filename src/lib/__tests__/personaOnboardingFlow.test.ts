@@ -44,6 +44,19 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     expect(login).toContain("encodeURIComponent(safeNext)");
   });
 
+  it("consumes the safe post-onboarding destination and lets Monde honor it", () => {
+    const complete = read("src/app/api/onboarding/complete/route.ts");
+    const monde = read("src/app/[locale]/onboarding/monde/OnboardingMondeForm.tsx");
+
+    expect(complete).toContain("sanitizeOptionalInternalNext(rawPostOnboardingNext)");
+    expect(complete).toContain("post_onboarding_next: null");
+    expect(complete).toContain("postOnboardingRedirectApplied");
+    expect(monde).toContain("postOnboardingRedirectApplied?: boolean");
+    expect(monde).toContain("apiDestination");
+    expect(monde).toContain('startPoint === "test"');
+    expect(monde).not.toContain('startPoint === "test" ? "/test-niveau" : "/onboarding"');
+  });
+
   it("offers six public adult personas while keeping Super Admin non-self-service", () => {
     const page = read("src/app/[locale]/onboarding/persona/page.tsx");
     const route = read("src/app/api/onboarding/persona/route.ts");

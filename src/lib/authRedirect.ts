@@ -18,3 +18,10 @@ export function sanitizeInternalNext(
     return fallback;
   }
 }
+
+export function sanitizeOptionalInternalNext(
+  value: string | null | undefined,
+): string | null {
+  const sanitized = sanitizeInternalNext(value, "");
+  return sanitized || null;
+}
