@@ -31,6 +31,21 @@ describe("Lot 7A.2 · completed EXPIRED retiré", () => {
   });
 });
 
+describe("Dashboard Monde · reprise de cours", () => {
+  const dashboard = read("features/dashboards/student-monde/StudentMondeDashboard.tsx");
+  const overview = read("features/dashboards/student-monde/ivory/MondeIvoryOverview.tsx");
+
+  it("branche le CTA principal sur la prochaine leçon réelle", () => {
+    expect(dashboard).toContain("mondeLessonHref(currentLocale ?? locale, data.nextModule)");
+    expect(dashboard).toContain("resumeHref={courseHref}");
+    expect(overview).toContain("router.push(resumeHref)");
+  });
+
+  it("ne renvoie plus vers l’ancienne route inexistante", () => {
+    expect(overview).not.toContain("/apprentissage");
+  });
+});
+
 describe("Lot 7A.2 · resolveMondePath resserré · zéro faux positif", () => {
   it("valeurs canoniques exactes (STUDIES / WORK / TRAVEL / EXAM / DAILY_LIFE)", () => {
     // Correspondance exacte à un des 5 identifiants canoniques (upper).

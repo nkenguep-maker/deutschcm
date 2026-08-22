@@ -23,6 +23,7 @@ import { CourseSection } from "./sections/CourseSection";
 import { AssignmentsSection } from "./sections/AssignmentsSection";
 import { ClassSection } from "./sections/ClassSection";
 import { MessagesPlaceholderSection } from "./sections/MessagesPlaceholderSection";
+import { mondeCourseHref, mondeLessonHref } from "./courseRoutes";
 import type { AssignmentsAvailability, MondeDashboardData, MondeStudentAssignment } from "./types";
 
 async function fetchJson<T>(url: string): Promise<T> {
@@ -144,11 +145,17 @@ export function StudentMondeDashboard({ locale, activeSectionId = "accueil" }: P
         ? t("studentMonde.access.expired")
         : (currentLocale === "en" ? "Course not open yet" : "Cours pas encore ouvert");
   const accessTone = data.access.status === "ACTIVE" ? "success" as const : data.access.status === "EXPIRED" ? "alert" as const : "muted" as const;
+  const courseHref = data.nextModule
+    ? mondeLessonHref(currentLocale ?? locale, data.nextModule)
+    : mondeCourseHref(currentLocale ?? locale);
 
   // Lot 7A.2: completed is an explicit état pédagogique; an expired
   // entitlement alone must never mark a learner's path as completed.
   const overview = (
-    <MondeIvoryOverview input={{ learningGoal: data.onboarding?.learningGoal ?? null, targetCity: data.onboarding?.targetCity ?? null, targetDate: null, progressPct: data.overallPct ?? 0, completed: false, level: data.learningPath?.currentLevel ?? null }} />
+    <MondeIvoryOverview
+      input={{ learningGoal: data.onboarding?.learningGoal ?? null, targetCity: data.onboarding?.targetCity ?? null, targetDate: null, progressPct: data.overallPct ?? 0, completed: false, level: data.learningPath?.currentLevel ?? null }}
+      resumeHref={courseHref}
+    />
   );
   const content: Record<string, React.ReactNode> = {
     accueil: overview,
