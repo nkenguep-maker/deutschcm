@@ -49,6 +49,13 @@ const AUTH_BOUNDARIES = [
   { path: "/api/center/pending", status: 404 },
 ];
 
+const CALLBACK_FAILURES = [
+  { next: "/fr/onboarding/monde", loginPath: "/fr/login" },
+  { next: "/en/dashboard", loginPath: "/en/login" },
+  { next: "https://attacker.invalid/steal", loginPath: "/login" },
+  { next: "//attacker.invalid/steal", loginPath: "/login" },
+];
+
 const OUT_DIR = "screenshots/lot-6-preview";
 mkdirSync(OUT_DIR, { recursive: true });
 
@@ -166,6 +173,25 @@ test.describe("public auth boundaries · fail closed", () => {
       expect(response.status()).toBe(boundary.status);
       const text = await response.text();
       expect(text).not.toMatch(/SUPABASE_SERVICE_ROLE|SUPABASE_JWT_SECRET|sbp_[a-z0-9]{20,}|sb_secret_[A-Za-z0-9_]{20,}/i);
+    });
+  }
+});
+
+test.describe("auth callback · safe failure redirects", () => {
+  for (const callback of CALLBACK_FAILURES) {
+    test(`keeps next=${callback.next} on YEMA`, async ({ request, baseURL }) => {
+      const response = await request.get(
+        `/auth/callback?next=${encodeURIComponent(callback.next)}`,
+        { maxRedirects: 0 },
+      );
+      expect(response.status()).toBe(307);
+
+      const location = response.headers().location;
+      expect(location).toBeTruthy();
+      const redirect = new URL(location!, baseURL);
+      expect(redirect.origin).toBe(new URL(baseURL!).origin);
+      expect(redirect.pathname).toBe(callback.loginPath);
+      expect(redirect.searchParams.get("error")).toBe("auth_callback_failed");
     });
   }
 });
