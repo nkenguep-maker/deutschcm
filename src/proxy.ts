@@ -28,7 +28,7 @@ const PUBLIC_ROUTES = [
   "/pre-onboarding",
   "/privacy", "/terms", "/landing",
   "/goodbye", "/teacher/goodbye",
-  "/methode", "/histoires", "/manifeste", "/langues", "/enseignants", "/setup-role",
+  "/methode", "/histoires", "/manifeste", "/langues", "/enseignants",
   "/simulateur",
   "/activation",
   "/qa",

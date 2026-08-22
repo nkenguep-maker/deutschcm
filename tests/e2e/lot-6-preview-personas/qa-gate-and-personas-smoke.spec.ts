@@ -195,3 +195,13 @@ test.describe("auth callback · safe failure redirects", () => {
     });
   }
 });
+
+test("role setup requires an authenticated session", async ({ request, baseURL }) => {
+  const response = await request.get("/fr/setup-role", { maxRedirects: 0 });
+  expect(response.status()).toBe(307);
+
+  const redirect = new URL(response.headers().location!, baseURL);
+  expect(redirect.origin).toBe(new URL(baseURL!).origin);
+  expect(redirect.pathname).toBe("/fr/login");
+  expect(redirect.searchParams.get("next")).toBe("/fr/setup-role");
+});
