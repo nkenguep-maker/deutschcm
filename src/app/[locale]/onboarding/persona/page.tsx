@@ -21,6 +21,7 @@ import { useEffect, useRef, useState } from "react";
 import { BrandY } from "@/components/brand/BrandY";
 import { useOnboardingSelectionMode } from "@/components/onboarding/OnboardingPreviewContext";
 import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
+import { sanitizeInternalNext } from "@/lib/authRedirect";
 import { FOREIGN, NATIVE } from "@/lib/languages";
 import type { AdultPersonaId } from "@/lib/personas/runtime";
 
@@ -379,7 +380,19 @@ export default function PersonaOnboardingPage() {
         PRECONFIRMATION_DRAFT_KEY,
         JSON.stringify({ persona: card.persona, pathwayVariant: card.pathwayVariant, languageId }),
       );
-      setPreviewChoice(card);
+
+      const completionParams = new URLSearchParams();
+      if (selectedPlan) completionParams.set("plan", selectedPlan);
+      if (selectedAddon) completionParams.set("addon", selectedAddon);
+      if (teacherAddonRequested) completionParams.set("prof", "1");
+      if (postOnboardingNext) {
+        completionParams.set(
+          "next",
+          sanitizeInternalNext(postOnboardingNext, `/${locale}/dashboard`),
+        );
+      }
+      const completionQuery = completionParams.toString();
+      router.replace(`/pre-onboarding/complete${completionQuery ? `?${completionQuery}` : ""}`);
       return;
     }
 

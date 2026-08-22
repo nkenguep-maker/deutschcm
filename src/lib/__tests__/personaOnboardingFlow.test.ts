@@ -21,6 +21,20 @@ describe("canonical registration → onboarding → persona home funnel", () => 
     expect(register).not.toContain("signUp({ phone:");
   });
 
+  it("redirects a prepared pre-confirmation journey instead of leaving the user stuck", () => {
+    const persona = read("src/app/[locale]/onboarding/persona/page.tsx");
+    const complete = read("src/app/[locale]/pre-onboarding/complete/page.tsx");
+    const draftSave = persona.indexOf("window.localStorage.setItem(");
+    const completionRedirect = persona.indexOf('router.replace(`/pre-onboarding/complete');
+
+    expect(draftSave).toBeGreaterThan(-1);
+    expect(completionRedirect).toBeGreaterThan(draftSave);
+    expect(complete).toContain("confirm your email address");
+    expect(complete).toContain("Confirmez maintenant votre adresse e-mail");
+    expect(complete).toContain("/onboarding/persona");
+    expect(complete).toContain("/login?next=");
+  });
+
   it("offers six public adult personas while keeping Super Admin non-self-service", () => {
     const page = read("src/app/[locale]/onboarding/persona/page.tsx");
     const route = read("src/app/api/onboarding/persona/route.ts");

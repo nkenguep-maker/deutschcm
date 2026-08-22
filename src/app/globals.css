@@ -14477,6 +14477,11 @@ body:has(.pricing-universe-racines) { /* pas de bg body si scope contenu */ }
 }
 
 .entry-success { text-align: center; padding: 20px 0; }
+.entry-success-icon {
+  display: block;
+  margin: 0 auto 18px;
+  color: var(--brass);
+}
 .entry-success-actions { display: grid; gap: 10px; margin-top: 28px; }
 .entry-success-help {
   margin: 12px 0 0;
