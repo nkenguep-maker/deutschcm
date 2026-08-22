@@ -41,6 +41,14 @@ const QA_ENDPOINTS = [
   "/api/qa/child-session?child=racines",
 ];
 
+const AUTH_BOUNDARIES = [
+  { path: "/api/notifications", status: 401 },
+  { path: "/api/social", status: 401 },
+  { path: "/api/messaging/inbox", status: 404 },
+  { path: "/api/admin/applications", status: 403 },
+  { path: "/api/center/pending", status: 404 },
+];
+
 const OUT_DIR = "screenshots/lot-6-preview";
 mkdirSync(OUT_DIR, { recursive: true });
 
@@ -147,6 +155,17 @@ test.describe("QA endpoints · gate 404 stable", () => {
       const text = await resp.text();
       const forbidden = /SUPABASE_SERVICE_ROLE|SUPABASE_JWT_SECRET|sbp_[a-z0-9]{20,}|sb_secret_[A-Za-z0-9_]{20,}/i;
       expect(forbidden.test(text), `secret leak in body of ${url}`).toBe(false);
+    });
+  }
+});
+
+test.describe("public auth boundaries · fail closed", () => {
+  for (const boundary of AUTH_BOUNDARIES) {
+    test(`GET ${boundary.path} refuse une session anonyme`, async ({ request }) => {
+      const response = await request.get(boundary.path);
+      expect(response.status()).toBe(boundary.status);
+      const text = await response.text();
+      expect(text).not.toMatch(/SUPABASE_SERVICE_ROLE|SUPABASE_JWT_SECRET|sbp_[a-z0-9]{20,}|sb_secret_[A-Za-z0-9_]{20,}/i);
     });
   }
 });
