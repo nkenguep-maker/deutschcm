@@ -20,4 +20,10 @@ describe("registration confirmation resend cooldown", () => {
     expect(source).toContain("setResendCooldown((seconds) => Math.max(0, seconds - 1))");
     expect(source).toContain("setResendCooldown(0)");
   });
+
+  it("moves keyboard focus to registration errors", () => {
+    expect(source).toContain("const errorRef = useRef<HTMLParagraphElement>(null)");
+    expect(source).toContain("if (error) errorRef.current?.focus()");
+    expect(source).toContain('ref={errorRef} className="entry-err" role="alert" tabIndex={-1}');
+  });
 });

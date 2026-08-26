@@ -185,6 +185,7 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false);
   const [resendState, setResendState] = useState<"idle" | "sending" | "sent" | "rate_limited" | "error">("idle");
   const [resendCooldown, setResendCooldown] = useState(0);
+  const errorRef = useRef<HTMLParagraphElement>(null);
   const successHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const errorFromKey = (key: AuthErrorKey): string => t(tErr(key));
@@ -199,6 +200,10 @@ export default function RegisterPage() {
   useEffect(() => {
     if (success) successHeadingRef.current?.focus();
   }, [success]);
+
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
 
   useEffect(() => {
     if (resendCooldown <= 0) return;
@@ -455,7 +460,11 @@ export default function RegisterPage() {
                   <span className="entry-field-hint">{t(c.passwordHint)}</span>
                 </label>
 
-                {error ? <p className="entry-err" role="alert">{error}</p> : null}
+                {error ? (
+                  <p ref={errorRef} className="entry-err" role="alert" tabIndex={-1}>
+                    {error}
+                  </p>
+                ) : null}
                 <button type="submit" className="entry-cta entry-cta-primary" disabled={loading}>
                   {loading ? t(c.loading) : t(c.submit)}
                 </button>

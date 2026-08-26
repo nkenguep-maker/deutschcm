@@ -107,16 +107,19 @@ test("registration validates identity fields before contacting Supabase", async 
   await page.goto("/fr/register", { waitUntil: "load", timeout: 30_000 });
   await page.getByRole("button", { name: "Créer mon compte" }).click();
   await expect(page.locator(".entry-err")).toContainText("Renseignez votre prénom et votre nom");
+  await expect(page.locator(".entry-err")).toBeFocused();
 
   await page.getByLabel("Prénom", { exact: true }).fill("Ada");
   await page.getByLabel("Nom", { exact: true }).fill("Lovelace");
   await page.getByRole("button", { name: "Créer mon compte" }).click();
   await expect(page.locator(".entry-err")).toContainText("Entrez une adresse e-mail valide");
+  await expect(page.locator(".entry-err")).toBeFocused();
 
   await page.getByLabel("E-mail", { exact: true }).fill("ada@example.invalid");
   await page.locator('input[autocomplete="new-password"]').fill("short");
   await page.getByRole("button", { name: "Créer mon compte" }).click();
   await expect(page.locator(".entry-err")).toContainText("au moins huit caractères");
+  await expect(page.locator(".entry-err")).toBeFocused();
   expect(signupRequests).toHaveLength(0);
 });
 
