@@ -4,6 +4,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { chromium } from "playwright";
+import { findAuthUserId } from "./lib/find-auth-user-id.mjs";
 
 const P1_REF = "kzzagbojjkivdzzcrmxn";
 const FORBIDDEN_REFS = [
@@ -79,12 +80,6 @@ async function loadedBundleEvidence(page) {
     containsSupabaseHost ||= body.includes(".supabase.co");
   }
   return { containsP1Ref, containsSupabaseHost };
-}
-
-async function findAuthUserId(admin, email) {
-  const { data, error } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
-  if (error) throw error;
-  return data.users.find((user) => user.email?.toLowerCase() === email)?.id ?? null;
 }
 
 async function main() {
