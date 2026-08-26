@@ -39,6 +39,7 @@ const VALID_PLANS = new Set<SelectedPlan>([
 ]);
 
 const GOOGLE_AUTH_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true";
+const RESEND_COOLDOWN_SECONDS = 60;
 
 function parseSelectedPlan(value: string | null): SelectedPlan | null {
   return value && VALID_PLANS.has(value as SelectedPlan) ? value as SelectedPlan : null;
@@ -76,6 +77,7 @@ const COPY = {
     successChangeEmail: "Corriger mon adresse",
     resend: "Renvoyer l’e-mail de confirmation",
     resending: "Nouvel envoi en cours…",
+    resendCooldown: (seconds: number) => `Renvoyer dans ${seconds} s`,
     resendHelp: "Regardez aussi dans les indésirables.",
     resendSent: "Un nouveau lien a été demandé. Vérifiez votre boîte de réception.",
     resendRateLimited: "Trop de demandes pour le moment. Attendez un peu avant de réessayer.",
@@ -112,6 +114,7 @@ const COPY = {
     successChangeEmail: "Correct my email",
     resend: "Resend confirmation email",
     resending: "Requesting a new email…",
+    resendCooldown: (seconds: number) => `Resend in ${seconds}s`,
     resendHelp: "Please check your spam folder too.",
     resendSent: "A new link was requested. Check your inbox.",
     resendRateLimited: "Too many requests for now. Please wait a little before trying again.",
@@ -181,6 +184,7 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [resendState, setResendState] = useState<"idle" | "sending" | "sent" | "rate_limited" | "error">("idle");
+  const [resendCooldown, setResendCooldown] = useState(0);
   const successHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const errorFromKey = (key: AuthErrorKey): string => t(tErr(key));
@@ -195,6 +199,15 @@ export default function RegisterPage() {
   useEffect(() => {
     if (success) successHeadingRef.current?.focus();
   }, [success]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timeout = window.setTimeout(
+      () => setResendCooldown((seconds) => Math.max(0, seconds - 1)),
+      1_000,
+    );
+    return () => window.clearTimeout(timeout);
+  }, [resendCooldown]);
 
   async function handleRegister(event: React.FormEvent) {
     event.preventDefault();
@@ -302,6 +315,7 @@ export default function RegisterPage() {
   }
 
   async function handleResendConfirmation() {
+    if (resendCooldown > 0 || resendState === "sending") return;
     const normalizedEmail = email.trim().toLowerCase();
     if (!isEmailLike(normalizedEmail)) return;
 
@@ -318,12 +332,17 @@ export default function RegisterPage() {
         }),
       );
       if (resendError) {
-        setResendState(classifyAuthError(resendError) === "rate_limited" ? "rate_limited" : "error");
+        const nextState = classifyAuthError(resendError) === "rate_limited" ? "rate_limited" : "error";
+        setResendState(nextState);
+        if (nextState === "rate_limited") setResendCooldown(RESEND_COOLDOWN_SECONDS);
         return;
       }
       setResendState("sent");
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
     } catch (resendError) {
-      setResendState(classifyAuthError(resendError) === "rate_limited" ? "rate_limited" : "error");
+      const nextState = classifyAuthError(resendError) === "rate_limited" ? "rate_limited" : "error";
+      setResendState(nextState);
+      if (nextState === "rate_limited") setResendCooldown(RESEND_COOLDOWN_SECONDS);
     }
   }
 
@@ -358,9 +377,15 @@ export default function RegisterPage() {
                   type="button"
                   className="entry-cta entry-cta-ghost"
                   onClick={handleResendConfirmation}
-                  disabled={resendState === "sending"}
+                  disabled={resendState === "sending" || resendCooldown > 0}
                 >
-                  {t(resendState === "sending" ? c.resending : c.resend)}
+                  {t(
+                    resendState === "sending"
+                      ? c.resending
+                      : resendCooldown > 0
+                        ? c.resendCooldown(resendCooldown)
+                        : c.resend,
+                  )}
                 </button>
                 <button
                   type="button"
@@ -368,6 +393,7 @@ export default function RegisterPage() {
                   onClick={() => {
                     clearPreconfirmationStorage();
                     setResendState("idle");
+                    setResendCooldown(0);
                     setSuccess(false);
                   }}
                 >
