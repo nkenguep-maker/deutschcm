@@ -52,8 +52,16 @@ export default async function OnboardingRouterPage({ params }: Props) {
   });
 
   if (dbUser) {
+    const selectedUniverse =
+      runtime.persona === "student_monde" || runtime.persona === "student_racines"
+        ? runtime.universe
+        : null;
     const path = await prisma.learningPath.findFirst({
-      where: { userId: dbUser.id, status: "ACTIVE" },
+      where: {
+        userId: dbUser.id,
+        status: "ACTIVE",
+        ...(selectedUniverse ? { universe: selectedUniverse } : {}),
+      },
       orderBy: { createdAt: "desc" },
     });
 
