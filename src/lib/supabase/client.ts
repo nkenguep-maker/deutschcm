@@ -33,7 +33,7 @@ export function createClient() {
     const password = "password" in credentials && typeof credentials.password === "string"
       ? credentials.password
       : "";
-    const metadata = credentials.options?.data ?? {};
+    const metadata = (credentials.options?.data ?? {}) as Record<string, unknown>;
     const firstName = typeof metadata.first_name === "string" ? metadata.first_name : "";
     const lastName = typeof metadata.last_name === "string" ? metadata.last_name : "";
 
