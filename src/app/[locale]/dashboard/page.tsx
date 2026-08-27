@@ -116,14 +116,23 @@ export default async function DashboardPage({ params }: Props) {
   const rawPersona = jar.get(INTERNAL_TEST_COOKIE_NAME)?.value;
   const persona = isInternalPersonaId(rawPersona) ? rawPersona : null;
   const internalOwner = isInternalTesterEmail(user.email);
-  const requestedUniverse =
+  const internalRequestedUniverse =
     internalOwner && persona === "student_monde" ? "MONDE" :
     internalOwner && persona === "student_racines" ? "RACINES" :
     null;
+  const runtimeUniverse =
+    runtime.persona === "student_monde" || runtime.persona === "student_racines"
+      ? runtime.universe
+      : null;
+  const requestedUniverse = internalRequestedUniverse ?? runtimeUniverse;
+  const internalSelection = internalRequestedUniverse !== null;
 
   const lp = requestedUniverse
-    ? paths.find((path) => path.universe === requestedUniverse && hasInternalTestMarker(path.onboardingAnswers))
-      ?? paths.find((path) => path.universe === requestedUniverse)
+    ? internalSelection
+      ? paths.find((path) => path.universe === requestedUniverse && hasInternalTestMarker(path.onboardingAnswers))
+        ?? paths.find((path) => path.universe === requestedUniverse)
+      : paths.find((path) => path.universe === requestedUniverse && !hasInternalTestMarker(path.onboardingAnswers))
+        ?? paths.find((path) => path.universe === requestedUniverse)
     : paths.find((path) => !hasInternalTestMarker(path.onboardingAnswers)) ?? paths[0];
 
   if (!lp) { redirect({ href: "/onboarding/persona", locale }); return null; }
