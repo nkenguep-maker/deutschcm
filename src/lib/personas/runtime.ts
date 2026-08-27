@@ -63,7 +63,6 @@ export async function resolvePersonaRuntime(params: {
       learningPaths: {
         where: { status: "ACTIVE" },
         orderBy: { createdAt: "desc" },
-        take: 1,
         select: { universe: true },
       },
     },
@@ -81,8 +80,14 @@ export async function resolvePersonaRuntime(params: {
 
   const roleMap = new Map(user.userRoles.map((r) => [r.role, r.onboarded] as const));
   const appRoles = new Set(user.appRoles.map((r) => r.role));
+  const activeUniverses = new Set(user.learningPaths.map((path) => path.universe));
   const latestUniverse = user.learningPaths[0]?.universe ?? null;
+  const requested = isAdultPersonaId(params.requestedPersona)
+    ? params.requestedPersona
+    : null;
 
+  // Privileged/professional spaces are derived from trusted DB roles only.
+  // requested_persona is never enough to grant access to these surfaces.
   if (roleMap.has("ADMIN")) {
     return {
       persona: "super_admin",
@@ -126,6 +131,33 @@ export async function resolvePersonaRuntime(params: {
     };
   }
 
+  // A learner may legitimately own both Monde and Racines LearningPaths.
+  // In that case the explicitly selected learner persona is the active space;
+  // creation time must never decide which dashboard opens.
+  if (requested === "student_monde") {
+    const hasPath = activeUniverses.has("MONDE");
+    const onboarded = hasPath && (roleMap.get("STUDENT") === true || user.onboardingDone);
+    return {
+      persona: "student_monde",
+      homeRoute: "/dashboard",
+      onboardingRoute: onboarded ? "/dashboard" : "/onboarding/monde",
+      onboarded,
+      universe: "MONDE",
+    };
+  }
+
+  if (requested === "student_racines") {
+    const hasPath = activeUniverses.has("RACINES");
+    const onboarded = hasPath && (roleMap.get("STUDENT") === true || user.onboardingDone);
+    return {
+      persona: "student_racines",
+      homeRoute: "/dashboard",
+      onboardingRoute: onboarded ? "/dashboard" : "/onboarding/racines",
+      onboarded,
+      universe: "RACINES",
+    };
+  }
+
   if (appRoles.has("PARENT")) {
     const onboarded = roleMap.get("STUDENT") === true || user.onboardingDone;
     return {
@@ -137,6 +169,8 @@ export async function resolvePersonaRuntime(params: {
     };
   }
 
+  // Backward-compatible fallback for accounts created before requested_persona
+  // became canonical. This is intentionally only a fallback.
   if (latestUniverse === "RACINES") {
     const onboarded = roleMap.get("STUDENT") === true || user.onboardingDone;
     return {
@@ -159,9 +193,6 @@ export async function resolvePersonaRuntime(params: {
     };
   }
 
-  const requested = isAdultPersonaId(params.requestedPersona)
-    ? params.requestedPersona
-    : null;
   if (requested && PROFESSIONAL_REQUESTS.has(requested)) {
     return {
       persona: requested,
@@ -179,26 +210,6 @@ export async function resolvePersonaRuntime(params: {
       onboardingRoute: "/onboarding/family",
       onboarded: false,
       universe: null,
-    };
-  }
-
-  if (requested === "student_racines") {
-    return {
-      persona: "student_racines",
-      homeRoute: "/onboarding/racines",
-      onboardingRoute: "/onboarding/racines",
-      onboarded: false,
-      universe: "RACINES",
-    };
-  }
-
-  if (requested === "student_monde") {
-    return {
-      persona: "student_monde",
-      homeRoute: "/onboarding/monde",
-      onboardingRoute: "/onboarding/monde",
-      onboarded: false,
-      universe: "MONDE",
     };
   }
 
