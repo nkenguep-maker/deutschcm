@@ -22,7 +22,12 @@ async function signIn(email: string, storageStateFile: string, page: import("pla
   await page.waitForLoadState("networkidle", { timeout: 15_000 });
   await page.getByLabel(/^Email$/).fill(email);
   await page.getByLabel(/Mot de passe|Password/).fill(password);
+  const syncResponsePromise = page.waitForResponse(
+    (response) => new URL(response.url()).pathname === "/api/auth/sync" && response.request().method() === "POST",
+  );
   await page.getByRole("button", { name: /Ouvrir ma maison|Come in/i }).click();
+  const syncResponse = await syncResponsePromise;
+  expect(syncResponse.status(), `expected successful auth sync for ${email}`).toBe(200);
   // Le handler `handleLogin` fait signInWithPassword puis router.push
   // vers /dashboard. Certains personas (TEACHER, CENTER, no-role) ne
   // peuvent pas atteindre /dashboard et retombent sur /login via proxy.
@@ -35,6 +40,27 @@ async function signIn(email: string, storageStateFile: string, page: import("pla
   const cookies = await page.context().cookies();
   const sbCookie = cookies.find((c) => c.name.startsWith("sb-"));
   expect(sbCookie, `expected sb-* cookie for ${email}`).toBeTruthy();
+
+  // Un cookie présent n'est pas une preuve de session utilisable. Vérifier
+  // le serveur protège contre une régression SSR, un token invalide ou un
+  // profil Prisma désaligné avant de réutiliser le storageState.
+  let profile: { email?: string } | null = null;
+  let lastStatus: number | null = null;
+  // Auth peut avoir une très courte fenêtre de propagation après createUser +
+  // signInWithPassword sur P-1. Le storageState n'est écrit qu'après une
+  // réponse serveur authentifiée correspondant bien à l'email demandé.
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const me = await page.goto("/api/me", { waitUntil: "domcontentloaded" });
+    lastStatus = me?.status() ?? null;
+    if (lastStatus === 200) {
+      profile = await me?.json() as { email?: string };
+      if (profile.email?.toLowerCase() === email.toLowerCase()) break;
+      profile = null;
+    }
+    await page.waitForTimeout(250);
+  }
+  expect(lastStatus, `expected authenticated /api/me for ${email}`).toBe(200);
+  expect(profile?.email?.toLowerCase(), `expected /api/me identity for ${email}`).toBe(email.toLowerCase());
   await page.context().storageState({ path: storageStateFile });
 }
 

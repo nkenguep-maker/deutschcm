@@ -26,6 +26,9 @@ const PUBLIC_PAGES = [
   { name: "landing-fr", path: "/fr" },
   { name: "landing-en", path: "/en" },
   { name: "login-fr", path: "/fr/login" },
+  { name: "open-beta-fr", path: "/fr/beta" },
+  { name: "register-fr", path: "/fr/register" },
+  { name: "pre-onboarding-fr", path: "/fr/pre-onboarding" },
 ];
 
 // Endpoints QA qui doivent renvoyer 404 par défaut (gate off si la Preview
@@ -36,6 +39,21 @@ const QA_ENDPOINTS = [
   "/api/qa/status",
   "/api/qa/child-session?child=monde",
   "/api/qa/child-session?child=racines",
+];
+
+const AUTH_BOUNDARIES = [
+  { path: "/api/notifications", status: 401 },
+  { path: "/api/social", status: 401 },
+  { path: "/api/messaging/inbox", status: 404 },
+  { path: "/api/admin/applications", status: 403 },
+  { path: "/api/center/pending", status: 404 },
+];
+
+const CALLBACK_FAILURES = [
+  { next: "/fr/onboarding/monde", loginPath: "/fr/login" },
+  { next: "/en/dashboard", loginPath: "/en/login" },
+  { next: "https://attacker.invalid/steal", loginPath: "/login" },
+  { next: "//attacker.invalid/steal", loginPath: "/login" },
 ];
 
 const OUT_DIR = "screenshots/lot-6-preview";
@@ -66,6 +84,98 @@ for (const p of PUBLIC_PAGES) {
   }
 }
 
+test("open beta entry point reaches public registration by keyboard", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const response = await page.goto("/fr/beta", { waitUntil: "load", timeout: 30_000 });
+  expect(response?.status(), "open beta HTTP status").toBe(200);
+
+  const registerLink = page.locator('a[href="/fr/register"]');
+  await expect(registerLink).toBeVisible();
+  await registerLink.focus();
+  await expect(registerLink).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/fr\/register$/);
+  await expect(page.locator("form")).toBeVisible();
+});
+
+test("registration validates identity fields before contacting Supabase", async ({ page }) => {
+  const signupRequests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/auth/v1/signup")) signupRequests.push(request.url());
+  });
+
+  await page.goto("/fr/register", { waitUntil: "load", timeout: 30_000 });
+  await page.getByRole("button", { name: "Créer mon compte" }).click();
+  await expect(page.locator(".entry-err")).toContainText("Renseignez votre prénom et votre nom");
+  await expect(page.locator(".entry-err")).toBeFocused();
+
+  await page.getByLabel("Prénom", { exact: true }).fill("Ada");
+  await page.getByLabel("Nom", { exact: true }).fill("Lovelace");
+  await page.getByRole("button", { name: "Créer mon compte" }).click();
+  await expect(page.locator(".entry-err")).toContainText("Entrez une adresse e-mail valide");
+  await expect(page.locator(".entry-err")).toBeFocused();
+
+  await page.getByLabel("E-mail", { exact: true }).fill("ada@example.invalid");
+  await page.locator('input[autocomplete="new-password"]').fill("short");
+  await page.getByRole("button", { name: "Créer mon compte" }).click();
+  await expect(page.locator(".entry-err")).toContainText("au moins huit caractères");
+  await expect(page.locator(".entry-err")).toBeFocused();
+  expect(signupRequests).toHaveLength(0);
+});
+
+test("preconfirmation onboarding records a World journey without authentication", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const response = await page.goto("/fr/pre-onboarding", { waitUntil: "load", timeout: 30_000 });
+  expect(response?.status(), "pre-onboarding HTTP status").toBe(200);
+
+  await page.getByRole("button", { name: /Une langue du monde/ }).click();
+  await expect(page.getByRole("heading", { name: "Quelle langue souhaitez-vous apprendre ?" })).toBeVisible();
+  await page.getByRole("button", { name: /Allemand/ }).click();
+  await expect(page.getByRole("heading", { name: "À quoi doit vous servir cette langue ?" })).toBeVisible();
+  await page.getByRole("button", { name: /Voyager/ }).click();
+
+  await expect(page).toHaveURL(/\/fr\/pre-onboarding\/complete$/);
+  await expect(page.getByRole("heading", { name: "Votre parcours est prêt." })).toBeVisible();
+  const worldDraft = await page.evaluate(() => {
+    const raw = localStorage.getItem("yema.preconfirmation.journey");
+    return raw ? JSON.parse(raw) : null;
+  });
+  expect(worldDraft).toMatchObject({
+    version: 1,
+    authUserId: null,
+    persona: "student_monde",
+    pathwayVariant: "TOURISM",
+    languageId: "deutsch",
+  });
+  expect(typeof worldDraft?.createdAt).toBe("number");
+});
+
+test("preconfirmation onboarding records a Roots family journey and keeps coming languages unavailable", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/fr/pre-onboarding", { waitUntil: "load", timeout: 30_000 });
+
+  await page.getByRole("button", { name: /Une langue de famille/ }).click();
+  await expect(page.getByRole("heading", { name: "Quelle langue souhaitez-vous retrouver ?" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Bassa/ })).toBeDisabled();
+  await page.getByRole("button", { name: /Wolof/ }).click();
+  await expect(page.getByRole("heading", { name: "Pour qui commence ce parcours ?" })).toBeVisible();
+  await page.getByRole("button", { name: /Pour ma famille/ }).click();
+
+  await expect(page).toHaveURL(/\/fr\/pre-onboarding\/complete$/);
+  await expect(page.getByRole("heading", { name: "Votre parcours est prêt." })).toBeVisible();
+  const rootsDraft = await page.evaluate(() => {
+    const raw = localStorage.getItem("yema.preconfirmation.journey");
+    return raw ? JSON.parse(raw) : null;
+  });
+  expect(rootsDraft).toMatchObject({
+    version: 1,
+    authUserId: null,
+    persona: "family",
+    languageId: "wolof",
+  });
+  expect(typeof rootsDraft?.createdAt).toBe("number");
+});
+
 test.describe("QA endpoints · gate 404 stable", () => {
   for (const url of QA_ENDPOINTS) {
     test(`GET ${url} ne renvoie ni 500 ni fuite secret`, async ({ request }) => {
@@ -79,4 +189,44 @@ test.describe("QA endpoints · gate 404 stable", () => {
       expect(forbidden.test(text), `secret leak in body of ${url}`).toBe(false);
     });
   }
+});
+
+test.describe("public auth boundaries · fail closed", () => {
+  for (const boundary of AUTH_BOUNDARIES) {
+    test(`GET ${boundary.path} refuse une session anonyme`, async ({ request }) => {
+      const response = await request.get(boundary.path);
+      expect(response.status()).toBe(boundary.status);
+      const text = await response.text();
+      expect(text).not.toMatch(/SUPABASE_SERVICE_ROLE|SUPABASE_JWT_SECRET|sbp_[a-z0-9]{20,}|sb_secret_[A-Za-z0-9_]{20,}/i);
+    });
+  }
+});
+
+test.describe("auth callback · safe failure redirects", () => {
+  for (const callback of CALLBACK_FAILURES) {
+    test(`keeps next=${callback.next} on YEMA`, async ({ request, baseURL }) => {
+      const response = await request.get(
+        `/auth/callback?next=${encodeURIComponent(callback.next)}`,
+        { maxRedirects: 0 },
+      );
+      expect(response.status()).toBe(307);
+
+      const location = response.headers().location;
+      expect(location).toBeTruthy();
+      const redirect = new URL(location!, baseURL);
+      expect(redirect.origin).toBe(new URL(baseURL!).origin);
+      expect(redirect.pathname).toBe(callback.loginPath);
+      expect(redirect.searchParams.get("error")).toBe("auth_callback_failed");
+    });
+  }
+});
+
+test("role setup requires an authenticated session", async ({ request, baseURL }) => {
+  const response = await request.get("/fr/setup-role", { maxRedirects: 0 });
+  expect(response.status()).toBe(307);
+
+  const redirect = new URL(response.headers().location!, baseURL);
+  expect(redirect.origin).toBe(new URL(baseURL!).origin);
+  expect(redirect.pathname).toBe("/fr/login");
+  expect(redirect.searchParams.get("next")).toBe("/fr/setup-role");
 });

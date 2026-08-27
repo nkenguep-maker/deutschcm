@@ -23,6 +23,8 @@ const REQUIRED_PRESENT = [
   "YEMA_CHILD_SESSION_SECRET",
 ];
 
+const CLOSED_BETA_INVITE_SECRET_MIN_LENGTH = 32;
+
 function isTruthy(v) {
   return v === "true" || v === "1";
 }
@@ -46,14 +48,25 @@ function main() {
     if (!isPresent(process.env[name])) failures.push(name);
   }
 
+  const closedBetaEnabled = process.env.YEMA_CLOSED_BETA_ENABLED === "true";
+  if (closedBetaEnabled) {
+    const inviteSecret = process.env.YEMA_BETA_INVITE_SECRET ?? "";
+    if (inviteSecret.length < CLOSED_BETA_INVITE_SECRET_MIN_LENGTH) {
+      failures.push("YEMA_BETA_INVITE_SECRET");
+    }
+  }
+
   if (failures.length > 0) {
     // Log NOMS UNIQUEMENT · jamais les valeurs (secrets).
-    console.error(`[preflight-release-prod] FAIL · ${failures.length} required var(s) missing or non-truthy ·`);
+    console.error(`[preflight-release-prod] FAIL · ${failures.length} required var(s) missing or non-conforming ·`);
     for (const name of failures) console.error(`  - ${name}`);
     process.exit(failures.length);
   }
 
-  console.log(`[preflight-release-prod] OK · ${REQUIRED_TRUTHY.length + REQUIRED_PRESENT.length} required vars present + conformes`);
+  const betaChecks = closedBetaEnabled ? 1 : 0;
+  console.log(
+    `[preflight-release-prod] OK · ${REQUIRED_TRUTHY.length + REQUIRED_PRESENT.length + betaChecks} required checks present + conformes`,
+  );
   process.exit(0);
 }
 

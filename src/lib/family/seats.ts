@@ -2,25 +2,8 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import type { FamilyGuardianActor } from "./actor";
 
-// Lot 7C.4 · sièges Family PAR UNIVERS · cross-subsidy impossible.
-//
-// Doctrine brief §2 (figée) ·
-//   - FAMILY_WORLD          → 3 sièges enfant Monde, 0 Racines, 0 adulte
-//   - CHILD_WORLD_SINGLE    → 1 siège enfant Monde,  0 Racines, 0 adulte
-//   - ROOTS_FAMILY          → 0 Monde, 4 sièges enfant Racines, 2 adultes Racines
-//   - PASSAGE / ROOTS_SOLO  → grants USER individuels · aucun pool Family
-//
-// Universe stocké EXPLICITEMENT sur ChildProfile.universe · JAMAIS déduit
-// depuis langue / learningGoal / entitlement / parent / nom.
-
 export type SeatUniverse = "MONDE" | "RACINES";
 
-/**
- * Capacité structurée par univers · un simple nombre global est insuffisant
- * (un Household FAMILY_WORLD+ROOTS_FAMILY ne doit pas devenir un pool
- * indistinct de 7 enfants · les 3 sièges Monde restent réservés aux Monde,
- * les 4 Racines aux Racines).
- */
 export interface FamilySeatCapacity {
   mondeChildren: number;
   racinesChildren: number;
@@ -28,12 +11,8 @@ export interface FamilySeatCapacity {
 }
 
 const ZERO: FamilySeatCapacity = { mondeChildren: 0, racinesChildren: 0, rootsAdults: 0 };
+const P1_REF = "kzzagbojjkivdzzcrmxn";
 
-/**
- * Mapping canonique ProductCode → capacité par univers.
- * Fail-closed sur code inconnu (default retourne ZERO). Toute évolution
- * commerciale doit ajouter un case explicite ici.
- */
 export function capacityFromProduct(code: string): FamilySeatCapacity {
   switch (code) {
     case "FAMILY_WORLD":
@@ -47,10 +26,23 @@ export function capacityFromProduct(code: string): FamilySeatCapacity {
   }
 }
 
-// Fallback P4.1 legacy · un Household sans grant Family reçoit un pool
-// Racines uniquement (4 enfants max) pour préserver le comportement
-// historique. Aucun siège Monde par défaut · Monde exige un grant explicite.
 const FALLBACK_MAX_RACINES_CHILDREN = 4;
+
+/**
+ * P-1 technical beta only: allow a Family tester to create one Monde child
+ * without fabricating an Order/AccessGrant. Production and non-P-1 projects
+ * never receive this seat. Racines keeps the historical four-child fallback.
+ */
+export function hasP1TechnicalFamilySeat(): boolean {
+  if (process.env.VERCEL_ENV === "production") return false;
+  const raw = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  try {
+    const url = new URL(raw);
+    return url.protocol === "https:" && url.hostname === `${P1_REF}.supabase.co`;
+  } catch {
+    return false;
+  }
+}
 
 export interface FamilySeatSnapshot {
   universe: SeatUniverse;
@@ -78,11 +70,9 @@ function addCapacity(a: FamilySeatCapacity, b: FamilySeatCapacity): FamilySeatCa
 }
 
 export interface FamilySeatSnapshotResult {
-  // Ancienne API préservée pour compat UI.
   seats: FamilySeatSnapshot[];
   totalChildSeatsAvailable: number;
   totalChildrenActuallyLinked: number;
-  // Lot 7C.4 · nouvelle API structurée par univers.
   capacity: FamilySeatCapacity;
   used: FamilySeatCapacity;
   remaining: FamilySeatCapacity;
@@ -110,16 +100,12 @@ export async function getFamilySeatSnapshot(actor: FamilyGuardianActor): Promise
       })
     : [];
 
-  // Comptage EXPLICITE par universe · un ChildProfile.universe=null ne
-  // compte dans AUCUN pool (fail-closed).
   const [mondeUsed, racinesUsed, totalChildrenActuallyLinked] = await Promise.all([
     prisma.childProfile.count({ where: { parentUserId: actor.userId, universe: "MONDE" } }),
     prisma.childProfile.count({ where: { parentUserId: actor.userId, universe: "RACINES" } }),
     prisma.childProfile.count({ where: { parentUserId: actor.userId } }),
   ]);
 
-  // Comptage sièges adultes ROOTS_FAMILY · grants USER pointant sur un
-  // household ROOTS_FAMILY (voir doctrine assignAdultRootsSeat).
   const rfHouseholds = activeGrants
     .filter((g) => g.productVariant.product.code === "ROOTS_FAMILY")
     .map((g) => g.id);
@@ -134,15 +120,17 @@ export async function getFamilySeatSnapshot(actor: FamilyGuardianActor): Promise
       })
     : 0;
 
-  // Agrégation capacité par produit actif.
   let capacity: FamilySeatCapacity = { ...ZERO };
   for (const g of activeGrants) {
     capacity = addCapacity(capacity, capacityFromProduct(g.productVariant.product.code));
   }
 
-  // Fallback legacy · aucun grant Family → 4 Racines max (préservation P4.1).
   if (activeGrants.length === 0) {
-    capacity = { mondeChildren: 0, racinesChildren: FALLBACK_MAX_RACINES_CHILDREN, rootsAdults: 0 };
+    capacity = {
+      mondeChildren: hasP1TechnicalFamilySeat() ? 1 : 0,
+      racinesChildren: FALLBACK_MAX_RACINES_CHILDREN,
+      rootsAdults: 0,
+    };
   }
 
   const used: FamilySeatCapacity = {
@@ -156,9 +144,18 @@ export async function getFamilySeatSnapshot(actor: FamilyGuardianActor): Promise
     rootsAdults: Math.max(0, capacity.rootsAdults - used.rootsAdults),
   };
 
-  // API legacy preservée · seats[] par (productCode, universe) + total.
   const seats: FamilySeatSnapshot[] = [];
   if (activeGrants.length === 0) {
+    if (capacity.mondeChildren > 0) {
+      seats.push({
+        universe: "MONDE",
+        productCode: "P1_TECHNICAL_BETA_CHILD_WORLD",
+        seatsTotal: capacity.mondeChildren,
+        seatsUsed: mondeUsed,
+        seatsAvailable: remaining.mondeChildren,
+        grantEndsAt: null,
+      });
+    }
     seats.push({
       universe: "RACINES",
       productCode: "FALLBACK_HOUSEHOLD_LEGACY",
@@ -175,7 +172,7 @@ export async function getFamilySeatSnapshot(actor: FamilyGuardianActor): Promise
           universe: "MONDE",
           productCode: g.productVariant.product.code,
           seatsTotal: cap.mondeChildren,
-          seatsUsed: 0, // sièges nommés non implémentés · agrégation en `used`
+          seatsUsed: 0,
           seatsAvailable: cap.mondeChildren,
           grantEndsAt: g.endsAt,
         });
@@ -204,14 +201,6 @@ export async function getFamilySeatSnapshot(actor: FamilyGuardianActor): Promise
   };
 }
 
-/**
- * Lot 7C.4 · le service exige désormais l'univers demandé et vérifie
- * uniquement le pool correspondant · cross-subsidy impossible.
- *
- * Refuse également :
- *   - universe absent ou invalide (fail-closed)
- *   - pool saturé sur l'univers demandé même si l'autre pool a des places
- */
 export type AssertChildOk = { ok: true };
 export type AssertChildKo = {
   ok: false;

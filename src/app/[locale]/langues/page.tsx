@@ -166,7 +166,15 @@ const COPY_EN: Copy = {
 };
 
 // ─── Carte langue ───────────────────────────────────────────────────
-function LangueCard({ lang, locale }: { lang: LangueDisplay; locale: "fr" | "en" }) {
+function LangueCard({
+  lang,
+  locale,
+  headingLevel,
+}: {
+  lang: LangueDisplay;
+  locale: "fr" | "en";
+  headingLevel: 2 | 3;
+}) {
   const name = locale === "en" ? lang.nameEn : lang.name;
   const region = locale === "en" ? lang.regionEn : lang.region;
   const note = locale === "en" ? lang.noteEn : lang.note;
@@ -177,6 +185,7 @@ function LangueCard({ lang, locale }: { lang: LangueDisplay; locale: "fr" | "en"
   const meta = LANGUAGES[lang.id];
   const isLive = meta?.status === "live";
   const comingLabel = locale === "en" ? "Coming soon" : "Bientôt";
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
     <article
       className={`langue-card ${isLive ? "langue-card-live" : "langue-card-coming"}`}
@@ -185,12 +194,12 @@ function LangueCard({ lang, locale }: { lang: LangueDisplay; locale: "fr" | "en"
     >
       <div className="langue-card-mono" aria-hidden="true">{lang.code}</div>
       <div className="langue-card-body">
-        <h3 className="langue-card-name">
+        <Heading className="langue-card-name">
           {name}
           {!isLive ? (
             <span className="langue-card-badge" aria-label={comingLabel}>· {comingLabel}</span>
           ) : null}
-        </h3>
+        </Heading>
         <p className="langue-card-region">{t(region)}</p>
         {note ? <p className="langue-card-note">{t(note)}</p> : null}
       </div>
@@ -250,7 +259,7 @@ export default function LanguesPage() {
 
             <div className="langues-grid">
               {FOREIGN.map((l) => (
-                <LangueCard key={l.id} lang={l} locale={loc} />
+                <LangueCard key={l.id} lang={l} locale={loc} headingLevel={2} />
               ))}
             </div>
           </div>
@@ -275,16 +284,16 @@ export default function LanguesPage() {
           <div className="maison-container langues-sources-inner">
             <div className="maison-section-head">
               <p className="maison-kicker">{t(c.sourcesKicker)}</p>
-              <h1 className="maison-h">
+              <h2 className="maison-h">
                 {t(c.sourcesTitle)} <em>{t(c.sourcesTitleEm)}</em>
-              </h1>
+              </h2>
               <p className="maison-lede">{t(c.sourcesLede)}</p>
               <p className="langues-scale-cap">{c.sourcesScaleCap}</p>
             </div>
 
             <div className="langues-grid langues-grid-4">
               {NATIVE.map((l) => (
-                <LangueCard key={l.id} lang={l} locale={loc} />
+                <LangueCard key={l.id} lang={l} locale={loc} headingLevel={3} />
               ))}
             </div>
 

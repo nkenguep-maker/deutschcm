@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
 }
 
 enum Role {
@@ -218,23 +218,42 @@ enum ProgressStatus {
   COMPLETED
 }
 
+// ─── Closed beta · server-only invitation ledger ────────────────
+model BetaInvitation {
+  id               String           @id @default(cuid())
+  tokenHash        String           @unique
+  emailHash        String
+  status           InvitationStatus @default(PENDING)
+  issuedByUserId   String
+  acceptedByUserId String?
+  expiresAt        DateTime
+  acceptedAt       DateTime?
+  revokedAt        DateTime?
+  createdAt        DateTime         @default(now())
+
+  @@index([emailHash, status])
+  @@index([expiresAt])
+  @@index([issuedByUserId, createdAt])
+  @@map("beta_invitations")
+}
+
 model User {
-  id                String    @id @default(uuid())
-  supabaseId        String    @unique
-  email             String    @unique
+  id                String           @id @default(uuid())
+  supabaseId        String           @unique
+  email             String           @unique
   fullName          String
   phone             String?
   avatarUrl         String?
-  role              Role      @default(STUDENT)
-  preferredLang     String    @default("fr")
-  country           String    @default("CM")
+  role              Role             @default(STUDENT)
+  preferredLang     String           @default("fr")
+  country           String           @default("CM")
   city              String?
-  xpTotal           Int       @default(0)
-  streakDays        Int       @default(0)
+  xpTotal           Int              @default(0)
+  streakDays        Int              @default(0)
   lastActiveAt      DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  onboardingDone    Boolean   @default(false)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  onboardingDone    Boolean          @default(false)
   germanLevel       String?
   learningGoal      String?
   availability      String?
@@ -242,12 +261,12 @@ model User {
   dateOfBirth       DateTime?
   gender            String?
   classCode         String?
-  studentType       String?   @default("solo")
+  studentType       String?          @default("solo")
   classroomCode     String?
-  isValidated       Boolean   @default(false)
+  isValidated       Boolean          @default(false)
   validatedAt       DateTime?
   validatedBy       String?
-  testAttempts      Int       @default(0)
+  testAttempts      Int              @default(0)
   testScore         Float?
   levelAssignedAt   DateTime?
   centerId          String?
@@ -273,45 +292,45 @@ model User {
   groupMemberships      StudentGroupMember[]
   levelHistory          LevelHistory[]
   classJoinRequests     ClassJoinRequest[]
-  sentInvites           StudyGroupInvite[]   @relation("inviteSent")
-  receivedInvites       StudyGroupInvite[]   @relation("inviteReceived")
-  connections           UserConnection[]     @relation("connections")
-  connectedBy           UserConnection[]     @relation("connectedBy")
+  sentInvites           StudyGroupInvite[]     @relation("inviteSent")
+  receivedInvites       StudyGroupInvite[]     @relation("inviteReceived")
+  connections           UserConnection[]       @relation("connections")
+  connectedBy           UserConnection[]       @relation("connectedBy")
   userRoles             UserRole[]
   childProfiles         ChildProfile[]
 
   // ─── V1 · relations vers le socle YEMA ─────────────────────────
-  appRoles              UserAppRole[]
-  learningPaths         LearningPath[]
-  ordersOwned           Order[]              @relation("orderUser")
-  accessGrantsAsUser    AccessGrant[]        @relation("grantsAsUser")
-  householdsOwned       Household[]          @relation("householdOwner")
-  householdMemberships  HouseholdMembership[]
-  dependentsManaged     DependentProfile[]   @relation("dependentManager")
-  classMemberships      ClassMembership[]
-  classesTaught         Class[]              @relation("classProvider")
-  messagesAuthored      Message[]
-  submissionsMade       Submission[]
-  feedbackAuthored      ClassFeedback[]      @relation("feedbackAuthor")
-  providerProfile       ProviderProfile?
+  appRoles             UserAppRole[]
+  learningPaths        LearningPath[]
+  ordersOwned          Order[]               @relation("orderUser")
+  accessGrantsAsUser   AccessGrant[]         @relation("grantsAsUser")
+  householdsOwned      Household[]           @relation("householdOwner")
+  householdMemberships HouseholdMembership[]
+  dependentsManaged    DependentProfile[]    @relation("dependentManager")
+  classMemberships     ClassMembership[]
+  classesTaught        Class[]               @relation("classProvider")
+  messagesAuthored     Message[]
+  submissionsMade      Submission[]
+  feedbackAuthored     ClassFeedback[]       @relation("feedbackAuthor")
+  providerProfile      ProviderProfile?
 
   // ─── P4.1 · relations Circle + Audit + Storage ────────────────
-  circlesCreated        Circle[]             @relation("CircleCreator")
-  circleMemberships     CircleMembership[]   @relation("CircleUserMembership")
-  circleInvitationsSent CircleMembership[]   @relation("CircleInviter")
-  auditEventsAsActor    AuditEvent[]         @relation("AuditActor")
-  storageObjectsOwned   StorageObject[]      @relation("StorageObjectOwner")
+  circlesCreated        Circle[]           @relation("CircleCreator")
+  circleMemberships     CircleMembership[] @relation("CircleUserMembership")
+  circleInvitationsSent CircleMembership[] @relation("CircleInviter")
+  auditEventsAsActor    AuditEvent[]       @relation("AuditActor")
+  storageObjectsOwned   StorageObject[]    @relation("StorageObjectOwner")
 
   // ─── P4.2 · invitations Circle ─────────────────────────────────
-  invitationsIssued     CircleInvitation[]   @relation("InvitationInviter")
-  invitationsAccepted   CircleInvitation[]   @relation("InvitationAcceptor")
-  invitationsRevoked    CircleInvitation[]   @relation("InvitationRevoker")
+  invitationsIssued   CircleInvitation[] @relation("InvitationInviter")
+  invitationsAccepted CircleInvitation[] @relation("InvitationAcceptor")
+  invitationsRevoked  CircleInvitation[] @relation("InvitationRevoker")
 
   // ─── P4.5 · Racines productions Coach/Parent ──────────────────
-  circleAssignmentsCreated  CircleAssignment[]      @relation("CircleAssignmentCoach")
-  circleSubmissionsMade     CircleSubmission[]      @relation("CircleSubmissionSubmitter")
-  circleFeedbacksAuthored   CircleFeedback[]        @relation("CircleFeedbackAuthor")
-  circleReplyAuthored       CircleSubmissionReply[] @relation("CircleSubmissionReplyAuthor")
+  circleAssignmentsCreated CircleAssignment[]      @relation("CircleAssignmentCoach")
+  circleSubmissionsMade    CircleSubmission[]      @relation("CircleSubmissionSubmitter")
+  circleFeedbacksAuthored  CircleFeedback[]        @relation("CircleFeedbackAuthor")
+  circleReplyAuthored      CircleSubmissionReply[] @relation("CircleSubmissionReplyAuthor")
 
   // ─── P4.6-A · Messagerie · relations back-refs ────────────────
   messagingParticipations   MessagingConversationParticipant[] @relation("MessagingParticipantUser")
@@ -326,14 +345,14 @@ model User {
 }
 
 model UserRole {
-  id         String     @id @default(cuid())
-  userId     String
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role       Role
-  status     RoleStatus @default(ACTIVE)
-  onboarded  Boolean    @default(false)
-  grantedBy  String?
-  createdAt  DateTime   @default(now())
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role
+  status    RoleStatus @default(ACTIVE)
+  onboarded Boolean    @default(false)
+  grantedBy String?
+  createdAt DateTime   @default(now())
 
   @@unique([userId, role])
   @@index([userId])
@@ -487,7 +506,7 @@ model QuizAttempt {
 }
 
 model QuizAnswer {
-  id             String @id @default(uuid())
+  id             String  @id @default(uuid())
   attemptId      String
   questionId     String
   selectedAnswer String
@@ -520,20 +539,20 @@ model UserAppRole {
 
 // --- Parcours d'apprentissage (le cœur : 1 user → N parcours) -------
 model LearningPath {
-  id                 String              @id @default(cuid())
-  userId             String
-  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  universe           Universe
-  language           LanguageCode
-  currentLevel       CefrLevel?
-  intention          Intention?
-  onboardingAnswers  Json                @default("{}")
-  status             LearningPathStatus  @default(ACTIVE)
-  createdAt          DateTime            @default(now())
-  archivedAt         DateTime?
+  id                String             @id @default(cuid())
+  userId            String
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  universe          Universe
+  language          LanguageCode
+  currentLevel      CefrLevel?
+  intention         Intention?
+  onboardingAnswers Json               @default("{}")
+  status            LearningPathStatus @default(ACTIVE)
+  createdAt         DateTime           @default(now())
+  archivedAt        DateTime?
 
-  grants             AccessGrant[]       @relation("grantsAsLearningPath")
-  classMemberships   ClassMembership[]
+  grants           AccessGrant[]     @relation("grantsAsLearningPath")
+  classMemberships ClassMembership[]
 
   @@index([userId, status])
   @@index([universe, language])
@@ -542,34 +561,34 @@ model LearningPath {
 
 // --- Catalogue : produit ≠ variante commerciale ---------------------
 model Product {
-  id          String       @id @default(cuid())
-  code        ProductCode  @unique
+  id          String      @id @default(cuid())
+  code        ProductCode @unique
   universe    Universe?
   billingType BillingType
-  isActive    Boolean      @default(true)
-  createdAt   DateTime     @default(now())
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
 
-  variants           ProductVariant[]
-  entitlementRules   ProductEntitlementRule[]
+  variants         ProductVariant[]
+  entitlementRules ProductEntitlementRule[]
 
   @@map("products")
 }
 
 model ProductVariant {
-  id             String        @id @default(cuid())
-  productId      String
-  product        Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
-  language       LanguageCode?
-  level          CefrLevel?
-  currency       Currency
-  amount         Int
-  durationDays   Int?
-  market         String?
-  active         Boolean       @default(true)
-  createdAt      DateTime      @default(now())
+  id           String        @id @default(cuid())
+  productId    String
+  product      Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  language     LanguageCode?
+  level        CefrLevel?
+  currency     Currency
+  amount       Int
+  durationDays Int?
+  market       String?
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
 
-  orderItems     OrderItem[]
-  grants         AccessGrant[]
+  orderItems OrderItem[]
+  grants     AccessGrant[]
 
   @@unique([productId, language, level, currency, durationDays])
   @@index([productId])
@@ -591,51 +610,51 @@ model ProductEntitlementRule {
 
 // --- Achats & paiements v2 (les vrais) ------------------------------
 model Order {
-  id         String       @id @default(cuid())
-  userId     String
-  user       User         @relation("orderUser", fields: [userId], references: [id], onDelete: Cascade)
-  status     OrderStatus  @default(PENDING)
-  currency   Currency
-  total      Int          @default(0)
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation("orderUser", fields: [userId], references: [id], onDelete: Cascade)
+  status    OrderStatus @default(PENDING)
+  currency  Currency
+  total     Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
-  items      OrderItem[]
-  payments   Payment[]
+  items    OrderItem[]
+  payments Payment[]
 
   @@index([userId, status])
   @@map("orders")
 }
 
 model OrderItem {
-  id                 String          @id @default(cuid())
-  orderId            String
-  order              Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productVariantId   String
-  productVariant     ProductVariant  @relation(fields: [productVariantId], references: [id])
-  beneficiaryType    BeneficiaryType
-  beneficiaryId      String
-  quantity           Int             @default(1)
-  unitAmount         Int
-  grants             AccessGrant[]
+  id               String          @id @default(cuid())
+  orderId          String
+  order            Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productVariantId String
+  productVariant   ProductVariant  @relation(fields: [productVariantId], references: [id])
+  beneficiaryType  BeneficiaryType
+  beneficiaryId    String
+  quantity         Int             @default(1)
+  unitAmount       Int
+  grants           AccessGrant[]
 
   @@index([orderId])
   @@map("order_items")
 }
 
 model Payment {
-  id           String            @id @default(cuid())
-  orderId      String
-  order        Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  provider     PaymentProviderV2
-  status       PaymentV2Status   @default(PENDING)
-  amount       Int
-  currency     Currency
-  externalRef  String?
-  confirmedAt  DateTime?
-  failedAt     DateTime?
-  metadata     Json?
-  createdAt    DateTime          @default(now())
+  id          String            @id @default(cuid())
+  orderId     String
+  order       Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider    PaymentProviderV2
+  status      PaymentV2Status   @default(PENDING)
+  amount      Int
+  currency    Currency
+  externalRef String?
+  confirmedAt DateTime?
+  failedAt    DateTime?
+  metadata    Json?
+  createdAt   DateTime          @default(now())
 
   @@index([orderId])
   @@index([status])
@@ -644,24 +663,24 @@ model Payment {
 
 // --- Access grants : LA pierre angulaire ---------------------------
 model AccessGrant {
-  id                String           @id @default(cuid())
-  beneficiaryType   BeneficiaryType
-  beneficiaryId     String
-  productVariantId  String
-  productVariant    ProductVariant   @relation(fields: [productVariantId], references: [id])
-  sourceType        GrantSourceType
-  sourceId          String
-  orderItemId       String?
-  orderItem         OrderItem?       @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
-  startsAt          DateTime         @default(now())
-  endsAt            DateTime?
-  status            GrantStatus      @default(ACTIVE)
-  metadata          Json?
-  createdAt         DateTime         @default(now())
+  id               String          @id @default(cuid())
+  beneficiaryType  BeneficiaryType
+  beneficiaryId    String
+  productVariantId String
+  productVariant   ProductVariant  @relation(fields: [productVariantId], references: [id])
+  sourceType       GrantSourceType
+  sourceId         String
+  orderItemId      String?
+  orderItem        OrderItem?      @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
+  startsAt         DateTime        @default(now())
+  endsAt           DateTime?
+  status           GrantStatus     @default(ACTIVE)
+  metadata         Json?
+  createdAt        DateTime        @default(now())
 
   // FK optionnelles pour lookup rapide (une seule sera set selon type)
-  userBeneficiary        User?          @relation("grantsAsUser",         fields: [beneficiaryId], references: [id], onDelete: NoAction, map: "access_grants_user_fk")
-  householdBeneficiary   Household?     @relation("grantsAsHousehold",    fields: [beneficiaryId], references: [id], onDelete: NoAction, map: "access_grants_household_fk")
+  userBeneficiary         User?         @relation("grantsAsUser", fields: [beneficiaryId], references: [id], onDelete: NoAction, map: "access_grants_user_fk")
+  householdBeneficiary    Household?    @relation("grantsAsHousehold", fields: [beneficiaryId], references: [id], onDelete: NoAction, map: "access_grants_household_fk")
   learningPathBeneficiary LearningPath? @relation("grantsAsLearningPath", fields: [beneficiaryId], references: [id], onDelete: NoAction, map: "access_grants_lp_fk")
 
   @@index([beneficiaryType, beneficiaryId, status])
@@ -672,32 +691,32 @@ model AccessGrant {
 
 // --- Foyer (Famille) ----------------------------------------------
 model Household {
-  id           String                @id @default(cuid())
-  ownerUserId  String
-  owner        User                  @relation("householdOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
-  status       HouseholdStatus       @default(ACTIVE)
-  createdAt    DateTime              @default(now())
+  id          String          @id @default(cuid())
+  ownerUserId String
+  owner       User            @relation("householdOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  status      HouseholdStatus @default(ACTIVE)
+  createdAt   DateTime        @default(now())
 
-  memberships  HouseholdMembership[]
-  dependents   DependentProfile[]
-  grants       AccessGrant[]         @relation("grantsAsHousehold")
+  memberships HouseholdMembership[]
+  dependents  DependentProfile[]
+  grants      AccessGrant[]         @relation("grantsAsHousehold")
   // P4.1
-  circles      Circle[]              @relation("HouseholdCircles")
-  children     ChildProfile[]        @relation("HouseholdChildren")
+  circles     Circle[]              @relation("HouseholdCircles")
+  children    ChildProfile[]        @relation("HouseholdChildren")
 
   @@index([ownerUserId])
   @@map("households")
 }
 
 model HouseholdMembership {
-  id           String           @id @default(cuid())
-  householdId  String
-  household    Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  userId       String
-  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role         HouseholdRole
-  status       HouseholdStatus  @default(ACTIVE)
-  joinedAt     DateTime         @default(now())
+  id          String          @id @default(cuid())
+  householdId String
+  household   Household       @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        HouseholdRole
+  status      HouseholdStatus @default(ACTIVE)
+  joinedAt    DateTime        @default(now())
 
   @@unique([householdId, userId])
   @@index([userId])
@@ -705,16 +724,16 @@ model HouseholdMembership {
 }
 
 model DependentProfile {
-  id                String          @id @default(cuid())
-  householdId       String
-  household         Household       @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  managedByUserId   String
-  managedBy         User            @relation("dependentManager", fields: [managedByUserId], references: [id], onDelete: Cascade)
-  firstName         String
-  birthYear         Int?
-  status            HouseholdStatus @default(ACTIVE)
-  metadata          Json?
-  createdAt         DateTime        @default(now())
+  id              String          @id @default(cuid())
+  householdId     String
+  household       Household       @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  managedByUserId String
+  managedBy       User            @relation("dependentManager", fields: [managedByUserId], references: [id], onDelete: Cascade)
+  firstName       String
+  birthYear       Int?
+  status          HouseholdStatus @default(ACTIVE)
+  metadata        Json?
+  createdAt       DateTime        @default(now())
 
   @@index([householdId])
   @@index([managedByUserId])
@@ -723,19 +742,19 @@ model DependentProfile {
 
 // --- Classes v2, threads, messages, devoirs ------------------------
 model Class {
-  id                String            @id @default(cuid())
-  classType         ClassType
-  organizationId    String?
-  language          LanguageCode
-  level             CefrLevel?
-  providerUserId    String
-  provider          User              @relation("classProvider", fields: [providerUserId], references: [id], onDelete: Cascade)
-  status            ClassStatus       @default(ACTIVE)
-  createdAt         DateTime          @default(now())
+  id             String       @id @default(cuid())
+  classType      ClassType
+  organizationId String?
+  language       LanguageCode
+  level          CefrLevel?
+  providerUserId String
+  provider       User         @relation("classProvider", fields: [providerUserId], references: [id], onDelete: Cascade)
+  status         ClassStatus  @default(ACTIVE)
+  createdAt      DateTime     @default(now())
 
-  memberships       ClassMembership[]
-  threads           Thread[]
-  assignments       ClassAssignment[]
+  memberships ClassMembership[]
+  threads     Thread[]
+  assignments ClassAssignment[]
 
   @@index([providerUserId])
   @@index([language, level])
@@ -743,16 +762,16 @@ model Class {
 }
 
 model ClassMembership {
-  id              String            @id @default(cuid())
-  classId         String
-  class           Class             @relation(fields: [classId], references: [id], onDelete: Cascade)
-  userId          String
-  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  learningPathId  String?
-  learningPath    LearningPath?     @relation(fields: [learningPathId], references: [id], onDelete: SetNull)
-  role            ClassMemberRole
-  status          HouseholdStatus   @default(ACTIVE)
-  joinedAt        DateTime          @default(now())
+  id             String          @id @default(cuid())
+  classId        String
+  class          Class           @relation(fields: [classId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  learningPathId String?
+  learningPath   LearningPath?   @relation(fields: [learningPathId], references: [id], onDelete: SetNull)
+  role           ClassMemberRole
+  status         HouseholdStatus @default(ACTIVE)
+  joinedAt       DateTime        @default(now())
 
   @@unique([classId, userId])
   @@index([userId])
@@ -767,67 +786,67 @@ model Thread {
   title      String?
   createdAt  DateTime   @default(now())
 
-  messages   Message[]
+  messages Message[]
 
   @@index([classId])
   @@map("threads")
 }
 
 model Message {
-  id            String      @id @default(cuid())
-  threadId      String
-  thread        Thread      @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  authorUserId  String
-  author        User        @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
-  messageType   MessageType @default(TEXT)
-  body          String?
-  audioUrl      String?
-  createdAt     DateTime    @default(now())
+  id           String      @id @default(cuid())
+  threadId     String
+  thread       Thread      @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  authorUserId String
+  author       User        @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
+  messageType  MessageType @default(TEXT)
+  body         String?
+  audioUrl     String?
+  createdAt    DateTime    @default(now())
 
   @@index([threadId, createdAt])
   @@map("messages")
 }
 
 model ClassAssignment {
-  id           String       @id @default(cuid())
-  classId      String
-  class        Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
-  title        String
-  description  String?
-  dueAt        DateTime?
-  createdAt    DateTime     @default(now())
+  id          String    @id @default(cuid())
+  classId     String
+  class       Class     @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  dueAt       DateTime?
+  createdAt   DateTime  @default(now())
 
-  submissions  Submission[]
+  submissions Submission[]
 
   @@index([classId])
   @@map("class_assignments")
 }
 
 model Submission {
-  id             String          @id @default(cuid())
-  assignmentId   String
-  assignment     ClassAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
-  userId         String
-  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  body           String?
-  audioUrl       String?
-  submittedAt    DateTime        @default(now())
+  id           String          @id @default(cuid())
+  assignmentId String
+  assignment   ClassAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  body         String?
+  audioUrl     String?
+  submittedAt  DateTime        @default(now())
 
-  feedback       ClassFeedback[]
+  feedback ClassFeedback[]
 
   @@unique([assignmentId, userId])
   @@map("submissions")
 }
 
 model ClassFeedback {
-  id            String      @id @default(cuid())
-  submissionId  String
-  submission    Submission  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  authorUserId  String
-  author        User        @relation("feedbackAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
-  score         Float?
-  body          String?
-  createdAt     DateTime    @default(now())
+  id           String     @id @default(cuid())
+  submissionId String
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  authorUserId String
+  author       User       @relation("feedbackAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
+  score        Float?
+  body         String?
+  createdAt    DateTime   @default(now())
 
   @@index([submissionId])
   @@map("class_feedback")
@@ -835,21 +854,21 @@ model ClassFeedback {
 
 // --- Provider profiles (profs / coachs) ----------------------------
 model ProviderProfile {
-  id         String         @id @default(cuid())
-  userId     String         @unique
-  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bio        String?
-  languages  LanguageCode[]
-  levels     CefrLevel[]
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
+  id        String         @id @default(cuid())
+  userId    String         @unique
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio       String?
+  languages LanguageCode[]
+  levels    CefrLevel[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 
   @@map("provider_profiles")
 }
 
 model Badge {
-  id          String @id @default(uuid())
-  name        String @unique
+  id          String  @id @default(uuid())
+  name        String  @unique
   description String
   iconUrl     String?
   condition   Json
@@ -908,12 +927,12 @@ model Teacher {
   availabilitySchedule Json?
   code                 String?  @unique
 
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  center     LanguageCenter? @relation(fields: [centerId], references: [id])
-  classrooms Classroom[]
+  user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  center             LanguageCenter?      @relation(fields: [centerId], references: [id])
+  classrooms         Classroom[]
   // P4.5 · back-relations Monde assignments/feedback (fondations sous flag).
-  createdAssignments  Assignment[]         @relation("AssignmentCreator")
-  authoredFeedbacks   AssignmentFeedback[] @relation("AssignmentFeedbackAuthor")
+  createdAssignments Assignment[]         @relation("AssignmentCreator")
+  authoredFeedbacks  AssignmentFeedback[] @relation("AssignmentFeedbackAuthor")
 
   @@map("teachers")
 }
@@ -931,8 +950,8 @@ model Classroom {
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
 
-  teacher     Teacher              @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  center      LanguageCenter?      @relation(fields: [centerId], references: [id])
+  teacher     Teacher               @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  center      LanguageCenter?       @relation(fields: [centerId], references: [id])
   enrollments ClassroomEnrollment[]
   assignments Assignment[]
 
@@ -954,28 +973,28 @@ model ClassroomEnrollment {
 }
 
 model Assignment {
-  id                 String            @id @default(uuid())
+  id                 String           @id @default(uuid())
   classroomId        String
   title              String
   description        String?
   instructions       String?
   moduleId           String?
   dueDate            DateTime?
-  maxScore           Int               @default(100)
+  maxScore           Int              @default(100)
   // P4.5 · lifecycle et type de production attendue.
-  type               AssignmentType    @default(WRITTEN)
-  status             AssignmentStatus  @default(DRAFT)
+  type               AssignmentType   @default(WRITTEN)
+  status             AssignmentStatus @default(DRAFT)
   publishedAt        DateTime?
   closedAt           DateTime?
   archivedAt         DateTime?
   createdByTeacherId String?
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @default(now())
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @default(now())
 
-  classroom       Classroom              @relation(fields: [classroomId], references: [id], onDelete: Cascade)
-  module          Module?                @relation(fields: [moduleId], references: [id], onDelete: SetNull)
-  createdByTeacher Teacher?              @relation("AssignmentCreator", fields: [createdByTeacherId], references: [id], onDelete: SetNull)
-  submissions     AssignmentSubmission[]
+  classroom        Classroom              @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  module           Module?                @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  createdByTeacher Teacher?               @relation("AssignmentCreator", fields: [createdByTeacherId], references: [id], onDelete: SetNull)
+  submissions      AssignmentSubmission[]
 
   @@index([classroomId, status])
   @@index([status, publishedAt])
@@ -996,24 +1015,24 @@ enum AssignmentStatus {
 }
 
 model AssignmentSubmission {
-  id              String              @id @default(uuid())
+  id              String           @id @default(uuid())
   assignmentId    String
   userId          String
   score           Float?
   feedback        String?
-  submittedAt     DateTime            @default(now())
+  submittedAt     DateTime         @default(now())
   // P4.5 · lifecycle + versionnement + association Storage optionnel.
-  status          SubmissionStatus    @default(DRAFT)
-  version         Int                 @default(1)
+  status          SubmissionStatus @default(DRAFT)
+  version         Int              @default(1)
   writtenContent  String?
   storageObjectId String?
   withdrawnAt     DateTime?
-  updatedAt       DateTime            @default(now())
+  updatedAt       DateTime         @default(now())
 
-  assignment  Assignment          @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
-  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  storageObject StorageObject?    @relation("AssignmentSubmissionStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
-  feedbacks   AssignmentFeedback[]
+  assignment    Assignment           @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  storageObject StorageObject?       @relation("AssignmentSubmissionStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
+  feedbacks     AssignmentFeedback[]
 
   @@unique([assignmentId, userId, version])
   @@index([assignmentId, status])
@@ -1029,24 +1048,24 @@ enum SubmissionStatus {
 
 // P4.5 · retour Teacher immuable après PUBLISHED (trigger DB).
 model AssignmentFeedback {
-  id                    String            @id @default(cuid())
-  submissionId          String
-  authorTeacherId       String
-  status                FeedbackStatus    @default(DRAFT)
-  version               Int               @default(1)
-  supersedesFeedbackId  String?
-  writtenContent        String?
-  storageObjectId       String?
-  publishedAt           DateTime?
-  retractedAt           DateTime?
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @default(now())
+  id                   String         @id @default(cuid())
+  submissionId         String
+  authorTeacherId      String
+  status               FeedbackStatus @default(DRAFT)
+  version              Int            @default(1)
+  supersedesFeedbackId String?
+  writtenContent       String?
+  storageObjectId      String?
+  publishedAt          DateTime?
+  retractedAt          DateTime?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @default(now())
 
-  submission        AssignmentSubmission  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  authorTeacher     Teacher               @relation("AssignmentFeedbackAuthor", fields: [authorTeacherId], references: [id], onDelete: Restrict)
-  storageObject     StorageObject?        @relation("AssignmentFeedbackStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
+  submission         AssignmentSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  authorTeacher      Teacher              @relation("AssignmentFeedbackAuthor", fields: [authorTeacherId], references: [id], onDelete: Restrict)
+  storageObject      StorageObject?       @relation("AssignmentFeedbackStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
   supersedesFeedback AssignmentFeedback?  @relation("AssignmentFeedbackSupersedes", fields: [supersedesFeedbackId], references: [id], onDelete: SetNull)
-  addenda           AssignmentFeedback[]  @relation("AssignmentFeedbackSupersedes")
+  addenda            AssignmentFeedback[] @relation("AssignmentFeedbackSupersedes")
 
   @@index([submissionId])
   @@index([authorTeacherId, status])
@@ -1094,14 +1113,14 @@ model StudentGroupMember {
 }
 
 model LevelHistory {
-  id            String   @id @default(uuid())
-  userId        String
-  oldLevel      String
-  newLevel      String
-  reason        String
-  changedBy     String
-  changedAt     DateTime @default(now())
-  ceremonySeen  Boolean  @default(false)
+  id           String   @id @default(uuid())
+  userId       String
+  oldLevel     String
+  newLevel     String
+  reason       String
+  changedBy    String
+  changedAt    DateTime @default(now())
+  ceremonySeen Boolean  @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -1156,16 +1175,16 @@ model ClassJoinRequest {
 }
 
 model StudyGroupInvite {
-  id          String   @id @default(uuid())
-  fromUserId  String
-  toUserId    String
-  groupId     String?
-  groupName   String?
-  message     String?
-  status      String   @default("pending")
-  createdAt   DateTime @default(now())
-  fromUser    User     @relation("inviteSent",     fields: [fromUserId], references: [id], onDelete: Cascade)
-  toUser      User     @relation("inviteReceived", fields: [toUserId],   references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid())
+  fromUserId String
+  toUserId   String
+  groupId    String?
+  groupName  String?
+  message    String?
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+  fromUser   User     @relation("inviteSent", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser     User     @relation("inviteReceived", fields: [toUserId], references: [id], onDelete: Cascade)
 
   @@index([toUserId])
   @@map("study_group_invites")
@@ -1177,7 +1196,7 @@ model UserConnection {
   connectedId String
   type        String   @default("classmate")
   createdAt   DateTime @default(now())
-  user        User     @relation("connections", fields: [userId],      references: [id], onDelete: Cascade)
+  user        User     @relation("connections", fields: [userId], references: [id], onDelete: Cascade)
   connected   User     @relation("connectedBy", fields: [connectedId], references: [id], onDelete: Cascade)
 
   @@unique([userId, connectedId])
@@ -1188,25 +1207,25 @@ model UserConnection {
 // Le premier contact — YEMA rencontre chaque prof avant de créer un
 // compte TEACHER. Le statut évolue à la main dans /admin.
 enum ApplicationStatus {
-  RECEIVED    // en file
-  CONTACTED   // à contacter
-  MET         // entretien fait
-  ACCREDITED  // accrédité, compte créé
-  DECLINED    // décliné (courtoisement)
+  RECEIVED // en file
+  CONTACTED // à contacter
+  MET // entretien fait
+  ACCREDITED // accrédité, compte créé
+  DECLINED // décliné (courtoisement)
 }
 
 model TeacherApplication {
-  id            String            @id @default(uuid())
-  fullName      String
-  email         String
-  whatsapp      String?
-  city          String
-  languages     String            // langue(s) enseignée(s), texte libre
-  experience    String            // diplôme / années d'expérience
-  status        ApplicationStatus @default(RECEIVED)
-  notes         String?           // notes internes admin
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  id         String            @id @default(uuid())
+  fullName   String
+  email      String
+  whatsapp   String?
+  city       String
+  languages  String // langue(s) enseignée(s), texte libre
+  experience String // diplôme / années d'expérience
+  status     ApplicationStatus @default(RECEIVED)
+  notes      String? // notes internes admin
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
 
   @@index([status])
   @@index([createdAt])
@@ -1229,12 +1248,12 @@ model TeacherApplication {
 // activeLangue · id de la langue en cours d'écoute · null si aucune
 //   sélection n'a encore été faite.
 model ChildProfile {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   parentUserId String
   prenom       String
   avatarAnimal String
   age          Int
-  langues      Json     @default("[]")
+  langues      Json      @default("[]")
   activeLangue String?
   // P4.1 · rattachement explicite au foyer (opt-in, SetNull préserve enfant en cas de suppression foyer).
   householdId  String?
@@ -1251,13 +1270,13 @@ model ChildProfile {
   // Nullable · aucun défaut · resolveMondePath mappe la string libre vers
   // MondePath. Alimenté par fixture QA · onboarding enfant à venir.
   learningGoal String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  parent            User               @relation(fields: [parentUserId], references: [id], onDelete: Cascade)
-  household         Household?         @relation("HouseholdChildren", fields: [householdId], references: [id], onDelete: SetNull)
-  circleMemberships CircleMembership[]
-  storageObjects    StorageObject[]    @relation("StorageObjectChildOwner")
+  parent                  User                     @relation(fields: [parentUserId], references: [id], onDelete: Cascade)
+  household               Household?               @relation("HouseholdChildren", fields: [householdId], references: [id], onDelete: SetNull)
+  circleMemberships       CircleMembership[]
+  storageObjects          StorageObject[]          @relation("StorageObjectChildOwner")
   // P4.5 · productions Circle-scoped (ciblage individuel + soumissions).
   circleAssignmentTargets CircleAssignmentTarget[]
   circleSubmissions       CircleSubmission[]
@@ -1317,17 +1336,17 @@ enum CircleStatus {
 // Un membership rattache soit un User adulte (OWNER, ADULT, COACH),
 // soit un ChildProfile (CHILD). Contrainte XOR au niveau DB.
 model CircleMembership {
-  id              String                   @id @default(cuid())
+  id              String                 @id @default(cuid())
   circleId        String
   role            CircleRole
-  status          CircleMembershipStatus   @default(INVITED)
+  status          CircleMembershipStatus @default(INVITED)
   userId          String?
   childProfileId  String?
   invitedByUserId String?
   joinedAt        DateTime?
   removedAt       DateTime?
-  createdAt       DateTime                 @default(now())
-  updatedAt       DateTime                 @updatedAt
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
 
   circle       Circle        @relation(fields: [circleId], references: [id], onDelete: Cascade)
   user         User?         @relation("CircleUserMembership", fields: [userId], references: [id], onDelete: Cascade)
@@ -1360,25 +1379,25 @@ enum CircleMembershipStatus {
 // pour éviter l'énumération). Le token brut n'est jamais stocké ni journalisé,
 // seul son hash SHA-256. Expiration 72h. Usage unique.
 model CircleInvitation {
-  id                String            @id @default(cuid())
-  circleId          String
-  role              CircleRole
-  status            InvitationStatus  @default(PENDING)
-  invitedEmailHash  String
-  invitedByUserId   String
-  tokenHash         String
-  expiresAt         DateTime
-  acceptedAt        DateTime?
-  acceptedByUserId  String?
-  revokedAt         DateTime?
-  revokedByUserId   String?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+  id               String           @id @default(cuid())
+  circleId         String
+  role             CircleRole
+  status           InvitationStatus @default(PENDING)
+  invitedEmailHash String
+  invitedByUserId  String
+  tokenHash        String
+  expiresAt        DateTime
+  acceptedAt       DateTime?
+  acceptedByUserId String?
+  revokedAt        DateTime?
+  revokedByUserId  String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
-  circle       Circle @relation(fields: [circleId], references: [id], onDelete: Cascade)
-  invitedBy    User   @relation("InvitationInviter", fields: [invitedByUserId], references: [id], onDelete: Cascade)
-  acceptedBy   User?  @relation("InvitationAcceptor", fields: [acceptedByUserId], references: [id], onDelete: SetNull)
-  revokedBy    User?  @relation("InvitationRevoker", fields: [revokedByUserId], references: [id], onDelete: SetNull)
+  circle     Circle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  invitedBy  User   @relation("InvitationInviter", fields: [invitedByUserId], references: [id], onDelete: Cascade)
+  acceptedBy User?  @relation("InvitationAcceptor", fields: [acceptedByUserId], references: [id], onDelete: SetNull)
+  revokedBy  User?  @relation("InvitationRevoker", fields: [revokedByUserId], references: [id], onDelete: SetNull)
 
   @@unique([tokenHash])
   @@index([circleId, status])
@@ -1399,16 +1418,16 @@ enum InvitationStatus {
 // invitations, retraits, assignations coach, accès refusés, break-glass.
 // Ne JAMAIS stocker corps de message, transcription audio, secret.
 model AuditEvent {
-  id           String       @id @default(cuid())
-  actorUserId  String?
-  actorRole    String?
-  action       AuditAction
-  targetType   String
-  targetId     String
-  scopeType    String?
-  scopeId      String?
-  metadata     Json?
-  createdAt    DateTime     @default(now())
+  id          String      @id @default(cuid())
+  actorUserId String?
+  actorRole   String?
+  action      AuditAction
+  targetType  String
+  targetId    String
+  scopeType   String?
+  scopeId     String?
+  metadata    Json?
+  createdAt   DateTime    @default(now())
 
   actor User? @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
 
@@ -1501,7 +1520,7 @@ enum AuditAction {
 // s'y appuyer sans migration supplémentaire. Aucun bucket public pour
 // productions enfants (Q7 rétention 90 j Circle / 12 mois productions).
 model StorageObject {
-  id                  String                @id @default(cuid())
+  id                  String               @id @default(cuid())
   bucket              String
   path                String
   ownerUserId         String?
@@ -1513,11 +1532,11 @@ model StorageObject {
   sizeBytes           Int
   durationSeconds     Int?
   retentionUntil      DateTime?
-  createdAt           DateTime              @default(now())
+  createdAt           DateTime             @default(now())
   deletedAt           DateTime?
 
-  owner        User?         @relation("StorageObjectOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
-  ownerChild   ChildProfile? @relation("StorageObjectChildOwner", fields: [ownerChildProfileId], references: [id], onDelete: SetNull)
+  owner                 User?                  @relation("StorageObjectOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerChild            ChildProfile?          @relation("StorageObjectChildOwner", fields: [ownerChildProfileId], references: [id], onDelete: SetNull)
   // P4.5 · back-relations pour associations submission/feedback (Monde + Racines).
   assignmentSubmissions AssignmentSubmission[] @relation("AssignmentSubmissionStorage")
   assignmentFeedbacks   AssignmentFeedback[]   @relation("AssignmentFeedbackStorage")
@@ -1546,24 +1565,24 @@ enum StorageObjectPurpose {
 // (voir migration 20260723000010_p4_5_racines_productions_rls).
 
 model CircleAssignment {
-  id                    String                   @id @default(cuid())
-  circleId              String
-  createdByCoachUserId  String
-  title                 String
-  instructions          String?
-  productionType        CircleAssignmentType     @default(WRITTEN)
-  status                CircleAssignmentStatus   @default(DRAFT)
-  publishedAt           DateTime?
-  closedAt              DateTime?
-  archivedAt            DateTime?
-  dueAt                 DateTime?
-  createdAt             DateTime                 @default(now())
-  updatedAt             DateTime                 @default(now())
+  id                   String                 @id @default(cuid())
+  circleId             String
+  createdByCoachUserId String
+  title                String
+  instructions         String?
+  productionType       CircleAssignmentType   @default(WRITTEN)
+  status               CircleAssignmentStatus @default(DRAFT)
+  publishedAt          DateTime?
+  closedAt             DateTime?
+  archivedAt           DateTime?
+  dueAt                DateTime?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @default(now())
 
-  circle                Circle                   @relation(fields: [circleId], references: [id], onDelete: Cascade)
-  createdByCoach        User                     @relation("CircleAssignmentCoach", fields: [createdByCoachUserId], references: [id], onDelete: Restrict)
-  targets               CircleAssignmentTarget[]
-  submissions           CircleSubmission[]
+  circle         Circle                   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  createdByCoach User                     @relation("CircleAssignmentCoach", fields: [createdByCoachUserId], references: [id], onDelete: Restrict)
+  targets        CircleAssignmentTarget[]
+  submissions    CircleSubmission[]
 
   @@index([circleId, status])
   @@index([createdByCoachUserId, publishedAt])
@@ -1585,13 +1604,13 @@ enum CircleAssignmentStatus {
 }
 
 model CircleAssignmentTarget {
-  id             String            @id @default(cuid())
+  id             String   @id @default(cuid())
   assignmentId   String
   childProfileId String
-  createdAt      DateTime          @default(now())
+  createdAt      DateTime @default(now())
 
-  assignment     CircleAssignment  @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
-  childProfile   ChildProfile      @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
+  assignment   CircleAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  childProfile ChildProfile     @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
 
   @@unique([assignmentId, childProfileId])
   @@index([childProfileId])
@@ -1599,25 +1618,25 @@ model CircleAssignmentTarget {
 }
 
 model CircleSubmission {
-  id                 String                 @id @default(cuid())
-  assignmentId       String
-  childProfileId     String
-  submittedByUserId  String
-  version            Int                    @default(1)
-  status             CircleSubmissionStatus @default(DRAFT)
-  writtenContent     String?
-  storageObjectId    String?
-  submittedAt        DateTime?
-  withdrawnAt        DateTime?
-  createdAt          DateTime               @default(now())
-  updatedAt          DateTime               @default(now())
+  id                String                 @id @default(cuid())
+  assignmentId      String
+  childProfileId    String
+  submittedByUserId String
+  version           Int                    @default(1)
+  status            CircleSubmissionStatus @default(DRAFT)
+  writtenContent    String?
+  storageObjectId   String?
+  submittedAt       DateTime?
+  withdrawnAt       DateTime?
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @default(now())
 
-  assignment        CircleAssignment          @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
-  childProfile      ChildProfile              @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
-  submittedBy       User                      @relation("CircleSubmissionSubmitter", fields: [submittedByUserId], references: [id], onDelete: Restrict)
-  storageObject     StorageObject?            @relation("CircleSubmissionStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
-  feedbacks         CircleFeedback[]
-  replies           CircleSubmissionReply[]
+  assignment    CircleAssignment        @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  childProfile  ChildProfile            @relation(fields: [childProfileId], references: [id], onDelete: Cascade)
+  submittedBy   User                    @relation("CircleSubmissionSubmitter", fields: [submittedByUserId], references: [id], onDelete: Restrict)
+  storageObject StorageObject?          @relation("CircleSubmissionStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
+  feedbacks     CircleFeedback[]
+  replies       CircleSubmissionReply[]
 
   @@index([assignmentId, status])
   @@index([childProfileId, status])
@@ -1633,24 +1652,24 @@ enum CircleSubmissionStatus {
 }
 
 model CircleFeedback {
-  id                    String                @id @default(cuid())
-  submissionId          String
-  authorCoachUserId     String
-  status                CircleFeedbackStatus  @default(DRAFT)
-  version               Int                   @default(1)
-  supersedesFeedbackId  String?
-  writtenContent        String?
-  storageObjectId       String?
-  publishedAt           DateTime?
-  retractedAt           DateTime?
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @default(now())
+  id                   String               @id @default(cuid())
+  submissionId         String
+  authorCoachUserId    String
+  status               CircleFeedbackStatus @default(DRAFT)
+  version              Int                  @default(1)
+  supersedesFeedbackId String?
+  writtenContent       String?
+  storageObjectId      String?
+  publishedAt          DateTime?
+  retractedAt          DateTime?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @default(now())
 
-  submission            CircleSubmission      @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  authorCoach           User                  @relation("CircleFeedbackAuthor", fields: [authorCoachUserId], references: [id], onDelete: Restrict)
-  storageObject         StorageObject?        @relation("CircleFeedbackStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
-  supersedesFeedback    CircleFeedback?       @relation("CircleFeedbackSupersedes", fields: [supersedesFeedbackId], references: [id], onDelete: SetNull)
-  addenda               CircleFeedback[]      @relation("CircleFeedbackSupersedes")
+  submission         CircleSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  authorCoach        User             @relation("CircleFeedbackAuthor", fields: [authorCoachUserId], references: [id], onDelete: Restrict)
+  storageObject      StorageObject?   @relation("CircleFeedbackStorage", fields: [storageObjectId], references: [id], onDelete: SetNull)
+  supersedesFeedback CircleFeedback?  @relation("CircleFeedbackSupersedes", fields: [supersedesFeedbackId], references: [id], onDelete: SetNull)
+  addenda            CircleFeedback[] @relation("CircleFeedbackSupersedes")
 
   @@index([submissionId])
   @@index([authorCoachUserId, status])
@@ -1668,16 +1687,16 @@ enum CircleFeedbackStatus {
 // Q14 · fil structuré parent–Coach sur une production. Aucune messagerie
 // générale. §10 · pas d'audio, pas de pièce jointe, pas de DM.
 model CircleSubmissionReply {
-  id            String                       @id @default(cuid())
-  submissionId  String
-  authorUserId  String
-  authorRole    CircleSubmissionReplyRole
-  body          String
-  createdAt     DateTime                     @default(now())
-  hiddenAt      DateTime?
+  id           String                    @id @default(cuid())
+  submissionId String
+  authorUserId String
+  authorRole   CircleSubmissionReplyRole
+  body         String
+  createdAt    DateTime                  @default(now())
+  hiddenAt     DateTime?
 
-  submission    CircleSubmission             @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  author        User                         @relation("CircleSubmissionReplyAuthor", fields: [authorUserId], references: [id], onDelete: Restrict)
+  submission CircleSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  author     User             @relation("CircleSubmissionReplyAuthor", fields: [authorUserId], references: [id], onDelete: Restrict)
 
   @@index([submissionId, createdAt])
   @@index([authorUserId])
@@ -1692,15 +1711,15 @@ enum CircleSubmissionReplyRole {
 // ─── Demandes de démo (centres) ──────────────────────────────────
 // Sprint 7 · B2B. Formulaire court sur /landing.
 model CenterApplication {
-  id            String            @id @default(uuid())
-  centerName    String
-  city          String
-  whatsapp      String?
-  email         String
-  status        ApplicationStatus @default(RECEIVED)
-  notes         String?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  id         String            @id @default(uuid())
+  centerName String
+  city       String
+  whatsapp   String?
+  email      String
+  status     ApplicationStatus @default(RECEIVED)
+  notes      String?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
 
   @@index([status])
   @@index([createdAt])
@@ -1719,15 +1738,15 @@ model CenterApplication {
 // UPDATE/DELETE côté client). Les routes QA server-only accèdent via
 // Prisma en service_role (bypass RLS).
 model QaBootstrapNonce {
-  id                String    @id @default(cuid())
-  nonceHash         String    @unique @map("nonce_hash")
-  qaAdminEmailHash  String    @map("qa_admin_email_hash")
-  deploymentHost    String    @map("deployment_host")
-  projectRef        String    @map("project_ref")
-  issuedAt          DateTime  @map("issued_at")
-  expiresAt         DateTime  @map("expires_at")
-  consumedAt        DateTime? @map("consumed_at")
-  createdAt         DateTime  @default(now()) @map("created_at")
+  id               String    @id @default(cuid())
+  nonceHash        String    @unique @map("nonce_hash")
+  qaAdminEmailHash String    @map("qa_admin_email_hash")
+  deploymentHost   String    @map("deployment_host")
+  projectRef       String    @map("project_ref")
+  issuedAt         DateTime  @map("issued_at")
+  expiresAt        DateTime  @map("expires_at")
+  consumedAt       DateTime? @map("consumed_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
 
   @@index([expiresAt])
   @@index([consumedAt])
@@ -1826,29 +1845,29 @@ enum MessagingAudioStatus {
 }
 
 model MessagingConversation {
-  id             String                       @id @default(cuid())
-  type           ConversationType
-  status         MessagingConversationStatus  @default(ACTIVE)
+  id            String                      @id @default(cuid())
+  type          ConversationType
+  status        MessagingConversationStatus @default(ACTIVE)
   // Contexts métier · nullable au SQL, validés par type dans matrix.ts
-  centerId       String?
-  classroomId    String?
-  householdId    String?
-  assignmentId   String?
-  submissionId   String?
-  feedbackId     String?
+  centerId      String?
+  classroomId   String?
+  householdId   String?
+  assignmentId  String?
+  submissionId  String?
+  feedbackId    String?
   // Pour rappels de paiement · référence future à un Invoice réel.
-  invoiceId      String?
-  createdAt      DateTime                     @default(now())
-  updatedAt      DateTime                     @updatedAt
-  lastMessageAt  DateTime?
-  closedAt       DateTime?
-  metadata       Json?
+  invoiceId     String?
+  createdAt     DateTime                    @default(now())
+  updatedAt     DateTime                    @updatedAt
+  lastMessageAt DateTime?
+  closedAt      DateTime?
+  metadata      Json?
 
-  participants        MessagingConversationParticipant[]
-  messages            MessagingMessage[]
-  readStates          MessagingConversationReadState[]
-  moderationActions   MessagingModerationAction[]
-  audioAssets         MessagingAudioAsset[]
+  participants      MessagingConversationParticipant[]
+  messages          MessagingMessage[]
+  readStates        MessagingConversationReadState[]
+  moderationActions MessagingModerationAction[]
+  audioAssets       MessagingAudioAsset[]
 
   @@index([type, centerId])
   @@index([type, classroomId])
@@ -1858,19 +1877,19 @@ model MessagingConversation {
 }
 
 model MessagingConversationParticipant {
-  id                String                    @id @default(cuid())
-  conversationId    String
-  conversation      MessagingConversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  actorType         MessagingActorType
-  userId            String?
-  user              User?                     @relation("MessagingParticipantUser", fields: [userId], references: [id], onDelete: SetNull)
-  childProfileId    String?
-  childProfile      ChildProfile?             @relation("MessagingParticipantChild", fields: [childProfileId], references: [id], onDelete: SetNull)
-  participantRole   MessagingParticipantRole  @default(MEMBER)
-  joinedAt          DateTime                  @default(now())
-  leftAt            DateTime?
-  createdAt         DateTime                  @default(now())
-  updatedAt         DateTime                  @updatedAt
+  id              String                   @id @default(cuid())
+  conversationId  String
+  conversation    MessagingConversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  actorType       MessagingActorType
+  userId          String?
+  user            User?                    @relation("MessagingParticipantUser", fields: [userId], references: [id], onDelete: SetNull)
+  childProfileId  String?
+  childProfile    ChildProfile?            @relation("MessagingParticipantChild", fields: [childProfileId], references: [id], onDelete: SetNull)
+  participantRole MessagingParticipantRole @default(MEMBER)
+  joinedAt        DateTime                 @default(now())
+  leftAt          DateTime?
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
 
   // Unicité active : un user ou un child ne peut avoir qu'une seule
   // participation dans une conversation donnée. Le service métier gère
@@ -1884,34 +1903,34 @@ model MessagingConversationParticipant {
 }
 
 model MessagingMessage {
-  id                    String                     @id @default(cuid())
-  conversationId        String
-  conversation          MessagingConversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  senderType            MessagingActorType
-  senderUserId          String?
-  senderUser            User?                      @relation("MessagingMessageSenderUser", fields: [senderUserId], references: [id], onDelete: SetNull)
-  senderChildProfileId  String?
-  senderChildProfile    ChildProfile?              @relation("MessagingMessageSenderChild", fields: [senderChildProfileId], references: [id], onDelete: SetNull)
-  kind                  MessagingMessageKind
-  body                  String?
-  guidedPhraseId        String?
-  guidedPhrase          MessagingGuidedPhrase?     @relation(fields: [guidedPhraseId], references: [id], onDelete: SetNull)
-  replyToMessageId      String?
-  replyTo               MessagingMessage?          @relation("MessagingMessageReply", fields: [replyToMessageId], references: [id], onDelete: SetNull)
-  replies               MessagingMessage[]         @relation("MessagingMessageReply")
-  cardType              MessagingCardType?
-  cardPayload           Json?
-  audioAssetId          String?
-  audioAsset            MessagingAudioAsset?       @relation(fields: [audioAssetId], references: [id], onDelete: SetNull)
-  moderationState       MessagingModerationState   @default(ACTIVE)
-  idempotencyKey        String?
-  createdAt             DateTime                   @default(now())
-  publishedAt           DateTime?
-  deletedAt             DateTime?
-  metadata              Json?
+  id                   String                   @id @default(cuid())
+  conversationId       String
+  conversation         MessagingConversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderType           MessagingActorType
+  senderUserId         String?
+  senderUser           User?                    @relation("MessagingMessageSenderUser", fields: [senderUserId], references: [id], onDelete: SetNull)
+  senderChildProfileId String?
+  senderChildProfile   ChildProfile?            @relation("MessagingMessageSenderChild", fields: [senderChildProfileId], references: [id], onDelete: SetNull)
+  kind                 MessagingMessageKind
+  body                 String?
+  guidedPhraseId       String?
+  guidedPhrase         MessagingGuidedPhrase?   @relation(fields: [guidedPhraseId], references: [id], onDelete: SetNull)
+  replyToMessageId     String?
+  replyTo              MessagingMessage?        @relation("MessagingMessageReply", fields: [replyToMessageId], references: [id], onDelete: SetNull)
+  replies              MessagingMessage[]       @relation("MessagingMessageReply")
+  cardType             MessagingCardType?
+  cardPayload          Json?
+  audioAssetId         String?
+  audioAsset           MessagingAudioAsset?     @relation(fields: [audioAssetId], references: [id], onDelete: SetNull)
+  moderationState      MessagingModerationState @default(ACTIVE)
+  idempotencyKey       String?
+  createdAt            DateTime                 @default(now())
+  publishedAt          DateTime?
+  deletedAt            DateTime?
+  metadata             Json?
 
-  attachments           MessagingMessageAttachment[]
-  receipts              MessagingMessageReceipt[]
+  attachments MessagingMessageAttachment[]
+  receipts    MessagingMessageReceipt[]
 
   @@unique([conversationId, idempotencyKey], name: "conv_idem_unique")
   @@index([conversationId, createdAt])
@@ -1921,42 +1940,42 @@ model MessagingMessage {
 }
 
 model MessagingMessageAttachment {
-  id          String            @id @default(cuid())
-  messageId   String
-  message     MessagingMessage  @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  kind        String            // "audio", "card_ref", "other" · pas d'enum pour flexibilité
-  storageKey  String?           // clé bucket privé · aucune URL publique
-  mimeType    String?
-  sizeBytes   Int?
-  createdAt   DateTime          @default(now())
+  id         String           @id @default(cuid())
+  messageId  String
+  message    MessagingMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  kind       String // "audio", "card_ref", "other" · pas d'enum pour flexibilité
+  storageKey String? // clé bucket privé · aucune URL publique
+  mimeType   String?
+  sizeBytes  Int?
+  createdAt  DateTime         @default(now())
 
   @@index([messageId])
   @@map("messaging_message_attachments")
 }
 
 model MessagingAudioAsset {
-  id                    String                @id @default(cuid())
-  ownerUserId           String?
-  ownerUser             User?                 @relation("MessagingAudioOwnerUser", fields: [ownerUserId], references: [id], onDelete: SetNull)
-  ownerChildProfileId   String?
-  ownerChildProfile     ChildProfile?         @relation("MessagingAudioOwnerChild", fields: [ownerChildProfileId], references: [id], onDelete: SetNull)
+  id                  String                 @id @default(cuid())
+  ownerUserId         String?
+  ownerUser           User?                  @relation("MessagingAudioOwnerUser", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerChildProfileId String?
+  ownerChildProfile   ChildProfile?          @relation("MessagingAudioOwnerChild", fields: [ownerChildProfileId], references: [id], onDelete: SetNull)
   // P4.6-C.1 · conversation d'origine · requis pour storage path
   // v1/<conversationId>/<id>.<ext> et retention scans efficaces.
-  conversationId        String?
-  conversation          MessagingConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
-  status                MessagingAudioStatus  @default(PENDING)
-  storageKey            String?               // clé privée · jamais publique
-  mimeType              String?
-  sizeBytes             Int?
-  durationMs            Int?
-  waveform              Json?                 // représentation calculée client
-  transcript            String?
-  createdAt             DateTime              @default(now())
-  finalizedAt           DateTime?             // = readyAt (brief §5)
-  expiresAt             DateTime?             // = retentionUntil (brief §5)
-  deletedAt             DateTime?             // P4.6-C.1 · tombstone soft-delete
+  conversationId      String?
+  conversation        MessagingConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  status              MessagingAudioStatus   @default(PENDING)
+  storageKey          String? // clé privée · jamais publique
+  mimeType            String?
+  sizeBytes           Int?
+  durationMs          Int?
+  waveform            Json? // représentation calculée client
+  transcript          String?
+  createdAt           DateTime               @default(now())
+  finalizedAt         DateTime? // = readyAt (brief §5)
+  expiresAt           DateTime? // = retentionUntil (brief §5)
+  deletedAt           DateTime? // P4.6-C.1 · tombstone soft-delete
 
-  messages              MessagingMessage[]
+  messages MessagingMessage[]
 
   @@index([status, expiresAt])
   @@index([ownerUserId])
@@ -1967,32 +1986,32 @@ model MessagingAudioAsset {
 }
 
 model MessagingGuidedPhrase {
-  id                String              @id @default(cuid())
-  universe          Universe
-  locale            String              // "fr" | "en"
-  conversationType  ConversationType
-  category          String?
-  text              String
-  isActive          Boolean             @default(true)
-  ordering          Int                 @default(0)
-  createdAt         DateTime            @default(now())
+  id               String           @id @default(cuid())
+  universe         Universe
+  locale           String // "fr" | "en"
+  conversationType ConversationType
+  category         String?
+  text             String
+  isActive         Boolean          @default(true)
+  ordering         Int              @default(0)
+  createdAt        DateTime         @default(now())
 
-  messages          MessagingMessage[]
+  messages MessagingMessage[]
 
   @@index([universe, conversationType, isActive])
   @@map("messaging_guided_phrases")
 }
 
 model MessagingMessageReceipt {
-  id                        String                @id @default(cuid())
+  id                        String               @id @default(cuid())
   messageId                 String
-  message                   MessagingMessage      @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  message                   MessagingMessage     @relation(fields: [messageId], references: [id], onDelete: Cascade)
   kind                      MessagingReceiptKind
   // Le récepteur peut être un User (parent observer, membre) ou un
   // ChildProfile pour les futures notifications spécifiques enfants.
   participantUserId         String?
   participantChildProfileId String?
-  createdAt                 DateTime              @default(now())
+  createdAt                 DateTime             @default(now())
 
   @@index([messageId, kind])
   @@index([participantUserId, kind])
@@ -2015,18 +2034,18 @@ model MessagingConversationReadState {
 }
 
 model MessagingModerationAction {
-  id                String                    @id @default(cuid())
-  conversationId    String
-  conversation      MessagingConversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  actorUserId       String
-  actor             User                      @relation("MessagingModerationActor", fields: [actorUserId], references: [id], onDelete: Cascade)
+  id              String                @id @default(cuid())
+  conversationId  String
+  conversation    MessagingConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  actorUserId     String
+  actor           User                  @relation("MessagingModerationActor", fields: [actorUserId], references: [id], onDelete: Cascade)
   // "HIDE_MESSAGE" | "CLOSE_CONVERSATION" | "REOPEN" | "INTERVENE_SUPPORT" ·
   // pas d'enum pour permettre évolutions rapides.
-  action            String
-  targetMessageId   String?
-  reason            String?
-  metadata          Json?
-  createdAt         DateTime                  @default(now())
+  action          String
+  targetMessageId String?
+  reason          String?
+  metadata        Json?
+  createdAt       DateTime              @default(now())
 
   @@index([conversationId, createdAt])
   @@map("messaging_moderation_actions")

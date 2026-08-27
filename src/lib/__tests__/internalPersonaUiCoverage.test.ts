@@ -74,9 +74,9 @@ describe("Persona dashboards · dedicated pages", () => {
     expect(audit).toContain("unexpectedSections");
   });
 
-  it("keeps commercial surfaces out of the technical beta navigation", () => {
-    expect(PUBLIC_SURFACE.pricing.status).toBe("HIDDEN");
-    expect(PUBLIC_SURFACE.centers.status).toBe("PRIVATE");
+  it("keeps payment execution out while public commercial discovery is live", () => {
+    expect(PUBLIC_SURFACE.pricing.status).toBe("LIVE");
+    expect(PUBLIC_SURFACE.centers.status).toBe("BETA");
 
     const familyNav = read("src/features/dashboards/family/nav.ts");
     const familyDashboard = read("src/features/dashboards/family/FamilyDashboard.tsx");
@@ -96,9 +96,8 @@ describe("Persona dashboards · dedicated pages", () => {
 
     const register = read("src/app/[locale]/register/page.tsx");
     const registerLayout = read("src/app/[locale]/register/layout.tsx");
-    expect(register).not.toContain('searchParams.get("plan")');
-    expect(register).not.toContain('searchParams.get("prof")');
-    expect(register).not.toContain("PLAN_LABEL_");
+    expect(register).not.toContain("checkout");
+    expect(register).not.toContain("payment_intent");
     expect(registerLayout).not.toContain("credit card");
     expect(registerLayout).not.toContain("carte bancaire");
 

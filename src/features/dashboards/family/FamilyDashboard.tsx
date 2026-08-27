@@ -32,7 +32,7 @@ async function fetchDashboard(): Promise<FamilyDashboardResponse> {
 
 type LoadState = { kind: "loading" } | { kind: "error" } | { kind: "ready"; data: FamilyDashboardResponse };
 type Props = { locale: "fr" | "en"; activeSectionId?: string };
-const ALLOWED = new Set(["accueil", "enfants", "progression", "activite-prioritaire", "histoires-jeux", "seances", "messages", "parametres"]);
+const ALLOWED = new Set(["accueil", "mes-enfants", "progression", "activite-prioritaire", "histoires-jeux", "seances", "messages", "parametres"]);
 
 export function FamilyDashboard({ locale, activeSectionId = "accueil" }: Props) {
   const t = useTranslations("yemaDashboards.family");
@@ -41,7 +41,8 @@ export function FamilyDashboard({ locale, activeSectionId = "accueil" }: Props) 
   const tAdd = useTranslations("yemaDashboards.family.addDialog");
   const currentLocale = useLocale();
   const [state, setState] = useState<LoadState>({ kind: "loading" });
-  const activeSection = ALLOWED.has(activeSectionId) ? activeSectionId : "accueil";
+  const normalizedSectionId = activeSectionId === "enfants" ? "mes-enfants" : activeSectionId;
+  const activeSection = ALLOWED.has(normalizedSectionId) ? normalizedSectionId : "accueil";
   const baseHref = `/${currentLocale ?? locale}/family`;
   const activeHref = sectionPageHref(baseHref, activeSection, "accueil");
 
@@ -67,7 +68,7 @@ export function FamilyDashboard({ locale, activeSectionId = "accueil" }: Props) 
   const personaSubtitle = t("personaSubtitle");
   const navGroups = routeSectionNav(buildFamilyNav({ overview: t("nav.overview"), children: t("nav.children"), progression: t("nav.progression"), sessions: t("nav.sessions"), messages: t("nav.messages"), settings: t("nav.settings"), sectionLabel: t("sidebarSection") }, baseHref), baseHref, "accueil");
   const mobileTabs = routeSectionTabs(buildFamilyMobileTabs({ overview: t("mobileNav.overview"), children: t("mobileNav.children"), progression: t("mobileNav.progression"), messages: t("mobileNav.messages") }, baseHref), baseHref, "accueil");
-  const activeTab = ({ accueil: "overview", enfants: "children", progression: "progression", "activite-prioritaire": "progression", "histoires-jeux": "progression", seances: "overview", messages: "messages", parametres: "overview" } as Record<string, string>)[activeSection];
+  const activeTab = ({ accueil: "overview", "mes-enfants": "children", progression: "progression", "activite-prioritaire": "progression", "histoires-jeux": "progression", seances: "overview", messages: "messages", parametres: "overview" } as Record<string, string>)[activeSection];
   const sidebar = <DashboardSidebar groups={navGroups} activeHref={activeHref} personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${currentLocale ?? locale}`} previewBadge={tCommon("previewBadge")} />;
   const mobileHeader = <DashboardMobileHeader personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${currentLocale ?? locale}`} />;
   const tabBar = <DashboardTabBar tabs={mobileTabs} activeKey={activeTab} />;
@@ -80,15 +81,20 @@ export function FamilyDashboard({ locale, activeSectionId = "accueil" }: Props) 
   const progression = <FamilyProgressionSection profiles={data.children} />;
   const content: Record<string, React.ReactNode> = {
     accueil: <FamilyOverviewSection data={data} />,
-    enfants: <FamilyChildrenSection data={data} baseHref={baseHref} locale={locale} actionsCopy={actionsCopy} />,
+    "mes-enfants": <FamilyChildrenSection data={data} baseHref={baseHref} locale={locale} actionsCopy={actionsCopy} />,
     progression,
     "activite-prioritaire": progression,
     "histoires-jeux": progression,
     seances: <FamilySessionsSection />,
     messages: <FamilyMessagesSection />,
-    parametres: <FamilySettingsSection />,
+    parametres: <FamilySettingsSection data={data} locale={locale} />,
   };
   const metaText = t("meta", { count: data.totalChildrenLinked });
   const accessMeta = data.adultAccess.hasAnyAdultAccess ? <DashboardStatusChip tone="gold">{[data.adultAccess.monde ? "Monde" : null, data.adultAccess.racines ? "Racines" : null].filter(Boolean).join(" · ")}</DashboardStatusChip> : undefined;
-  return shell(<div data-live-persona-section={activeSection}>{content[activeSection]}</div>, <DashboardHeader title={personaLabel} subtitle={metaText} meta={accessMeta} />);
+  const guardianFirstName = data.guardian.fullName?.trim().split(/\s+/)[0] || personaLabel;
+  const subtitle = data.guardian.city ? `${metaText} · ${data.guardian.city}` : metaText;
+  return shell(
+    <div data-live-persona-section={activeSection}>{content[activeSection]}</div>,
+    <DashboardHeader title={guardianFirstName} subtitle={subtitle} meta={accessMeta} />,
+  );
 }

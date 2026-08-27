@@ -6,10 +6,10 @@ import { PUBLIC_SURFACE } from "@/lib/release/publicSurface";
 const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
 
-describe("technical beta surface isolation", () => {
-  it("keeps pricing hidden and centers private on the public surface", () => {
-    expect(PUBLIC_SURFACE.pricing.status).toBe("HIDDEN");
-    expect(PUBLIC_SURFACE.centers.status).toBe("PRIVATE");
+describe("open beta public surface", () => {
+  it("keeps public offers live and centers explicitly in beta", () => {
+    expect(PUBLIC_SURFACE.pricing.status).toBe("LIVE");
+    expect(PUBLIC_SURFACE.centers.status).toBe("BETA");
   });
 
   it("does not expose payment navigation in the family dashboard", () => {
@@ -30,11 +30,32 @@ describe("technical beta surface isolation", () => {
     expect(dashboard).not.toContain('"factures"');
   });
 
-  it("keeps public registration independent from plan parameters", () => {
+  it("carries a selected offer through public registration without payment claims", () => {
     const register = read("src/app/[locale]/register/page.tsx");
-    expect(register).not.toContain('searchParams.get("plan")');
-    expect(register).not.toContain('searchParams.get("prof")');
+    expect(register).toContain('searchParams.get("plan")');
+    expect(register).toContain('searchParams.get("prof")');
+    expect(register).toContain("selected_plan: selectedPlan");
     expect(register).not.toContain("PLAN_LABEL_");
     expect(register).not.toContain("avant tout paiement");
+  });
+
+  it("does not boot QA or account probes on public pages", () => {
+    const layout = read("src/app/[locale]/layout.tsx");
+    const testSpaceBar = read("src/components/TestSpaceBar.tsx");
+
+    expect(layout).toContain('import { isQaModeActive } from "@/lib/qa/config"');
+    expect(layout).toContain("const qaModeActive = isQaModeActive()");
+    expect(layout).toContain("{qaModeActive ? <QaTestBar /> : null}");
+    expect(testSpaceBar).toContain("const APP_PREFIXES =");
+    expect(testSpaceBar).toContain("if (!isAppRoute) {");
+    expect(testSpaceBar).not.toContain("const publicPost =");
+  });
+
+  it("defers the authentication SDK until a registration action needs it", () => {
+    const register = read("src/app/[locale]/register/page.tsx");
+
+    expect(register).toContain('await import("@/lib/supabase/client")');
+    expect(register).toContain("await getSupabaseClient()");
+    expect(register).not.toContain('import { createClient } from "@/lib/supabase/client"');
   });
 });

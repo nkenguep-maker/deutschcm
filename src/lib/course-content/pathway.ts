@@ -13,7 +13,7 @@ const PERSONALIZED_VARIANTS = MONDE_PATHWAY_VARIANTS.filter(
 const LABELS_FR: Record<MondePathwayVariant, string> = {
   GENERAL: "Parcours général",
   STUDIES: "Études",
-  VISA: "Visa et démarches",
+  VISA: "Travailler et s’installer",
   NATURALIZATION: "Naturalisation",
   TOURISM: "Tourisme",
 };
@@ -21,7 +21,7 @@ const LABELS_FR: Record<MondePathwayVariant, string> = {
 const LABELS_EN: Record<MondePathwayVariant, string> = {
   GENERAL: "General pathway",
   STUDIES: "Studies",
-  VISA: "Visa and procedures",
+  VISA: "Work and move abroad",
   NATURALIZATION: "Naturalization",
   TOURISM: "Tourism",
 };

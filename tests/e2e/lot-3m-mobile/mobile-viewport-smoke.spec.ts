@@ -6,6 +6,7 @@
 // équivalent avec storageState — cf. tests/e2e/p4-5-b2b3-b2/responsive.spec.ts.
 
 import { test, expect } from "playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync } from "node:fs";
 
 const VIEWPORTS = [
@@ -21,6 +22,18 @@ const PUBLIC_PAGES = [
   { name: "landing-fr", path: "/fr" },
   { name: "landing-en", path: "/en" },
   { name: "login-fr", path: "/fr/login" },
+  { name: "register-fr", path: "/fr/register" },
+  { name: "pre-onboarding-fr", path: "/fr/pre-onboarding" },
+  { name: "beta-fr", path: "/fr/beta" },
+  { name: "terms-fr", path: "/fr/terms" },
+  { name: "terms-en", path: "/en/terms" },
+  { name: "privacy-fr", path: "/fr/privacy" },
+  { name: "privacy-en", path: "/en/privacy" },
+];
+
+const ACCESSIBILITY_VIEWPORTS = [
+  { name: "mobile", width: 390, height: 844 },
+  { name: "desktop", width: 1440, height: 900 },
 ];
 
 const OUT_DIR = "screenshots/lot-3m-mobile";
@@ -47,6 +60,27 @@ for (const p of PUBLIC_PAGES) {
         path: `${OUT_DIR}/${p.name}-${vp.name}.png`,
         fullPage: false,
       });
+      await context.close();
+    });
+  }
+}
+
+for (const p of PUBLIC_PAGES) {
+  for (const vp of ACCESSIBILITY_VIEWPORTS) {
+    test(`WCAG A/AA · ${p.name} · ${vp.name}`, async ({ browser }) => {
+      const context = await browser.newContext({
+        viewport: { width: vp.width, height: vp.height },
+      });
+      const page = await context.newPage();
+      const resp = await page.goto(p.path, { waitUntil: "load", timeout: 20_000 });
+      expect(resp?.status(), `${p.name} HTTP status`).toBeLessThan(400);
+      await page.evaluate(() => document.fonts.ready);
+
+      const { violations } = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "experimental"])
+        .analyze();
+
+      expect(violations, `${p.name} ${vp.name} doit respecter WCAG A/AA`).toEqual([]);
       await context.close();
     });
   }

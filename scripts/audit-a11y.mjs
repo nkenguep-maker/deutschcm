@@ -15,7 +15,6 @@ const PAGES = [
   { name: "login-fr",      path: "/fr/login" },
   { name: "register-fr",   path: "/fr/register" },
   { name: "methode-fr",    path: "/fr/methode" },
-  { name: "histoires-fr",  path: "/fr/histoires" },
   { name: "manifeste-fr",  path: "/fr/manifeste" },
   { name: "setup-role-fr", path: "/fr/setup-role" },
   { name: "onboard-stu-fr", path: "/fr/onboarding/student" },
@@ -37,7 +36,10 @@ const report = { base: BASE, when: new Date().toISOString(), pages: [] };
 for (const p of PAGES) {
   const url = `${BASE}${p.path}`;
   try {
-    await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+    const response = await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+    if (!response || !response.ok()) {
+      throw new Error(`expected a public 2xx response, received ${response?.status() ?? "no response"}`);
+    }
     await page.waitForTimeout(600);
 
     const res = await new AxeBuilder({ page })

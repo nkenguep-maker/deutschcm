@@ -1,0 +1,4 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "ignoreCommand": "node -e \"process.exit(process.env.VERCEL_PROJECT_ID === 'prj_tYT5aw4koV0BhcbuyK1BdF0b1f5n' ? 0 : 1)\""
+}

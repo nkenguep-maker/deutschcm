@@ -1,16 +1,10 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import {
-  Callout,
-  H2,
-  LegalShell,
-  P,
-  Ul,
-} from "@/components/landing/LegalShell";
+import { Callout, H2, LegalShell, P, Ul } from "@/components/landing/LegalShell";
 
-const EFFECTIVE_DATE = "15 mai 2026";
-const EFFECTIVE_DATE_EN = "May 15, 2026";
+const EFFECTIVE_DATE = "14 août 2026";
+const EFFECTIVE_DATE_EN = "August 14, 2026";
 const CONTACT_EMAIL = "privacy@yema.app";
 const COMPANY = "YEMA Languages";
 
@@ -21,240 +15,110 @@ export default function PrivacyPage() {
 
 function PrivacyEN() {
   return (
-    <LegalShell
-      locale="en"
-      eye="Legal"
-      title="Privacy Policy"
-      effective={EFFECTIVE_DATE_EN}
-      updated={EFFECTIVE_DATE_EN}
-      contactEmail={CONTACT_EMAIL}
-      contactLine="Questions or requests? Reach us at"
-    >
-      <P>
-        {COMPANY} (&quot;YEMA&quot;, &quot;we&quot;, &quot;us&quot;) is
-        committed to protecting your personal data. This Privacy Policy
-        explains what data we collect, how we use it, and your rights — in
-        compliance with Cameroon Law No. 2024/017 on Personal Data Protection
-        and GDPR best practices.
-      </P>
+    <LegalShell locale="en" eye="Legal" title="Privacy Policy" effective={EFFECTIVE_DATE_EN} updated={EFFECTIVE_DATE_EN} contactEmail={CONTACT_EMAIL} contactLine="Questions or requests? Reach us at">
+      <P>{COMPANY} (&quot;YEMA&quot;, &quot;we&quot;, &quot;us&quot;) explains here how personal data is handled in the current open-beta product. We apply applicable data-protection requirements and will update this notice when materially new processing, including online payments, is introduced.</P>
+      <Callout variant="info"><strong>Current status:</strong> YEMA is operating as an open beta. Online payment is not currently activated.</Callout>
 
-      <Callout variant="info">
-        <strong>Independence notice:</strong> {COMPANY} is an independent
-        pan-African language learning platform, not affiliated with any state
-        examination institute.
-      </Callout>
+      <H2>1. Data we may process</H2>
+      <Ul items={[
+        "Adult account data: name, email address, profile information and trusted workspace roles.",
+        "Learning data: selected language journeys, progress, exercises, quiz results and activity required to provide the service.",
+        "Family data: child profiles created and managed by a parent or guardian, including first name, age range or age, selected languages, learning settings and PIN-security state.",
+        "Class, center and coaching data: memberships, enrollment requests, assignments, sessions, feedback and other records needed for the relevant workspace.",
+        "Messaging and user content: messages and, where the feature is enabled, audio or other content intentionally submitted through YEMA.",
+        "Technical and security data: authentication/session information, security events and limited diagnostics necessary to operate and protect the service.",
+      ]} />
 
-      <H2>1. Data we collect</H2>
-      <P>When you use YEMA, we may collect:</P>
-      <Ul
-        items={[
-          "Account data: name, email address, chosen role (student, teacher, center manager)",
-          "Learning data: lesson progress, quiz scores, XP points, streak, badge history",
-          "Voice & audio data: audio recordings submitted during pronunciation exercises and simulator sessions — processed in real time and not stored permanently",
-          "Usage data: pages visited, features used, session duration (via anonymized analytics)",
-          "Payment data: Mobile Money transaction references — processed by MTN / Orange Money, not stored by YEMA",
-          "Device data: browser type, operating system, approximate country (via IP, not stored)",
-        ]}
-      />
+      <H2>2. How we use data</H2>
+      <Ul items={[
+        "Authenticate users and route them to the correct YEMA workspace.",
+        "Provide learning, family, classroom, coaching, messaging and open-beta features.",
+        "Protect accounts and the platform against abuse, fraud and unauthorized access.",
+        "Operate invitations, support requests and service-related communications.",
+        "Improve product reliability and understand feature usage using the telemetry that is actually enabled.",
+        "Meet applicable legal obligations and respond to valid rights requests.",
+      ]} />
 
-      <H2>2. How we use your data</H2>
-      <Ul
-        items={[
-          "Provide and improve the learning platform",
-          "Personalize your learning experience across languages (foreign and native)",
-          "Process AI-powered voice analysis and writing correction",
-          "Send account-related emails (confirmation, notifications) — with your consent",
-          "Generate anonymous platform usage statistics",
-          "Comply with legal obligations",
-        ]}
-      />
+      <H2>3. Audio, AI and user content</H2>
+      <P>Different YEMA features handle audio differently. Some learning or AI-assisted interactions may process audio transiently through enabled service providers. Messaging or other user-submitted audio may be stored when storage is required for that feature. We therefore do not claim that every audio recording is deleted immediately. Access and retention depend on the feature, its security controls and the purpose for which the content was submitted.</P>
+      <P>AI-assisted features may process text or audio through third-party services when those features are enabled. AI output can be imperfect and is not treated as an official examination decision.</P>
 
-      <H2>3. AI and voice processing</H2>
-      <P>
-        AI features (voice recognition, scenario simulator, writing correction)
-        process audio and text input using third-party AI APIs. Audio is
-        transmitted securely via HTTPS and is not stored after processing. By
-        using these features, you consent to this real-time processing.
-      </P>
+      <H2>4. Children and family accounts</H2>
+      <P>YEMA supports child profiles that are created and managed under an adult parent or guardian account. Children do not create independent YEMA email accounts through the family flow. The adult account holder is responsible for creating the child profile and for the information and permissions associated with that profile.</P>
 
-      <H2>4. Data sharing</H2>
-      <P>We do not sell your personal data. We may share data with:</P>
-      <Ul
-        items={[
-          "Supabase (database and authentication infrastructure, hosted in the EU)",
-          "AI providers (AI features — data not used to train models)",
-          "Vercel (hosting infrastructure)",
-          "Your teacher or center manager (learning progress only, if you are enrolled in a class)",
-        ]}
-      />
+      <H2>5. Service providers and sharing</H2>
+      <P>We do not sell personal data. We may use infrastructure and service providers such as authentication/database, hosting, email or AI providers where a feature requires them. We share only the information reasonably necessary to operate that feature. Learning or class information may also be visible to an authorized teacher, coach, parent/guardian or center representative according to the workspace and permissions involved.</P>
 
-      <H2>5. Data retention</H2>
-      <Ul
-        items={[
-          "Account data: retained while your account is active",
-          "Learning data: retained for 36 months after last activity",
-          "Voice recordings: deleted immediately after processing (not stored)",
-          "Deleted accounts: all personal data erased within 30 days of deletion request",
-        ]}
-      />
+      <H2>6. Payments</H2>
+      <P>Online payments are not currently activated. YEMA does not currently ask users to complete a live checkout in the open-beta product. Before payment processing is enabled, the relevant checkout, provider information and any additional privacy terms will be presented and this notice will be updated where required.</P>
 
-      <H2>6. Your rights</H2>
-      <P>You have the right to:</P>
-      <Ul
-        items={[
-          "Access your personal data",
-          "Correct inaccurate data",
-          "Delete your account and all associated data",
-          "Withdraw consent for email notifications or analytics at any time",
-          "Request a copy of your data (data portability)",
-          "Lodge a complaint with Cameroon's personal data protection authority",
-        ]}
-      />
-      <P>
-        To exercise these rights, email us at{" "}
-        <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> or use the
-        &quot;Delete my account&quot; option in your account settings.
-      </P>
+      <H2>7. Retention and deletion</H2>
+      <P>We retain data only for as long as reasonably necessary for the feature, account, security, legal or operational purpose involved. Different categories may have different retention needs. We do not promise a fixed deletion or retention period here unless that period is actually implemented for the relevant feature.</P>
+      <P>To request access, correction, deletion or another applicable privacy right, contact <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. We may need to verify the requester before acting on account or child-profile data.</P>
 
-      <H2>7. Cookies and analytics</H2>
-      <P>
-        YEMA uses minimal, privacy-respecting analytics (no cross-site
-        tracking). We do not use advertising cookies. Session cookies are
-        required for authentication. You can disable non-essential cookies in
-        your browser.
-      </P>
+      <H2>8. Cookies and authentication</H2>
+      <P>YEMA uses session and security mechanisms required for authentication and protected workspaces. Additional analytics or optional technologies are used only when enabled for the product. We do not describe advertising tracking as part of the current open-beta product.</P>
 
-      <H2>8. Children</H2>
-      <P>
-        YEMA is not directed at children under 16. If you believe a child has
-        provided us with personal data without parental consent, please contact
-        us immediately.
-      </P>
+      <H2>9. Security</H2>
+      <P>YEMA uses technical and organizational controls including authenticated access, role checks, scoped server-side authorization and security logging for sensitive operations. No online system can guarantee absolute security.</P>
 
-      <H2>9. Changes to this policy</H2>
-      <P>
-        We may update this policy. We will notify you by email for material
-        changes. Continued use of YEMA after changes constitutes acceptance.
-      </P>
+      <H2>10. Changes</H2>
+      <P>We may update this notice as YEMA evolves. Material changes to data processing will be reflected in the published policy and, where appropriate, communicated through the service or by email.</P>
     </LegalShell>
   );
 }
 
 function PrivacyFR() {
   return (
-    <LegalShell
-      locale="fr"
-      eye="Mentions légales"
-      title="Politique de confidentialité"
-      effective={EFFECTIVE_DATE}
-      updated={EFFECTIVE_DATE}
-      contactEmail={CONTACT_EMAIL}
-      contactLine="Questions ou demandes ? Contactez-nous à"
-    >
-      <P>
-        {COMPANY} (&quot;YEMA&quot;, &quot;nous&quot;) s&apos;engage à protéger
-        vos données personnelles. Cette politique explique les données
-        collectées, leur utilisation et vos droits — conformément à la Loi
-        camerounaise n°2024/017 sur la protection des données personnelles et
-        aux bonnes pratiques RGPD.
-      </P>
+    <LegalShell locale="fr" eye="Mentions légales" title="Politique de confidentialité" effective={EFFECTIVE_DATE} updated={EFFECTIVE_DATE} contactEmail={CONTACT_EMAIL} contactLine="Questions ou demandes ? Contactez-nous à">
+      <P>{COMPANY} (&quot;YEMA&quot;, &quot;nous&quot;) explique ici comment les données personnelles sont traitées dans le produit actuellement disponible en bêta ouverte. Nous appliquons les exigences de protection des données qui nous sont applicables et mettrons cette notice à jour lors de l’introduction de traitements matériels nouveaux, notamment les paiements en ligne.</P>
+      <Callout variant="info"><strong>Statut actuel :</strong> YEMA fonctionne en bêta ouverte. Le paiement en ligne n’est pas activé à ce jour.</Callout>
 
-      <Callout variant="info">
-        <strong>Notice d&apos;indépendance :</strong> {COMPANY} est une
-        plateforme d&apos;apprentissage indépendante, non affiliée à aucun
-        organisme officiel d&apos;examen.
-      </Callout>
-
-      <H2>1. Données collectées</H2>
-      <Ul
-        items={[
-          "Données de compte : nom, email, rôle (élève, enseignant, responsable de centre)",
-          "Données d'apprentissage : progression, scores, XP, streak, badges — pour les langues du monde comme africaines",
-          "Données vocales : enregistrements audio traités en temps réel lors des exercices de prononciation et du simulateur — non stockés",
-          "Données d'utilisation : pages visitées, fonctionnalités utilisées (analytics anonymisés)",
-          "Données de paiement : références Mobile Money traitées par MTN/Orange, non stockées par YEMA",
-        ]}
-      />
+      <H2>1. Données que nous pouvons traiter</H2>
+      <Ul items={[
+        "Données du compte adulte : nom, adresse e-mail, informations de profil et rôles d’espace de confiance.",
+        "Données d’apprentissage : parcours choisis, progression, exercices, résultats de quiz et activité nécessaire au service.",
+        "Données famille : profils enfants créés et gérés par un parent ou tuteur, notamment prénom, âge ou tranche d’âge, langues choisies, réglages d’apprentissage et état de sécurité du PIN.",
+        "Données classe, centre et coaching : appartenances, demandes d’inscription, devoirs, séances, retours et autres éléments nécessaires à l’espace concerné.",
+        "Messagerie et contenus utilisateur : messages et, lorsque la fonctionnalité est activée, audio ou autres contenus volontairement envoyés dans YEMA.",
+        "Données techniques et de sécurité : informations d’authentification/session, événements de sécurité et diagnostics limités nécessaires au fonctionnement et à la protection du service.",
+      ]} />
 
       <H2>2. Utilisation des données</H2>
-      <Ul
-        items={[
-          "Fournir et améliorer la plateforme",
-          "Personnaliser votre apprentissage (langues du monde ou africaines)",
-          "Traitement IA (voix, écriture) — avec votre consentement",
-          "Envoi d'emails liés au compte (avec votre accord)",
-          "Statistiques anonymes d'utilisation",
-          "Respect des obligations légales",
-        ]}
-      />
+      <Ul items={[
+        "Authentifier les utilisateurs et les orienter vers le bon espace YEMA.",
+        "Fournir les fonctions d’apprentissage, famille, classe, coaching, messagerie et bêta ouverte.",
+        "Protéger les comptes et la plateforme contre les abus, la fraude et les accès non autorisés.",
+        "Gérer les invitations, demandes de support et communications liées au service.",
+        "Améliorer la fiabilité du produit et comprendre l’usage des fonctionnalités à partir de la télémétrie réellement activée.",
+        "Respecter les obligations légales applicables et répondre aux demandes valides d’exercice de droits.",
+      ]} />
 
-      <H2>3. Traitement IA et voix</H2>
-      <P>
-        Les fonctionnalités IA (reconnaissance vocale, simulateur, correction
-        écrite) utilisent des APIs IA tierces. L&apos;audio est transmis en
-        HTTPS et non stocké après traitement. En utilisant ces fonctionnalités,
-        vous consentez à ce traitement.
-      </P>
+      <H2>3. Audio, IA et contenus utilisateur</H2>
+      <P>Les fonctionnalités YEMA ne traitent pas toutes l’audio de la même façon. Certaines interactions d’apprentissage ou assistées par IA peuvent traiter un audio de manière transitoire via les prestataires activés. La messagerie ou d’autres fonctions peuvent conserver un audio envoyé par l’utilisateur lorsque ce stockage est nécessaire au service. Nous n’affirmons donc pas que tous les enregistrements sont supprimés immédiatement. L’accès et la conservation dépendent de la fonctionnalité, de ses contrôles de sécurité et de la finalité du contenu envoyé.</P>
+      <P>Les fonctions assistées par IA peuvent traiter du texte ou de l’audio via des services tiers lorsqu’elles sont activées. Les sorties IA peuvent comporter des erreurs et ne constituent pas une décision officielle d’examen.</P>
 
-      <H2>4. Partage des données</H2>
-      <P>Nous ne vendons pas vos données. Nous les partageons avec :</P>
-      <Ul
-        items={[
-          "Supabase (infrastructure base de données et authentification, hébergée en UE)",
-          "Fournisseurs IA (fonctionnalités IA — données non utilisées pour l'entraînement)",
-          "Vercel (infrastructure d'hébergement)",
-          "Votre enseignant ou responsable de centre (progression uniquement, si inscrit en classe)",
-        ]}
-      />
+      <H2>4. Enfants et comptes famille</H2>
+      <P>YEMA permet à un parent ou tuteur adulte de créer et gérer des profils enfants sous son propre compte. Le parcours Famille ne crée pas de compte e-mail YEMA indépendant pour l’enfant. Le titulaire adulte du compte est responsable de la création du profil enfant et des informations et autorisations qui lui sont associées.</P>
 
-      <H2>5. Conservation des données</H2>
-      <Ul
-        items={[
-          "Données de compte : conservées tant que le compte est actif",
-          "Données d'apprentissage : conservées 36 mois après dernière activité",
-          "Enregistrements vocaux : supprimés immédiatement après traitement",
-          "Comptes supprimés : toutes données effacées dans les 30 jours",
-        ]}
-      />
+      <H2>5. Prestataires et partage</H2>
+      <P>Nous ne vendons pas les données personnelles. Nous pouvons utiliser des prestataires d’authentification/base de données, d’hébergement, d’e-mail ou d’IA lorsqu’une fonctionnalité le nécessite. Nous ne partageons que les informations raisonnablement nécessaires au fonctionnement de cette fonctionnalité. Les informations d’apprentissage ou de classe peuvent aussi être visibles par un enseignant, coach, parent/tuteur ou représentant de centre autorisé selon l’espace et les permissions concernés.</P>
 
-      <H2>6. Vos droits</H2>
-      <Ul
-        items={[
-          "Accéder à vos données",
-          "Corriger vos données",
-          "Supprimer votre compte et toutes les données associées",
-          "Retirer votre consentement aux emails ou analytics",
-          "Demander une copie de vos données (portabilité)",
-          "Déposer une réclamation auprès de l'autorité compétente au Cameroun",
-        ]}
-      />
-      <P>
-        Contactez-nous à{" "}
-        <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> ou utilisez
-        l&apos;option &quot;Supprimer mon compte&quot; dans vos paramètres.
-      </P>
+      <H2>6. Paiements</H2>
+      <P>Les paiements en ligne ne sont pas encore activés. YEMA ne demande actuellement aucun checkout réel dans le produit en bêta ouverte. Avant l’activation du paiement, le parcours de checkout, les informations du prestataire et les éventuelles conditions de confidentialité supplémentaires seront présentés et cette notice sera mise à jour si nécessaire.</P>
 
-      <H2>7. Cookies et analytics</H2>
-      <P>
-        YEMA utilise des analytics minimales, respectueuses de la vie privée
-        (pas de tracking inter-sites). Pas de cookies publicitaires. Les
-        cookies de session sont requis pour l&apos;authentification. Vous
-        pouvez désactiver les cookies non essentiels dans votre navigateur.
-      </P>
+      <H2>7. Conservation et suppression</H2>
+      <P>Nous conservons les données pendant une durée raisonnablement nécessaire à la fonctionnalité, au compte, à la sécurité, aux obligations légales ou au fonctionnement du service. Les catégories de données peuvent avoir des besoins différents. Nous ne promettons pas ici un délai fixe de conservation ou de suppression lorsqu’il n’est pas effectivement implémenté pour la fonctionnalité concernée.</P>
+      <P>Pour demander l’accès, la rectification, la suppression ou exercer un autre droit applicable, contactez <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Nous pouvons vérifier l’identité du demandeur avant d’agir sur les données d’un compte ou d’un profil enfant.</P>
 
-      <H2>8. Enfants</H2>
-      <P>
-        YEMA n&apos;est pas destiné aux enfants de moins de 16 ans. Si vous
-        pensez qu&apos;un enfant nous a communiqué des données personnelles
-        sans consentement parental, contactez-nous immédiatement.
-      </P>
+      <H2>8. Cookies et authentification</H2>
+      <P>YEMA utilise les mécanismes de session et de sécurité nécessaires à l’authentification et aux espaces protégés. Les technologies analytiques ou optionnelles ne sont utilisées que lorsqu’elles sont effectivement activées. Nous ne présentons pas de suivi publicitaire comme faisant partie de la bêta ouverte actuelle.</P>
 
-      <H2>9. Modifications</H2>
-      <P>
-        Nous pouvons mettre à jour cette politique. Pour les modifications
-        importantes, vous serez notifié par email. La poursuite de
-        l&apos;utilisation de YEMA vaut acceptation.
-      </P>
+      <H2>9. Sécurité</H2>
+      <P>YEMA utilise des mesures techniques et organisationnelles comprenant l’accès authentifié, des contrôles de rôles, des autorisations serveur limitées au bon périmètre et la journalisation d’opérations sensibles. Aucun service en ligne ne peut garantir une sécurité absolue.</P>
+
+      <H2>10. Modifications</H2>
+      <P>Cette notice peut évoluer avec YEMA. Les changements importants concernant le traitement des données seront reflétés dans la politique publiée et, lorsque cela est approprié, communiqués dans le service ou par e-mail.</P>
     </LegalShell>
   );
 }

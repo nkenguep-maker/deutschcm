@@ -14,6 +14,7 @@ import { isInternalTesterEmail, INTERNAL_TEST_COOKIE_MAX_AGE, INTERNAL_TEST_COOK
 import { ensureInternalTestWorkspace, hasInternalTestMarker } from "@/lib/internalTestProvisioning";
 import { syncUserMetadata } from "@/lib/roles";
 import { CHILD_SESSION_COOKIE_NAME } from "@/lib/security/childSession";
+import { toMinorUnits } from "@/lib/payments/money";
 import {
   AFRICAN_FAMILY,
   AFRICAN_SOLO,
@@ -54,16 +55,19 @@ function amountFor(params: {
 }): number {
   const rail: Rail = params.currency === "XAF" ? "fcfa" : "eur";
   if (params.offer === "PASSAGE") {
-    return WORLD_PASSAGE_PRICES[params.level ?? "A1"][rail];
+    return toMinorUnits(
+      String(WORLD_PASSAGE_PRICES[params.level ?? "A1"][rail]),
+      params.currency,
+    );
   }
   const table = params.offer === "ROOTS_FAMILY" ? AFRICAN_FAMILY : AFRICAN_SOLO;
   const value = table[rail][params.period === "MONTH" ? "month" : "year"];
-  return params.currency === "EUR" ? Math.round(value * 100) : Math.round(value);
+  return toMinorUnits(String(value), params.currency);
 }
 
 function teacherAmount(level: LevelId, currency: Currency): number {
   const rail: Rail = currency === "XAF" ? "fcfa" : "eur";
-  return WORLD_TEACHER_ADD[level][rail];
+  return toMinorUnits(String(WORLD_TEACHER_ADD[level][rail]), currency);
 }
 
 async function ensureProductVariant(params: {

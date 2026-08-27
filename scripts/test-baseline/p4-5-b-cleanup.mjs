@@ -80,6 +80,7 @@ async function main() {
     process.stderr.write("\nBASELINE DATA CLEANED\n");
   } else {
     process.stderr.write("\nCLEANUP FAILED · residual fixtures detected\n");
+    process.exitCode = 1;
   }
   await db.$disconnect();
   return residuals;

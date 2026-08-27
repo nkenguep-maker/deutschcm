@@ -7,6 +7,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { frTypo } from "@/components/landing/typo";
 import { BrandLockup } from "@/components/brand/BrandLockup";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import { classifyAuthError, withTimeout } from "@/lib/authErrors";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
 
@@ -83,7 +84,28 @@ export default function LoginPage() {
         setErrorKey(classifyAuthError(signInError));
         return;
       }
-      router.push(safeNext);
+
+      const syncResponse = await fetch("/api/auth/sync", { method: "POST" });
+      if (!syncResponse.ok) {
+        await supabase.auth.signOut();
+        setErrorKey("generic");
+        return;
+      }
+      await supabase.auth.refreshSession();
+
+      let destination = safeNext;
+      if (!rawNext) {
+        const homeResponse = await fetch("/api/auth/home", { cache: "no-store" });
+        const home = await homeResponse.json().catch(() => null) as { destination?: string } | null;
+        if (!homeResponse.ok || !home?.destination) {
+          await supabase.auth.signOut();
+          setErrorKey("generic");
+          return;
+        }
+        destination = `/${locale}${home.destination.startsWith("/") ? home.destination : `/${home.destination}`}`;
+      }
+
+      router.push(destination);
       router.refresh();
     } catch (err) {
       setErrorKey(classifyAuthError(err));
@@ -93,12 +115,19 @@ export default function LoginPage() {
   }
 
   async function handleResendConfirmation() {
-    if (!email) return;
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) return;
     setResendState("sending");
     try {
       const supabase = createClient();
       const { error: resendError } = await withTimeout(
-        supabase.auth.resend({ type: "signup", email }),
+        supabase.auth.resend({
+          type: "signup",
+          email: normalizedEmail,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`,
+          },
+        }),
         10_000,
       );
       setResendState(resendError ? "error" : "sent");
@@ -113,6 +142,7 @@ export default function LoginPage() {
 
   return (
     <div className="porte-seuil">
+      <SeuilGreetings locale={loc} visibleCount={3} variant="entry" />
       <header className="porte-header">
         <Link href={`/${locale}`} className="porte-brand">
           <BrandLockup orientation="horizontal" variant="world" state="static" size={28} />
@@ -156,16 +186,10 @@ export default function LoginPage() {
                       </span>
                     ) : resendState === "error" ? (
                       <>
-                        <button
-                          type="button"
-                          className="ens-form-error-link"
-                          onClick={handleResendConfirmation}
-                        >
+                        <button type="button" className="ens-form-error-link" onClick={handleResendConfirmation}>
                           {applyTypo(tErr("email_not_confirmed_action"))}
                         </button>
-                        <span className="ens-form-error-hint">
-                          {applyTypo(tErr("email_not_confirmed_error"))}
-                        </span>
+                        <span className="ens-form-error-hint">{applyTypo(tErr("email_not_confirmed_error"))}</span>
                       </>
                     ) : (
                       <button
@@ -174,11 +198,7 @@ export default function LoginPage() {
                         onClick={handleResendConfirmation}
                         disabled={resendState === "sending"}
                       >
-                        {applyTypo(
-                          resendState === "sending"
-                            ? tErr("email_not_confirmed_action") + "…"
-                            : tErr("email_not_confirmed_action"),
-                        )}
+                        {applyTypo(resendState === "sending" ? tErr("email_not_confirmed_action") + "…" : tErr("email_not_confirmed_action"))}
                       </button>
                     )}
                   </div>

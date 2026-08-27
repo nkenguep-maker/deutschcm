@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { BrandLockup } from "@/components/brand/BrandLockup";
 import { frTypo } from "@/components/landing/typo";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
 import { withTimeout } from "@/lib/authErrors";
 import { createClient } from "@/lib/supabase/client";
@@ -75,6 +76,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="porte-seuil">
+      <SeuilGreetings locale={loc} visibleCount={3} pool="all" variant="entry" />
       <header className="porte-header">
         <Link href={`/${locale}`} className="porte-brand">
           <BrandLockup orientation="horizontal" variant="world" state="static" size={28} />

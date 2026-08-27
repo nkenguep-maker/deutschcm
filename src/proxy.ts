@@ -8,52 +8,50 @@ import {
   resolveInternalPersona,
 } from "./lib/internalPersona"
 
-// Multi-rôles YEMA — le proxy lit user_metadata.roles (miroir DB).
-// Source de vérité = table user_roles (Prisma). Le proxy n'interroge
-// pas la DB pour rester rapide sur les routes protégées.
-//
-// ⚠️ Next 16 · Ce fichier DOIT s'appeler proxy.ts (pas middleware.ts) ET
-// vivre dans src/ (à côté de app/). Un middleware.ts à la racine ou un
-// proxy.ts à la racine avec layout src/app/ sont SILENCIEUSEMENT ignorés
-// → tous les gardes d'auth tombent sans erreur visible.
-// Voir mémoire ~/.claude/projects/-Users-paulnkengue/memory/lesson_nextjs_src_middleware.md
+// Multi-rôles YEMA — source de vérité = user_roles (Prisma).
+// Le miroir rapide d'autorisation est Supabase app_metadata, écrit uniquement
+// par le client admin. user_metadata et les cookies UI sont non fiables.
 
 type SpaceRole = "STUDENT" | "TEACHER" | "CENTER" | "ADMIN"
 
+type AuthUserProjection = {
+  email?: string | null
+  app_metadata?: Record<string, unknown>
+}
+
 const PUBLIC_ROUTES = [
-  "/", "/login", "/register", "/pricing",
+  "/", "/login", "/register", "/pricing", "/beta",
   "/discover", "/auth",
   "/hoeren/demo", "/schreiben/demo",
   "/quiz/demo", "/video/preview",
+  "/preview/onboarding",
+  "/pre-onboarding",
   "/privacy", "/terms", "/landing",
   "/goodbye", "/teacher/goodbye",
-  "/methode", "/histoires", "/manifeste", "/langues", "/enseignants", "/setup-role",
-  // /simulateur : feature IA supprimée (AUDIT.md §11). La page renvoie
-  // notFound() ; on la place en public pour qu'anonymes ET connectés
-  // reçoivent le même 404 canonique au lieu d'un 307 → login.
+  "/methode", "/histoires", "/manifeste", "/langues", "/enseignants",
   "/simulateur",
-  // Note : "/demo" retiré ici (page supprimée), "/eleves" idem.
-  // /activation : écran de passage post-paiement. Le page shell est
-  // vide de données ; la sécurité est portée par /api/activation-status
-  // (auth + ownership check). Si un anon arrive ici, la page fetche
-  // l'endpoint, reçoit 401, et redirige vers /login (voir page.tsx).
   "/activation",
-  // QA-b2a · console persona-picker QA Preview. La page se protège
-  // elle-même (verify cookie yema_qa_session + gate 4 conditions) et
-  // rend notFound() si KO. Le proxy la laisse passer pour permettre le
-  // bootstrap → /qa sans exiger une session Supabase préalable.
   "/qa",
 ]
 
-// Routes protégées → rôle requis pour l'espace parent.
+// Admission bootstrap is deliberately narrow. Future /api/auth/* or
+// /api/beta/* routes must pass the normal beta wall unless explicitly reviewed.
+const CLOSED_BETA_API_BYPASS_EXACT = new Set([
+  "/api/auth/sync",
+  "/api/beta/accept",
+])
+
+function isClosedBetaApiBypass(pathname: string): boolean {
+  return (
+    CLOSED_BETA_API_BYPASS_EXACT.has(pathname) ||
+    pathname === "/api/qa" ||
+    pathname.startsWith("/api/qa/")
+  )
+}
+
 const PROTECTED_ROUTES: Record<string, SpaceRole[]> = {
-  // Onboarding pro · doit rester ouvert au rôle concerné · placé AVANT
-  // /onboarding pour que Object.keys.find() matche le préfixe le plus
-  // spécifique en premier (comportement ES2020+ · ordre d'insertion).
   "/onboarding/teacher": ["TEACHER", "ADMIN"],
   "/onboarding/center": ["CENTER", "ADMIN"],
-  // Funnel P1 étudiant · STUDENT strict (hardening §6). Les rôles pro ont
-  // leur propre onboarding et ne doivent pas être aiguillés ici.
   "/onboarding": ["STUDENT"],
   "/admin": ["ADMIN"],
   "/admin/courses/generate": ["ADMIN"],
@@ -68,20 +66,63 @@ const PROTECTED_ROUTES: Record<string, SpaceRole[]> = {
   "/dashboard": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
   "/courses": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
   "/progress": ["STUDENT", "TEACHER", "CENTER", "ADMIN"],
-  // /family = espace foyer parent (route canonique i18n · redesign). /famille
-  // reste ouvert au même scope · il redirige serveur-side vers /family.
   "/family": ["STUDENT", "ADMIN"],
   "/famille": ["STUDENT", "ADMIN"],
-  // Funnel P1 · découverte + activation · réservé STUDENT strict
-  // (hardening §6). ADMIN n'est PAS un contournement générique — il a
-  // son propre espace et n'a pas à passer par un funnel d'apprenant.
-  // TEACHER et CENTER ont leur onboarding pro dédié.
   "/decouverte": ["STUDENT"],
   "/activation-intent": ["STUDENT"],
 }
 
-// À quel espace appartient un pathname donné ? (pour déterminer le rôle
-// dont dépend l'onboarding requis)
+function isClosedBetaEnabled(): boolean {
+  return process.env.YEMA_CLOSED_BETA_ENABLED === "true"
+}
+
+function rolesFromAuthz(authz: Record<string, unknown>): SpaceRole[] {
+  const raw = Array.isArray(authz.roles) ? (authz.roles as string[]) : []
+  return raw.filter(
+    r => ["STUDENT", "TEACHER", "CENTER", "ADMIN"].includes(r),
+  ) as SpaceRole[]
+}
+
+function betaAccessAllowed(params: {
+  authz: Record<string, unknown>
+  roles: SpaceRole[]
+  internalPersona: ReturnType<typeof resolveInternalPersona>
+}): boolean {
+  return (
+    params.authz.beta_access === true ||
+    params.roles.includes("ADMIN") ||
+    Boolean(params.internalPersona)
+  )
+}
+
+async function readAuthenticatedUser(request: NextRequest, response: NextResponse): Promise<AuthUserProjection | null> {
+  const hasSession = request.cookies.getAll().some(c =>
+    /^sb-.+-auth-token(\.\d+)?$/.test(c.name),
+  )
+  if (!hasSession) return null
+
+  try {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return request.cookies.getAll() },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options)
+            })
+          },
+        },
+      },
+    )
+    const { data } = await supabase.auth.getUser()
+    return data.user
+  } catch {
+    return null
+  }
+}
+
 function spaceForPath(pathname: string): SpaceRole | null {
   if (pathname.startsWith("/admin")) return "ADMIN"
   if (pathname.startsWith("/teacher")) return "TEACHER"
@@ -118,10 +159,6 @@ function getDefaultRedirect(roles: SpaceRole[], activeSpace: SpaceRole | undefin
 function getOnboardingRoute(role: SpaceRole, locale: string): string {
   if (role === "TEACHER") return `/${locale}/onboarding/teacher`
   if (role === "CENTER") return `/${locale}/onboarding/center`
-  // STUDENT et ADMIN : /onboarding est un router qui aiguille selon
-  // user_metadata.universe (ou learning_paths existants) vers /monde
-  // ou /racines. La route /onboarding/student n'existe pas ; l'ancien
-  // fallback envoyait sur un 404.
   return `/${locale}/onboarding`
 }
 
@@ -129,10 +166,8 @@ const intlMiddleware = createMiddleware(routing)
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const closedBeta = isClosedBetaEnabled()
 
-  // Garde-fou · empêche /fr/fr/..., /fr/en/..., /en/fr/..., /en/en/...
-  // Bug next-intl · un helper localisé + un chemin déjà localisé
-  // produit une double locale. On strip la seconde et on redirige.
   const dupLocale = pathname.match(/^\/(fr|en)\/(fr|en)(\/.*)?$/)
   if (dupLocale) {
     const [, first, , rest] = dupLocale
@@ -143,11 +178,34 @@ export async function proxy(request: NextRequest) {
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
-    pathname.startsWith("/api") ||
     pathname.startsWith("/auth") ||
     (pathname.includes(".") && !pathname.startsWith("/api"))
   ) {
     return NextResponse.next()
+  }
+
+  // API admission boundary for authenticated direct callers. Anonymous calls
+  // continue to each route's own auth/public contract. Only the exact auth/beta
+  // bootstrap endpoints and fail-closed QA endpoints bypass this admission wall.
+  if (pathname.startsWith("/api")) {
+    if (!closedBeta || isClosedBetaApiBypass(pathname)) {
+      return NextResponse.next()
+    }
+
+    const response = NextResponse.next()
+    const user = await readAuthenticatedUser(request, response)
+    if (!user) return response
+
+    const authz = user.app_metadata ?? {}
+    const roles = rolesFromAuthz(authz)
+    const internalPersona = resolveInternalPersona(
+      request.cookies.get(INTERNAL_TEST_COOKIE_NAME)?.value,
+      user.email,
+    )
+    if (!betaAccessAllowed({ authz, roles, internalPersona })) {
+      return NextResponse.json({ error: "Closed beta access required" }, { status: 403 })
+    }
+    return response
   }
 
   const localePrefix = routing.locales.find(l => pathname === `/${l}` || pathname.startsWith(`/${l}/`))
@@ -155,6 +213,17 @@ export async function proxy(request: NextRequest) {
     ? pathname === `/${localePrefix}` ? "/" : pathname.slice(`/${localePrefix}`.length)
     : pathname
   const locale = localePrefix ?? routing.defaultLocale
+
+  // Historical acquisition links used both French and English nouns. Keep
+  // those public and canonicalize them to the current B2B landing page without
+  // ever opening the private singular /center application space.
+  if (canonicalPath === "/centres" || canonicalPath === "/centers") {
+    return NextResponse.redirect(new URL(`/${locale}/landing`, request.url), 308)
+  }
+
+  if (closedBeta && canonicalPath === "/register") {
+    return NextResponse.redirect(new URL(`/${locale}/beta`, request.url))
+  }
 
   if (PUBLIC_ROUTES.some(r => canonicalPath === r || canonicalPath.startsWith(r + "/"))) {
     return intlMiddleware(request)
@@ -165,9 +234,6 @@ export async function proxy(request: NextRequest) {
 
   const response = intlResponse
 
-  // Helper · construit /{locale}/login?next=<canonicalPath localisé>
-  // pour que l'utilisateur reprenne où il en était après reconnexion.
-  // Sans ce next, un bounce vers /login = user perdu (retour à l'accueil).
   function loginRedirect() {
     const loginUrl = new URL(`/${locale}/login`, request.url)
     const returnTo = canonicalPath === "/" ? `/${locale}` : `/${locale}${canonicalPath}`
@@ -175,64 +241,22 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Détection de la session Supabase. Le cookie sb-<ref>-auth-token peut
-  // être CHUNKÉ (`.0`, `.1`, `.N`) quand le JWT dépasse ~4KB, ce qui
-  // arrive dès que user_metadata contient plusieurs champs (onboarded_map,
-  // onboarding{...}, roles[], etc.). Sans matcher les chunks, le proxy
-  // croit qu'il n'y a pas de session et redirige tout le monde vers /login,
-  // même immédiatement après un signInWithPassword réussi.
-  // Historique : bug prod Vercel, Paul bloqué en boucle /login → /dashboard.
-  const hasSession = request.cookies.getAll().some(c =>
-    /^sb-.+-auth-token(\.\d+)?$/.test(c.name),
-  )
-  if (!hasSession) {
+  const user = await readAuthenticatedUser(request, response)
+  if (!user) {
     if (canonicalPath === "/test-niveau") {
-      return NextResponse.redirect(new URL(`/${locale}/register?next=/${locale}/test-niveau`, request.url))
+      const target = closedBeta ? `/${locale}/beta` : `/${locale}/register?next=/${locale}/test-niveau`
+      return NextResponse.redirect(new URL(target, request.url))
     }
     return loginRedirect()
   }
 
-  let user: { email?: string | null; user_metadata?: Record<string, unknown> } | null = null
-  try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() { return request.cookies.getAll() },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options)
-            })
-          },
-        },
-      }
-    )
-    const { data } = await supabase.auth.getUser()
-    user = data.user
-  } catch {
-    return loginRedirect()
-  }
+  // Authorization is read only from signed app_metadata. Supabase users can
+  // edit user_metadata themselves, so it must never grant a route capability.
+  const authz = user.app_metadata ?? {}
+  let roles = rolesFromAuthz(authz)
 
-  if (!user) {
-    return loginRedirect()
-  }
-
-  // Extract multi-rôles depuis user_metadata (miroir DB synchronisé par /api/*).
-  const meta = user.user_metadata ?? {}
-  const metaRoles = Array.isArray(meta.roles) ? (meta.roles as string[]) : []
-  let roles = metaRoles.filter(r => ["STUDENT", "TEACHER", "CENTER", "ADMIN"].includes(r)) as SpaceRole[]
-
-  // Fallback : legacy cookie ou single role si user_metadata.roles pas encore sync
-  if (roles.length === 0) {
-    const legacyRole = (request.cookies.get("user_role")?.value || meta.role) as SpaceRole | undefined
-    if (legacyRole) roles = [legacyRole]
-  }
-
-  // Le JWT de la requête qui suit immédiatement une bascule persona peut
-  // encore contenir l'ancien tableau roles. Le cookie persona est HttpOnly,
-  // posé uniquement par la route owner-only, et n'est accepté qu'avec
-  // l'email propriétaire vérifié : il fournit donc un overlay fail-closed.
+  // QA-only overlay: HttpOnly cookie + verified owner email, fail-closed in
+  // resolveInternalPersona. This never comes from general user input.
   const internalPersona = resolveInternalPersona(
     request.cookies.get(INTERNAL_TEST_COOKIE_NAME)?.value,
     user.email,
@@ -242,18 +266,21 @@ export async function proxy(request: NextRequest) {
     roles = [...roles, personaSpace]
   }
 
-  // Aucun rôle → forcer setup
+  if (closedBeta && !betaAccessAllowed({ authz, roles, internalPersona })) {
+    return NextResponse.redirect(new URL(`/${locale}/beta`, request.url))
+  }
+
   if (roles.length === 0) {
     if (canonicalPath === "/setup-role") return response
     return NextResponse.redirect(new URL(`/${locale}/setup-role`, request.url))
   }
 
-  const metadataActiveSpace = (typeof meta.active_space === "string" ? meta.active_space : undefined) as SpaceRole | undefined
+  const metadataActiveSpace = (
+    typeof authz.active_space === "string" ? authz.active_space : undefined
+  ) as SpaceRole | undefined
   const activeSpace = personaSpace ?? metadataActiveSpace
-  const onboardedMap = (meta.onboarded_map ?? {}) as Record<string, boolean>
+  const onboardedMap = (authz.onboarded_map ?? {}) as Record<string, boolean>
 
-  // Onboarding par rôle : si on entre dans un espace dont le rôle
-  // n'a pas encore été onboardé, rediriger vers son onboarding.
   const targetSpace = spaceForPath(canonicalPath)
   if (targetSpace && roles.includes(targetSpace) && !canonicalPath.startsWith("/onboarding")) {
     if (onboardedMap[targetSpace] === false && personaSpace !== targetSpace) {

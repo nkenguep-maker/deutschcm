@@ -41,6 +41,6 @@ describe("onboarding router · LANGUAGE_SELECTED", () => {
     expect(routerSource).not.toMatch(
       /step === "UNIVERSE_SELECTED" \|\| step === "LANGUAGE_SELECTED"/,
     );
-    expect(routerSource).toMatch(/const dest = nextFunnelHref\(step,/);
+    expect(routerSource).toMatch(/href:\s*nextFunnelHref\(step,/);
   });
 });

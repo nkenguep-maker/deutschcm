@@ -83,7 +83,7 @@ export interface VoixStory {
   category?: "conte" | "proverbe" | "quotidien" | "apprenant";
   portraitSrc?: string;
   monogram: string;
-  audioSrc: string;
+  audioSrc?: string;
   proverb: VoixProverb;
   cues: VoixCue[];
 }
@@ -108,9 +108,7 @@ export const STORIES: readonly VoixStory[] = [
     territory: "world",
     validated: false,
     category: "quotidien",
-    portraitSrc: "/portraits/kevin.avif",
     monogram: "K",
-    audioSrc: "/audio/voix/kevin-allemand.mp3",
     proverb: {
       // Racines · Kevin est camerounais (Yaoundé). Son proverbe doit
       // venir d'une langue camerounaise (ewondo, la langue majoritaire
@@ -148,9 +146,7 @@ export const STORIES: readonly VoixStory[] = [
     territory: "world",
     validated: false,
     category: "quotidien",
-    portraitSrc: "/portraits/fatima.avif",
     monogram: "F",
-    audioSrc: "/audio/voix/fatima-allemand.mp3",
     proverb: {
       // Racines · Fatima est d'origine camerounaise (contexte narratif).
       // Son proverbe doit venir d'une langue camerounaise du littoral
@@ -188,9 +184,7 @@ export const STORIES: readonly VoixStory[] = [
     territory: "world",
     validated: false,
     category: "quotidien",
-    portraitSrc: "/portraits/aicha.avif",
     monogram: "A",
-    audioSrc: "/audio/voix/aicha-anglais.mp3",
     proverb: {
       // Racines · Aïcha vient d'Abidjan. Son proverbe doit venir d'une
       // langue ivoirienne (baoulé, largement parlé), pas de l'anglais
@@ -227,9 +221,7 @@ export const STORIES: readonly VoixStory[] = [
     territory: "world",
     validated: false,
     category: "quotidien",
-    portraitSrc: "/portraits/jean.avif",
     monogram: "J",
-    audioSrc: "/audio/voix/jean-francais.mp3",
     proverb: {
       // Racines · Jean vient de Bamenda (grassfields du Cameroun
       // anglophone). Son proverbe doit venir d'une langue des
@@ -267,9 +259,7 @@ export const STORIES: readonly VoixStory[] = [
     territory: "sources",
     validated: false,
     category: "quotidien",
-    portraitSrc: "/portraits/bintou.avif",
     monogram: "B",
-    audioSrc: "/audio/voix/bintou-wolof.mp3",
     proverb: {
       // Racines · Bintou parle wolof — son proverbe vient déjà de la
       // bonne culture. Reste à faire relire par une locutrice native

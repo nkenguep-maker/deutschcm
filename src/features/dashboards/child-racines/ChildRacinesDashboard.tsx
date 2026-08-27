@@ -56,6 +56,7 @@ export function ChildRacinesDashboard({ locale, child, activeSectionId = "case" 
   const t = useTranslations("yemaDashboards.childRacines");
   const currentLocale = useLocale() || locale;
   const baseHref = `/${currentLocale}/dashboard`;
+  const messagesHref = `/${currentLocale}/messages`;
   const activeSection = ALLOWED.has(activeSectionId) ? activeSectionId : "case";
   const [exiting, setExiting] = useState(false);
   const activeLang = child.langues.find((language) => language.langue === child.activeLangue) ?? child.langues[0] ?? null;
@@ -190,6 +191,7 @@ export function ChildRacinesDashboard({ locale, child, activeSectionId = "case" 
       <div className={game.shell}>
         <header className={game.topbar}>
           <Link className={game.brand} href={`/${currentLocale}`}><span className={game.brandMark}>Y</span> YEMA KIDS</Link>
+          <Link data-testid="child-messages-cta" href={messagesHref} style={{ minHeight: 44, display: "inline-flex", alignItems: "center" }}>{t("openMessages")}</Link>
           <button className={game.exit} type="button" onClick={exitChildMode} disabled={exiting}>{exiting ? "…" : isFr ? "Sortir" : "Exit"}</button>
         </header>
         <div className={game.statusRow}>

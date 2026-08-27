@@ -4,12 +4,6 @@ import type { FamilyGuardianActor } from "./actor";
 import { getFamilySeatSnapshot, type FamilySeatSnapshot } from "./seats";
 import { getAdultAccessSummary, type AdultAccessSummary } from "@/lib/entitlements/adult";
 
-// P4.6 Lot 4A · lectures Family (jamais d'écriture ici).
-//
-// Projections strictes : aucun `pinHash` ne quitte jamais ce module. Aucun
-// `parentUserId` d'un autre parent, aucun `childProfileId` d'une autre
-// famille. La resolution actor précédente garantit `parentUserId === actor.userId`.
-
 export interface FamilyChildRow {
   id: string;
   prenom: string;
@@ -20,15 +14,14 @@ export interface FamilyChildRow {
   hasPin: boolean;
   createdAt: string;
   universe?: "MONDE" | "RACINES" | null;
-  // Lot 7B.1 · source canonique parcours Monde enfant. Null jusqu'à ce
-  // qu'une fixture QA ou onboarding enfant l'alimente. resolveMondePath()
-  // côté UI mappe cette string libre vers MondePath ou renvoie null.
   learningGoal?: string | null;
 }
 
 export interface FamilyDashboardData {
   guardian: {
     userId: string;
+    fullName: string | null;
+    city: string | null;
     hasParentRole: boolean;
     hasHousehold: boolean;
   };
@@ -51,13 +44,9 @@ export async function listFamilyChildren(actor: FamilyGuardianActor): Promise<Fa
       age: true,
       activeLangue: true,
       langues: true,
-      pinHash: true, // lu ici pour dériver hasPin, JAMAIS renvoyé au client
+      pinHash: true,
       createdAt: true,
-      // Lot 7B · universe projeté pour scoper thème Monde Ivory vs Racines
-      // côté UI Family (aucun autre champ enfant sensible n'est ajouté).
       universe: true,
-      // Lot 7B.1 · projection de l'objectif pédagogique enfant · alimente
-      // resolveMondePath côté UI. Null autorisé (état "à préciser" honnête).
       learningGoal: true,
     },
   });
@@ -78,14 +67,20 @@ export async function listFamilyChildren(actor: FamilyGuardianActor): Promise<Fa
 export async function getFamilyDashboard(
   actor: FamilyGuardianActor,
 ): Promise<FamilyDashboardData> {
-  const [children, snap, adultAccess] = await Promise.all([
+  const [children, snap, adultAccess, guardian] = await Promise.all([
     listFamilyChildren(actor),
     getFamilySeatSnapshot(actor),
     getAdultAccessSummary(actor.userId),
+    prisma.user.findUnique({
+      where: { id: actor.userId },
+      select: { fullName: true, city: true },
+    }),
   ]);
   return {
     guardian: {
       userId: actor.userId,
+      fullName: guardian?.fullName ?? null,
+      city: guardian?.city ?? null,
       hasParentRole: actor.hasParentRole,
       hasHousehold: actor.householdIdsOwned.length + actor.householdIdsMember.length > 0,
     },
@@ -98,8 +93,6 @@ export async function getFamilyDashboard(
   };
 }
 
-// Chargement enfant par ID · vérifie l'ownership avant retour. Retourne null
-// si l'enfant n'appartient pas à ce guardian (isolation famille A/B stricte).
 export async function loadOwnedChild(
   actor: FamilyGuardianActor,
   childId: string,

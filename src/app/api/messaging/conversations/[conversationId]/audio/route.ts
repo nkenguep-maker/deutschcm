@@ -36,9 +36,12 @@ import {
 } from "@/lib/messaging/audio/storage";
 import { broadcastMessageCreated } from "@/lib/messaging/realtimePublisher";
 import { writeAuditEvent } from "@/lib/audit/events";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs"; // Buffer + music-metadata requièrent Node runtime.
+
+const MAX_CLIENT_MESSAGE_ID_CHARS = 128;
 
 function notFound() {
   return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -70,14 +73,8 @@ export async function POST(
   const actor = await resolveMessagingActor();
   if (!actor) return notFound();
 
-  // 3. + 4. CSRF/origin · Next.js Server Actions gèrent origin via
-  // Same-Origin par défaut · en API route on vérifie que la requête
-  // vient bien de l'origin de la requête (protection basique CSRF).
-  const origin = req.headers.get("origin");
-  const host = req.headers.get("host");
-  if (origin && host && !origin.endsWith(host)) {
-    return forbidden("origin_mismatch");
-  }
+  // 3. + 4. API mutation · Origin navigateur exact requis lorsqu'il existe.
+  if (!isSameOriginRequest(req)) return forbidden("origin_mismatch");
 
   const { conversationId } = await ctx.params;
 
@@ -110,8 +107,12 @@ export async function POST(
   const file = form.get("file");
   const clientMessageId = form.get("clientMessageId");
   if (!(file instanceof File)) return badRequest("file_missing");
-  if (typeof clientMessageId !== "string" || clientMessageId.length < 4) {
-    return badRequest("client_message_id_missing");
+  if (
+    typeof clientMessageId !== "string"
+    || clientMessageId.length < 4
+    || clientMessageId.length > MAX_CLIENT_MESSAGE_ID_CHARS
+  ) {
+    return badRequest("client_message_id_invalid");
   }
   if (file.size > limits.maxSizeBytes) return tooLarge("size_exceeded");
   if (file.size === 0) return badRequest("empty_file");

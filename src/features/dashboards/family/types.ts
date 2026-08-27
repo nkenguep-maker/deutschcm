@@ -1,6 +1,3 @@
-// Types miroir de /api/family/dashboard — copies minimales pour éviter
-// d'importer server-only Prisma types côté client.
-
 export interface FamilyChildRow {
   id: string;
   prenom: string;
@@ -10,13 +7,7 @@ export interface FamilyChildRow {
   langues: unknown[];
   hasPin: boolean;
   createdAt: string;
-  // Lot 7B · universe projeté depuis ChildProfile pour permettre à
-  // Family UI de scoper le thème Monde Ivory vs Racines. AUCUN autre
-  // champ enfant sensible (pinHash, pinUpdatedAt, cookie) n'est exposé.
   universe?: "MONDE" | "RACINES" | null;
-  // Lot 7B.1 · objectif pédagogique enfant · projeté depuis
-  // ChildProfile.learningGoal (source canonique ajoutée dans ce lot).
-  // Null tant qu'aucune fixture QA ou onboarding ne l'alimente.
   learningGoal?: string | null;
 }
 
@@ -38,6 +29,8 @@ export interface AdultAccessSummary {
 export interface FamilyDashboardResponse {
   guardian: {
     userId: string;
+    fullName: string | null;
+    city: string | null;
     hasParentRole: boolean;
     hasHousehold: boolean;
   };

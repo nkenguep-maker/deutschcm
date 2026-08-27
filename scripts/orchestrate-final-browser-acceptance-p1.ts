@@ -79,7 +79,12 @@
 
   async function main() {
     console.log("[final-browser] STEP 1 · fixtures QA");
-    spawnSync("node", ["scripts/test-baseline/yema-qa-fixtures.mjs"], { stdio: "inherit", env: process.env });
+    const fixtures = spawnSync("node", ["scripts/test-baseline/yema-qa-fixtures.mjs"], {
+      stdio: "inherit",
+      env: process.env,
+    });
+    if (fixtures.error) fail("1", `fixtures impossible à lancer · ${fixtures.error.message}`);
+    if (fixtures.status !== 0) fail("1", `fixtures exit ${fixtures.status ?? "unknown"}`);
 
     const ts = Date.now();
 
@@ -204,28 +209,36 @@
         YEMA_CHILD_SESSION_SECRET: hmacSecret,
       },
     });
-    if (pw.status !== 0) console.log(`  ⚠ Playwright exit ${pw.status} · certaines assertions peuvent avoir échoué`);
-    else console.log(`  ✓ Playwright tests all green`);
+    if (pw.error) fail("5", `Playwright impossible à lancer · ${pw.error.message}`);
+    if (pw.status !== 0) fail("5", `Playwright exit ${pw.status ?? "unknown"}`);
+    console.log(`  ✓ Playwright tests all green`);
 
     console.log("[final-browser] ALL DONE");
   }
 
   async function runCleanup() {
     console.log("[final-browser] CLEANUP · restauration finally");
+    let cleanupFailed = false;
     while (cleanup.length) {
       try { await cleanup.pop()!(); }
-      catch (e) { console.error(`  · cleanup fail · ${(e as Error).message}`); }
+      catch (e) {
+        cleanupFailed = true;
+        console.error(`  · cleanup fail · ${(e as Error).message}`);
+      }
     }
     const leakUsers = await db.user.count({ where: { email: { startsWith: "temp_gate8i_" } } });
     const leakChildren = await db.childProfile.count({ where: { id: { startsWith: "test_yema_qa_gate8i_" } } });
     const leakCircles = await db.circle.count({ where: { id: { startsWith: "test_yema_qa_gate8i_" } } });
     const leakHouseholds = await db.household.count({ where: { id: { startsWith: "test_yema_qa_gate8i_" } } });
     const leakGrants = await db.accessGrant.count({ where: { id: { startsWith: "test_yema_qa_gate8i_" } } });
-    if (leakUsers + leakChildren + leakCircles + leakHouseholds + leakGrants > 0) {
-      console.error(`  · WARN · résidus · users=${leakUsers} children=${leakChildren} circles=${leakCircles} households=${leakHouseholds} grants=${leakGrants}`);
+    const leakCount = leakUsers + leakChildren + leakCircles + leakHouseholds + leakGrants;
+    if (leakCount > 0) {
+      cleanupFailed = true;
+      console.error(`  · FAIL · résidus · users=${leakUsers} children=${leakChildren} circles=${leakCircles} households=${leakHouseholds} grants=${leakGrants}`);
     } else {
       console.log("  · aucun résidu temp ✓");
     }
+    if (cleanupFailed) process.exitCode = 1;
   }
 
   try {

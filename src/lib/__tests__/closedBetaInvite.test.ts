@@ -1,0 +1,241 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
+
+const REPO = resolve(__dirname, "../../..");
+const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
+
+describe("closed beta invitation provisioning", () => {
+  it("signs an email-targeted, short-lived token without plaintext email", () => {
+    const invite = read("src/lib/beta/invite.ts");
+
+    expect(invite).toContain('createHmac("sha256"');
+    expect(invite).toContain('createHash("sha256"');
+    expect(invite).toContain("timingSafeEqual");
+    expect(invite).toContain("randomBytes(24)");
+    expect(invite).toContain("72 * 60 * 60");
+    expect(invite).toContain("emailHash: hashInviteEmail(params.email)");
+    expect(invite).toContain("hashInviteToken");
+    expect(invite).not.toContain("email: normalizeInviteEmail(params.email)");
+    expect(invite).toContain("secret.length < 32");
+  });
+
+  it("models a server-only invitation ledger in Prisma", () => {
+    const schema = read("prisma/schema.prisma");
+
+    expect(schema).toContain("model BetaInvitation {");
+    expect(schema).toContain("tokenHash        String           @unique");
+    expect(schema).toContain("emailHash        String");
+    expect(schema).toContain("status           InvitationStatus @default(PENDING)");
+    expect(schema).toContain('@@map("beta_invitations")');
+  });
+
+  it("migrates the ledger deny-by-default with no Data API grants", () => {
+    const migration = read("prisma/migrations/20260808000002_closed_beta_invitations/migration.sql");
+
+    expect(migration).toContain("CREATE TABLE IF NOT EXISTS public.beta_invitations");
+    expect(migration).toContain('"tokenHash" TEXT NOT NULL');
+    expect(migration).toContain('"emailHash" TEXT NOT NULL');
+    expect(migration).toContain("ALTER TABLE public.beta_invitations ENABLE ROW LEVEL SECURITY");
+    expect(migration).toContain("REVOKE ALL ON TABLE public.beta_invitations FROM PUBLIC, anon, authenticated");
+    expect(migration).not.toMatch(/token\s+TEXT/i);
+    expect(migration).not.toMatch(/email\s+TEXT/i);
+  });
+
+  it("stores only hashes and claims a pending invitation atomically", () => {
+    const store = read("src/lib/beta/invitationStore.ts");
+
+    expect(store).toContain("prisma.$transaction");
+    expect(store).toContain("tx.betaInvitation.create");
+    expect(store).toContain("tokenHash: hashInviteToken(params.token)");
+    expect(store).toContain("emailHash");
+    expect(store).toContain("prisma.betaInvitation.updateMany");
+    expect(store).toContain('status: "PENDING"');
+    expect(store).toContain('status: "ACCEPTED"');
+    expect(store).toContain("claim.count === 1");
+    expect(store).not.toContain("token: params.token");
+    expect(store).not.toContain("email: params.email");
+  });
+
+  it("keeps at most one pending invitation for each hashed email", () => {
+    const store = read("src/lib/beta/invitationStore.ts");
+    const transactionStart = store.indexOf("return prisma.$transaction");
+    const revokeOld = store.indexOf("await tx.betaInvitation.updateMany", transactionStart);
+    const createNew = store.indexOf("return tx.betaInvitation.create", transactionStart);
+
+    expect(transactionStart).toBeGreaterThan(-1);
+    expect(revokeOld).toBeGreaterThan(transactionStart);
+    expect(createNew).toBeGreaterThan(revokeOld);
+    expect(store.slice(revokeOld, createNew)).toContain("emailHash");
+    expect(store.slice(revokeOld, createNew)).toContain('status: "PENDING"');
+    expect(store.slice(revokeOld, createNew)).toContain('status: "REVOKED"');
+    expect(store.slice(revokeOld, createNew)).toContain("revokedAt: now");
+  });
+
+  it("recovers only stale incomplete claims instead of permanently burning an invite", () => {
+    const store = read("src/lib/beta/invitationStore.ts");
+
+    expect(store).toContain("const STALE_CLAIM_MS = 10 * 60 * 1000");
+    expect(store).toContain("acceptedByUserId: null");
+    expect(store).toContain("acceptedAt: { lte: new Date(now.getTime() - STALE_CLAIM_MS) }");
+    expect(store).toContain("revokedAt: null");
+    expect(store).toContain("expiresAt: { gt: now }");
+  });
+
+  it("requires closed-beta mode and a real active admin before issuing a link", () => {
+    const route = read("src/app/api/admin/beta/invite/route.ts");
+
+    expect(route).toContain("isClosedBetaEnabled()");
+    expect(route).toContain("isSameOriginRequest(request)");
+    expect(route).toContain('role: "ADMIN"');
+    expect(route).toContain('status: "ACTIVE"');
+    expect(route).toContain("createBetaInviteToken({");
+    expect(route).toContain("storeBetaInvitation({");
+    expect(route).toContain("sendEmail({");
+    expect(route).toContain("invitationId: stored.id");
+  });
+
+  it("keeps the raw token out of HTTP request URLs and Referer headers", () => {
+    const route = read("src/app/api/admin/beta/invite/route.ts");
+    const page = read("src/app/[locale]/beta/accept/page.tsx");
+
+    expect(route).toContain("inviteUrl.hash = new URLSearchParams({ token }).toString()");
+    expect(route).not.toContain('searchParams.set("token"');
+    expect(page).toContain("window.location.hash");
+    expect(page).toContain("window.history.replaceState");
+    expect(page).not.toContain("useSearchParams");
+  });
+
+  it("verifies and atomically claims the token before any auth account creation", () => {
+    const route = read("src/app/api/beta/accept/route.ts");
+
+    const verify = route.indexOf("verifyBetaInviteToken({ token: input.token, email })");
+    const claim = route.indexOf("claimBetaInvitation({ token: input.token, email })");
+    const create = route.indexOf("admin.auth.admin.createUser");
+    expect(verify).toBeGreaterThan(-1);
+    expect(claim).toBeGreaterThan(verify);
+    expect(create).toBeGreaterThan(claim);
+    expect(route).toContain('code: "invite_not_pending"');
+  });
+
+  it("never lets a beta invitation grant a privileged YEMA role", () => {
+    const route = read("src/app/api/beta/accept/route.ts");
+
+    expect(route).toContain("reconcileAuthenticatedUser(authUser)");
+    expect(route).toContain("setBetaAccess({ supabaseId: authUser.id, enabled: true })");
+    expect(route).not.toContain('role: "ADMIN"');
+    expect(route).not.toContain('role: "TEACHER"');
+    expect(route).not.toContain('role: "CENTER"');
+    expect(route).not.toContain("grantRole(");
+  });
+
+  it("keeps existing account passwords and roles untouched", () => {
+    const route = read("src/app/api/beta/accept/route.ts");
+    const existingBranch = route.slice(
+      route.indexOf("const existing = await prisma.user.findFirst"),
+      route.indexOf('if (typeof input.password !== "string"'),
+    );
+
+    expect(existingBranch).toContain("setBetaAccess");
+    expect(existingBranch).toContain("finalizeBetaInvitation");
+    expect(existingBranch).not.toContain("password:");
+    expect(existingBranch).not.toContain("grantRole(");
+  });
+
+  it("requires the invited email to still match the linked Supabase Auth identity", () => {
+    const route = read("src/app/api/beta/accept/route.ts");
+
+    expect(route).toContain("admin.auth.admin.getUserById(existing.supabaseId)");
+    expect(route).toContain('normalizeInviteEmail(authIdentity.user.email ?? "") !== email');
+    expect(route).toContain('code: "invite_identity_mismatch"');
+    const mismatch = route.indexOf('code: "invite_identity_mismatch"');
+    const grantExisting = route.indexOf("previousBetaAccess = await setBetaAccess");
+    expect(mismatch).toBeGreaterThan(-1);
+    expect(grantExisting).toBeGreaterThan(mismatch);
+  });
+
+  it("restores an existing account beta flag when ledger finalization fails", () => {
+    const access = read("src/lib/beta/access.ts");
+    const route = read("src/app/api/beta/accept/route.ts");
+
+    expect(access).toContain("const previousEnabled = existing.beta_access === true");
+    expect(access).toContain("return previousEnabled");
+    expect(route).toContain("previousBetaAccess = await setBetaAccess");
+    expect(route).toContain("enabled: previousBetaAccess");
+    expect(route).toContain("releaseBetaInvitationClaim(claim.id)");
+  });
+
+  it("requires a password only for a genuinely new account", () => {
+    const route = read("src/app/api/beta/accept/route.ts");
+    const page = read("src/app/[locale]/beta/accept/page.tsx");
+    const existingLookup = route.indexOf("const existing = await prisma.user.findFirst");
+    const passwordGuard = route.indexOf('if (typeof input.password !== "string" || input.password.length < 8)');
+    const create = route.indexOf("admin.auth.admin.createUser");
+
+    expect(existingLookup).toBeGreaterThan(-1);
+    expect(passwordGuard).toBeGreaterThan(existingLookup);
+    expect(create).toBeGreaterThan(passwordGuard);
+    expect(route).toContain('code: "password_required"');
+    expect(page).toContain('payload?.code === "password_required"');
+    expect(page).toContain("nouveaux comptes uniquement");
+    expect(page).not.toContain('type="password" required');
+  });
+
+  it("recovers only beta-marked Auth orphans without a Prisma owner", () => {
+    const route = read("src/app/api/beta/accept/route.ts");
+
+    expect(route).toContain("findRecoverableBetaOrphan");
+    expect(route).toContain("metadata.beta_invited === true ? exact : null");
+    expect(route).toContain("normalizeInviteEmail(candidate.email ?? \"\") === email");
+    expect(route).toContain("where: { supabaseId: orphan.id }");
+    expect(route).toContain("if (!dbOwner)");
+    expect(route).toContain("admin.auth.admin.updateUserById(orphan.id");
+    expect(route).toContain('status: recoveredOrphan ? "recovered" : "created"');
+  });
+
+  it("compensates failed new-account provisioning and releases the claim", () => {
+    const route = read("src/app/api/beta/accept/route.ts");
+
+    expect(route).toContain("email_confirm: true");
+    expect(route).toContain("admin.auth.admin.deleteUser(authUser.id)");
+    expect(route).toContain("prisma.user.deleteMany({ where: { supabaseId: authUser.id } })");
+    expect(route).toContain("releaseBetaInvitationClaim(claim.id)");
+    expect(route).toContain('status: recoveredOrphan ? "recovered" : "created"');
+  });
+
+  it("lets an active DB admin revoke only an unused link", () => {
+    const route = read("src/app/api/admin/beta/invite/revoke/route.ts");
+    const store = read("src/lib/beta/invitationStore.ts");
+
+    expect(route).toContain("isSameOriginRequest(request)");
+    expect(route).toContain('role: "ADMIN"');
+    expect(route).toContain('status: "ACTIVE"');
+    expect(route).toContain("revokeBetaInvitation({ invitationId })");
+    expect(store).toContain('status: "REVOKED"');
+    expect(store).toContain('status: "PENDING"');
+  });
+
+  it("uses password login only after server acceptance", () => {
+    const page = read("src/app/[locale]/beta/accept/page.tsx");
+
+    const accept = page.indexOf('fetch("/api/beta/accept"');
+    const login = page.indexOf("supabase.auth.signInWithPassword");
+    expect(accept).toBeGreaterThan(-1);
+    expect(login).toBeGreaterThan(accept);
+    expect(page).toContain('fetch("/api/auth/sync", { method: "POST" })');
+    expect(page).not.toContain("signInWithOAuth");
+  });
+
+  it("keeps the admin invitation console admission-only and revocable", () => {
+    const page = read("src/app/[locale]/admin/beta/page.tsx");
+
+    expect(page).toContain('fetch("/api/admin/beta/invite"');
+    expect(page).toContain('fetch("/api/admin/beta/invite/revoke"');
+    expect(page).toContain("navigator.clipboard.writeText");
+    expect(page).toContain("utilisable une seule fois");
+    expect(page).toContain("Révoquer ce lien");
+    expect(page).not.toContain('value="TEACHER"');
+    expect(page).not.toContain('value="CENTER"');
+    expect(page).not.toContain('value="ADMIN"');
+  });
+});

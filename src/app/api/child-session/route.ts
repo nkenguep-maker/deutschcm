@@ -24,6 +24,12 @@ import { resolveFamilyGuardianActorOrNull } from "@/lib/family/actor";
 import { prisma } from "@/lib/prisma";
 import { verifyChildPin } from "@/lib/security/childPin";
 import {
+  childPinRateLimitConfig,
+  isChildPinRateLimited,
+  recordInvalidChildPinAttempt,
+} from "@/lib/security/childPinRateLimit";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
+import {
   CHILD_SESSION_COOKIE_NAME,
   CHILD_SESSION_TTL_SECONDS,
   encodeChildSession,
@@ -36,7 +42,17 @@ function err(code: string, status: number) {
   return NextResponse.json({ error: code }, { status });
 }
 
+function pinRateLimited() {
+  const retryAfter = childPinRateLimitConfig().windowMinutes * 60;
+  return NextResponse.json(
+    { error: "PIN_RATE_LIMITED" },
+    { status: 429, headers: { "Retry-After": String(retryAfter) } },
+  );
+}
+
 export async function POST(req: NextRequest) {
+  if (!isSameOriginRequest(req)) return err("ORIGIN_MISMATCH", 403);
+
   // 1. Parent authentifié requis.
   const actor = await resolveFamilyGuardianActorOrNull();
   if (!actor) return err("UNAUTHORIZED", 401);
@@ -61,8 +77,16 @@ export async function POST(req: NextRequest) {
   if (!child) return err("NOT_FOUND", 404);
   if (!child.pinHash) return err("PIN_NOT_SET", 409);
 
+  // P4.7 · limite distribuée par parent + enfant. Les échecs sont comptés
+  // dans AuditEvent, jamais dans un compteur mémoire serverless.
+  if (await isChildPinRateLimited(actor.userId, child.id)) return pinRateLimited();
+
   const ok = await verifyChildPin(pin, child.pinHash);
-  if (!ok) return err("PIN_INVALID", 401);
+  if (!ok) {
+    const limited = await recordInvalidChildPinAttempt(actor.userId, child.id);
+    if (limited) return pinRateLimited();
+    return err("PIN_INVALID", 401);
+  }
 
   // 4. Émission cookie signé · version PIN incluse (Lot 5.1) pour
   // invalider automatiquement toute session antérieure après changement.
@@ -73,7 +97,9 @@ export async function POST(req: NextRequest) {
   jar.set(CHILD_SESSION_COOKIE_NAME, cookieValue, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    // The child session is used only inside YEMA. It never participates in an
+    // OAuth/cross-site callback, so Strict is safer than the previous Lax mode.
+    sameSite: "strict",
     path: "/",
     maxAge: CHILD_SESSION_TTL_SECONDS,
   });
@@ -90,12 +116,14 @@ export async function GET() {
   return NextResponse.json({ active: true, childProfileId: check.payload.childProfileId });
 }
 
-export async function DELETE() {
+export async function DELETE(req: NextRequest) {
+  if (!isSameOriginRequest(req)) return err("ORIGIN_MISMATCH", 403);
+
   const jar = await cookies();
   jar.set(CHILD_SESSION_COOKIE_NAME, "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "strict",
     path: "/",
     maxAge: 0,
   });

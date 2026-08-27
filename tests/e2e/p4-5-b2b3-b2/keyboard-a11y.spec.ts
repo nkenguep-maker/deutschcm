@@ -10,6 +10,9 @@ test.describe("Teacher · nav clavier", () => {
 
   test("Teacher · liste assignments · Tab → premier lien focusable", async ({ page }) => {
     await page.goto("/fr/teacher/assignments");
+    await expect(page.getByRole("heading", { level: 1, name: /Devoirs|Assignments/i })).toBeVisible();
+    const firstFocusable = page.locator("a:visible, button:visible, select:visible, input:visible").first();
+    await expect(firstFocusable).toBeVisible();
     await page.keyboard.press("Tab");
     // Le premier interactif focusé doit avoir un outline visible (via CSS ring).
     const focused = await page.evaluate(() => document.activeElement?.tagName);
@@ -34,9 +37,8 @@ test.describe("Student · nav clavier + submit via Enter", () => {
 
   test("Student · draft · textarea focusable au clavier", async ({ page }) => {
     await page.goto(`/fr/student/submissions/${FIXTURE_IDS.subDraftA}`);
-    await page.keyboard.press("Tab");
-    // Cliquer sur le textarea via tabindex naturel
-    const textarea = page.locator("textarea").first();
+    const textarea = page.getByRole("textbox");
+    await expect(textarea).toBeEditable();
     await textarea.focus();
     await expect(textarea).toBeFocused();
     // Saisir + confirmer editable

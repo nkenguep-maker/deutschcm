@@ -3,10 +3,10 @@
 // SeuilGreeting — les langues murmurent dans les murs du seuil.
 //
 // Chaque emplacement (slot) a sa propre vie autonome, décalée des
-// autres. Elles n'apparaissent JAMAIS ensemble : l'une émerge, une
-// autre est déjà pleine, une troisième s'efface, une quatrième est
-// endormie. Cycle de 12s par slot, offset -3s entre chaque, pour un
-// souffle continu autour de la séquence centrale.
+// autres. Selon le nombre de slots, une ou deux voix sont déjà lisibles
+// au premier paint pendant que les autres restent endormies. Cycle de
+// 12s par slot, réparti régulièrement pour un souffle continu autour de
+// la séquence centrale.
 //
 // Le cycle CSS gère l'apparition/vie/effacement. Le JS n'incrémente
 // que le mot affiché à chaque itération d'animation (via
@@ -35,20 +35,23 @@ export interface GreetingItem {
   territory: "world" | "sources";
 }
 
-// Pool des salutations · UNIQUEMENT les 10 natales africaines validées.
-// Les langues d'interface (Bonjour, Hello, Hola…) ne murmurent pas ici :
-// le seuil est le vestibule des voix africaines, jamais l'inverse.
+// Les écrans Monde, Racines et communs choisissent chacun leur répertoire.
+// Le pool commun alterne volontairement les deux univers dès les premiers slots.
 export const GREETINGS: readonly GreetingItem[] = [
+  { id: "good-morning", word: "Good morning", language: "anglais", languageEn: "English", country: "Royaume-Uni", countryEn: "United Kingdom", langTag: "en", territory: "world" },
   { id: "mbolo",     word: "Mbolo",     language: "ewondo",       languageEn: "Ewondo",       country: "Cameroun",           countryEn: "Cameroon",              langTag: "ewo", territory: "sources" },
-  { id: "nangadef",  word: "Na nga def", language: "wolof",        languageEn: "Wolof",        country: "Sénégal",            countryEn: "Senegal",               langTag: "wol", territory: "sources" },
-  { id: "mbote",     word: "Mbote",     language: "lingala",      languageEn: "Lingala",      country: "RDC",                countryEn: "DRC",                   langTag: "lin", territory: "sources" },
-  { id: "jambo",     word: "Jambo",     language: "swahili",      languageEn: "Swahili",      country: "Kenya · Tanzanie",   countryEn: "Kenya · Tanzania",      langTag: "swa", territory: "sources" },
-  { id: "enle",      word: "Ẹ n lẹ",    language: "yorùbá",       languageEn: "Yoruba",       country: "Nigeria",            countryEn: "Nigeria",               langTag: "yor", territory: "sources" },
-  { id: "sannu",     word: "Sannu",     language: "haoussa",      languageEn: "Hausa",        country: "Niger · Nigeria",    countryEn: "Niger · Nigeria",       langTag: "hau", territory: "sources" },
-  { id: "akwaaba",   word: "Akwaaba",   language: "twi",          languageEn: "Twi",          country: "Ghana",              countryEn: "Ghana",                 langTag: "twi", territory: "sources" },
-  { id: "muraho",    word: "Muraho",    language: "kinyarwanda",  languageEn: "Kinyarwanda",  country: "Rwanda",             countryEn: "Rwanda",                langTag: "kin", territory: "sources" },
-  { id: "selam",     word: "Selam",     language: "amharique",    languageEn: "Amharic",      country: "Éthiopie",           countryEn: "Ethiopia",              langTag: "amh", territory: "sources" },
-  { id: "sawubona",  word: "Sawubona",  language: "zoulou",       languageEn: "Zulu",         country: "Afrique du Sud",     countryEn: "South Africa",          langTag: "zul", territory: "sources" },
+  { id: "guten-tag", word: "Guten Tag", language: "allemand",     languageEn: "German",        country: "Allemagne",          countryEn: "Germany",               langTag: "de", territory: "world" },
+  { id: "nangadef",  word: "Na nga def", language: "wolof",        languageEn: "Wolof",        country: "Sénégal",            countryEn: "Senegal",               langTag: "wo", territory: "sources" },
+  { id: "bonjour",   word: "Bonjour",   language: "français",     languageEn: "French",        country: "France",             countryEn: "France",                langTag: "fr", territory: "world" },
+  { id: "mbote",     word: "Mbote",     language: "lingala",      languageEn: "Lingala",      country: "RDC",                countryEn: "DRC",                   langTag: "ln", territory: "sources" },
+  { id: "hola",      word: "Hola",      language: "espagnol",     languageEn: "Spanish",       country: "Espagne",            countryEn: "Spain",                 langTag: "es", territory: "world" },
+  { id: "jambo",     word: "Jambo",     language: "swahili",      languageEn: "Swahili",      country: "Kenya · Tanzanie",   countryEn: "Kenya · Tanzania",      langTag: "sw", territory: "sources" },
+  { id: "enle",      word: "Ẹ n lẹ",    language: "yorùbá",       languageEn: "Yoruba",       country: "Nigeria",            countryEn: "Nigeria",               langTag: "yo", territory: "sources" },
+  { id: "sannu",     word: "Sannu",     language: "haoussa",      languageEn: "Hausa",        country: "Niger · Nigeria",    countryEn: "Niger · Nigeria",       langTag: "ha", territory: "sources" },
+  { id: "akwaaba",   word: "Akwaaba",   language: "twi",          languageEn: "Twi",          country: "Ghana",              countryEn: "Ghana",                 langTag: "tw", territory: "sources" },
+  { id: "muraho",    word: "Muraho",    language: "kinyarwanda",  languageEn: "Kinyarwanda",  country: "Rwanda",             countryEn: "Rwanda",                langTag: "rw", territory: "sources" },
+  { id: "selam",     word: "Selam",     language: "amharique",    languageEn: "Amharic",      country: "Éthiopie",           countryEn: "Ethiopia",              langTag: "am", territory: "sources" },
+  { id: "sawubona",  word: "Sawubona",  language: "zoulou",       languageEn: "Zulu",         country: "Afrique du Sud",     countryEn: "South Africa",          langTag: "zu", territory: "sources" },
 ] as const;
 
 interface SeuilGreetingsProps {
@@ -60,6 +63,8 @@ interface SeuilGreetingsProps {
    *  Utilisé sur /langues pour aligner les salutations avec le
    *  territoire de la section. */
   pool?: "all" | "world" | "sources";
+  /** Landing keeps the listening interaction; entry flows use a decorative layer. */
+  variant?: "landing" | "entry";
 }
 
 const POSITIONS = ["p0", "p1", "p2", "p3"] as const;
@@ -68,11 +73,17 @@ const POSITIONS = ["p0", "p1", "p2", "p3"] as const;
  *  doit rester en phase avec ce nombre. */
 const CYCLE_MS = 12000;
 
+export function greetingAnimationDelay(slot: number, slotCount: number): number {
+  return -Math.round(((slot + 1) * CYCLE_MS) / (slotCount + 1));
+}
+
 export function SeuilGreetings({
   locale,
   visibleCount = 4,
   pool = "all",
+  variant = "landing",
 }: SeuilGreetingsProps) {
+  const interactive = variant === "landing";
   // Filtre le pool si territoire imposé (pages world / sources).
   const items = useMemo(() => {
     if (pool === "world") return GREETINGS.filter((g) => g.territory === "world");
@@ -148,36 +159,61 @@ export function SeuilGreetings({
 
   return (
     <div
-      className="seuil-greetings"
-      aria-label={locale === "en" ? "African greetings" : "Salutations africaines"}
+      className={`seuil-greetings ${variant === "entry" ? "seuil-greetings-entry" : ""}`}
+      aria-hidden={interactive ? undefined : true}
+      aria-label={interactive ? (locale === "en" ? "Greetings" : "Salutations") : undefined}
     >
       {Array.from({ length: slotCount }, (_, i) => {
-        const item = items[wordIdx[i]];
-        // Chaque slot démarre son cycle à un point différent.
-        // Offset négatif = déjà en cours au mount → un est en
-        // émergence, un en vie, un en effacement, un endormi.
-        const offset = -Math.round((i * CYCLE_MS) / slotCount);
+        // Le pool peut changer quand l'utilisateur passe de l'univers commun
+        // à Monde ou Racines. L'index précédent reste alors borné au pool actif.
+        const item = items[wordIdx[i] % items.length];
+        // Le premier slot démarre dans la phase visible pour éviter qu'une
+        // salutation tardive devienne le LCP; les autres restent répartis
+        // sur le reste du cycle.
+        const offset = greetingAnimationDelay(i, slotCount);
         const style: React.CSSProperties = reduced
           ? {}
           : { animationDelay: `${offset}ms` };
-        return (
-          <button
-            key={i}
-            type="button"
-            className={`seuil-greeting seuil-greeting-${POSITIONS[i]} ${
-              playing === item.id ? "playing" : ""
-            }`}
-            style={style}
-            onAnimationIteration={() => handleIteration(i)}
-            onClick={() => handlePick(item)}
-            aria-label={ariaLabel(item)}
-            lang={item.langTag}
-          >
-            <span className="seuil-greeting-word">{item.word}</span>
+        const greetingContent = (
+          <>
+            <span className="seuil-greeting-word" lang={item.langTag}>{item.word}</span>
             <span className="seuil-greeting-meta">
               {(locale === "en" ? item.languageEn : item.language)} ·{" "}
               {(locale === "en" ? item.countryEn : item.country)}
             </span>
+          </>
+        );
+
+        const className = `seuil-greeting seuil-greeting-${POSITIONS[i]} ${
+          playing === item.id ? "playing" : ""
+        } ${interactive && item.territory !== "sources" ? "seuil-greeting-static" : ""}`;
+
+        // Les voix Racines disposent de leurs enregistrements audio. Les mots
+        // Monde restent des éléments visuels, même sur le seuil interactif.
+        if (!interactive || item.territory !== "sources") {
+          return (
+            <span
+              key={i}
+              className={className}
+              style={style}
+              onAnimationIteration={() => handleIteration(i)}
+            >
+              {greetingContent}
+            </span>
+          );
+        }
+
+        return (
+          <button
+            key={i}
+            type="button"
+            className={className}
+            style={style}
+            onAnimationIteration={() => handleIteration(i)}
+            onClick={() => handlePick(item)}
+            aria-label={ariaLabel(item)}
+          >
+            {greetingContent}
           </button>
         );
       })}

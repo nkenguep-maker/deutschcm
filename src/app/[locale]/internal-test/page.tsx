@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import {
   INTERNAL_TEST_COOKIE_NAME,
@@ -9,6 +8,7 @@ import {
   isInternalPersonaId,
   isInternalTesterEmail,
 } from "@/lib/internalTest";
+import { isInternalTestEnvironment } from "@/lib/internalTestEnvironment";
 
 export const dynamic = "force-dynamic";
 
@@ -22,15 +22,17 @@ const PERSONAS: Array<{
   { id: "super_admin", labelFr: "Super Admin", labelEn: "Super Admin", descriptionFr: "Console globale et audit.", descriptionEn: "Global console and audit." },
   { id: "teacher", labelFr: "Enseignant·e", labelEn: "Teacher", descriptionFr: "Classes, devoirs et corrections.", descriptionEn: "Classes, assignments and reviews." },
   { id: "coach", labelFr: "Coach Racines", labelEn: "Racines Coach", descriptionFr: "Cercles, apprenants et séances.", descriptionEn: "Circles, learners and sessions." },
-  { id: "center_admin", labelFr: "Centre", labelEn: "Center", descriptionFr: "Élèves, enseignants et facturation.", descriptionEn: "Students, teachers and billing." },
+  { id: "center_admin", labelFr: "Centre", labelEn: "Center", descriptionFr: "Élèves, enseignants et administration.", descriptionEn: "Students, teachers and administration." },
   { id: "student_monde", labelFr: "Élève Monde", labelEn: "World Student", descriptionFr: "Parcours CECRL et dashboard Monde.", descriptionEn: "CEFR path and World dashboard." },
   { id: "student_racines", labelFr: "Élève Racines", labelEn: "Roots Student", descriptionFr: "Étapes E1–E5 et dashboard Racines.", descriptionEn: "E1–E5 path and Roots dashboard." },
-  { id: "family", labelFr: "Famille", labelEn: "Family", descriptionFr: "Foyer, enfants, places et paiements.", descriptionEn: "Household, children, seats and payments." },
+  { id: "family", labelFr: "Famille", labelEn: "Family", descriptionFr: "Foyer, enfants et places techniques.", descriptionEn: "Household, children and technical seats." },
   { id: "child_monde", labelFr: "Enfant Monde", labelEn: "World Child", descriptionFr: "Espace enfant Monde avec session sécurisée.", descriptionEn: "World child space with a secure session." },
   { id: "child_racines", labelFr: "Enfant Racines", labelEn: "Roots Child", descriptionFr: "Espace enfant Racines avec session sécurisée.", descriptionEn: "Roots child space with a secure session." },
 ];
 
 export default async function InternalTestPage({ params }: { params: Promise<{ locale: string }> }) {
+  if (!isInternalTestEnvironment()) notFound();
+
   const { locale } = await params;
   const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
   const supabase = await createClient();
@@ -46,22 +48,19 @@ export default async function InternalTestPage({ params }: { params: Promise<{ l
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
         <header style={{ marginBottom: 28 }}>
           <p style={{ margin: "0 0 8px", color: "var(--brass, #d9a855)", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase" }}>
-            {loc === "fr" ? "Production · tests internes" : "Production · internal testing"}
+            {loc === "fr" ? "P-1 · tests internes" : "P-1 · internal testing"}
           </p>
           <h1 style={{ margin: "0 0 10px", fontFamily: "var(--font-fraunces), Georgia, serif", fontSize: "clamp(30px, 5vw, 52px)", lineHeight: 1.05 }}>
             {loc === "fr" ? "Tester les neuf maisons YEMA." : "Test all nine YEMA spaces."}
           </h1>
           <p style={{ margin: 0, maxWidth: 820, color: "var(--creme-mute, #b9aa98)", lineHeight: 1.65 }}>
             {loc === "fr"
-              ? "Chaque bascule réémet une session limitée au rôle du persona, vérifie son univers et affiche ici le contrat d’attributs attendu. Les fixtures restent privées et rattachées uniquement à votre compte propriétaire."
-              : "Each switch reissues a session limited to the persona role, verifies its universe, and shows the expected attribute contract here. Fixtures remain private and attached only to your owner account."}
+              ? "Cette console n’est disponible que sur l’environnement P-1. Chaque bascule vérifie le contrat du persona et utilise uniquement des fixtures de test."
+              : "This console is available only in the P-1 environment. Each switch verifies the persona contract and uses test fixtures only."}
           </p>
         </header>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 28 }}>
-          <Link href={`/${loc}/offers`} style={{ minHeight: 44, display: "inline-flex", alignItems: "center", padding: "0 18px", borderRadius: 999, background: "var(--brass, #d9a855)", color: "#1a120d", textDecoration: "none", fontWeight: 700 }}>
-            {loc === "fr" ? "Voir tous les tarifs" : "View all pricing"}
-          </Link>
           <form action="/api/internal-test/switch-persona" method="post">
             <input type="hidden" name="action" value="reset" />
             <input type="hidden" name="locale" value={loc} />

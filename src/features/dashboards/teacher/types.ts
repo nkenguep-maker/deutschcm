@@ -1,6 +1,3 @@
-// Types miroir des réponses /api/teacher/* — copies minimales pour éviter
-// d'importer côté client des modules Prisma.
-
 export interface TeacherDashboardStats {
   classroomCount: number;
   activeStudentCount: number;
@@ -9,6 +6,7 @@ export interface TeacherDashboardStats {
 
 export interface TeacherDashboardResponse {
   teacher: { id: string; isVerified: boolean };
+  profile: { fullName: string | null; city: string | null };
   center: { id: string; name: string; city: string; country?: string; plan?: string } | null;
   stats: TeacherDashboardStats;
   actorRole?: string;
@@ -42,8 +40,6 @@ export interface TeacherStudentRow {
   classroomName?: string | null;
   joinedAt: string | null;
   isActive: boolean;
-  // Lot 7B · projection minimale du parcours · client fait
-  // resolveMondePath({ learningGoal }) · aucun autre champ User exposé.
   learningGoal?: string | null;
 }
 

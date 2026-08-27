@@ -1,167 +1,166 @@
-import { NextRequest, NextResponse } from "next/server"
-import { createServerClient } from "@supabase/ssr"
-import { cookies } from "next/headers"
-import { markRoleOnboarded, syncUserMetadata, type SpaceRole } from "@/lib/roles"
-import { reconcileDbUser } from "@/lib/reconcileDbUser"
-import { prisma } from "@/lib/prisma"
-
-// Fin d'onboarding — reconcile la ligne Prisma (idempotent, tolérant à
-// un état partiel : mauvais supabaseId, users row orpheline avec même
-// email, absence de UserRole, etc.), marque UserRole.onboarded=true, et
-// sync user_metadata pour que le proxy arrête de rediriger vers /onboarding.
-//
-// Réponses :
-//   200  { success, userId, redirectTo }
-//   400  { error, code: "VALIDATION_ERROR" }
-//   401  { error, code: "UNAUTHORIZED" }
-//   500  { error, code: "DB_CONFLICT" | "INTERNAL" }
-
-const VALID: SpaceRole[] = ["STUDENT", "TEACHER", "CENTER", "ADMIN"]
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
+import { reconcileDbUser } from "@/lib/reconcileDbUser";
+import { sanitizeOptionalInternalNext } from "@/lib/authRedirect";
+import { hasActiveRole, markRoleOnboarded, syncUserMetadata, type SpaceRole } from "@/lib/roles";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
+import { isAdultPersonaId, resolvePersonaRuntime, type AdultPersonaId } from "@/lib/personas/runtime";
+import { assertSupabaseResult } from "@/lib/supabase/assertResult";
 
 function err(code: string, message: string, status: number, detail?: unknown) {
   return NextResponse.json({ error: message, code, ...(detail ? { detail } : {}) }, { status });
 }
 
+function profileString(value: unknown): string | undefined {
+  return typeof value === "string" ? value.trim() || undefined : undefined;
+}
+
 export async function POST(req: NextRequest) {
+  if (!isSameOriginRequest(req)) return err("ORIGIN_MISMATCH", "Forbidden", 403);
+
   try {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() { return cookieStore.getAll() },
-          setAll() {}
-        }
-      }
-    )
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return err("UNAUTHORIZED", "Not signed in", 401);
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return err("UNAUTHORIZED", "Not signed in", 401)
+    const body = await req.json().catch(() => null) as Record<string, unknown> | null;
+    if (!body) return err("VALIDATION_ERROR", "Invalid JSON", 400);
 
-    let role: SpaceRole | undefined
-    let profileData: Record<string, string | null | undefined> = {}
-    let cap: string | undefined
-    let activeLanguage: string | undefined
-    let personalGoal: string | undefined
-    let availability: string | undefined
-
-    try {
-      const body = await req.json()
-      const bodyRole = body.role as string | undefined
-      if (bodyRole && VALID.includes(bodyRole as SpaceRole)) role = bodyRole as SpaceRole
-      profileData = body.profileData ?? {}
-      cap = typeof body.cap === "string" ? body.cap : undefined
-      activeLanguage = typeof body.activeLanguage === "string" ? body.activeLanguage : undefined
-      personalGoal = typeof body.personalGoal === "string" ? body.personalGoal : undefined
-      availability = typeof body.availability === "string" ? body.availability : undefined
-    } catch {
-      // pas de body — on tombera sur le fallback ci-dessous
+    const requestedRole = typeof body.role === "string" ? body.role : "STUDENT";
+    if (!["STUDENT", "TEACHER", "CENTER", "ADMIN"].includes(requestedRole)) {
+      return err("VALIDATION_ERROR", "Invalid role", 400);
     }
+    const persona: AdultPersonaId | null = isAdultPersonaId(body.persona) ? body.persona : null;
+    const rawPostOnboardingNext = profileString(user.user_metadata?.post_onboarding_next);
+    const profileData = body.profileData && typeof body.profileData === "object"
+      ? body.profileData as Record<string, unknown>
+      : {};
 
-    // Fallback rôle : legacy cookie, user_metadata.role, ou STUDENT.
-    const effectiveRole: SpaceRole =
-      role ||
-      (cookieStore.get("user_role")?.value as SpaceRole | undefined) ||
-      (user.user_metadata?.role as SpaceRole | undefined) ||
-      "STUDENT"
-
-    // 1) Réconcilie la ligne users Prisma (crée / adopte l'orpheline / met à jour).
-    //    reconcileDbUser gère aussi la création idempotente du UserRole.
+    // Fresh identities always reconcile as STUDENT. Professional roles are
+    // never granted from browser input; they must already be ACTIVE in DB.
     const { user: dbUser, path: reconcilePath } = await reconcileDbUser({
       authUser: user,
-      defaultRole: effectiveRole,
+      defaultRole: "STUDENT",
       patch: {
-        onboardingDone: true,
-        fullName: profileData.fullName ?? undefined,
+        fullName: profileString(profileData.fullName),
       },
     });
     if (reconcilePath !== "matched_supabase_id") {
       console.info(`[onboarding/complete] reconcile path=${reconcilePath} for supabaseId=${user.id}`);
     }
 
-    // 2) Applique le patch profil complet (le reconcile ne fait qu'un patch minimal)
-    if (Object.keys(profileData).length > 0) {
-      await prisma.user.update({
-        where: { id: dbUser.id },
-        data: {
-          phone: profileData.phone ?? undefined,
-          city: profileData.city ?? undefined,
-          country: profileData.country ?? undefined,
-          bio: profileData.bio ?? undefined,
-          dateOfBirth: profileData.dateOfBirth ? new Date(profileData.dateOfBirth) : undefined,
-          germanLevel: profileData.germanLevel ?? undefined,
-          learningGoal: profileData.learningGoal ?? undefined,
-          availability: profileData.availability ?? undefined,
-          qualifications: profileData.qualifications ?? undefined,
-          teachingLevels: profileData.teachingLevels ?? undefined,
-          centerName: profileData.centerName ?? undefined,
-          centerAddress: profileData.centerAddress ?? undefined,
-          centerCity: profileData.centerCity ?? undefined,
-          centerWebsite: profileData.centerWebsite ?? undefined,
-          updatedAt: new Date(),
-        }
-      })
-    }
-
-    // 3) Marque onboarded=true pour ce rôle (upsert · idempotent).
-    await markRoleOnboarded(dbUser.id, effectiveRole)
-
-    // 4) Cap · langue · but perso · disponibilité → user_metadata direct.
-    if (cap || activeLanguage || personalGoal || availability) {
-      const { createClient: createAdminClient } = await import("@supabase/supabase-js")
-      const SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY
-      if (SERVICE) {
-        const admin = createAdminClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          SERVICE,
-          { auth: { autoRefreshToken: false, persistSession: false } },
-        )
-        const { data: current } = await admin.auth.admin.getUserById(user.id)
-        const existing = (current?.user?.user_metadata ?? {}) as Record<string, unknown>
-        await admin.auth.admin.updateUserById(user.id, {
-          user_metadata: {
-            ...existing,
-            ...(cap ? { cap } : {}),
-            ...(activeLanguage ? { activeLanguage } : {}),
-            ...(personalGoal ? { personalGoal } : {}),
-            ...(availability ? { availability } : {}),
-          },
-        })
+    let effectiveRole: SpaceRole = "STUDENT";
+    if (requestedRole === "TEACHER" || requestedRole === "CENTER") {
+      const allowed = await hasActiveRole(dbUser.id, requestedRole);
+      if (!allowed) {
+        return err("ROLE_NOT_GRANTED", "Professional role is not active", 403);
       }
+      effectiveRole = requestedRole;
+    } else if (requestedRole === "ADMIN") {
+      return err("ROLE_NOT_SELF_SERVICE", "Admin onboarding is not self-service", 403);
     }
 
-    // 5) Sync user_metadata pour le proxy (roles + onboarded)
-    await syncUserMetadata({ supabaseId: user.id, activeSpace: effectiveRole })
+    if (persona === "coach") {
+      const coachRole = await prisma.userAppRole.findUnique({
+        where: { userId_role: { userId: dbUser.id, role: "RACINES_COACH" } },
+        select: { id: true },
+      });
+      if (!coachRole) return err("ROLE_NOT_GRANTED", "Coach role is not active", 403);
+    }
 
-    // Après onboarding STUDENT → dashboard direct.
-    const redirectTo = effectiveRole === "TEACHER"
-      ? "/teacher"
-      : effectiveRole === "CENTER"
-      ? "/center"
-      : "/dashboard"
+    if (persona === "family") {
+      await prisma.userAppRole.upsert({
+        where: { userId_role: { userId: dbUser.id, role: "PARENT" } },
+        create: { userId: dbUser.id, role: "PARENT" },
+        update: {},
+      });
+    }
+    if (persona === "student_monde" || persona === "student_racines") {
+      await prisma.userAppRole.upsert({
+        where: { userId_role: { userId: dbUser.id, role: "LEARNER" } },
+        create: { userId: dbUser.id, role: "LEARNER" },
+        update: {},
+      });
+    }
+
+    const firstName = profileString(profileData.firstName);
+    const lastName = profileString(profileData.lastName);
+    const fullName = profileString(profileData.fullName)
+      ?? (firstName && lastName ? `${firstName} ${lastName}` : undefined);
+
+    await prisma.user.update({
+      where: { id: dbUser.id },
+      data: {
+        onboardingDone: true,
+        fullName: fullName ?? undefined,
+        phone: profileString(profileData.phone),
+        city: profileString(profileData.city),
+        country: profileString(profileData.country),
+        bio: profileString(profileData.bio),
+        dateOfBirth: profileString(profileData.dateOfBirth)
+          ? new Date(String(profileData.dateOfBirth))
+          : undefined,
+        germanLevel: profileString(profileData.germanLevel),
+        learningGoal: profileString(profileData.learningGoal),
+        availability: profileString(profileData.availability),
+        qualifications: profileString(profileData.qualifications),
+        teachingLevels: profileString(profileData.teachingLevels),
+        centerName: profileString(profileData.centerName),
+        centerAddress: profileString(profileData.centerAddress),
+        centerCity: profileString(profileData.centerCity),
+        centerWebsite: profileString(profileData.centerWebsite),
+      },
+    });
+
+    await markRoleOnboarded(dbUser.id, effectiveRole);
+
+    // Profile metadata is convenient for UI and survives confirmation flows,
+    // but it never grants authorization. app_metadata remains admin-only.
+    const metadataPatch: Record<string, unknown> = {
+      ...(user.user_metadata ?? {}),
+      ...(firstName ? { first_name: firstName } : {}),
+      ...(lastName ? { last_name: lastName } : {}),
+      ...(fullName ? { full_name: fullName } : {}),
+      ...(persona ? { requested_persona: persona } : {}),
+      ...(typeof body.activeLanguage === "string" ? { activeLanguage: body.activeLanguage } : {}),
+      ...(typeof body.cap === "string" ? { cap: body.cap } : {}),
+      ...(typeof body.personalGoal === "string" ? { personalGoal: body.personalGoal } : {}),
+      ...(typeof body.availability === "string" ? { availability: body.availability } : {}),
+      post_onboarding_next: null,
+    };
+    const metadataResult = await supabase.auth.updateUser({ data: metadataPatch });
+    assertSupabaseResult(metadataResult, "auth.updateUser.onboardingComplete");
+    await syncUserMetadata({ supabaseId: user.id, activeSpace: effectiveRole });
+
+    const runtime = await resolvePersonaRuntime({
+      supabaseId: user.id,
+      requestedPersona: persona ?? user.user_metadata?.requested_persona,
+    });
+    const safePostOnboardingNext = sanitizeOptionalInternalNext(rawPostOnboardingNext);
+    const postOnboardingRedirectApplied = Boolean(safePostOnboardingNext);
+    const redirectTo = safePostOnboardingNext || runtime.homeRoute;
 
     const response = NextResponse.json({
       success: true,
       userId: dbUser.id,
+      persona: runtime.persona,
       redirectTo,
-    })
-    // Cookie legacy conservé pour compat
-    response.cookies.set("onboarding_done", "true", { path: "/", maxAge: 2592000 })
-    response.cookies.set("active_space", effectiveRole, { path: "/", maxAge: 2592000 })
-    return response
-
+      postOnboardingRedirectApplied,
+    });
+    response.cookies.set("onboarding_done", "true", { path: "/", maxAge: 2592000, sameSite: "lax" });
+    response.cookies.set("active_space", effectiveRole, { path: "/", maxAge: 2592000, sameSite: "lax" });
+    return response;
   } catch (e) {
     const errObj = e as { code?: string; message?: string; meta?: unknown };
     console.error("[onboarding/complete] FAIL", {
       code: errObj.code,
       message: errObj.message,
       meta: errObj.meta,
-      stack: e instanceof Error ? e.stack : undefined,
     });
     if (errObj.code === "P2002") {
       return err("DB_CONFLICT", "unique constraint violation", 500, { meta: errObj.meta });
     }
-    return err("INTERNAL", errObj.message ?? "internal error", 500)
+    return err("INTERNAL", errObj.message ?? "internal error", 500);
   }
 }

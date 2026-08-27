@@ -1,162 +1,263 @@
 "use client";
 
-// /register · porte d'entrée publique YEMA.
-// L'inscription ne dépend d'aucun plan commercial : l'utilisateur crée son
-// compte puis passe par l'onboarding Monde/Racines avant d'ouvrir son espace.
-
 import Link from "next/link";
 import { useRouter } from "@/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { frTypo } from "@/components/landing/typo";
 import { BrandY } from "@/components/brand/BrandY";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import { classifyAuthError, withTimeout, type AuthErrorKey } from "@/lib/authErrors";
 import { sanitizeInternalNext } from "@/lib/authRedirect";
+import {
+  createPreconfirmationIdentity,
+  PRECONFIRMATION_DRAFT_KEY,
+  PRECONFIRMATION_IDENTITY_KEY,
+} from "@/lib/preconfirmationJourney";
 
 type Universe = "monde" | "racines";
 
-const COPY_FR = {
-  brand: "YEMA",
-  kicker: "L'entrée",
-  title: "Créer votre compte.",
-  lede: "Commencez votre parcours YEMA et reprenez-le sur n’importe quel appareil.",
-  contextMonde: "Vous entrez par l’univers Monde.",
-  contextRacines: "Vous entrez par l’univers Racines.",
-  fldName: "Nom",
-  fldContact: "E-mail ou téléphone",
-  fldContactHint: "Format e-mail (nom@domaine) ou téléphone (+237…).",
-  fldPassword: "Mot de passe",
-  fldPasswordHint: "Au moins huit caractères.",
-  submit: "Créer mon compte",
-  submitLoading: "On ouvre la porte…",
-  sep: "ou",
-  google: "Continuer avec Google",
-  googleUnavailable: "Google n'est pas encore branché.",
-  errPassword: "Mot de passe · au moins huit caractères.",
-  errContactEmpty: "Un e-mail ou un numéro, pour vous retrouver.",
-  errContactInvalid: "Ce n'est ni un e-mail ni un numéro valide.",
-  loginPrompt: "Déjà un compte ?",
-  loginCta: "Se connecter",
-  legal: "En créant votre compte, vous acceptez nos conditions et notre politique de confidentialité.",
-  successTitle: "Vérifiez votre boîte.",
-  successBody: "Nous vous avons envoyé un lien pour confirmer votre inscription. Votre parcours commencera juste après.",
-} as const;
+type SelectedPlan =
+  | "passage-a1"
+  | "passage-a2"
+  | "passage-b1"
+  | "passage-b2"
+  | "passage-c1"
+  | "racines-solo"
+  | "racines-famille";
 
-const COPY_EN = {
-  brand: "YEMA",
-  kicker: "The entrance",
-  title: "Create your account.",
-  lede: "Start your YEMA journey and pick it up again on any device.",
-  contextMonde: "You’re entering through the World universe.",
-  contextRacines: "You’re entering through the Roots universe.",
-  fldName: "Name",
-  fldContact: "Email or phone",
-  fldContactHint: "Email format (name@domain) or phone (+237…).",
-  fldPassword: "Password",
-  fldPasswordHint: "At least eight characters.",
-  submit: "Create my account",
-  submitLoading: "Opening the door…",
-  sep: "or",
-  google: "Continue with Google",
-  googleUnavailable: "Google isn't wired up yet.",
-  errPassword: "Password · at least eight characters.",
-  errContactEmpty: "An email or a phone, so we can find you again.",
-  errContactInvalid: "That doesn't look like a valid email or phone number.",
-  loginPrompt: "Already have an account?",
-  loginCta: "Sign in",
-  legal: "By creating your account, you accept our terms and privacy policy.",
-  successTitle: "Check your inbox.",
-  successBody: "We sent you a link to confirm your registration. Your journey starts right after that.",
-} as const;
+const VALID_PLANS = new Set<SelectedPlan>([
+  "passage-a1",
+  "passage-a2",
+  "passage-b1",
+  "passage-b2",
+  "passage-c1",
+  "racines-solo",
+  "racines-famille",
+]);
 
-function isPhoneLike(value: string): boolean {
-  const normalized = value.trim().replace(/[\s-]/g, "");
-  return /^\+?\d{7,}$/.test(normalized);
+const GOOGLE_AUTH_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true";
+const RESEND_COOLDOWN_SECONDS = 60;
+
+function parseSelectedPlan(value: string | null): SelectedPlan | null {
+  return value && VALID_PLANS.has(value as SelectedPlan) ? value as SelectedPlan : null;
 }
+
+const COPY = {
+  fr: {
+    kicker: "L'entrée",
+    title: "Créer votre compte.",
+    lede: "Votre identité reste la même dans tous vos espaces YEMA.",
+    firstName: "Prénom",
+    lastName: "Nom",
+    email: "E-mail",
+    password: "Mot de passe",
+    passwordHint: "Au moins huit caractères.",
+    showPassword: "Afficher le mot de passe",
+    hidePassword: "Masquer le mot de passe",
+    submit: "Créer mon compte",
+    loading: "On ouvre la porte…",
+    google: "Continuer avec Google",
+    googleUnavailable: "Google n'est pas encore branché.",
+    emailInvalid: "Entrez une adresse e-mail valide.",
+    nameMissing: "Renseignez votre prénom et votre nom.",
+    passwordInvalid: "Le mot de passe doit contenir au moins huit caractères.",
+    loginPrompt: "Déjà un compte ?",
+    loginCta: "Se connecter",
+    legalBefore: "En créant votre compte, vous acceptez nos ",
+    legalTerms: "conditions d’utilisation",
+    legalMiddle: " et notre ",
+    legalPrivacy: "politique de confidentialité.",
+    successTitle: "Vérifiez votre boîte.",
+    successBody: "Votre lien de confirmation est en route. Vous pouvez déjà préparer votre parcours.",
+    successContinue: "Préparer mon parcours",
+    successLogin: "J’ai confirmé mon adresse",
+    successChangeEmail: "Corriger mon adresse",
+    resend: "Renvoyer l’e-mail de confirmation",
+    resending: "Nouvel envoi en cours…",
+    resendCooldown: (seconds: number) => `Renvoyer dans ${seconds} s`,
+    resendHelp: "Regardez aussi dans les indésirables.",
+    resendSent: "Un nouveau lien a été demandé. Vérifiez votre boîte de réception.",
+    resendRateLimited: "Trop de demandes pour le moment. Attendez un peu avant de réessayer.",
+    resendError: "Le nouvel e-mail n’a pas pu être demandé. Réessayez dans un instant.",
+  },
+  en: {
+    kicker: "The entrance",
+    title: "Create your account.",
+    lede: "Your identity stays the same across all your YEMA spaces.",
+    firstName: "First name",
+    lastName: "Last name",
+    email: "Email",
+    password: "Password",
+    passwordHint: "At least eight characters.",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
+    submit: "Create my account",
+    loading: "Opening the door…",
+    google: "Continue with Google",
+    googleUnavailable: "Google isn't wired up yet.",
+    emailInvalid: "Enter a valid email address.",
+    nameMissing: "Enter your first and last name.",
+    passwordInvalid: "Your password must contain at least eight characters.",
+    loginPrompt: "Already have an account?",
+    loginCta: "Sign in",
+    legalBefore: "By creating your account, you accept our ",
+    legalTerms: "terms of use",
+    legalMiddle: " and ",
+    legalPrivacy: "privacy policy.",
+    successTitle: "Check your inbox.",
+    successBody: "Your confirmation link is on its way. You can already prepare your journey.",
+    successContinue: "Prepare my journey",
+    successLogin: "I confirmed my email",
+    successChangeEmail: "Correct my email",
+    resend: "Resend confirmation email",
+    resending: "Requesting a new email…",
+    resendCooldown: (seconds: number) => `Resend in ${seconds}s`,
+    resendHelp: "Please check your spam folder too.",
+    resendSent: "A new link was requested. Check your inbox.",
+    resendRateLimited: "Too many requests for now. Please wait a little before trying again.",
+    resendError: "We could not request a new email. Please try again shortly.",
+  },
+} as const;
 
 function isEmailLike(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
+async function getSupabaseClient() {
+  const { createClient } = await import("@/lib/supabase/client");
+  return createClient();
+}
+
+function clearPreconfirmationStorage() {
+  try {
+    window.localStorage.removeItem(PRECONFIRMATION_DRAFT_KEY);
+    window.localStorage.removeItem(PRECONFIRMATION_IDENTITY_KEY);
+  } catch {
+    // Registration must remain available when browser storage is disabled.
+  }
 }
 
 export default function RegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const locale = useLocale();
-  const loc: "fr" | "en" = locale === "en" ? "en" : "fr";
-  const c = loc === "en" ? COPY_EN : COPY_FR;
+  const loc = locale === "en" ? "en" : "fr";
+  const c = COPY[loc];
   const t = (value: string) => (loc === "fr" ? frTypo(value) : value);
+  const tErr = useTranslations("auth.errors");
 
   const universeParam = searchParams.get("universe");
-  const universe: Universe | null =
-    universeParam === "monde" || universeParam === "racines" ? universeParam : null;
+  const universe: Universe | null = universeParam === "monde" || universeParam === "racines"
+    ? universeParam
+    : null;
+  const selectedPlan = parseSelectedPlan(searchParams.get("plan"));
+  const rootsSoloSelected = searchParams.get("addon") === "roots-solo";
+  const rootsCoachSelected = searchParams.get("addon") === "roots-coach";
+  const teacherAddonRequested = searchParams.get("prof") === "1";
   const rawNext = searchParams.get("next");
   const safeNext = sanitizeInternalNext(rawNext, `/${locale}/dashboard`);
   const loginHref = rawNext
     ? `/${locale}/login?next=${encodeURIComponent(safeNext)}`
     : `/${locale}/login`;
 
-  const [fullName, setFullName] = useState("");
-  const [contact, setContact] = useState("");
+  const personaIntentQuery = useMemo(() => {
+    const params = new URLSearchParams();
+    if (selectedPlan) params.set("plan", selectedPlan);
+    if (rootsSoloSelected) params.set("addon", "roots-solo");
+    else if (rootsCoachSelected) params.set("addon", "roots-coach");
+    if (teacherAddonRequested) params.set("prof", "1");
+    if (rawNext) params.set("next", safeNext);
+    const suffix = params.toString();
+    return suffix ? `?${suffix}` : "";
+  }, [rawNext, rootsCoachSelected, rootsSoloSelected, safeNext, selectedPlan, teacherAddonRequested]);
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const tErr = useTranslations("auth.errors");
+  const [resendState, setResendState] = useState<"idle" | "sending" | "sent" | "rate_limited" | "error">("idle");
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const errorRef = useRef<HTMLParagraphElement>(null);
+  const successHeadingRef = useRef<HTMLHeadingElement>(null);
+
   const errorFromKey = (key: AuthErrorKey): string => t(tErr(key));
+  const localizedPersonaRoute = `/${locale}/onboarding/persona${personaIntentQuery}`;
+  const appPersonaRoute = `/onboarding/persona${personaIntentQuery}`;
+  const preconfirmationOnboardingHref = `/${locale}/pre-onboarding${personaIntentQuery}`;
 
   useEffect(() => {
     document.querySelector<HTMLInputElement>("input[data-autofocus]")?.focus();
   }, []);
 
-  const onboardingRoute = universe === "racines"
-    ? "/onboarding/racines"
-    : universe === "monde"
-      ? "/onboarding/monde"
-      : "/onboarding";
-  const localizedOnboardingRoute = `/${locale}${onboardingRoute}`;
+  useEffect(() => {
+    if (success) successHeadingRef.current?.focus();
+  }, [success]);
+
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timeout = window.setTimeout(
+      () => setResendCooldown((seconds) => Math.max(0, seconds - 1)),
+      1_000,
+    );
+    return () => window.clearTimeout(timeout);
+  }, [resendCooldown]);
 
   async function handleRegister(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
+    setResendState("idle");
 
-    const trimmed = contact.trim();
-    if (!trimmed) {
-      setError(t(c.errContactEmpty));
+    const first = firstName.trim();
+    const last = lastName.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!first || !last) {
+      setError(t(c.nameMissing));
+      return;
+    }
+    if (!isEmailLike(normalizedEmail)) {
+      setError(t(c.emailInvalid));
       return;
     }
     if (password.length < 8) {
-      setError(t(c.errPassword));
-      return;
-    }
-
-    const usePhone = isPhoneLike(trimmed);
-    const useEmail = isEmailLike(trimmed);
-    if (!usePhone && !useEmail) {
-      setError(t(c.errContactInvalid));
+      setError(t(c.passwordInvalid));
       return;
     }
 
     setLoading(true);
     try {
-      const supabase = createClient();
-      const options = {
-        data: {
-          full_name: fullName || null,
-          role: "STUDENT" as const,
-          universe: universe ?? null,
-        },
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizedOnboardingRoute)}`,
-      };
-
-      const credentials = usePhone
-        ? { phone: trimmed.replace(/[\s-]/g, ""), password, options }
-        : { email: trimmed, password, options };
-
+      const supabase = await getSupabaseClient();
+      const fullName = `${first} ${last}`;
+      const selectedAddon = rootsSoloSelected ? "roots-solo" : rootsCoachSelected ? "roots-coach" : null;
       const { data, error: signUpError } = await withTimeout(
-        supabase.auth.signUp(credentials),
+        supabase.auth.signUp({
+          email: normalizedEmail,
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+              first_name: first,
+              last_name: last,
+              universe: universe ?? null,
+              selected_plan: selectedPlan,
+              selected_addons: selectedAddon ? [selectedAddon] : [],
+              teacher_addon_requested: teacherAddonRequested,
+              post_onboarding_next: rawNext ? safeNext : null,
+            },
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizedPersonaRoute)}`,
+          },
+        }),
       );
 
       if (signUpError) {
@@ -164,19 +265,31 @@ export default function RegisterPage() {
         return;
       }
 
-      try {
-        document.cookie = "user_role=STUDENT;path=/;max-age=2592000";
-        document.cookie = "active_space=STUDENT;path=/;max-age=2592000";
-      } catch {
-        // L'auth Supabase reste la source de vérité si le cookie local échoue.
-      }
-
       if (data.session) {
-        router.push(onboardingRoute);
+        clearPreconfirmationStorage();
+        const syncResponse = await fetch("/api/auth/sync", { method: "POST" });
+        if (!syncResponse.ok) {
+          await supabase.auth.signOut();
+          setError(errorFromKey("generic"));
+          return;
+        }
+        await supabase.auth.refreshSession();
+        router.push(appPersonaRoute);
         router.refresh();
         return;
       }
 
+      if (data.user?.id) {
+        try {
+          window.localStorage.removeItem(PRECONFIRMATION_DRAFT_KEY);
+          window.localStorage.setItem(
+            PRECONFIRMATION_IDENTITY_KEY,
+            JSON.stringify(createPreconfirmationIdentity(data.user.id)),
+          );
+        } catch {
+          // The confirmation flow still works without same-device draft recovery.
+        }
+      }
       setSuccess(true);
     } catch (registerError) {
       setError(errorFromKey(classifyAuthError(registerError)));
@@ -188,17 +301,13 @@ export default function RegisterPage() {
   async function handleGoogle() {
     setError(null);
     setGoogleLoading(true);
-
     try {
-      const supabase = createClient();
-      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizedOnboardingRoute)}`;
+      const supabase = await getSupabaseClient();
+      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizedPersonaRoute)}`;
       const { error: oauthError } = await withTimeout(
         supabase.auth.signInWithOAuth({
           provider: "google",
-          options: {
-            redirectTo,
-            queryParams: { access_type: "offline", prompt: "consent" },
-          },
+          options: { redirectTo, queryParams: { access_type: "offline", prompt: "consent" } },
         }),
       );
       if (oauthError) setError(t(c.googleUnavailable));
@@ -210,21 +319,52 @@ export default function RegisterPage() {
     }
   }
 
-  const universeClass = universe === "racines"
-    ? "entry-universe-racines"
-    : universe === "monde"
-      ? "entry-universe-monde"
-      : "";
+  async function handleResendConfirmation() {
+    if (resendCooldown > 0 || resendState === "sending") return;
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!isEmailLike(normalizedEmail)) return;
+
+    setResendState("sending");
+    try {
+      const supabase = await getSupabaseClient();
+      const { error: resendError } = await withTimeout(
+        supabase.auth.resend({
+          type: "signup",
+          email: normalizedEmail,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(localizedPersonaRoute)}`,
+          },
+        }),
+      );
+      if (resendError) {
+        const nextState = classifyAuthError(resendError) === "rate_limited" ? "rate_limited" : "error";
+        setResendState(nextState);
+        if (nextState === "rate_limited") setResendCooldown(RESEND_COOLDOWN_SECONDS);
+        return;
+      }
+      setResendState("sent");
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
+    } catch (resendError) {
+      const nextState = classifyAuthError(resendError) === "rate_limited" ? "rate_limited" : "error";
+      setResendState(nextState);
+      if (nextState === "rate_limited") setResendCooldown(RESEND_COOLDOWN_SECONDS);
+    }
+  }
 
   return (
-    <div className={`entry-page ${universeClass}`} data-universe={universe ?? "none"}>
+    <div className={`entry-page ${universe === "racines" ? "entry-universe-racines" : universe === "monde" ? "entry-universe-monde" : ""}`}>
+      <SeuilGreetings
+        locale={loc}
+        visibleCount={3}
+        pool={universe === "monde" ? "world" : universe === "racines" ? "sources" : "all"}
+        variant="entry"
+      />
       <header className="entry-header">
-        <Link href={`/${locale}`} className="entry-brand" aria-label={c.brand}>
+        <Link href={`/${locale}`} className="entry-brand" aria-label="YEMA">
           <BrandY variant={universe === "racines" ? "sources" : "world"} state="static" size={36} />
         </Link>
         <p className="entry-header-alt">
-          {t(c.loginPrompt)}{" "}
-          <Link href={loginHref} className="entry-header-link">{t(c.loginCta)}</Link>
+          {t(c.loginPrompt)}{" "}<Link href={loginHref} className="entry-header-link">{t(c.loginCta)}</Link>
         </p>
       </header>
 
@@ -232,8 +372,44 @@ export default function RegisterPage() {
         <div className="entry-card">
           {success ? (
             <div className="entry-success">
-              <h1 className="entry-h">{t(c.successTitle)}</h1>
+              <h1 ref={successHeadingRef} className="entry-h" tabIndex={-1}>{t(c.successTitle)}</h1>
               <p className="entry-lede">{t(c.successBody)}</p>
+              <p className="entry-success-help">{t(c.resendHelp)}</p>
+              <div className="entry-success-actions">
+                <Link href={preconfirmationOnboardingHref} className="entry-cta entry-cta-primary">{t(c.successContinue)}</Link>
+                <Link href={loginHref} className="entry-cta entry-cta-ghost">{t(c.successLogin)}</Link>
+                <button
+                  type="button"
+                  className="entry-cta entry-cta-ghost"
+                  onClick={handleResendConfirmation}
+                  disabled={resendState === "sending" || resendCooldown > 0}
+                >
+                  {t(
+                    resendState === "sending"
+                      ? c.resending
+                      : resendCooldown > 0
+                        ? c.resendCooldown(resendCooldown)
+                        : c.resend,
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="entry-cta entry-cta-ghost"
+                  onClick={() => {
+                    clearPreconfirmationStorage();
+                    setResendState("idle");
+                    setResendCooldown(0);
+                    setSuccess(false);
+                  }}
+                >
+                  {t(c.successChangeEmail)}
+                </button>
+              </div>
+              {resendState !== "idle" && resendState !== "sending" ? (
+                <p className={`entry-success-feedback ${resendState === "sent" ? "is-success" : "is-error"}`} role="status">
+                  {t(resendState === "sent" ? c.resendSent : resendState === "rate_limited" ? c.resendRateLimited : c.resendError)}
+                </p>
+              ) : null}
             </div>
           ) : (
             <>
@@ -241,78 +417,74 @@ export default function RegisterPage() {
               <h1 className="entry-h">{t(c.title)}</h1>
               <p className="entry-lede">{t(c.lede)}</p>
 
-              {universe ? (
+              {selectedPlan || rootsSoloSelected || rootsCoachSelected || teacherAddonRequested ? (
                 <div className="entry-context" role="note">
                   <span className="entry-context-dot" aria-hidden="true" />
                   <span className="entry-context-text">
-                    {t(universe === "racines" ? c.contextRacines : c.contextMonde)}
+                    {loc === "en" ? "Your selected offer will be kept through onboarding." : "Votre choix d’offre sera conservé pendant l’onboarding."}
                   </span>
                 </div>
               ) : null}
 
               <form onSubmit={handleRegister} className="entry-form" noValidate>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <label className="entry-field">
+                    <span className="entry-field-lbl">{t(c.firstName)}</span>
+                    <input data-autofocus type="text" autoComplete="given-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="entry-input" required />
+                  </label>
+                  <label className="entry-field">
+                    <span className="entry-field-lbl">{t(c.lastName)}</span>
+                    <input type="text" autoComplete="family-name" value={lastName} onChange={(e) => setLastName(e.target.value)} className="entry-input" required />
+                  </label>
+                </div>
+
                 <label className="entry-field">
-                  <span className="entry-field-lbl">{t(c.fldName)}</span>
-                  <input
-                    type="text"
-                    autoComplete="name"
-                    value={fullName}
-                    onChange={(event) => setFullName(event.target.value)}
-                    className="entry-input"
-                    data-autofocus
-                  />
+                  <span className="entry-field-lbl">{t(c.email)}</span>
+                  <input type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className="entry-input" required />
                 </label>
 
                 <label className="entry-field">
-                  <span className="entry-field-lbl">{t(c.fldContact)}</span>
-                  <input
-                    type="text"
-                    inputMode="email"
-                    required
-                    autoComplete="username"
-                    value={contact}
-                    onChange={(event) => setContact(event.target.value)}
-                    className="entry-input"
-                    aria-describedby="contact-hint"
-                  />
-                  <span id="contact-hint" className="entry-field-hint">{t(c.fldContactHint)}</span>
+                  <span className="entry-field-lbl">{t(c.password)}</span>
+                  <span className="entry-password-wrap">
+                    <input type={passwordVisible ? "text" : "password"} autoComplete="new-password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className="entry-input" required />
+                    <button
+                      type="button"
+                      className="entry-password-toggle"
+                      onClick={() => setPasswordVisible((visible) => !visible)}
+                      aria-label={t(passwordVisible ? c.hidePassword : c.showPassword)}
+                      title={t(passwordVisible ? c.hidePassword : c.showPassword)}
+                    >
+                      {passwordVisible ? <EyeOff size={17} aria-hidden="true" /> : <Eye size={17} aria-hidden="true" />}
+                    </button>
+                  </span>
+                  <span className="entry-field-hint">{t(c.passwordHint)}</span>
                 </label>
 
-                <label className="entry-field">
-                  <span className="entry-field-lbl">{t(c.fldPassword)}</span>
-                  <input
-                    type="password"
-                    required
-                    autoComplete="new-password"
-                    minLength={8}
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    className="entry-input"
-                    aria-describedby="password-hint"
-                  />
-                  <span id="password-hint" className="entry-field-hint">{t(c.fldPasswordHint)}</span>
-                </label>
-
-                {error ? <p className="entry-err" role="alert">{error}</p> : null}
-
+                {error ? (
+                  <p ref={errorRef} className="entry-err" role="alert" tabIndex={-1}>
+                    {error}
+                  </p>
+                ) : null}
                 <button type="submit" className="entry-cta entry-cta-primary" disabled={loading}>
-                  {loading ? t(c.submitLoading) : t(c.submit)}
+                  {loading ? t(c.loading) : t(c.submit)}
                 </button>
-
-                <div className="entry-sep" aria-hidden="true"><span>{c.sep}</span></div>
-
-                <button
-                  type="button"
-                  className="entry-cta entry-cta-ghost"
-                  onClick={handleGoogle}
-                  disabled={googleLoading || loading}
-                >
-                  <span className="entry-google-dot" aria-hidden="true" />
-                  {t(c.google)}
-                </button>
+                {GOOGLE_AUTH_ENABLED ? (
+                  <>
+                    <div className="entry-sep" aria-hidden="true"><span>{loc === "en" ? "or" : "ou"}</span></div>
+                    <button type="button" className="entry-cta entry-cta-ghost" onClick={handleGoogle} disabled={googleLoading || loading}>
+                      <span className="entry-google-dot" aria-hidden="true" />
+                      {t(c.google)}
+                    </button>
+                  </>
+                ) : null}
               </form>
 
-              <p className="entry-legal">{t(c.legal)}</p>
+              <p className="entry-legal">
+                {t(c.legalBefore)}
+                <Link href={`/${locale}/terms`} className="entry-legal-link">{t(c.legalTerms)}</Link>
+                {t(c.legalMiddle)}
+                <Link href={`/${locale}/privacy`} className="entry-legal-link">{t(c.legalPrivacy)}</Link>
+              </p>
             </>
           )}
         </div>

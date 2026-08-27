@@ -67,7 +67,7 @@ export function CoachRacinesDashboard({ locale, activeSectionId = "accueil" }: P
     { key: "sessionNotes", label: t("mobileNav.sessionNotes"), href: `${baseHref}#notes` },
   ];
   const tabs = routeSectionTabs(rawTabs, baseHref, "accueil");
-  const activeTab = ({ accueil: "overview", "seances-du-jour": "overview", apprenants: "learners", seances: "sessions", messages: "messages", notes: "sessionNotes" } as Record<string, string>)[activeSection];
+  const activeTab = ({ accueil: "overview", "seances-du-jour": "sessions", apprenants: "learners", seances: "sessions", messages: "messages", notes: "sessionNotes" } as Record<string, string>)[activeSection];
   const tabBar = <DashboardTabBar tabs={tabs} activeKey={activeTab} />;
   const shell = (body: React.ReactNode, header: React.ReactNode) => <DashboardPageBoundary><DashboardShell universe="racines" sidebar={sidebar} mobileHeader={mobileHeader} tabBar={tabBar} header={header}>{body}</DashboardShell></DashboardPageBoundary>;
 
@@ -75,16 +75,22 @@ export function CoachRacinesDashboard({ locale, activeSectionId = "accueil" }: P
   if (state.kind === "error") return shell(<DashboardErrorState title={t("error")} action={<button type="button" onClick={load}>{t("retry")}</button>} />, <DashboardHeader title={personaLabel} />);
 
   const { data, learners } = state;
-  const meta = t("meta", { activeCircles: data.stats.activeCircleCount, activeChildren: data.stats.activeChildProfileCount });
+  const counts = t("meta", { activeCircles: data.stats.activeCircleCount, activeChildren: data.stats.activeChildProfileCount });
+  const greeting = data.profile.fullName?.trim().split(/\s+/)[0] || personaLabel;
+  const meta = data.profile.city ? `${counts} · ${data.profile.city}` : counts;
   const overview = <CoachOverviewSection stats={data.stats} />;
+  const sessions = <CoachSessionsSection learners={learners} />;
   const content: Record<string, React.ReactNode> = {
     accueil: overview,
-    "seances-du-jour": overview,
+    "seances-du-jour": sessions,
     apprenants: <CoachLearnersSection learners={learners} loading={false} baseHref={baseHref} />,
-    seances: <CoachSessionsSection />,
+    seances: sessions,
     messages: <CoachMessagesSection />,
     notes: <CoachSessionNotesSection />,
   };
 
-  return shell(<div data-live-persona-section={activeSection}>{content[activeSection]}</div>, <DashboardHeader title={personaLabel} subtitle={meta} meta={<DashboardStatusChip tone="neutral">{data.actorRole}</DashboardStatusChip>} />);
+  return shell(
+    <div data-live-persona-section={activeSection}>{content[activeSection]}</div>,
+    <DashboardHeader title={greeting} subtitle={meta} meta={<DashboardStatusChip tone="neutral">{data.actorRole}</DashboardStatusChip>} />,
+  );
 }
