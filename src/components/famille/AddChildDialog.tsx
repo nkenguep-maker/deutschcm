@@ -129,8 +129,50 @@ export function AddChildDialog({ loc, copy, onCancel, onCreated }: Props) {
       aria-modal="true"
       aria-label={copy.step}
       data-testid="add-child-dialog"
+      style={{
+        overflowY: "auto",
+        overscrollBehavior: "contain",
+        padding: "clamp(12px, 3vw, 28px)",
+        alignItems: "flex-start",
+      }}
     >
-      <div className="famille-dialog-inner">
+      <div
+        className="famille-dialog-inner"
+        style={{
+          width: "min(100%, 620px)",
+          maxHeight: "calc(100dvh - 24px)",
+          overflowY: "auto",
+          overscrollBehavior: "contain",
+          position: "relative",
+          paddingBottom: 0,
+        }}
+      >
+        <button
+          type="button"
+          onClick={onCancel}
+          aria-label={copy.cancel}
+          data-testid="add-child-close"
+          style={{
+            position: "sticky",
+            top: 0,
+            marginLeft: "auto",
+            zIndex: 4,
+            width: 40,
+            height: 40,
+            minHeight: 40,
+            borderRadius: "999px",
+            border: "1px solid var(--creme-hair)",
+            background: "rgba(42, 15, 20, 0.92)",
+            color: "var(--creme)",
+            display: "grid",
+            placeItems: "center",
+            fontSize: 24,
+            lineHeight: 1,
+          }}
+        >
+          ×
+        </button>
+
         <p className="famille-kicker">{t(copy.step).toUpperCase()}</p>
         <label className="famille-field">
           <span className="famille-field-lbl">{t(copy.prenomLbl)}</span>
@@ -270,7 +312,19 @@ export function AddChildDialog({ loc, copy, onCancel, onCreated }: Props) {
         ) : null}
 
         {err ? <p className="famille-err" role="alert" data-testid="add-child-error">{err}</p> : null}
-        <div className="famille-dialog-actions">
+        <div
+          className="famille-dialog-actions"
+          style={{
+            position: "sticky",
+            bottom: 0,
+            zIndex: 5,
+            margin: "18px -1px 0",
+            padding: "14px 0 max(14px, env(safe-area-inset-bottom))",
+            background: "linear-gradient(180deg, rgba(74, 32, 27, 0.94), #4a201b 28%)",
+            borderTop: "1px solid var(--creme-hair)",
+            boxShadow: "0 -16px 28px rgba(18, 12, 6, 0.22)",
+          }}
+        >
           <button
             type="button"
             className="famille-btn ghost"
@@ -286,7 +340,7 @@ export function AddChildDialog({ loc, copy, onCancel, onCreated }: Props) {
             disabled={submitting || !universe}
             data-testid="add-child-submit"
           >
-            {copy.create}
+            {submitting ? "…" : copy.create}
           </button>
         </div>
       </div>
