@@ -61,6 +61,29 @@ describe("P0.17 · AccessGrant provenance", () => {
     expect(offenders, `direct runtime AccessGrant writes: ${offenders.join(", ")}`).toEqual([]);
   });
 
+  it("requires an active household ROOTS_FAMILY grant before an adult seat", () => {
+    const source = read("src/lib/entitlements/grants.ts");
+    const adultSeats = read("src/lib/family/adultSeats.ts");
+
+    expect(source).toContain("grantAdultRootsSeatFromHouseholdGrant");
+    expect(source).toContain('beneficiaryType: "HOUSEHOLD"');
+    expect(source).toContain('productVariant: { product: { code: "ROOTS_FAMILY" } }');
+    expect(source).toContain("backingGrantId: backingGrant.id");
+    expect(adultSeats).toContain("grantAdultRootsSeatFromHouseholdGrant({");
+    expect(adultSeats).not.toContain("prisma.accessGrant.create(");
+  });
+
+  it("keeps internal promo fixtures behind the canonical P-1 environment gate", () => {
+    const source = read("src/lib/entitlements/grants.ts");
+    const provisioning = read("src/lib/internalTestProvisioning.ts");
+
+    expect(source).toContain("upsertInternalTestPromoGrant");
+    expect(source).toContain("!isInternalTestEnvironment()");
+    expect(source).toContain('params.sourceId.startsWith("internal-test:")');
+    expect(provisioning).toContain("upsertInternalTestPromoGrant(params)");
+    expect(provisioning).not.toContain("prisma.accessGrant.create(");
+  });
+
   it("gates simulated payments to canonical P-1 before parsing or writes", () => {
     const source = read("src/app/api/internal-test/simulate-payment/route.ts");
     const envGate = source.indexOf("isInternalTestEnvironment()");
@@ -91,7 +114,7 @@ describe("P0.17 · AccessGrant provenance", () => {
     expect(source).toContain('g.\"productVariantId\" <> oi.\"productVariantId\"');
     expect(source).toContain("p.status::text = 'CONFIRMED'");
     expect(source).toContain("p.amount = o.total");
-    expect(source).toContain("\"sourceId\" !~ '^test[_-]'");
+    expect(source).toContain("\"sourceId\" !~ '^(test[_-]|internal-test:)'");
     expect(source).not.toMatch(/\b(?:insert|update|delete|alter|grant|revoke)\s+(?:into\s+|from\s+|table\s+)?public\./i);
   });
 
