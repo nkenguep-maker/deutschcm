@@ -121,9 +121,9 @@ export async function verifyInternalPersonaFixture(params: {
       },
     });
     if (!path || path.userId !== params.userId || path.status !== "ACTIVE") fail(params.persona, "active Racines path");
-    if (path.universe !== "RACINES" || path.language !== "WOLOF") fail(params.persona, "RACINES/WOLOF path");
+    if (path.universe !== "RACINES" || path.language !== "BASSA") fail(params.persona, "RACINES/BASSA path");
     if (!hasInternalTestMarker(path.onboardingAnswers)) fail(params.persona, "internal Racines fixture marker");
-    checks.push("path:RACINES/WOLOF/E1");
+    checks.push("path:RACINES/BASSA/E1");
   }
 
   if (params.persona === "family") {
@@ -159,7 +159,7 @@ export async function verifyInternalPersonaFixture(params: {
   if (params.persona === "child_monde" || params.persona === "child_racines") {
     const expected = params.persona === "child_monde"
       ? { id: params.fixture.childMonde.id, universe: "MONDE", language: "deutsch" }
-      : { id: params.fixture.childRacines.id, universe: "RACINES", language: "wolof" };
+      : { id: params.fixture.childRacines.id, universe: "RACINES", language: "bassa" };
     const child = await prisma.childProfile.findUnique({
       where: { id: expected.id },
       select: {
