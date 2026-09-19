@@ -35,7 +35,7 @@ const T = {
     modalCancel: "Annuler",
     modalJoinBtn: "Rejoindre →",
     modalJoiningBtn: "Connexion...",
-    modalSuccessTitle: "Classe rejointe !",
+    modalSuccessTitle: "Demande envoyée !",
     modalError: "Erreur inconnue",
     modalNetworkError: "Erreur réseau",
     communityTitle: "Bientôt : groupes d'étude et partenaires d'apprentissage",
@@ -68,7 +68,7 @@ const T = {
     modalCancel: "Cancel",
     modalJoinBtn: "Join →",
     modalJoiningBtn: "Joining...",
-    modalSuccessTitle: "Class joined!",
+    modalSuccessTitle: "Request sent!",
     modalError: "Unknown error",
     modalNetworkError: "Network error",
     communityTitle: "Coming soon: study groups and learning partners",
@@ -247,10 +247,10 @@ export default function ClassroomListPage() {
     setJoining(true);
     setJoinError("");
     try {
-      const r = await fetch("/api/classroom", {
+      const r = await fetch("/api/classroom/join", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "join", code: code.trim().toUpperCase() }),
+        body: JSON.stringify({ code: code.trim().toUpperCase() }),
       });
       if (!r.ok) {
         const d = await r.json();
