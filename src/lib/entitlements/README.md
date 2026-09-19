@@ -67,21 +67,45 @@ export async function POST(req: NextRequest) {
 
 ## Comment créer un grant (uniquement système)
 
-Un `access_grant` n'est créé QUE par :
+La création directe d'un `access_grant` est centralisée dans
+`src/lib/entitlements/grants.ts`. Les routes et services métier n'écrivent
+jamais `prisma.accessGrant.create(...)` eux-mêmes.
 
-1. Un `Payment` qui bascule à `CONFIRMED` (webhook Cinetpay / callback carte).
-2. Une promo auditée (audit trail dans `metadata`).
+### Achat / Order
+
+`grantFromOrderItem(item.id)` exige simultanément :
+
+- `order.status = PAID` ;
+- un `Payment CONFIRMED` avec `confirmedAt` ;
+- même devise que l'Order ;
+- montant confirmé exactement égal à `order.total` ;
+- `sourceType/sourceId/orderItemId` dérivés côté serveur, jamais fournis par le client.
 
 ```ts
 import { grantFromOrderItem } from "@/lib/entitlements/grants";
 
-// Dans le webhook de confirmation de paiement, après avoir mis order.status = "PAID"
 for (const item of order.items) {
   await grantFromOrderItem(item.id);
 }
 ```
 
-**Interdit** : `prisma.accessGrant.create(...)` en dehors des flux payment/promo.
+La base ajoute aussi deux invariants : un grant `ORDER` doit avoir un
+`orderItemId`, et un `OrderItem` ne peut produire qu'un seul grant.
+
+### Siège adulte ROOTS_FAMILY
+
+`grantAdultRootsSeatFromHouseholdGrant(...)` revalide un grant Household
+`ROOTS_FAMILY` actif avant de créer le grant USER dérivé.
+
+### Promos / abonnements / sièges futurs
+
+Aucun factory promo Production générique n'est ouvert actuellement.
+`upsertInternalTestPromoGrant(...)` est strictement P-1 et
+`createGrant(...)` est strictement réservé à `NODE_ENV=test`.
+Toute nouvelle provenance `PROMO`, `SUBSCRIPTION` ou `CENTER_SEAT`
+doit avoir son factory audité dédié.
+
+**Interdit** : `prisma.accessGrant.create(...)` en dehors du module canonique.
 
 ## Comment créer / réconcilier la ligne `users` Prisma
 
