@@ -42,7 +42,7 @@ describe("P0.21 · canonical factory and onboarding integration", () => {
     expect(grants).toContain('path.language === "DEUTSCH"');
     expect(grants).toContain('path.currentLevel === null || path.currentLevel === "A1"');
     expect(grants).toContain('path.universe === "RACINES"');
-    expect(grants).toContain('path.language === "WOLOF"');
+    expect(grants).toContain('path.language === "BASSA"');
     expect(grants).toContain('const productCode = isMondeA1 ? "PASSAGE" : "ROOTS_SOLO"');
     expect(grants).toContain('sourceType: "PROMO"');
     expect(grants).toContain('beneficiaryType: "LEARNING_PATH"');
