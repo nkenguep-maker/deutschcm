@@ -37,7 +37,7 @@ describe("Production persona fixture verification", () => {
     expect(verification).toContain('path.language !== "DEUTSCH"');
     expect(verification).toContain('path.currentLevel !== "A1"');
     expect(verification).toContain('path.universe !== "RACINES"');
-    expect(verification).toContain('path.language !== "WOLOF"');
+    expect(verification).toContain('path.language !== "BASSA"');
     expect(verification).toContain("hasInternalTestMarker(path.onboardingAnswers)");
   });
 
