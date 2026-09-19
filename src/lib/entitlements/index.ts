@@ -15,6 +15,7 @@
 // Retourne { allowed, limits?, reason? } — le caller décide la réponse HTTP.
 
 import { prisma } from "@/lib/prisma";
+import { isFreeDiscoveryCourseResource } from "@/lib/release/dayOneAccess";
 import type {
   Capability,
   LearningPath,
@@ -50,12 +51,11 @@ export type EntitlementResult = {
 /** Cap de minutes d'IA offerts gratuitement en univers MONDE. */
 export const FREE_MONDE_AI_MINUTES = 5;
 
-/** Capacités accordées gratuitement en univers MONDE.
- *  Correspond à : test niveau · 1re leçon · mini-rapport. */
-const FREE_MONDE_CAPS: Capability[] = ["COURSE_ACCESS"];
-/** Capacités accordées gratuitement en univers RACINES.
- *  Correspond à : 1re leçon · une Veillée · un conte audio. */
-const FREE_RACINES_CAPS: Capability[] = ["COURSE_ACCESS", "VEILLEE_CONTENT"];
+/** Capacités gratuites non liées à une ressource de cours précise.
+ *  COURSE_ACCESS est volontairement exclu : la gratuité J1 est limitée
+ *  à une ressource de découverte explicite via resourceId. */
+const FREE_MONDE_CAPS: Capability[] = [];
+const FREE_RACINES_CAPS: Capability[] = ["VEILLEE_CONTENT"];
 
 function deny(reason: string): EntitlementResult {
   return { allowed: false, reason };
@@ -121,7 +121,7 @@ async function resolveBeneficiaryIds(userId: string, learningPathId?: string) {
  * Retourne { allowed, reason?, limits? } ; jamais throw sur un déni.
  */
 export async function getEntitlements(req: EntitlementRequest): Promise<EntitlementResult> {
-  const { userId, learningPathId, capability, actorType = "USER" } = req;
+  const { userId, learningPathId, capability, resourceId, actorType = "USER" } = req;
   const now = new Date();
 
   // 1) Règle serveur absolue : dependent_profile ne peut pas poster
@@ -178,6 +178,10 @@ export async function getEntitlements(req: EntitlementRequest): Promise<Entitlem
   //    (l'accès gratuit est TOUJOURS scopé à un parcours).
   if (path) {
     if (path.universe === "MONDE") {
+      if (
+        capability === "COURSE_ACCESS" &&
+        isFreeDiscoveryCourseResource("MONDE", resourceId)
+      ) return allow();
       if (FREE_MONDE_CAPS.includes(capability)) return allow();
       if (capability === "AI_TEXT" || capability === "AI_VOICE") {
         // TODO(v1.1) · compter la conso réelle via une table free_ai_usage
@@ -185,6 +189,10 @@ export async function getEntitlements(req: EntitlementRequest): Promise<Entitlem
       }
     }
     if (path.universe === "RACINES") {
+      if (
+        capability === "COURSE_ACCESS" &&
+        isFreeDiscoveryCourseResource("RACINES", resourceId)
+      ) return allow();
       if (FREE_RACINES_CAPS.includes(capability)) return allow();
     }
   }
