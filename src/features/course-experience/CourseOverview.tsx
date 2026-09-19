@@ -45,7 +45,7 @@ export function CourseOverview({
     : null;
   const canLearn = accessStatus === "ACTIVE";
   const courseBaseHref = baseHref ?? `/${locale}/learn/${course.course.id}`;
-  const nextHref = next ? `${courseBaseHref}/${next.unit.id}/${next.lesson.id}` : `/${locale}/dashboard/view/mon-cours`;
+  const nextHref = next ? `${courseBaseHref}/${next.unit.id}/${next.lesson.id}` : `${courseBaseHref}/complete`;
   const isPreview = Boolean(baseHref);
 
   return (
