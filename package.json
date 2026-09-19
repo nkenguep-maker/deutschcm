@@ -52,7 +52,9 @@
     "test:final-runtime-assertions:p1": "node scripts/test-final-runtime-assertions-p1.mjs",
     "capture:final-runtime-assertions:p1": "node scripts/capture-final-runtime-assertions-p1.mjs",
     "capture:personas:p1": "node scripts/capture-personas-p1.mjs",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "auth:hardening:p1": "node scripts/apply-p1-auth-hardening.mjs",
+    "verify:auth-hardening:p1": "node scripts/verify-p1-auth-hardening.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "latest",
