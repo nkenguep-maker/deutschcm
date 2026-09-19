@@ -24,6 +24,12 @@ describe("P4.7 · classroom join approval hardening", () => {
     expect(join).toContain("status: 429");
   });
 
+  it("routes the legacy classroom page through the approval endpoint", () => {
+    const page = read("src/app/[locale]/classroom/page.tsx");
+    expect(page).toContain('fetch("/api/classroom/join"');
+    expect(page).not.toContain('fetch("/api/classroom",');
+  });
+
   it("requires exact same-origin on the classroom join mutation", () => {
     const join = read("src/app/api/classroom/join/route.ts");
 
