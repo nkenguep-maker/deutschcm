@@ -14,6 +14,9 @@ import { isInternalTesterEmail, INTERNAL_TEST_COOKIE_MAX_AGE, INTERNAL_TEST_COOK
 import { ensureInternalTestWorkspace, hasInternalTestMarker } from "@/lib/internalTestProvisioning";
 import { syncUserMetadata } from "@/lib/roles";
 import { CHILD_SESSION_COOKIE_NAME } from "@/lib/security/childSession";
+import { isInternalTestEnvironment } from "@/lib/internalTestEnvironment";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
+import { grantFromOrderItem } from "@/lib/entitlements/grants";
 import { toMinorUnits } from "@/lib/payments/money";
 import {
   AFRICAN_FAMILY,
@@ -195,6 +198,13 @@ async function ensurePaidLearningPath(params: {
 }
 
 export async function POST(req: NextRequest) {
+  if (!isInternalTestEnvironment()) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  if (!isSameOriginRequest(req)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const form = await req.formData().catch(() => null);
   if (!form) return NextResponse.json({ error: "BAD_FORM" }, { status: 400 });
 
@@ -332,20 +342,7 @@ export async function POST(req: NextRequest) {
           },
     });
     if (!existingGrant) {
-      await tx.accessGrant.create({
-        data: {
-          beneficiaryType,
-          beneficiaryId,
-          productVariantId: variant.id,
-          sourceType: "ORDER",
-          sourceId: order.id,
-          orderItemId: item.id,
-          startsAt: new Date(),
-          endsAt: new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000),
-          status: "ACTIVE",
-          metadata: { internalTest: true, simulatedPayment: true } as Prisma.InputJsonValue,
-        },
-      });
+      await grantFromOrderItem(item.id, tx);
     }
 
     if (teacherVariant) {
@@ -369,20 +366,7 @@ export async function POST(req: NextRequest) {
         },
       });
       if (!teacherGrant) {
-        await tx.accessGrant.create({
-          data: {
-            beneficiaryType: "LEARNING_PATH",
-            beneficiaryId: learningPath.id,
-            productVariantId: teacherVariant.id,
-            sourceType: "ORDER",
-            sourceId: order.id,
-            orderItemId: teacherItem.id,
-            startsAt: new Date(),
-            endsAt: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
-            status: "ACTIVE",
-            metadata: { internalTest: true, simulatedPayment: true } as Prisma.InputJsonValue,
-          },
-        });
+        await grantFromOrderItem(teacherItem.id, tx);
       }
     }
   });
