@@ -16,15 +16,16 @@ order.
 4. AccessGrant provenance (P-1 read-only audit)
 5. Adult ROOTS_FAMILY seat uniqueness/concurrency invariant (P-1 read-only)
 6. MVP trial provenance + launch catalogue invariant (P-1 read-only)
-7. Next.js build
-8. QA persona fixture + beta-admission checks
-9. 9-persona authenticated runtime matrix
-10. Canonical persona home-route verification
-11. 9-persona FR/EN visual sweep (390 / 768 / 1440)
-12. Monde assignments E2E
-13. Messaging Realtime E2E
-14. Messaging audio E2E
-15. Final browser acceptance
+7. German A1 adult canonical runtime provisioning (P-1 read-only)
+8. Next.js build
+9. QA persona fixture + beta-admission checks
+10. 9-persona authenticated runtime matrix
+11. Canonical persona home-route verification
+12. 9-persona FR/EN visual sweep (390 / 768 / 1440)
+13. Monde assignments E2E
+14. Messaging Realtime E2E
+15. Messaging audio E2E
+16. Final browser acceptance
 
 The gate is fail-fast. No later step runs after an earlier failure.
 
