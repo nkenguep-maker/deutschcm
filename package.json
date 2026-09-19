@@ -55,7 +55,8 @@
     "seed": "tsx prisma/seed.ts",
     "auth:hardening:p1": "node scripts/apply-p1-auth-hardening.mjs",
     "verify:auth-hardening:p1": "node scripts/verify-p1-auth-hardening.mjs",
-    "test:auth-confirmation:p1": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag off -- node scripts/test-auth-confirmation-p1.mjs"
+    "test:auth-confirmation:p1": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag off -- node scripts/test-auth-confirmation-p1.mjs",
+    "test:grant-provenance:p1": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag off -- node scripts/test-baseline/p0-17-grant-provenance-gate.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "latest",
