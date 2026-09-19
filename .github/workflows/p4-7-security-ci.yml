@@ -42,6 +42,12 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
+      - name: P0 auth script syntax
+        run: >-
+          node --check scripts/apply-p1-auth-hardening.mjs &&
+          node --check scripts/verify-p1-auth-hardening.mjs &&
+          node --check scripts/test-auth-confirmation-p1.mjs
+
       - name: TypeScript
         run: npx tsc --noEmit
 
