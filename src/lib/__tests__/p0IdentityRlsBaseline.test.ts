@@ -12,6 +12,10 @@ const migration = readFileSync(
 );
 
 const TABLES = ["users", "user_roles", "user_app_roles", "learning_paths"];
+const executableSql = migration
+  .split("\n")
+  .filter((line) => !line.trimStart().startsWith("--"))
+  .join("\n");
 
 describe("P0.1 · identity foundation RLS baseline", () => {
   it("enables RLS on the four identity foundation tables", () => {
@@ -34,7 +38,7 @@ describe("P0.1 · identity foundation RLS baseline", () => {
   });
 
   it("does not force RLS on the trusted Prisma server path", () => {
-    expect(migration).not.toContain("FORCE ROW LEVEL SECURITY");
-    expect(migration).not.toMatch(/GRANT\s+.+\s+TO\s+(?:anon|authenticated)\b/i);
+    expect(executableSql).not.toContain("FORCE ROW LEVEL SECURITY");
+    expect(executableSql).not.toMatch(/GRANT\s+.+\s+TO\s+(?:anon|authenticated)\b/i);
   });
 });
