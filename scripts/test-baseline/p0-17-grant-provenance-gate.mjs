@@ -98,29 +98,81 @@ try {
       and g."sourceType"::text <> 'ORDER'
       and g."sourceId" !~ '^(test[_-]|internal-test:)'
       and not (
-        g."sourceType"::text = 'SUBSCRIPTION'
-        and g."beneficiaryType"::text = 'USER'
-        and g.metadata->>'seatType' = 'ADULT_ROOTS'
-        and g.metadata->>'householdId' = g."sourceId"
-        and exists (
-          select 1
-          from public.access_grants backing
-          join public.product_variants pv on pv.id = backing."productVariantId"
-          join public.products p on p.id = pv."productId"
-          where backing.id = g.metadata->>'backingGrantId'
-            and backing."beneficiaryType"::text = 'HOUSEHOLD'
-            and backing."beneficiaryId" = g."sourceId"
-            and backing."productVariantId" = g."productVariantId"
-            and backing.status::text = 'ACTIVE'
-            and backing."startsAt" <= now()
-            and (backing."endsAt" is null or backing."endsAt" > now())
-            and p.code::text = 'ROOTS_FAMILY'
+        (
+          g."sourceType"::text = 'SUBSCRIPTION'
+          and g."beneficiaryType"::text = 'USER'
+          and g.metadata->>'seatType' = 'ADULT_ROOTS'
+          and g.metadata->>'householdId' = g."sourceId"
+          and exists (
+            select 1
+            from public.access_grants backing
+            join public.product_variants pv on pv.id = backing."productVariantId"
+            join public.products p on p.id = pv."productId"
+            where backing.id = g.metadata->>'backingGrantId'
+              and backing."beneficiaryType"::text = 'HOUSEHOLD'
+              and backing."beneficiaryId" = g."sourceId"
+              and backing."productVariantId" = g."productVariantId"
+              and backing.status::text = 'ACTIVE'
+              and backing."startsAt" <= now()
+              and (backing."endsAt" is null or backing."endsAt" > now())
+              and p.code::text = 'ROOTS_FAMILY'
+          )
+        )
+        or
+        (
+          g."sourceType"::text = 'PROMO'
+          and g."beneficiaryType"::text = 'LEARNING_PATH'
+          and g."orderItemId" is null
+          and g.metadata->>'kind' = 'MVP_TRIAL'
+          and g.metadata->>'learningPathId' = g."beneficiaryId"
+          and g.metadata->>'trialDays' = '30'
+          and g."endsAt" = g."startsAt" + interval '30 days'
+          and g."sourceId" = concat(
+            'mvp-trial:',
+            g.metadata->>'cohort',
+            ':',
+            g.metadata->>'userId',
+            ':',
+            g.metadata->>'productCode'
+          )
+          and exists (
+            select 1
+            from public.learning_paths lp
+            join public.product_variants pv on pv.id = g."productVariantId"
+            join public.products p on p.id = pv."productId"
+            where lp.id = g."beneficiaryId"
+              and lp."userId" = g.metadata->>'userId'
+              and lp.status::text = 'ACTIVE'
+              and pv.active = true
+              and pv.currency::text = 'EUR'
+              and p."isActive" = true
+              and p.code::text = g.metadata->>'productCode'
+              and (
+                (
+                  p.code::text = 'PASSAGE'
+                  and lp.universe::text = 'MONDE'
+                  and lp.language::text = 'DEUTSCH'
+                  and (lp."currentLevel" is null or lp."currentLevel"::text = 'A1')
+                  and pv.language::text = 'DEUTSCH'
+                  and pv.level::text = 'A1'
+                )
+                or
+                (
+                  p.code::text = 'ROOTS_SOLO'
+                  and lp.universe::text = 'RACINES'
+                  and lp.language::text = 'WOLOF'
+                  and pv.language::text = 'WOLOF'
+                  and pv.level is null
+                  and pv."durationDays" = 30
+                )
+              )
+          )
         )
       )
   `);
   if (unexplainedNonOrder.rowCount !== 0) {
     fail(
-      `${unexplainedNonOrder.rowCount} active non-ORDER grant(s) lack an audited fixture or backed adult-seat provenance`,
+      `${unexplainedNonOrder.rowCount} active non-ORDER grant(s) lack an audited fixture, backed adult-seat provenance, or valid MVP trial provenance`,
     );
   }
 
