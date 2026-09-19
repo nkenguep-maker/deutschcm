@@ -75,6 +75,7 @@ jobs:
           src/lib/__tests__/p0RlsInventoryGuard.test.ts
           src/lib/__tests__/p0AuthHardeningRunbook.test.ts
           src/lib/__tests__/p0AuthConfirmationSmoke.test.ts
+          src/lib/__tests__/p0CourseAccessBoundary.test.ts
           src/lib/__tests__/classroomJoinHardening.test.ts
           src/lib/__tests__/groupBetaHardening.test.ts
           src/lib/__tests__/groupLocalizationSurface.test.ts
