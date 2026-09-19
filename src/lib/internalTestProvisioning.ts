@@ -2,6 +2,7 @@ import "server-only";
 
 import type { AppRole, LanguageCode, Prisma, Role, Universe } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { upsertInternalTestPromoGrant } from "@/lib/entitlements/grants";
 
 const INTERNAL_CENTER_CODE = "YEMA-INTERNAL";
 const INTERNAL_TEACHER_CODE = "YEMA-INTERNAL-TEACHER";
@@ -131,35 +132,7 @@ async function ensureFixtureGrant(params: {
   productVariantId: string;
   sourceId: string;
 }) {
-  const existing = await prisma.accessGrant.findFirst({
-    where: {
-      beneficiaryType: "HOUSEHOLD",
-      beneficiaryId: params.householdId,
-      productVariantId: params.productVariantId,
-      sourceType: "PROMO",
-      sourceId: params.sourceId,
-    },
-  });
-  const endsAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-  if (existing) {
-    return prisma.accessGrant.update({
-      where: { id: existing.id },
-      data: { status: "ACTIVE", startsAt: new Date(), endsAt },
-    });
-  }
-  return prisma.accessGrant.create({
-    data: {
-      beneficiaryType: "HOUSEHOLD",
-      beneficiaryId: params.householdId,
-      productVariantId: params.productVariantId,
-      sourceType: "PROMO",
-      sourceId: params.sourceId,
-      startsAt: new Date(),
-      endsAt,
-      status: "ACTIVE",
-      metadata: { internalTest: true } as Prisma.InputJsonValue,
-    },
-  });
+  return upsertInternalTestPromoGrant(params);
 }
 
 export async function ensureInternalTestWorkspace(userId: string) {
