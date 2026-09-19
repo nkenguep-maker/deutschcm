@@ -30,6 +30,17 @@ describe("German A1 adult runtime provisioning", () => {
     expect(qaPage).toContain('status: "COMPLETED" as const');
   });
 
+  it("renders the supplied high-value lesson blocks instead of dropping their payloads", () => {
+    const lessonUi = read("src/features/course-experience/LessonExperience.tsx");
+    for (const type of ["roleplay", "rubric", "visualFormula", "contrast", "sequenceBuilder"]) {
+      expect(lessonUi).toContain(`block.type === "${type}"`);
+    }
+    expect(lessonUi).toContain("followUpsDe");
+    expect(lessonUi).toContain("passScore");
+    expect(lessonUi).toContain("block.pairs");
+    expect(lessonUi).toContain("block.connectors");
+  });
+
   it("keeps the supplied A1 shape exact", () => {
     expect(DE_A1_COURSE.units).toHaveLength(6);
     expect(getCourseLessonIds(DE_A1_COURSE.course.id)).toHaveLength(36);
