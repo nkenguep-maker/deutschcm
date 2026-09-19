@@ -39,6 +39,7 @@ const SINGLE_CHOICE_TYPES = new Set([
   "chooseResponse",
   "contextChoice",
   "spacedReviewChoice",
+  "choiceResponse",
 ]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -96,7 +97,7 @@ function objectiveCorrect(exercise: RacinesExercise, value: unknown): boolean | 
   if (SINGLE_CHOICE_TYPES.has(exercise.type)) {
     return typeof value === "string" && value === asString(exercise.answer);
   }
-  if (exercise.type === "dialogueOrder") {
+  if (exercise.type === "dialogueOrder" || exercise.type === "audioOrder") {
     return Array.isArray(value) && sameStrings(value.filter((item): item is string => typeof item === "string"), asStringArray(exercise.answer));
   }
   if (exercise.type === "matchMeaning") {
@@ -116,7 +117,7 @@ function isAttempted(
   oralDone: Record<string, boolean>,
   rubricScores: Record<string, Record<string, number>>,
 ): boolean {
-  if (SINGLE_CHOICE_TYPES.has(exercise.type) || exercise.type === "dialogueOrder" || exercise.type === "matchMeaning") {
+  if (SINGLE_CHOICE_TYPES.has(exercise.type) || exercise.type === "dialogueOrder" || exercise.type === "audioOrder" || exercise.type === "matchMeaning") {
     return checked[exercise.id] === true;
   }
   if (ORAL_TYPES.has(exercise.type)) return oralDone[exercise.id] === true;
@@ -524,7 +525,7 @@ export function RacinesLessonPreview({ courseId, courseTitle, languageCode, lang
                     onChoose={(value) => setAnswers((current) => ({ ...current, [exercise.id]: value }))}
                     onCheck={() => setChecked((current) => ({ ...current, [exercise.id]: true }))}
                   />
-                ) : exercise.type === "dialogueOrder" ? (
+                ) : exercise.type === "dialogueOrder" || exercise.type === "audioOrder" ? (
                   <DialogueOrderExercise
                     exercise={exercise}
                     value={answers[exercise.id]}
