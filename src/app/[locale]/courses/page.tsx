@@ -94,6 +94,13 @@ export default async function CoursesPage({ params }: Props) {
         { beneficiaryType: "USER", beneficiaryId: dbUser.id },
         { beneficiaryType: "LEARNING_PATH", beneficiaryId: lp.id },
       ],
+      status: "ACTIVE",
+      productVariant: {
+        active: true,
+        language: lp.language,
+        ...(lp.currentLevel ? { level: lp.currentLevel } : {}),
+        product: { code: "PASSAGE" },
+      },
     },
     select: { startsAt: true, endsAt: true, status: true, metadata: true },
   });
