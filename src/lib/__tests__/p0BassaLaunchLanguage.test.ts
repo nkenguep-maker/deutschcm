@@ -6,9 +6,19 @@ const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
 
 describe("Racines launch language · Bassa first", () => {
-  it("makes Bassa a first-class Prisma language", () => {
+  it("makes Bassa a first-class Prisma language with reproducible migrations", () => {
     const schema = read("prisma/schema.prisma");
+    const enumMigration = read(
+      "prisma/migrations/20260919000022_p0_21_bassa_language_enum/migration.sql",
+    );
+    const catalogueMigration = read(
+      "prisma/migrations/20260919000023_p0_21_bassa_catalog_variants/migration.sql",
+    );
+
     expect(schema).toMatch(/enum LanguageCode\s*{[\s\S]*?\bBASSA\b/);
+    expect(enumMigration).toContain("ALTER TYPE \"LanguageCode\" ADD VALUE IF NOT EXISTS 'BASSA'");
+    expect(catalogueMigration).toContain("'BASSA'::\"LanguageCode\"");
+    expect(catalogueMigration).toContain("p.universe = 'RACINES'::\"Universe\"");
   });
 
   it("defaults Racines self-service onboarding to Bassa, not Wolof", () => {
