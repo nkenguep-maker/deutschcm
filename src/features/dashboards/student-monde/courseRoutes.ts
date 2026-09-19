@@ -9,6 +9,10 @@ export function mondeCourseHref(locale: string): string {
   return `/${locale}/learn/${OFFICIAL_A1_COURSE_ID}`;
 }
 
+export function mondeCompletionHref(locale: string): string {
+  return `${mondeCourseHref(locale)}/complete`;
+}
+
 export function mondeLessonHref(locale: string, nextModule: NextModule): string {
   return `${mondeCourseHref(locale)}/${encodeURIComponent(nextModule.courseId)}/${encodeURIComponent(nextModule.moduleId)}`;
 }
