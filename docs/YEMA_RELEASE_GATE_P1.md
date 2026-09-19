@@ -12,14 +12,17 @@ order.
 
 1. Vitest
 2. TypeScript (`tsc --noEmit`)
-3. AccessGrant provenance (P-1 read-only audit)
-4. Next.js build
-5. 9-persona authenticated runtime matrix
-6. 9-persona FR/EN visual sweep (390 / 768 / 1440)
-7. Monde assignments E2E
-8. Messaging Realtime E2E
-9. Messaging audio E2E
-10. Final browser acceptance
+3. RLS inventory + all P0 domain RLS gates (P-1 read-only)
+4. AccessGrant provenance (P-1 read-only audit)
+5. Next.js build
+6. QA persona fixture + beta-admission checks
+7. 9-persona authenticated runtime matrix
+8. Canonical persona home-route verification
+9. 9-persona FR/EN visual sweep (390 / 768 / 1440)
+10. Monde assignments E2E
+11. Messaging Realtime E2E
+12. Messaging audio E2E
+13. Final browser acceptance
 
 The gate is fail-fast. No later step runs after an earlier failure.
 
