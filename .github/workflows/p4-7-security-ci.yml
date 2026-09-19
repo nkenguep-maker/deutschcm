@@ -59,6 +59,7 @@ jobs:
           src/lib/__tests__/rlsPolicyConsolidation.test.ts
           src/lib/__tests__/p0IdentityRlsBaseline.test.ts
           src/lib/__tests__/p0CommerceRlsBaseline.test.ts
+          src/lib/__tests__/p0FamilyOwnershipRlsBaseline.test.ts
           src/lib/__tests__/classroomJoinHardening.test.ts
           src/lib/__tests__/groupBetaHardening.test.ts
           src/lib/__tests__/groupLocalizationSurface.test.ts
