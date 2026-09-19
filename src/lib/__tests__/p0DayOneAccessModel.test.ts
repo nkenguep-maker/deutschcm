@@ -17,10 +17,11 @@ describe("P0.16 · day-one access model", () => {
     expect(isFreeDiscoveryCourseResource("MONDE", undefined)).toBe(false);
   });
 
-  it("opens only the first reviewed Racines discovery lesson ids for free", () => {
-    expect(isFreeDiscoveryCourseResource("RACINES", "byv-e1-u1-l1")).toBe(true);
-    expect(isFreeDiscoveryCourseResource("RACINES", "ln-e1-u1-l1")).toBe(true);
-    expect(isFreeDiscoveryCourseResource("RACINES", "byv-e1-u1-l2")).toBe(false);
+  it("opens only the first Bassa Racines launch lesson for free", () => {
+    expect(isFreeDiscoveryCourseResource("RACINES", "bas-e1-u1-l1")).toBe(true);
+    expect(isFreeDiscoveryCourseResource("RACINES", "bas-e1-u1-l2")).toBe(false);
+    expect(isFreeDiscoveryCourseResource("RACINES", "byv-e1-u1-l1")).toBe(false);
+    expect(isFreeDiscoveryCourseResource("RACINES", "ln-e1-u1-l1")).toBe(false);
   });
 });
 
