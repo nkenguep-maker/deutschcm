@@ -154,7 +154,7 @@ export async function grantAdultRootsSeatFromHouseholdGrant(
  * and a valid cohort id is configured. It is intentionally limited to the two
  * launch personas:
  * - MONDE · DEUTSCH · A1 -> PASSAGE
- * - RACINES · WOLOF -> ROOTS_SOLO
+ * - RACINES · BASSA -> ROOTS_SOLO
  *
  * The grant is scoped to the exact LearningPath and lasts 30 days regardless
  * of the catalogue variant's commercial duration.
@@ -187,7 +187,7 @@ export async function grantMvpTrialForLearningPath(params: {
     (path.currentLevel === null || path.currentLevel === "A1");
   const isRacinesSolo =
     path.universe === "RACINES" &&
-    path.language === "WOLOF";
+    path.language === "BASSA";
 
   if (!isMondeA1 && !isRacinesSolo) {
     return { issued: false as const, reason: "not_eligible" as const };
