@@ -46,7 +46,8 @@ jobs:
         run: >-
           node --check scripts/apply-p1-auth-hardening.mjs &&
           node --check scripts/verify-p1-auth-hardening.mjs &&
-          node --check scripts/test-auth-confirmation-p1.mjs
+          node --check scripts/test-auth-confirmation-p1.mjs &&
+          node --check scripts/test-baseline/p0-17-grant-provenance-gate.mjs
 
       - name: TypeScript
         run: npx tsc --noEmit
@@ -79,6 +80,7 @@ jobs:
           src/lib/__tests__/p0CourseAuthoringAuthorization.test.ts
           src/lib/__tests__/p0LegacyClassroomAuthorization.test.ts
           src/lib/__tests__/p0DayOneAccessModel.test.ts
+          src/lib/__tests__/p0GrantProvenance.test.ts
           src/lib/__tests__/classroomJoinHardening.test.ts
           src/lib/__tests__/groupBetaHardening.test.ts
           src/lib/__tests__/groupLocalizationSurface.test.ts
