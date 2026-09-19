@@ -60,6 +60,13 @@ export async function loadCourseViewer(
         { beneficiaryType: "USER", beneficiaryId: dbUser.id },
         { beneficiaryType: "LEARNING_PATH", beneficiaryId: learningPath.id },
       ],
+      status: "ACTIVE",
+      productVariant: {
+        active: true,
+        language: "DEUTSCH",
+        ...(learningPath.currentLevel ? { level: learningPath.currentLevel } : {}),
+        product: { code: "PASSAGE" },
+      },
     },
     select: { startsAt: true, endsAt: true, status: true, metadata: true },
   });
