@@ -23,3 +23,46 @@ describe("P0.21 · MVP trial grant contract", () => {
     expect(migration).toContain("metadata->>'kind' = 'MVP_TRIAL'");
   });
 });
+
+
+describe("P0.21 · canonical factory and onboarding integration", () => {
+  const grants = read("src/lib/entitlements/grants.ts");
+  const onboarding = read("src/app/api/onboarding/complete/route.ts");
+  const gate = read("scripts/test-baseline/p0-21-mvp-trial-gate.mjs");
+
+  it("issues only the two launch-persona trial products", () => {
+    expect(grants).toContain("grantMvpTrialForLearningPath");
+    expect(grants).toContain('path.universe === "MONDE"');
+    expect(grants).toContain('path.language === "DEUTSCH"');
+    expect(grants).toContain('path.currentLevel === null || path.currentLevel === "A1"');
+    expect(grants).toContain('path.universe === "RACINES"');
+    expect(grants).toContain('path.language === "WOLOF"');
+    expect(grants).toContain('const productCode = isMondeA1 ? "PASSAGE" : "ROOTS_SOLO"');
+    expect(grants).toContain('sourceType: "PROMO"');
+    expect(grants).toContain('beneficiaryType: "LEARNING_PATH"');
+  });
+
+  it("derives trial provenance server-side and serializes duplicate issuance", () => {
+    expect(grants).toContain('const sourceId = `mvp-trial:${config.cohort}:${params.userId}:${productCode}`');
+    expect(grants).toContain("pg_advisory_xact_lock");
+    expect(grants).toContain("kind: MVP_TRIAL_KIND");
+    expect(grants).toContain("trialDays: MVP_TRIAL_DAYS");
+    expect(grants).toContain('reason: "already_issued"');
+  });
+
+  it("hooks trial issuance only into learner onboarding", () => {
+    expect(onboarding).toContain(
+      'effectivePersona === "student_monde" || effectivePersona === "student_racines"',
+    );
+    expect(onboarding).toContain("grantMvpTrialForLearningPath({");
+    expect(onboarding).toContain("learningPathId: trialPath.id");
+    expect(onboarding).not.toContain('effectivePersona === "family" ||');
+  });
+
+  it("ships a read-only P-1 runtime gate for trial provenance", () => {
+    expect(gate).toContain("access_grants_one_mvp_trial_per_source_idx");
+    expect(gate).toContain("metadata->>'kind'='MVP_TRIAL'");
+    expect(gate).toContain("invalid MVP trial grant(s)");
+    expect(gate).not.toMatch(/\b(?:insert|update|delete|alter|grant|revoke)\s+(?:into\s+|from\s+|table\s+)?public\./i);
+  });
+});
