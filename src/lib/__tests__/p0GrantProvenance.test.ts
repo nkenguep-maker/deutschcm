@@ -69,7 +69,7 @@ describe("P0.17 · AccessGrant provenance", () => {
     expect(source).toContain('beneficiaryType: "HOUSEHOLD"');
     expect(source).toContain('productVariant: { product: { code: "ROOTS_FAMILY" } }');
     expect(source).toContain("backingGrantId: backingGrant.id");
-    expect(adultSeats).toContain("grantAdultRootsSeatFromHouseholdGrant({");
+    expect(adultSeats).toContain("grantAdultRootsSeatFromHouseholdGrant(");
     expect(adultSeats).not.toContain("prisma.accessGrant.create(");
   });
 
