@@ -12,11 +12,13 @@ describe("P0.18 · release gate security closure", () => {
   it("runs the full RLS gate set before grant provenance and build", () => {
     const rls = gate.indexOf('name: "RLS inventory and domain gates"');
     const provenance = gate.indexOf('name: "AccessGrant provenance"');
+    const a1Runtime = gate.indexOf('name: "German A1 adult runtime"');
     const build = gate.indexOf('name: "Next build"');
 
     expect(rls).toBeGreaterThan(-1);
     expect(provenance).toBeGreaterThan(rls);
-    expect(build).toBeGreaterThan(provenance);
+    expect(a1Runtime).toBeGreaterThan(provenance);
+    expect(build).toBeGreaterThan(a1Runtime);
     expect(gate).toContain('args: ["scripts/test-baseline/p0-rls-gates.mjs"]');
   });
 
@@ -31,6 +33,7 @@ describe("P0.18 · release gate security closure", () => {
   it("documents RLS and AccessGrant provenance as mandatory release checks", () => {
     expect(docs).toContain("RLS inventory + all P0 domain RLS gates");
     expect(docs).toContain("AccessGrant provenance");
+    expect(docs).toContain("German A1 adult canonical runtime provisioning");
     expect(docs).toContain("Passing this gate is required before merging");
   });
 });
