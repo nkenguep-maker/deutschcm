@@ -63,6 +63,7 @@ jobs:
           src/lib/__tests__/p0LearningRuntimeRlsBaseline.test.ts
           src/lib/__tests__/p0PedagogicalCatalogueRlsBaseline.test.ts
           src/lib/__tests__/p0MessagingDomainRlsBaseline.test.ts
+          src/lib/__tests__/p0SocialLegacyRlsBaseline.test.ts
           src/lib/__tests__/classroomJoinHardening.test.ts
           src/lib/__tests__/groupBetaHardening.test.ts
           src/lib/__tests__/groupLocalizationSurface.test.ts
