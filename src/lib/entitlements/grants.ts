@@ -102,13 +102,16 @@ export async function grantFromOrderItem(
  * ROOTS_FAMILY grant. The household entitlement is re-checked here so a
  * caller cannot mint a seat from only a variant id.
  */
-export async function grantAdultRootsSeatFromHouseholdGrant(params: {
-  householdId: string;
-  userId: string;
-  productVariantId: string;
-}) {
+export async function grantAdultRootsSeatFromHouseholdGrant(
+  params: {
+    householdId: string;
+    userId: string;
+    productVariantId: string;
+  },
+  db: GrantDb = prisma,
+) {
   const now = new Date();
-  const backingGrant = await prisma.accessGrant.findFirst({
+  const backingGrant = await db.accessGrant.findFirst({
     where: {
       beneficiaryType: "HOUSEHOLD",
       beneficiaryId: params.householdId,
@@ -124,7 +127,7 @@ export async function grantAdultRootsSeatFromHouseholdGrant(params: {
     throw new Error("active household ROOTS_FAMILY grant required");
   }
 
-  return prisma.accessGrant.create({
+  return db.accessGrant.create({
     data: {
       beneficiaryType: "USER",
       beneficiaryId: params.userId,
