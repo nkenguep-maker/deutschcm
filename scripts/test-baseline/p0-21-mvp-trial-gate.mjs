@@ -44,7 +44,7 @@ try {
         or
         (
           p.code::text='ROOTS_SOLO'
-          and pv.language::text='WOLOF'
+          and pv.language::text='BASSA'
           and pv.level is null
           and pv."durationDays"=30
         )
@@ -98,8 +98,8 @@ try {
           (
             p.code::text='ROOTS_SOLO'
             and lp.universe::text='RACINES'
-            and lp.language::text='WOLOF'
-            and pv.language::text='WOLOF'
+            and lp.language::text='BASSA'
+            and pv.language::text='BASSA'
             and pv.level is null
             and pv."durationDays"=30
           )
