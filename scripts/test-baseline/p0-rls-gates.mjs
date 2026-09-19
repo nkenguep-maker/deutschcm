@@ -7,6 +7,7 @@ const gates = [
   "scripts/test-baseline/p0-1-identity-rls-gate.mjs",
   "scripts/test-baseline/p0-2-commerce-rls-gate.mjs",
   "scripts/test-baseline/p0-3-family-ownership-rls-gate.mjs",
+  "scripts/test-baseline/p0-4-learning-runtime-rls-gate.mjs",
 ];
 
 for (const gate of gates) {
