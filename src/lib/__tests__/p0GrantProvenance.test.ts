@@ -94,4 +94,19 @@ describe("P0.17 · AccessGrant provenance", () => {
     expect(source).toContain("\"sourceId\" !~ '^test[_-]'");
     expect(source).not.toMatch(/\b(?:insert|update|delete|alter|grant|revoke)\s+(?:into\s+|from\s+|table\s+)?public\./i);
   });
+
+  it("locks ORDER/orderItem provenance and one-grant-per-item in the database", () => {
+    const migration = read(
+      "prisma/migrations/20260919000017_p0_17_access_grant_provenance_invariants/migration.sql",
+    );
+
+    expect(migration).toContain("access_grants_order_source_consistency");
+    expect(migration).toContain('\"sourceType\"::text = \'ORDER\'');
+    expect(migration).toContain('\"orderItemId\" IS NOT NULL');
+    expect(migration).toContain('\"sourceType\"::text <> \'ORDER\'');
+    expect(migration).toContain('\"orderItemId\" IS NULL');
+    expect(migration).toContain("access_grants_one_grant_per_order_item_idx");
+    expect(migration).toContain('WHERE \"orderItemId\" IS NOT NULL');
+  });
+
 });
