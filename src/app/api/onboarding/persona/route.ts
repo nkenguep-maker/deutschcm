@@ -98,12 +98,12 @@ export async function POST(req: NextRequest) {
   const requestedLanguage = persona === "student_monde"
     ? (rawLanguageId ?? "deutsch")
     : persona === "student_racines" || persona === "family"
-      ? (rawLanguageId ?? "wolof")
+      ? (rawLanguageId ?? "bassa")
       : null;
 
   if (
     (persona === "student_monde" && requestedLanguage !== "deutsch") ||
-    ((persona === "student_racines" || persona === "family") && requestedLanguage !== "wolof")
+    ((persona === "student_racines" || persona === "family") && requestedLanguage !== "bassa")
   ) {
     return bad("LANGUAGE_INVALID");
   }
