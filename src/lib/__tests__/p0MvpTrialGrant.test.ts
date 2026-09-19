@@ -13,6 +13,12 @@ describe("P0.21 · MVP trial grant contract", () => {
     expect(source).toContain("MVP_TRIAL_DAYS = 30");
   });
 
+  it("keeps the P-1 environment contract disabled-by-default", () => {
+    const env = read(".env.p1-baseline.example");
+    expect(env).toContain("YEMA_MVP_TRIAL_ENABLED=false");
+    expect(env).toContain("YEMA_MVP_TRIAL_COHORT=beta-sept26");
+  });
+
   it("locks one MVP trial per canonical source in the database", () => {
     const migration = read(
       "prisma/migrations/20260919000021_p0_21_mvp_trial_uniqueness/migration.sql",
