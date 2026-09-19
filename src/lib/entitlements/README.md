@@ -249,3 +249,21 @@ Couverture V1 (`src/lib/entitlements/__tests__/entitlements.test.ts`, 7 tests) :
 - `provider_accreditations`
 - `moderation_status` sur messages · rôle OBSERVER
 - Pack coach public
+
+
+## Cohorte MVP / trial explicite
+
+Le lancement cohorte gratuite n'utilise aucun bypass d'autorisation. Quand
+`YEMA_MVP_TRIAL_ENABLED=true`, `YEMA_MVP_TRIAL_COHORT` doit identifier
+explicitement la cohorte. À la fin de l'onboarding learner, le serveur peut
+émettre un `AccessGrant` `PROMO` de 30 jours via
+`grantMvpTrialForLearningPath()`.
+
+Périmètre J1 uniquement :
+
+- Monde · Deutsch · A1 → `PASSAGE`
+- Racines · Wolof · Solo → `ROOTS_SOLO`
+
+Le grant est lié au `LEARNING_PATH`, possède une provenance
+`MVP_TRIAL` auditée et n'est émis qu'une fois par cohorte / utilisateur /
+produit. Les personas Famille et professionnels ne reçoivent jamais ce trial.
