@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  mondeCompletionHref,
   mondeCourseHref,
   mondeLessonHref,
 } from "@/features/dashboards/student-monde/courseRoutes";
@@ -7,6 +8,10 @@ import {
 describe("Monde dashboard course routes", () => {
   it("opens the official A1 course when no next lesson is available", () => {
     expect(mondeCourseHref("fr")).toBe("/fr/learn/monde-adulte-de-a1");
+  });
+
+  it("opens the A1 level review after full completion", () => {
+    expect(mondeCompletionHref("fr")).toBe("/fr/learn/monde-adulte-de-a1/complete");
   });
 
   it("opens the exact next lesson exposed by the dashboard API", () => {
