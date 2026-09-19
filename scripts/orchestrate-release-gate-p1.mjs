@@ -40,6 +40,7 @@ const steps = [
   { name: "TypeScript", cmd: "npx", args: ["tsc", "--noEmit"] },
   { name: "RLS inventory and domain gates", cmd: "node", args: ["scripts/test-baseline/p0-rls-gates.mjs"] },
   { name: "AccessGrant provenance", cmd: "node", args: ["scripts/test-baseline/p0-17-grant-provenance-gate.mjs"] },
+  { name: "Adult ROOTS seat invariants", cmd: "node", args: ["scripts/test-baseline/p0-20-adult-roots-seat-gate.mjs"] },
   { name: "Next build", cmd: "npm", args: ["run", "build"] },
   // Run fixture provisioning as its own fail-closed gate. The persona runner
   // also invokes this helper defensively; keeping it explicit prevents a
