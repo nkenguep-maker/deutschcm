@@ -131,6 +131,7 @@ export async function POST(req: NextRequest) {
         where: {
           userId: dbUser.id,
           universe: trialUniverse,
+          language: effectivePersona === "student_monde" ? "DEUTSCH" : "BASSA",
           status: "ACTIVE",
         },
         orderBy: { createdAt: "desc" },
