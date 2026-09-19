@@ -6,8 +6,10 @@ export function PilotBanner({ course }: { course?: YemaRacinesCourseContent }) {
   return (
     <div className={styles.pilot} role="note">
       <strong>Prototype éditorial · test interne</strong>
-      {course?.course.learningLanguage.code === "byv"
-        ? "Bangangté / Medumba : relecture native, graphie et tons à valider avant publication."
+      {course?.course.learningLanguage.code === "bas"
+        ? "Bassa / Ɓàsàa : cours É1 intégré ; deux relectures natives, tons et audio natif restent requis avant publication publique."
+        : course?.course.learningLanguage.code === "byv"
+          ? "Bangangté / Medumba : relecture native, graphie et tons à valider avant publication."
         : course?.course.learningLanguage.code === "ln"
           ? "Lingala : relecture lingalaphone et variété des voix à valider avant publication."
           : "Ces parcours restent fermés au public tant que la relecture native et les voix ne sont pas validées."}
@@ -26,7 +28,7 @@ export function RacinesPilotLanding({ locale, courses }: { locale: string; cours
         <PilotBanner />
         <section className={styles.hero}>
           <p className={styles.eyebrow}>RACINES · É1 · ÉVEIL</p>
-          <h1 className={styles.title}>Deux langues à réveiller par la voix.</h1>
+          <h1 className={styles.title}>Trois parcours É1 à tester par la voix.</h1>
           <p className={styles.lede}>Parcours adulte solo. Ici, pas de CECRL : on écoute, on imite, on répond, on raconte puis on transmet. La navigation est libre en Preview QA pour faciliter les tests.</p>
           <div className={styles.sequence} aria-label="Séquence pédagogique">
             {courses[0]?.course.signatureSequence.map((stage) => <div className={styles.stage} key={stage}>{stage}</div>)}
