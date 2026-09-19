@@ -72,6 +72,7 @@ export const RACINES_STEP_DEFINITIONS: RacinesStepDefinition[] = [
 export type RacinesContentStatus = "READY" | "PARTIAL" | "MISSING";
 
 export const RACINES_LANG_STATUS: Record<string, RacinesContentStatus> = {
+  bassa:   "MISSING",
   wolof:   "MISSING",
   douala:  "MISSING",
   lingala: "MISSING",
