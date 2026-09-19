@@ -1,3 +1,5 @@
+import "server-only";
+
 // AccessGrant issuance boundary.
 //
 // Production-grade rights are issued from a provenance-specific factory.
@@ -7,6 +9,7 @@
 // prisma.accessGrant.create ad hoc.
 
 import { prisma } from "@/lib/prisma";
+import { isInternalTestEnvironment } from "@/lib/internalTestEnvironment";
 import type {
   BeneficiaryType,
   GrantSourceType,
@@ -90,6 +93,102 @@ export async function grantFromOrderItem(
       startsAt,
       endsAt,
       status: "ACTIVE",
+    },
+  });
+}
+
+/**
+ * Issues one explicit adult ROOTS_FAMILY seat from an already active household
+ * ROOTS_FAMILY grant. The household entitlement is re-checked here so a
+ * caller cannot mint a seat from only a variant id.
+ */
+export async function grantAdultRootsSeatFromHouseholdGrant(params: {
+  householdId: string;
+  userId: string;
+  productVariantId: string;
+}) {
+  const now = new Date();
+  const backingGrant = await prisma.accessGrant.findFirst({
+    where: {
+      beneficiaryType: "HOUSEHOLD",
+      beneficiaryId: params.householdId,
+      productVariantId: params.productVariantId,
+      status: "ACTIVE",
+      startsAt: { lte: now },
+      OR: [{ endsAt: null }, { endsAt: { gt: now } }],
+      productVariant: { product: { code: "ROOTS_FAMILY" } },
+    },
+    select: { id: true },
+  });
+  if (!backingGrant) {
+    throw new Error("active household ROOTS_FAMILY grant required");
+  }
+
+  return prisma.accessGrant.create({
+    data: {
+      beneficiaryType: "USER",
+      beneficiaryId: params.userId,
+      productVariantId: params.productVariantId,
+      sourceType: "SUBSCRIPTION",
+      sourceId: params.householdId,
+      status: "ACTIVE",
+      startsAt: now,
+      metadata: {
+        seatType: "ADULT_ROOTS",
+        householdId: params.householdId,
+        backingGrantId: backingGrant.id,
+      },
+    },
+    select: { id: true },
+  });
+}
+
+/**
+ * P-1-only promo fixture factory. Runtime fixture provisioning must pass the
+ * same canonical P-1 environment gate as the internal testing console.
+ */
+export async function upsertInternalTestPromoGrant(params: {
+  householdId: string;
+  productVariantId: string;
+  sourceId: string;
+}) {
+  if (!isInternalTestEnvironment()) {
+    throw new Error("internal test promo grants are P-1-only");
+  }
+  if (!params.sourceId.startsWith("internal-test:")) {
+    throw new Error("internal test promo source must use internal-test: prefix");
+  }
+
+  const existing = await prisma.accessGrant.findFirst({
+    where: {
+      beneficiaryType: "HOUSEHOLD",
+      beneficiaryId: params.householdId,
+      productVariantId: params.productVariantId,
+      sourceType: "PROMO",
+      sourceId: params.sourceId,
+    },
+  });
+  const startsAt = new Date();
+  const endsAt = new Date(startsAt.getTime() + 365 * 24 * 60 * 60 * 1000);
+
+  if (existing) {
+    return prisma.accessGrant.update({
+      where: { id: existing.id },
+      data: { status: "ACTIVE", startsAt, endsAt },
+    });
+  }
+
+  return prisma.accessGrant.create({
+    data: {
+      beneficiaryType: "HOUSEHOLD",
+      beneficiaryId: params.householdId,
+      productVariantId: params.productVariantId,
+      sourceType: "PROMO",
+      sourceId: params.sourceId,
+      startsAt,
+      endsAt,
+      status: "ACTIVE",
+      metadata: { internalTest: true },
     },
   });
 }
