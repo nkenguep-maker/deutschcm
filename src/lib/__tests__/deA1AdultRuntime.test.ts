@@ -21,10 +21,13 @@ describe("German A1 adult runtime provisioning", () => {
   it("keeps the final A1 review behind full completion", () => {
     const page = read("src/app/[locale]/learn/[courseId]/complete/page.tsx");
     const component = read("src/features/course-experience/CourseCompletion.tsx");
+    const qaPage = read("src/app/[locale]/qa/course-preview/de-a1/complete/page.tsx");
     expect(page).toContain('item.status === "COMPLETED"');
     expect(page).toContain("every((id) => completed.has(id))");
     expect(component).toContain("Tes acquis A1");
     expect(component).toContain("course.levelReview.finalChecklist");
+    expect(qaPage).toContain("getCourseLessonIds");
+    expect(qaPage).toContain('status: "COMPLETED" as const');
   });
 
   it("keeps the supplied A1 shape exact", () => {
