@@ -11,6 +11,9 @@ describe("German A1 adult Monde course", () => {
     expect(DE_A1_COURSE.units).toHaveLength(6);
     expect(getCourseLessonIds(DE_A1_COURSE_ID)).toHaveLength(36);
     expect(DE_A1_COURSE.alternativeStates).toHaveLength(8);
+    expect(DE_A1_COURSE.contentVersion).toBe("2026.08.04");
+    expect(DE_A1_COURSE.status).toBe("editorial-ready");
+    expect(DE_A1_COURSE.units.flatMap((unit) => unit.lessons.flatMap((lesson) => lesson.exercises))).toHaveLength(102);
   });
 
   it("contains the six communicative missions in the supplied order", () => {
@@ -41,6 +44,20 @@ describe("German A1 adult Monde course", () => {
     expect(afterUnitOne[0]?.status).toBe("COMPLETED");
     expect(afterUnitOne[1]?.status).toBe("OPEN");
     expect(nextIncompleteModule(firstUnitDone)?.moduleId).toBe("de-a1-u2-l1");
+  });
+
+  it("keeps every supplied exercise answerable or human-reviewable", () => {
+    const exercises = DE_A1_COURSE.units.flatMap((unit) =>
+      unit.lessons.flatMap((lesson) => lesson.exercises),
+    );
+    for (const exercise of exercises) {
+      const hasAnswer =
+        exercise.answer !== undefined ||
+        (exercise.acceptedAnswers?.length ?? 0) > 0 ||
+        (exercise.successCriteria?.length ?? 0) > 0 ||
+        Boolean(exercise.rubricRef);
+      expect(hasAnswer, exercise.id).toBe(true);
+    }
   });
 
   it("links every lesson to the next lesson without crossing the wrong order", () => {
