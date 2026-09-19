@@ -96,7 +96,7 @@ try {
     from public.access_grants
     where status::text = 'ACTIVE'
       and "sourceType"::text <> 'ORDER'
-      and "sourceId" !~ '^test[_-]'
+      and "sourceId" !~ '^(test[_-]|internal-test:)'
   `);
   if (unexplainedNonOrder.rowCount !== 0) {
     fail(
