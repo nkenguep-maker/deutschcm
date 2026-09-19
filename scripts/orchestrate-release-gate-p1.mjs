@@ -38,6 +38,7 @@ if (process.env.P1_BASELINE_CONFIRMED_NOT_PRODUCTION !== "true") {
 const steps = [
   { name: "Vitest", cmd: "npm", args: ["test"] },
   { name: "TypeScript", cmd: "npx", args: ["tsc", "--noEmit"] },
+  { name: "RLS inventory and domain gates", cmd: "node", args: ["scripts/test-baseline/p0-rls-gates.mjs"] },
   { name: "AccessGrant provenance", cmd: "node", args: ["scripts/test-baseline/p0-17-grant-provenance-gate.mjs"] },
   { name: "Next build", cmd: "npm", args: ["run", "build"] },
   // Run fixture provisioning as its own fail-closed gate. The persona runner
