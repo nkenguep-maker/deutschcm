@@ -179,8 +179,8 @@ export function OnboardingRacinesForm() {
         supabase.auth.updateUser({
           data: {
             universe: "racines",
-            onboarding: { language: "wolof", link, startPoint },
-            activeLanguage: "wolof",
+            onboarding: { language: "bassa", link, startPoint },
+            activeLanguage: "bassa",
           },
         }),
       );
@@ -196,7 +196,7 @@ export function OnboardingRacinesForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           universe: "RACINES",
-          language: "WOLOF",
+          language: "BASSA",
           intention: link ? intentionMap[link] : undefined,
           onboardingAnswers: { link, startPoint },
         }),
@@ -209,7 +209,7 @@ export function OnboardingRacinesForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           role: "STUDENT",
-          activeLanguage: "wolof",
+          activeLanguage: "bassa",
         }),
       }));
       if (ocRes.status === 401) { showError("session_expired"); return; }
