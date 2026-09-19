@@ -209,7 +209,7 @@ export type GrantSeed = {
   beneficiaryType: BeneficiaryType;
   beneficiaryId: string;
   productVariant: Pick<ProductVariant, "id" | "durationDays">;
-  sourceType: GrantSourceType;
+  sourceType: Exclude<GrantSourceType, "ORDER">;
   sourceId: string;
   orderItemId?: string;
   startsAt?: Date;
