@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { computeMondeAccess } from "@/lib/monde";
 import { getCourseContent, getCourseLessonById } from "@/data/courses/registry";
 import { decideLessonProgress, type CourseProgressStatus } from "@/lib/course-content/validation";
+import { isTechnicalBetaCourseAccessEnabled } from "@/lib/release/technicalBeta";
 
 function error(code: string, message: string, status: number) {
   return NextResponse.json({ ok: false, code, error: message }, { status });
@@ -55,7 +56,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ cou
     const learningPath = await prisma.learningPath.findFirst({
       where: { userId: dbUser.id, universe: "MONDE", language: "DEUTSCH", status: "ACTIVE" },
       orderBy: { createdAt: "desc" },
-      select: { id: true },
+      select: { id: true, currentLevel: true },
     });
     if (!learningPath) return error("LEARNING_PATH_REQUIRED", "German Monde learning path required", 403);
 
@@ -68,7 +69,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ cou
       },
       select: { startsAt: true, endsAt: true, status: true, metadata: true },
     });
-    if (computeMondeAccess(grants).status !== "ACTIVE") return error("COURSE_ACCESS_REQUIRED", "Active course access required", 403);
+    const technicalBetaA1 =
+      courseId === "monde-adulte-de-a1" &&
+      (learningPath.currentLevel === null || learningPath.currentLevel === "A1") &&
+      isTechnicalBetaCourseAccessEnabled();
+    if (computeMondeAccess(grants, { technicalBetaA1 }).status !== "ACTIVE") {
+      return error("COURSE_ACCESS_REQUIRED", "Active course access required", 403);
+    }
 
     const flatLessons = course.units.flatMap((unit) => unit.lessons);
     const requestedIndex = flatLessons.findIndex((lesson) => lesson.id === lessonId);
