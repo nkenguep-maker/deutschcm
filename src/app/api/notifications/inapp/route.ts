@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import { prisma } from "@/lib/prisma"
+import { isSameOriginRequest } from "@/lib/security/requestOrigin"
 
 export async function GET() {
   try {
@@ -44,6 +45,10 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
+  if (!isSameOriginRequest(req)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  }
+
   try {
     const cookieStore = await cookies()
     const supabase = createServerClient(
@@ -70,9 +75,9 @@ export async function PUT(req: NextRequest) {
         where: { userId: profile.id, isRead: false },
         data: { isRead: true }
       })
-    } else if (notificationId) {
-      await prisma.notification.update({
-        where: { id: notificationId },
+    } else if (typeof notificationId === "string" && notificationId.length > 0) {
+      await prisma.notification.updateMany({
+        where: { id: notificationId, userId: profile.id },
         data: { isRead: true }
       })
     }
