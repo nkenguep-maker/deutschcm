@@ -92,15 +92,35 @@ try {
   }
 
   const unexplainedNonOrder = await db.query(`
-    select id, "sourceType"::text as source_type, "sourceId"
-    from public.access_grants
-    where status::text = 'ACTIVE'
-      and "sourceType"::text <> 'ORDER'
-      and "sourceId" !~ '^(test[_-]|internal-test:)'
+    select g.id, g."sourceType"::text as source_type, g."sourceId"
+    from public.access_grants g
+    where g.status::text = 'ACTIVE'
+      and g."sourceType"::text <> 'ORDER'
+      and g."sourceId" !~ '^(test[_-]|internal-test:)'
+      and not (
+        g."sourceType"::text = 'SUBSCRIPTION'
+        and g."beneficiaryType"::text = 'USER'
+        and g.metadata->>'seatType' = 'ADULT_ROOTS'
+        and g.metadata->>'householdId' = g."sourceId"
+        and exists (
+          select 1
+          from public.access_grants backing
+          join public.product_variants pv on pv.id = backing."productVariantId"
+          join public.products p on p.id = pv."productId"
+          where backing.id = g.metadata->>'backingGrantId'
+            and backing."beneficiaryType"::text = 'HOUSEHOLD'
+            and backing."beneficiaryId" = g."sourceId"
+            and backing."productVariantId" = g."productVariantId"
+            and backing.status::text = 'ACTIVE'
+            and backing."startsAt" <= now()
+            and (backing."endsAt" is null or backing."endsAt" > now())
+            and p.code::text = 'ROOTS_FAMILY'
+        )
+      )
   `);
   if (unexplainedNonOrder.rowCount !== 0) {
     fail(
-      `${unexplainedNonOrder.rowCount} active non-ORDER grant(s) are not explicit P-1 test fixtures`,
+      `${unexplainedNonOrder.rowCount} active non-ORDER grant(s) lack an audited fixture or backed adult-seat provenance`,
     );
   }
 
