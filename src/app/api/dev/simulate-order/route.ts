@@ -24,6 +24,8 @@ import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { grantFromOrderItem } from "@/lib/entitlements/grants";
+import { isInternalTestEnvironment } from "@/lib/internalTestEnvironment";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 import type { LanguageCode, CefrLevel, ProductCode } from "@prisma/client";
 
 type Preset = "passage_seul" | "passage_prof" | "roots_solo" | "roots_family" | "roots_famille_prof";
@@ -38,8 +40,11 @@ const PRESET_CODES: Record<Preset, ProductCode[]> = {
 };
 
 export async function POST(request: NextRequest) {
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV !== "development" || !isInternalTestEnvironment()) {
     return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const supabase = await createClient();
