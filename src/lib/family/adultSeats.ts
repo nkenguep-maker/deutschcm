@@ -1,6 +1,7 @@
 import "server-only";
 import { ProductCode } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { grantAdultRootsSeatFromHouseholdGrant } from "@/lib/entitlements/grants";
 
 // P4.6 Lot 4A → 4B · attribution explicite des sièges adultes Racines.
 //
@@ -122,18 +123,10 @@ export async function assignAdultRootsSeat(
     return { ok: false, error: "household_seats_exhausted", snapshot: snap };
   }
 
-  const grant = await prisma.accessGrant.create({
-    data: {
-      beneficiaryType: "USER",
-      beneficiaryId: userId,
-      productVariantId: variantId,
-      sourceType: "SUBSCRIPTION",
-      sourceId: householdId,
-      status: "ACTIVE",
-      startsAt: new Date(),
-      metadata: { seatType: "ADULT_ROOTS", householdId },
-    },
-    select: { id: true },
+  const grant = await grantAdultRootsSeatFromHouseholdGrant({
+    householdId,
+    userId,
+    productVariantId: variantId,
   });
 
   return { ok: true, grantId: grant.id, snapshot: await listAssignedAdultRootsSeats(householdId) };
