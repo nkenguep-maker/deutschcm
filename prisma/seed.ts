@@ -52,6 +52,10 @@ type ProductDef = {
 // the currency's minor unit: cents for EUR, whole francs for zero-decimal XAF.
 const eur = (value: string) => toMinorUnits(value, "EUR");
 
+// Bassa is the first Racines launch language. Wolof stays in the catalogue
+// for future cohorts, but launch defaults must not depend on it.
+const RACINES_CATALOG_LANGUAGES: LanguageCode[] = ["BASSA", "WOLOF"];
+
 const PASSAGE_LEVELS: Array<{ level: CefrLevel; xaf: number; eur: number }> = LEVELS.map((level) => ({
   level,
   xaf: WORLD_PASSAGE_PRICES[level].fcfa,
@@ -110,12 +114,12 @@ const CATALOG: ProductDef[] = [
     universe: "RACINES",
     billingType: "SUBSCRIPTION",
     isActive: true,
-    variants: [
-      { language: "WOLOF", currency: "XAF", amount: AFRICAN_SOLO.fcfa.month, durationDays: 30 },
-      { language: "WOLOF", currency: "XAF", amount: AFRICAN_SOLO.fcfa.year, durationDays: 365 },
-      { language: "WOLOF", currency: "EUR", amount: eur(String(AFRICAN_SOLO.eur.month)), durationDays: 30 },
-      { language: "WOLOF", currency: "EUR", amount: eur(String(AFRICAN_SOLO.eur.year)), durationDays: 365 },
-    ],
+    variants: RACINES_CATALOG_LANGUAGES.flatMap((language) => [
+      { language, currency: "XAF", amount: AFRICAN_SOLO.fcfa.month, durationDays: 30 },
+      { language, currency: "XAF", amount: AFRICAN_SOLO.fcfa.year, durationDays: 365 },
+      { language, currency: "EUR", amount: eur(String(AFRICAN_SOLO.eur.month)), durationDays: 30 },
+      { language, currency: "EUR", amount: eur(String(AFRICAN_SOLO.eur.year)), durationDays: 365 },
+    ]),
     capabilities: ["COURSE_ACCESS", "VEILLEE_CONTENT"],
   },
   {
@@ -123,12 +127,12 @@ const CATALOG: ProductDef[] = [
     universe: "RACINES",
     billingType: "SUBSCRIPTION",
     isActive: true,
-    variants: [
-      { language: "WOLOF", currency: "XAF", amount: AFRICAN_FAMILY.fcfa.month, durationDays: 30 },
-      { language: "WOLOF", currency: "XAF", amount: AFRICAN_FAMILY.fcfa.year, durationDays: 365 },
-      { language: "WOLOF", currency: "EUR", amount: eur(String(AFRICAN_FAMILY.eur.month)), durationDays: 30 },
-      { language: "WOLOF", currency: "EUR", amount: eur(String(AFRICAN_FAMILY.eur.year)), durationDays: 365 },
-    ],
+    variants: RACINES_CATALOG_LANGUAGES.flatMap((language) => [
+      { language, currency: "XAF", amount: AFRICAN_FAMILY.fcfa.month, durationDays: 30 },
+      { language, currency: "XAF", amount: AFRICAN_FAMILY.fcfa.year, durationDays: 365 },
+      { language, currency: "EUR", amount: eur(String(AFRICAN_FAMILY.eur.month)), durationDays: 30 },
+      { language, currency: "EUR", amount: eur(String(AFRICAN_FAMILY.eur.year)), durationDays: 365 },
+    ]),
     capabilities: ["COURSE_ACCESS", "VEILLEE_CONTENT", "CHILD_PROFILES"],
   },
   {
@@ -136,10 +140,10 @@ const CATALOG: ProductDef[] = [
     universe: "RACINES",
     billingType: "ONE_TIME",
     isActive: RACINES_COACH_OPERATIONAL,
-    variants: [
-      { language: "WOLOF", currency: "XAF", amount: RACINES_COACH_ADDON.fcfa, durationDays: 30 },
-      { language: "WOLOF", currency: "EUR", amount: eur(String(RACINES_COACH_ADDON.eur)), durationDays: 30 },
-    ],
+    variants: RACINES_CATALOG_LANGUAGES.flatMap((language) => [
+      { language, currency: "XAF", amount: RACINES_COACH_ADDON.fcfa, durationDays: 30 },
+      { language, currency: "EUR", amount: eur(String(RACINES_COACH_ADDON.eur)), durationDays: 30 },
+    ]),
     capabilities: ["CLASSROOM", "THREAD_POST", "HOMEWORK"],
   },
   {
