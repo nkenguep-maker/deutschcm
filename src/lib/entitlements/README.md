@@ -262,7 +262,7 @@ explicitement la cohorte. À la fin de l'onboarding learner, le serveur peut
 Périmètre J1 uniquement :
 
 - Monde · Deutsch · A1 → `PASSAGE`
-- Racines · Wolof · Solo → `ROOTS_SOLO`
+- Racines · Bassa · Solo → `ROOTS_SOLO`
 
 Le grant est lié au `LEARNING_PATH`, possède une provenance
 `MVP_TRIAL` auditée et n'est émis qu'une fois par cohorte / utilisateur /
