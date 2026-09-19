@@ -25,6 +25,31 @@ const db = new Client({ connectionString });
 try {
   await db.connect();
 
+  const constraint = await db.query(`
+    select convalidated
+    from pg_constraint
+    where conname = 'access_grants_order_source_consistency'
+      and conrelid = 'public.access_grants'::regclass
+  `);
+  if (constraint.rowCount !== 1 || constraint.rows[0].convalidated !== true) {
+    fail("order/source consistency constraint missing or unvalidated");
+  }
+
+  const uniqueIndex = await db.query(`
+    select indexdef
+    from pg_indexes
+    where schemaname = 'public'
+      and tablename = 'access_grants'
+      and indexname = 'access_grants_one_grant_per_order_item_idx'
+  `);
+  if (
+    uniqueIndex.rowCount !== 1 ||
+    !/CREATE UNIQUE INDEX/i.test(uniqueIndex.rows[0].indexdef) ||
+    !/WHERE .*orderItemId.* IS NOT NULL/i.test(uniqueIndex.rows[0].indexdef)
+  ) {
+    fail("one-grant-per-order-item unique partial index missing");
+  }
+
   const invalidOrder = await db.query(`
     select g.id
     from public.access_grants g
@@ -89,7 +114,7 @@ try {
   }
 
   process.stdout.write(
-    "[P0.17] GRANT PROVENANCE OK · invalid ORDER=0 · duplicate orderItem=0 · unexplained active non-ORDER=0\n",
+    "[P0.17] GRANT PROVENANCE OK · DB invariants=2 · invalid ORDER=0 · duplicate orderItem=0 · unexplained active non-ORDER=0\n",
   );
 } finally {
   await db.end().catch(() => {});
