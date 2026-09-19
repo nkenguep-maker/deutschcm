@@ -11,6 +11,7 @@ const gates = [
   "scripts/test-baseline/p0-5-pedagogical-catalogue-rls-gate.mjs",
   "scripts/test-baseline/p0-6-messaging-domain-rls-gate.mjs",
   "scripts/test-baseline/p0-7-social-legacy-rls-gate.mjs",
+  "scripts/test-baseline/p0-8-classes-centres-rls-gate.mjs",
 ];
 
 for (const gate of gates) {
