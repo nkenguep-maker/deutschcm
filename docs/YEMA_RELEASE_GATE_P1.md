@@ -15,15 +15,16 @@ order.
 3. RLS inventory + all P0 domain RLS gates (P-1 read-only)
 4. AccessGrant provenance (P-1 read-only audit)
 5. Adult ROOTS_FAMILY seat uniqueness/concurrency invariant (P-1 read-only)
-6. Next.js build
-7. QA persona fixture + beta-admission checks
-8. 9-persona authenticated runtime matrix
-9. Canonical persona home-route verification
-10. 9-persona FR/EN visual sweep (390 / 768 / 1440)
-11. Monde assignments E2E
-12. Messaging Realtime E2E
-13. Messaging audio E2E
-14. Final browser acceptance
+6. MVP trial provenance + launch catalogue invariant (P-1 read-only)
+7. Next.js build
+8. QA persona fixture + beta-admission checks
+9. 9-persona authenticated runtime matrix
+10. Canonical persona home-route verification
+11. 9-persona FR/EN visual sweep (390 / 768 / 1440)
+12. Monde assignments E2E
+13. Messaging Realtime E2E
+14. Messaging audio E2E
+15. Final browser acceptance
 
 The gate is fail-fast. No later step runs after an earlier failure.
 
