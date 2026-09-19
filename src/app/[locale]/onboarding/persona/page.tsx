@@ -34,7 +34,7 @@ import {
 
 type Stage = "start" | "world-language" | "world" | "roots-language" | "roots" | "professional";
 type PathwayVariant = "STUDIES" | "VISA" | "NATURALIZATION" | "TOURISM";
-type LearningLanguageId = "deutsch" | "wolof";
+type LearningLanguageId = "deutsch" | "bassa";
 
 type Card = {
   id: string;
@@ -114,7 +114,7 @@ const WORLD_LANGUAGE_CARDS: readonly Card[] = FOREIGN.map((language) => {
 });
 
 const ROOTS_LANGUAGE_CARDS: readonly Card[] = NATIVE.map((language) => {
-  const available = language.id === "wolof";
+  const available = language.id === "bassa";
   return {
     id: language.id,
     icon: Languages,
@@ -128,7 +128,7 @@ const ROOTS_LANGUAGE_CARDS: readonly Card[] = NATIVE.map((language) => {
     bodyEn: available
       ? "The Roots journey currently offered in beta."
       : "This language is coming to YEMA soon.",
-    ...(available ? { languageId: "wolof" as const, nextStage: "roots" as const } : {}),
+    ...(available ? { languageId: "bassa" as const, nextStage: "roots" as const } : {}),
     available,
     tone: "roots" as const,
   };
@@ -275,13 +275,13 @@ function cardFromPreconfirmationDraft(value: unknown): { card: Card; languageId:
   const defaultLanguage = card.persona === "student_monde"
     ? "deutsch"
     : card.persona === "student_racines" || card.persona === "family"
-      ? "wolof"
+      ? "bassa"
       : null;
-  const languageId = draft.languageId === "deutsch" || draft.languageId === "wolof"
+  const languageId = draft.languageId === "deutsch" || draft.languageId === "bassa"
     ? draft.languageId
     : defaultLanguage;
   if (card.persona === "student_monde" && languageId !== "deutsch") return null;
-  if ((card.persona === "student_racines" || card.persona === "family") && languageId !== "wolof") return null;
+  if ((card.persona === "student_racines" || card.persona === "family") && languageId !== "bassa") return null;
   return { card, languageId };
 }
 
