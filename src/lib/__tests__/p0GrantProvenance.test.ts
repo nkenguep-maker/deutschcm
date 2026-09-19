@@ -114,8 +114,22 @@ describe("P0.17 · AccessGrant provenance", () => {
     expect(source).toContain('g.\"productVariantId\" <> oi.\"productVariantId\"');
     expect(source).toContain("p.status::text = 'CONFIRMED'");
     expect(source).toContain("p.amount = o.total");
-    expect(source).toContain("\"sourceId\" !~ '^(test[_-]|internal-test:)'");
+    expect(source).toContain("g.\"sourceId\" !~ '^(test[_-]|internal-test:)'");
     expect(source).not.toMatch(/\b(?:insert|update|delete|alter|grant|revoke)\s+(?:into\s+|from\s+|table\s+)?public\./i);
+  });
+
+  it("accepts a real adult subscription seat only when an active ROOTS_FAMILY household grant backs it", () => {
+    const source = read("scripts/test-baseline/p0-17-grant-provenance-gate.mjs");
+
+    expect(source).toContain("backed adult-seat provenance");
+    expect(source).toContain("g.metadata->>'seatType' = 'ADULT_ROOTS'");
+    expect(source).toContain("g.metadata->>'householdId' = g.\"sourceId\"");
+    expect(source).toContain("backing.id = g.metadata->>'backingGrantId'");
+    expect(source).toContain("backing.\"beneficiaryType\"::text = 'HOUSEHOLD'");
+    expect(source).toContain("backing.\"beneficiaryId\" = g.\"sourceId\"");
+    expect(source).toContain("backing.\"productVariantId\" = g.\"productVariantId\"");
+    expect(source).toContain("p.code::text = 'ROOTS_FAMILY'");
+    expect(source).toContain("backing.\"endsAt\" is null or backing.\"endsAt\" > now()");
   });
 
   it("locks ORDER/orderItem provenance and one-grant-per-item in the database", () => {
