@@ -346,7 +346,7 @@ function LessonResultPanel({
   const xpValue = result.firstCompletion ? `+${result.xpAwarded}` : result.completed ? `${lesson.xp}` : "0";
   const nextHref = nextLesson
     ? `${baseHref}/${nextLesson.unitId}/${nextLesson.lessonId}`
-    : baseHref;
+    : `${baseHref}/complete`;
 
   return (
     <section className={`${resultStyles.result} ${result.reviewRecommended ? resultStyles.resultReview : ""}`} aria-live="polite">
@@ -376,7 +376,7 @@ function LessonResultPanel({
 
       <div className={resultStyles.actions}>
         {result.completed ? (
-          <Link className={resultStyles.primaryAction} href={nextHref}>{nextLesson ? "Leçon suivante" : "Voir mon parcours"}</Link>
+          <Link className={resultStyles.primaryAction} href={nextHref}>{nextLesson ? "Leçon suivante" : `Voir mon bilan ${course.course.framework.level}`}</Link>
         ) : (
           <button type="button" className={resultStyles.primaryAction} onClick={onRetry}>Reprendre les points à corriger</button>
         )}
