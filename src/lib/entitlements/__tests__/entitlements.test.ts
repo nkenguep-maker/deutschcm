@@ -108,12 +108,12 @@ describeDatabase("getEntitlements", () => {
     expect(beforeAi.allowed).toBe(true); // AI limitée gratuite
     expect(beforeAi.limits?.max).toBe(5);
 
-    // Crée un grant Passage A1
+    // Crée un grant synthétique de test (PROMO) · les grants ORDER exigent désormais un OrderItem payé confirmé.
     await createGrant({
       beneficiaryType: "USER",
       beneficiaryId: u.id,
       productVariant: { id: passageA1Xaf, durationDays: 120 },
-      sourceType: "ORDER",
+      sourceType: "PROMO",
       sourceId: uid("ord1"),
     });
 
@@ -147,7 +147,7 @@ describeDatabase("getEntitlements", () => {
       beneficiaryType: "USER",
       beneficiaryId: u.id,
       productVariant: { id: passageA1Xaf, durationDays: 120 },
-      sourceType: "ORDER",
+      sourceType: "PROMO",
       sourceId: uid("ord2"),
     });
     const v1 = await validateAddonPurchase({
@@ -175,7 +175,7 @@ describeDatabase("getEntitlements", () => {
       beneficiaryType: "USER",
       beneficiaryId: u.id,
       productVariant: { id: passageA1Xaf, durationDays: 120 },
-      sourceType: "ORDER",
+      sourceType: "PROMO",
       sourceId: uid("ord3"),
     });
     // Parcours racines
@@ -290,7 +290,7 @@ describeDatabase("getEntitlements", () => {
       beneficiaryType: "USER",
       beneficiaryId: u.id,
       productVariant: { id: passageB1Xaf, durationDays: 120 },
-      sourceType: "ORDER",
+      sourceType: "PROMO",
       sourceId: uid("ord_exp"),
       startsAt: new Date(Date.now() - 200 * 86400_000),
       endsAt: new Date(Date.now() - 80 * 86400_000),
@@ -316,7 +316,7 @@ describeDatabase("getEntitlements", () => {
       beneficiaryType: "HOUSEHOLD",
       beneficiaryId: h.id,
       productVariant: { id: rootsFamilyYearXaf, durationDays: 365 },
-      sourceType: "ORDER",
+      sourceType: "PROMO",
       sourceId: uid("ord_fam"),
     });
 
