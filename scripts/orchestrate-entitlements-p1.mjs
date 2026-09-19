@@ -193,7 +193,7 @@ async function main() {
       method: "POST", headers: H,
       body: JSON.stringify({
         prenom: `TempRacines${tempRacinesIds.length + 1}`, age: 8, avatarAnimal: "elephant",
-        langues: [{ langue: "wolof", type: "native" }], universe: "RACINES",
+        langues: [{ langue: "bassa", type: "native" }], universe: "RACINES",
       }),
     });
     if (r.status !== 200) fail(`ajout Racines temp échoue · ${r.status} · ${await r.text()}`);
@@ -208,7 +208,7 @@ async function main() {
     method: "POST", headers: H,
     body: JSON.stringify({
       prenom: "RefusedRacines", age: 8, avatarAnimal: "renard",
-      langues: [{ langue: "wolof", type: "native" }], universe: "RACINES",
+      langues: [{ langue: "bassa", type: "native" }], universe: "RACINES",
     }),
   });
   if (fifthRacines.status !== 409) fail(`5e Racines · statut ${fifthRacines.status}`);
