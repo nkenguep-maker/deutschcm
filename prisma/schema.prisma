@@ -36,6 +36,7 @@ enum Intention {
 
 enum LanguageCode {
   DEUTSCH
+  BASSA
   WOLOF
   DOUALA
   LINGALA
