@@ -42,11 +42,13 @@ describe("Racines launch language · Bassa first", () => {
     expect(gate).toContain("pv.language::text='BASSA'");
   });
 
-  it("keeps existing Bassa content status honest until native-reviewed content is added", () => {
+  it("marks integrated Bassa content PARTIAL until native review and audio are complete", () => {
     const racines = read("src/lib/racines.ts");
     const discovery = read("src/lib/discovery.ts");
+    const registry = read("src/content/racines-e1-solo/index.ts");
 
-    expect(racines).toContain('bassa:   "MISSING"');
+    expect(racines).toContain('bassa:   "PARTIAL"');
+    expect(registry).toContain('"racines-solo-bas-e1": bassaE1');
     expect(discovery).toContain('{ id: "bassa",    code: "BASSA"');
     expect(discovery).toContain('status: "soon"');
   });
