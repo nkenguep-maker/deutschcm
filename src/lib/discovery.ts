@@ -61,7 +61,9 @@ export const LANGUAGES: LanguageStatus[] = [
   { id: "deutsch",  code: "DEUTSCH", universe: "MONDE",   nameFr: "Allemand", nameEn: "German",  status: "active", activatedAt: "2026-07-22" },
   { id: "anglais",  code: null,      universe: "MONDE",   nameFr: "Anglais",  nameEn: "English", status: "soon" },
   { id: "francais", code: null,      universe: "MONDE",   nameFr: "Français", nameEn: "French",  status: "soon" },
-  // Racines · Les racines · aucune langue active tant que le seed n'existe pas.
+  // Racines · Bassa est la première langue de lancement, mais reste "soon"
+  // tant que le contenu Bassa validé n'existe pas dans le repo.
+  { id: "bassa",    code: "BASSA",   universe: "RACINES", nameFr: "Bassa",    nameEn: "Bassa",    status: "soon" },
   { id: "wolof",    code: "WOLOF",   universe: "RACINES", nameFr: "Wolof",    nameEn: "Wolof",    status: "soon" },
   { id: "douala",   code: "DOUALA",  universe: "RACINES", nameFr: "Douala",   nameEn: "Duala",    status: "soon" },
   { id: "lingala",  code: "LINGALA", universe: "RACINES", nameFr: "Lingala",  nameEn: "Lingala",  status: "soon" },
