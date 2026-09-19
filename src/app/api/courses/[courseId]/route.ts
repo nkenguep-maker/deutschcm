@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma";
+import type { CefrLevel } from "@prisma/client";
 
 async function getActor() {
   const supabase = await createClient();
@@ -106,7 +107,7 @@ export async function GET(
       productVariant: {
         active: true,
         language: "DEUTSCH",
-        level: course.level,
+        level: course.level as CefrLevel,
         product: { code: "PASSAGE" },
       },
     },
