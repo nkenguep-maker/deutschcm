@@ -11,11 +11,11 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { isInternalTestEnvironment } from "@/lib/internalTestEnvironment";
 import { getMvpTrialConfig, MVP_TRIAL_DAYS, MVP_TRIAL_KIND } from "@/lib/release/mvpTrial";
-import type {
-  BeneficiaryType,
-  GrantSourceType,
+import {
   Prisma,
-  ProductVariant,
+  type BeneficiaryType,
+  type GrantSourceType,
+  type ProductVariant,
 } from "@prisma/client";
 
 type GrantDb = Prisma.TransactionClient;
