@@ -86,6 +86,7 @@ jobs:
           src/lib/__tests__/p0ReleaseGateClosure.test.ts
           src/lib/__tests__/p0AdultRootsSeatConcurrency.test.ts
           src/lib/__tests__/p0MvpTrialGrant.test.ts
+          src/lib/__tests__/p0BassaLaunchLanguage.test.ts
           src/lib/__tests__/classroomJoinHardening.test.ts
           src/lib/__tests__/groupBetaHardening.test.ts
           src/lib/__tests__/groupLocalizationSurface.test.ts
