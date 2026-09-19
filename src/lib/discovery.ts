@@ -293,8 +293,8 @@ export interface MondeLevelAvailability {
 }
 
 export const MONDE_LEVEL_AVAILABILITY: Record<MondeLevel, MondeLevelAvailability> = {
-  // A1 · P2 hardening · courseReady=true (5 leçons × 5 modules dans
-  // src/data/a1-beta-modules.ts, contenu original relu et validé).
+  // A1 · cours adulte canonique intégré : 6 unités × 6 leçons dans
+  // src/data/courses/monde/adulte/de-a1. Checkout public encore fermé.
   // purchasable=false tant que P5 n'a pas branché le paiement réel.
   A1: { priced: true, discoveryReady: true,  courseReady: true,  purchasable: false },
   A2: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },
