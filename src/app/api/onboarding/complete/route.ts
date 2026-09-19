@@ -7,6 +7,7 @@ import { hasActiveRole, markRoleOnboarded, syncUserMetadata, type SpaceRole } fr
 import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 import { isAdultPersonaId, resolvePersonaRuntime, type AdultPersonaId } from "@/lib/personas/runtime";
 import { assertSupabaseResult } from "@/lib/supabase/assertResult";
+import { grantMvpTrialForLearningPath } from "@/lib/entitlements/grants";
 
 function err(code: string, message: string, status: number, detail?: unknown) {
   return NextResponse.json({ error: message, code, ...(detail ? { detail } : {}) }, { status });
@@ -32,6 +33,10 @@ export async function POST(req: NextRequest) {
       return err("VALIDATION_ERROR", "Invalid role", 400);
     }
     const persona: AdultPersonaId | null = isAdultPersonaId(body.persona) ? body.persona : null;
+    const metadataPersona: AdultPersonaId | null = isAdultPersonaId(user.user_metadata?.requested_persona)
+      ? user.user_metadata.requested_persona
+      : null;
+    const effectivePersona = persona ?? metadataPersona;
     const rawPostOnboardingNext = profileString(user.user_metadata?.post_onboarding_next);
     const profileData = body.profileData && typeof body.profileData === "object"
       ? body.profileData as Record<string, unknown>
@@ -115,6 +120,31 @@ export async function POST(req: NextRequest) {
 
     await markRoleOnboarded(dbUser.id, effectiveRole);
 
+    // J1 cohort access is an explicit PROMO AccessGrant, never an onboarding
+    // metadata bypass. The factory itself is feature-flagged and idempotent.
+    let mvpTrialResult:
+      | { issued: boolean; reason: string; grant?: { id: string; endsAt: Date | null } }
+      | null = null;
+    if (effectivePersona === "student_monde" || effectivePersona === "student_racines") {
+      const trialUniverse = effectivePersona === "student_monde" ? "MONDE" : "RACINES";
+      const trialPath = await prisma.learningPath.findFirst({
+        where: {
+          userId: dbUser.id,
+          universe: trialUniverse,
+          status: "ACTIVE",
+        },
+        orderBy: { createdAt: "desc" },
+        select: { id: true },
+      });
+      if (!trialPath) {
+        throw new Error(`MVP trial onboarding path missing for ${effectivePersona}`);
+      }
+      mvpTrialResult = await grantMvpTrialForLearningPath({
+        userId: dbUser.id,
+        learningPathId: trialPath.id,
+      });
+    }
+
     // Profile metadata is convenient for UI and survives confirmation flows,
     // but it never grants authorization. app_metadata remains admin-only.
     const metadataPatch: Record<string, unknown> = {
@@ -147,6 +177,14 @@ export async function POST(req: NextRequest) {
       persona: runtime.persona,
       redirectTo,
       postOnboardingRedirectApplied,
+      mvpTrial: mvpTrialResult
+        ? {
+            issued: mvpTrialResult.issued,
+            reason: mvpTrialResult.reason,
+            grantId: mvpTrialResult.grant?.id ?? null,
+            endsAt: mvpTrialResult.grant?.endsAt?.toISOString() ?? null,
+          }
+        : null,
     });
     response.cookies.set("onboarding_done", "true", { path: "/", maxAge: 2592000, sameSite: "lax" });
     response.cookies.set("active_space", effectiveRole, { path: "/", maxAge: 2592000, sameSite: "lax" });
