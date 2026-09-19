@@ -190,6 +190,55 @@ describeDatabase("getActivationStatus", () => {
     expect(s!.echec).toEqual({ kind: "ORDER_CANCELLED" });
   });
 
+  it("refuse de créer un grant ORDER sans paiement confirmé exact", async () => {
+    const u = await makeUser("u_provenance_pending");
+    const order = await makeOrder({
+      userId: u.id,
+      variants: [passageA1Xaf],
+      paymentStatus: "PENDING",
+      orderStatus: "PAID",
+    });
+
+    await expect(grantFromOrderItem(order.items[0].id)).rejects.toThrow(
+      /no exact confirmed payment provenance/,
+    );
+  });
+
+  it("refuse un paiement confirmé dont le montant ne correspond pas à l'order", async () => {
+    const u = await makeUser("u_provenance_amount");
+    const order = await makeOrder({
+      userId: u.id,
+      variants: [passageA1Xaf],
+      paymentStatus: "CONFIRMED",
+    });
+    await db.payment.updateMany({
+      where: { orderId: order.id },
+      data: { amount: 9999 },
+    });
+
+    await expect(grantFromOrderItem(order.items[0].id)).rejects.toThrow(
+      /no exact confirmed payment provenance/,
+    );
+  });
+
+  it("grantFromOrderItem est idempotent pour un même order item", async () => {
+    const u = await makeUser("u_provenance_idempotent");
+    const order = await makeOrder({
+      userId: u.id,
+      variants: [passageA1Xaf],
+      paymentStatus: "CONFIRMED",
+    });
+
+    const first = await grantFromOrderItem(order.items[0].id);
+    const second = await grantFromOrderItem(order.items[0].id);
+    expect(second.id).toBe(first.id);
+
+    const count = await db.accessGrant.count({
+      where: { orderItemId: order.items[0].id },
+    });
+    expect(count).toBe(1);
+  });
+
   it("orderId inconnu → null", async () => {
     const s = await getActivationStatus(uid("nope"));
     expect(s).toBeNull();
