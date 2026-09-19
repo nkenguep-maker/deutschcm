@@ -14,7 +14,7 @@ function input(universe: "MONDE" | "RACINES"): FunnelInput {
     hasActiveAccessGrant: false,
     learningPath: {
       universe,
-      language: universe === "MONDE" ? "DEUTSCH" : "WOLOF",
+      language: universe === "MONDE" ? "DEUTSCH" : "BASSA",
       currentLevel: null,
       onboardingAnswers: null,
     },
