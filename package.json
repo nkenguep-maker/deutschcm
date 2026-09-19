@@ -28,6 +28,7 @@
     "verify:persona-accounts:p1": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag on -- node scripts/verify-persona-accounts-p1.mjs",
     "test:release-gate:p1": "node scripts/test-release-gate-p1.mjs",
     "test:entitlements:p1": "node scripts/test-entitlements-p1.mjs",
+    "test:rls:p1": "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag off -- node scripts/test-baseline/p0-1-identity-rls-gate.mjs",
     "test:roots-adult-seats:p1": "tsx scripts/test-roots-adult-seats-p1.ts",
     "preflight:release:prod": "node scripts/preflight-release-prod.mjs",
     "test:deployment-readiness:p1": "node scripts/test-deployment-readiness-p1.mjs",
