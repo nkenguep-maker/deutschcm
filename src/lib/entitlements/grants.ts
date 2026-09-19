@@ -11,11 +11,10 @@ import type {
   BeneficiaryType,
   GrantSourceType,
   Prisma,
-  PrismaClient,
   ProductVariant,
 } from "@prisma/client";
 
-type GrantDb = PrismaClient | Prisma.TransactionClient;
+type GrantDb = Prisma.TransactionClient;
 
 /**
  * Creates (or returns) the grant for one confirmed paid OrderItem.
