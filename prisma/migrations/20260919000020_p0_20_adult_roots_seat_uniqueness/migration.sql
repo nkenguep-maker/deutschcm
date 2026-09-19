@@ -6,7 +6,7 @@
 
 CREATE UNIQUE INDEX access_grants_one_active_adult_roots_seat_per_household_user_idx
   ON public.access_grants ("sourceId", "beneficiaryId")
-  WHERE "sourceType"::text = 'SUBSCRIPTION'
-    AND "beneficiaryType"::text = 'USER'
-    AND status::text = 'ACTIVE'
+  WHERE "sourceType" = 'SUBSCRIPTION'::"GrantSourceType"
+    AND "beneficiaryType" = 'USER'::"BeneficiaryType"
+    AND status = 'ACTIVE'::"GrantStatus"
     AND metadata->>'seatType' = 'ADULT_ROOTS';
