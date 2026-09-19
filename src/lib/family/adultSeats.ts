@@ -1,5 +1,5 @@
 import "server-only";
-import { ProductCode } from "@prisma/client";
+import { ProductCode, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { grantAdultRootsSeatFromHouseholdGrant } from "@/lib/entitlements/grants";
 
@@ -45,11 +45,16 @@ export interface AdultSeatSnapshot {
   assignedUserIds: string[];
 }
 
-async function findHouseholdRootsFamilyVariantId(householdId: string): Promise<string | null> {
+type SeatDb = Prisma.TransactionClient | typeof prisma;
+
+async function findHouseholdRootsFamilyVariantId(
+  householdId: string,
+  db: SeatDb = prisma,
+): Promise<string | null> {
   // On récupère le grant HOUSEHOLD ROOTS_FAMILY (souscription du foyer) et
   // on renvoie son productVariantId. Sans ce grant, aucune attribution
   // possible.
-  const householdGrant = await prisma.accessGrant.findFirst({
+  const householdGrant = await db.accessGrant.findFirst({
     where: {
       beneficiaryType: "HOUSEHOLD",
       beneficiaryId: householdId,
@@ -61,8 +66,12 @@ async function findHouseholdRootsFamilyVariantId(householdId: string): Promise<s
   return householdGrant?.productVariantId ?? null;
 }
 
-async function isActiveHouseholdMember(userId: string, householdId: string): Promise<boolean> {
-  const membership = await prisma.householdMembership.findFirst({
+async function isActiveHouseholdMember(
+  userId: string,
+  householdId: string,
+  db: SeatDb = prisma,
+): Promise<boolean> {
+  const membership = await db.householdMembership.findFirst({
     where: { userId, householdId, status: "ACTIVE" },
     select: { id: true },
   });
@@ -81,8 +90,11 @@ export async function countAssignedAdultRootsSeats(householdId: string): Promise
   });
 }
 
-export async function listAssignedAdultRootsSeats(householdId: string): Promise<AdultSeatSnapshot> {
-  const rows = await prisma.accessGrant.findMany({
+async function listAssignedAdultRootsSeatsWithDb(
+  householdId: string,
+  db: SeatDb,
+): Promise<AdultSeatSnapshot> {
+  const rows = await db.accessGrant.findMany({
     where: {
       beneficiaryType: "USER",
       sourceType: "SUBSCRIPTION",
@@ -101,6 +113,10 @@ export async function listAssignedAdultRootsSeats(householdId: string): Promise<
   };
 }
 
+export async function listAssignedAdultRootsSeats(householdId: string): Promise<AdultSeatSnapshot> {
+  return listAssignedAdultRootsSeatsWithDb(householdId, prisma);
+}
+
 export type AdultSeatAssignmentResult =
   | { ok: true; grantId: string; snapshot: AdultSeatSnapshot }
   | { ok: false; error: AdultSeatAssignmentError; snapshot?: AdultSeatSnapshot };
@@ -109,27 +125,42 @@ export async function assignAdultRootsSeat(
   householdId: string,
   userId: string,
 ): Promise<AdultSeatAssignmentResult> {
-  const variantId = await findHouseholdRootsFamilyVariantId(householdId);
-  if (!variantId) return { ok: false, error: "household_has_no_family_subscription" };
+  return prisma.$transaction(async (tx) => {
+    // Serialize seat assignments for one household. Without this row lock,
+    // two concurrent requests could both observe one free seat and mint a
+    // third active adult entitlement.
+    const locked = await tx.$queryRaw<Array<{ id: string }>>(
+      Prisma.sql`SELECT id FROM "households" WHERE id = ${householdId} FOR UPDATE`,
+    );
+    if (locked.length !== 1) {
+      return { ok: false, error: "household_has_no_family_subscription" };
+    }
 
-  const isMember = await isActiveHouseholdMember(userId, householdId);
-  if (!isMember) return { ok: false, error: "user_is_not_household_member" };
+    const variantId = await findHouseholdRootsFamilyVariantId(householdId, tx);
+    if (!variantId) return { ok: false, error: "household_has_no_family_subscription" };
 
-  const snap = await listAssignedAdultRootsSeats(householdId);
-  if (snap.assignedUserIds.includes(userId)) {
-    return { ok: false, error: "user_already_has_seat", snapshot: snap };
-  }
-  if (snap.seatsAvailable <= 0) {
-    return { ok: false, error: "household_seats_exhausted", snapshot: snap };
-  }
+    const isMember = await isActiveHouseholdMember(userId, householdId, tx);
+    if (!isMember) return { ok: false, error: "user_is_not_household_member" };
 
-  const grant = await grantAdultRootsSeatFromHouseholdGrant({
-    householdId,
-    userId,
-    productVariantId: variantId,
+    const snap = await listAssignedAdultRootsSeatsWithDb(householdId, tx);
+    if (snap.assignedUserIds.includes(userId)) {
+      return { ok: false, error: "user_already_has_seat", snapshot: snap };
+    }
+    if (snap.seatsAvailable <= 0) {
+      return { ok: false, error: "household_seats_exhausted", snapshot: snap };
+    }
+
+    const grant = await grantAdultRootsSeatFromHouseholdGrant(
+      { householdId, userId, productVariantId: variantId },
+      tx,
+    );
+
+    return {
+      ok: true,
+      grantId: grant.id,
+      snapshot: await listAssignedAdultRootsSeatsWithDb(householdId, tx),
+    };
   });
-
-  return { ok: true, grantId: grant.id, snapshot: await listAssignedAdultRootsSeats(householdId) };
 }
 
 export type AdultSeatRevocationResult =
