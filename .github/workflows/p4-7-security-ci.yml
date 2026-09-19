@@ -78,6 +78,7 @@ jobs:
           src/lib/__tests__/p0CourseAccessBoundary.test.ts
           src/lib/__tests__/p0CourseAuthoringAuthorization.test.ts
           src/lib/__tests__/p0LegacyClassroomAuthorization.test.ts
+          src/lib/__tests__/p0DayOneAccessModel.test.ts
           src/lib/__tests__/classroomJoinHardening.test.ts
           src/lib/__tests__/groupBetaHardening.test.ts
           src/lib/__tests__/groupLocalizationSurface.test.ts
