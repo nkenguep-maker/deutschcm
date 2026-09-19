@@ -24,7 +24,7 @@ describe("pre-confirmation journey ownership", () => {
   it("never replays an unowned public-preview draft into an authenticated account", () => {
     const draft = createPreconfirmationJourneyDraft(null, {
       persona: "family",
-      languageId: "wolof",
+      languageId: "bassa",
     }, NOW);
 
     expect(draft.authUserId).toBeNull();
