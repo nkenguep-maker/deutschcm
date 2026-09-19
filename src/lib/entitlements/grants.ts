@@ -10,6 +10,7 @@ import "server-only";
 
 import { prisma } from "@/lib/prisma";
 import { isInternalTestEnvironment } from "@/lib/internalTestEnvironment";
+import { getMvpTrialConfig, MVP_TRIAL_DAYS, MVP_TRIAL_KIND } from "@/lib/release/mvpTrial";
 import type {
   BeneficiaryType,
   GrantSourceType,
@@ -143,6 +144,122 @@ export async function grantAdultRootsSeatFromHouseholdGrant(
       },
     },
     select: { id: true },
+  });
+}
+
+/**
+ * Issues the explicit J1 MVP cohort trial.
+ *
+ * This is production-capable but disabled unless YEMA_MVP_TRIAL_ENABLED=true
+ * and a valid cohort id is configured. It is intentionally limited to the two
+ * launch personas:
+ * - MONDE · DEUTSCH · A1 -> PASSAGE
+ * - RACINES · WOLOF -> ROOTS_SOLO
+ *
+ * The grant is scoped to the exact LearningPath and lasts 30 days regardless
+ * of the catalogue variant's commercial duration.
+ */
+export async function grantMvpTrialForLearningPath(params: {
+  userId: string;
+  learningPathId: string;
+}) {
+  const config = getMvpTrialConfig();
+  if (!config.enabled) return { issued: false as const, reason: "disabled" as const };
+
+  const path = await prisma.learningPath.findFirst({
+    where: {
+      id: params.learningPathId,
+      userId: params.userId,
+      status: "ACTIVE",
+    },
+    select: {
+      id: true,
+      universe: true,
+      language: true,
+      currentLevel: true,
+    },
+  });
+  if (!path) throw new Error("MVP trial requires an owned active learning path");
+
+  const isMondeA1 =
+    path.universe === "MONDE" &&
+    path.language === "DEUTSCH" &&
+    (path.currentLevel === null || path.currentLevel === "A1");
+  const isRacinesSolo =
+    path.universe === "RACINES" &&
+    path.language === "WOLOF";
+
+  if (!isMondeA1 && !isRacinesSolo) {
+    return { issued: false as const, reason: "not_eligible" as const };
+  }
+
+  const productCode = isMondeA1 ? "PASSAGE" : "ROOTS_SOLO";
+  const variant = await prisma.productVariant.findFirst({
+    where: {
+      active: true,
+      currency: "EUR",
+      language: path.language,
+      ...(isMondeA1
+        ? { level: "A1", product: { code: "PASSAGE", isActive: true } }
+        : { level: null, durationDays: 30, product: { code: "ROOTS_SOLO", isActive: true } }),
+    },
+    select: { id: true },
+  });
+  if (!variant) {
+    throw new Error(`MVP trial catalogue variant missing for ${productCode}`);
+  }
+
+  const sourceId = `mvp-trial:${config.cohort}:${params.userId}:${productCode}`;
+  const startsAt = new Date();
+  const endsAt = new Date(startsAt.getTime() + MVP_TRIAL_DAYS * 86400_000);
+
+  return prisma.$transaction(async (tx) => {
+    await tx.$queryRaw(
+      Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${sourceId}))`,
+    );
+
+    const existing = await tx.accessGrant.findFirst({
+      where: {
+        sourceType: "PROMO",
+        sourceId,
+      },
+      select: { id: true, startsAt: true, endsAt: true, status: true },
+    });
+    if (existing) {
+      return {
+        issued: false as const,
+        reason: "already_issued" as const,
+        grant: existing,
+      };
+    }
+
+    const grant = await tx.accessGrant.create({
+      data: {
+        beneficiaryType: "LEARNING_PATH",
+        beneficiaryId: path.id,
+        productVariantId: variant.id,
+        sourceType: "PROMO",
+        sourceId,
+        startsAt,
+        endsAt,
+        status: "ACTIVE",
+        metadata: {
+          kind: MVP_TRIAL_KIND,
+          cohort: config.cohort,
+          userId: params.userId,
+          learningPathId: path.id,
+          productCode,
+          trialDays: MVP_TRIAL_DAYS,
+        },
+      },
+      select: { id: true, startsAt: true, endsAt: true, status: true },
+    });
+
+    return {
+      issued: true as const,
+      reason: "created" as const,
+      grant,
+    };
   });
 }
 
