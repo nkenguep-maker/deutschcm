@@ -85,9 +85,25 @@ describeDatabase("getEntitlements", () => {
       data: { id: uid("path_u1_de"), userId: u.id, universe: "MONDE", language: "DEUTSCH", currentLevel: "A1" },
     });
 
-    // Sans grant → deny sauf gratuits (COURSE_ACCESS 1re leçon + AI 5min)
+    // Sans grant → seule la ressource de découverte explicite est gratuite.
     const beforeCert = await getEntitlements({ userId: u.id, learningPathId: pathDe.id, capability: "CERTIFICATE" });
     expect(beforeCert.allowed).toBe(false); // CERTIFICATE requiert un Passage
+    const genericCourse = await getEntitlements({ userId: u.id, learningPathId: pathDe.id, capability: "COURSE_ACCESS" });
+    expect(genericCourse.allowed).toBe(false);
+    const freeLesson = await getEntitlements({
+      userId: u.id,
+      learningPathId: pathDe.id,
+      capability: "COURSE_ACCESS",
+      resourceId: "de-a1-u1-l1",
+    });
+    expect(freeLesson.allowed).toBe(true);
+    const lockedLesson = await getEntitlements({
+      userId: u.id,
+      learningPathId: pathDe.id,
+      capability: "COURSE_ACCESS",
+      resourceId: "de-a1-u1-l2",
+    });
+    expect(lockedLesson.allowed).toBe(false);
     const beforeAi = await getEntitlements({ userId: u.id, learningPathId: pathDe.id, capability: "AI_TEXT" });
     expect(beforeAi.allowed).toBe(true); // AI limitée gratuite
     expect(beforeAi.limits?.max).toBe(5);
@@ -247,6 +263,19 @@ describeDatabase("getEntitlements", () => {
 
     const rAi = await getEntitlements({ userId: u.id, learningPathId: pRacines.id, capability: "AI_TEXT" });
     expect(rAi.allowed).toBe(false);
+    const genericRacinesCourse = await getEntitlements({
+      userId: u.id,
+      learningPathId: pRacines.id,
+      capability: "COURSE_ACCESS",
+    });
+    expect(genericRacinesCourse.allowed).toBe(false);
+    const freeRacinesLesson = await getEntitlements({
+      userId: u.id,
+      learningPathId: pRacines.id,
+      capability: "COURSE_ACCESS",
+      resourceId: "ln-e1-u1-l1",
+    });
+    expect(freeRacinesLesson.allowed).toBe(true);
     const rVeillee = await getEntitlements({ userId: u.id, learningPathId: pRacines.id, capability: "VEILLEE_CONTENT" });
     expect(rVeillee.allowed).toBe(true);
   });
