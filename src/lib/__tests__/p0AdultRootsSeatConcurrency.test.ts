@@ -35,9 +35,9 @@ describe("P0.20 · adult ROOTS_FAMILY seat concurrency", () => {
       "access_grants_one_active_adult_roots_seat_per_household_user_idx",
     );
     expect(migration).toContain('ON public.access_grants ("sourceId", "beneficiaryId")');
-    expect(migration).toContain('\"sourceType\"::text = \'SUBSCRIPTION\'');
-    expect(migration).toContain('\"beneficiaryType\"::text = \'USER\'');
-    expect(migration).toContain("status::text = 'ACTIVE'");
+    expect(migration).toContain('\"sourceType\" = \'SUBSCRIPTION\'::\"GrantSourceType\"');
+    expect(migration).toContain('\"beneficiaryType\" = \'USER\'::\"BeneficiaryType\"');
+    expect(migration).toContain('status = \'ACTIVE\'::\"GrantStatus\"');
     expect(migration).toContain("metadata->>'seatType' = 'ADULT_ROOTS'");
   });
 });
