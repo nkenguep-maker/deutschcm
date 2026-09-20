@@ -16,6 +16,7 @@ import {
   getA1V2Remediation,
 } from "@/content/monde-a1-v2";
 import { resolveA1V2AudioText } from "@/content/monde-a1-v2/audio";
+import { A1_V2_MOCK_EXAMS } from "@/content/monde-a1-v2/mock-exams";
 import { evaluateA1Exercise } from "@/lib/course-content/a1-v2/evaluation";
 import {
   nextCardMemory,
@@ -284,6 +285,40 @@ describe("A1 refonte v2 · source contract", () => {
     expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(true);
     expect(MONDE_A1_V2_MANIFEST.readiness.criticalNativeAudioReady).toBe(false);
     expect(MONDE_A1_V2_MANIFEST.readiness.mockExamsReady).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
+  });
+
+  it("integrates two detailed generic mock exams without claiming an official certification", () => {
+    expect(A1_V2_MOCK_EXAMS).toHaveLength(2);
+    expect(new Set(A1_V2_MOCK_EXAMS.map((exam) => exam.id)).size).toBe(2);
+    for (const exam of A1_V2_MOCK_EXAMS) {
+      expect(exam.status).toBe("QA_DETAILED");
+      expect(exam.maxPoints).toBe(60);
+      expect(exam.durationMinutes).toBe(65);
+      expect(exam.sections.map((section) => section.id)).toEqual(["hoeren", "lesen", "schreiben", "sprechen"]);
+      expect(exam.sections.map((section) => section.items.length)).toEqual([6, 6, 2, 3]);
+      expect(exam.sections.reduce((sum, section) => sum + section.maxPoints, 0)).toBe(60);
+      expect(exam.sections.reduce((sum, section) => sum + section.durationMinutes, 0)).toBe(65);
+      const items = exam.sections.flatMap((section) => section.items);
+      expect(new Set(items.map((item) => item.id)).size).toBe(items.length);
+      for (const item of items) {
+        if (item.kind === "listening-mcq") {
+          expect(item.audioRef).toBeTruthy();
+          expect(item.audioScript?.trim().length ?? 0).toBeGreaterThan(20);
+          expect(item.choices?.some((choice) => choice.id === item.correctChoiceId)).toBe(true);
+        }
+        if (item.kind === "reading-mcq") {
+          expect(item.stimulus?.trim().length ?? 0).toBeGreaterThan(10);
+          expect(item.choices?.some((choice) => choice.id === item.correctChoiceId)).toBe(true);
+        }
+        if (item.kind === "writing" || item.kind === "speaking") {
+          expect(item.checklist?.length ?? 0).toBeGreaterThanOrEqual(4);
+        }
+      }
+    }
+    expect(JSON.stringify(A1_V2_MOCK_EXAMS)).not.toMatch(/goethe|telc|testdaf|ösd/i);
+    expect(MONDE_A1_V2_MANIFEST.readiness.mockExamsReady).toBe(true);
+    expect(MONDE_A1_V2_MANIFEST.readiness.criticalNativeAudioReady).toBe(false);
     expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
   });
 

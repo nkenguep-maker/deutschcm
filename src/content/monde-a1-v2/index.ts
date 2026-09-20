@@ -32,7 +32,7 @@ export const MONDE_A1_V2_MANIFEST: A1RefonteManifest = {
   readiness: {
     fullLevelIntegrated: true,
     criticalNativeAudioReady: false,
-    mockExamsReady: false,
+    mockExamsReady: true,
   },
 };
 

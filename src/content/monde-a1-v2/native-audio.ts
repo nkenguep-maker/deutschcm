@@ -1,7 +1,8 @@
 import { A1_V2_UNITS } from "./index";
 import { getA1V2Dialogue, resolveA1V2AudioText } from "./audio";
+import { A1_V2_MOCK_EXAMS } from "./mock-exams";
 
-export type A1NativeAudioAssetKind = "dialogue" | "exercise" | "shadowing" | "card";
+export type A1NativeAudioAssetKind = "dialogue" | "exercise" | "shadowing" | "card" | "mock-exam";
 
 export type A1NativeAudioAsset = {
   ref: string;
@@ -25,6 +26,7 @@ export function buildA1V2NativeAudioInventory(): A1NativeAudioAsset[] {
     kind: A1NativeAudioAssetKind,
     unitId: string,
     lessonId?: string,
+    explicitText?: string,
   ) => {
     if (byRef.has(ref)) return;
     byRef.set(ref, {
@@ -32,7 +34,7 @@ export function buildA1V2NativeAudioInventory(): A1NativeAudioAsset[] {
       kind,
       unitId,
       lessonId,
-      text: resolveA1V2AudioText(ref) ?? "",
+      text: explicitText ?? resolveA1V2AudioText(ref) ?? "",
       publicPath: a1NativeAudioPublicPath(ref),
     });
   };
@@ -58,6 +60,16 @@ export function buildA1V2NativeAudioInventory(): A1NativeAudioAsset[] {
         if (exercise.audioRef) add(exercise.audioRef, "exercise", unit.id, lesson.id);
         for (const target of exercise.targets ?? []) {
           add(target.audioRef, "shadowing", unit.id, lesson.id);
+        }
+      }
+    }
+  }
+
+  for (const exam of A1_V2_MOCK_EXAMS) {
+    for (const section of exam.sections) {
+      for (const item of section.items) {
+        if (item.kind === "listening-mcq" && item.audioRef && item.audioScript) {
+          add(item.audioRef, "mock-exam", exam.id, section.id, item.audioScript);
         }
       }
     }
