@@ -149,4 +149,9 @@ export type A1RefonteManifest = {
     lexicalItemsMax: number;
   };
   integratedUnits: string[];
+  readiness: {
+    fullLevelIntegrated: boolean;
+    criticalNativeAudioReady: boolean;
+    mockExamsReady: boolean;
+  };
 };
