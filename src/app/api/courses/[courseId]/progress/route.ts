@@ -5,6 +5,7 @@ import { computeMondeAccess } from "@/lib/monde";
 import { getCourseContent, getCourseLessonById } from "@/data/courses/registry";
 import { decideLessonProgress, type CourseProgressStatus } from "@/lib/course-content/validation";
 import { isTechnicalBetaCourseAccessEnabled } from "@/lib/release/technicalBeta";
+import { a1IsCourseReady } from "@/lib/monde";
 
 function error(code: string, message: string, status: number) {
   return NextResponse.json({ ok: false, code, error: message }, { status });
@@ -24,6 +25,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ cou
     const { courseId } = await params;
     const course = getCourseContent(courseId);
     if (!course) return error("COURSE_NOT_FOUND", "Course not found", 404);
+    if (courseId === "monde-adulte-de-a1" && !a1IsCourseReady()) {
+      return error("COURSE_REFONTE_IN_PROGRESS", "A1 refonte in progress", 503);
+    }
 
     const payload = await request.json().catch(() => null) as {
       lessonId?: unknown;
