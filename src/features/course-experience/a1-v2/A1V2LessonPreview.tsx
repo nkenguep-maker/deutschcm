@@ -57,7 +57,7 @@ function Exercise({
   result?: ResultState;
   response: ResponseValue;
   onResponse: (value: ResponseValue) => void;
-  onSubmit: () => void;
+  onSubmit: (value?: ResponseValue) => void;
 }) {
   const audio = audioText(exercise.audioRef);
   const isChoice = Boolean(exercise.choices?.length);
@@ -91,8 +91,7 @@ function Exercise({
               key={choice.id}
               onClick={() => {
                 onResponse(choice.id);
-                const evaluation = evaluateA1Exercise(exercise, choice.id);
-                onSubmitDirect?.(evaluation);
+                onSubmit(choice.id);
               }}
             >
               {choice.text}
@@ -164,10 +163,6 @@ function Exercise({
     </div>
   );
 
-  function onSubmitDirect(evaluation: A1ExerciseEvaluation) {
-    void evaluation;
-    onSubmit();
-  }
 }
 
 export function A1V2LessonPreview({
@@ -280,9 +275,8 @@ export function A1V2LessonPreview({
                     result={results[exercise.id]}
                     response={responses[exercise.id] ?? (Array.isArray(exercise.answer) ? [] : "")}
                     onResponse={(value) => setResponses((current) => ({ ...current, [exercise.id]: value }))}
-                    onSubmit={() => {
-                      const value = responses[exercise.id] ?? "";
-                      submit(exercise, value);
+                    onSubmit={(value) => {
+                      submit(exercise, value ?? responses[exercise.id] ?? "");
                     }}
                   />
                 ))}
