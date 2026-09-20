@@ -147,6 +147,26 @@ describe("A1 refonte v2 · source contract", () => {
     expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
   });
 
+  it("integrates U6 as the sixth of twelve units and removes the legacy A1-finished claim", () => {
+    expect(A1_V2_UNIT_6).toMatchObject({
+      id: "de-a1-u6",
+      order: 6,
+      title: "Faire des achats et organiser une sortie",
+      contentVersion: "2026.09.20-u6-refonte-r1",
+      status: "refonte-a-valider",
+    });
+    expect(A1_V2_UNIT_6.cards).toHaveLength(40);
+    expect(A1_V2_UNIT_6.lessons).toHaveLength(5);
+    expect(A1_V2_UNIT_6.lessons.flatMap((lesson) => lesson.exercises)).toHaveLength(25);
+    expect(A1_V2_UNIT_6.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
+    expect(A1_V2_UNIT_6.lessons.flatMap((lesson) => lesson.exercises).every((exercise) => exercise.promptLang === "de")).toBe(true);
+    expect(A1_V2_UNIT_6.note).toContain("moitié");
+    expect(A1_V2_UNIT_6.lessons.at(-1)?.completionMessage).toContain("U7");
+    expect(MONDE_A1_V2_MANIFEST.integratedUnits).toHaveLength(6);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
+    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
+  });
+
   it("enforces the core doctrine contract on every integrated unit", () => {
     const allCardIds = new Set(A1_V2_UNITS.flatMap((unit) => unit.cards).map((card) => card.id));
     for (const unit of A1_V2_UNITS) {
@@ -437,6 +457,12 @@ describe("A1 refonte v2 · spaced recall and remediation", () => {
     const cards = getA1V2CardsAvailableForLesson("de-a1-u5-l1");
     expect(cards).toHaveLength(200);
     expect(cards.some((card) => card.id === "card.u5.entschuldigung")).toBe(true);
+  });
+
+  it("makes U1–U6 cards available at the U6 Réveil boundary", () => {
+    const cards = getA1V2CardsAvailableForLesson("de-a1-u6-l1");
+    expect(cards).toHaveLength(240);
+    expect(cards.some((card) => card.id === "card.u6.jacke")).toBe(true);
   });
 
   it("prioritizes missed/due cards in the Réveil", () => {

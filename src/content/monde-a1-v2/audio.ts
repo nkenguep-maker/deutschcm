@@ -15,6 +15,11 @@ import {
 } from "./u3.support";
 import { A1_V2_U4_AUDIO_OVERRIDES, A1_V2_U4_DIALOGUE, A1_V2_U4_DRILLS } from "./u4.support";
 import { A1_V2_U5_AUDIO_OVERRIDES, A1_V2_U5_DIALOGUE, A1_V2_U5_DRILLS } from "./u5.support";
+import {
+  A1_V2_U6_AUDIO_OVERRIDES,
+  A1_V2_U6_DIALOGUE,
+  A1_V2_U6_DRILLS,
+} from "./u6.support";
 
 export type A1Dialogue = {
   id: string;
@@ -30,6 +35,7 @@ export const A1_V2_DIALOGUES: Record<string, A1Dialogue> = {
   [A1_V2_U3_DIALOGUE.id]: A1_V2_U3_DIALOGUE,
   [A1_V2_U4_DIALOGUE.id]: A1_V2_U4_DIALOGUE,
   [A1_V2_U5_DIALOGUE.id]: A1_V2_U5_DIALOGUE,
+  [A1_V2_U6_DIALOGUE.id]: A1_V2_U6_DIALOGUE,
 };
 
 export const A1_V2_AUDIO_OVERRIDES: Record<string, string> = {
@@ -38,6 +44,7 @@ export const A1_V2_AUDIO_OVERRIDES: Record<string, string> = {
   ...A1_V2_U3_AUDIO_OVERRIDES,
   ...A1_V2_U4_AUDIO_OVERRIDES,
   ...A1_V2_U5_AUDIO_OVERRIDES,
+  ...A1_V2_U6_AUDIO_OVERRIDES,
 };
 
 export const A1_V2_DRILLS: Record<string, string> = {
@@ -46,6 +53,7 @@ export const A1_V2_DRILLS: Record<string, string> = {
   ...A1_V2_U3_DRILLS,
   ...A1_V2_U4_DRILLS,
   ...A1_V2_U5_DRILLS,
+  ...A1_V2_U6_DRILLS,
 };
 
 export function getA1V2Dialogue(dialogueId?: string) {
