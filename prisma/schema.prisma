@@ -282,6 +282,7 @@ model User {
 
   enrollments           Enrollment[]
   moduleProgress        ModuleProgress[]
+  learningMemoryStates  LearningMemoryState[]
   conversationSessions  ConversationSession[]
   quizAttempts          QuizAttempt[]
   badges                UserBadge[]
@@ -441,6 +442,27 @@ model ModuleProgress {
   @@unique([userId, moduleId])
   @@index([userId])
   @@map("module_progress")
+}
+
+model LearningMemoryState {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId      String
+  itemKind      String
+  itemId        String
+  intervalIndex Int      @default(0)
+  nextDueAt     DateTime?
+  failureStreak Int      @default(0)
+  lastResult    Boolean?
+  lastSeenAt    DateTime?
+  metadata      Json     @default("{}")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, courseId, itemKind, itemId])
+  @@index([userId, courseId, nextDueAt])
+  @@map("learning_memory_states")
 }
 
 model ConversationSession {
