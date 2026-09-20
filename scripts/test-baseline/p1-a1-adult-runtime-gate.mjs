@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// German A1 adult runtime gate · canonical P-1 only.
-// Read-only: the static course registry and the database runtime rows must agree.
+// German A1 refonte v2 gate · canonical P-1 only.
+// Read-only. Proves the superseded 6-unit runtime is archived and the new
+// server-side memory substrate exists while the 12-unit level remains closed.
 
 import { readFileSync } from "node:fs";
 import pg from "pg";
@@ -10,88 +11,80 @@ const { Client } = pg;
 assertNonProduction();
 
 const connectionString = process.env.DATABASE_URL ?? process.env.DIRECT_URL;
-if (!connectionString) throw new Error("A1 runtime gate: DATABASE_URL/DIRECT_URL missing");
+if (!connectionString) throw new Error("A1 refonte gate: DATABASE_URL/DIRECT_URL missing");
 
-const meta = JSON.parse(
-  readFileSync("src/data/courses/monde/adulte/de-a1/meta.json", "utf8"),
+const unit = JSON.parse(
+  readFileSync("src/content/monde-a1-v2/u1.reference.json", "utf8"),
 );
-const units = [1, 2, 3, 4, 5, 6].map((n) =>
-  JSON.parse(readFileSync(`src/data/courses/monde/adulte/de-a1/u${n}.json`, "utf8")),
-);
-const expected = units.flatMap((unit) =>
-  unit.lessons.map((lesson, index) => ({
-    id: lesson.id,
-    title: lesson.title,
-    description: lesson.objective,
-    xpReward: lesson.xp,
-    unitId: unit.id,
-    phase: lesson.phase,
-    exerciseCount: lesson.exercises.length,
-  })),
-);
+const lessons = unit.lessons ?? [];
+const exercises = lessons.flatMap((lesson) => lesson.exercises ?? []);
 
-if (meta.course.id !== "monde-adulte-de-a1") throw new Error("A1 runtime gate: unexpected course id");
-if (units.length !== 6 || expected.length !== 36) throw new Error("A1 runtime gate: source contract is not 6 units / 36 lessons");
+if (unit.schemaVersion !== "2.0") throw new Error("A1 refonte gate: schemaVersion must be 2.0");
+if (unit.contentVersion !== "2026.09.20-u1-refonte-reference") {
+  throw new Error("A1 refonte gate: unexpected U1 contentVersion");
+}
+if (unit.status !== "gabarit-a-valider") {
+  throw new Error("A1 refonte gate: U1 must remain gabarit-a-valider until editorial signoff");
+}
+if (lessons.length !== 2 || exercises.length !== 10) {
+  throw new Error(`A1 refonte gate: expected received U1 = 2 lessons / 10 exercises, got ${lessons.length}/${exercises.length}`);
+}
 
 const db = new Client({ connectionString });
 
 try {
   await db.connect();
 
-  const course = await db.query(`
-    select id, title, description, level::text as level,
-           "isPublished", "isFree", "durationHours", tags, "sortOrder"
+  const legacy = await db.query(`
+    select id, "isPublished", tags
     from public.courses
-    where id = $1
-  `, [meta.course.id]);
-
-  if (course.rowCount !== 1) throw new Error("A1 runtime gate: canonical course row missing");
-  const c = course.rows[0];
-  if (c.level !== "A1" || c.isPublished !== true || c.isFree !== false) {
-    throw new Error("A1 runtime gate: canonical course flags are invalid");
+    where id='monde-adulte-de-a1'
+  `);
+  if (legacy.rowCount !== 1) throw new Error("A1 refonte gate: archived legacy course row missing");
+  if (legacy.rows[0].isPublished !== false) {
+    throw new Error("A1 refonte gate: superseded 6-unit A1 course is still published");
+  }
+  if (!Array.isArray(legacy.rows[0].tags) || !legacy.rows[0].tags.includes("LEGACY_A1_2026_08_04")) {
+    throw new Error("A1 refonte gate: legacy A1 archive marker missing");
   }
 
-  const modules = await db.query(`
-    select id, "courseId", title, description, type::text as type,
-           content, "sortOrder", "xpReward", "isPublished"
+  const legacyModules = await db.query(`
+    select count(*)::int as total,
+           count(*) filter (where "isPublished"=true)::int as published
     from public.modules
-    where "courseId" = $1
-    order by "sortOrder", id
-  `, [meta.course.id]);
-
-  if (modules.rowCount !== expected.length) {
-    throw new Error(`A1 runtime gate: expected ${expected.length} modules, got ${modules.rowCount}`);
+    where "courseId"='monde-adulte-de-a1'
+  `);
+  if (Number(legacyModules.rows[0].total) !== 36 || Number(legacyModules.rows[0].published) !== 0) {
+    throw new Error("A1 refonte gate: legacy module archive invariant failed");
   }
 
-  for (let index = 0; index < expected.length; index += 1) {
-    const want = expected[index];
-    const got = modules.rows[index];
-    if (
-      got.id !== want.id ||
-      got.title !== want.title ||
-      got.description !== want.description ||
-      got.type !== "LESSON" ||
-      Number(got.sortOrder) !== index ||
-      Number(got.xpReward) !== Number(want.xpReward) ||
-      got.isPublished !== true
-    ) {
-      throw new Error(`A1 runtime gate: module mismatch at index ${index} (${want.id})`);
-    }
-    const content = got.content ?? {};
-    if (
-      content.source !== "yema-course-registry" ||
-      content.contentVersion !== meta.contentVersion ||
-      content.unitId !== want.unitId ||
-      content.lessonId !== want.id ||
-      content.phase !== want.phase ||
-      Number(content.exerciseCount) !== Number(want.exerciseCount)
-    ) {
-      throw new Error(`A1 runtime gate: module metadata mismatch for ${want.id}`);
-    }
+  const memory = await db.query(`
+    select c.relrowsecurity as rls_enabled,
+           has_table_privilege('anon', 'public.learning_memory_states', 'SELECT') as anon_select,
+           has_table_privilege('authenticated', 'public.learning_memory_states', 'SELECT') as authenticated_select
+    from pg_class c
+    join pg_namespace n on n.oid=c.relnamespace
+    where n.nspname='public' and c.relname='learning_memory_states'
+  `);
+  if (memory.rowCount !== 1) throw new Error("A1 refonte gate: learning_memory_states missing");
+  if (memory.rows[0].rls_enabled !== true) throw new Error("A1 refonte gate: learning_memory_states RLS disabled");
+  if (memory.rows[0].anon_select === true || memory.rows[0].authenticated_select === true) {
+    throw new Error("A1 refonte gate: learning_memory_states exposed to client roles");
+  }
+
+  const uniqueIndex = await db.query(`
+    select indexdef
+    from pg_indexes
+    where schemaname='public'
+      and tablename='learning_memory_states'
+      and indexname='learning_memory_states_user_course_kind_item_key'
+  `);
+  if (uniqueIndex.rowCount !== 1 || !/CREATE UNIQUE INDEX/i.test(uniqueIndex.rows[0].indexdef)) {
+    throw new Error("A1 refonte gate: memory uniqueness invariant missing");
   }
 
   process.stdout.write(
-    `[A1] RUNTIME OK · ${meta.course.id} · ${units.length} units · ${expected.length} lessons · contentVersion=${meta.contentVersion}\n`,
+    `[A1-V2] GATE OK · legacy 6×6 archived · U1 reference ${lessons.length} lessons / ${exercises.length} exercises · memory RLS closed\n`,
   );
 } finally {
   await db.end().catch(() => {});
