@@ -8,6 +8,7 @@ import { getCourseContent, getCourseLessonIds } from "@/data/courses/registry";
 import type { MondePathwayVariant } from "@/data/courses/types";
 import { resolveMondePathwayVariant } from "@/lib/course-content/pathway";
 import { isTechnicalBetaCourseAccessEnabled } from "@/lib/release/technicalBeta";
+import { a1IsCourseReady } from "@/lib/monde";
 
 export type CourseViewer = {
   userId: string;
@@ -29,6 +30,9 @@ export async function loadCourseViewer(
 ): Promise<CourseViewer> {
   const course = getCourseContent(courseId);
   if (!course) redirect(`/${locale}/dashboard`);
+  if (courseId === "monde-adulte-de-a1" && !a1IsCourseReady()) {
+    redirect(`/${locale}/dashboard/view/mon-cours`);
+  }
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
