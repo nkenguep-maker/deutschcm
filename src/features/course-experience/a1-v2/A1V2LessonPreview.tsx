@@ -122,7 +122,7 @@ function Exercise({
             })}
           </div>
           <p className={styles.note}>Ordre choisi : {Array.isArray(response) ? response.map((item) => item.split(":").slice(1).join(":")).join(" ") : ""}</p>
-          <button className={styles.button} type="button" onClick={onSubmit}>Vérifier l’ordre</button>
+          <button className={styles.button} type="button" onClick={() => onSubmit()}>Vérifier l’ordre</button>
         </div>
       ) : null}
 
@@ -133,7 +133,7 @@ function Exercise({
           ) : (
             <input className={styles.input} value={typeof response === "string" ? response : ""} onChange={(e) => onResponse(e.target.value)} />
           )}
-          <button className={styles.button} type="button" onClick={onSubmit}>Vérifier</button>
+          <button className={styles.button} type="button" onClick={() => onSubmit()}>Vérifier</button>
         </>
       ) : null}
 
