@@ -42,6 +42,6 @@ hours, and the server-side learning memory remains closed to client roles.
 
 The source-integration gate is now complete (`fullLevelIntegrated=true`), but
 public A1 must remain unavailable while `status=REFONTE_IN_PROGRESS`.
-Critical native audio, two detailed generic mock exams, user QA, the full P-1
-release gate, and explicit signoff are still required before any Production
-publication or READY status.
+Two detailed generic mock exams are now integrated in QA. Critical native
+audio, user QA, the full P-1 release gate, and explicit signoff are still
+required before any Production publication or READY status.

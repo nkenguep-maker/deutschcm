@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { A1_V2_SYLLABUS, A1_V2_UNITS, MONDE_A1_V2_MANIFEST } from "@/content/monde-a1-v2";
+import { A1_V2_MOCK_EXAMS } from "@/content/monde-a1-v2/mock-exams";
 import styles from "./A1V2Preview.module.css";
 
 export function A1V2Overview({ locale }: { locale: string }) {
@@ -23,7 +24,7 @@ export function A1V2Overview({ locale }: { locale: string }) {
           <p className={styles.lead}>
             L’ancien parcours 6 unités / 36 leçons reste archivé. Le contrat vise 12 unités,
             60 leçons, 180+ exercices, 35–40 h guidées et 450–600 éléments lexicaux.
-            Le syllabus complet est un plan ; seules les unités explicitement marquées intégrées existent dans le runtime.
+            Les 12 unités sont maintenant intégrées dans le runtime QA. Le niveau public reste fermé tant que l’audio natif critique, la QA utilisateurs et le signoff final ne sont pas terminés.
           </p>
           <div className={styles.stats}>
             <div className={styles.stat}><strong>{A1_V2_UNITS.length}/{MONDE_A1_V2_MANIFEST.target.units}</strong><span>unités intégrées</span></div>
@@ -60,7 +61,7 @@ export function A1V2Overview({ locale }: { locale: string }) {
             })}
 
             <section className={styles.card}>
-              <div className={styles.kicker}>SYLLABUS 12 UNITÉS · PLAN, PAS CONTENU INTÉGRÉ</div>
+              <div className={styles.kicker}>SYLLABUS 12 UNITÉS · ÉTAT D’INTÉGRATION</div>
               <div className={styles.stack}>
                 {A1_V2_SYLLABUS.map((unit) => {
                   const integrated = MONDE_A1_V2_MANIFEST.integratedUnits.includes(unit.id);
@@ -71,6 +72,29 @@ export function A1V2Overview({ locale }: { locale: string }) {
                     </div>
                   );
                 })}
+              </div>
+            </section>
+
+            <section className={styles.card}>
+              <div className={styles.kicker}>EXAMENS BLANCS · QA · NON OFFICIELS</div>
+              <p className={styles.muted}>
+                Deux simulations génériques YEMA sont intégrées. Elles ne sont affiliées à aucun organisme d’examen ou de certification.
+              </p>
+              <div className={styles.stack}>
+                {A1_V2_MOCK_EXAMS.map((exam) => (
+                  <Link
+                    className={styles.lessonLink}
+                    key={exam.id}
+                    href={`/${locale}/qa/course-preview/de-a1-v2/mock/${exam.id}`}
+                  >
+                    <article className={styles.objective}>
+                      <strong>{exam.title}</strong><br />
+                      <span className={styles.muted}>
+                        4 sections · 17 tâches · {exam.durationMinutes} min · {exam.maxPoints} points internes
+                      </span>
+                    </article>
+                  </Link>
+                ))}
               </div>
             </section>
           </div>

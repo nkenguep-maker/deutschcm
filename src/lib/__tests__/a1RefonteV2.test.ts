@@ -52,7 +52,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
     expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
     expect(MONDE_A1_V2_MANIFEST.readiness.criticalNativeAudioReady).toBe(false);
-    expect(MONDE_A1_V2_MANIFEST.readiness.mockExamsReady).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.readiness.mockExamsReady).toBe(true);
   });
 
   it("locks a transparent 12-unit / 60-lesson reconstruction plan without pretending it is integrated", () => {
@@ -284,7 +284,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(MONDE_A1_V2_MANIFEST.integratedUnits).toEqual(A1_V2_UNITS.map((item) => item.id));
     expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(true);
     expect(MONDE_A1_V2_MANIFEST.readiness.criticalNativeAudioReady).toBe(false);
-    expect(MONDE_A1_V2_MANIFEST.readiness.mockExamsReady).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.readiness.mockExamsReady).toBe(true);
     expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
   });
 

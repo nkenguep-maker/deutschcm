@@ -90,8 +90,8 @@ if (!/fullLevelIntegrated:\s*true/.test(manifestSource)) {
 if (!/criticalNativeAudioReady:\s*false/.test(manifestSource)) {
   throw new Error("A1 refonte gate: critical native audio must remain closed until real recordings are approved");
 }
-if (!/mockExamsReady:\s*false/.test(manifestSource)) {
-  throw new Error("A1 refonte gate: mock exams must remain closed until both detailed exams are integrated");
+if (!/mockExamsReady:\s*true/.test(manifestSource)) {
+  throw new Error("A1 refonte gate: both detailed generic mock exams must be integrated");
 }
 
 const db = new Client({ connectionString });
