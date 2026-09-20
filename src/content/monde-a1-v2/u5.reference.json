@@ -1,0 +1,1816 @@
+{
+  "id": "de-a1-u5",
+  "order": 5,
+  "title": "Se déplacer en ville",
+  "schemaVersion": "2.0",
+  "contentVersion": "2026.09.20-u5-refonte-r1",
+  "status": "refonte-a-valider",
+  "note": "Refonte v2 du matériau éditorial legacy U5 : orientation, impératif de politesse, reformulation et ticket. À partir de cette unité, toutes les consignes d’exercice sont en allemand.",
+  "cards": [
+    {
+      "id": "card.u5.entschuldigung",
+      "kind": "chunk",
+      "de": "Entschuldigung.",
+      "fr": "Excusez-moi.",
+      "introducedIn": "de-a1-u5-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.wo-ist",
+      "kind": "structure",
+      "de": "Wo ist …?",
+      "fr": "Où est… ?",
+      "introducedIn": "de-a1-u5-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.wo-sind",
+      "kind": "structure",
+      "de": "Wo sind …?",
+      "fr": "Où sont… ?",
+      "introducedIn": "de-a1-u5-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.geradeaus",
+      "kind": "lexical",
+      "de": "geradeaus",
+      "fr": "tout droit",
+      "introducedIn": "de-a1-u5-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.links",
+      "kind": "lexical",
+      "de": "links",
+      "fr": "à gauche",
+      "introducedIn": "de-a1-u5-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.rechts",
+      "kind": "lexical",
+      "de": "rechts",
+      "fr": "à droite",
+      "introducedIn": "de-a1-u5-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.ampel",
+      "kind": "lexical",
+      "de": "die Ampel",
+      "fr": "le feu de circulation",
+      "introducedIn": "de-a1-u5-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.kreuzung",
+      "kind": "lexical",
+      "de": "die Kreuzung",
+      "fr": "le carrefour",
+      "introducedIn": "de-a1-u5-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.neben",
+      "kind": "lexical",
+      "de": "neben",
+      "fr": "à côté de",
+      "introducedIn": "de-a1-u5-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.gegenueber",
+      "kind": "lexical",
+      "de": "gegenüber",
+      "fr": "en face de",
+      "introducedIn": "de-a1-u5-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.zu-fuss",
+      "kind": "chunk",
+      "de": "zu Fuß",
+      "fr": "à pied",
+      "introducedIn": "de-a1-u5-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.bahnhof",
+      "kind": "lexical",
+      "de": "der Bahnhof",
+      "fr": "la gare",
+      "introducedIn": "de-a1-u5-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.haltestelle",
+      "kind": "lexical",
+      "de": "die Haltestelle",
+      "fr": "l’arrêt",
+      "introducedIn": "de-a1-u5-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.apotheke",
+      "kind": "lexical",
+      "de": "die Apotheke",
+      "fr": "la pharmacie",
+      "introducedIn": "de-a1-u5-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.hotel",
+      "kind": "lexical",
+      "de": "das Hotel",
+      "fr": "l’hôtel",
+      "introducedIn": "de-a1-u5-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.bank",
+      "kind": "lexical",
+      "de": "die Bank",
+      "fr": "la banque",
+      "introducedIn": "de-a1-u5-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.station",
+      "kind": "lexical",
+      "de": "die Station",
+      "fr": "la station / l’arrêt",
+      "introducedIn": "de-a1-u5-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.u-bahn",
+      "kind": "lexical",
+      "de": "die U-Bahn",
+      "fr": "le métro",
+      "introducedIn": "de-a1-u5-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.bus",
+      "kind": "lexical",
+      "de": "der Bus",
+      "fr": "le bus",
+      "introducedIn": "de-a1-u5-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.linie",
+      "kind": "lexical",
+      "de": "die Linie",
+      "fr": "la ligne",
+      "introducedIn": "de-a1-u5-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.fahrkarte",
+      "kind": "lexical",
+      "de": "die Fahrkarte",
+      "fr": "le billet / ticket",
+      "introducedIn": "de-a1-u5-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.nach",
+      "kind": "lexical",
+      "de": "nach",
+      "fr": "vers / à destination de",
+      "introducedIn": "de-a1-u5-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.einfach",
+      "kind": "lexical",
+      "de": "einfach",
+      "fr": "aller simple (billet)",
+      "introducedIn": "de-a1-u5-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.hin-zurueck",
+      "kind": "chunk",
+      "de": "hin und zurück",
+      "fr": "aller-retour",
+      "introducedIn": "de-a1-u5-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.umsteigen",
+      "kind": "lexical",
+      "de": "umsteigen",
+      "fr": "changer / faire une correspondance",
+      "introducedIn": "de-a1-u5-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.stationen",
+      "kind": "lexical",
+      "de": "die Stationen",
+      "fr": "les arrêts / stations",
+      "introducedIn": "de-a1-u5-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.weit",
+      "kind": "lexical",
+      "de": "weit",
+      "fr": "loin",
+      "introducedIn": "de-a1-u5-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.minuten",
+      "kind": "lexical",
+      "de": "die Minuten",
+      "fr": "les minutes",
+      "introducedIn": "de-a1-u5-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.gehen-sie",
+      "kind": "structure",
+      "de": "Gehen Sie …",
+      "fr": "Allez… (poli)",
+      "introducedIn": "de-a1-u5-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.nehmen-sie",
+      "kind": "structure",
+      "de": "Nehmen Sie …",
+      "fr": "Prenez… (poli)",
+      "introducedIn": "de-a1-u5-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.an-der-ampel",
+      "kind": "chunk",
+      "de": "an der Ampel",
+      "fr": "au feu",
+      "introducedIn": "de-a1-u5-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.an-der-kreuzung",
+      "kind": "chunk",
+      "de": "an der Kreuzung",
+      "fr": "au carrefour",
+      "introducedIn": "de-a1-u5-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.neben-apotheke",
+      "kind": "chunk",
+      "de": "neben der Apotheke",
+      "fr": "à côté de la pharmacie",
+      "introducedIn": "de-a1-u5-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.gegenueber-bahnhof",
+      "kind": "chunk",
+      "de": "gegenüber dem Bahnhof",
+      "fr": "en face de la gare",
+      "introducedIn": "de-a1-u5-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.also",
+      "kind": "lexical",
+      "de": "also",
+      "fr": "donc / alors",
+      "introducedIn": "de-a1-u5-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.also-route",
+      "kind": "chunk",
+      "de": "Also geradeaus und dann links?",
+      "fr": "Donc tout droit puis à gauche ?",
+      "introducedIn": "de-a1-u5-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.vielen-dank",
+      "kind": "chunk",
+      "de": "Vielen Dank!",
+      "fr": "Merci beaucoup !",
+      "introducedIn": "de-a1-u5-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.gern-geschehen",
+      "kind": "chunk",
+      "de": "Gern geschehen.",
+      "fr": "Avec plaisir.",
+      "introducedIn": "de-a1-u5-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.fahrkarte-nach",
+      "kind": "chunk",
+      "de": "Eine Fahrkarte nach …, bitte.",
+      "fr": "Un billet pour…, s’il vous plaît.",
+      "introducedIn": "de-a1-u5-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u5.wie-viele-stationen",
+      "kind": "chunk",
+      "de": "Wie viele Stationen?",
+      "fr": "Combien d’arrêts ?",
+      "introducedIn": "de-a1-u5-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj.u5.reperer",
+      "label": "Repérer direction, point de repère et durée dans un itinéraire oral"
+    },
+    {
+      "id": "obj.u5.directions",
+      "label": "Utiliser geradeaus, links, rechts et les repères urbains"
+    },
+    {
+      "id": "obj.u5.demander",
+      "label": "Demander poliment où se trouve un lieu"
+    },
+    {
+      "id": "obj.u5.imperatif",
+      "label": "Comprendre et produire l’impératif de politesse avec Sie"
+    },
+    {
+      "id": "obj.u5.transport",
+      "label": "Acheter un billet simple et comprendre quelques questions de transport"
+    },
+    {
+      "id": "obj.u5.interagir",
+      "label": "Demander, reformuler et confirmer un itinéraire simple"
+    }
+  ],
+  "remediations": [
+    {
+      "id": "rem.u5.links-rechts",
+      "objectiveId": "obj.u5.directions",
+      "durationSeconds": 105,
+      "explanation": "links = gauche, rechts = droite, geradeaus = tout droit. Associe chaque mot à un geste ou une flèche.",
+      "contrast": [
+        {
+          "de": "Gehen Sie geradeaus.",
+          "fr": "Allez tout droit.",
+          "ok": true
+        },
+        {
+          "de": "Dann links.",
+          "fr": "Puis à gauche.",
+          "ok": true
+        },
+        {
+          "de": "Dann rechts.",
+          "fr": "Puis à droite.",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u5.links-rechts.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "← = ____",
+          "answer": "links",
+          "acceptedAnswers": [
+            "links"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u5.links-rechts.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "→ = ____",
+          "answer": "rechts",
+          "acceptedAnswers": [
+            "rechts"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u5.wo-ist",
+      "objectiveId": "obj.u5.demander",
+      "durationSeconds": 110,
+      "explanation": "Wo ist…? sert au singulier ; Wo sind…? au pluriel.",
+      "contrast": [
+        {
+          "de": "Wo ist der Bahnhof?",
+          "fr": "Où est la gare ?",
+          "ok": true
+        },
+        {
+          "de": "Wo sind die Toiletten?",
+          "fr": "Où sont les toilettes ?",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u5.wo-ist.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Wo ____ der Bahnhof?",
+          "answer": "ist",
+          "acceptedAnswers": [
+            "ist"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u5.wo-ist.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Wo ____ die Toiletten?",
+          "answer": "sind",
+          "acceptedAnswers": [
+            "sind"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u5.sie-imperativ",
+      "objectiveId": "obj.u5.imperatif",
+      "durationSeconds": 120,
+      "explanation": "À l’impératif poli, utilise verbe + Sie : Gehen Sie…, Nehmen Sie….",
+      "contrast": [
+        {
+          "de": "Gehen Sie geradeaus.",
+          "fr": "Allez tout droit.",
+          "ok": true
+        },
+        {
+          "de": "Nehmen Sie den Bus 100.",
+          "fr": "Prenez le bus 100.",
+          "ok": true
+        },
+        {
+          "de": "Sie gehen geradeaus!",
+          "fr": "—",
+          "ok": false,
+          "why": "La cible polie travaillée est Gehen Sie …"
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u5.sie-imperativ.i1",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue die Anweisung.",
+          "tokens": [
+            "Sie",
+            "geradeaus",
+            "Gehen"
+          ],
+          "answer": [
+            "Gehen",
+            "Sie",
+            "geradeaus"
+          ],
+          "normalization": []
+        },
+        {
+          "id": "rem.u5.sie-imperativ.i2",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue die Anweisung.",
+          "tokens": [
+            "den Bus",
+            "Sie",
+            "Nehmen"
+          ],
+          "answer": [
+            "Nehmen",
+            "Sie",
+            "den Bus"
+          ],
+          "normalization": []
+        }
+      ]
+    },
+    {
+      "id": "rem.u5.also",
+      "objectiveId": "obj.u5.interagir",
+      "durationSeconds": 105,
+      "explanation": "also sert à reformuler ce que tu as compris avant de partir : Also geradeaus und dann links?",
+      "contrast": [
+        {
+          "de": "Also geradeaus und dann links?",
+          "fr": "Donc tout droit puis à gauche ?",
+          "ok": true
+        },
+        {
+          "de": "Also zwei Stationen?",
+          "fr": "Donc deux arrêts ?",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u5.also.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "____ geradeaus und dann rechts?",
+          "answer": "Also",
+          "acceptedAnswers": [
+            "Also"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u5.also.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "____ drei Stationen?",
+          "answer": "Also",
+          "acceptedAnswers": [
+            "Also"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u5.fahrkarte",
+      "objectiveId": "obj.u5.transport",
+      "durationSeconds": 115,
+      "explanation": "Pour un billet : Eine Fahrkarte nach + destination, bitte. einfach = aller simple ; hin und zurück = aller-retour.",
+      "contrast": [
+        {
+          "de": "Eine Fahrkarte nach Potsdam, bitte.",
+          "fr": "Un billet pour Potsdam, s’il vous plaît.",
+          "ok": true
+        },
+        {
+          "de": "Einfach, bitte.",
+          "fr": "Aller simple, s’il vous plaît.",
+          "ok": true
+        },
+        {
+          "de": "Hin und zurück, bitte.",
+          "fr": "Aller-retour, s’il vous plaît.",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u5.fahrkarte.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Eine Fahrkarte ____ Potsdam, bitte.",
+          "answer": "nach",
+          "acceptedAnswers": [
+            "nach"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u5.fahrkarte.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Nur Hinfahrt: ____, bitte.",
+          "answer": "Einfach",
+          "acceptedAnswers": [
+            "Einfach"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "de-a1-u5-l1",
+      "order": 1,
+      "phase": "Comprends",
+      "title": "Comprendre des indications simples",
+      "objectiveIds": [
+        "obj.u5.reperer",
+        "obj.u5.directions"
+      ],
+      "durationMinutes": 30,
+      "reveil": {
+        "cardIds": [
+          "card.u4.wann",
+          "card.u4.minuten",
+          "card.u3.guten-tag",
+          "card.u1.sie"
+        ],
+        "itemCount": 4,
+        "maxSeconds": 90,
+        "selection": "cartes dues/ratées des unités précédentes avant l’orientation"
+      },
+      "blocks": [
+        {
+          "id": "blk.u5.l1.intro",
+          "type": "intro",
+          "title": "Mission",
+          "text": "Repère direction, point de repère et durée dans l’itinéraire vers la station."
+        },
+        {
+          "id": "blk.u5.l1.dialogue",
+          "type": "dialogueRef",
+          "dialogueId": "de-a1-u5-dialogue",
+          "speeds": [
+            "slow",
+            "natural"
+          ],
+          "instruction": "Höre zuerst nur die Richtungen. Höre dann auf Ort und Dauer."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u5-l1-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u5.reperer",
+          "cardIds": [
+            "card.u5.geradeaus"
+          ],
+          "promptLang": "de",
+          "prompt": "Was soll Ibrahim zuerst machen?",
+          "audioRef": "de-a1-u5-dialogue#seg2",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Geradeaus gehen.",
+              "correct": true,
+              "feedback": "Ja. Die Passantin sagt zuerst: Gehen Sie hier geradeaus."
+            },
+            {
+              "id": "b",
+              "text": "Rechts gehen.",
+              "correct": false,
+              "feedback": "rechts kommt in dieser Wegbeschreibung nicht zuerst."
+            },
+            {
+              "id": "c",
+              "text": "Den Bus nehmen.",
+              "correct": false,
+              "feedback": "Im Dialog wird kein Bus als erster Schritt genannt."
+            }
+          ],
+          "remediationRef": "rem.u5.links-rechts"
+        },
+        {
+          "id": "de-a1-u5-l1-e2",
+          "type": "audioCloze",
+          "objectiveId": "obj.u5.reperer",
+          "cardIds": [
+            "card.u5.links",
+            "card.u5.ampel"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: an der Ampel ____.",
+          "audioRef": "de-a1-u5-dialogue#seg2",
+          "answer": "links",
+          "acceptedAnswers": [
+            "links"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^rechts$",
+              "accept": false,
+              "note": "Im Dialog sagt die Passantin links."
+            }
+          ],
+          "remediationRef": "rem.u5.links-rechts"
+        },
+        {
+          "id": "de-a1-u5-l1-e3",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u5.reperer",
+          "cardIds": [
+            "card.u5.neben-apotheke"
+          ],
+          "promptLang": "de",
+          "prompt": "Wo ist die Station?",
+          "audioRef": "de-a1-u5-dialogue#seg4",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Neben der Apotheke.",
+              "correct": true,
+              "feedback": "Genau. Die Station ist neben der Apotheke."
+            },
+            {
+              "id": "b",
+              "text": "Gegenüber dem Bahnhof.",
+              "correct": false,
+              "feedback": "gegenüber dem Bahnhof ist ein anderes Ortsmuster, nicht die gehörte Antwort."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u5-l1-e4",
+          "type": "dictation",
+          "objectiveId": "obj.u5.reperer",
+          "cardIds": [
+            "card.u5.zu-fuss",
+            "card.u5.minuten"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib den Satzteil, den du hörst.",
+          "audioRef": "de-a1-u5-dialogue#seg6",
+          "answer": "Fünf Minuten zu Fuß.",
+          "acceptedAnswers": [
+            "Fünf Minuten zu Fuß.",
+            "Fuenf Minuten zu Fuss."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut",
+            "eszett"
+          ],
+          "feedbackIncorrect": "Achte auf fünf Minuten und zu Fuß."
+        },
+        {
+          "id": "de-a1-u5-l1-e5",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u5.demander",
+          "cardIds": [
+            "card.u5.entschuldigung",
+            "card.u5.wo-ist",
+            "card.u5.bahnhof"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib eine höfliche Frage nach dem Bahnhof.",
+          "answer": "Entschuldigung, wo ist der Bahnhof?",
+          "acceptedAnswers": [
+            "Entschuldigung, wo ist der Bahnhof?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^entschuldigung wo sind der bahnhof$",
+              "accept": false,
+              "note": "Bahnhof ist Singular: Wo ist der Bahnhof?"
+            }
+          ],
+          "remediationRef": "rem.u5.wo-ist"
+        }
+      ],
+      "completionMessage": "Tu comprends les informations de base d’un itinéraire court."
+    },
+    {
+      "id": "de-a1-u5-l2",
+      "order": 2,
+      "phase": "Pratique",
+      "title": "Utiliser directions et repères",
+      "objectiveIds": [
+        "obj.u5.directions",
+        "obj.u5.imperatif"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u5.geradeaus",
+          "card.u5.links",
+          "card.u5.rechts",
+          "card.u4.dann",
+          "card.u3.bitte"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "directions dues d’abord puis connecteur et politesse déjà connus"
+      },
+      "blocks": [
+        {
+          "id": "blk.u5.l2.dir",
+          "type": "model",
+          "title": "Vier Kernsignale",
+          "textDe": "geradeaus · links · rechts · neben"
+        },
+        {
+          "id": "blk.u5.l2.imp",
+          "type": "rule",
+          "title": "Höfliche Anweisung",
+          "textDe": "Gehen Sie geradeaus. · Gehen Sie an der Kreuzung rechts."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u5-l2-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u5.directions",
+          "cardIds": [
+            "card.u5.rechts"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib das Wort für →.",
+          "answer": "rechts",
+          "acceptedAnswers": [
+            "rechts"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^links$",
+              "accept": false,
+              "note": "→ bedeutet rechts."
+            }
+          ],
+          "remediationRef": "rem.u5.links-rechts"
+        },
+        {
+          "id": "de-a1-u5-l2-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u5.imperatif",
+          "cardIds": [
+            "card.u5.gehen-sie",
+            "card.u5.geradeaus"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die höfliche Anweisung.",
+          "tokens": [
+            "Sie",
+            "geradeaus",
+            "Gehen"
+          ],
+          "answer": [
+            "Gehen",
+            "Sie",
+            "geradeaus"
+          ],
+          "feedbackIncorrect": "Das Muster ist Verb + Sie + Ergänzung.",
+          "remediationRef": "rem.u5.sie-imperativ"
+        },
+        {
+          "id": "de-a1-u5-l2-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u5.directions",
+          "cardIds": [
+            "card.u5.an-der-kreuzung",
+            "card.u5.rechts"
+          ],
+          "promptLang": "de",
+          "prompt": "Gehen Sie geradeaus. → Ergänze: an der Kreuzung rechts.",
+          "answer": "Gehen Sie geradeaus und an der Kreuzung rechts.",
+          "acceptedAnswers": [
+            "Gehen Sie geradeaus und an der Kreuzung rechts."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "feedbackIncorrect": "Verbinde die zwei Richtungen mit und."
+        },
+        {
+          "id": "de-a1-u5-l2-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u5.imperatif",
+          "cardIds": [
+            "card.u5.gehen-sie",
+            "card.u5.links",
+            "card.u5.rechts"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich nach.",
+          "targets": [
+            {
+              "id": "d1",
+              "de": "Gehen Sie geradeaus.",
+              "audioRef": "drill.u5.dir1",
+              "maxSeconds": 5
+            },
+            {
+              "id": "d2",
+              "de": "Dann links.",
+              "audioRef": "drill.u5.dir2",
+              "maxSeconds": 4
+            },
+            {
+              "id": "d3",
+              "de": "An der Kreuzung rechts.",
+              "audioRef": "drill.u5.dir3",
+              "maxSeconds": 5
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur constrained QA, keine freie automatische Sprechbewertung."
+        },
+        {
+          "id": "de-a1-u5-l2-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u5.directions",
+          "cardIds": [
+            "card.u5.geradeaus",
+            "card.u5.links",
+            "card.u5.rechts",
+            "card.u5.neben"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib eine Wegbeschreibung mit drei Schritten und einem Orientierungspunkt.",
+          "minimumWords": 24,
+          "successCriteria": [
+            "drei Schritte",
+            "mindestens zwei Richtungen",
+            "ein Orientierungspunkt"
+          ],
+          "autoCheck": [
+            "contient geradeaus",
+            "contient links"
+          ],
+          "note": "Du kannst einen fiktiven Stadtplan benutzen."
+        }
+      ],
+      "completionMessage": "Tu peux donner un itinéraire très court avec des repères simples."
+    },
+    {
+      "id": "de-a1-u5-l3",
+      "order": 3,
+      "phase": "Pratique",
+      "title": "Demander et reformuler son chemin",
+      "objectiveIds": [
+        "obj.u5.demander",
+        "obj.u5.interagir"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u5.entschuldigung",
+          "card.u5.wo-ist",
+          "card.u5.also",
+          "card.u5.vielen-dank",
+          "card.u1.v2"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "questions et reformulation dues d’abord"
+      },
+      "blocks": [
+        {
+          "id": "blk.u5.l3.ask",
+          "type": "model",
+          "title": "Fragen",
+          "textDe": "Entschuldigung, wo ist der Bahnhof? · Wo ist die nächste U-Bahn-Station?"
+        },
+        {
+          "id": "blk.u5.l3.check",
+          "type": "strategy",
+          "title": "Verstehen sichern",
+          "textDe": "Also geradeaus und dann links? · Also zwei Stationen?"
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u5-l3-e1",
+          "type": "audioCloze",
+          "objectiveId": "obj.u5.demander",
+          "cardIds": [
+            "card.u5.wo-ist",
+            "card.u5.bahnhof"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Wo ____ der Bahnhof?",
+          "audioRef": "drill.u5.wo-bahnhof",
+          "answer": "ist",
+          "acceptedAnswers": [
+            "ist"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^sind$",
+              "accept": false,
+              "note": "Bahnhof ist Singular: ist."
+            }
+          ],
+          "remediationRef": "rem.u5.wo-ist"
+        },
+        {
+          "id": "de-a1-u5-l3-e2",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u5.interagir",
+          "cardIds": [
+            "card.u5.also-route"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib eine Rückfrage: geradeaus, dann links.",
+          "answer": "Also geradeaus und dann links?",
+          "acceptedAnswers": [
+            "Also geradeaus und dann links?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "feedbackIncorrect": "Beginne mit Also und wiederhole die zwei Richtungen.",
+          "remediationRef": "rem.u5.also"
+        },
+        {
+          "id": "de-a1-u5-l3-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u5.demander",
+          "cardIds": [
+            "card.u5.entschuldigung",
+            "card.u5.wo-ist",
+            "card.u5.haltestelle"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "ist",
+            "Entschuldigung",
+            "die Haltestelle",
+            "wo"
+          ],
+          "answer": [
+            "Entschuldigung",
+            "wo",
+            "ist",
+            "die Haltestelle"
+          ],
+          "feedbackIncorrect": "Entschuldigung + wo + ist + Ort.",
+          "remediationRef": "rem.u5.wo-ist"
+        },
+        {
+          "id": "de-a1-u5-l3-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u5.interagir",
+          "cardIds": [
+            "card.u5.also",
+            "card.u5.rechts"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Rückfrage hörst du?",
+          "audioRef": "drill.u5.also-right",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Also geradeaus und dann rechts?",
+              "correct": true,
+              "feedback": "Ja. Die Person prüft die Route."
+            },
+            {
+              "id": "b",
+              "text": "Wo ist der Bahnhof?",
+              "correct": false,
+              "feedback": "Das wäre die erste Frage, keine Reformulierung."
+            }
+          ],
+          "remediationRef": "rem.u5.also"
+        },
+        {
+          "id": "de-a1-u5-l3-e5",
+          "type": "transformation",
+          "objectiveId": "obj.u5.interagir",
+          "cardIds": [
+            "card.u5.vielen-dank",
+            "card.u5.garn-geschehen"
+          ],
+          "promptLang": "de",
+          "prompt": "Ergänze den Dialog höflich: Route verstanden → bedanken.",
+          "answer": "Vielen Dank!",
+          "acceptedAnswers": [
+            "Vielen Dank!",
+            "Vielen Dank"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "feedbackIncorrect": "Nach einer Wegbeschreibung passt Vielen Dank!"
+        }
+      ],
+      "completionMessage": "Tu peux demander un lieu et vérifier l’itinéraire avant de partir."
+    },
+    {
+      "id": "de-a1-u5-l4",
+      "order": 4,
+      "phase": "Produis",
+      "title": "Acheter un billet simple",
+      "objectiveIds": [
+        "obj.u5.transport",
+        "obj.u5.interagir"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u5.fahrkarte",
+          "card.u5.nach",
+          "card.u5.einfach",
+          "card.u5.stationen",
+          "card.u3.das-macht"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "transport puis prix U3 pour réutiliser la transaction"
+      },
+      "blocks": [
+        {
+          "id": "blk.u5.l4.ticket",
+          "type": "model",
+          "title": "Am Schalter",
+          "textDe": "Eine Fahrkarte nach Potsdam, bitte. — Einfach oder hin und zurück? — Einfach, bitte."
+        },
+        {
+          "id": "blk.u5.l4.questions",
+          "type": "model",
+          "title": "Nützliche Fragen",
+          "textDe": "Welche Linie? · Wie viele Stationen? · Wo muss ich umsteigen?"
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u5-l4-e1",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u5.transport",
+          "cardIds": [
+            "card.u5.fahrkarte-nach"
+          ],
+          "promptLang": "de",
+          "prompt": "Was kauft die Person?",
+          "audioRef": "drill.u5.ticket-potsdam",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Eine Fahrkarte nach Potsdam.",
+              "correct": true,
+              "feedback": "Genau. Die Zielstadt ist Potsdam."
+            },
+            {
+              "id": "b",
+              "text": "Eine Fahrkarte nach Berlin.",
+              "correct": false,
+              "feedback": "Berlin ist nicht das gehörte Ziel."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u5-l4-e2",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u5.transport",
+          "cardIds": [
+            "card.u5.fahrkarte-nach"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib: ein Ticket nach Leipzig, höflich.",
+          "answer": "Eine Fahrkarte nach Leipzig, bitte.",
+          "acceptedAnswers": [
+            "Eine Fahrkarte nach Leipzig, bitte."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^eine fahrkarte in leipzig bitte$",
+              "accept": false,
+              "note": "Für das Ziel benutzt der Chunk nach: nach Leipzig."
+            }
+          ],
+          "remediationRef": "rem.u5.fahrkarte"
+        },
+        {
+          "id": "de-a1-u5-l4-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u5.transport",
+          "cardIds": [
+            "card.u5.wie-viele-stationen"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "Stationen",
+            "viele",
+            "Wie"
+          ],
+          "answer": [
+            "Wie",
+            "viele",
+            "Stationen"
+          ],
+          "feedbackIncorrect": "Das feste Fragewort ist Wie viele …?"
+        },
+        {
+          "id": "de-a1-u5-l4-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u5.transport",
+          "cardIds": [
+            "card.u5.fahrkarte-nach",
+            "card.u5.einfach",
+            "card.u5.wie-viele-stationen"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich nach.",
+          "targets": [
+            {
+              "id": "t1",
+              "de": "Eine Fahrkarte nach Potsdam, bitte.",
+              "audioRef": "drill.u5.ticket1",
+              "maxSeconds": 7
+            },
+            {
+              "id": "t2",
+              "de": "Einfach, bitte.",
+              "audioRef": "drill.u5.ticket2",
+              "maxSeconds": 4
+            },
+            {
+              "id": "t3",
+              "de": "Wie viele Stationen?",
+              "audioRef": "drill.u5.ticket3",
+              "maxSeconds": 5
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Constrained QA only."
+        },
+        {
+          "id": "de-a1-u5-l4-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u5.transport",
+          "cardIds": [
+            "card.u5.fahrkarte-nach",
+            "card.u5.einfach",
+            "card.u5.stationen"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib einen kurzen Dialog am Fahrkartenschalter: Ziel, einfach/hin und zurück, Preis und eine Zusatzfrage.",
+          "minimumWords": 32,
+          "successCriteria": [
+            "Ziel",
+            "Tickettyp",
+            "Preis",
+            "Zusatzfrage"
+          ],
+          "autoCheck": [
+            "contient Fahrkarte",
+            "contient bitte"
+          ],
+          "note": "Nutze eine echte oder erfundene Stadt."
+        }
+      ],
+      "completionMessage": "Tu peux acheter un billet simple et poser une question de transport."
+    },
+    {
+      "id": "de-a1-u5-l5",
+      "order": 5,
+      "phase": "Valide",
+      "title": "Mission finale : trouver la gare",
+      "objectiveIds": [
+        "obj.u5.reperer",
+        "obj.u5.directions",
+        "obj.u5.demander",
+        "obj.u5.imperatif",
+        "obj.u5.transport",
+        "obj.u5.interagir"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u5.wo-ist",
+          "card.u5.geradeaus",
+          "card.u5.also",
+          "card.u5.fahrkarte-nach",
+          "card.u5.vielen-dank"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "erreurs persistantes puis cartes dues de la mission"
+      },
+      "blocks": [
+        {
+          "id": "blk.u5.l5.scenario",
+          "type": "scenario",
+          "title": "Situation",
+          "text": "Du musst den Bahnhof finden und danach eine Fahrkarte kaufen."
+        },
+        {
+          "id": "blk.u5.l5.success",
+          "type": "rubric",
+          "title": "Erfolg",
+          "text": "Ort fragen, zwei Richtungen verstehen/reformulieren, danken, Ticket mit Ziel kaufen."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u5-l5-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u5.demander",
+          "cardIds": [
+            "card.u5.wo-ist",
+            "card.u5.bahnhof"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Frage passt zum Bahnhof?",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Wo ist der Bahnhof?",
+              "correct": true,
+              "feedback": "Genau. Bahnhof ist ein Ort im Singular."
+            },
+            {
+              "id": "b",
+              "text": "Wo sind der Bahnhof?",
+              "correct": false,
+              "feedback": "Bahnhof ist Singular: Wo ist …?"
+            },
+            {
+              "id": "c",
+              "text": "Was kostet der Bahnhof?",
+              "correct": false,
+              "feedback": "kosten fragt nach einem Preis, nicht nach einem Ort."
+            }
+          ],
+          "remediationRef": "rem.u5.wo-ist"
+        },
+        {
+          "id": "de-a1-u5-l5-e2",
+          "type": "dictation",
+          "objectiveId": "obj.u5.imperatif",
+          "cardIds": [
+            "card.u5.gehen-sie",
+            "card.u5.geradeaus",
+            "card.u5.links"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib die Anweisung.",
+          "audioRef": "drill.u5.final-dictation",
+          "answer": "Gehen Sie geradeaus und dann links.",
+          "acceptedAnswers": [
+            "Gehen Sie geradeaus und dann links."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^sie gehen geradeaus und dann links$",
+              "accept": false,
+              "note": "Die höfliche Anweisung beginnt mit Gehen Sie."
+            }
+          ],
+          "remediationRef": "rem.u5.sie-imperativ"
+        },
+        {
+          "id": "de-a1-u5-l5-e3",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u5.transport",
+          "cardIds": [
+            "card.u5.fahrkarte-nach"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib eine höfliche Bitte um eine Fahrkarte nach Berlin.",
+          "answer": "Eine Fahrkarte nach Berlin, bitte.",
+          "acceptedAnswers": [
+            "Eine Fahrkarte nach Berlin, bitte."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u5.fahrkarte"
+        },
+        {
+          "id": "de-a1-u5-l5-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u5.interagir",
+          "cardIds": [
+            "card.u5.also-route"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Rückfrage hörst du?",
+          "audioRef": "drill.u5.final-listening",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Also geradeaus und dann links?",
+              "correct": true,
+              "feedback": "Ja. Die Route wird wiederholt und geprüft."
+            },
+            {
+              "id": "b",
+              "text": "Eine Fahrkarte nach Berlin, bitte.",
+              "correct": false,
+              "feedback": "Das ist eine Ticketbitte, keine Weg-Reformulierung."
+            }
+          ],
+          "remediationRef": "rem.u5.also"
+        },
+        {
+          "id": "de-a1-u5-l5-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u5.interagir",
+          "cardIds": [
+            "card.u5.entschuldigung",
+            "card.u5.wo-ist",
+            "card.u5.also",
+            "card.u5.vielen-dank",
+            "card.u5.fahrkarte-nach"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib die ganze Mission in 8–10 Zeilen: Bahnhof fragen, Weg reformulieren, danken, dann ein Ticket kaufen.",
+          "minimumWords": 48,
+          "successCriteria": [
+            "Ortsfrage",
+            "zwei Richtungen",
+            "Also-Reformulierung",
+            "Dank",
+            "Fahrkarte"
+          ],
+          "autoCheck": [
+            "contient Entschuldigung",
+            "contient Also",
+            "contient Fahrkarte"
+          ],
+          "note": "Freie Sprechqualität wird nicht automatisch bewertet."
+        }
+      ],
+      "completionMessage": "Unité 5 terminée en QA : tu peux demander ton chemin et acheter un billet simple."
+    }
+  ],
+  "qualityGates": {
+    "exerciseMix": {
+      "recognitionMax": 0.25,
+      "productiveWrittenMin": 0.35,
+      "structureMin": 0.2,
+      "oralMin": 0.2
+    },
+    "promptLang": {
+      "deMin": 1,
+      "note": "À partir de U5, toutes les consignes d’exercice sont en allemand."
+    },
+    "spacedRecall": {
+      "minCardsRevisitedPerLesson": 3
+    },
+    "feedback": {
+      "distinctPerDistractor": true
+    },
+    "normalization": {
+      "requiredOn": [
+        "fillBlank",
+        "dictation",
+        "productiveRecall",
+        "transformation",
+        "audioCloze"
+      ]
+    }
+  }
+}
