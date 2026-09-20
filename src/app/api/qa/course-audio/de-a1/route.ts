@@ -6,7 +6,12 @@ import { buildA1V2NativeAudioInventory } from "@/content/monde-a1-v2/native-audi
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+function csvCell(value: string | number | undefined) {
+  const text = value === undefined ? "" : String(value);
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+export async function GET(request: Request) {
   if (process.env.VERCEL_ENV === "production") {
     return NextResponse.json({ ok: false, error: "NOT_FOUND" }, { status: 404 });
   }
@@ -49,6 +54,31 @@ export async function GET() {
   );
 
   const complete = inventory.length > 0 && missing.length === 0;
+  const format = new URL(request.url).searchParams.get("format");
+
+  if (format === "csv") {
+    const rows = [
+      ["ref", "kind", "unitId", "lessonId", "text", "publicPath", "present"],
+      ...assets.map((asset) => [
+        asset.ref,
+        asset.kind,
+        asset.unitId,
+        asset.lessonId ?? "",
+        asset.text,
+        asset.publicPath,
+        asset.present ? "yes" : "no",
+      ]),
+    ];
+    const csv = rows.map((row) => row.map((cell) => csvCell(cell)).join(",")).join("\n");
+    return new Response(csv, {
+      status: 200,
+      headers: {
+        "content-type": "text/csv; charset=utf-8",
+        "content-disposition": 'attachment; filename="yema-a1-native-audio-pack.csv"',
+        "cache-control": "no-store",
+      },
+    });
+  }
 
   return NextResponse.json({
     ok: true,
