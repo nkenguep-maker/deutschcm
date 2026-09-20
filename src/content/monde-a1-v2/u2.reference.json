@@ -1,0 +1,1871 @@
+{
+  "id": "de-a1-u2",
+  "order": 2,
+  "title": "Parler de sa famille",
+  "schemaVersion": "2.0",
+  "contentVersion": "2026.09.20-u2-refonte-r1",
+  "status": "refonte-a-valider",
+  "note": "U2 reconstruite à partir du matériau éditorial legacy 2026.08.04 (dialogue Mila/Jonas, famille, possessifs, haben, er/sie). Les anciens QCM et feedbacks génériques ne sont pas portés tels quels : la mécanique suit la doctrine A1 v2, avec Réveil inter-unités, rappel productif, feedback ciblé, tolérance clavier, remédiation et oral progressif.",
+  "cards": [
+    {
+      "id": "card.u2.familie",
+      "kind": "lexical",
+      "de": "die Familie",
+      "fr": "la famille",
+      "introducedIn": "de-a1-u2-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.mutter",
+      "kind": "lexical",
+      "de": "die Mutter",
+      "fr": "la mère",
+      "introducedIn": "de-a1-u2-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.vater",
+      "kind": "lexical",
+      "de": "der Vater",
+      "fr": "le père",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.eltern",
+      "kind": "lexical",
+      "de": "die Eltern",
+      "fr": "les parents",
+      "introducedIn": "de-a1-u2-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.bruder",
+      "kind": "lexical",
+      "de": "der Bruder",
+      "fr": "le frère",
+      "introducedIn": "de-a1-u2-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.schwester",
+      "kind": "lexical",
+      "de": "die Schwester",
+      "fr": "la sœur",
+      "introducedIn": "de-a1-u2-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.sohn",
+      "kind": "lexical",
+      "de": "der Sohn",
+      "fr": "le fils",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.tochter",
+      "kind": "lexical",
+      "de": "die Tochter",
+      "fr": "la fille",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.mann",
+      "kind": "lexical",
+      "de": "der Mann",
+      "fr": "le mari / l’homme",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.frau",
+      "kind": "lexical",
+      "de": "die Frau",
+      "fr": "la femme / l’épouse",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.cousin",
+      "kind": "lexical",
+      "de": "der Cousin",
+      "fr": "le cousin",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.cousine",
+      "kind": "lexical",
+      "de": "die Cousine",
+      "fr": "la cousine",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.grossmutter",
+      "kind": "lexical",
+      "de": "die Großmutter",
+      "fr": "la grand-mère",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.grossvater",
+      "kind": "lexical",
+      "de": "der Großvater",
+      "fr": "le grand-père",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.kind",
+      "kind": "lexical",
+      "de": "das Kind",
+      "fr": "l’enfant",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.kinder",
+      "kind": "lexical",
+      "de": "die Kinder",
+      "fr": "les enfants",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.geschwister",
+      "kind": "lexical",
+      "de": "die Geschwister",
+      "fr": "les frères et sœurs",
+      "introducedIn": "de-a1-u2-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.wer",
+      "kind": "lexical",
+      "de": "wer",
+      "fr": "qui",
+      "introducedIn": "de-a1-u2-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.foto",
+      "kind": "lexical",
+      "de": "das Foto",
+      "fr": "la photo",
+      "introducedIn": "de-a1-u2-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.alt",
+      "kind": "lexical",
+      "de": "alt",
+      "fr": "âgé(e)",
+      "introducedIn": "de-a1-u2-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.das-ist",
+      "kind": "chunk",
+      "de": "Das ist …",
+      "fr": "Voici / C’est …",
+      "introducedIn": "de-a1-u2-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.mein",
+      "kind": "structure",
+      "de": "mein Vater / mein Bruder",
+      "fr": "mon père / mon frère",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.meine",
+      "kind": "structure",
+      "de": "meine Mutter / meine Schwester",
+      "fr": "ma mère / ma sœur",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.dein",
+      "kind": "structure",
+      "de": "dein Vater / dein Bruder",
+      "fr": "ton père / ton frère",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.deine",
+      "kind": "structure",
+      "de": "deine Mutter / deine Eltern",
+      "fr": "ta mère / tes parents",
+      "introducedIn": "de-a1-u2-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.ich-habe",
+      "kind": "chunk",
+      "de": "Ich habe …",
+      "fr": "J’ai …",
+      "introducedIn": "de-a1-u2-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.hast-du",
+      "kind": "chunk",
+      "de": "Hast du …?",
+      "fr": "Est-ce que tu as … ?",
+      "introducedIn": "de-a1-u2-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.einen-bruder",
+      "kind": "chunk",
+      "de": "Ich habe einen Bruder.",
+      "fr": "J’ai un frère.",
+      "introducedIn": "de-a1-u2-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.keine-schwester",
+      "kind": "chunk",
+      "de": "Ich habe keine Schwester.",
+      "fr": "Je n’ai pas de sœur.",
+      "introducedIn": "de-a1-u2-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.er",
+      "kind": "structure",
+      "de": "er",
+      "fr": "il",
+      "introducedIn": "de-a1-u2-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.sie-fem",
+      "kind": "structure",
+      "de": "sie",
+      "fr": "elle",
+      "introducedIn": "de-a1-u2-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.sie-pl",
+      "kind": "structure",
+      "de": "sie",
+      "fr": "ils / elles",
+      "introducedIn": "de-a1-u2-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.jahre-alt",
+      "kind": "chunk",
+      "de": "… Jahre alt",
+      "fr": "âgé(e) de … ans",
+      "introducedIn": "de-a1-u2-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.achtzehn",
+      "kind": "lexical",
+      "de": "achtzehn",
+      "fr": "dix-huit",
+      "introducedIn": "de-a1-u2-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.zwoelf",
+      "kind": "lexical",
+      "de": "zwölf",
+      "fr": "douze",
+      "introducedIn": "de-a1-u2-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.fuenf",
+      "kind": "lexical",
+      "de": "fünf",
+      "fr": "cinq",
+      "introducedIn": "de-a1-u2-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.leben",
+      "kind": "lexical",
+      "de": "leben",
+      "fr": "vivre",
+      "introducedIn": "de-a1-u2-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.arbeiten",
+      "kind": "lexical",
+      "de": "arbeiten",
+      "fr": "travailler",
+      "introducedIn": "de-a1-u2-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.studieren",
+      "kind": "lexical",
+      "de": "studieren",
+      "fr": "étudier à l’université",
+      "introducedIn": "de-a1-u2-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u2.auch",
+      "kind": "lexical",
+      "de": "auch",
+      "fr": "aussi",
+      "introducedIn": "de-a1-u2-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj.u2.reperer",
+      "label": "Repérer le lien familial, le prénom, l’âge et le lieu dans une présentation orale"
+    },
+    {
+      "id": "obj.u2.nommer",
+      "label": "Nommer les membres essentiels d’une famille"
+    },
+    {
+      "id": "obj.u2.possessif",
+      "label": "Choisir mein/meine et dein/deine selon le nom"
+    },
+    {
+      "id": "obj.u2.haben",
+      "label": "Dire ce que l’on a ou n’a pas avec haben et keine"
+    },
+    {
+      "id": "obj.u2.reprendre",
+      "label": "Reprendre une personne avec er/sie et accorder le verbe au pluriel"
+    },
+    {
+      "id": "obj.u2.interagir",
+      "label": "Présenter plusieurs proches et répondre à des questions simples"
+    }
+  ],
+  "remediations": [
+    {
+      "id": "rem.u2.mein-meine",
+      "objectiveId": "obj.u2.possessif",
+      "durationSeconds": 115,
+      "explanation": "Utilise mein devant un nom masculin ou neutre au nominatif, et meine devant un nom féminin ou pluriel : mein Vater, meine Mutter, meine Eltern.",
+      "contrast": [
+        {
+          "de": "Das ist mein Vater.",
+          "fr": "Voici mon père.",
+          "ok": true
+        },
+        {
+          "de": "Das ist meine Mutter.",
+          "fr": "Voici ma mère.",
+          "ok": true
+        },
+        {
+          "de": "Das ist mein Mutter.",
+          "fr": "—",
+          "ok": false,
+          "why": "Mutter est féminin : meine Mutter."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u2.mein-meine.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Das ist ____ Vater.",
+          "answer": "mein",
+          "acceptedAnswers": [
+            "mein"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u2.mein-meine.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Das ist ____ Schwester.",
+          "answer": "meine",
+          "acceptedAnswers": [
+            "meine"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u2.haben",
+      "objectiveId": "obj.u2.haben",
+      "durationSeconds": 115,
+      "explanation": "Avec ich : habe. Avec du : hast. Dans une question oui/non, le verbe vient en première position : Hast du Geschwister?",
+      "contrast": [
+        {
+          "de": "Ich habe einen Bruder.",
+          "fr": "J’ai un frère.",
+          "ok": true
+        },
+        {
+          "de": "Hast du Geschwister?",
+          "fr": "As-tu des frères et sœurs ?",
+          "ok": true
+        },
+        {
+          "de": "Du habe Geschwister.",
+          "fr": "—",
+          "ok": false,
+          "why": "Avec du, haben devient hast."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u2.haben.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich ____ zwei Kinder.",
+          "answer": "habe",
+          "acceptedAnswers": [
+            "habe"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u2.haben.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "____ du Geschwister?",
+          "answer": "Hast",
+          "acceptedAnswers": [
+            "Hast"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u2.kein-keine",
+      "objectiveId": "obj.u2.haben",
+      "durationSeconds": 105,
+      "explanation": "Pour nier un nom féminin ou pluriel dans les blocs de cette unité, retiens keine : keine Schwester, keine Kinder.",
+      "contrast": [
+        {
+          "de": "Ich habe keine Schwester.",
+          "fr": "Je n’ai pas de sœur.",
+          "ok": true
+        },
+        {
+          "de": "Ich habe keine Kinder.",
+          "fr": "Je n’ai pas d’enfants.",
+          "ok": true
+        },
+        {
+          "de": "Ich habe kein Schwester.",
+          "fr": "—",
+          "ok": false,
+          "why": "Schwester est féminin : keine Schwester."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u2.kein-keine.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich habe ____ Schwester.",
+          "answer": "keine",
+          "acceptedAnswers": [
+            "keine"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u2.kein-keine.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich habe ____ Kinder.",
+          "answer": "keine",
+          "acceptedAnswers": [
+            "keine"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u2.er-sie",
+      "objectiveId": "obj.u2.reprendre",
+      "durationSeconds": 120,
+      "explanation": "er reprend un nom masculin ; sie reprend un nom féminin. Ne répète pas le nom à chaque phrase : Mein Bruder heißt Leo. Er wohnt in Wien.",
+      "contrast": [
+        {
+          "de": "Mein Bruder heißt Leo. Er wohnt in Wien.",
+          "fr": "Mon frère s’appelle Leo. Il habite à Vienne.",
+          "ok": true
+        },
+        {
+          "de": "Meine Schwester heißt Lina. Sie studiert in Berlin.",
+          "fr": "Ma sœur s’appelle Lina. Elle étudie à Berlin.",
+          "ok": true
+        },
+        {
+          "de": "Meine Schwester heißt Lina. Er wohnt in Berlin.",
+          "fr": "—",
+          "ok": false,
+          "why": "Schwester est féminin : sie."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u2.er-sie.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Mein Vater heißt Paul. ____ arbeitet in Bonn.",
+          "answer": "Er",
+          "acceptedAnswers": [
+            "Er"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u2.er-sie.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Meine Mutter heißt Sara. ____ lebt in Köln.",
+          "answer": "Sie",
+          "acceptedAnswers": [
+            "Sie"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u2.plural",
+      "objectiveId": "obj.u2.reprendre",
+      "durationSeconds": 110,
+      "explanation": "Eltern est toujours pluriel. Au présent, le verbe reprend ici la forme en -en : Meine Eltern wohnen. Au singulier : Mein Vater wohnt.",
+      "contrast": [
+        {
+          "de": "Meine Eltern wohnen in Wien.",
+          "fr": "Mes parents habitent à Vienne.",
+          "ok": true
+        },
+        {
+          "de": "Mein Vater wohnt in Bonn.",
+          "fr": "Mon père habite à Bonn.",
+          "ok": true
+        },
+        {
+          "de": "Meine Eltern wohnt in Wien.",
+          "fr": "—",
+          "ok": false,
+          "why": "Eltern est pluriel : wohnen."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u2.plural.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Meine Eltern ____ in Wien.",
+          "answer": "wohnen",
+          "acceptedAnswers": [
+            "wohnen"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u2.plural.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Mein Vater ____ in Bonn.",
+          "answer": "wohnt",
+          "acceptedAnswers": [
+            "wohnt"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "de-a1-u2-l1",
+      "order": 1,
+      "phase": "Comprends",
+      "title": "Comprendre un portrait de famille",
+      "objectiveIds": [
+        "obj.u2.reperer"
+      ],
+      "durationMinutes": 30,
+      "reveil": {
+        "cardIds": [
+          "card.u1.heissen",
+          "card.u1.wohnen.in",
+          "card.u1.frage-wohnen",
+          "card.u1.wo"
+        ],
+        "itemCount": 4,
+        "maxSeconds": 90,
+        "selection": "rappel U1 dû/raté d’abord ; la nouvelle unité commence par réactiver nom et lieu"
+      },
+      "blocks": [
+        {
+          "id": "blk.u2.l1.intro",
+          "type": "intro",
+          "title": "Ta mission",
+          "text": "Mila montre une photo de famille à Jonas. Repère qui est qui, l’âge donné et le lieu où habitent les parents."
+        },
+        {
+          "id": "blk.u2.l1.dialogue",
+          "type": "dialogueRef",
+          "dialogueId": "de-a1-u2-dialogue",
+          "speeds": [
+            "slow",
+            "natural"
+          ],
+          "instruction": "Première écoute sans traduction. Deuxième écoute avec le texte allemand ; utilise les mots déjà connus comme heißt et wohnen."
+        },
+        {
+          "id": "blk.u2.l1.strategy",
+          "type": "strategy",
+          "title": "Réutilise U1",
+          "textDe": "Sie heißt Sofia. · Sie wohnen in Wien.",
+          "textFr": "Tu connais déjà heißen et wohnen : le nouveau travail consiste à identifier qui est le sujet."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u2-l1-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u2.reperer",
+          "cardIds": [
+            "card.u2.mutter"
+          ],
+          "promptLang": "de",
+          "prompt": "Wie heißt Milas Mutter?",
+          "audioRef": "de-a1-u2-dialogue#seg2",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Sofia",
+              "correct": true,
+              "feedback": "Ja. Mila dit : Das ist meine Mutter. Sie heißt Sofia."
+            },
+            {
+              "id": "b",
+              "text": "Leo",
+              "correct": false,
+              "feedback": "Leo est le frère de Mila, présenté dans la quatrième réplique."
+            },
+            {
+              "id": "c",
+              "text": "Jonas",
+              "correct": false,
+              "feedback": "Jonas est l’interlocuteur de Mila, pas sa mère."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u2-l1-e2",
+          "type": "audioCloze",
+          "objectiveId": "obj.u2.reperer",
+          "cardIds": [
+            "card.u2.achtzehn",
+            "card.u2.jahre-alt"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Er ist ____ Jahre alt.",
+          "audioRef": "de-a1-u2-dialogue#seg4",
+          "answer": "achtzehn",
+          "acceptedAnswers": [
+            "achtzehn",
+            "18"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "feedbackIncorrect": "Leo est présenté comme achtzehn Jahre alt : dix-huit ans."
+        },
+        {
+          "id": "de-a1-u2-l1-e3",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u2.reperer",
+          "cardIds": [
+            "card.u2.eltern"
+          ],
+          "promptLang": "de",
+          "prompt": "Wo wohnen Milas Eltern?",
+          "audioRef": "drill.u2.parents-wien",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Sie wohnen in Wien.",
+              "correct": true,
+              "feedback": "Genau. L’audio contient Wien."
+            },
+            {
+              "id": "b",
+              "text": "Sie wohnen in Berlin.",
+              "correct": false,
+              "feedback": "Berlin est familier depuis U1, mais ici tu entends Wien."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u2-l1-e4",
+          "type": "dictation",
+          "objectiveId": "obj.u2.reperer",
+          "cardIds": [
+            "card.u2.keine-schwester"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib den Satz, den du hörst.",
+          "audioRef": "de-a1-u2-dialogue#seg6",
+          "answer": "Ich habe keine Schwester.",
+          "acceptedAnswers": [
+            "Ich habe keine Schwester."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^ich habe kein schwester$",
+              "accept": false,
+              "note": "Schwester est féminin : keine Schwester."
+            }
+          ],
+          "remediationRef": "rem.u2.kein-keine"
+        },
+        {
+          "id": "de-a1-u2-l1-e5",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u2.nommer",
+          "cardIds": [
+            "card.u2.das-ist",
+            "card.u2.mein",
+            "card.u2.bruder"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris en allemand : « Voici mon frère Leo. »",
+          "answer": "Das ist mein Bruder Leo.",
+          "acceptedAnswers": [
+            "Das ist mein Bruder Leo."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^das ist meine bruder leo$",
+              "accept": false,
+              "note": "Bruder est masculin : mein Bruder."
+            }
+          ],
+          "remediationRef": "rem.u2.mein-meine"
+        }
+      ],
+      "completionMessage": "Tu peux extraire les informations essentielles d’une courte présentation de famille en t’appuyant sur le vocabulaire de U1."
+    },
+    {
+      "id": "de-a1-u2-l2",
+      "order": 2,
+      "phase": "Pratique",
+      "title": "Nommer les proches et utiliser mein/meine",
+      "objectiveIds": [
+        "obj.u2.nommer",
+        "obj.u2.possessif"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u1.heissen",
+          "card.u2.mutter",
+          "card.u2.bruder",
+          "card.u2.das-ist",
+          "card.u2.eltern"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "cartes ratées et dues avant le nouveau contraste mein/meine"
+      },
+      "blocks": [
+        {
+          "id": "blk.u2.l2.family",
+          "type": "model",
+          "title": "Présenter une personne",
+          "textDe": "Das ist mein Bruder. · Das ist meine Schwester. · Das sind meine Eltern.",
+          "textFr": "Retenir le nom avec son article aide à choisir mein ou meine."
+        },
+        {
+          "id": "blk.u2.l2.possessive",
+          "type": "rule",
+          "title": "mein / meine",
+          "textDe": "mein Vater · mein Bruder · meine Mutter · meine Schwester · meine Eltern",
+          "textFr": "Masculin/neutre : mein. Féminin/pluriel : meine, dans les structures de cette leçon."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u2-l2-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u2.possessif",
+          "cardIds": [
+            "card.u2.meine",
+            "card.u2.mutter"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris en allemand : « ma mère »",
+          "answer": "meine Mutter",
+          "acceptedAnswers": [
+            "meine Mutter"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^mein mutter$",
+              "accept": false,
+              "note": "Mutter est féminin : meine Mutter."
+            }
+          ],
+          "remediationRef": "rem.u2.mein-meine"
+        },
+        {
+          "id": "de-a1-u2-l2-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u2.nommer",
+          "cardIds": [
+            "card.u2.das-ist",
+            "card.u2.meine",
+            "card.u2.schwester"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "Schwester",
+            "ist",
+            "meine",
+            "Das"
+          ],
+          "answer": [
+            "Das",
+            "ist",
+            "meine",
+            "Schwester"
+          ],
+          "feedbackIncorrect": "Le cadre est Das ist + possessif + nom : Das ist meine Schwester."
+        },
+        {
+          "id": "de-a1-u2-l2-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u2.possessif",
+          "cardIds": [
+            "card.u2.mein",
+            "card.u2.meine"
+          ],
+          "promptLang": "de",
+          "prompt": "Das ist mein Bruder. → Ersetze Bruder durch Schwester.",
+          "answer": "Das ist meine Schwester.",
+          "acceptedAnswers": [
+            "Das ist meine Schwester."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^das ist mein schwester$",
+              "accept": false,
+              "note": "Quand tu passes à Schwester, mein devient meine."
+            }
+          ],
+          "remediationRef": "rem.u2.mein-meine"
+        },
+        {
+          "id": "de-a1-u2-l2-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u2.nommer",
+          "cardIds": [
+            "card.u2.mutter",
+            "card.u2.bruder",
+            "card.u2.grossmutter"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Familienwörter im Satz nach.",
+          "targets": [
+            {
+              "id": "f1",
+              "de": "Das ist meine Mutter.",
+              "audioRef": "drill.u2.mutter",
+              "maxSeconds": 5
+            },
+            {
+              "id": "f2",
+              "de": "Das ist mein Bruder.",
+              "audioRef": "drill.u2.bruder",
+              "maxSeconds": 5
+            },
+            {
+              "id": "f3",
+              "de": "Das ist meine Großmutter.",
+              "audioRef": "drill.u2.grossmutter",
+              "maxSeconds": 6
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Validation contrainte uniquement ; aucune note automatique d’accent libre."
+        },
+        {
+          "id": "de-a1-u2-l2-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u2.interagir",
+          "cardIds": [
+            "card.u2.das-ist",
+            "card.u2.mein",
+            "card.u2.meine"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris 4 à 6 lignes pour présenter au moins deux personnes : utilise Das ist…, mein et meine.",
+          "minimumWords": 24,
+          "successCriteria": [
+            "Deux personnes",
+            "Au moins un nom masculin",
+            "Au moins un nom féminin",
+            "mein et meine"
+          ],
+          "autoCheck": [
+            "contient Das ist",
+            "contient mein",
+            "contient meine"
+          ],
+          "note": "Tu peux utiliser une famille fictive."
+        }
+      ],
+      "completionMessage": "Tu peux nommer les proches essentiels et choisir mein/meine dans les présentations de base."
+    },
+    {
+      "id": "de-a1-u2-l3",
+      "order": 3,
+      "phase": "Pratique",
+      "title": "Avoir, ne pas avoir et reprendre avec er/sie",
+      "objectiveIds": [
+        "obj.u2.haben",
+        "obj.u2.reprendre"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u2.mein",
+          "card.u2.meine",
+          "card.u2.bruder",
+          "card.u2.schwester",
+          "card.u1.v2"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "les erreurs mein/meine et les cartes U1 dues restent prioritaires"
+      },
+      "blocks": [
+        {
+          "id": "blk.u2.l3.haben",
+          "type": "rule",
+          "title": "haben dans deux formes très rentables",
+          "textDe": "Ich habe einen Bruder. · Hast du Geschwister? · Ich habe keine Schwester.",
+          "textFr": "Apprends d’abord les blocs complets : ils couvrent l’affirmation, la question et une négation utile."
+        },
+        {
+          "id": "blk.u2.l3.pronouns",
+          "type": "contrast",
+          "title": "er / sie",
+          "textDe": "Mein Bruder heißt Leo. Er wohnt in Wien. · Meine Schwester heißt Lina. Sie wohnt in Köln.",
+          "textFr": "er reprend un nom masculin ; sie reprend un nom féminin."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u2-l3-e1",
+          "type": "audioCloze",
+          "objectiveId": "obj.u2.haben",
+          "cardIds": [
+            "card.u2.ich-habe",
+            "card.u2.einen-bruder"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Ich ____ einen Bruder.",
+          "audioRef": "drill.u2.ich-habe",
+          "answer": "habe",
+          "acceptedAnswers": [
+            "habe"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^hast$",
+              "accept": false,
+              "note": "hast va avec du. Avec ich : habe."
+            }
+          ],
+          "remediationRef": "rem.u2.haben"
+        },
+        {
+          "id": "de-a1-u2-l3-e2",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u2.haben",
+          "cardIds": [
+            "card.u2.hast-du",
+            "card.u2.geschwister"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris en allemand : « As-tu des frères et sœurs ? »",
+          "answer": "Hast du Geschwister?",
+          "acceptedAnswers": [
+            "Hast du Geschwister?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^du hast geschwister$",
+              "accept": false,
+              "note": "C’est une affirmation. Pour la question oui/non, le verbe passe devant : Hast du Geschwister?"
+            }
+          ],
+          "remediationRef": "rem.u2.haben"
+        },
+        {
+          "id": "de-a1-u2-l3-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u2.reprendre",
+          "cardIds": [
+            "card.u2.eltern",
+            "card.u2.sie-pl"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "in",
+            "Eltern",
+            "Wien",
+            "wohnen",
+            "Meine"
+          ],
+          "answer": [
+            "Meine",
+            "Eltern",
+            "wohnen",
+            "in",
+            "Wien"
+          ],
+          "feedbackIncorrect": "Eltern est pluriel : Meine Eltern wohnen in Wien.",
+          "remediationRef": "rem.u2.plural"
+        },
+        {
+          "id": "de-a1-u2-l3-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u2.reprendre",
+          "cardIds": [
+            "card.u2.er",
+            "card.u2.bruder"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Fortsetzung hörst du?",
+          "audioRef": "drill.u2.er",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Er wohnt in Wien.",
+              "correct": true,
+              "feedback": "Ja. Bruder est masculin, donc er."
+            },
+            {
+              "id": "b",
+              "text": "Sie wohnt in Wien.",
+              "correct": false,
+              "feedback": "sie reprendrait une personne féminine, par exemple Schwester."
+            }
+          ],
+          "remediationRef": "rem.u2.er-sie"
+        },
+        {
+          "id": "de-a1-u2-l3-e5",
+          "type": "transformation",
+          "objectiveId": "obj.u2.reprendre",
+          "cardIds": [
+            "card.u2.sie-fem",
+            "card.u2.schwester"
+          ],
+          "promptLang": "de",
+          "prompt": "Vermeide die Wiederholung: Meine Schwester heißt Lina. Meine Schwester wohnt in Köln.",
+          "answer": "Meine Schwester heißt Lina. Sie wohnt in Köln.",
+          "acceptedAnswers": [
+            "Meine Schwester heißt Lina. Sie wohnt in Köln."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^meine schwester heisst lina er wohnt in koeln$",
+              "accept": false,
+              "note": "Schwester est féminin : remplace la deuxième occurrence par sie."
+            }
+          ],
+          "remediationRef": "rem.u2.er-sie"
+        }
+      ],
+      "completionMessage": "Tu peux dire ce que tu as ou n’as pas et éviter les répétitions avec er/sie."
+    },
+    {
+      "id": "de-a1-u2-l4",
+      "order": 4,
+      "phase": "Produis",
+      "title": "Décrire une personne clairement",
+      "objectiveIds": [
+        "obj.u2.reprendre",
+        "obj.u2.interagir"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u2.er",
+          "card.u2.sie-fem",
+          "card.u2.jahre-alt",
+          "card.u1.wohnen.in",
+          "card.u1.sprechen"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "mélange U1 + U2 pour produire âge, lieu et langues sans compartimenter les unités"
+      },
+      "blocks": [
+        {
+          "id": "blk.u2.l4.model",
+          "type": "model",
+          "title": "Portrait court",
+          "textDe": "Das ist mein Vater. Er heißt Daniel und wohnt in Bonn. Er spricht Französisch. Das ist meine Schwester Léa. Sie ist zwölf Jahre alt.",
+          "textFr": "Réutilise heißen, wohnen et sprechen de U1 au lieu d’apprendre une nouvelle grammaire pour chaque détail."
+        },
+        {
+          "id": "blk.u2.l4.pronunciation",
+          "type": "pronunciation",
+          "title": "Voyelles courtes et longues",
+          "textDe": "Mutter · Bruder · wohnen",
+          "textFr": "Dans Mutter, u est court ; dans Bruder, u est plus long ; dans wohnen, o est long. La cible reste l’intelligibilité."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u2-l4-e1",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u2.interagir",
+          "cardIds": [
+            "card.u2.mutter",
+            "card.u2.bruder"
+          ],
+          "promptLang": "de",
+          "prompt": "Welches Wort hörst du?",
+          "audioRef": "drill.u2.pron-bruder",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Bruder",
+              "correct": true,
+              "feedback": "Ja. Tu entends le u long de Bruder."
+            },
+            {
+              "id": "b",
+              "text": "Mutter",
+              "correct": false,
+              "feedback": "Mutter a un u court et une autre fin de mot."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u2-l4-e2",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u2.interagir",
+          "cardIds": [
+            "card.u2.schwester",
+            "card.u2.zwoelf",
+            "card.u2.jahre-alt"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Meine Schwester ist 12 Jahre alt.",
+          "answer": "Meine Schwester ist zwölf Jahre alt.",
+          "acceptedAnswers": [
+            "Meine Schwester ist zwölf Jahre alt.",
+            "Meine Schwester ist 12 Jahre alt."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ],
+          "feedbackIncorrect": "Le cadre est : Meine Schwester ist … Jahre alt."
+        },
+        {
+          "id": "de-a1-u2-l4-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u2.reprendre",
+          "cardIds": [
+            "card.u2.bruder",
+            "card.u1.wohnen.in"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "Berlin",
+            "Bruder",
+            "in",
+            "wohnt",
+            "Mein"
+          ],
+          "answer": [
+            "Mein",
+            "Bruder",
+            "wohnt",
+            "in",
+            "Berlin"
+          ],
+          "feedbackIncorrect": "Sujet d’abord, verbe en deuxième position : Mein Bruder wohnt in Berlin.",
+          "remediationRef": "rem.u2.plural"
+        },
+        {
+          "id": "de-a1-u2-l4-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u2.interagir",
+          "cardIds": [
+            "card.u2.mutter",
+            "card.u2.bruder",
+            "card.u1.wohnen.in"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und wiederhole. Achte nur auf Verständlichkeit.",
+          "targets": [
+            {
+              "id": "pr1",
+              "de": "Meine Mutter wohnt in Köln.",
+              "audioRef": "drill.u2.pron-mutter",
+              "maxSeconds": 6
+            },
+            {
+              "id": "pr2",
+              "de": "Mein Bruder heißt Musa.",
+              "audioRef": "drill.u2.pron-bruder-satz",
+              "maxSeconds": 6
+            },
+            {
+              "id": "pr3",
+              "de": "Meine Großmutter wohnt in Bonn.",
+              "audioRef": "drill.u2.pron-wohnen",
+              "maxSeconds": 7
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Le score automatique ne doit jamais prétendre juger une production orale libre."
+        },
+        {
+          "id": "de-a1-u2-l4-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u2.interagir",
+          "cardIds": [
+            "card.u2.das-ist",
+            "card.u2.er",
+            "card.u2.sie-fem",
+            "card.u1.wohnen.in"
+          ],
+          "promptLang": "bi",
+          "prompt": "Présente trois personnes en 6 à 8 phrases. Pour chacune : lien, prénom et au moins une information (âge, ville, langue ou activité).",
+          "minimumWords": 35,
+          "successCriteria": [
+            "Trois personnes",
+            "Au moins un er",
+            "Au moins un sie",
+            "Au moins deux informations réutilisées de U1"
+          ],
+          "autoCheck": [
+            "contient Das ist",
+            "contient heißt",
+            "contient wohnt"
+          ],
+          "note": "Famille réelle ou fictive au choix."
+        }
+      ],
+      "completionMessage": "Tu peux combiner les acquis U1 et U2 pour produire de petits portraits cohérents."
+    },
+    {
+      "id": "de-a1-u2-l5",
+      "order": 5,
+      "phase": "Valide",
+      "title": "Mission finale : présenter sa famille",
+      "objectiveIds": [
+        "obj.u2.reperer",
+        "obj.u2.possessif",
+        "obj.u2.haben",
+        "obj.u2.reprendre",
+        "obj.u2.interagir"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u2.mein",
+          "card.u2.meine",
+          "card.u2.ich-habe",
+          "card.u2.er",
+          "card.u2.sie-fem"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "erreurs persistantes d’abord ; la mission doit réutiliser les blocs déjà mémorisés"
+      },
+      "blocks": [
+        {
+          "id": "blk.u2.l5.scenario",
+          "type": "scenario",
+          "title": "Situation",
+          "text": "Une collègue voit une photo sur ton téléphone. Présente trois personnes, réponds à une question sur tes frères/sœurs et donne au moins un lieu ou un âge."
+        },
+        {
+          "id": "blk.u2.l5.success",
+          "type": "rubric",
+          "title": "Réussite",
+          "text": "Trois personnes identifiables · mein/meine cohérents · haben utilisé dans une réponse · er/sie pour éviter une répétition · informations U1 réutilisées. L’oral libre n’est pas auto-noté."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u2-l5-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u2.haben",
+          "cardIds": [
+            "card.u2.hast-du",
+            "card.u2.einen-bruder"
+          ],
+          "promptLang": "de",
+          "prompt": "Jemand fragt: « Hast du Geschwister? » Welche Antwort passt?",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Ja, ich habe einen Bruder.",
+              "correct": true,
+              "feedback": "Genau. La réponse reprend haben avec ich → habe."
+            },
+            {
+              "id": "b",
+              "text": "Mein Bruder wohnt in Berlin.",
+              "correct": false,
+              "feedback": "La phrase parle du frère mais ne répond pas à la question « en as-tu ? »."
+            },
+            {
+              "id": "c",
+              "text": "Das ist meine Mutter.",
+              "correct": false,
+              "feedback": "Cette phrase présente la mère ; elle ne répond pas à Geschwister."
+            }
+          ],
+          "remediationRef": "rem.u2.haben"
+        },
+        {
+          "id": "de-a1-u2-l5-e2",
+          "type": "dictation",
+          "objectiveId": "obj.u2.reprendre",
+          "cardIds": [
+            "card.u2.eltern",
+            "card.u2.sie-pl"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib den Satz, den du hörst.",
+          "audioRef": "drill.u2.final-dictation",
+          "answer": "Meine Eltern wohnen in Wien.",
+          "acceptedAnswers": [
+            "Meine Eltern wohnen in Wien."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^meine eltern wohnt in wien$",
+              "accept": false,
+              "note": "Eltern est pluriel : wohnen."
+            }
+          ],
+          "remediationRef": "rem.u2.plural"
+        },
+        {
+          "id": "de-a1-u2-l5-e3",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u2.haben",
+          "cardIds": [
+            "card.u2.keine-schwester"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris en allemand : « Je n’ai pas de sœur. »",
+          "answer": "Ich habe keine Schwester.",
+          "acceptedAnswers": [
+            "Ich habe keine Schwester."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^ich habe kein schwester$",
+              "accept": false,
+              "note": "Schwester est féminin : keine Schwester."
+            }
+          ],
+          "remediationRef": "rem.u2.kein-keine"
+        },
+        {
+          "id": "de-a1-u2-l5-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u2.haben",
+          "cardIds": [
+            "card.u2.geschwister",
+            "card.u2.hast-du"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Frage hörst du?",
+          "audioRef": "drill.u2.final-listening",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Hast du Geschwister?",
+              "correct": true,
+              "feedback": "Ja. C’est la question sur les frères et sœurs."
+            },
+            {
+              "id": "b",
+              "text": "Wo wohnen deine Eltern?",
+              "correct": false,
+              "feedback": "Cette question contiendrait wohnen et Eltern ; l’audio contient Geschwister."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u2-l5-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u2.interagir",
+          "cardIds": [
+            "card.u2.das-ist",
+            "card.u2.mein",
+            "card.u2.meine",
+            "card.u2.er",
+            "card.u2.sie-fem"
+          ],
+          "promptLang": "bi",
+          "prompt": "Mission écrite : présente trois personnes en 8 à 10 lignes, utilise mein/meine, reprends au moins deux personnes avec er/sie et réponds à « Hast du Geschwister? ».",
+          "minimumWords": 42,
+          "successCriteria": [
+            "Trois personnes",
+            "mein et meine",
+            "er ou sie",
+            "Réponse avec habe",
+            "Au moins un lieu ou un âge"
+          ],
+          "autoCheck": [
+            "contient Das ist",
+            "contient mein",
+            "contient meine",
+            "contient habe"
+          ],
+          "note": "La production libre reste une mission guidée ; elle n’est pas transformée artificiellement en score oral automatique."
+        }
+      ],
+      "completionMessage": "Unité 2 terminée en QA : tu peux présenter plusieurs proches et réutiliser les acquis de U1 dans un nouvel échange."
+    }
+  ],
+  "qualityGates": {
+    "exerciseMix": {
+      "recognitionMax": 0.25,
+      "productiveWrittenMin": 0.35,
+      "structureMin": 0.2,
+      "oralMin": 0.2
+    },
+    "promptLang": {
+      "deMin": 0.7,
+      "note": "U2 réduit le français par rapport à U1 ; le bilingue reste réservé aux productions où la consigne doit rester limpide."
+    },
+    "spacedRecall": {
+      "minCardsRevisitedPerLesson": 3
+    },
+    "feedback": {
+      "distinctPerDistractor": true
+    },
+    "normalization": {
+      "requiredOn": [
+        "fillBlank",
+        "dictation",
+        "productiveRecall",
+        "transformation",
+        "audioCloze"
+      ]
+    }
+  }
+}

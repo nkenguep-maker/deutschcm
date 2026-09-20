@@ -3,11 +3,14 @@ import {
   A1_V2_SYLLABUS,
   A1_V2_SYLLABUS_TOTALS,
   A1_V2_UNIT_1,
+  A1_V2_UNIT_2,
+  A1_V2_UNITS,
   MONDE_A1_V2_MANIFEST,
   getA1V2Card,
   getA1V2CardsAvailableForLesson,
   getA1V2Exercise,
   getA1V2Lesson,
+  getA1V2LessonContext,
   getA1V2Remediation,
 } from "@/content/monde-a1-v2";
 import { resolveA1V2AudioText } from "@/content/monde-a1-v2/audio";
@@ -62,7 +65,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(A1_V2_SYLLABUS.every((unit) => unit.lessons.length === 5)).toBe(true);
     expect(A1_V2_SYLLABUS.slice(0, 6).every((unit) => unit.origin === "LEGACY_EDITORIAL_REFONTE")).toBe(true);
     expect(A1_V2_SYLLABUS.slice(6).every((unit) => unit.origin === "NEW_RECONSTRUCTION")).toBe(true);
-    expect(MONDE_A1_V2_MANIFEST.integratedUnits).toEqual(["de-a1-u1"]);
+    expect(MONDE_A1_V2_MANIFEST.integratedUnits).toEqual(["de-a1-u1", "de-a1-u2"]);
   });
 
   it("makes U1 a full five-lesson template before U2", () => {
@@ -78,6 +81,51 @@ describe("A1 refonte v2 · source contract", () => {
       expect(lesson.reveil.itemCount ?? lesson.reveil.cardIds.length, lesson.id).toBeGreaterThanOrEqual(3);
       expect(lesson.reveil.itemCount ?? lesson.reveil.cardIds.length, lesson.id).toBeLessThanOrEqual(5);
     }
+  });
+
+  it("integrates U2 as a five-lesson refonte without opening the full-level READY gate", () => {
+    expect(A1_V2_UNIT_2).toMatchObject({
+      id: "de-a1-u2",
+      order: 2,
+      title: "Parler de sa famille",
+      contentVersion: "2026.09.20-u2-refonte-r1",
+      status: "refonte-a-valider",
+    });
+    expect(A1_V2_UNIT_2.cards).toHaveLength(40);
+    expect(A1_V2_UNIT_2.objectives).toHaveLength(6);
+    expect(A1_V2_UNIT_2.remediations).toHaveLength(5);
+    expect(A1_V2_UNIT_2.lessons).toHaveLength(5);
+    expect(A1_V2_UNIT_2.lessons.flatMap((lesson) => lesson.exercises)).toHaveLength(25);
+    expect(A1_V2_UNIT_2.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
+    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
+  });
+
+  it("resolves U2 stable references, including deliberate cross-unit recall", () => {
+    const lessonIds = new Set(A1_V2_UNIT_2.lessons.map((lesson) => lesson.id));
+    const allCardIds = new Set(A1_V2_UNITS.flatMap((unit) => unit.cards).map((card) => card.id));
+    const objectiveIds = new Set(A1_V2_UNIT_2.objectives.map((objective) => objective.id));
+    const remediationIds = new Set(A1_V2_UNIT_2.remediations.map((item) => item.id));
+
+    for (const card of A1_V2_UNIT_2.cards) {
+      expect(lessonIds.has(card.introducedIn), card.id).toBe(true);
+    }
+    for (const lesson of A1_V2_UNIT_2.lessons) {
+      expect(lesson.reveil.cardIds.length, lesson.id).toBeGreaterThanOrEqual(3);
+      for (const wakeId of lesson.reveil.cardIds) expect(allCardIds.has(wakeId), `${lesson.id}:${wakeId}`).toBe(true);
+      for (const objectiveId of lesson.objectiveIds) expect(objectiveIds.has(objectiveId), objectiveId).toBe(true);
+      for (const exercise of lesson.exercises) {
+        expect(exercise.id.startsWith(`${lesson.id}-e`), exercise.id).toBe(true);
+        if (exercise.objectiveId) expect(objectiveIds.has(exercise.objectiveId), exercise.id).toBe(true);
+        for (const cardId of exercise.cardIds ?? []) expect(allCardIds.has(cardId), `${exercise.id}:${cardId}`).toBe(true);
+        if (exercise.remediationRef) expect(remediationIds.has(exercise.remediationRef), exercise.id).toBe(true);
+      }
+    }
+
+    expect(getA1V2LessonContext("de-a1-u2-l4")?.unit.id).toBe("de-a1-u2");
+    expect(getA1V2Exercise("de-a1-u2-l3-e2")?.unit.id).toBe("de-a1-u2");
+    expect(getA1V2Card("card.u2.mutter")?.de).toBe("die Mutter");
+    expect(getA1V2Remediation("rem.u2.mein-meine")?.objectiveId).toBe("obj.u2.possessif");
   });
 
   it("uses only stable references and resolves every objective/card/remediation id", () => {
@@ -117,8 +165,8 @@ describe("A1 refonte v2 · source contract", () => {
     expect(getA1V2Remediation("rem.u1.v2")?.objectiveId).toBe("obj.u1.question");
   });
 
-  it("resolves every U1 exercise audio reference used by the QA preview", () => {
-    const audioRefs = A1_V2_UNIT_1.lessons.flatMap((lesson) =>
+  it("resolves every integrated exercise audio reference used by the QA preview", () => {
+    const audioRefs = A1_V2_UNITS.flatMap((unit) => unit.lessons).flatMap((lesson) =>
       lesson.exercises.flatMap((exercise) => [
         ...(exercise.audioRef ? [exercise.audioRef] : []),
         ...(exercise.targets ?? []).map((target) => target.audioRef),
@@ -145,6 +193,30 @@ describe("A1 refonte v2 · source contract", () => {
     expect(structure).toBeGreaterThanOrEqual(A1_V2_UNIT_1.qualityGates.exerciseMix.structureMin);
     expect(oral).toBeGreaterThanOrEqual(A1_V2_UNIT_1.qualityGates.exerciseMix.oralMin);
     expect(dePrompt).toBeGreaterThanOrEqual(A1_V2_UNIT_1.qualityGates.promptLang.deMin);
+  });
+
+  it("meets the doctrine ratios and German-prompt gate on U2", () => {
+    const exercises = A1_V2_UNIT_2.lessons.flatMap((lesson) => lesson.exercises);
+    const ratio = (types: string[]) => exercises.filter((exercise) => types.includes(exercise.type)).length / exercises.length;
+    expect(ratio(["multipleChoice"])).toBeLessThanOrEqual(A1_V2_UNIT_2.qualityGates.exerciseMix.recognitionMax);
+    expect(ratio(["dictation", "productiveRecall", "transformation", "guidedProduction"])).toBeGreaterThanOrEqual(A1_V2_UNIT_2.qualityGates.exerciseMix.productiveWrittenMin);
+    expect(ratio(["audioCloze", "reorder"])).toBeGreaterThanOrEqual(A1_V2_UNIT_2.qualityGates.exerciseMix.structureMin);
+    expect(ratio(["listeningDiscrimination", "shadowing"])).toBeGreaterThanOrEqual(A1_V2_UNIT_2.qualityGates.exerciseMix.oralMin);
+    expect(exercises.filter((exercise) => exercise.promptLang === "de").length / exercises.length).toBeGreaterThanOrEqual(A1_V2_UNIT_2.qualityGates.promptLang.deMin);
+  });
+
+  it("keeps U2 distractor feedback distinct and normalization present", () => {
+    const exercises = A1_V2_UNIT_2.lessons.flatMap((lesson) => lesson.exercises);
+    for (const exercise of exercises) {
+      if (exercise.choices?.length) {
+        const feedbacks = exercise.choices.map((choice) => choice.feedback.trim());
+        expect(new Set(feedbacks).size, exercise.id).toBe(feedbacks.length);
+        expect(exercise.choices.filter((choice) => choice.correct), exercise.id).toHaveLength(1);
+      }
+      if (A1_V2_UNIT_2.qualityGates.normalization.requiredOn.includes(exercise.type)) {
+        expect(exercise.normalization?.length ?? 0, exercise.id).toBeGreaterThan(0);
+      }
+    }
   });
 
   it("has distractor-specific feedback and required normalization", () => {
@@ -268,6 +340,13 @@ describe("A1 refonte v2 · spaced recall and remediation", () => {
     const cards = getA1V2CardsAvailableForLesson("de-a1-u1-l5");
     expect(cards).toHaveLength(A1_V2_UNIT_1.cards.length);
     expect(cards.some((card) => card.id === "card.u1.heissen")).toBe(true);
+  });
+
+  it("makes U1 cards available in U2 Réveil without exposing future units", () => {
+    const cards = getA1V2CardsAvailableForLesson("de-a1-u2-l1");
+    expect(cards).toHaveLength(80);
+    expect(cards.some((card) => card.id === "card.u1.heissen")).toBe(true);
+    expect(cards.some((card) => card.id === "card.u2.mutter")).toBe(true);
   });
 
   it("prioritizes missed/due cards in the Réveil", () => {
