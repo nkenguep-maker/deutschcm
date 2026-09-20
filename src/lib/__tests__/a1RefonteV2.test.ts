@@ -427,6 +427,12 @@ describe("A1 refonte v2 · spaced recall and remediation", () => {
     expect(cards.some((card) => card.id === "card.u3.kaffee")).toBe(true);
   });
 
+  it("makes U1–U4 cards available in the U4 Réveil boundary", () => {
+    const cards = getA1V2CardsAvailableForLesson("de-a1-u4-l1");
+    expect(cards).toHaveLength(160);
+    expect(cards.some((card) => card.id === "card.u4.aufstehen")).toBe(true);
+  });
+
   it("prioritizes missed/due cards in the Réveil", () => {
     const lesson = getA1V2Lesson("de-a1-u1-l2")!;
     const now = new Date("2026-09-20T08:00:00.000Z");
