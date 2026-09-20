@@ -1,0 +1,1796 @@
+{
+  "id": "de-a1-u9",
+  "order": 9,
+  "title": "Santé et rendez-vous",
+  "schemaVersion": "2.0",
+  "contentVersion": "2026.09.20-u9-reconstruction-r1",
+  "status": "reconstruction-a-valider",
+  "note": "U9 est une reconstruction nouvelle à partir du syllabus canonique. Elle est strictement linguistique : décrire un problème courant, nommer quelques parties du corps, exprimer douleur/besoin et fixer un rendez-vous simple. Aucun conseil médical n’est enseigné.",
+  "cards": [
+    {
+      "id": "card.u9.arzt",
+      "kind": "lexical",
+      "de": "der Arzt / die Ärztin",
+      "fr": "le médecin / la médecin",
+      "introducedIn": "de-a1-u9-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.praxis",
+      "kind": "lexical",
+      "de": "die Praxis",
+      "fr": "le cabinet médical",
+      "introducedIn": "de-a1-u9-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.apotheke",
+      "kind": "lexical",
+      "de": "die Apotheke",
+      "fr": "la pharmacie",
+      "introducedIn": "de-a1-u9-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.termin",
+      "kind": "lexical",
+      "de": "der Termin",
+      "fr": "le rendez-vous",
+      "introducedIn": "de-a1-u9-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.kopf",
+      "kind": "lexical",
+      "de": "der Kopf",
+      "fr": "la tête",
+      "introducedIn": "de-a1-u9-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.hals",
+      "kind": "lexical",
+      "de": "der Hals",
+      "fr": "la gorge / le cou",
+      "introducedIn": "de-a1-u9-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.bauch",
+      "kind": "lexical",
+      "de": "der Bauch",
+      "fr": "le ventre",
+      "introducedIn": "de-a1-u9-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.ruecken",
+      "kind": "lexical",
+      "de": "der Rücken",
+      "fr": "le dos",
+      "introducedIn": "de-a1-u9-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.zahn",
+      "kind": "lexical",
+      "de": "der Zahn",
+      "fr": "la dent",
+      "introducedIn": "de-a1-u9-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.arm",
+      "kind": "lexical",
+      "de": "der Arm",
+      "fr": "le bras",
+      "introducedIn": "de-a1-u9-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.hand",
+      "kind": "lexical",
+      "de": "die Hand",
+      "fr": "la main",
+      "introducedIn": "de-a1-u9-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.bein",
+      "kind": "lexical",
+      "de": "das Bein",
+      "fr": "la jambe",
+      "introducedIn": "de-a1-u9-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.fieber",
+      "kind": "lexical",
+      "de": "das Fieber",
+      "fr": "la fièvre",
+      "introducedIn": "de-a1-u9-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.husten",
+      "kind": "lexical",
+      "de": "der Husten",
+      "fr": "la toux",
+      "introducedIn": "de-a1-u9-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.schnupfen",
+      "kind": "lexical",
+      "de": "der Schnupfen",
+      "fr": "le rhume",
+      "introducedIn": "de-a1-u9-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.schmerzen",
+      "kind": "lexical",
+      "de": "die Schmerzen",
+      "fr": "les douleurs",
+      "introducedIn": "de-a1-u9-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.kopfschmerzen",
+      "kind": "chunk",
+      "de": "Kopfschmerzen haben",
+      "fr": "avoir mal à la tête",
+      "introducedIn": "de-a1-u9-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.bauchschmerzen",
+      "kind": "chunk",
+      "de": "Bauchschmerzen haben",
+      "fr": "avoir mal au ventre",
+      "introducedIn": "de-a1-u9-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.zahnschmerzen",
+      "kind": "chunk",
+      "de": "Zahnschmerzen haben",
+      "fr": "avoir mal aux dents",
+      "introducedIn": "de-a1-u9-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.weh-tun",
+      "kind": "structure",
+      "de": "… tut weh.",
+      "fr": "… fait mal.",
+      "introducedIn": "de-a1-u9-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.kopf-tut-weh",
+      "kind": "chunk",
+      "de": "Mein Kopf tut weh.",
+      "fr": "J’ai mal à la tête.",
+      "introducedIn": "de-a1-u9-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.ruecken-tut-weh",
+      "kind": "chunk",
+      "de": "Mein Rücken tut weh.",
+      "fr": "J’ai mal au dos.",
+      "introducedIn": "de-a1-u9-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.ich-habe-fieber",
+      "kind": "chunk",
+      "de": "Ich habe Fieber.",
+      "fr": "J’ai de la fièvre.",
+      "introducedIn": "de-a1-u9-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.ich-habe-husten",
+      "kind": "chunk",
+      "de": "Ich habe Husten.",
+      "fr": "J’ai de la toux.",
+      "introducedIn": "de-a1-u9-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.krank",
+      "kind": "lexical",
+      "de": "krank",
+      "fr": "malade",
+      "introducedIn": "de-a1-u9-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.brauchen",
+      "kind": "lexical",
+      "de": "brauchen",
+      "fr": "avoir besoin de",
+      "introducedIn": "de-a1-u9-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.brauche-termin",
+      "kind": "chunk",
+      "de": "Ich brauche einen Termin.",
+      "fr": "J’ai besoin d’un rendez-vous.",
+      "introducedIn": "de-a1-u9-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.heute",
+      "kind": "lexical",
+      "de": "heute",
+      "fr": "aujourd’hui",
+      "introducedIn": "de-a1-u9-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.morgen",
+      "kind": "lexical",
+      "de": "morgen",
+      "fr": "demain",
+      "introducedIn": "de-a1-u9-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.vormittag",
+      "kind": "lexical",
+      "de": "am Vormittag",
+      "fr": "le matin",
+      "introducedIn": "de-a1-u9-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.nachmittag",
+      "kind": "lexical",
+      "de": "am Nachmittag",
+      "fr": "l’après-midi",
+      "introducedIn": "de-a1-u9-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.frei",
+      "kind": "lexical",
+      "de": "frei",
+      "fr": "libre / disponible",
+      "introducedIn": "de-a1-u9-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.termin-frei",
+      "kind": "chunk",
+      "de": "Haben Sie heute einen Termin frei?",
+      "fr": "Avez-vous un rendez-vous disponible aujourd’hui ?",
+      "introducedIn": "de-a1-u9-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.um-wie-viel",
+      "kind": "structure",
+      "de": "Um wie viel Uhr?",
+      "fr": "À quelle heure ?",
+      "introducedIn": "de-a1-u9-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.um-zehn",
+      "kind": "chunk",
+      "de": "um zehn Uhr",
+      "fr": "à dix heures",
+      "introducedIn": "de-a1-u9-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.passt",
+      "kind": "chunk",
+      "de": "Das passt.",
+      "fr": "Ça me convient.",
+      "introducedIn": "de-a1-u9-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.leider",
+      "kind": "lexical",
+      "de": "leider",
+      "fr": "malheureusement",
+      "introducedIn": "de-a1-u9-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.geht",
+      "kind": "chunk",
+      "de": "Geht es morgen?",
+      "fr": "Est-ce possible demain ?",
+      "introducedIn": "de-a1-u9-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.guten-morgen",
+      "kind": "chunk",
+      "de": "Guten Morgen.",
+      "fr": "Bonjour (matin).",
+      "introducedIn": "de-a1-u9-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u9.auf-wiederhoeren",
+      "kind": "chunk",
+      "de": "Auf Wiederhören.",
+      "fr": "Au revoir (au téléphone).",
+      "introducedIn": "de-a1-u9-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj.u9.problem",
+      "label": "Comprendre un problème de santé courant exprimé très simplement"
+    },
+    {
+      "id": "obj.u9.koerper",
+      "label": "Nommer quelques parties du corps et symptômes courants"
+    },
+    {
+      "id": "obj.u9.schmerz",
+      "label": "Dire ce qui fait mal avec haben ou tut weh"
+    },
+    {
+      "id": "obj.u9.bedarf",
+      "label": "Exprimer un besoin simple avec brauchen"
+    },
+    {
+      "id": "obj.u9.termin",
+      "label": "Demander et fixer un rendez-vous avec jour et heure"
+    },
+    {
+      "id": "obj.u9.interaktion",
+      "label": "Mener un échange très court au téléphone, au cabinet ou à la pharmacie"
+    }
+  ],
+  "remediations": [
+    {
+      "id": "rem.u9.haben-symptom",
+      "objectiveId": "obj.u9.problem",
+      "durationSeconds": 105,
+      "explanation": "Pour plusieurs symptômes fréquents, utilise haben : Ich habe Fieber. Ich habe Husten. Ich habe Kopfschmerzen.",
+      "contrast": [
+        {
+          "de": "Ich habe Fieber.",
+          "fr": "J’ai de la fièvre.",
+          "ok": true
+        },
+        {
+          "de": "Ich habe Kopfschmerzen.",
+          "fr": "J’ai mal à la tête.",
+          "ok": true
+        },
+        {
+          "de": "Ich bin Fieber.",
+          "fr": "—",
+          "ok": false,
+          "why": "Avec Fieber, utilise haben."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u9.haben-symptom.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich ____ Fieber.",
+          "answer": "habe",
+          "acceptedAnswers": [
+            "habe"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u9.haben-symptom.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich ____ Kopfschmerzen.",
+          "answer": "habe",
+          "acceptedAnswers": [
+            "habe"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u9.tut-weh",
+      "objectiveId": "obj.u9.schmerz",
+      "durationSeconds": 110,
+      "explanation": "Pour une partie du corps singulière, le bloc est … tut weh : Mein Kopf tut weh. Mein Rücken tut weh.",
+      "contrast": [
+        {
+          "de": "Mein Kopf tut weh.",
+          "fr": "J’ai mal à la tête.",
+          "ok": true
+        },
+        {
+          "de": "Mein Rücken tut weh.",
+          "fr": "J’ai mal au dos.",
+          "ok": true
+        },
+        {
+          "de": "Mein Kopf tun weh.",
+          "fr": "—",
+          "ok": false,
+          "why": "Kopf est singulier : tut."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u9.tut-weh.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Mein Kopf ____ weh.",
+          "answer": "tut",
+          "acceptedAnswers": [
+            "tut"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u9.tut-weh.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Mein Rücken ____ weh.",
+          "answer": "tut",
+          "acceptedAnswers": [
+            "tut"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u9.brauchen",
+      "objectiveId": "obj.u9.bedarf",
+      "durationSeconds": 105,
+      "explanation": "brauchen exprime un besoin concret : Ich brauche einen Termin. Le verbe est conjugué en position 2.",
+      "contrast": [
+        {
+          "de": "Ich brauche einen Termin.",
+          "fr": "J’ai besoin d’un rendez-vous.",
+          "ok": true
+        },
+        {
+          "de": "Ich brauche Hilfe.",
+          "fr": "J’ai besoin d’aide.",
+          "ok": true
+        },
+        {
+          "de": "Ich einen Termin brauche.",
+          "fr": "—",
+          "ok": false,
+          "why": "Dans la phrase principale, brauche vient en deuxième position."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u9.brauchen.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich ____ einen Termin.",
+          "answer": "brauche",
+          "acceptedAnswers": [
+            "brauche"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u9.brauchen.i2",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "einen Termin",
+            "Ich",
+            "brauche"
+          ],
+          "answer": [
+            "Ich",
+            "brauche",
+            "einen Termin"
+          ],
+          "normalization": []
+        }
+      ]
+    },
+    {
+      "id": "rem.u9.termin-zeit",
+      "objectiveId": "obj.u9.termin",
+      "durationSeconds": 115,
+      "explanation": "Pour demander une disponibilité : Haben Sie … einen Termin frei? Pour préciser l’heure : Um wie viel Uhr? / um zehn Uhr.",
+      "contrast": [
+        {
+          "de": "Haben Sie heute einen Termin frei?",
+          "fr": "Avez-vous un rendez-vous disponible aujourd’hui ?",
+          "ok": true
+        },
+        {
+          "de": "Um wie viel Uhr?",
+          "fr": "À quelle heure ?",
+          "ok": true
+        },
+        {
+          "de": "Wo viel Uhr?",
+          "fr": "—",
+          "ok": false,
+          "why": "Pour l’heure, utilise Um wie viel Uhr?"
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u9.termin-zeit.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Um wie ____ Uhr?",
+          "answer": "viel",
+          "acceptedAnswers": [
+            "viel"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u9.termin-zeit.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Haben Sie heute einen Termin ____?",
+          "answer": "frei",
+          "acceptedAnswers": [
+            "frei"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u9.heute-morgen",
+      "objectiveId": "obj.u9.termin",
+      "durationSeconds": 105,
+      "explanation": "heute = aujourd’hui ; morgen = demain. Si aujourd’hui n’est pas possible, Geht es morgen? permet de proposer demain.",
+      "contrast": [
+        {
+          "de": "Heute um zehn Uhr.",
+          "fr": "Aujourd’hui à dix heures.",
+          "ok": true
+        },
+        {
+          "de": "Geht es morgen?",
+          "fr": "Est-ce possible demain ?",
+          "ok": true
+        },
+        {
+          "de": "Morgen heute.",
+          "fr": "—",
+          "ok": false,
+          "why": "Choisis un seul jour selon la situation."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u9.heute-morgen.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "____ um zehn Uhr.",
+          "answer": "Heute",
+          "acceptedAnswers": [
+            "Heute"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u9.heute-morgen.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Geht es ____?",
+          "answer": "morgen",
+          "acceptedAnswers": [
+            "morgen"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "de-a1-u9-l1",
+      "order": 1,
+      "phase": "Comprends",
+      "title": "Ein einfaches Gesundheitsproblem verstehen",
+      "objectiveIds": [
+        "obj.u9.problem",
+        "obj.u9.bedarf",
+        "obj.u9.termin"
+      ],
+      "durationMinutes": 30,
+      "reveil": {
+        "cardIds": [
+          "card.u8.wann-arbeitest",
+          "card.u4.acht-uhr",
+          "card.u6.zeit-haben",
+          "card.u8.von-bis"
+        ],
+        "itemCount": 4,
+        "maxSeconds": 90,
+        "selection": "Zeit- und Gesprächsblöcke aus früheren Einheiten vor dem Telefonat reaktivieren"
+      },
+      "blocks": [
+        {
+          "id": "blk.u9.l1.intro",
+          "type": "intro",
+          "title": "Telefonat in der Praxis",
+          "textDe": "Samira ruft in einer Praxis an. Höre auf Symptome, gewünschten Termin und Uhrzeit.",
+          "textFr": "Objectif purement linguistique : comprendre la demande et l’horaire."
+        },
+        {
+          "id": "blk.u9.l1.dialogue",
+          "type": "dialogueRef",
+          "dialogueId": "de-a1-u9-dialogue",
+          "speeds": [
+            "slow",
+            "natural"
+          ],
+          "instruction": "Höre zuerst auf das Problem. Beim zweiten Hören notiere Tag und Uhrzeit."
+        },
+        {
+          "id": "blk.u9.l1.safety",
+          "type": "note",
+          "title": "Sprachtraining",
+          "textDe": "Diese Einheit trainiert Sprache für Alltagssituationen. Sie gibt keine medizinischen Empfehlungen.",
+          "textFr": "Le contenu n’enseigne pas de diagnostic ni de traitement."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u9-l1-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u9.problem",
+          "cardIds": [
+            "card.u9.fieber",
+            "card.u9.husten"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Symptome nennt Samira?",
+          "audioRef": "de-a1-u9-dialogue#seg2",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Fieber und Husten.",
+              "correct": true,
+              "feedback": "Ja. Samira nennt genau Fieber und Husten."
+            },
+            {
+              "id": "b",
+              "text": "Bauchschmerzen und Zahnschmerzen.",
+              "correct": false,
+              "feedback": "Diese Schmerzen werden im Telefonat nicht genannt."
+            },
+            {
+              "id": "c",
+              "text": "Nur Schnupfen.",
+              "correct": false,
+              "feedback": "Schnupfen ist Wortschatz der Einheit, aber nicht Samiras Aussage."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u9-l1-e2",
+          "type": "audioCloze",
+          "objectiveId": "obj.u9.problem",
+          "cardIds": [
+            "card.u9.ich-habe-fieber"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Ich ____ Fieber.",
+          "audioRef": "de-a1-u9-dialogue#seg2",
+          "answer": "habe",
+          "acceptedAnswers": [
+            "habe"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u9.haben-symptom"
+        },
+        {
+          "id": "de-a1-u9-l1-e3",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u9.bedarf",
+          "cardIds": [
+            "card.u9.brauche-termin"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Ich brauche einen Termin.",
+          "answer": "Ich brauche einen Termin.",
+          "acceptedAnswers": [
+            "Ich brauche einen Termin."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u9.brauchen"
+        },
+        {
+          "id": "de-a1-u9-l1-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u9.termin",
+          "cardIds": [
+            "card.u9.um-zehn"
+          ],
+          "promptLang": "de",
+          "prompt": "Um wie viel Uhr ist der Termin?",
+          "audioRef": "de-a1-u9-dialogue#seg6",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Um zehn Uhr.",
+              "correct": true,
+              "feedback": "Genau. Der Termin ist um zehn Uhr."
+            },
+            {
+              "id": "b",
+              "text": "Um zwölf Uhr.",
+              "correct": false,
+              "feedback": "Zwölf Uhr wird im Gespräch nicht vereinbart."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u9-l1-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u9.problem",
+          "cardIds": [
+            "card.u9.fieber",
+            "card.u9.husten",
+            "card.u9.termin",
+            "card.u9.um-zehn"
+          ],
+          "promptLang": "de",
+          "prompt": "Notiere das Telefonat in vier kurzen Sätzen: Problem, zwei Symptome, Termin und Uhrzeit.",
+          "minimumWords": 24,
+          "successCriteria": [
+            "Problem",
+            "Symptome",
+            "Termin",
+            "Uhrzeit"
+          ],
+          "autoCheck": [
+            "contient habe",
+            "contient Termin",
+            "contient Uhr"
+          ],
+          "note": "Nur Sprachinformationen rekonstruieren."
+        }
+      ],
+      "completionMessage": "Du kannst ein sehr einfaches Telefonat zu Symptomen und Termin verstehen."
+    },
+    {
+      "id": "de-a1-u9-l2",
+      "order": 2,
+      "phase": "Pratique",
+      "title": "Körper und häufige Symptome",
+      "objectiveIds": [
+        "obj.u9.koerper",
+        "obj.u9.problem"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u9.kopf",
+          "card.u9.hals",
+          "card.u9.fieber",
+          "card.u8.kochen",
+          "card.u7.wo-ist"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "neue Körper-/Symptomkarten zuerst, dann fällige ältere Karten"
+      },
+      "blocks": [
+        {
+          "id": "blk.u9.l2.body",
+          "type": "model",
+          "title": "Körper",
+          "textDe": "Kopf · Hals · Bauch · Rücken · Zahn · Arm · Hand · Bein",
+          "textFr": "Petit noyau lexical utile pour décrire une gêne."
+        },
+        {
+          "id": "blk.u9.l2.symptoms",
+          "type": "model",
+          "title": "Symptome",
+          "textDe": "Fieber · Husten · Schnupfen · Kopfschmerzen · Bauchschmerzen · Zahnschmerzen",
+          "textFr": "Apprends les groupes complets avec haben."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u9-l2-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u9.koerper",
+          "cardIds": [
+            "card.u9.ruecken"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe das deutsche Wort für den Rücken.",
+          "answer": "Rücken",
+          "acceptedAnswers": [
+            "Rücken",
+            "Ruecken",
+            "der Rücken",
+            "der Ruecken"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ],
+          "feedbackIncorrect": "Das Wort ist Rücken."
+        },
+        {
+          "id": "de-a1-u9-l2-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u9.problem",
+          "cardIds": [
+            "card.u9.kopfschmerzen"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "Kopfschmerzen",
+            "Ich",
+            "habe"
+          ],
+          "answer": [
+            "Ich",
+            "habe",
+            "Kopfschmerzen"
+          ],
+          "feedbackIncorrect": "Symptomblock: Ich habe + Symptom.",
+          "remediationRef": "rem.u9.haben-symptom"
+        },
+        {
+          "id": "de-a1-u9-l2-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u9.problem",
+          "cardIds": [
+            "card.u9.kopfschmerzen",
+            "card.u9.bauchschmerzen"
+          ],
+          "promptLang": "de",
+          "prompt": "Ich habe Kopfschmerzen. → Ändere auf Bauchschmerzen.",
+          "answer": "Ich habe Bauchschmerzen.",
+          "acceptedAnswers": [
+            "Ich habe Bauchschmerzen."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u9.haben-symptom"
+        },
+        {
+          "id": "de-a1-u9-l2-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u9.koerper",
+          "cardIds": [
+            "card.u9.kopf",
+            "card.u9.bauch",
+            "card.u9.ruecken"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Sätze nach.",
+          "targets": [
+            {
+              "id": "b1",
+              "de": "Mein Kopf tut weh.",
+              "audioRef": "drill.u9.body1",
+              "maxSeconds": 5
+            },
+            {
+              "id": "b2",
+              "de": "Mein Bauch tut weh.",
+              "audioRef": "drill.u9.body2",
+              "maxSeconds": 5
+            },
+            {
+              "id": "b3",
+              "de": "Mein Rücken tut weh.",
+              "audioRef": "drill.u9.body3",
+              "maxSeconds": 5
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur vorgegebene Sätze werden verglichen."
+        },
+        {
+          "id": "de-a1-u9-l2-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u9.problem",
+          "cardIds": [
+            "card.u9.kopfschmerzen",
+            "card.u9.bauchschmerzen",
+            "card.u9.fieber",
+            "card.u9.husten"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe vier kurze Beispielsätze mit vier verschiedenen Symptomen.",
+          "minimumWords": 20,
+          "successCriteria": [
+            "vier Symptome",
+            "Ich habe"
+          ],
+          "autoCheck": [
+            "contient Ich habe"
+          ],
+          "note": "Es geht nur um Sprachmuster, nicht um eine medizinische Einschätzung."
+        }
+      ],
+      "completionMessage": "Du kannst einige Körperteile und häufige Symptome auf A1-Niveau benennen."
+    },
+    {
+      "id": "de-a1-u9-l3",
+      "order": 3,
+      "phase": "Pratique",
+      "title": "Sagen, was weh tut und was ich brauche",
+      "objectiveIds": [
+        "obj.u9.schmerz",
+        "obj.u9.bedarf"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u9.weh-tun",
+          "card.u9.kopf-tut-weh",
+          "card.u9.brauche-termin",
+          "card.u8.kann",
+          "card.u6.kann-ich"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "Schmerz- und Bedürfnisblöcke plus bekannte Modalstruktur reaktivieren"
+      },
+      "blocks": [
+        {
+          "id": "blk.u9.l3.pain",
+          "type": "rule",
+          "title": "Zwei Muster",
+          "textDe": "Ich habe Kopfschmerzen. · Mein Kopf tut weh.",
+          "textFr": "Deux formulations très simples pour exprimer un problème."
+        },
+        {
+          "id": "blk.u9.l3.need",
+          "type": "model",
+          "title": "Bedarf",
+          "textDe": "Ich brauche einen Termin. · Ich brauche Hilfe.",
+          "textFr": "brauchen permet d’exprimer un besoin concret."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u9-l3-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u9.schmerz",
+          "cardIds": [
+            "card.u9.kopf-tut-weh"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Mein Kopf tut weh.",
+          "answer": "Mein Kopf tut weh.",
+          "acceptedAnswers": [
+            "Mein Kopf tut weh."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u9.tut-weh"
+        },
+        {
+          "id": "de-a1-u9-l3-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u9.bedarf",
+          "cardIds": [
+            "card.u9.brauche-termin"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "einen Termin",
+            "brauche",
+            "Ich"
+          ],
+          "answer": [
+            "Ich",
+            "brauche",
+            "einen Termin"
+          ],
+          "feedbackIncorrect": "Das Verb brauche steht an Position 2.",
+          "remediationRef": "rem.u9.brauchen"
+        },
+        {
+          "id": "de-a1-u9-l3-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u9.schmerz",
+          "cardIds": [
+            "card.u9.kopfschmerzen",
+            "card.u9.kopf-tut-weh"
+          ],
+          "promptLang": "de",
+          "prompt": "Ich habe Kopfschmerzen. → Formuliere mit tut weh.",
+          "answer": "Mein Kopf tut weh.",
+          "acceptedAnswers": [
+            "Mein Kopf tut weh."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u9.tut-weh"
+        },
+        {
+          "id": "de-a1-u9-l3-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u9.schmerz",
+          "cardIds": [
+            "card.u9.kopf-tut-weh",
+            "card.u9.ruecken-tut-weh"
+          ],
+          "promptLang": "de",
+          "prompt": "Was tut weh?",
+          "audioRef": "drill.u9.pain",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Der Rücken.",
+              "correct": true,
+              "feedback": "Ja. Du hörst: Mein Rücken tut weh."
+            },
+            {
+              "id": "b",
+              "text": "Der Kopf.",
+              "correct": false,
+              "feedback": "Kopf wäre ein anderer Satz; im Audio hörst du Rücken."
+            }
+          ],
+          "remediationRef": "rem.u9.tut-weh"
+        },
+        {
+          "id": "de-a1-u9-l3-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u9.bedarf",
+          "cardIds": [
+            "card.u9.weh-tun",
+            "card.u9.brauchen",
+            "card.u9.brauche-termin"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe drei Mini-Situationen: ein Problem + ein einfacher Bedarf.",
+          "minimumWords": 30,
+          "successCriteria": [
+            "drei Probleme",
+            "drei Bedürfnisse",
+            "brauche"
+          ],
+          "autoCheck": [
+            "contient weh",
+            "contient brauche"
+          ],
+          "note": "Keine Diagnose oder Behandlung vorschlagen; nur sprachlich Problem und Bedarf ausdrücken."
+        }
+      ],
+      "completionMessage": "Du kannst sehr einfach sagen, was weh tut und was du brauchst."
+    },
+    {
+      "id": "de-a1-u9-l4",
+      "order": 4,
+      "phase": "Produis",
+      "title": "Einen Termin vereinbaren",
+      "objectiveIds": [
+        "obj.u9.termin",
+        "obj.u9.interaktion"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u9.termin-frei",
+          "card.u9.um-wie-viel",
+          "card.u9.heute",
+          "card.u4.wann",
+          "card.u8.von-bis"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "Terminfragen mit bekannten Zeitfragen kombinieren"
+      },
+      "blocks": [
+        {
+          "id": "blk.u9.l4.call",
+          "type": "model",
+          "title": "Termin am Telefon",
+          "textDe": "Haben Sie heute einen Termin frei? · Leider nicht. · Geht es morgen? · Ja, um zehn Uhr. · Das passt.",
+          "textFr": "Disponibilité → alternative → heure → confirmation."
+        },
+        {
+          "id": "blk.u9.l4.time",
+          "type": "strategy",
+          "title": "Zeit präzisieren",
+          "textDe": "heute · morgen · am Vormittag · am Nachmittag · um zehn Uhr",
+          "textFr": "Jour/daypart + heure précise."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u9-l4-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u9.termin",
+          "cardIds": [
+            "card.u9.termin-frei"
+          ],
+          "promptLang": "de",
+          "prompt": "Frage nach einem freien Termin heute.",
+          "answer": "Haben Sie heute einen Termin frei?",
+          "acceptedAnswers": [
+            "Haben Sie heute einen Termin frei?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u9.termin-zeit"
+        },
+        {
+          "id": "de-a1-u9-l4-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u9.termin",
+          "cardIds": [
+            "card.u9.um-wie-viel"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Frage nach der Uhrzeit.",
+          "tokens": [
+            "Uhr",
+            "viel",
+            "wie",
+            "Um"
+          ],
+          "answer": [
+            "Um",
+            "wie",
+            "viel",
+            "Uhr"
+          ],
+          "feedbackIncorrect": "Der feste Frageblock lautet Um wie viel Uhr?",
+          "remediationRef": "rem.u9.termin-zeit"
+        },
+        {
+          "id": "de-a1-u9-l4-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u9.termin",
+          "cardIds": [
+            "card.u9.heute",
+            "card.u9.morgen",
+            "card.u9.geht"
+          ],
+          "promptLang": "de",
+          "prompt": "Heute geht es nicht. → Frage nach morgen.",
+          "answer": "Geht es morgen?",
+          "acceptedAnswers": [
+            "Geht es morgen?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u9.heute-morgen"
+        },
+        {
+          "id": "de-a1-u9-l4-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u9.interaktion",
+          "cardIds": [
+            "card.u9.termin-frei",
+            "card.u9.geht",
+            "card.u9.passt"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Terminblöcke nach.",
+          "targets": [
+            {
+              "id": "t1",
+              "de": "Haben Sie heute einen Termin frei?",
+              "audioRef": "drill.u9.term1",
+              "maxSeconds": 7
+            },
+            {
+              "id": "t2",
+              "de": "Geht es morgen?",
+              "audioRef": "drill.u9.term2",
+              "maxSeconds": 5
+            },
+            {
+              "id": "t3",
+              "de": "Ja, das passt.",
+              "audioRef": "drill.u9.term3",
+              "maxSeconds": 5
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur vorgegebene Terminblöcke werden verglichen."
+        },
+        {
+          "id": "de-a1-u9-l4-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u9.interaktion",
+          "cardIds": [
+            "card.u9.termin-frei",
+            "card.u9.um-wie-viel",
+            "card.u9.morgen",
+            "card.u9.passt"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe ein Telefongespräch mit 6–8 Zeilen: Termin fragen, erste Zeit ablehnen/ändern, neue Zeit bestätigen und verabschieden.",
+          "minimumWords": 38,
+          "successCriteria": [
+            "Terminanfrage",
+            "Alternative",
+            "Uhrzeit",
+            "Bestätigung",
+            "Abschied"
+          ],
+          "autoCheck": [
+            "contient Termin",
+            "contient Uhr",
+            "contient passt"
+          ],
+          "note": "Nur Terminorganisation, keine medizinische Beratung."
+        }
+      ],
+      "completionMessage": "Du kannst einen einfachen Termin telefonisch organisieren."
+    },
+    {
+      "id": "de-a1-u9-l5",
+      "order": 5,
+      "phase": "Valide",
+      "title": "Mission: Apotheke oder Praxis",
+      "objectiveIds": [
+        "obj.u9.problem",
+        "obj.u9.koerper",
+        "obj.u9.schmerz",
+        "obj.u9.bedarf",
+        "obj.u9.termin",
+        "obj.u9.interaktion"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u9.ich-habe-fieber",
+          "card.u9.kopf-tut-weh",
+          "card.u9.brauche-termin",
+          "card.u9.termin-frei",
+          "card.u9.passt"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "persistierende Fehler und Kernblöcke der Situation zuerst"
+      },
+      "blocks": [
+        {
+          "id": "blk.u9.l5.scenario",
+          "type": "scenario",
+          "title": "Situation",
+          "text": "Du beschreibst ein einfaches Problem sprachlich und organisierst einen Termin oder stellst eine einfache Frage in einer Apotheke. Keine Diagnose- oder Behandlungsempfehlung ist Teil der Aufgabe."
+        },
+        {
+          "id": "blk.u9.l5.success",
+          "type": "rubric",
+          "title": "Erfolg",
+          "text": "Problem/Symptom klar nennen · Körperteil oder Schmerz ausdrücken · Bedarf formulieren · Termin mit Tag/Uhrzeit organisieren · Gespräch höflich abschließen."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u9-l5-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u9.problem",
+          "cardIds": [
+            "card.u9.ich-habe-fieber"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Aussage beschreibt ein Symptom korrekt?",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Ich habe Fieber.",
+              "correct": true,
+              "feedback": "Genau. Mit Fieber nutzt du hier haben."
+            },
+            {
+              "id": "b",
+              "text": "Ich bin Fieber.",
+              "correct": false,
+              "feedback": "Fieber wird hier mit haben ausgedrückt, nicht mit sein."
+            },
+            {
+              "id": "c",
+              "text": "Ich mache Fieber.",
+              "correct": false,
+              "feedback": "machen passt in diesem A1-Muster nicht zu Fieber."
+            }
+          ],
+          "remediationRef": "rem.u9.haben-symptom"
+        },
+        {
+          "id": "de-a1-u9-l5-e2",
+          "type": "dictation",
+          "objectiveId": "obj.u9.termin",
+          "cardIds": [
+            "card.u9.termin-frei"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib die Frage, die du hörst.",
+          "audioRef": "drill.u9.final-dictation",
+          "answer": "Haben Sie heute einen Termin frei?",
+          "acceptedAnswers": [
+            "Haben Sie heute einen Termin frei?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u9.termin-zeit"
+        },
+        {
+          "id": "de-a1-u9-l5-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u9.bedarf",
+          "cardIds": [
+            "card.u9.brauche-termin"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "brauche",
+            "Ich",
+            "einen Termin"
+          ],
+          "answer": [
+            "Ich",
+            "brauche",
+            "einen Termin"
+          ],
+          "feedbackIncorrect": "Ich + brauche + einen Termin.",
+          "remediationRef": "rem.u9.brauchen"
+        },
+        {
+          "id": "de-a1-u9-l5-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u9.schmerz",
+          "cardIds": [
+            "card.u9.bauchschmerzen",
+            "card.u9.kopfschmerzen"
+          ],
+          "promptLang": "de",
+          "prompt": "Welches Problem hörst du?",
+          "audioRef": "drill.u9.final-symptom",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Bauchschmerzen.",
+              "correct": true,
+              "feedback": "Ja. Das Audio nennt Bauchschmerzen."
+            },
+            {
+              "id": "b",
+              "text": "Kopfschmerzen.",
+              "correct": false,
+              "feedback": "Kopfschmerzen wäre ein anderes Symptom; hier hörst du Bauchschmerzen."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u9-l5-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u9.interaktion",
+          "cardIds": [
+            "card.u9.termin",
+            "card.u9.brauche-termin",
+            "card.u9.um-wie-viel",
+            "card.u9.auf-wiederhoeren"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe ein kurzes Rollenspiel in 10–12 Zeilen: Problem nennen, Bedarf ausdrücken, Termin vereinbaren und höflich beenden.",
+          "minimumWords": 55,
+          "successCriteria": [
+            "Problem",
+            "Bedarf",
+            "Termin",
+            "Tag/Uhrzeit",
+            "Abschied"
+          ],
+          "autoCheck": [
+            "contient habe",
+            "contient brauche",
+            "contient Termin"
+          ],
+          "note": "Die Aufgabe bewertet nur Sprache und Interaktion, nicht medizinische Richtigkeit."
+        }
+      ],
+      "completionMessage": "U9 ist in QA abgeschlossen: Du kannst ein alltägliches Problem sprachlich beschreiben und einen einfachen Termin organisieren."
+    }
+  ],
+  "qualityGates": {
+    "exerciseMix": {
+      "recognitionMax": 0.25,
+      "productiveWrittenMin": 0.35,
+      "structureMin": 0.2,
+      "oralMin": 0.2
+    },
+    "promptLang": {
+      "deMin": 1,
+      "note": "Ab U5 sind alle Übungsanweisungen auf Deutsch."
+    },
+    "spacedRecall": {
+      "minCardsRevisitedPerLesson": 3
+    },
+    "feedback": {
+      "distinctPerDistractor": true
+    },
+    "normalization": {
+      "requiredOn": [
+        "fillBlank",
+        "dictation",
+        "productiveRecall",
+        "transformation",
+        "audioCloze"
+      ]
+    }
+  }
+}
