@@ -263,6 +263,30 @@ describe("A1 refonte v2 · source contract", () => {
     expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
   });
 
+  it("integrates U12 and closes only the full-level source gate, not public READY", () => {
+    const unit = A1_V2_UNITS.find((item) => item.id === "de-a1-u12");
+    expect(unit).toBeTruthy();
+    expect(unit).toMatchObject({ order: 12, title: "Consolider son autonomie A1", contentVersion: "2026.09.20-u12-reconstruction-r1", status: "reconstruction-a-valider" });
+    expect(unit!.cards).toHaveLength(40);
+    expect(unit!.lessons).toHaveLength(5);
+    expect(unit!.lessons.flatMap((lesson) => lesson.exercises)).toHaveLength(25);
+    expect(unit!.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
+
+    const allLessons = A1_V2_UNITS.flatMap((item) => item.lessons);
+    const allExercises = allLessons.flatMap((lesson) => lesson.exercises);
+    const allCards = A1_V2_UNITS.flatMap((item) => item.cards);
+    expect(A1_V2_UNITS).toHaveLength(12);
+    expect(allLessons).toHaveLength(60);
+    expect(allExercises).toHaveLength(300);
+    expect(allCards).toHaveLength(480);
+    expect(allLessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(2160);
+    expect(MONDE_A1_V2_MANIFEST.integratedUnits).toEqual(A1_V2_UNITS.map((item) => item.id));
+    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(true);
+    expect(MONDE_A1_V2_MANIFEST.readiness.criticalNativeAudioReady).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.readiness.mockExamsReady).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
+  });
+
   it("enforces the core doctrine contract on every integrated unit", () => {
     const allCardIds = new Set(A1_V2_UNITS.flatMap((unit) => unit.cards).map((card) => card.id));
     for (const unit of A1_V2_UNITS) {
@@ -589,6 +613,13 @@ describe("A1 refonte v2 · spaced recall and remediation", () => {
     const cards = getA1V2CardsAvailableForLesson("de-a1-u11-l1");
     expect(cards).toHaveLength(440);
     expect(cards.some((card) => card.id === "card.u11.reise")).toBe(true);
+  });
+
+  it("makes all 480 A1 cards available at the U12 Réveil boundary", () => {
+    const cards = getA1V2CardsAvailableForLesson("de-a1-u12-l1");
+    expect(cards).toHaveLength(480);
+    expect(cards.some((card) => card.id === "card.u1.heissen")).toBe(true);
+    expect(cards.some((card) => card.id === "card.u12.ich-verstehe-nicht")).toBe(true);
   });
 
   it("prioritizes missed/due cards in the Réveil", () => {
