@@ -1,0 +1,642 @@
+{
+  "schemaVersion": "2.0",
+  "contentVersion": "2026.09.20-u1-refonte-reference",
+  "status": "gabarit-a-valider",
+  "note": "Gabarit de référence pour la refonte pédagogique. Unité 1 seulement. Toute référence est un identifiant stable, jamais un chemin positionnel.",
+  "cards": [
+    {
+      "id": "card.u1.heissen",
+      "kind": "chunk",
+      "de": "Ich heiße …",
+      "fr": "Je m'appelle …",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.kommen.aus",
+      "kind": "chunk",
+      "de": "Ich komme aus …",
+      "fr": "Je viens de …",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.wohnen.in",
+      "kind": "chunk",
+      "de": "Ich wohne in …",
+      "fr": "J'habite à …",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.sprechen",
+      "kind": "chunk",
+      "de": "Ich spreche …",
+      "fr": "Je parle …",
+      "introducedIn": "de-a1-u1-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.woher",
+      "kind": "lexical",
+      "de": "woher",
+      "fr": "d'où",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.wo",
+      "kind": "lexical",
+      "de": "wo",
+      "fr": "où",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.v2",
+      "kind": "structure",
+      "de": "Woher kommst du?",
+      "fr": "Le verbe vient juste après le mot interrogatif.",
+      "introducedIn": "de-a1-u1-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj.u1.reperer",
+      "label": "Repérer nom, origine, ville et langues dans un échange oral"
+    },
+    {
+      "id": "obj.u1.produire",
+      "label": "Produire les quatre informations personnelles de base"
+    },
+    {
+      "id": "obj.u1.question",
+      "label": "Poser une question en plaçant le verbe en deuxième position"
+    }
+  ],
+  "remediations": [
+    {
+      "id": "rem.u1.aus-von",
+      "objectiveId": "obj.u1.produire",
+      "durationSeconds": 110,
+      "explanation": "Pour dire d'où l'on vient — un pays, une ville — l'allemand utilise aus : Ich komme aus Kamerun. Ich komme aus Douala. On garde von pour une personne ou un point de départ précis : Ich komme von Anna. Ich komme von der Arbeit.",
+      "contrast": [
+        {
+          "de": "Ich komme aus Kamerun.",
+          "fr": "Je viens du Cameroun.",
+          "ok": true
+        },
+        {
+          "de": "Ich komme von Kamerun.",
+          "fr": "—",
+          "ok": false,
+          "why": "Kamerun est un pays d'origine, donc aus."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u1.aus-von.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich komme ____ Douala.",
+          "answer": "aus",
+          "acceptedAnswers": [
+            "aus"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u1.aus-von.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich komme ____ der Arbeit.",
+          "answer": "von",
+          "acceptedAnswers": [
+            "von"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u1.v2",
+      "objectiveId": "obj.u1.question",
+      "durationSeconds": 120,
+      "explanation": "Dans une question qui commence par un mot interrogatif, le verbe occupe toujours la deuxième place, et le sujet vient juste après lui. C'est la règle la plus rentable de tout le niveau A1 : elle vaut pour woher, wo, wie, wann et was.",
+      "contrast": [
+        {
+          "de": "Woher kommst du?",
+          "fr": "D'où viens-tu ?",
+          "ok": true
+        },
+        {
+          "de": "Woher du kommst?",
+          "fr": "—",
+          "ok": false,
+          "why": "En français on peut dire « D'où tu viens ? », pas en allemand : le verbe passe devant le sujet."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u1.v2.i1",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Wo …",
+          "tokens": [
+            "wohnst",
+            "Wo",
+            "du"
+          ],
+          "answer": [
+            "Wo",
+            "wohnst",
+            "du"
+          ],
+          "normalization": []
+        },
+        {
+          "id": "rem.u1.v2.i2",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Wie …",
+          "tokens": [
+            "Sie",
+            "heißen",
+            "Wie"
+          ],
+          "answer": [
+            "Wie",
+            "heißen",
+            "Sie"
+          ],
+          "normalization": []
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "de-a1-u1-l1",
+      "order": 1,
+      "phase": "Comprends",
+      "title": "Comprendre une première rencontre",
+      "objectiveIds": [
+        "obj.u1.reperer"
+      ],
+      "durationMinutes": 16,
+      "reveil": {
+        "cardIds": [],
+        "note": "Première leçon du niveau : aucune carte due. À partir de la leçon 2, 3 à 5 cartes tirées du calendrier J+1 / J+3 / J+7 / J+21, items ratés d'abord."
+      },
+      "blocks": [
+        {
+          "id": "blk.u1.l1.intro",
+          "type": "intro",
+          "title": "Ta mission",
+          "text": "Écoute une rencontre. Ne cherche pas à tout comprendre : repère quatre informations — le nom, l'origine, la ville, les langues."
+        },
+        {
+          "id": "blk.u1.l1.dialogue",
+          "type": "dialogueRef",
+          "dialogueId": "de-a1-u1-dialogue",
+          "speeds": [
+            "slow",
+            "natural"
+          ],
+          "instruction": "Première écoute au ralenti, sans le texte. Deuxième écoute à vitesse normale, avec le texte."
+        },
+        {
+          "id": "blk.u1.l1.strategy",
+          "type": "strategy",
+          "title": "Stratégie d'écoute",
+          "text": "Les noms de pays et de villes se reconnaissent presque toujours. Accroche-toi à eux : ils te donnent la structure de la phrase, et le reste se devine autour."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u1-l1-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u1.reperer",
+          "cardIds": [
+            "card.u1.heissen"
+          ],
+          "promptLang": "de",
+          "prompt": "Wie heißt der Mann?",
+          "audioRef": "de-a1-u1-dialogue#seg2",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Karim",
+              "correct": true,
+              "feedback": "Ja. Er sagt: Ich heiße Karim."
+            },
+            {
+              "id": "b",
+              "text": "Anna",
+              "correct": false,
+              "feedback": "Anna, c'est la femme qui parle en premier. Réécoute la deuxième réplique."
+            },
+            {
+              "id": "c",
+              "text": "Malik",
+              "correct": false,
+              "feedback": "Ce prénom n'apparaît pas dans le dialogue."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u1-l1-e2",
+          "type": "audioCloze",
+          "objectiveId": "obj.u1.reperer",
+          "cardIds": [
+            "card.u1.kommen.aus"
+          ],
+          "promptLang": "de",
+          "prompt": "Écoute et complète : Ich komme ____ Kamerun.",
+          "audioRef": "de-a1-u1-dialogue#seg4",
+          "answer": "aus",
+          "acceptedAnswers": [
+            "aus"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^von$",
+              "accept": false,
+              "note": "von s'emploie pour une personne ou un point de départ. Pour un pays d'origine, c'est aus."
+            },
+            {
+              "pattern": "^in$",
+              "accept": false,
+              "note": "in dit où l'on se trouve, pas d'où l'on vient : Ich wohne in Berlin, mais Ich komme aus Kamerun."
+            }
+          ],
+          "remediationRef": "rem.u1.aus-von"
+        },
+        {
+          "id": "de-a1-u1-l1-e3",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u1.reperer",
+          "cardIds": [
+            "card.u1.woher",
+            "card.u1.wo"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Antwort passt zu: « Woher kommst du? »",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Ich komme aus Kamerun.",
+              "correct": true,
+              "feedback": "Genau. woher demande l'origine."
+            },
+            {
+              "id": "b",
+              "text": "Ich wohne in Berlin.",
+              "correct": false,
+              "feedback": "Ça répond à wo (où tu habites), pas à woher (d'où tu viens). Le -her marque le mouvement depuis un lieu."
+            },
+            {
+              "id": "c",
+              "text": "Ich heiße Karim.",
+              "correct": false,
+              "feedback": "Ça répond à wie heißt du, la question du nom."
+            }
+          ],
+          "remediationRef": "rem.u1.v2"
+        },
+        {
+          "id": "de-a1-u1-l1-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u1.reperer",
+          "promptLang": "de",
+          "prompt": "Was hörst du?",
+          "audioRef": "drill.u1.wo-woher",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Wo wohnst du?",
+              "correct": false,
+              "feedback": "Écoute la syllabe finale du premier mot : tu entends -her."
+            },
+            {
+              "id": "b",
+              "text": "Woher kommst du?",
+              "correct": true,
+              "feedback": "Ja. Wo-her : deux syllabes."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u1-l1-e5",
+          "type": "dictation",
+          "objectiveId": "obj.u1.reperer",
+          "cardIds": [
+            "card.u1.heissen"
+          ],
+          "promptLang": "de",
+          "prompt": "Écris la phrase que tu entends.",
+          "audioRef": "de-a1-u1-dialogue#seg1b",
+          "answer": "Ich heiße Anna.",
+          "acceptedAnswers": [
+            "Ich heiße Anna.",
+            "Ich heisse Anna."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "eszett",
+            "umlaut"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^ich heise anna\\.?$",
+              "accept": true,
+              "note": "Accepté. Orthographe exacte : heiße, ou heisse si ton clavier n'a pas le ß."
+            },
+            {
+              "pattern": "^ich heiße anna$",
+              "accept": true,
+              "note": "Accepté. Pense au point final."
+            }
+          ]
+        }
+      ],
+      "completionMessage": "Tu repères maintenant les quatre informations d'une présentation sans traduire chaque mot."
+    },
+    {
+      "id": "de-a1-u1-l2",
+      "order": 2,
+      "phase": "Pratique",
+      "title": "Dire qui tu es",
+      "objectiveIds": [
+        "obj.u1.produire",
+        "obj.u1.question"
+      ],
+      "durationMinutes": 18,
+      "reveil": {
+        "cardIds": [
+          "card.u1.heissen",
+          "card.u1.kommen.aus",
+          "card.u1.woher"
+        ],
+        "itemCount": 3,
+        "maxSeconds": 90,
+        "selection": "dues d'abord, ratées en priorité, complétées au hasard si le quota n'est pas atteint"
+      },
+      "blocks": [
+        {
+          "id": "blk.u1.l2.model",
+          "type": "model",
+          "title": "Le modèle à personnaliser",
+          "textDe": "Hallo! Ich heiße ____. Ich komme aus ____. Ich wohne in ____. Ich spreche ____ und ein bisschen Deutsch.",
+          "textFr": "Salut ! Je m'appelle ____. Je viens de ____. J'habite à ____. Je parle ____ et un peu allemand."
+        },
+        {
+          "id": "blk.u1.l2.tip",
+          "type": "tip",
+          "title": "Conseil",
+          "text": "Apprends des blocs entiers — Ich komme aus… — plutôt que des mots isolés. Un bloc se réutilise tel quel ; un mot isolé demande de reconstruire la phrase à chaque fois."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u1-l2-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u1.produire",
+          "cardIds": [
+            "card.u1.kommen.aus"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris en allemand : « Je viens du Cameroun. »",
+          "answer": "Ich komme aus Kamerun.",
+          "acceptedAnswers": [
+            "Ich komme aus Kamerun."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "aus dem kamerun",
+              "accept": false,
+              "note": "Pas d'article devant les noms de pays en allemand : aus Kamerun, pas aus dem Kamerun."
+            },
+            {
+              "pattern": "ich kommen aus",
+              "accept": false,
+              "note": "Avec ich, le verbe se termine par -e : ich komme."
+            }
+          ],
+          "remediationRef": "rem.u1.aus-von"
+        },
+        {
+          "id": "de-a1-u1-l2-e2",
+          "type": "transformation",
+          "objectiveId": "obj.u1.question",
+          "cardIds": [
+            "card.u1.v2",
+            "card.u1.woher"
+          ],
+          "promptLang": "de",
+          "prompt": "Anna kommt aus Deutschland. → Stelle die Frage.",
+          "answer": "Woher kommt Anna?",
+          "acceptedAnswers": [
+            "Woher kommt Anna?",
+            "Woher kommt sie?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "woher anna kommt",
+              "accept": false,
+              "note": "Le verbe passe en deuxième position, avant le sujet : Woher kommt Anna ?"
+            }
+          ],
+          "remediationRef": "rem.u1.v2"
+        },
+        {
+          "id": "de-a1-u1-l2-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u1.question",
+          "cardIds": [
+            "card.u1.v2"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "sprichst",
+            "Welche",
+            "du",
+            "Sprachen"
+          ],
+          "answer": [
+            "Welche",
+            "Sprachen",
+            "sprichst",
+            "du"
+          ],
+          "feedbackIncorrect": "Le groupe interrogatif complet — Welche Sprachen — occupe la première place, puis le verbe, puis le sujet.",
+          "remediationRef": "rem.u1.v2"
+        },
+        {
+          "id": "de-a1-u1-l2-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u1.produire",
+          "cardIds": [
+            "card.u1.heissen",
+            "card.u1.wohnen.in"
+          ],
+          "promptLang": "de",
+          "prompt": "Écoute, puis répète immédiatement. Trois blocs qui s'allongent.",
+          "targets": [
+            {
+              "id": "s1",
+              "de": "Ich heiße Karim.",
+              "audioRef": "drill.u1.s1",
+              "maxSeconds": 4
+            },
+            {
+              "id": "s2",
+              "de": "Ich heiße Karim und ich komme aus Kamerun.",
+              "audioRef": "drill.u1.s2",
+              "maxSeconds": 7
+            },
+            {
+              "id": "s3",
+              "de": "Ich heiße Karim, ich komme aus Kamerun und ich wohne in Berlin.",
+              "audioRef": "drill.u1.s3",
+              "maxSeconds": 10
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Énoncé contraint : l'apprenant répète une phrase connue, donc la transcription est comparable à une cible. Ne jamais utiliser ce moteur pour noter une production libre."
+        },
+        {
+          "id": "de-a1-u1-l2-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u1.produire",
+          "promptLang": "bi",
+          "prompt": "Écris tes quatre phrases à toi, sur le modèle.",
+          "minimumWords": 20,
+          "successCriteria": [
+            "Une salutation",
+            "Le nom",
+            "L'origine",
+            "La ville",
+            "Au moins une langue"
+          ],
+          "autoCheck": [
+            "contient heiße",
+            "contient aus",
+            "contient wohne",
+            "contient spreche"
+          ],
+          "note": "La vérification automatique porte sur la présence des quatre blocs, pas sur la qualité. La correction fine revient au professeur en phase 4, ou à l'auto-évaluation guidée en parcours solo."
+        }
+      ],
+      "completionMessage": "Tu peux te présenter en quatre phrases et poser la question en retour."
+    }
+  ],
+  "qualityGates": {
+    "exerciseMix": {
+      "recognitionMax": 0.25,
+      "productiveWrittenMin": 0.35,
+      "structureMin": 0.2,
+      "oralMin": 0.2
+    },
+    "promptLang": {
+      "deMin": 0.6,
+      "note": "À partir de l'unité 5, viser 100 % de consignes d'exercice en allemand."
+    },
+    "spacedRecall": {
+      "minCardsRevisitedPerLesson": 3
+    },
+    "feedback": {
+      "distinctPerDistractor": true
+    },
+    "normalization": {
+      "requiredOn": [
+        "fillBlank",
+        "dictation",
+        "productiveRecall",
+        "transformation",
+        "audioCloze"
+      ]
+    }
+  }
+}
