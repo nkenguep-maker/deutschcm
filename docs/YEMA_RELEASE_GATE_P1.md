@@ -16,7 +16,7 @@ order.
 4. AccessGrant provenance (P-1 read-only audit)
 5. Adult ROOTS_FAMILY seat uniqueness/concurrency invariant (P-1 read-only)
 6. MVP trial provenance + launch catalogue invariant (P-1 read-only)
-7. German A1 adult canonical runtime provisioning (P-1 read-only)
+7. German A1 refonte v2 invariants (legacy 6×6 archived, U1 reference contract, memory RLS closed; P-1 read-only)
 8. Next.js build
 9. QA persona fixture + beta-admission checks
 10. 9-persona authenticated runtime matrix
@@ -31,3 +31,12 @@ The gate is fail-fast. No later step runs after an earlier failure.
 
 Passing this gate is required before merging the P4.7 security branch. A Vercel
 `build-rate-limit` status is not a passing build and cannot replace this gate.
+
+
+## A1 refonte note
+
+The A1 gate deliberately does not declare the level READY. It proves only that
+the superseded 6-unit runtime is archived, the received U1 refonte reference is
+the active pilot contract, and the server-side memory table is closed to client
+roles. Public A1 stays unavailable until the 12-unit/60-lesson/180-exercise
+refonte, critical native audio, and final editorial gates are complete.
