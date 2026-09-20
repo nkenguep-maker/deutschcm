@@ -113,6 +113,9 @@ export type A1Remediation = {
 };
 
 export type A1UnitReference = {
+  id: string;
+  order: number;
+  title: string;
   schemaVersion: "2.0";
   contentVersion: string;
   status: string;

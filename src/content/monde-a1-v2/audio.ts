@@ -1,0 +1,46 @@
+import {
+  A1_V2_U1_AUDIO_OVERRIDES,
+  A1_V2_U1_DIALOGUE,
+  A1_V2_U1_DRILLS,
+} from "./u1.support";
+
+export type A1Dialogue = {
+  id: string;
+  title: string;
+  context: string;
+  audioStatus: string;
+  lines: Array<{ id: string; speaker: string; de: string; fr: string }>;
+};
+
+export const A1_V2_DIALOGUES: Record<string, A1Dialogue> = {
+  [A1_V2_U1_DIALOGUE.id]: A1_V2_U1_DIALOGUE,
+};
+
+export const A1_V2_AUDIO_OVERRIDES: Record<string, string> = {
+  ...A1_V2_U1_AUDIO_OVERRIDES,
+};
+
+export const A1_V2_DRILLS: Record<string, string> = {
+  ...A1_V2_U1_DRILLS,
+};
+
+export function getA1V2Dialogue(dialogueId?: string) {
+  if (!dialogueId) return null;
+  return A1_V2_DIALOGUES[dialogueId] ?? null;
+}
+
+export function resolveA1V2AudioText(ref?: string) {
+  if (!ref) return null;
+  const override = A1_V2_AUDIO_OVERRIDES[ref];
+  if (override) return override;
+
+  const separator = ref.indexOf("#");
+  if (separator > 0) {
+    const dialogueId = ref.slice(0, separator);
+    const segmentId = ref.slice(separator + 1);
+    const dialogue = getA1V2Dialogue(dialogueId);
+    return dialogue?.lines.find((line) => line.id === segmentId)?.de ?? null;
+  }
+
+  return A1_V2_DRILLS[ref] ?? null;
+}

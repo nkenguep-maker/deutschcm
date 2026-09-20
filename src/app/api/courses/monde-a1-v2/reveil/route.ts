@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import {
-  A1_V2_UNIT_1,
   MONDE_A1_V2_COURSE_ID,
   MONDE_A1_V2_MANIFEST,
+  getA1V2CardsAvailableForLesson,
   getA1V2Lesson,
 } from "@/content/monde-a1-v2";
 import { selectWakeCards } from "@/lib/course-content/a1-v2/memory";
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
 
   const cards = selectWakeCards({
     lesson,
-    cards: A1_V2_UNIT_1.cards,
+    cards: getA1V2CardsAvailableForLesson(lessonId),
     states,
   });
 

@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { getA1V2Card } from "@/content/monde-a1-v2";
+import { getA1V2Dialogue, resolveA1V2AudioText } from "@/content/monde-a1-v2/audio";
 import type { A1Exercise, A1LessonV2, A1Remediation, A1UnitReference } from "@/content/monde-a1-v2/types";
-import { A1_V2_U1_AUDIO_OVERRIDES, A1_V2_U1_DIALOGUE, A1_V2_U1_DRILLS } from "@/content/monde-a1-v2/u1.support";
 import { evaluateA1Exercise, type A1ExerciseEvaluation } from "@/lib/course-content/a1-v2/evaluation";
 import styles from "./A1V2Preview.module.css";
 
@@ -17,17 +18,6 @@ function speak(text: string, slow = false) {
   utterance.lang = "de-DE";
   utterance.rate = slow ? 0.72 : 0.96;
   window.speechSynthesis.speak(utterance);
-}
-
-function audioText(ref?: string) {
-  if (!ref) return null;
-  const override = A1_V2_U1_AUDIO_OVERRIDES[ref];
-  if (override) return override;
-  if (ref.startsWith("de-a1-u1-dialogue#")) {
-    const segment = ref.split("#")[1];
-    return A1_V2_U1_DIALOGUE.lines.find((line) => line.id === segment)?.de ?? null;
-  }
-  return A1_V2_U1_DRILLS[ref] ?? null;
 }
 
 function RemediationBox({ remediation }: { remediation: A1Remediation }) {
@@ -54,6 +44,33 @@ function RemediationBox({ remediation }: { remediation: A1Remediation }) {
   );
 }
 
+function DialogueBlock({ dialogueId, instruction }: { dialogueId?: string; instruction?: string }) {
+  const dialogue = getA1V2Dialogue(dialogueId);
+  if (!dialogue) {
+    return <p className={styles.note}>Dialogue introuvable : {dialogueId ?? "référence absente"}.</p>;
+  }
+  const text = dialogue.lines.map((line) => line.de).join(" ");
+  return (
+    <>
+      {instruction ? <p className={styles.muted}>{instruction}</p> : null}
+      <div className={styles.audioRow}>
+        <button className={styles.buttonGhost} type="button" onClick={() => speak(text, true)}>▶ Dialogue lent</button>
+        <button className={styles.buttonGhost} type="button" onClick={() => speak(text, false)}>▶ Dialogue naturel</button>
+      </div>
+      <div className={styles.dialogue}>
+        {dialogue.lines.map((line) => (
+          <div className={styles.line} key={line.id}>
+            <strong>{line.speaker}</strong>
+            <div className={styles.de}>{line.de}</div>
+            <div className={styles.fr}>{line.fr}</div>
+          </div>
+        ))}
+      </div>
+      <p className={styles.note}>Audio de travail : synthèse navigateur. Audio natif critique obligatoire avant READY.</p>
+    </>
+  );
+}
+
 function Exercise({
   exercise,
   result,
@@ -67,7 +84,7 @@ function Exercise({
   onResponse: (value: ResponseValue) => void;
   onSubmit: (value?: ResponseValue) => void;
 }) {
-  const audio = audioText(exercise.audioRef);
+  const audio = resolveA1V2AudioText(exercise.audioRef);
   const isChoice = Boolean(exercise.choices?.length);
   const isReorder = Array.isArray(exercise.answer);
   const isGuided = exercise.type === "guidedProduction";
@@ -231,7 +248,7 @@ export function A1V2LessonPreview({
         </header>
 
         <section className={styles.hero}>
-          <div className={styles.kicker}>UNITÉ 1 · {lesson.phase} · GABARIT À VALIDER</div>
+          <div className={styles.kicker}>UNITÉ {unit.order} · {lesson.phase} · {unit.status.toUpperCase()}</div>
           <h1 className={styles.title}>{lesson.title}</h1>
           <p className={styles.lead}>Cette version teste la nouvelle mécanique : rappel productif, feedback par erreur, Réveil SRS, remédiation et allemand comme langue de test.</p>
           <div className={styles.objectives}>
@@ -248,7 +265,7 @@ export function A1V2LessonPreview({
                 <p className={styles.muted}>{lesson.reveil.note}</p>
               ) : (
                 <div className={styles.chips}>
-                  {lesson.reveil.cardIds.map((id) => <span className={styles.chip} key={id}>{cardMap.get(id)?.de ?? id}</span>)}
+                  {lesson.reveil.cardIds.map((id) => <span className={styles.chip} key={id}>{cardMap.get(id)?.de ?? getA1V2Card(id)?.de ?? id}</span>)}
                 </div>
               )}
               {lesson.reveil.selection ? <p className={styles.note}>{lesson.reveil.selection}</p> : null}
@@ -262,23 +279,7 @@ export function A1V2LessonPreview({
                 {block.textDe ? <p className={styles.de}>{block.textDe}</p> : null}
                 {block.textFr ? <p className={styles.fr}>{block.textFr}</p> : null}
                 {block.type === "dialogueRef" ? (
-                  <>
-                    <p className={styles.muted}>{block.instruction}</p>
-                    <div className={styles.audioRow}>
-                      <button className={styles.buttonGhost} type="button" onClick={() => speak(A1_V2_U1_DIALOGUE.lines.map((line) => line.de).join(" "), true)}>▶ Dialogue lent</button>
-                      <button className={styles.buttonGhost} type="button" onClick={() => speak(A1_V2_U1_DIALOGUE.lines.map((line) => line.de).join(" "), false)}>▶ Dialogue naturel</button>
-                    </div>
-                    <div className={styles.dialogue}>
-                      {A1_V2_U1_DIALOGUE.lines.map((line) => (
-                        <div className={styles.line} key={line.id}>
-                          <strong>{line.speaker}</strong>
-                          <div className={styles.de}>{line.de}</div>
-                          <div className={styles.fr}>{line.fr}</div>
-                        </div>
-                      ))}
-                    </div>
-                    <p className={styles.note}>Audio de travail : synthèse navigateur. Audio natif critique obligatoire avant READY.</p>
-                  </>
+                  <DialogueBlock dialogueId={block.dialogueId} instruction={block.instruction} />
                 ) : null}
               </section>
             ))}
@@ -320,7 +321,7 @@ export function A1V2LessonPreview({
             <section className={styles.card}>
               <div className={styles.kicker}>ÉTAT</div>
               <h3>Pas encore READY</h3>
-              <p className={styles.muted}>Le fichier reçu est un gabarit de référence U1 avec 2 leçons. YEMA ne prétend plus que l’ancien parcours 6×6 constitue le niveau A1 complet.</p>
+              <p className={styles.muted}>{unit.title} reste en QA. Le niveau complet reste fermé tant que les 12 unités, l’audio natif critique et les examens blancs ne sont pas validés.</p>
             </section>
           </aside>
         </div>

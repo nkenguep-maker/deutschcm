@@ -5,11 +5,12 @@ import {
   A1_V2_UNIT_1,
   MONDE_A1_V2_MANIFEST,
   getA1V2Card,
+  getA1V2CardsAvailableForLesson,
   getA1V2Exercise,
   getA1V2Lesson,
   getA1V2Remediation,
 } from "@/content/monde-a1-v2";
-import { A1_V2_U1_AUDIO_OVERRIDES, A1_V2_U1_DIALOGUE, A1_V2_U1_DRILLS } from "@/content/monde-a1-v2/u1.support";
+import { resolveA1V2AudioText } from "@/content/monde-a1-v2/audio";
 import { evaluateA1Exercise } from "@/lib/course-content/a1-v2/evaluation";
 import {
   nextCardMemory,
@@ -20,6 +21,9 @@ import { normalizeA1Answer } from "@/lib/course-content/a1-v2/normalization";
 
 describe("A1 refonte v2 · source contract", () => {
   it("keeps the received U1 reference exact and refuses to pretend the full A1 is ready", () => {
+    expect(A1_V2_UNIT_1.id).toBe("de-a1-u1");
+    expect(A1_V2_UNIT_1.order).toBe(1);
+    expect(A1_V2_UNIT_1.title).toBe("Saluer et se présenter");
     expect(A1_V2_UNIT_1.schemaVersion).toBe("2.0");
     expect(A1_V2_UNIT_1.contentVersion).toBe("2026.09.20-u1-refonte-r3");
     expect(A1_V2_UNIT_1.status).toBe("gabarit-a-valider");
@@ -122,13 +126,7 @@ describe("A1 refonte v2 · source contract", () => {
     );
 
     for (const ref of audioRefs) {
-      if (A1_V2_U1_AUDIO_OVERRIDES[ref]) continue;
-      if (ref.startsWith("de-a1-u1-dialogue#")) {
-        const segment = ref.split("#")[1];
-        expect(A1_V2_U1_DIALOGUE.lines.some((line) => line.id === segment), ref).toBe(true);
-      } else {
-        expect(A1_V2_U1_DRILLS[ref], ref).toBeTruthy();
-      }
+      expect(resolveA1V2AudioText(ref), ref).toBeTruthy();
     }
   });
 
@@ -264,6 +262,12 @@ describe("A1 refonte v2 · spaced recall and remediation", () => {
 
     expect(shouldTriggerRemediation(1, "rem.u1.v2")).toBe(false);
     expect(shouldTriggerRemediation(2, "rem.u1.v2")).toBe(true);
+  });
+
+  it("exposes all cards up to the lesson's unit for cross-unit Réveil", () => {
+    const cards = getA1V2CardsAvailableForLesson("de-a1-u1-l5");
+    expect(cards).toHaveLength(A1_V2_UNIT_1.cards.length);
+    expect(cards.some((card) => card.id === "card.u1.heissen")).toBe(true);
   });
 
   it("prioritizes missed/due cards in the Réveil", () => {

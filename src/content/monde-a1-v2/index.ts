@@ -26,23 +26,54 @@ export const MONDE_A1_V2_MANIFEST: A1RefonteManifest = {
 };
 
 export const A1_V2_UNIT_1 = unit1Reference as A1UnitReference;
+export const A1_V2_UNITS: A1UnitReference[] = [A1_V2_UNIT_1];
+
+export function getA1V2Unit(unitId: string) {
+  return A1_V2_UNITS.find((unit) => unit.id === unitId) ?? null;
+}
+
+export function getA1V2LessonContext(lessonId: string) {
+  for (const unit of A1_V2_UNITS) {
+    const lesson = unit.lessons.find((item) => item.id === lessonId);
+    if (lesson) return { unit, lesson };
+  }
+  return null;
+}
 
 export function getA1V2Lesson(lessonId: string) {
-  return A1_V2_UNIT_1.lessons.find((lesson) => lesson.id === lessonId) ?? null;
+  return getA1V2LessonContext(lessonId)?.lesson ?? null;
 }
 
 export function getA1V2Exercise(exerciseId: string) {
-  for (const lesson of A1_V2_UNIT_1.lessons) {
-    const exercise = lesson.exercises.find((item) => item.id === exerciseId);
-    if (exercise) return { lesson, exercise };
+  for (const unit of A1_V2_UNITS) {
+    for (const lesson of unit.lessons) {
+      const exercise = lesson.exercises.find((item) => item.id === exerciseId);
+      if (exercise) return { unit, lesson, exercise };
+    }
   }
   return null;
 }
 
 export function getA1V2Card(cardId: string) {
-  return A1_V2_UNIT_1.cards.find((card) => card.id === cardId) ?? null;
+  for (const unit of A1_V2_UNITS) {
+    const card = unit.cards.find((item) => item.id === cardId);
+    if (card) return card;
+  }
+  return null;
 }
 
 export function getA1V2Remediation(remediationId: string) {
-  return A1_V2_UNIT_1.remediations.find((item) => item.id === remediationId) ?? null;
+  for (const unit of A1_V2_UNITS) {
+    const remediation = unit.remediations.find((item) => item.id === remediationId);
+    if (remediation) return remediation;
+  }
+  return null;
+}
+
+export function getA1V2CardsAvailableForLesson(lessonId: string) {
+  const context = getA1V2LessonContext(lessonId);
+  if (!context) return [];
+  return A1_V2_UNITS
+    .filter((unit) => unit.order <= context.unit.order)
+    .flatMap((unit) => unit.cards);
 }

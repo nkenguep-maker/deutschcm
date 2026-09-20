@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { A1_V2_UNIT_1, getA1V2Lesson } from "@/content/monde-a1-v2";
+import { getA1V2LessonContext } from "@/content/monde-a1-v2";
 import { A1V2LessonPreview } from "@/features/course-experience/a1-v2/A1V2LessonPreview";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +11,7 @@ export default async function A1V2LessonPreviewPage({
 }) {
   if (process.env.VERCEL_ENV === "production") notFound();
   const { locale, lessonId } = await params;
-  const lesson = getA1V2Lesson(lessonId);
-  if (!lesson) notFound();
-  return <A1V2LessonPreview unit={A1_V2_UNIT_1} lesson={lesson} locale={locale} />;
+  const context = getA1V2LessonContext(lessonId);
+  if (!context) notFound();
+  return <A1V2LessonPreview unit={context.unit} lesson={context.lesson} locale={locale} />;
 }
