@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  A1_V2_SYLLABUS,
+  A1_V2_SYLLABUS_TOTALS,
   A1_V2_UNIT_1,
   MONDE_A1_V2_MANIFEST,
   getA1V2Card,
@@ -19,13 +21,13 @@ import { normalizeA1Answer } from "@/lib/course-content/a1-v2/normalization";
 describe("A1 refonte v2 · source contract", () => {
   it("keeps the received U1 reference exact and refuses to pretend the full A1 is ready", () => {
     expect(A1_V2_UNIT_1.schemaVersion).toBe("2.0");
-    expect(A1_V2_UNIT_1.contentVersion).toBe("2026.09.20-u1-refonte-r2");
+    expect(A1_V2_UNIT_1.contentVersion).toBe("2026.09.20-u1-refonte-r3");
     expect(A1_V2_UNIT_1.status).toBe("gabarit-a-valider");
-    expect(A1_V2_UNIT_1.cards).toHaveLength(7);
-    expect(A1_V2_UNIT_1.objectives).toHaveLength(3);
-    expect(A1_V2_UNIT_1.remediations).toHaveLength(3);
-    expect(A1_V2_UNIT_1.lessons).toHaveLength(2);
-    expect(A1_V2_UNIT_1.lessons.flatMap((lesson) => lesson.exercises)).toHaveLength(10);
+    expect(A1_V2_UNIT_1.cards).toHaveLength(40);
+    expect(A1_V2_UNIT_1.objectives).toHaveLength(6);
+    expect(A1_V2_UNIT_1.remediations).toHaveLength(5);
+    expect(A1_V2_UNIT_1.lessons).toHaveLength(5);
+    expect(A1_V2_UNIT_1.lessons.flatMap((lesson) => lesson.exercises)).toHaveLength(25);
 
     expect(MONDE_A1_V2_MANIFEST.courseId).toBe("monde-solo-de-a1");
     expect(MONDE_A1_V2_MANIFEST.target).toMatchObject({
@@ -41,6 +43,37 @@ describe("A1 refonte v2 · source contract", () => {
     expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
     expect(MONDE_A1_V2_MANIFEST.readiness.criticalNativeAudioReady).toBe(false);
     expect(MONDE_A1_V2_MANIFEST.readiness.mockExamsReady).toBe(false);
+  });
+
+  it("locks a transparent 12-unit / 60-lesson reconstruction plan without pretending it is integrated", () => {
+    expect(A1_V2_SYLLABUS_TOTALS).toMatchObject({
+      units: 12,
+      lessons: 60,
+      guidedMinutes: 2160,
+      lexicalItems: 480,
+      exerciseFloor: 180,
+    });
+    expect(A1_V2_SYLLABUS_TOTALS.guidedMinutes / 60).toBe(36);
+    expect(new Set(A1_V2_SYLLABUS.map((unit) => unit.id)).size).toBe(12);
+    expect(A1_V2_SYLLABUS.every((unit) => unit.lessons.length === 5)).toBe(true);
+    expect(A1_V2_SYLLABUS.slice(0, 6).every((unit) => unit.origin === "LEGACY_EDITORIAL_REFONTE")).toBe(true);
+    expect(A1_V2_SYLLABUS.slice(6).every((unit) => unit.origin === "NEW_RECONSTRUCTION")).toBe(true);
+    expect(MONDE_A1_V2_MANIFEST.integratedUnits).toEqual(["de-a1-u1"]);
+  });
+
+  it("makes U1 a full five-lesson template before U2", () => {
+    expect(A1_V2_UNIT_1.lessons.map((lesson) => lesson.id)).toEqual([
+      "de-a1-u1-l1",
+      "de-a1-u1-l2",
+      "de-a1-u1-l3",
+      "de-a1-u1-l4",
+      "de-a1-u1-l5",
+    ]);
+    expect(A1_V2_UNIT_1.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
+    for (const lesson of A1_V2_UNIT_1.lessons.slice(1)) {
+      expect(lesson.reveil.itemCount ?? lesson.reveil.cardIds.length, lesson.id).toBeGreaterThanOrEqual(3);
+      expect(lesson.reveil.itemCount ?? lesson.reveil.cardIds.length, lesson.id).toBeLessThanOrEqual(5);
+    }
   });
 
   it("uses only stable references and resolves every objective/card/remediation id", () => {

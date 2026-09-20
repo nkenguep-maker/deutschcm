@@ -1,8 +1,8 @@
 {
   "schemaVersion": "2.0",
-  "contentVersion": "2026.09.20-u1-refonte-r2",
+  "contentVersion": "2026.09.20-u1-refonte-r3",
   "status": "gabarit-a-valider",
-  "note": "Gabarit de référence U1 révisé après validation bout en bout : identifiants stables, audio QA résolvable et remédiation ciblée wo/woher. Toujours à valider avant extension U2.",
+  "note": "U1 reconstruite à 5 leçons / 180 min pour servir de gabarit complet avant U2. Le matériau communicatif utile de l’ancien U1 est conservé, mais les mécaniques sont celles de la doctrine v2. Audio natif et QA utilisateur restent requis avant toute notion de READY.",
   "cards": [
     {
       "id": "card.u1.heissen",
@@ -108,6 +108,501 @@
           21
         ]
       }
+    },
+    {
+      "id": "card.u1.hallo",
+      "kind": "chunk",
+      "de": "Hallo!",
+      "fr": "Salut !",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.guten-morgen",
+      "kind": "chunk",
+      "de": "Guten Morgen!",
+      "fr": "Bonjour (le matin)",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.guten-tag",
+      "kind": "chunk",
+      "de": "Guten Tag!",
+      "fr": "Bonjour (journée, poli)",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.guten-abend",
+      "kind": "chunk",
+      "de": "Guten Abend!",
+      "fr": "Bonsoir !",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.tschuess",
+      "kind": "chunk",
+      "de": "Tschüss!",
+      "fr": "Salut / Au revoir",
+      "introducedIn": "de-a1-u1-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.auf-wiedersehen",
+      "kind": "chunk",
+      "de": "Auf Wiedersehen!",
+      "fr": "Au revoir (poli)",
+      "introducedIn": "de-a1-u1-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.bis-spaeter",
+      "kind": "chunk",
+      "de": "Bis später!",
+      "fr": "À plus tard !",
+      "introducedIn": "de-a1-u1-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.bis-morgen",
+      "kind": "chunk",
+      "de": "Bis morgen!",
+      "fr": "À demain !",
+      "introducedIn": "de-a1-u1-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.mein-name",
+      "kind": "chunk",
+      "de": "Mein Name ist …",
+      "fr": "Mon nom est …",
+      "introducedIn": "de-a1-u1-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.freut-mich",
+      "kind": "chunk",
+      "de": "Freut mich.",
+      "fr": "Enchanté(e).",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.kennenlernen",
+      "kind": "chunk",
+      "de": "Schön, dich kennenzulernen.",
+      "fr": "Ravi(e) de faire ta connaissance.",
+      "introducedIn": "de-a1-u1-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.ebenso",
+      "kind": "chunk",
+      "de": "Ebenso!",
+      "fr": "Moi aussi / pareillement !",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.und-du",
+      "kind": "chunk",
+      "de": "Und du?",
+      "fr": "Et toi ?",
+      "introducedIn": "de-a1-u1-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.ein-bisschen",
+      "kind": "chunk",
+      "de": "ein bisschen",
+      "fr": "un peu",
+      "introducedIn": "de-a1-u1-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.wie",
+      "kind": "lexical",
+      "de": "wie",
+      "fr": "comment",
+      "introducedIn": "de-a1-u1-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.welche",
+      "kind": "lexical",
+      "de": "welche",
+      "fr": "quel(le)s",
+      "introducedIn": "de-a1-u1-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.frage-heissen",
+      "kind": "structure",
+      "de": "Wie heißt du?",
+      "fr": "Comment t’appelles-tu ?",
+      "introducedIn": "de-a1-u1-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.frage-wohnen",
+      "kind": "structure",
+      "de": "Wo wohnst du?",
+      "fr": "Où habites-tu ?",
+      "introducedIn": "de-a1-u1-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.frage-sprachen",
+      "kind": "structure",
+      "de": "Welche Sprachen sprichst du?",
+      "fr": "Quelles langues parles-tu ?",
+      "introducedIn": "de-a1-u1-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.sie-formal",
+      "kind": "structure",
+      "de": "Wie heißen Sie?",
+      "fr": "Comment vous appelez-vous ?",
+      "introducedIn": "de-a1-u1-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.du",
+      "kind": "lexical",
+      "de": "du",
+      "fr": "tu",
+      "introducedIn": "de-a1-u1-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.sie",
+      "kind": "lexical",
+      "de": "Sie",
+      "fr": "vous (forme polie)",
+      "introducedIn": "de-a1-u1-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.deutsch",
+      "kind": "lexical",
+      "de": "Deutsch",
+      "fr": "allemand",
+      "introducedIn": "de-a1-u1-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.englisch",
+      "kind": "lexical",
+      "de": "Englisch",
+      "fr": "anglais",
+      "introducedIn": "de-a1-u1-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.franzoesisch",
+      "kind": "lexical",
+      "de": "Französisch",
+      "fr": "français",
+      "introducedIn": "de-a1-u1-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.deutschland",
+      "kind": "lexical",
+      "de": "Deutschland",
+      "fr": "Allemagne",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.kamerun",
+      "kind": "lexical",
+      "de": "Kamerun",
+      "fr": "Cameroun",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.frankreich",
+      "kind": "lexical",
+      "de": "Frankreich",
+      "fr": "France",
+      "introducedIn": "de-a1-u1-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.berlin",
+      "kind": "lexical",
+      "de": "Berlin",
+      "fr": "Berlin",
+      "introducedIn": "de-a1-u1-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.koeln",
+      "kind": "lexical",
+      "de": "Köln",
+      "fr": "Cologne",
+      "introducedIn": "de-a1-u1-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.name",
+      "kind": "lexical",
+      "de": "der Name",
+      "fr": "le nom",
+      "introducedIn": "de-a1-u1-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.sprachen",
+      "kind": "lexical",
+      "de": "die Sprachen",
+      "fr": "les langues",
+      "introducedIn": "de-a1-u1-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u1.wohnen-verb",
+      "kind": "lexical",
+      "de": "wohnen",
+      "fr": "habiter",
+      "introducedIn": "de-a1-u1-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
     }
   ],
   "objectives": [
@@ -122,6 +617,18 @@
     {
       "id": "obj.u1.question",
       "label": "Poser une question en plaçant le verbe en deuxième position"
+    },
+    {
+      "id": "obj.u1.saluer",
+      "label": "Choisir une salutation et une formule de fin adaptées à la situation"
+    },
+    {
+      "id": "obj.u1.prononcer",
+      "label": "Rendre compréhensibles les sons-clés de la première rencontre"
+    },
+    {
+      "id": "obj.u1.interagir",
+      "label": "Enchaîner une courte première rencontre en répondant et en relançant"
     }
   ],
   "remediations": [
@@ -286,6 +793,126 @@
           ]
         }
       ]
+    },
+    {
+      "id": "rem.u1.du-sie",
+      "objectiveId": "obj.u1.interagir",
+      "durationSeconds": 120,
+      "explanation": "du est la forme informelle ; Sie est la forme polie. Le verbe change avec la personne : Wie heißt du? mais Wie heißen Sie? Choisis une seule relation et garde-la cohérente dans l’échange.",
+      "contrast": [
+        {
+          "de": "Wie heißt du? — Ich heiße Nora.",
+          "fr": "Comment t’appelles-tu ? — Je m’appelle Nora.",
+          "ok": true
+        },
+        {
+          "de": "Wie heißen Sie? — Mein Name ist Nora Klein.",
+          "fr": "Comment vous appelez-vous ? — Je m’appelle Nora Klein.",
+          "ok": true
+        },
+        {
+          "de": "Wie heißt Sie?",
+          "fr": "—",
+          "ok": false,
+          "why": "Avec Sie, on utilise heißen : Wie heißen Sie?"
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u1.du-sie.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Wie ____ du?",
+          "answer": "heißt",
+          "acceptedAnswers": [
+            "heißt",
+            "heisst"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "eszett"
+          ]
+        },
+        {
+          "id": "rem.u1.du-sie.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Wie ____ Sie?",
+          "answer": "heißen",
+          "acceptedAnswers": [
+            "heißen",
+            "heissen"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "eszett"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u1.heissen-form",
+      "objectiveId": "obj.u1.question",
+      "durationSeconds": 105,
+      "explanation": "Avec ich : ich heiße. Avec du : du heißt. Dans la question Wie heißt du?, le verbe porte donc -t et vient avant du.",
+      "contrast": [
+        {
+          "de": "Ich heiße Amina.",
+          "fr": "Je m’appelle Amina.",
+          "ok": true
+        },
+        {
+          "de": "Wie heißt du?",
+          "fr": "Comment t’appelles-tu ?",
+          "ok": true
+        },
+        {
+          "de": "Wie heiße du?",
+          "fr": "—",
+          "ok": false,
+          "why": "heiße va avec ich. Avec du : heißt."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u1.heissen-form.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich ____ Malik.",
+          "answer": "heiße",
+          "acceptedAnswers": [
+            "heiße",
+            "heisse"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "eszett"
+          ]
+        },
+        {
+          "id": "rem.u1.heissen-form.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Wie ____ du?",
+          "answer": "heißt",
+          "acceptedAnswers": [
+            "heißt",
+            "heisst"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "eszett"
+          ]
+        }
+      ]
     }
   ],
   "lessons": [
@@ -297,7 +924,7 @@
       "objectiveIds": [
         "obj.u1.reperer"
       ],
-      "durationMinutes": 16,
+      "durationMinutes": 30,
       "reveil": {
         "cardIds": [],
         "note": "Première leçon du niveau : aucune carte due. À partir de la leçon 2, 3 à 5 cartes tirées du calendrier J+1 / J+3 / J+7 / J+21, items ratés d'abord."
@@ -492,7 +1119,7 @@
         "obj.u1.produire",
         "obj.u1.question"
       ],
-      "durationMinutes": 18,
+      "durationMinutes": 35,
       "reveil": {
         "cardIds": [
           "card.u1.heissen",
@@ -666,6 +1293,556 @@
         }
       ],
       "completionMessage": "Tu peux te présenter en quatre phrases et poser la question en retour."
+    },
+    {
+      "id": "de-a1-u1-l3",
+      "order": 3,
+      "phase": "Pratique",
+      "title": "Poser les bonnes questions",
+      "objectiveIds": [
+        "obj.u1.question",
+        "obj.u1.interagir"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u1.heissen",
+          "card.u1.kommen.aus",
+          "card.u1.woher",
+          "card.u1.wohnen.in"
+        ],
+        "itemCount": 4,
+        "maxSeconds": 90,
+        "selection": "cartes ratées, puis dues, puis cartes du contexte de la leçon"
+      },
+      "blocks": [
+        {
+          "id": "blk.u1.l3.rule",
+          "type": "rule",
+          "title": "Question = mot interrogatif + verbe + sujet",
+          "textDe": "Wie heißt du? · Woher kommst du? · Wo wohnst du? · Welche Sprachen sprichst du?",
+          "textFr": "Le verbe vient immédiatement après le mot ou groupe interrogatif."
+        },
+        {
+          "id": "blk.u1.l3.formality",
+          "type": "contrast",
+          "title": "du ou Sie",
+          "textDe": "Wie heißt du? ↔ Wie heißen Sie?",
+          "textFr": "du = informel ; Sie = poli. Ne mélange pas les deux formes dans le même échange."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u1-l3-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u1.question",
+          "cardIds": [
+            "card.u1.frage-heissen"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris en allemand : « Comment t’appelles-tu ? »",
+          "answer": "Wie heißt du?",
+          "acceptedAnswers": [
+            "Wie heißt du?",
+            "Wie heisst du?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "eszett"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^wie heisse du$",
+              "accept": false,
+              "note": "heiße va avec ich. Avec du : Wie heißt du?"
+            }
+          ],
+          "remediationRef": "rem.u1.heissen-form"
+        },
+        {
+          "id": "de-a1-u1-l3-e2",
+          "type": "transformation",
+          "objectiveId": "obj.u1.question",
+          "cardIds": [
+            "card.u1.frage-wohnen",
+            "card.u1.v2"
+          ],
+          "promptLang": "de",
+          "prompt": "Ich wohne in Hamburg. → Stelle die Frage an du.",
+          "answer": "Wo wohnst du?",
+          "acceptedAnswers": [
+            "Wo wohnst du?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^wo du wohnst$",
+              "accept": false,
+              "note": "Le verbe occupe la deuxième position : Wo wohnst du?"
+            }
+          ],
+          "remediationRef": "rem.u1.v2"
+        },
+        {
+          "id": "de-a1-u1-l3-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u1.question",
+          "cardIds": [
+            "card.u1.frage-sprachen",
+            "card.u1.v2"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "du",
+            "Sprachen",
+            "sprichst",
+            "Welche"
+          ],
+          "answer": [
+            "Welche",
+            "Sprachen",
+            "sprichst",
+            "du"
+          ],
+          "feedbackIncorrect": "Welche Sprachen forme le bloc interrogatif ; ensuite viennent le verbe sprichst puis le sujet du.",
+          "remediationRef": "rem.u1.v2"
+        },
+        {
+          "id": "de-a1-u1-l3-e4",
+          "type": "audioCloze",
+          "objectiveId": "obj.u1.question",
+          "cardIds": [
+            "card.u1.frage-wohnen"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Wo ____ du?",
+          "audioRef": "drill.u1.question-wohnen",
+          "answer": "wohnst",
+          "acceptedAnswers": [
+            "wohnst"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^wohne$",
+              "accept": false,
+              "note": "wohne va avec ich ; avec du : wohnst."
+            }
+          ],
+          "remediationRef": "rem.u1.v2"
+        },
+        {
+          "id": "de-a1-u1-l3-e5",
+          "type": "shadowing",
+          "objectiveId": "obj.u1.question",
+          "cardIds": [
+            "card.u1.frage-heissen",
+            "card.u1.frage-wohnen",
+            "card.u1.frage-sprachen"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Fragen direkt nach.",
+          "targets": [
+            {
+              "id": "q1",
+              "de": "Wie heißt du?",
+              "audioRef": "drill.u1.q1",
+              "maxSeconds": 4
+            },
+            {
+              "id": "q2",
+              "de": "Wo wohnst du?",
+              "audioRef": "drill.u1.q2",
+              "maxSeconds": 4
+            },
+            {
+              "id": "q3",
+              "de": "Welche Sprachen sprichst du?",
+              "audioRef": "drill.u1.q3",
+              "maxSeconds": 6
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "QA manuelle tant que la transcription contrainte n’est pas branchée ; aucune production libre n’est notée automatiquement."
+        }
+      ],
+      "completionMessage": "Tu peux maintenant poser les questions de base sans reconstruire l’ordre des mots depuis le français."
+    },
+    {
+      "id": "de-a1-u1-l4",
+      "order": 4,
+      "phase": "Produis",
+      "title": "Saluer, prononcer et enchaîner",
+      "objectiveIds": [
+        "obj.u1.saluer",
+        "obj.u1.prononcer",
+        "obj.u1.interagir"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u1.hallo",
+          "card.u1.freut-mich",
+          "card.u1.frage-heissen",
+          "card.u1.frage-wohnen",
+          "card.u1.kommen.aus"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "cartes ratées, puis dues, puis expressions nécessaires au mini-dialogue"
+      },
+      "blocks": [
+        {
+          "id": "blk.u1.l4.greetings",
+          "type": "model",
+          "title": "Ouvrir et fermer l’échange",
+          "textDe": "Guten Morgen! / Hallo! · Freut mich. · Tschüss! / Auf Wiedersehen!",
+          "textFr": "Choisis la formule selon le degré de formalité, puis garde le même registre."
+        },
+        {
+          "id": "blk.u1.l4.pronunciation",
+          "type": "pronunciation",
+          "title": "Trois sons à rendre compréhensibles",
+          "textDe": "ich · wohnen · zwei",
+          "textFr": "ch de ich : doux ; w : proche du v français ; z : [ts]. La cible est l’intelligibilité, pas un accent natif."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u1-l4-e1",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u1.saluer",
+          "cardIds": [
+            "card.u1.guten-morgen",
+            "card.u1.tschuess"
+          ],
+          "promptLang": "de",
+          "prompt": "Was hörst du?",
+          "audioRef": "drill.u1.greeting-formal",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Guten Morgen!",
+              "correct": true,
+              "feedback": "Ja. C’est une ouverture polie du matin."
+            },
+            {
+              "id": "b",
+              "text": "Tschüss!",
+              "correct": false,
+              "feedback": "Tschüss ferme généralement l’échange ; l’audio ouvre la conversation."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u1-l4-e2",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u1.interagir",
+          "cardIds": [
+            "card.u1.freut-mich"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris en allemand : « Enchanté(e). »",
+          "answer": "Freut mich.",
+          "acceptedAnswers": [
+            "Freut mich.",
+            "Freut mich"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "feedbackIncorrect": "Utilise le bloc mémorisé Freut mich. — pas une traduction mot à mot."
+        },
+        {
+          "id": "de-a1-u1-l4-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u1.interagir",
+          "cardIds": [
+            "card.u1.kennenlernen"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "dich",
+            "Schön",
+            "kennenzulernen"
+          ],
+          "answer": [
+            "Schön",
+            "dich",
+            "kennenzulernen"
+          ],
+          "feedbackIncorrect": "Le bloc est figé ici : Schön, dich kennenzulernen."
+        },
+        {
+          "id": "de-a1-u1-l4-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u1.prononcer",
+          "cardIds": [
+            "card.u1.wohnen-verb",
+            "card.u1.sprachen"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu. Wiederhole langsam, dann natürlich.",
+          "targets": [
+            {
+              "id": "p1",
+              "de": "Ich wohne in Berlin.",
+              "audioRef": "drill.u1.pron.w",
+              "maxSeconds": 5
+            },
+            {
+              "id": "p2",
+              "de": "Ich spreche ein bisschen Deutsch.",
+              "audioRef": "drill.u1.pron.ch",
+              "maxSeconds": 6
+            },
+            {
+              "id": "p3",
+              "de": "Ich spreche zwei Sprachen.",
+              "audioRef": "drill.u1.pron.z",
+              "maxSeconds": 6
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Le prototype ne note pas l’accent ; il prépare une comparaison contrainte à la cible."
+        },
+        {
+          "id": "de-a1-u1-l4-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u1.interagir",
+          "cardIds": [
+            "card.u1.hallo",
+            "card.u1.heissen",
+            "card.u1.frage-heissen",
+            "card.u1.freut-mich"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris un mini-échange de 4 à 6 lignes : salue, présente-toi, pose une question, réponds et termine amicalement.",
+          "minimumWords": 24,
+          "successCriteria": [
+            "Une salutation",
+            "Ton nom",
+            "Au moins une question",
+            "Une réponse personnelle",
+            "Une formule de fin"
+          ],
+          "autoCheck": [
+            "contient heiße",
+            "contient ?",
+            "contient Hallo"
+          ],
+          "note": "L’auto-vérification contrôle seulement des blocs. La qualité interactionnelle reste une auto-évaluation guidée / future correction professeur."
+        }
+      ],
+      "completionMessage": "Tu peux ouvrir, maintenir et fermer une première interaction courte avec une prononciation suffisamment lisible."
+    },
+    {
+      "id": "de-a1-u1-l5",
+      "order": 5,
+      "phase": "Valide",
+      "title": "Mission finale : première rencontre",
+      "objectiveIds": [
+        "obj.u1.reperer",
+        "obj.u1.produire",
+        "obj.u1.question",
+        "obj.u1.interagir"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u1.heissen",
+          "card.u1.kommen.aus",
+          "card.u1.wohnen.in",
+          "card.u1.sprechen",
+          "card.u1.v2"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "erreurs persistantes d’abord, puis cartes dues, puis blocs de mission"
+      },
+      "blocks": [
+        {
+          "id": "blk.u1.l5.scenario",
+          "type": "scenario",
+          "title": "Situation",
+          "text": "Tu arrives à un événement international. Une personne se présente. Tu dois comprendre l’essentiel, répondre avec quatre informations, puis poser deux questions."
+        },
+        {
+          "id": "blk.u1.l5.success",
+          "type": "rubric",
+          "title": "Réussite",
+          "text": "Comprendre le nom/origine/ville · se présenter · poser deux questions avec le verbe en deuxième position · terminer poliment. La production libre n’est pas auto-notée comme de l’oral natif."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u1-l5-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u1.reperer",
+          "cardIds": [
+            "card.u1.wo",
+            "card.u1.wohnen.in"
+          ],
+          "promptLang": "de",
+          "prompt": "Jemand fragt: « Wo wohnst du? » Welche Antwort passt?",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Ich wohne in Köln.",
+              "correct": true,
+              "feedback": "Genau. wo + wohnen demande le lieu d’habitation."
+            },
+            {
+              "id": "b",
+              "text": "Ich komme aus Frankreich.",
+              "correct": false,
+              "feedback": "Cette réponse donne l’origine ; elle répond à Woher kommst du?"
+            },
+            {
+              "id": "c",
+              "text": "Ich heiße Nora.",
+              "correct": false,
+              "feedback": "Cette réponse donne le nom ; elle répond à Wie heißt du?"
+            }
+          ],
+          "remediationRef": "rem.u1.wo-woher"
+        },
+        {
+          "id": "de-a1-u1-l5-e2",
+          "type": "dictation",
+          "objectiveId": "obj.u1.reperer",
+          "cardIds": [
+            "card.u1.freut-mich",
+            "card.u1.kennenlernen"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib den Satz, den du hörst.",
+          "audioRef": "drill.u1.final-dictation",
+          "answer": "Schön, dich kennenzulernen.",
+          "acceptedAnswers": [
+            "Schön, dich kennenzulernen.",
+            "Schoen, dich kennenzulernen."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ],
+          "feedbackIncorrect": "Écoute le bloc entier : Schön, dich kennenzulernen."
+        },
+        {
+          "id": "de-a1-u1-l5-e3",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u1.interagir",
+          "cardIds": [
+            "card.u1.sie-formal"
+          ],
+          "promptLang": "bi",
+          "prompt": "Demande poliment le nom d’une personne inconnue.",
+          "answer": "Wie heißen Sie?",
+          "acceptedAnswers": [
+            "Wie heißen Sie?",
+            "Wie heissen Sie?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "eszett"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^wie heisst du$",
+              "accept": false,
+              "note": "La phrase est correcte en registre informel, mais la consigne demande la forme polie Sie."
+            }
+          ],
+          "remediationRef": "rem.u1.du-sie"
+        },
+        {
+          "id": "de-a1-u1-l5-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u1.reperer",
+          "cardIds": [
+            "card.u1.woher",
+            "card.u1.wo"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Frage hörst du?",
+          "audioRef": "drill.u1.final-listening",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Woher kommst du?",
+              "correct": false,
+              "feedback": "Tu entendrais kommst pour l’origine. Ici l’audio contient wohnst."
+            },
+            {
+              "id": "b",
+              "text": "Wo wohnst du?",
+              "correct": true,
+              "feedback": "Ja. wo + wohnst demande le lieu d’habitation."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u1-l5-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u1.interagir",
+          "cardIds": [
+            "card.u1.heissen",
+            "card.u1.kommen.aus",
+            "card.u1.wohnen.in",
+            "card.u1.sprechen",
+            "card.u1.frage-heissen"
+          ],
+          "promptLang": "bi",
+          "prompt": "Réalise la mission par écrit : 6 à 9 lignes. Présente-toi avec nom, origine, ville et langue(s), puis pose deux questions et termine l’échange.",
+          "minimumWords": 38,
+          "successCriteria": [
+            "Nom",
+            "Origine",
+            "Ville",
+            "Langue(s)",
+            "Deux questions",
+            "Formule de fin"
+          ],
+          "autoCheck": [
+            "contient heiße",
+            "contient aus",
+            "contient wohne",
+            "contient spreche",
+            "contient ?"
+          ],
+          "note": "Validation de blocs uniquement. L’aisance, la pertinence et l’oral libre seront évalués humainement / par auto-évaluation guidée."
+        }
+      ],
+      "completionMessage": "Unité 1 terminée en QA : tu peux comprendre et mener une première rencontre très simple. Les cartes restent actives pour les Réveils des unités suivantes."
     }
   ],
   "qualityGates": {

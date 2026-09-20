@@ -25,6 +25,16 @@ export const A1_V2_U1_AUDIO_OVERRIDES: Record<string, string> = {
 };
 
 export const A1_V2_U1_DRILLS: Record<string, string> = {
+  "drill.u1.question-wohnen": "Wo wohnst du?",
+  "drill.u1.q1": "Wie heißt du?",
+  "drill.u1.q2": "Wo wohnst du?",
+  "drill.u1.q3": "Welche Sprachen sprichst du?",
+  "drill.u1.greeting-formal": "Guten Morgen!",
+  "drill.u1.pron.w": "Ich wohne in Berlin.",
+  "drill.u1.pron.ch": "Ich spreche ein bisschen Deutsch.",
+  "drill.u1.pron.z": "Ich spreche zwei Sprachen.",
+  "drill.u1.final-dictation": "Schön, dich kennenzulernen.",
+  "drill.u1.final-listening": "Wo wohnst du?",
   "drill.u1.wo-woher": "Woher kommst du?",
   "drill.u1.s1": "Ich heiße Karim.",
   "drill.u1.s2": "Ich heiße Karim und ich komme aus Kamerun.",

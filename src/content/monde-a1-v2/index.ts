@@ -1,5 +1,6 @@
 import unit1Reference from "./u1.reference.json";
 import type { A1RefonteManifest, A1UnitReference } from "./types";
+export { A1_V2_SYLLABUS, A1_V2_SYLLABUS_TOTALS } from "./syllabus";
 
 export const MONDE_A1_V2_COURSE_ID = "monde-solo-de-a1" as const;
 
