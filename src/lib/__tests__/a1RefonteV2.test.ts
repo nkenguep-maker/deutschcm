@@ -49,7 +49,7 @@ describe("A1 refonte v2 · source contract", () => {
       lexicalItemsMax: 600,
     });
     expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
-    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
     expect(MONDE_A1_V2_MANIFEST.readiness.criticalNativeAudioReady).toBe(false);
     expect(MONDE_A1_V2_MANIFEST.readiness.mockExamsReady).toBe(false);
   });
@@ -100,7 +100,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(A1_V2_UNIT_2.lessons.flatMap((lesson) => lesson.exercises)).toHaveLength(25);
     expect(A1_V2_UNIT_2.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
     expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
-    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
   });
 
   it("resolves U2 stable references, including deliberate cross-unit recall", () => {
@@ -145,7 +145,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(A1_V2_UNIT_3.lessons.flatMap((lesson) => lesson.exercises)).toHaveLength(25);
     expect(A1_V2_UNIT_3.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
     expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
-    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
   });
 
   it("integrates U6 as the sixth of twelve units and removes the legacy A1-finished claim", () => {
@@ -165,7 +165,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(A1_V2_UNIT_6.lessons.at(-1)?.completionMessage).toContain("U7");
     expect(MONDE_A1_V2_MANIFEST.integratedUnits).toContain("de-a1-u6");
     expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
-    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
   });
 
   it("integrates U7 as explicit NEW_RECONSTRUCTION housing content", () => {
@@ -184,7 +184,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(unit!.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
     expect(unit!.lessons.flatMap((lesson) => lesson.exercises).every((exercise) => exercise.promptLang === "de")).toBe(true);
     expect(MONDE_A1_V2_MANIFEST.integratedUnits).toContain("de-a1-u7");
-    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
   });
 
   it("integrates U8 as explicit NEW_RECONSTRUCTION work-and-study content", () => {
@@ -203,7 +203,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(unit!.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
     expect(unit!.lessons.flatMap((lesson) => lesson.exercises).every((exercise) => exercise.promptLang === "de")).toBe(true);
     expect(MONDE_A1_V2_MANIFEST.integratedUnits).toContain("de-a1-u8");
-    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
   });
 
   it("integrates U9 as explicit NEW_RECONSTRUCTION language-only health content", () => {
@@ -222,7 +222,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(unit!.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
     expect(unit!.lessons.flatMap((lesson) => lesson.exercises).every((exercise) => exercise.promptLang === "de")).toBe(true);
     expect(MONDE_A1_V2_MANIFEST.integratedUnits).toContain("de-a1-u9");
-    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
   });
 
   it("integrates U10 as explicit NEW_RECONSTRUCTION generic service content", () => {
@@ -241,7 +241,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(unit!.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
     expect(unit!.lessons.flatMap((lesson) => lesson.exercises).every((exercise) => exercise.promptLang === "de")).toBe(true);
     expect(MONDE_A1_V2_MANIFEST.integratedUnits).toContain("de-a1-u10");
-    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
   });
 
   it("integrates U11 as explicit NEW_RECONSTRUCTION travel content", () => {
@@ -260,7 +260,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(unit!.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
     expect(unit!.lessons.flatMap((lesson) => lesson.exercises).every((exercise) => exercise.promptLang === "de")).toBe(true);
     expect(MONDE_A1_V2_MANIFEST.integratedUnits).toContain("de-a1-u11");
-    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
   });
 
   it("integrates U12 and closes only the full-level source gate, not public READY", () => {
