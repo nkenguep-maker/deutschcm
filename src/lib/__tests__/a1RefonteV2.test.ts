@@ -187,6 +187,25 @@ describe("A1 refonte v2 · source contract", () => {
     expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
   });
 
+  it("integrates U8 as explicit NEW_RECONSTRUCTION work-and-study content", () => {
+    const unit = A1_V2_UNITS.find((item) => item.id === "de-a1-u8");
+    expect(unit).toBeTruthy();
+    expect(unit).toMatchObject({
+      order: 8,
+      title: "Travail, études et compétences",
+      contentVersion: "2026.09.20-u8-reconstruction-r1",
+      status: "reconstruction-a-valider",
+    });
+    expect(unit!.note).toContain("reconstruction nouvelle");
+    expect(unit!.cards).toHaveLength(40);
+    expect(unit!.lessons).toHaveLength(5);
+    expect(unit!.lessons.flatMap((lesson) => lesson.exercises)).toHaveLength(25);
+    expect(unit!.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
+    expect(unit!.lessons.flatMap((lesson) => lesson.exercises).every((exercise) => exercise.promptLang === "de")).toBe(true);
+    expect(MONDE_A1_V2_MANIFEST.integratedUnits).toContain("de-a1-u8");
+    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
+  });
+
   it("enforces the core doctrine contract on every integrated unit", () => {
     const allCardIds = new Set(A1_V2_UNITS.flatMap((unit) => unit.cards).map((card) => card.id));
     for (const unit of A1_V2_UNITS) {
@@ -489,6 +508,12 @@ describe("A1 refonte v2 · spaced recall and remediation", () => {
     const cards = getA1V2CardsAvailableForLesson("de-a1-u7-l1");
     expect(cards).toHaveLength(280);
     expect(cards.some((card) => card.id === "card.u7.wohnung")).toBe(true);
+  });
+
+  it("makes U1–U8 cards available at the U8 Réveil boundary", () => {
+    const cards = getA1V2CardsAvailableForLesson("de-a1-u8-l1");
+    expect(cards).toHaveLength(320);
+    expect(cards.some((card) => card.id === "card.u8.beruf")).toBe(true);
   });
 
   it("prioritizes missed/due cards in the Réveil", () => {
