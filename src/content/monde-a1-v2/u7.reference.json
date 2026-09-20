@@ -1,0 +1,1797 @@
+{
+  "id": "de-a1-u7",
+  "order": 7,
+  "title": "Habiter et décrire son logement",
+  "schemaVersion": "2.0",
+  "contentVersion": "2026.09.20-u7-reconstruction-r1",
+  "status": "reconstruction-a-valider",
+  "note": "U7 est une reconstruction nouvelle à partir du syllabus canonique, pas un contenu legacy retrouvé. Elle introduit le logement, es gibt, ist/sind et des prépositions spatiales simples, avec 100 % des consignes d’exercice en allemand.",
+  "cards": [
+    {
+      "id": "card.u7.wohnung",
+      "kind": "lexical",
+      "de": "die Wohnung",
+      "fr": "l’appartement",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.zimmer",
+      "kind": "lexical",
+      "de": "das Zimmer",
+      "fr": "la pièce / chambre",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.wohnzimmer",
+      "kind": "lexical",
+      "de": "das Wohnzimmer",
+      "fr": "le salon",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.schlafzimmer",
+      "kind": "lexical",
+      "de": "das Schlafzimmer",
+      "fr": "la chambre",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.kueche",
+      "kind": "lexical",
+      "de": "die Küche",
+      "fr": "la cuisine",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.bad",
+      "kind": "lexical",
+      "de": "das Bad",
+      "fr": "la salle de bain",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.balkon",
+      "kind": "lexical",
+      "de": "der Balkon",
+      "fr": "le balcon",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.fenster",
+      "kind": "lexical",
+      "de": "das Fenster",
+      "fr": "la fenêtre",
+      "introducedIn": "de-a1-u7-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.tuer",
+      "kind": "lexical",
+      "de": "die Tür",
+      "fr": "la porte",
+      "introducedIn": "de-a1-u7-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.tisch",
+      "kind": "lexical",
+      "de": "der Tisch",
+      "fr": "la table",
+      "introducedIn": "de-a1-u7-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.stuhl",
+      "kind": "lexical",
+      "de": "der Stuhl",
+      "fr": "la chaise",
+      "introducedIn": "de-a1-u7-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.bett",
+      "kind": "lexical",
+      "de": "das Bett",
+      "fr": "le lit",
+      "introducedIn": "de-a1-u7-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.sofa",
+      "kind": "lexical",
+      "de": "das Sofa",
+      "fr": "le canapé",
+      "introducedIn": "de-a1-u7-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.schrank",
+      "kind": "lexical",
+      "de": "der Schrank",
+      "fr": "l’armoire",
+      "introducedIn": "de-a1-u7-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.lampe",
+      "kind": "lexical",
+      "de": "die Lampe",
+      "fr": "la lampe",
+      "introducedIn": "de-a1-u7-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.kuehlschrank",
+      "kind": "lexical",
+      "de": "der Kühlschrank",
+      "fr": "le réfrigérateur",
+      "introducedIn": "de-a1-u7-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.waschmaschine",
+      "kind": "lexical",
+      "de": "die Waschmaschine",
+      "fr": "la machine à laver",
+      "introducedIn": "de-a1-u7-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.es-gibt",
+      "kind": "structure",
+      "de": "Es gibt …",
+      "fr": "Il y a…",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.ist",
+      "kind": "structure",
+      "de": "… ist …",
+      "fr": "… est…",
+      "introducedIn": "de-a1-u7-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.sind",
+      "kind": "structure",
+      "de": "… sind …",
+      "fr": "… sont…",
+      "introducedIn": "de-a1-u7-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.in",
+      "kind": "lexical",
+      "de": "in",
+      "fr": "dans",
+      "introducedIn": "de-a1-u7-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.auf",
+      "kind": "lexical",
+      "de": "auf",
+      "fr": "sur",
+      "introducedIn": "de-a1-u7-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.unter",
+      "kind": "lexical",
+      "de": "unter",
+      "fr": "sous",
+      "introducedIn": "de-a1-u7-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.neben",
+      "kind": "lexical",
+      "de": "neben",
+      "fr": "à côté de",
+      "introducedIn": "de-a1-u7-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.vor",
+      "kind": "lexical",
+      "de": "vor",
+      "fr": "devant",
+      "introducedIn": "de-a1-u7-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.hinter",
+      "kind": "lexical",
+      "de": "hinter",
+      "fr": "derrière",
+      "introducedIn": "de-a1-u7-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.zwischen",
+      "kind": "lexical",
+      "de": "zwischen",
+      "fr": "entre",
+      "introducedIn": "de-a1-u7-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.hier",
+      "kind": "lexical",
+      "de": "hier",
+      "fr": "ici",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.dort",
+      "kind": "lexical",
+      "de": "dort",
+      "fr": "là-bas",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.gross",
+      "kind": "lexical",
+      "de": "groß",
+      "fr": "grand",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.klein",
+      "kind": "lexical",
+      "de": "klein",
+      "fr": "petit",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.hell",
+      "kind": "lexical",
+      "de": "hell",
+      "fr": "lumineux",
+      "introducedIn": "de-a1-u7-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.ruhig",
+      "kind": "lexical",
+      "de": "ruhig",
+      "fr": "calme",
+      "introducedIn": "de-a1-u7-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.moebliert",
+      "kind": "lexical",
+      "de": "möbliert",
+      "fr": "meublé",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.frei",
+      "kind": "lexical",
+      "de": "frei",
+      "fr": "libre / disponible",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.miete",
+      "kind": "lexical",
+      "de": "die Miete",
+      "fr": "le loyer",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.monat",
+      "kind": "lexical",
+      "de": "der Monat",
+      "fr": "le mois",
+      "introducedIn": "de-a1-u7-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.wohnung-hat",
+      "kind": "chunk",
+      "de": "Die Wohnung hat …",
+      "fr": "L’appartement a…",
+      "introducedIn": "de-a1-u7-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.wo-ist",
+      "kind": "structure",
+      "de": "Wo ist …?",
+      "fr": "Où est… ?",
+      "introducedIn": "de-a1-u7-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u7.wo-sind",
+      "kind": "structure",
+      "de": "Wo sind …?",
+      "fr": "Où sont… ?",
+      "introducedIn": "de-a1-u7-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj.u7.annonce",
+      "label": "Comprendre les informations essentielles d’une annonce de logement simple"
+    },
+    {
+      "id": "obj.u7.lexique",
+      "label": "Nommer les pièces, meubles et objets essentiels"
+    },
+    {
+      "id": "obj.u7.existence",
+      "label": "Dire ce qu’il y a avec es gibt"
+    },
+    {
+      "id": "obj.u7.position",
+      "label": "Dire où se trouve un objet avec ist/sind et des prépositions spatiales simples"
+    },
+    {
+      "id": "obj.u7.decrire",
+      "label": "Décrire simplement un logement avec taille, pièces et caractéristiques"
+    },
+    {
+      "id": "obj.u7.visite",
+      "label": "Poser et comprendre des questions simples pendant une visite"
+    }
+  ],
+  "remediations": [
+    {
+      "id": "rem.u7.es-gibt",
+      "objectiveId": "obj.u7.existence",
+      "durationSeconds": 110,
+      "explanation": "Es gibt introduit ce qui existe dans un lieu : In der Wohnung gibt es zwei Zimmer. Pour localiser un objet déjà identifié, utilise ist/sind.",
+      "contrast": [
+        {
+          "de": "In der Wohnung gibt es zwei Zimmer.",
+          "fr": "Dans l’appartement, il y a deux pièces.",
+          "ok": true
+        },
+        {
+          "de": "Der Tisch ist im Wohnzimmer.",
+          "fr": "La table est dans le salon.",
+          "ok": true
+        },
+        {
+          "de": "Der Tisch gibt es im Wohnzimmer.",
+          "fr": "—",
+          "ok": false,
+          "why": "Pour localiser un objet précis, utilise ist."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u7.es-gibt.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "In der Wohnung ____ es zwei Zimmer.",
+          "answer": "gibt",
+          "acceptedAnswers": [
+            "gibt"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u7.es-gibt.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Im Wohnzimmer ____ ein Sofa.",
+          "answer": "ist",
+          "acceptedAnswers": [
+            "ist"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u7.ist-sind",
+      "objectiveId": "obj.u7.position",
+      "durationSeconds": 110,
+      "explanation": "ist va avec un élément singulier ; sind avec plusieurs éléments : Der Stuhl ist… / Die Stühle sind…",
+      "contrast": [
+        {
+          "de": "Der Tisch ist in der Küche.",
+          "fr": "La table est dans la cuisine.",
+          "ok": true
+        },
+        {
+          "de": "Die Stühle sind im Wohnzimmer.",
+          "fr": "Les chaises sont dans le salon.",
+          "ok": true
+        },
+        {
+          "de": "Die Stühle ist im Wohnzimmer.",
+          "fr": "—",
+          "ok": false,
+          "why": "Stühle est pluriel : sind."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u7.ist-sind.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Das Bett ____ im Schlafzimmer.",
+          "answer": "ist",
+          "acceptedAnswers": [
+            "ist"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u7.ist-sind.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Die Stühle ____ in der Küche.",
+          "answer": "sind",
+          "acceptedAnswers": [
+            "sind"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u7.in-auf-unter",
+      "objectiveId": "obj.u7.position",
+      "durationSeconds": 120,
+      "explanation": "in = dans ; auf = sur ; unter = sous. Relie chaque préposition à une image spatiale, pas à une traduction isolée.",
+      "contrast": [
+        {
+          "de": "Die Lampe ist auf dem Tisch.",
+          "fr": "La lampe est sur la table.",
+          "ok": true
+        },
+        {
+          "de": "Die Tasche ist unter dem Tisch.",
+          "fr": "Le sac est sous la table.",
+          "ok": true
+        },
+        {
+          "de": "Das Bett ist im Schlafzimmer.",
+          "fr": "Le lit est dans la chambre.",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u7.in-auf-unter.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Die Lampe ist ____ dem Tisch.",
+          "answer": "auf",
+          "acceptedAnswers": [
+            "auf"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u7.in-auf-unter.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Die Tasche ist ____ dem Tisch.",
+          "answer": "unter",
+          "acceptedAnswers": [
+            "unter"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u7.wo",
+      "objectiveId": "obj.u7.visite",
+      "durationSeconds": 105,
+      "explanation": "Wo ist…? demande un élément singulier ; Wo sind…? demande plusieurs éléments.",
+      "contrast": [
+        {
+          "de": "Wo ist das Bad?",
+          "fr": "Où est la salle de bain ?",
+          "ok": true
+        },
+        {
+          "de": "Wo sind die Fenster?",
+          "fr": "Où sont les fenêtres ?",
+          "ok": true
+        },
+        {
+          "de": "Wo ist die Fenster?",
+          "fr": "—",
+          "ok": false,
+          "why": "Fenster est ici pluriel : Wo sind…?"
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u7.wo.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Wo ____ das Bad?",
+          "answer": "ist",
+          "acceptedAnswers": [
+            "ist"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u7.wo.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Wo ____ die Stühle?",
+          "answer": "sind",
+          "acceptedAnswers": [
+            "sind"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u7.gibt-hat",
+      "objectiveId": "obj.u7.decrire",
+      "durationSeconds": 110,
+      "explanation": "Die Wohnung hat… décrit ce que possède le logement ; Es gibt… introduit ce qui existe. Les deux sont utiles mais ne se construisent pas pareil.",
+      "contrast": [
+        {
+          "de": "Die Wohnung hat einen Balkon.",
+          "fr": "L’appartement a un balcon.",
+          "ok": true
+        },
+        {
+          "de": "Es gibt einen Balkon.",
+          "fr": "Il y a un balcon.",
+          "ok": true
+        },
+        {
+          "de": "Die Wohnung gibt einen Balkon.",
+          "fr": "—",
+          "ok": false,
+          "why": "Avec Wohnung comme sujet, utilise hat."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u7.gibt-hat.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Die Wohnung ____ einen Balkon.",
+          "answer": "hat",
+          "acceptedAnswers": [
+            "hat"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u7.gibt-hat.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Es ____ einen Balkon.",
+          "answer": "gibt",
+          "acceptedAnswers": [
+            "gibt"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "de-a1-u7-l1",
+      "order": 1,
+      "phase": "Comprends",
+      "title": "Eine Wohnungsanzeige verstehen",
+      "objectiveIds": [
+        "obj.u7.annonce",
+        "obj.u7.existence"
+      ],
+      "durationMinutes": 30,
+      "reveil": {
+        "cardIds": [
+          "card.u6.gross",
+          "card.u5.neben",
+          "card.u4.zu-hause",
+          "card.u3.was-kostet"
+        ],
+        "itemCount": 4,
+        "maxSeconds": 90,
+        "selection": "bekannte Größen-, Orts- und Preisbegriffe zuerst reaktivieren"
+      },
+      "blocks": [
+        {
+          "id": "blk.u7.l1.intro",
+          "type": "intro",
+          "title": "Neue Situation",
+          "textDe": "Amina besichtigt eine Wohnung. Höre auf Zimmer, Balkon, Miete und wichtige Merkmale.",
+          "textFr": "U7 est une nouvelle reconstruction : logement et localisation."
+        },
+        {
+          "id": "blk.u7.l1.dialogue",
+          "type": "dialogueRef",
+          "dialogueId": "de-a1-u7-dialogue",
+          "speeds": [
+            "slow",
+            "natural"
+          ],
+          "instruction": "Höre zuerst ohne Text. Beim zweiten Hören notiere Zimmer, Balkon und Miete."
+        },
+        {
+          "id": "blk.u7.l1.ad",
+          "type": "model",
+          "title": "Anzeige",
+          "textDe": "2 Zimmer · Küche · Bad · Balkon · 780 Euro Miete · ab Oktober frei",
+          "textFr": "Repère les groupes nominaux et chiffres avant les phrases complètes."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u7-l1-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u7.annonce",
+          "cardIds": [
+            "card.u7.zimmer"
+          ],
+          "promptLang": "de",
+          "prompt": "Wie viele Zimmer hat die Wohnung?",
+          "audioRef": "de-a1-u7-dialogue#seg2",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Zwei Zimmer.",
+              "correct": true,
+              "feedback": "Ja. Herr Becker sagt: Die Wohnung hat zwei Zimmer."
+            },
+            {
+              "id": "b",
+              "text": "Drei Zimmer.",
+              "correct": false,
+              "feedback": "Drei Zimmer werden nicht genannt."
+            },
+            {
+              "id": "c",
+              "text": "Ein Zimmer.",
+              "correct": false,
+              "feedback": "Die Wohnung hat mehr als ein Zimmer."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u7-l1-e2",
+          "type": "audioCloze",
+          "objectiveId": "obj.u7.existence",
+          "cardIds": [
+            "card.u7.es-gibt",
+            "card.u7.balkon"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Es ____ auch einen Balkon.",
+          "audioRef": "de-a1-u7-dialogue#seg2",
+          "answer": "gibt",
+          "acceptedAnswers": [
+            "gibt"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u7.es-gibt"
+        },
+        {
+          "id": "de-a1-u7-l1-e3",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u7.annonce",
+          "cardIds": [
+            "card.u7.miete",
+            "card.u7.monat"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Die Miete ist 780 Euro im Monat.",
+          "answer": "Die Miete ist 780 Euro im Monat.",
+          "acceptedAnswers": [
+            "Die Miete ist 780 Euro im Monat."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "feedbackIncorrect": "Nutze den Block Die Miete ist … Euro im Monat."
+        },
+        {
+          "id": "de-a1-u7-l1-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u7.annonce",
+          "cardIds": [
+            "card.u7.frei"
+          ],
+          "promptLang": "de",
+          "prompt": "Wann ist die Wohnung frei?",
+          "audioRef": "de-a1-u7-dialogue#seg8",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Ab Oktober.",
+              "correct": true,
+              "feedback": "Genau. Du hörst ab Oktober."
+            },
+            {
+              "id": "b",
+              "text": "Ab Dezember.",
+              "correct": false,
+              "feedback": "Dezember wird nicht genannt."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u7-l1-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u7.annonce",
+          "cardIds": [
+            "card.u7.wohnung",
+            "card.u7.zimmer",
+            "card.u7.balkon",
+            "card.u7.miete"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe vier kurze Stichsätze zur Wohnung: Zimmer, Balkon, Miete und Verfügbarkeit.",
+          "minimumWords": 20,
+          "successCriteria": [
+            "Zimmer",
+            "Balkon",
+            "Miete",
+            "frei"
+          ],
+          "autoCheck": [
+            "contient Zimmer",
+            "contient Balkon",
+            "contient Miete",
+            "contient frei"
+          ],
+          "note": "Kurze Informationssätze reichen."
+        }
+      ],
+      "completionMessage": "Du kannst die wichtigsten Informationen einer einfachen Wohnungsanzeige verstehen."
+    },
+    {
+      "id": "de-a1-u7-l2",
+      "order": 2,
+      "phase": "Pratique",
+      "title": "Räume, Möbel und wichtige Dinge",
+      "objectiveIds": [
+        "obj.u7.lexique"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u7.wohnung",
+          "card.u7.kueche",
+          "card.u7.bad",
+          "card.u7.zimmer",
+          "card.u6.jacke"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "neue Raumkarten zuerst, dann fällige Karten aus früheren Einheiten"
+      },
+      "blocks": [
+        {
+          "id": "blk.u7.l2.rooms",
+          "type": "model",
+          "title": "Räume",
+          "textDe": "Wohnzimmer · Schlafzimmer · Küche · Bad · Balkon",
+          "textFr": "Apprends les noms avec leur article."
+        },
+        {
+          "id": "blk.u7.l2.furniture",
+          "type": "model",
+          "title": "Möbel und Geräte",
+          "textDe": "Tisch · Stuhl · Bett · Sofa · Schrank · Lampe · Kühlschrank · Waschmaschine",
+          "textFr": "Regroupe par pièce pour mémoriser."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u7-l2-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u7.lexique",
+          "cardIds": [
+            "card.u7.schlafzimmer"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe das deutsche Wort für das Zimmer zum Schlafen.",
+          "answer": "Schlafzimmer",
+          "acceptedAnswers": [
+            "Schlafzimmer",
+            "das Schlafzimmer"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "feedbackIncorrect": "Das Wort ist Schlafzimmer."
+        },
+        {
+          "id": "de-a1-u7-l2-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u7.lexique",
+          "cardIds": [
+            "card.u7.tisch",
+            "card.u7.kueche"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "in der Küche",
+            "Der Tisch",
+            "ist"
+          ],
+          "answer": [
+            "Der Tisch",
+            "ist",
+            "in der Küche"
+          ],
+          "feedbackIncorrect": "Subjekt + ist + Ort."
+        },
+        {
+          "id": "de-a1-u7-l2-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u7.lexique",
+          "cardIds": [
+            "card.u7.sofa",
+            "card.u7.bett"
+          ],
+          "promptLang": "de",
+          "prompt": "Im Wohnzimmer ist ein Sofa. → Ersetze Sofa durch Bett und Wohnzimmer durch Schlafzimmer.",
+          "answer": "Im Schlafzimmer ist ein Bett.",
+          "acceptedAnswers": [
+            "Im Schlafzimmer ist ein Bett."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "de-a1-u7-l2-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u7.lexique",
+          "cardIds": [
+            "card.u7.kuehlschrank",
+            "card.u7.waschmaschine",
+            "card.u7.schrank"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Wörter im Satz nach.",
+          "targets": [
+            {
+              "id": "f1",
+              "de": "Der Kühlschrank ist in der Küche.",
+              "audioRef": "drill.u7.furniture1",
+              "maxSeconds": 7
+            },
+            {
+              "id": "f2",
+              "de": "Die Waschmaschine ist im Bad.",
+              "audioRef": "drill.u7.furniture2",
+              "maxSeconds": 7
+            },
+            {
+              "id": "f3",
+              "de": "Der Schrank ist im Schlafzimmer.",
+              "audioRef": "drill.u7.furniture3",
+              "maxSeconds": 7
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur vorgegebene Sätze werden verglichen."
+        },
+        {
+          "id": "de-a1-u7-l2-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u7.lexique",
+          "cardIds": [
+            "card.u7.wohnzimmer",
+            "card.u7.schlafzimmer",
+            "card.u7.kueche",
+            "card.u7.bad"
+          ],
+          "promptLang": "de",
+          "prompt": "Ordne mindestens sechs Möbel oder Geräte vier Räumen zu und schreibe kurze Sätze.",
+          "minimumWords": 32,
+          "successCriteria": [
+            "vier Räume",
+            "sechs Gegenstände"
+          ],
+          "autoCheck": [
+            "contient ist"
+          ],
+          "note": "Du darfst deine eigene Wohnung oder eine erfundene Wohnung beschreiben."
+        }
+      ],
+      "completionMessage": "Du kannst die wichtigsten Räume, Möbel und Geräte eines einfachen Haushalts benennen."
+    },
+    {
+      "id": "de-a1-u7-l3",
+      "order": 3,
+      "phase": "Pratique",
+      "title": "Sagen, was da ist und wo es ist",
+      "objectiveIds": [
+        "obj.u7.existence",
+        "obj.u7.position",
+        "obj.u7.visite"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u7.es-gibt",
+          "card.u7.ist",
+          "card.u7.neben",
+          "card.u5.neben",
+          "card.u1.wo"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "es gibt und bekannte Ortsfrage Wo zuerst reaktivieren"
+      },
+      "blocks": [
+        {
+          "id": "blk.u7.l3.exists",
+          "type": "rule",
+          "title": "Existenz oder Position?",
+          "textDe": "Es gibt einen Balkon. · Der Balkon ist neben dem Wohnzimmer.",
+          "textFr": "Es gibt = existence ; ist/sind = position d’un élément identifié."
+        },
+        {
+          "id": "blk.u7.l3.prep",
+          "type": "model",
+          "title": "Wo?",
+          "textDe": "in · auf · unter · neben · vor · hinter · zwischen",
+          "textFr": "Associe les prépositions à un schéma spatial."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u7-l3-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u7.existence",
+          "cardIds": [
+            "card.u7.es-gibt",
+            "card.u7.balkon"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Es gibt einen Balkon.",
+          "answer": "Es gibt einen Balkon.",
+          "acceptedAnswers": [
+            "Es gibt einen Balkon."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u7.es-gibt"
+        },
+        {
+          "id": "de-a1-u7-l3-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u7.position",
+          "cardIds": [
+            "card.u7.auf",
+            "card.u7.tisch",
+            "card.u7.lampe"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "auf dem Tisch",
+            "Die Lampe",
+            "ist"
+          ],
+          "answer": [
+            "Die Lampe",
+            "ist",
+            "auf dem Tisch"
+          ],
+          "feedbackIncorrect": "Subjekt + ist + Position.",
+          "remediationRef": "rem.u7.in-auf-unter"
+        },
+        {
+          "id": "de-a1-u7-l3-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u7.position",
+          "cardIds": [
+            "card.u7.ist",
+            "card.u7.sind"
+          ],
+          "promptLang": "de",
+          "prompt": "Der Stuhl ist in der Küche. → Mache den Satz mit zwei Stühlen.",
+          "answer": "Die Stühle sind in der Küche.",
+          "acceptedAnswers": [
+            "Die Stühle sind in der Küche.",
+            "Die Stuehle sind in der Kueche."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ],
+          "remediationRef": "rem.u7.ist-sind"
+        },
+        {
+          "id": "de-a1-u7-l3-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u7.position",
+          "cardIds": [
+            "card.u7.auf",
+            "card.u7.unter"
+          ],
+          "promptLang": "de",
+          "prompt": "Wo ist die Tasche?",
+          "audioRef": "drill.u7.position",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Unter dem Tisch.",
+              "correct": true,
+              "feedback": "Ja. Du hörst unter dem Tisch."
+            },
+            {
+              "id": "b",
+              "text": "Auf dem Tisch.",
+              "correct": false,
+              "feedback": "auf wäre oben auf der Tischfläche; im Audio hörst du unter."
+            }
+          ],
+          "remediationRef": "rem.u7.in-auf-unter"
+        },
+        {
+          "id": "de-a1-u7-l3-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u7.visite",
+          "cardIds": [
+            "card.u7.wo-ist",
+            "card.u7.wo-sind",
+            "card.u7.in",
+            "card.u7.neben"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe vier Fragen und Antworten zu Gegenständen in einer Wohnung. Nutze Wo ist / Wo sind und mindestens zwei Ortsangaben.",
+          "minimumWords": 32,
+          "successCriteria": [
+            "Wo ist",
+            "Wo sind",
+            "zwei Präpositionen"
+          ],
+          "autoCheck": [
+            "contient Wo",
+            "contient ist"
+          ],
+          "note": "Kurze Frage-Antwort-Paare genügen."
+        }
+      ],
+      "completionMessage": "Du kannst sagen, was vorhanden ist, und einfache Positionen von Gegenständen beschreiben."
+    },
+    {
+      "id": "de-a1-u7-l4",
+      "order": 4,
+      "phase": "Produis",
+      "title": "Die eigene Wohnung beschreiben",
+      "objectiveIds": [
+        "obj.u7.decrire",
+        "obj.u7.position"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u7.wohnung-hat",
+          "card.u7.hell",
+          "card.u7.ruhig",
+          "card.u6.gross",
+          "card.u4.zu-hause"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "Eigenschaften und bekannte Größen-/Wohnblöcke kombinieren"
+      },
+      "blocks": [
+        {
+          "id": "blk.u7.l4.model",
+          "type": "model",
+          "title": "Kurze Beschreibung",
+          "textDe": "Meine Wohnung ist klein, aber hell. Sie hat zwei Zimmer und einen Balkon. Im Wohnzimmer gibt es ein Sofa. Die Lampe ist neben dem Sofa.",
+          "textFr": "Taille/caractéristique → pièces → existence → position."
+        },
+        {
+          "id": "blk.u7.l4.transfer",
+          "type": "strategy",
+          "title": "Bekannte Sprache wiederverwenden",
+          "textDe": "groß / klein · ruhig · hier / dort · neben",
+          "textFr": "Réutilise les cartes des unités précédentes au lieu d’isoler U7."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u7-l4-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u7.decrire",
+          "cardIds": [
+            "card.u7.wohnung-hat",
+            "card.u7.balkon"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Die Wohnung hat einen Balkon.",
+          "answer": "Die Wohnung hat einen Balkon.",
+          "acceptedAnswers": [
+            "Die Wohnung hat einen Balkon."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u7.gibt-hat"
+        },
+        {
+          "id": "de-a1-u7-l4-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u7.decrire",
+          "cardIds": [
+            "card.u7.hell",
+            "card.u7.klein"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "aber hell",
+            "ist",
+            "Die Wohnung",
+            "klein"
+          ],
+          "answer": [
+            "Die Wohnung",
+            "ist",
+            "klein",
+            "aber hell"
+          ],
+          "feedbackIncorrect": "Die Wohnung ist klein, aber hell."
+        },
+        {
+          "id": "de-a1-u7-l4-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u7.decrire",
+          "cardIds": [
+            "card.u7.es-gibt",
+            "card.u7.wohnung-hat"
+          ],
+          "promptLang": "de",
+          "prompt": "Es gibt einen Balkon. → Formuliere mit Die Wohnung hat…",
+          "answer": "Die Wohnung hat einen Balkon.",
+          "acceptedAnswers": [
+            "Die Wohnung hat einen Balkon."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u7.gibt-hat"
+        },
+        {
+          "id": "de-a1-u7-l4-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u7.decrire",
+          "cardIds": [
+            "card.u7.hell",
+            "card.u7.ruhig",
+            "card.u7.balkon"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Beschreibungssätze nach.",
+          "targets": [
+            {
+              "id": "d1",
+              "de": "Die Wohnung ist hell.",
+              "audioRef": "drill.u7.describe1",
+              "maxSeconds": 5
+            },
+            {
+              "id": "d2",
+              "de": "Das Schlafzimmer ist ruhig.",
+              "audioRef": "drill.u7.describe2",
+              "maxSeconds": 6
+            },
+            {
+              "id": "d3",
+              "de": "Die Wohnung hat einen Balkon.",
+              "audioRef": "drill.u7.describe3",
+              "maxSeconds": 6
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur Verständlichkeit der vorgegebenen Sätze."
+        },
+        {
+          "id": "de-a1-u7-l4-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u7.decrire",
+          "cardIds": [
+            "card.u7.wohnung",
+            "card.u7.wohnung-hat",
+            "card.u7.es-gibt",
+            "card.u7.neben"
+          ],
+          "promptLang": "de",
+          "prompt": "Beschreibe eine Wohnung in 7–9 Sätzen: Größe/Charakter, Räume, zwei Möbel und zwei Positionen.",
+          "minimumWords": 45,
+          "successCriteria": [
+            "Eigenschaft",
+            "Räume",
+            "Möbel",
+            "zwei Positionen"
+          ],
+          "autoCheck": [
+            "contient Wohnung",
+            "contient ist",
+            "contient gibt"
+          ],
+          "note": "Eigene oder erfundene Wohnung."
+        }
+      ],
+      "completionMessage": "Du kannst eine einfache Wohnung mit Räumen, Eigenschaften, Möbeln und Positionen beschreiben."
+    },
+    {
+      "id": "de-a1-u7-l5",
+      "order": 5,
+      "phase": "Valide",
+      "title": "Mission: eine Wohnung besichtigen",
+      "objectiveIds": [
+        "obj.u7.annonce",
+        "obj.u7.lexique",
+        "obj.u7.existence",
+        "obj.u7.position",
+        "obj.u7.decrire",
+        "obj.u7.visite"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u7.wo-ist",
+          "card.u7.es-gibt",
+          "card.u7.wohnung-hat",
+          "card.u7.miete",
+          "card.u7.balkon"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "persistierende Fehler und Kernblöcke für die Besichtigung zuerst"
+      },
+      "blocks": [
+        {
+          "id": "blk.u7.l5.scenario",
+          "type": "scenario",
+          "title": "Situation",
+          "text": "Du besichtigst eine Wohnung. Verstehe die Grunddaten, frage nach zwei Orten/Gegenständen und beschreibe danach kurz, was dir aufgefallen ist."
+        },
+        {
+          "id": "blk.u7.l5.success",
+          "type": "rubric",
+          "title": "Erfolg",
+          "text": "Grunddaten verstehen · Wo-ist/Wo-sind-Fragen · es gibt oder hat korrekt · mindestens zwei Ortsangaben · kurze Gesamtbeschreibung."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u7-l5-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u7.visite",
+          "cardIds": [
+            "card.u7.wo-ist",
+            "card.u7.bad"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Frage passt, wenn du das Bad suchst?",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Wo ist das Bad?",
+              "correct": true,
+              "feedback": "Genau. Bad ist Singular: Wo ist…?"
+            },
+            {
+              "id": "b",
+              "text": "Wo sind das Bad?",
+              "correct": false,
+              "feedback": "sind passt hier nicht zum Singular das Bad."
+            },
+            {
+              "id": "c",
+              "text": "Was kostet das Bad?",
+              "correct": false,
+              "feedback": "Das fragt nach einem Preis, nicht nach dem Ort."
+            }
+          ],
+          "remediationRef": "rem.u7.wo"
+        },
+        {
+          "id": "de-a1-u7-l5-e2",
+          "type": "dictation",
+          "objectiveId": "obj.u7.position",
+          "cardIds": [
+            "card.u7.lampe",
+            "card.u7.auf",
+            "card.u7.tisch"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib den Satz, den du hörst.",
+          "audioRef": "drill.u7.final-dictation",
+          "answer": "Die Lampe ist auf dem Tisch.",
+          "acceptedAnswers": [
+            "Die Lampe ist auf dem Tisch."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u7.in-auf-unter"
+        },
+        {
+          "id": "de-a1-u7-l5-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u7.existence",
+          "cardIds": [
+            "card.u7.es-gibt",
+            "card.u7.balkon"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "einen Balkon",
+            "gibt",
+            "Es"
+          ],
+          "answer": [
+            "Es",
+            "gibt",
+            "einen Balkon"
+          ],
+          "feedbackIncorrect": "Der Existenzblock lautet Es gibt …",
+          "remediationRef": "rem.u7.es-gibt"
+        },
+        {
+          "id": "de-a1-u7-l5-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u7.annonce",
+          "cardIds": [
+            "card.u7.miete"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Miete hörst du?",
+          "audioRef": "drill.u7.final-rent",
+          "choices": [
+            {
+              "id": "a",
+              "text": "780 Euro im Monat.",
+              "correct": true,
+              "feedback": "Ja. Du hörst siebenhundertachtzig Euro im Monat."
+            },
+            {
+              "id": "b",
+              "text": "870 Euro im Monat.",
+              "correct": false,
+              "feedback": "Die Hunderter sind vertauscht; im Audio hörst du 780."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u7-l5-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u7.visite",
+          "cardIds": [
+            "card.u7.wohnung",
+            "card.u7.wo-ist",
+            "card.u7.es-gibt",
+            "card.u7.wohnung-hat"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe eine kurze Wohnungsbesichtigung in 10–12 Zeilen: zwei Fragen, zwei Antworten zur Position und eine abschließende Wohnungsbeschreibung.",
+          "minimumWords": 55,
+          "successCriteria": [
+            "zwei Fragen",
+            "zwei Ortsangaben",
+            "es gibt oder hat",
+            "Gesamtbeschreibung"
+          ],
+          "autoCheck": [
+            "contient Wo",
+            "contient ist",
+            "contient Wohnung"
+          ],
+          "note": "U7 bleibt QA-Inhalt bis Nutzer- und Audiofreigabe."
+        }
+      ],
+      "completionMessage": "U7 ist in QA abgeschlossen: Du kannst eine einfache Wohnung verstehen, beschreiben und bei einer Besichtigung nachfragen."
+    }
+  ],
+  "qualityGates": {
+    "exerciseMix": {
+      "recognitionMax": 0.25,
+      "productiveWrittenMin": 0.35,
+      "structureMin": 0.2,
+      "oralMin": 0.2
+    },
+    "promptLang": {
+      "deMin": 1,
+      "note": "Ab U5 sind alle Übungsanweisungen auf Deutsch."
+    },
+    "spacedRecall": {
+      "minCardsRevisitedPerLesson": 3
+    },
+    "feedback": {
+      "distinctPerDistractor": true
+    },
+    "normalization": {
+      "requiredOn": [
+        "fillBlank",
+        "dictation",
+        "productiveRecall",
+        "transformation",
+        "audioCloze"
+      ]
+    }
+  }
+}

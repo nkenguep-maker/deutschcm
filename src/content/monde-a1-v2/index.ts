@@ -4,6 +4,7 @@ import unit3Reference from "./u3.reference.json";
 import unit4Reference from "./u4.reference.json";
 import unit5Reference from "./u5.reference.json";
 import unit6Reference from "./u6.reference.json";
+import unit7Reference from "./u7.reference.json";
 import type { A1RefonteManifest, A1UnitReference } from "./types";
 export { A1_V2_SYLLABUS, A1_V2_SYLLABUS_TOTALS } from "./syllabus";
 
@@ -22,7 +23,7 @@ export const MONDE_A1_V2_MANIFEST: A1RefonteManifest = {
     lexicalItemsMin: 450,
     lexicalItemsMax: 600,
   },
-  integratedUnits: ["de-a1-u1", "de-a1-u2", "de-a1-u3", "de-a1-u4", "de-a1-u5", "de-a1-u6"],
+  integratedUnits: ["de-a1-u1", "de-a1-u2", "de-a1-u3", "de-a1-u4", "de-a1-u5", "de-a1-u6", "de-a1-u7"],
   readiness: {
     fullLevelIntegrated: false,
     criticalNativeAudioReady: false,
@@ -36,7 +37,8 @@ export const A1_V2_UNIT_3 = unit3Reference as A1UnitReference;
 export const A1_V2_UNIT_4 = unit4Reference as A1UnitReference;
 export const A1_V2_UNIT_5 = unit5Reference as A1UnitReference;
 export const A1_V2_UNIT_6 = unit6Reference as A1UnitReference;
-export const A1_V2_UNITS: A1UnitReference[] = [A1_V2_UNIT_1, A1_V2_UNIT_2, A1_V2_UNIT_3, A1_V2_UNIT_4, A1_V2_UNIT_5, A1_V2_UNIT_6];
+export const A1_V2_UNIT_7 = unit7Reference as A1UnitReference;
+export const A1_V2_UNITS: A1UnitReference[] = [A1_V2_UNIT_1, A1_V2_UNIT_2, A1_V2_UNIT_3, A1_V2_UNIT_4, A1_V2_UNIT_5, A1_V2_UNIT_6, A1_V2_UNIT_7];
 
 export function getA1V2Unit(unitId: string) {
   return A1_V2_UNITS.find((unit) => unit.id === unitId) ?? null;
