@@ -17,6 +17,11 @@ export const MONDE_A1_V2_MANIFEST: A1RefonteManifest = {
     lexicalItemsMax: 600,
   },
   integratedUnits: ["de-a1-u1"],
+  readiness: {
+    fullLevelIntegrated: false,
+    criticalNativeAudioReady: false,
+    mockExamsReady: false,
+  },
 };
 
 export const A1_V2_UNIT_1 = unit1Reference as A1UnitReference;
