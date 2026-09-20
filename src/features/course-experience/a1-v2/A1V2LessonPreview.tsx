@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { A1Exercise, A1LessonV2, A1Remediation, A1UnitReference } from "@/content/monde-a1-v2/types";
-import { A1_V2_U1_DIALOGUE, A1_V2_U1_DRILLS } from "@/content/monde-a1-v2/u1.support";
+import { A1_V2_U1_AUDIO_OVERRIDES, A1_V2_U1_DIALOGUE, A1_V2_U1_DRILLS } from "@/content/monde-a1-v2/u1.support";
 import { evaluateA1Exercise, type A1ExerciseEvaluation } from "@/lib/course-content/a1-v2/evaluation";
 import styles from "./A1V2Preview.module.css";
 
@@ -21,6 +21,8 @@ function speak(text: string, slow = false) {
 
 function audioText(ref?: string) {
   if (!ref) return null;
+  const override = A1_V2_U1_AUDIO_OVERRIDES[ref];
+  if (override) return override;
   if (ref.startsWith("de-a1-u1-dialogue#")) {
     const segment = ref.split("#")[1];
     return A1_V2_U1_DIALOGUE.lines.find((line) => line.id === segment)?.de ?? null;
@@ -155,6 +157,7 @@ function Exercise({
             </div>
           ))}
           <div className={styles.note}>Le score Whisper contraint est prévu par le gabarit, mais il n’est pas simulé ici. Aucune production libre n’est auto-notée.</div>
+          <button className={styles.button} type="button" onClick={() => onSubmit("")}>J’ai répété les trois blocs</button>
         </div>
       ) : null}
 
@@ -186,6 +189,7 @@ export function A1V2LessonPreview({
   const [responses, setResponses] = useState<Record<string, ResponseValue>>({});
   const [results, setResults] = useState<Record<string, ResultState>>({});
   const [objectiveFails, setObjectiveFails] = useState<Record<string, number>>({});
+  const [triggeredRemediationIds, setTriggeredRemediationIds] = useState<string[]>([]);
   const attemptedCount = lesson.exercises.filter((exercise) => Boolean(results[exercise.id])).length;
   const correctCount = lesson.exercises.filter((exercise) => results[exercise.id]?.evaluation.correct === true).length;
 
@@ -200,16 +204,23 @@ export function A1V2LessonPreview({
       [exercise.id]: { evaluation, attempts: (current[exercise.id]?.attempts ?? 0) + 1 },
     }));
     if (exercise.objectiveId && evaluation.correct !== null) {
+      const currentStreak = objectiveFails[exercise.objectiveId] ?? 0;
+      const nextStreak = evaluation.correct ? 0 : currentStreak + 1;
       setObjectiveFails((current) => ({
         ...current,
-        [exercise.objectiveId!]: evaluation.correct ? 0 : (current[exercise.objectiveId!] ?? 0) + 1,
+        [exercise.objectiveId!]: nextStreak,
       }));
+      if (!evaluation.correct && nextStreak >= 2 && exercise.remediationRef) {
+        setTriggeredRemediationIds((current) => current.includes(exercise.remediationRef!)
+          ? current
+          : [...current, exercise.remediationRef!]);
+      }
     }
   };
 
-  const triggeredRemediations = unit.remediations.filter((remediation) =>
-    (objectiveFails[remediation.objectiveId] ?? 0) >= 2,
-  );
+  const triggeredRemediations = triggeredRemediationIds
+    .map((id) => remediationMap.get(id) ?? null)
+    .filter((item): item is A1Remediation => item !== null);
 
   return (
     <main className={styles.page}>

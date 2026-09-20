@@ -7,6 +7,7 @@ import {
   getA1V2Lesson,
   getA1V2Remediation,
 } from "@/content/monde-a1-v2";
+import { A1_V2_U1_AUDIO_OVERRIDES, A1_V2_U1_DIALOGUE, A1_V2_U1_DRILLS } from "@/content/monde-a1-v2/u1.support";
 import { evaluateA1Exercise } from "@/lib/course-content/a1-v2/evaluation";
 import {
   nextCardMemory,
@@ -18,11 +19,11 @@ import { normalizeA1Answer } from "@/lib/course-content/a1-v2/normalization";
 describe("A1 refonte v2 · source contract", () => {
   it("keeps the received U1 reference exact and refuses to pretend the full A1 is ready", () => {
     expect(A1_V2_UNIT_1.schemaVersion).toBe("2.0");
-    expect(A1_V2_UNIT_1.contentVersion).toBe("2026.09.20-u1-refonte-reference");
+    expect(A1_V2_UNIT_1.contentVersion).toBe("2026.09.20-u1-refonte-r2");
     expect(A1_V2_UNIT_1.status).toBe("gabarit-a-valider");
     expect(A1_V2_UNIT_1.cards).toHaveLength(7);
     expect(A1_V2_UNIT_1.objectives).toHaveLength(3);
-    expect(A1_V2_UNIT_1.remediations).toHaveLength(2);
+    expect(A1_V2_UNIT_1.remediations).toHaveLength(3);
     expect(A1_V2_UNIT_1.lessons).toHaveLength(2);
     expect(A1_V2_UNIT_1.lessons.flatMap((lesson) => lesson.exercises)).toHaveLength(10);
 
@@ -77,6 +78,25 @@ describe("A1 refonte v2 · source contract", () => {
     expect(getA1V2Exercise("de-a1-u1-l2-e2")?.exercise.type).toBe("transformation");
     expect(getA1V2Card("card.u1.v2")?.kind).toBe("structure");
     expect(getA1V2Remediation("rem.u1.v2")?.objectiveId).toBe("obj.u1.question");
+  });
+
+  it("resolves every U1 exercise audio reference used by the QA preview", () => {
+    const audioRefs = A1_V2_UNIT_1.lessons.flatMap((lesson) =>
+      lesson.exercises.flatMap((exercise) => [
+        ...(exercise.audioRef ? [exercise.audioRef] : []),
+        ...(exercise.targets ?? []).map((target) => target.audioRef),
+      ]),
+    );
+
+    for (const ref of audioRefs) {
+      if (A1_V2_U1_AUDIO_OVERRIDES[ref]) continue;
+      if (ref.startsWith("de-a1-u1-dialogue#")) {
+        const segment = ref.split("#")[1];
+        expect(A1_V2_U1_DIALOGUE.lines.some((line) => line.id === segment), ref).toBe(true);
+      } else {
+        expect(A1_V2_U1_DRILLS[ref], ref).toBeTruthy();
+      }
+    }
   });
 
   it("meets the received exercise-mix and German-prompt quality gates on U1", () => {
@@ -146,6 +166,14 @@ describe("A1 refonte v2 · evaluation", () => {
     expect(result.correct).toBe(false);
     expect(result.feedback).toContain("pays d'origine");
     expect(result.remediationRef).toBe("rem.u1.aus-von");
+  });
+
+  it("uses a targeted wo/woher remediation for the comprehension distractor", () => {
+    const exercise = getA1V2Exercise("de-a1-u1-l1-e3")!.exercise;
+    const result = evaluateA1Exercise(exercise, "b");
+    expect(result.correct).toBe(false);
+    expect(result.remediationRef).toBe("rem.u1.wo-woher");
+    expect(getA1V2Remediation(result.remediationRef!)?.objectiveId).toBe("obj.u1.reperer");
   });
 
   it("checks guided production for the four required chunks without grading free quality", () => {

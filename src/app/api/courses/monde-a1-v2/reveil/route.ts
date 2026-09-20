@@ -32,6 +32,18 @@ export async function GET(request: NextRequest) {
   });
   if (!dbUser) return error("USER_NOT_FOUND", "User profile missing", 404);
 
+  const learningPath = await prisma.learningPath.findFirst({
+    where: {
+      userId: dbUser.id,
+      universe: "MONDE",
+      language: "DEUTSCH",
+      status: "ACTIVE",
+      OR: [{ currentLevel: null }, { currentLevel: "A1" }],
+    },
+    select: { id: true },
+  });
+  if (!learningPath) return error("A1_PATH_REQUIRED", "German A1 learning path required", 403);
+
   const states = await prisma.learningMemoryState.findMany({
     where: {
       userId: dbUser.id,

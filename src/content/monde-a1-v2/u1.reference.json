@@ -1,8 +1,8 @@
 {
   "schemaVersion": "2.0",
-  "contentVersion": "2026.09.20-u1-refonte-reference",
+  "contentVersion": "2026.09.20-u1-refonte-r2",
   "status": "gabarit-a-valider",
-  "note": "Gabarit de référence pour la refonte pédagogique. Unité 1 seulement. Toute référence est un identifiant stable, jamais un chemin positionnel.",
+  "note": "Gabarit de référence U1 révisé après validation bout en bout : identifiants stables, audio QA résolvable et remédiation ciblée wo/woher. Toujours à valider avant extension U2.",
   "cards": [
     {
       "id": "card.u1.heissen",
@@ -230,6 +230,62 @@
           "normalization": []
         }
       ]
+    },
+    {
+      "id": "rem.u1.wo-woher",
+      "objectiveId": "obj.u1.reperer",
+      "durationSeconds": 105,
+      "explanation": "wo demande un lieu où l'on se trouve ; woher demande l'origine ou le point de départ. Relie la question à la forme de la réponse : wo → in, woher → aus.",
+      "contrast": [
+        {
+          "de": "Wo wohnst du? — Ich wohne in Berlin.",
+          "fr": "Où habites-tu ? — J'habite à Berlin.",
+          "ok": true
+        },
+        {
+          "de": "Woher kommst du? — Ich komme aus Kamerun.",
+          "fr": "D'où viens-tu ? — Je viens du Cameroun.",
+          "ok": true
+        },
+        {
+          "de": "Woher wohnst du?",
+          "fr": "—",
+          "ok": false,
+          "why": "wohnen décrit le lieu où l'on habite : on demande Wo wohnst du ?"
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u1.wo-woher.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "____ kommst du? — Ich komme aus Kamerun.",
+          "answer": "Woher",
+          "acceptedAnswers": [
+            "Woher"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u1.wo-woher.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "____ wohnst du? — Ich wohne in Berlin.",
+          "answer": "Wo",
+          "acceptedAnswers": [
+            "Wo"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
     }
   ],
   "lessons": [
@@ -365,7 +421,7 @@
               "feedback": "Ça répond à wie heißt du, la question du nom."
             }
           ],
-          "remediationRef": "rem.u1.v2"
+          "remediationRef": "rem.u1.wo-woher"
         },
         {
           "id": "de-a1-u1-l1-e4",

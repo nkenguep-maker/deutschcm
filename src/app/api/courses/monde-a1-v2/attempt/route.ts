@@ -11,7 +11,6 @@ import {
 import { evaluateA1Exercise } from "@/lib/course-content/a1-v2/evaluation";
 import {
   nextCardMemory,
-  nextObjectiveMemory,
   shouldTriggerRemediation,
   type A1MemoryRow,
 } from "@/lib/course-content/a1-v2/memory";
@@ -105,7 +104,42 @@ export async function POST(request: NextRequest) {
       const card = getA1V2Card(cardId);
       if (!card) throw new Error(`A1_V2_CARD_NOT_FOUND:${cardId}`);
       const current = byKey.get(`CARD:${cardId}`) ?? null;
-      const next = nextCardMemory(card, current, evaluation.correct === true, now);
+
+      if (evaluation.correct === false) {
+        await tx.learningMemoryState.upsert({
+          where: {
+            userId_courseId_itemKind_itemId: {
+              userId: dbUser.id,
+              courseId: MONDE_A1_V2_COURSE_ID,
+              itemKind: "CARD",
+              itemId: cardId,
+            },
+          },
+          create: {
+            userId: dbUser.id,
+            courseId: MONDE_A1_V2_COURSE_ID,
+            itemKind: "CARD",
+            itemId: cardId,
+            intervalIndex: 0,
+            nextDueAt: now,
+            failureStreak: 1,
+            lastResult: false,
+            lastSeenAt: now,
+            metadata: { lessonId: resolved.lesson.id, exerciseId },
+          },
+          update: {
+            intervalIndex: 0,
+            nextDueAt: now,
+            failureStreak: { increment: 1 },
+            lastResult: false,
+            lastSeenAt: now,
+            metadata: { lessonId: resolved.lesson.id, exerciseId },
+          },
+        });
+        continue;
+      }
+
+      const next = nextCardMemory(card, current, true, now);
       await tx.learningMemoryState.upsert({
         where: {
           userId_courseId_itemKind_itemId: {
@@ -131,31 +165,70 @@ export async function POST(request: NextRequest) {
     }
 
     if (objectiveId) {
-      const current = byKey.get(`OBJECTIVE:${objectiveId}`) ?? null;
-      const next = nextObjectiveMemory(current, evaluation.correct === true, now);
-      objectiveFailureStreak = next.failureStreak;
-      await tx.learningMemoryState.upsert({
-        where: {
-          userId_courseId_itemKind_itemId: {
-            userId: dbUser.id,
-            courseId: MONDE_A1_V2_COURSE_ID,
-            itemKind: "OBJECTIVE",
-            itemId: objectiveId,
-          },
-        },
-        create: {
-          userId: dbUser.id,
-          courseId: MONDE_A1_V2_COURSE_ID,
-          itemKind: "OBJECTIVE",
-          itemId: objectiveId,
-          ...next,
-          metadata: { lessonId: resolved.lesson.id, exerciseId },
-        },
-        update: {
-          ...next,
-          metadata: { lessonId: resolved.lesson.id, exerciseId },
-        },
-      });
+      const objectiveState = evaluation.correct
+        ? await tx.learningMemoryState.upsert({
+            where: {
+              userId_courseId_itemKind_itemId: {
+                userId: dbUser.id,
+                courseId: MONDE_A1_V2_COURSE_ID,
+                itemKind: "OBJECTIVE",
+                itemId: objectiveId,
+              },
+            },
+            create: {
+              userId: dbUser.id,
+              courseId: MONDE_A1_V2_COURSE_ID,
+              itemKind: "OBJECTIVE",
+              itemId: objectiveId,
+              intervalIndex: 0,
+              nextDueAt: null,
+              failureStreak: 0,
+              lastResult: true,
+              lastSeenAt: now,
+              metadata: { lessonId: resolved.lesson.id, exerciseId },
+            },
+            update: {
+              intervalIndex: 0,
+              nextDueAt: null,
+              failureStreak: 0,
+              lastResult: true,
+              lastSeenAt: now,
+              metadata: { lessonId: resolved.lesson.id, exerciseId },
+            },
+            select: { failureStreak: true },
+          })
+        : await tx.learningMemoryState.upsert({
+            where: {
+              userId_courseId_itemKind_itemId: {
+                userId: dbUser.id,
+                courseId: MONDE_A1_V2_COURSE_ID,
+                itemKind: "OBJECTIVE",
+                itemId: objectiveId,
+              },
+            },
+            create: {
+              userId: dbUser.id,
+              courseId: MONDE_A1_V2_COURSE_ID,
+              itemKind: "OBJECTIVE",
+              itemId: objectiveId,
+              intervalIndex: 0,
+              nextDueAt: null,
+              failureStreak: 1,
+              lastResult: false,
+              lastSeenAt: now,
+              metadata: { lessonId: resolved.lesson.id, exerciseId },
+            },
+            update: {
+              intervalIndex: 0,
+              nextDueAt: null,
+              failureStreak: { increment: 1 },
+              lastResult: false,
+              lastSeenAt: now,
+              metadata: { lessonId: resolved.lesson.id, exerciseId },
+            },
+            select: { failureStreak: true },
+          });
+      objectiveFailureStreak = objectiveState.failureStreak;
     }
   });
 

@@ -20,6 +20,10 @@ export const A1_V2_U1_DIALOGUE = {
   ],
 };
 
+export const A1_V2_U1_AUDIO_OVERRIDES: Record<string, string> = {
+  "de-a1-u1-dialogue#seg1b": "Ich heiße Anna.",
+};
+
 export const A1_V2_U1_DRILLS: Record<string, string> = {
   "drill.u1.wo-woher": "Woher kommst du?",
   "drill.u1.s1": "Ich heiße Karim.",
