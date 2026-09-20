@@ -1,0 +1,1781 @@
+{
+  "id": "de-a1-u10",
+  "order": 10,
+  "title": "Services et démarches du quotidien",
+  "schemaVersion": "2.0",
+  "contentVersion": "2026.09.20-u10-reconstruction-r1",
+  "status": "reconstruction-a-valider",
+  "note": "U10 est une reconstruction nouvelle à partir du syllabus canonique. Le contexte de service reste générique : comprendre une consigne, donner/écrire des informations personnelles, demander de répéter ou d’expliquer et confirmer des données simples. Aucune procédure administrative réelle n’est enseignée.",
+  "cards": [
+    {
+      "id": "card.u10.service",
+      "kind": "lexical",
+      "de": "der Service",
+      "fr": "le service",
+      "introducedIn": "de-a1-u10-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.schalter",
+      "kind": "lexical",
+      "de": "der Schalter",
+      "fr": "le guichet",
+      "introducedIn": "de-a1-u10-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.formular",
+      "kind": "lexical",
+      "de": "das Formular",
+      "fr": "le formulaire",
+      "introducedIn": "de-a1-u10-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.ausfuellen",
+      "kind": "lexical",
+      "de": "ausfüllen",
+      "fr": "remplir",
+      "introducedIn": "de-a1-u10-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.unterschrift",
+      "kind": "lexical",
+      "de": "die Unterschrift",
+      "fr": "la signature",
+      "introducedIn": "de-a1-u10-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.name",
+      "kind": "lexical",
+      "de": "der Name",
+      "fr": "le nom",
+      "introducedIn": "de-a1-u10-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.vorname",
+      "kind": "lexical",
+      "de": "der Vorname",
+      "fr": "le prénom",
+      "introducedIn": "de-a1-u10-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.geburtsdatum",
+      "kind": "lexical",
+      "de": "das Geburtsdatum",
+      "fr": "la date de naissance",
+      "introducedIn": "de-a1-u10-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.adresse",
+      "kind": "lexical",
+      "de": "die Adresse",
+      "fr": "l’adresse",
+      "introducedIn": "de-a1-u10-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.strasse",
+      "kind": "lexical",
+      "de": "die Straße",
+      "fr": "la rue",
+      "introducedIn": "de-a1-u10-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.hausnummer",
+      "kind": "lexical",
+      "de": "die Hausnummer",
+      "fr": "le numéro de rue",
+      "introducedIn": "de-a1-u10-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.postleitzahl",
+      "kind": "lexical",
+      "de": "die Postleitzahl",
+      "fr": "le code postal",
+      "introducedIn": "de-a1-u10-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.ort",
+      "kind": "lexical",
+      "de": "der Ort",
+      "fr": "la ville / localité",
+      "introducedIn": "de-a1-u10-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.telefonnummer",
+      "kind": "lexical",
+      "de": "die Telefonnummer",
+      "fr": "le numéro de téléphone",
+      "introducedIn": "de-a1-u10-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.email",
+      "kind": "lexical",
+      "de": "die E-Mail-Adresse",
+      "fr": "l’adresse e-mail",
+      "introducedIn": "de-a1-u10-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.datum",
+      "kind": "lexical",
+      "de": "das Datum",
+      "fr": "la date",
+      "introducedIn": "de-a1-u10-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.nummer",
+      "kind": "lexical",
+      "de": "die Nummer",
+      "fr": "le numéro",
+      "introducedIn": "de-a1-u10-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.buchstabieren",
+      "kind": "lexical",
+      "de": "buchstabieren",
+      "fr": "épeler",
+      "introducedIn": "de-a1-u10-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.wiederholen",
+      "kind": "lexical",
+      "de": "wiederholen",
+      "fr": "répéter",
+      "introducedIn": "de-a1-u10-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.langsamer",
+      "kind": "lexical",
+      "de": "langsamer",
+      "fr": "plus lentement",
+      "introducedIn": "de-a1-u10-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.verstehen",
+      "kind": "lexical",
+      "de": "verstehen",
+      "fr": "comprendre",
+      "introducedIn": "de-a1-u10-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.erklaeren",
+      "kind": "lexical",
+      "de": "erklären",
+      "fr": "expliquer",
+      "introducedIn": "de-a1-u10-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.hilfe",
+      "kind": "lexical",
+      "de": "die Hilfe",
+      "fr": "l’aide",
+      "introducedIn": "de-a1-u10-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.frage",
+      "kind": "lexical",
+      "de": "die Frage",
+      "fr": "la question",
+      "introducedIn": "de-a1-u10-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.noch-einmal",
+      "kind": "chunk",
+      "de": "noch einmal",
+      "fr": "encore une fois",
+      "introducedIn": "de-a1-u10-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.wie-bitte",
+      "kind": "chunk",
+      "de": "Wie bitte?",
+      "fr": "Pardon ?",
+      "introducedIn": "de-a1-u10-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.koennen-wiederholen",
+      "kind": "chunk",
+      "de": "Können Sie das bitte wiederholen?",
+      "fr": "Pouvez-vous répéter, s’il vous plaît ?",
+      "introducedIn": "de-a1-u10-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.koennen-langsamer",
+      "kind": "chunk",
+      "de": "Können Sie bitte langsamer sprechen?",
+      "fr": "Pouvez-vous parler plus lentement ?",
+      "introducedIn": "de-a1-u10-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.was-bedeutet",
+      "kind": "structure",
+      "de": "Was bedeutet …?",
+      "fr": "Que signifie… ?",
+      "introducedIn": "de-a1-u10-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.meine-adresse",
+      "kind": "chunk",
+      "de": "Meine Adresse ist …",
+      "fr": "Mon adresse est…",
+      "introducedIn": "de-a1-u10-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.meine-nummer",
+      "kind": "chunk",
+      "de": "Meine Telefonnummer ist …",
+      "fr": "Mon numéro de téléphone est…",
+      "introducedIn": "de-a1-u10-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.geboren-am",
+      "kind": "chunk",
+      "de": "Ich bin am … geboren.",
+      "fr": "Je suis né(e) le…",
+      "introducedIn": "de-a1-u10-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.hier-eintragen",
+      "kind": "chunk",
+      "de": "Bitte hier eintragen.",
+      "fr": "Veuillez inscrire ici.",
+      "introducedIn": "de-a1-u10-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.hier-unterschreiben",
+      "kind": "chunk",
+      "de": "Bitte hier unterschreiben.",
+      "fr": "Veuillez signer ici.",
+      "introducedIn": "de-a1-u10-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.ist-richtig",
+      "kind": "chunk",
+      "de": "Ist das richtig?",
+      "fr": "Est-ce correct ?",
+      "introducedIn": "de-a1-u10-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.ja-richtig",
+      "kind": "chunk",
+      "de": "Ja, das ist richtig.",
+      "fr": "Oui, c’est correct.",
+      "introducedIn": "de-a1-u10-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.nein-korrektur",
+      "kind": "chunk",
+      "de": "Nein, das ist nicht richtig.",
+      "fr": "Non, ce n’est pas correct.",
+      "introducedIn": "de-a1-u10-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.warten",
+      "kind": "lexical",
+      "de": "warten",
+      "fr": "attendre",
+      "introducedIn": "de-a1-u10-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.moment",
+      "kind": "chunk",
+      "de": "Einen Moment, bitte.",
+      "fr": "Un instant, s’il vous plaît.",
+      "introducedIn": "de-a1-u10-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u10.danke-hilfe",
+      "kind": "chunk",
+      "de": "Danke für Ihre Hilfe.",
+      "fr": "Merci pour votre aide.",
+      "introducedIn": "de-a1-u10-l5",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj.u10.consignes",
+      "label": "Comprendre une consigne simple dans un service"
+    },
+    {
+      "id": "obj.u10.donnees",
+      "label": "Comprendre et donner des dates, numéros et informations personnelles simples"
+    },
+    {
+      "id": "obj.u10.repetition",
+      "label": "Demander de répéter, parler plus lentement ou expliquer un mot"
+    },
+    {
+      "id": "obj.u10.remplir",
+      "label": "Remplir ou dicter des informations simples dans un formulaire"
+    },
+    {
+      "id": "obj.u10.confirmer",
+      "label": "Confirmer ou corriger une information entendue"
+    },
+    {
+      "id": "obj.u10.aide",
+      "label": "Demander de l’aide de façon simple et polie dans un service"
+    }
+  ],
+  "remediations": [
+    {
+      "id": "rem.u10.wiederholen",
+      "objectiveId": "obj.u10.repetition",
+      "durationSeconds": 105,
+      "explanation": "Pour demander une répétition polie, utilise le bloc complet : Können Sie das bitte wiederholen?",
+      "contrast": [
+        {
+          "de": "Können Sie das bitte wiederholen?",
+          "fr": "Pouvez-vous répéter, s’il vous plaît ?",
+          "ok": true
+        },
+        {
+          "de": "Wiederholen Sie?",
+          "fr": "—",
+          "ok": false,
+          "why": "Le bloc avec Können Sie…? est plus clair et poli au niveau A1."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u10.wiederholen.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Können Sie das bitte ____?",
+          "answer": "wiederholen",
+          "acceptedAnswers": [
+            "wiederholen"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u10.wiederholen.i2",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue die Bitte.",
+          "tokens": [
+            "Sie",
+            "das",
+            "bitte",
+            "wiederholen",
+            "Können"
+          ],
+          "answer": [
+            "Können",
+            "Sie",
+            "das",
+            "bitte",
+            "wiederholen"
+          ],
+          "normalization": []
+        }
+      ]
+    },
+    {
+      "id": "rem.u10.langsamer",
+      "objectiveId": "obj.u10.repetition",
+      "durationSeconds": 105,
+      "explanation": "Si le problème est la vitesse, demande : Können Sie bitte langsamer sprechen? langsamer = plus lentement.",
+      "contrast": [
+        {
+          "de": "Können Sie bitte langsamer sprechen?",
+          "fr": "Pouvez-vous parler plus lentement ?",
+          "ok": true
+        },
+        {
+          "de": "Können Sie bitte schneller sprechen?",
+          "fr": "Pouvez-vous parler plus vite ?",
+          "ok": false,
+          "why": "schneller est l’opposé de langsamer."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u10.langsamer.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Können Sie bitte ____ sprechen?",
+          "answer": "langsamer",
+          "acceptedAnswers": [
+            "langsamer"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u10.langsamer.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Bitte sprechen Sie noch einmal und ____.",
+          "answer": "langsamer",
+          "acceptedAnswers": [
+            "langsamer"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u10.datenfrage",
+      "objectiveId": "obj.u10.donnees",
+      "durationSeconds": 110,
+      "explanation": "Les mots-clés indiquent le champ demandé : Name, Geburtsdatum, Adresse, Telefonnummer. Réponds seulement avec l’information nécessaire.",
+      "contrast": [
+        {
+          "de": "Wie ist Ihre Adresse? — Meine Adresse ist …",
+          "fr": "Quelle est votre adresse ? — Mon adresse est…",
+          "ok": true
+        },
+        {
+          "de": "Wie ist Ihre Telefonnummer? — Meine Telefonnummer ist …",
+          "fr": "Quel est votre numéro ? — Mon numéro est…",
+          "ok": true
+        },
+        {
+          "de": "Wie ist Ihr Name? — Um acht Uhr.",
+          "fr": "—",
+          "ok": false,
+          "why": "La réponse doit correspondre au champ demandé."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u10.datenfrage.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Meine ____ ist Musterstraße 4.",
+          "answer": "Adresse",
+          "acceptedAnswers": [
+            "Adresse"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u10.datenfrage.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Meine ____ ist 0170 123456.",
+          "answer": "Telefonnummer",
+          "acceptedAnswers": [
+            "Telefonnummer"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u10.buchstabieren",
+      "objectiveId": "obj.u10.donnees",
+      "durationSeconds": 105,
+      "explanation": "buchstabieren = épeler. Utilise Können Sie das buchstabieren? quand un nom ou une adresse doit être donné lettre par lettre.",
+      "contrast": [
+        {
+          "de": "Können Sie das buchstabieren?",
+          "fr": "Pouvez-vous l’épeler ?",
+          "ok": true
+        },
+        {
+          "de": "Können Sie das bezahlen?",
+          "fr": "Pouvez-vous payer cela ?",
+          "ok": false,
+          "why": "bezahlen concerne le paiement ; buchstabieren concerne les lettres."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u10.buchstabieren.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Können Sie das ____?",
+          "answer": "buchstabieren",
+          "acceptedAnswers": [
+            "buchstabieren"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u10.buchstabieren.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Bitte ____ Sie Ihren Namen.",
+          "answer": "buchstabieren",
+          "acceptedAnswers": [
+            "buchstabieren"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u10.bestaetigen",
+      "objectiveId": "obj.u10.confirmer",
+      "durationSeconds": 110,
+      "explanation": "Pour confirmer : Ja, das ist richtig. Pour corriger : Nein, das ist nicht richtig. Ajoute ensuite la bonne information.",
+      "contrast": [
+        {
+          "de": "Ist die Hausnummer 14? — Ja, das ist richtig.",
+          "fr": "Le numéro est 14 ? — Oui, c’est correct.",
+          "ok": true
+        },
+        {
+          "de": "Ist die Hausnummer 41? — Nein, das ist nicht richtig. Sie ist 14.",
+          "fr": "— Non, ce n’est pas correct. C’est 14.",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u10.bestaetigen.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ja, das ist ____.",
+          "answer": "richtig",
+          "acceptedAnswers": [
+            "richtig"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u10.bestaetigen.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Nein, das ist nicht ____.",
+          "answer": "richtig",
+          "acceptedAnswers": [
+            "richtig"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "de-a1-u10-l1",
+      "order": 1,
+      "phase": "Comprends",
+      "title": "Eine Service-Anweisung verstehen",
+      "objectiveIds": [
+        "obj.u10.consignes",
+        "obj.u10.aide"
+      ],
+      "durationMinutes": 30,
+      "reveil": {
+        "cardIds": [
+          "card.u9.termin",
+          "card.u6.kann-ich",
+          "card.u5.entschuldigung",
+          "card.u3.bitte"
+        ],
+        "itemCount": 4,
+        "maxSeconds": 90,
+        "selection": "Höflichkeit und bekannte Service-/Terminblöcke zuerst reaktivieren"
+      },
+      "blocks": [
+        {
+          "id": "blk.u10.l1.intro",
+          "type": "intro",
+          "title": "Am Serviceschalter",
+          "textDe": "Noah gibt ein Formular ab. Höre auf die drei Anweisungen: eintragen, unterschreiben, warten.",
+          "textFr": "Contexte générique de service, sans procédure administrative spécifique."
+        },
+        {
+          "id": "blk.u10.l1.dialogue",
+          "type": "dialogueRef",
+          "dialogueId": "de-a1-u10-dialogue",
+          "speeds": [
+            "slow",
+            "natural"
+          ],
+          "instruction": "Höre zuerst auf die Handlung. Beim zweiten Hören notiere die drei Anweisungen."
+        },
+        {
+          "id": "blk.u10.l1.sequence",
+          "type": "strategy",
+          "title": "Reihenfolge",
+          "textDe": "Formular → Daten eintragen → unterschreiben → einen Moment warten",
+          "textFr": "Transforme la consigne en petite séquence d’actions."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u10-l1-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u10.consignes",
+          "cardIds": [
+            "card.u10.hier-eintragen"
+          ],
+          "promptLang": "de",
+          "prompt": "Was soll Noah zuerst machen?",
+          "audioRef": "de-a1-u10-dialogue#seg2",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Seinen Namen und seine Adresse eintragen.",
+              "correct": true,
+              "feedback": "Ja. Die erste konkrete Anweisung ist Name und Adresse eintragen."
+            },
+            {
+              "id": "b",
+              "text": "Sofort gehen.",
+              "correct": false,
+              "feedback": "Noah soll das Formular bearbeiten, nicht sofort gehen."
+            },
+            {
+              "id": "c",
+              "text": "Eine Fahrkarte kaufen.",
+              "correct": false,
+              "feedback": "Das gehört zum Transportkontext, nicht zu diesem Servicegespräch."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u10-l1-e2",
+          "type": "audioCloze",
+          "objectiveId": "obj.u10.consignes",
+          "cardIds": [
+            "card.u10.unterschrift",
+            "card.u10.hier-unterschreiben"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Bitte hier ____.",
+          "audioRef": "de-a1-u10-dialogue#seg4",
+          "answer": "unterschreiben",
+          "acceptedAnswers": [
+            "unterschreiben"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "de-a1-u10-l1-e3",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u10.consignes",
+          "cardIds": [
+            "card.u10.moment",
+            "card.u10.warten"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe die höfliche Warte-Anweisung.",
+          "answer": "Einen Moment, bitte.",
+          "acceptedAnswers": [
+            "Einen Moment, bitte."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "feedbackIncorrect": "Der kurze Serviceblock ist Einen Moment, bitte."
+        },
+        {
+          "id": "de-a1-u10-l1-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u10.consignes",
+          "cardIds": [
+            "card.u10.formular",
+            "card.u10.ausfuellen"
+          ],
+          "promptLang": "de",
+          "prompt": "Was braucht Noah?",
+          "audioRef": "de-a1-u10-dialogue#seg2",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Ein ausgefülltes Formular.",
+              "correct": true,
+              "feedback": "Genau. Das Gespräch dreht sich um das Formular und die fehlenden Angaben."
+            },
+            {
+              "id": "b",
+              "text": "Ein Zugticket.",
+              "correct": false,
+              "feedback": "Ein Ticket gehört nicht zu dieser Servicesituation."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u10-l1-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u10.consignes",
+          "cardIds": [
+            "card.u10.formular",
+            "card.u10.hier-eintragen",
+            "card.u10.hier-unterschreiben",
+            "card.u10.moment"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe die Service-Anweisung in vier kurzen Schritten.",
+          "minimumWords": 20,
+          "successCriteria": [
+            "Formular",
+            "eintragen",
+            "unterschreiben",
+            "warten"
+          ],
+          "autoCheck": [
+            "contient Formular",
+            "contient unterschreiben"
+          ],
+          "note": "Kurze Anweisungssätze reichen."
+        }
+      ],
+      "completionMessage": "Du kannst eine kurze Folge einfacher Service-Anweisungen verstehen."
+    },
+    {
+      "id": "de-a1-u10-l2",
+      "order": 2,
+      "phase": "Pratique",
+      "title": "Daten, Zahlen und persönliche Informationen",
+      "objectiveIds": [
+        "obj.u10.donnees",
+        "obj.u10.remplir"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u10.name",
+          "card.u10.adresse",
+          "card.u10.telefonnummer",
+          "card.u1.heissen",
+          "card.u4.wann"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "neue Datenfelder werden mit bekannten Name-/Zeitfragen verbunden"
+      },
+      "blocks": [
+        {
+          "id": "blk.u10.l2.fields",
+          "type": "model",
+          "title": "Formularfelder",
+          "textDe": "Name · Vorname · Geburtsdatum · Adresse · Postleitzahl · Telefonnummer · E-Mail-Adresse",
+          "textFr": "Apprends les intitulés comme des repères visuels."
+        },
+        {
+          "id": "blk.u10.l2.answer",
+          "type": "model",
+          "title": "Kurze Antworten",
+          "textDe": "Meine Adresse ist … · Meine Telefonnummer ist … · Ich bin am … geboren.",
+          "textFr": "Réponds avec le minimum utile."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u10-l2-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u10.donnees",
+          "cardIds": [
+            "card.u10.meine-adresse"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe den Satzanfang für deine Adresse.",
+          "answer": "Meine Adresse ist",
+          "acceptedAnswers": [
+            "Meine Adresse ist",
+            "Meine Adresse ist …"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u10.datenfrage"
+        },
+        {
+          "id": "de-a1-u10-l2-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u10.donnees",
+          "cardIds": [
+            "card.u10.geboren-am"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "am 12. Mai",
+            "geboren",
+            "Ich",
+            "bin"
+          ],
+          "answer": [
+            "Ich",
+            "bin",
+            "am 12. Mai",
+            "geboren"
+          ],
+          "feedbackIncorrect": "Der Block lautet Ich bin am … geboren."
+        },
+        {
+          "id": "de-a1-u10-l2-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u10.donnees",
+          "cardIds": [
+            "card.u10.meine-adresse",
+            "card.u10.meine-nummer"
+          ],
+          "promptLang": "de",
+          "prompt": "Meine Adresse ist Musterstraße 4. → Ändere auf Telefonnummer 0170 123456.",
+          "answer": "Meine Telefonnummer ist 0170 123456.",
+          "acceptedAnswers": [
+            "Meine Telefonnummer ist 0170 123456."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u10.datenfrage"
+        },
+        {
+          "id": "de-a1-u10-l2-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u10.donnees",
+          "cardIds": [
+            "card.u10.adresse",
+            "card.u10.telefonnummer",
+            "card.u10.geburtsdatum"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Datensätze nach.",
+          "targets": [
+            {
+              "id": "d1",
+              "de": "Meine Adresse ist Lindenstraße 14.",
+              "audioRef": "drill.u10.data1",
+              "maxSeconds": 7
+            },
+            {
+              "id": "d2",
+              "de": "Meine Telefonnummer ist null eins sieben null, eins zwei drei vier fünf sechs.",
+              "audioRef": "drill.u10.data2",
+              "maxSeconds": 10
+            },
+            {
+              "id": "d3",
+              "de": "Ich bin am zwölften Mai geboren.",
+              "audioRef": "drill.u10.data3",
+              "maxSeconds": 7
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur vorgegebene Datensätze werden verglichen."
+        },
+        {
+          "id": "de-a1-u10-l2-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u10.remplir",
+          "cardIds": [
+            "card.u10.name",
+            "card.u10.geburtsdatum",
+            "card.u10.adresse",
+            "card.u10.email"
+          ],
+          "promptLang": "de",
+          "prompt": "Erstelle ein fiktives Mini-Formular in fünf Zeilen: Name, Vorname, Geburtsdatum, Adresse, E-Mail.",
+          "minimumWords": 22,
+          "successCriteria": [
+            "fünf Felder",
+            "vollständige Angaben"
+          ],
+          "autoCheck": [
+            "contient Name",
+            "contient Adresse"
+          ],
+          "note": "Nutze fiktive Daten, wenn du keine echten Angaben schreiben möchtest."
+        }
+      ],
+      "completionMessage": "Du kannst zentrale Formularfelder verstehen und einfache persönliche Angaben formulieren."
+    },
+    {
+      "id": "de-a1-u10-l3",
+      "order": 3,
+      "phase": "Pratique",
+      "title": "Um Wiederholung oder Erklärung bitten",
+      "objectiveIds": [
+        "obj.u10.repetition",
+        "obj.u10.aide"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u10.wie-bitte",
+          "card.u10.wiederholen",
+          "card.u6.kann-ich",
+          "card.u9.um-wie-viel",
+          "card.u5.entschuldigung"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "Höfliche Fragen und Reparaturstrategien zuerst reaktivieren"
+      },
+      "blocks": [
+        {
+          "id": "blk.u10.l3.repair",
+          "type": "model",
+          "title": "Wenn du etwas nicht verstehst",
+          "textDe": "Wie bitte? · Können Sie das bitte wiederholen? · Können Sie bitte langsamer sprechen? · Was bedeutet …?",
+          "textFr": "Quatre stratégies suffisent pour réparer une interaction A1."
+        },
+        {
+          "id": "blk.u10.l3.strategy",
+          "type": "strategy",
+          "title": "Nicht raten",
+          "textDe": "Wenn eine Information wichtig ist, frage nach oder bestätige sie.",
+          "textFr": "Ne devine pas une donnée importante : demande ou confirme."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u10-l3-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u10.repetition",
+          "cardIds": [
+            "card.u10.koennen-wiederholen"
+          ],
+          "promptLang": "de",
+          "prompt": "Bitte höflich um Wiederholung.",
+          "answer": "Können Sie das bitte wiederholen?",
+          "acceptedAnswers": [
+            "Können Sie das bitte wiederholen?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u10.wiederholen"
+        },
+        {
+          "id": "de-a1-u10-l3-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u10.repetition",
+          "cardIds": [
+            "card.u10.koennen-langsamer"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Bitte.",
+          "tokens": [
+            "langsamer",
+            "Sie",
+            "bitte",
+            "sprechen",
+            "Können"
+          ],
+          "answer": [
+            "Können",
+            "Sie",
+            "bitte",
+            "langsamer",
+            "sprechen"
+          ],
+          "feedbackIncorrect": "Der Infinitiv sprechen steht am Ende.",
+          "remediationRef": "rem.u10.langsamer"
+        },
+        {
+          "id": "de-a1-u10-l3-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u10.repetition",
+          "cardIds": [
+            "card.u10.was-bedeutet",
+            "card.u10.formular"
+          ],
+          "promptLang": "de",
+          "prompt": "Du verstehst das Wort Formular nicht. Formuliere eine Frage.",
+          "answer": "Was bedeutet Formular?",
+          "acceptedAnswers": [
+            "Was bedeutet Formular?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "feedbackIncorrect": "Nutze den Frageblock Was bedeutet …?"
+        },
+        {
+          "id": "de-a1-u10-l3-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u10.repetition",
+          "cardIds": [
+            "card.u10.wiederholen",
+            "card.u10.langsamer"
+          ],
+          "promptLang": "de",
+          "prompt": "Was möchte die Person?",
+          "audioRef": "drill.u10.repair",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Die Information noch einmal hören.",
+              "correct": true,
+              "feedback": "Ja. Die Person bittet um Wiederholung."
+            },
+            {
+              "id": "b",
+              "text": "Schneller sprechen.",
+              "correct": false,
+              "feedback": "Das Gegenteil ist gemeint: Wiederholung, nicht schnelleres Sprechen."
+            }
+          ],
+          "remediationRef": "rem.u10.wiederholen"
+        },
+        {
+          "id": "de-a1-u10-l3-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u10.aide",
+          "cardIds": [
+            "card.u10.wie-bitte",
+            "card.u10.koennen-wiederholen",
+            "card.u10.koennen-langsamer",
+            "card.u10.was-bedeutet"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe vier kurze Reaktionen für vier Verständigungsprobleme: nicht gehört, zu schnell, unbekanntes Wort, unklare Zahl.",
+          "minimumWords": 30,
+          "successCriteria": [
+            "vier Reparaturstrategien"
+          ],
+          "autoCheck": [
+            "contient Können Sie",
+            "contient bedeutet"
+          ],
+          "note": "Das Ziel ist Interaktionssicherheit, nicht perfekte Grammatikvielfalt."
+        }
+      ],
+      "completionMessage": "Du kannst ein Gespräch aktiv reparieren, wenn du etwas nicht verstehst."
+    },
+    {
+      "id": "de-a1-u10-l4",
+      "order": 4,
+      "phase": "Produis",
+      "title": "Informationen eintragen und bestätigen",
+      "objectiveIds": [
+        "obj.u10.remplir",
+        "obj.u10.confirmer"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u10.meine-adresse",
+          "card.u10.meine-nummer",
+          "card.u10.ist-richtig",
+          "card.u7.wo-ist",
+          "card.u8.wo-arbeitest"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "Daten geben und bekannte Frage-Antwort-Strukturen kombinieren"
+      },
+      "blocks": [
+        {
+          "id": "blk.u10.l4.confirm",
+          "type": "model",
+          "title": "Bestätigen",
+          "textDe": "Ist die Hausnummer 14? — Ja, das ist richtig. · Nein, das ist nicht richtig. Sie ist 41.",
+          "textFr": "Confirmation ou correction immédiate."
+        },
+        {
+          "id": "blk.u10.l4.spell",
+          "type": "model",
+          "title": "Buchstabieren",
+          "textDe": "Können Sie Ihren Namen buchstabieren? — N-O-A-H.",
+          "textFr": "Épeler devient une stratégie de précision."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u10-l4-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u10.confirmer",
+          "cardIds": [
+            "card.u10.ja-richtig"
+          ],
+          "promptLang": "de",
+          "prompt": "Bestätige höflich: Die Information stimmt.",
+          "answer": "Ja, das ist richtig.",
+          "acceptedAnswers": [
+            "Ja, das ist richtig."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u10.bestaetigen"
+        },
+        {
+          "id": "de-a1-u10-l4-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u10.donnees",
+          "cardIds": [
+            "card.u10.buchstabieren"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "das",
+            "Sie",
+            "buchstabieren",
+            "Können"
+          ],
+          "answer": [
+            "Können",
+            "Sie",
+            "das",
+            "buchstabieren"
+          ],
+          "feedbackIncorrect": "Können Sie + Objekt + Infinitiv.",
+          "remediationRef": "rem.u10.buchstabieren"
+        },
+        {
+          "id": "de-a1-u10-l4-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u10.confirmer",
+          "cardIds": [
+            "card.u10.nein-korrektur"
+          ],
+          "promptLang": "de",
+          "prompt": "Ja, das ist richtig. → Korrigiere die Information.",
+          "answer": "Nein, das ist nicht richtig.",
+          "acceptedAnswers": [
+            "Nein, das ist nicht richtig."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u10.bestaetigen"
+        },
+        {
+          "id": "de-a1-u10-l4-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u10.remplir",
+          "cardIds": [
+            "card.u10.buchstabieren",
+            "card.u10.ist-richtig",
+            "card.u10.ja-richtig"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Präzisionsblöcke nach.",
+          "targets": [
+            {
+              "id": "p1",
+              "de": "Können Sie das buchstabieren?",
+              "audioRef": "drill.u10.precision1",
+              "maxSeconds": 6
+            },
+            {
+              "id": "p2",
+              "de": "Ist das richtig?",
+              "audioRef": "drill.u10.precision2",
+              "maxSeconds": 5
+            },
+            {
+              "id": "p3",
+              "de": "Ja, das ist richtig.",
+              "audioRef": "drill.u10.precision3",
+              "maxSeconds": 5
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur vorgegebene Sätze werden verglichen."
+        },
+        {
+          "id": "de-a1-u10-l4-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u10.remplir",
+          "cardIds": [
+            "card.u10.adresse",
+            "card.u10.telefonnummer",
+            "card.u10.buchstabieren",
+            "card.u10.ist-richtig"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe einen Dialog mit 7–9 Zeilen: zwei Daten geben, eine Angabe buchstabieren, eine Zahl bestätigen und eine Information korrigieren.",
+          "minimumWords": 45,
+          "successCriteria": [
+            "zwei Daten",
+            "buchstabieren",
+            "Bestätigung",
+            "Korrektur"
+          ],
+          "autoCheck": [
+            "contient ist",
+            "contient richtig"
+          ],
+          "note": "Nutze fiktive Daten."
+        }
+      ],
+      "completionMessage": "Du kannst einfache Angaben präzisieren, bestätigen und korrigieren."
+    },
+    {
+      "id": "de-a1-u10-l5",
+      "order": 5,
+      "phase": "Valide",
+      "title": "Mission: um Hilfe bitten",
+      "objectiveIds": [
+        "obj.u10.consignes",
+        "obj.u10.donnees",
+        "obj.u10.repetition",
+        "obj.u10.remplir",
+        "obj.u10.confirmer",
+        "obj.u10.aide"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u10.formular",
+          "card.u10.koennen-wiederholen",
+          "card.u10.meine-adresse",
+          "card.u10.ist-richtig",
+          "card.u10.danke-hilfe"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "Kernblöcke für die gesamte Servicesituation zuerst"
+      },
+      "blocks": [
+        {
+          "id": "blk.u10.l5.scenario",
+          "type": "scenario",
+          "title": "Situation",
+          "text": "Du bist in einem generischen Service. Du verstehst eine Anweisung, gibst einige fiktive Daten, fragst einmal nach und bestätigst oder korrigierst eine Information."
+        },
+        {
+          "id": "blk.u10.l5.success",
+          "type": "rubric",
+          "title": "Erfolg",
+          "text": "Anweisung verstehen · Daten passend geben · bei Bedarf um Wiederholung bitten · mindestens eine Information bestätigen/korrigieren · höflich abschließen."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u10-l5-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u10.repetition",
+          "cardIds": [
+            "card.u10.koennen-langsamer"
+          ],
+          "promptLang": "de",
+          "prompt": "Die Person spricht zu schnell. Welche Reaktion passt?",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Können Sie bitte langsamer sprechen?",
+              "correct": true,
+              "feedback": "Genau. langsamer reagiert direkt auf das Tempo."
+            },
+            {
+              "id": "b",
+              "text": "Was kostet das?",
+              "correct": false,
+              "feedback": "Das ist eine Preisfrage und löst das Verständnisproblem nicht."
+            },
+            {
+              "id": "c",
+              "text": "Wo ist der Bahnhof?",
+              "correct": false,
+              "feedback": "Das ist eine Ortsfrage, keine Bitte um langsameres Sprechen."
+            }
+          ],
+          "remediationRef": "rem.u10.langsamer"
+        },
+        {
+          "id": "de-a1-u10-l5-e2",
+          "type": "dictation",
+          "objectiveId": "obj.u10.repetition",
+          "cardIds": [
+            "card.u10.koennen-wiederholen"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib die Bitte, die du hörst.",
+          "audioRef": "drill.u10.final-dictation",
+          "answer": "Können Sie das bitte wiederholen?",
+          "acceptedAnswers": [
+            "Können Sie das bitte wiederholen?",
+            "Koennen Sie das bitte wiederholen?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ],
+          "remediationRef": "rem.u10.wiederholen"
+        },
+        {
+          "id": "de-a1-u10-l5-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u10.confirmer",
+          "cardIds": [
+            "card.u10.ja-richtig"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Bestätigung.",
+          "tokens": [
+            "richtig",
+            "ist",
+            "das",
+            "Ja"
+          ],
+          "answer": [
+            "Ja",
+            "das",
+            "ist",
+            "richtig"
+          ],
+          "feedbackIncorrect": "Der Bestätigungsblock lautet Ja, das ist richtig.",
+          "remediationRef": "rem.u10.bestaetigen"
+        },
+        {
+          "id": "de-a1-u10-l5-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u10.consignes",
+          "cardIds": [
+            "card.u10.hier-unterschreiben",
+            "card.u10.hier-eintragen"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Anweisung hörst du?",
+          "audioRef": "drill.u10.final-instruction",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Bitte hier unterschreiben.",
+              "correct": true,
+              "feedback": "Ja. Das Audio fordert eine Unterschrift."
+            },
+            {
+              "id": "b",
+              "text": "Bitte hier die Adresse eintragen.",
+              "correct": false,
+              "feedback": "Eintragen wäre eine andere Handlung; im Audio hörst du unterschreiben."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u10-l5-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u10.aide",
+          "cardIds": [
+            "card.u10.formular",
+            "card.u10.meine-adresse",
+            "card.u10.koennen-wiederholen",
+            "card.u10.ist-richtig",
+            "card.u10.danke-hilfe"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe eine komplette Serviceszene in 10–12 Zeilen: Anweisung, zwei fiktive Daten, Rückfrage, Bestätigung/Korrektur und Abschluss.",
+          "minimumWords": 58,
+          "successCriteria": [
+            "Anweisung",
+            "zwei Daten",
+            "Rückfrage",
+            "Bestätigung oder Korrektur",
+            "Dank"
+          ],
+          "autoCheck": [
+            "contient Adresse",
+            "contient Können Sie",
+            "contient richtig"
+          ],
+          "note": "U10 trainiert Sprache, nicht eine konkrete Behörde oder reale Verwaltungsvorschrift."
+        }
+      ],
+      "completionMessage": "U10 ist in QA abgeschlossen: Du kannst in einem einfachen Service nachfragen, Angaben machen und Informationen bestätigen."
+    }
+  ],
+  "qualityGates": {
+    "exerciseMix": {
+      "recognitionMax": 0.25,
+      "productiveWrittenMin": 0.35,
+      "structureMin": 0.2,
+      "oralMin": 0.2
+    },
+    "promptLang": {
+      "deMin": 1,
+      "note": "Ab U5 sind alle Übungsanweisungen auf Deutsch."
+    },
+    "spacedRecall": {
+      "minCardsRevisitedPerLesson": 3
+    },
+    "feedback": {
+      "distinctPerDistractor": true
+    },
+    "normalization": {
+      "requiredOn": [
+        "fillBlank",
+        "dictation",
+        "productiveRecall",
+        "transformation",
+        "audioCloze"
+      ]
+    }
+  }
+}
