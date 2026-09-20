@@ -89,6 +89,7 @@ jobs:
           src/lib/__tests__/p0MvpTrialGrant.test.ts
           src/lib/__tests__/p0BassaLaunchLanguage.test.ts
           src/lib/__tests__/deA1AdultRuntime.test.ts
+          src/lib/__tests__/a1RefonteV2.test.ts
           src/lib/__tests__/classroomJoinHardening.test.ts
           src/lib/__tests__/groupBetaHardening.test.ts
           src/lib/__tests__/groupLocalizationSurface.test.ts
