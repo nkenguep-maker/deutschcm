@@ -920,7 +920,7 @@
       "reveil": {
         "cardIds": [
           "card.u4.wann",
-          "card.u4.minuten",
+          "card.u4.gegen-sechs",
           "card.u3.guten-tag",
           "card.u1.sie"
         ],
@@ -1410,7 +1410,7 @@
           "objectiveId": "obj.u5.interagir",
           "cardIds": [
             "card.u5.vielen-dank",
-            "card.u5.garn-geschehen"
+            "card.u5.gern-geschehen"
           ],
           "promptLang": "de",
           "prompt": "Ergänze den Dialog höflich: Route verstanden → bedanken.",
