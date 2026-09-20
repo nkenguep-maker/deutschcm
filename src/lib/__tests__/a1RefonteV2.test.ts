@@ -5,6 +5,7 @@ import {
   A1_V2_UNIT_1,
   A1_V2_UNIT_2,
   A1_V2_UNIT_3,
+  A1_V2_UNIT_6,
   A1_V2_UNITS,
   MONDE_A1_V2_MANIFEST,
   getA1V2Card,
