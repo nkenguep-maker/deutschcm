@@ -65,7 +65,7 @@ export const A1_V2_SYLLABUS: A1SyllabusUnit[] = [
       { order: 4, phase: "Produis", title: "Demander le prix et payer" },
       { order: 5, phase: "Valide", title: "Mission finale : commander et payer" },
     ]),
-  unit(4, "Décrire sa journée", "LEGACY_EDITORIAL_REFONTE", 42,
+  unit(4, "Décrire sa journée", "LEGACY_EDITORIAL_REFONTE", 40,
     "Je peux dire l’heure et raconter une routine quotidienne simple.",
     [
       { order: 1, phase: "Comprends", title: "Comprendre une journée typique" },
@@ -74,7 +74,7 @@ export const A1_V2_SYLLABUS: A1SyllabusUnit[] = [
       { order: 4, phase: "Produis", title: "Dire l’heure et organiser sa journée" },
       { order: 5, phase: "Valide", title: "Mission finale : ma journée" },
     ]),
-  unit(5, "Se déplacer en ville", "LEGACY_EDITORIAL_REFONTE", 42,
+  unit(5, "Se déplacer en ville", "LEGACY_EDITORIAL_REFONTE", 40,
     "Je peux demander et comprendre un chemin simple et acheter un billet.",
     [
       { order: 1, phase: "Comprends", title: "Comprendre des indications" },
@@ -83,7 +83,7 @@ export const A1_V2_SYLLABUS: A1SyllabusUnit[] = [
       { order: 4, phase: "Produis", title: "Utiliser un transport simple" },
       { order: 5, phase: "Valide", title: "Mission finale : trouver sa destination" },
     ]),
-  unit(6, "Faire des achats et organiser une sortie", "LEGACY_EDITORIAL_REFONTE", 42,
+  unit(6, "Faire des achats et organiser une sortie", "LEGACY_EDITORIAL_REFONTE", 40,
     "Je peux acheter un article simple et convenir d’un lieu et d’une heure.",
     [
       { order: 1, phase: "Comprends", title: "Comprendre un achat" },
@@ -92,7 +92,7 @@ export const A1_V2_SYLLABUS: A1SyllabusUnit[] = [
       { order: 4, phase: "Produis", title: "Proposer une sortie" },
       { order: 5, phase: "Valide", title: "Mission finale : achat et rendez-vous" },
     ]),
-  unit(7, "Habiter et décrire son logement", "NEW_RECONSTRUCTION", 42,
+  unit(7, "Habiter et décrire son logement", "NEW_RECONSTRUCTION", 40,
     "Je peux décrire un logement et dire où se trouvent les objets essentiels.",
     [
       { order: 1, phase: "Comprends", title: "Comprendre une annonce simple" },
@@ -101,7 +101,7 @@ export const A1_V2_SYLLABUS: A1SyllabusUnit[] = [
       { order: 4, phase: "Produis", title: "Décrire son logement" },
       { order: 5, phase: "Valide", title: "Mission finale : visiter un logement" },
     ]),
-  unit(8, "Travail, études et compétences", "NEW_RECONSTRUCTION", 42,
+  unit(8, "Travail, études et compétences", "NEW_RECONSTRUCTION", 40,
     "Je peux parler très simplement de mon activité, de mes horaires et de ce que je sais faire.",
     [
       { order: 1, phase: "Comprends", title: "Comprendre une présentation professionnelle" },
@@ -110,7 +110,7 @@ export const A1_V2_SYLLABUS: A1SyllabusUnit[] = [
       { order: 4, phase: "Produis", title: "Dire ce que je peux faire" },
       { order: 5, phase: "Valide", title: "Mission finale : me présenter au travail" },
     ]),
-  unit(9, "Santé et rendez-vous", "NEW_RECONSTRUCTION", 42,
+  unit(9, "Santé et rendez-vous", "NEW_RECONSTRUCTION", 40,
     "Je peux décrire un problème courant et fixer un rendez-vous simple.",
     [
       { order: 1, phase: "Comprends", title: "Comprendre un problème de santé simple" },
@@ -137,7 +137,7 @@ export const A1_V2_SYLLABUS: A1SyllabusUnit[] = [
       { order: 4, phase: "Produis", title: "Préparer un petit déplacement" },
       { order: 5, phase: "Valide", title: "Mission finale : organiser un voyage court" },
     ]),
-  unit(12, "Consolider son autonomie A1", "NEW_RECONSTRUCTION", 38,
+  unit(12, "Consolider son autonomie A1", "NEW_RECONSTRUCTION", 40,
     "Je peux combiner les fonctions essentielles du niveau dans plusieurs situations quotidiennes.",
     [
       { order: 1, phase: "Comprends", title: "Comprendre plusieurs situations A1" },
