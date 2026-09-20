@@ -60,6 +60,7 @@ describe("German A1 refonte v2 audio coverage", () => {
     expect(inventory.some((asset) => asset.kind === "dialogue")).toBe(true);
     expect(inventory.some((asset) => asset.kind === "exercise")).toBe(true);
     expect(inventory.some((asset) => asset.kind === "shadowing")).toBe(true);
+    expect(inventory.some((asset) => asset.kind === "mock-exam")).toBe(true);
     expect(MONDE_A1_V2_MANIFEST.readiness.criticalNativeAudioReady).toBe(false);
   });
 });

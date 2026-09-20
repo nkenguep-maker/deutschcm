@@ -101,6 +101,18 @@ export function A1V2Overview({ locale }: { locale: string }) {
 
           <aside className={styles.stack}>
             <section className={styles.card}>
+              <div className={styles.kicker}>PRODUCTION AUDIO NATIVE</div>
+              <p className={styles.muted}>
+                Le TTS navigateur sert uniquement au QA. La liste de production contient chaque ref et le chemin MP3 final attendu.
+              </p>
+              <Link className={styles.lessonLink} href={`/${locale}/qa/course-preview/de-a1-v2/audio`}>
+                <article className={styles.objective}>
+                  <strong>Ouvrir le pack audio natif</strong><br />
+                  <span className={styles.muted}>dialogues · exercices · shadowing · examens blancs</span>
+                </article>
+              </Link>
+            </section>
+            <section className={styles.card}>
               <div className={styles.kicker}>READY GATES</div>
               <h3>Tout reste fermé par défaut</h3>
               <p className={styles.muted}>
