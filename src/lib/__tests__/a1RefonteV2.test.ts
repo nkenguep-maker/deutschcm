@@ -158,7 +158,7 @@ describe("A1 refonte v2 · evaluation", () => {
 
     const incomplete = evaluateA1Exercise(
       exercise,
-      "Hallo ich heiße Paul. Ich komme aus Kamerun und ich wohne in Berlin. Heute lerne ich jeden Tag weiter.",
+      "Hallo ich heiße Paul. Ich komme aus Kamerun und ich wohne in Berlin. Heute lerne ich jeden Tag weiter mit meiner Familie und übe sehr viel Deutsch am Abend.",
     );
     expect(incomplete.correct).toBe(false);
     expect(incomplete.feedback).toContain("spreche");
