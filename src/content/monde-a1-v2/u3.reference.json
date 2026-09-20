@@ -1,0 +1,1880 @@
+{
+  "id": "de-a1-u3",
+  "order": 3,
+  "title": "Commander au café",
+  "schemaVersion": "2.0",
+  "contentVersion": "2026.09.20-u3-refonte-r1",
+  "status": "refonte-a-valider",
+  "note": "U3 refondue à partir du matériau éditorial legacy 2026.08.04 (Nora au café, produits, mit/ohne, Ich hätte gern, prix et paiement). Les mécaniques legacy sont remplacées par la doctrine A1 v2 : Réveil inter-unités, rappel productif, feedback ciblé, remédiation, tolérance clavier et oral progressif.",
+  "cards": [
+    {
+      "id": "card.u3.kaffee",
+      "kind": "lexical",
+      "de": "der Kaffee",
+      "fr": "le café",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.tee",
+      "kind": "lexical",
+      "de": "der Tee",
+      "fr": "le thé",
+      "introducedIn": "de-a1-u3-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.wasser",
+      "kind": "lexical",
+      "de": "das Wasser",
+      "fr": "l’eau",
+      "introducedIn": "de-a1-u3-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.broetchen",
+      "kind": "lexical",
+      "de": "das Brötchen",
+      "fr": "le petit pain",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.kaesebroetchen",
+      "kind": "lexical",
+      "de": "das Käsebrötchen",
+      "fr": "le petit pain au fromage",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.kuchen",
+      "kind": "lexical",
+      "de": "der Kuchen",
+      "fr": "le gâteau",
+      "introducedIn": "de-a1-u3-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.suppe",
+      "kind": "lexical",
+      "de": "die Suppe",
+      "fr": "la soupe",
+      "introducedIn": "de-a1-u3-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.milch",
+      "kind": "lexical",
+      "de": "die Milch",
+      "fr": "le lait",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.zucker",
+      "kind": "lexical",
+      "de": "der Zucker",
+      "fr": "le sucre",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.zitrone",
+      "kind": "lexical",
+      "de": "die Zitrone",
+      "fr": "le citron",
+      "introducedIn": "de-a1-u3-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.kohlensaeure",
+      "kind": "lexical",
+      "de": "die Kohlensäure",
+      "fr": "le gaz carbonique / les bulles",
+      "introducedIn": "de-a1-u3-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.rechnung",
+      "kind": "lexical",
+      "de": "die Rechnung",
+      "fr": "l’addition / la facture",
+      "introducedIn": "de-a1-u3-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.karte",
+      "kind": "lexical",
+      "de": "die Karte",
+      "fr": "la carte (bancaire / menu selon contexte)",
+      "introducedIn": "de-a1-u3-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.bar",
+      "kind": "lexical",
+      "de": "bar",
+      "fr": "en espèces",
+      "introducedIn": "de-a1-u3-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.euro",
+      "kind": "lexical",
+      "de": "der Euro",
+      "fr": "l’euro",
+      "introducedIn": "de-a1-u3-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.bezahlen",
+      "kind": "lexical",
+      "de": "bezahlen",
+      "fr": "payer",
+      "introducedIn": "de-a1-u3-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.kosten",
+      "kind": "lexical",
+      "de": "kosten",
+      "fr": "coûter",
+      "introducedIn": "de-a1-u3-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.mit",
+      "kind": "lexical",
+      "de": "mit",
+      "fr": "avec",
+      "introducedIn": "de-a1-u3-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.ohne",
+      "kind": "lexical",
+      "de": "ohne",
+      "fr": "sans",
+      "introducedIn": "de-a1-u3-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.bitte",
+      "kind": "chunk",
+      "de": "bitte",
+      "fr": "s’il vous plaît",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.danke",
+      "kind": "chunk",
+      "de": "danke",
+      "fr": "merci",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.haette-gern",
+      "kind": "chunk",
+      "de": "Ich hätte gern …",
+      "fr": "Je voudrais …",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.einen-kaffee",
+      "kind": "structure",
+      "de": "einen Kaffee",
+      "fr": "un café (commande)",
+      "introducedIn": "de-a1-u3-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.eine-suppe",
+      "kind": "structure",
+      "de": "eine Suppe",
+      "fr": "une soupe (commande)",
+      "introducedIn": "de-a1-u3-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.ein-wasser",
+      "kind": "structure",
+      "de": "ein Wasser",
+      "fr": "une eau (commande)",
+      "introducedIn": "de-a1-u3-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.mit-milch",
+      "kind": "chunk",
+      "de": "mit Milch",
+      "fr": "avec du lait",
+      "introducedIn": "de-a1-u3-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.ohne-zucker",
+      "kind": "chunk",
+      "de": "ohne Zucker",
+      "fr": "sans sucre",
+      "introducedIn": "de-a1-u3-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.was-moechten-sie",
+      "kind": "chunk",
+      "de": "Was möchten Sie?",
+      "fr": "Que désirez-vous ?",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.sonst-noch",
+      "kind": "chunk",
+      "de": "Sonst noch etwas?",
+      "fr": "Autre chose ?",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.nein-danke",
+      "kind": "chunk",
+      "de": "Nein, danke.",
+      "fr": "Non, merci.",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.was-kostet",
+      "kind": "chunk",
+      "de": "Was kostet das?",
+      "fr": "Combien cela coûte ?",
+      "introducedIn": "de-a1-u3-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.das-macht",
+      "kind": "chunk",
+      "de": "Das macht … Euro.",
+      "fr": "Cela fait … euros.",
+      "introducedIn": "de-a1-u3-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.mit-karte",
+      "kind": "chunk",
+      "de": "Kann ich mit Karte bezahlen?",
+      "fr": "Puis-je payer par carte ?",
+      "introducedIn": "de-a1-u3-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.rechnung-bitte",
+      "kind": "chunk",
+      "de": "Die Rechnung, bitte.",
+      "fr": "L’addition, s’il vous plaît.",
+      "introducedIn": "de-a1-u3-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.ich-nehme",
+      "kind": "chunk",
+      "de": "Ich nehme …",
+      "fr": "Je prends …",
+      "introducedIn": "de-a1-u3-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.natuerlich",
+      "kind": "lexical",
+      "de": "natürlich",
+      "fr": "bien sûr",
+      "introducedIn": "de-a1-u3-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.noch",
+      "kind": "lexical",
+      "de": "noch",
+      "fr": "encore / autre",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.etwas",
+      "kind": "lexical",
+      "de": "etwas",
+      "fr": "quelque chose",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.sieben-zwanzig",
+      "kind": "chunk",
+      "de": "sieben Euro zwanzig",
+      "fr": "7,20 €",
+      "introducedIn": "de-a1-u3-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u3.guten-tag",
+      "kind": "chunk",
+      "de": "Guten Tag.",
+      "fr": "Bonjour (poli).",
+      "introducedIn": "de-a1-u3-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj.u3.reperer",
+      "label": "Repérer produits, préférences, prix et moyen de paiement dans une commande orale"
+    },
+    {
+      "id": "obj.u3.personnaliser",
+      "label": "Personnaliser une commande avec mit et ohne"
+    },
+    {
+      "id": "obj.u3.commander",
+      "label": "Commander poliment avec Ich hätte gern et la forme einen/eine/ein"
+    },
+    {
+      "id": "obj.u3.prix",
+      "label": "Comprendre un prix simple et demander combien cela coûte"
+    },
+    {
+      "id": "obj.u3.payer",
+      "label": "Demander l’addition et préciser un moyen de paiement"
+    },
+    {
+      "id": "obj.u3.interagir",
+      "label": "Mener une commande courte du salut au paiement"
+    }
+  ],
+  "remediations": [
+    {
+      "id": "rem.u3.mit-ohne",
+      "objectiveId": "obj.u3.personnaliser",
+      "durationSeconds": 105,
+      "explanation": "mit ajoute quelque chose ; ohne l’enlève. Relie toujours le mot à ton intention : Kaffee mit Milch, Tee ohne Zucker.",
+      "contrast": [
+        {
+          "de": "Kaffee mit Milch.",
+          "fr": "Café avec du lait.",
+          "ok": true
+        },
+        {
+          "de": "Tee ohne Zucker.",
+          "fr": "Thé sans sucre.",
+          "ok": true
+        },
+        {
+          "de": "Kaffee ohne Milch.",
+          "fr": "Café sans lait.",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u3.mit-ohne.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Kaffee ____ Milch.",
+          "answer": "mit",
+          "acceptedAnswers": [
+            "mit"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u3.mit-ohne.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Tee ____ Zucker.",
+          "answer": "ohne",
+          "acceptedAnswers": [
+            "ohne"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u3.artikel",
+      "objectiveId": "obj.u3.commander",
+      "durationSeconds": 120,
+      "explanation": "Dans ces blocs de commande : der Kaffee → einen Kaffee ; die Suppe → eine Suppe ; das Wasser → ein Wasser. Apprends le produit avec son article.",
+      "contrast": [
+        {
+          "de": "Ich hätte gern einen Kaffee.",
+          "fr": "Je voudrais un café.",
+          "ok": true
+        },
+        {
+          "de": "Ich hätte gern eine Suppe.",
+          "fr": "Je voudrais une soupe.",
+          "ok": true
+        },
+        {
+          "de": "Ich hätte gern ein Wasser.",
+          "fr": "Je voudrais une eau.",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u3.artikel.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich hätte gern ____ Kaffee.",
+          "answer": "einen",
+          "acceptedAnswers": [
+            "einen"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u3.artikel.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich hätte gern ____ Wasser.",
+          "answer": "ein",
+          "acceptedAnswers": [
+            "ein"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u3.haette-gern",
+      "objectiveId": "obj.u3.commander",
+      "durationSeconds": 110,
+      "explanation": "Ich hätte gern … est un bloc poli. Garde-le entier au lieu de traduire mot à mot. Le produit vient ensuite.",
+      "contrast": [
+        {
+          "de": "Ich hätte gern einen Tee, bitte.",
+          "fr": "Je voudrais un thé, s’il vous plaît.",
+          "ok": true
+        },
+        {
+          "de": "Ich gern hätte einen Tee.",
+          "fr": "—",
+          "ok": false,
+          "why": "Le bloc utile est Ich hätte gern …"
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u3.haette-gern.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich ____ gern einen Kaffee.",
+          "answer": "hätte",
+          "acceptedAnswers": [
+            "hätte",
+            "haette"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ]
+        },
+        {
+          "id": "rem.u3.haette-gern.i2",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue die Bestellung.",
+          "tokens": [
+            "gern",
+            "Ich",
+            "einen Tee",
+            "hätte"
+          ],
+          "answer": [
+            "Ich",
+            "hätte",
+            "gern",
+            "einen Tee"
+          ],
+          "normalization": []
+        }
+      ]
+    },
+    {
+      "id": "rem.u3.preis",
+      "objectiveId": "obj.u3.prix",
+      "durationSeconds": 110,
+      "explanation": "Was kostet das? demande le prix. Das macht … Euro donne le total. Dans sieben Euro zwanzig, zwanzig correspond aux centimes.",
+      "contrast": [
+        {
+          "de": "Was kostet das? — Das macht sieben Euro zwanzig.",
+          "fr": "Combien cela coûte ? — Cela fait 7,20 €.",
+          "ok": true
+        },
+        {
+          "de": "Wo kostet das?",
+          "fr": "—",
+          "ok": false,
+          "why": "Pour demander le prix, utilise Was kostet das?"
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u3.preis.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Was ____ das?",
+          "answer": "kostet",
+          "acceptedAnswers": [
+            "kostet"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u3.preis.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Das ____ neun Euro zehn.",
+          "answer": "macht",
+          "acceptedAnswers": [
+            "macht"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u3.bezahlen",
+      "objectiveId": "obj.u3.payer",
+      "durationSeconds": 115,
+      "explanation": "bezahlen = payer. Pour demander si la carte est possible : Kann ich mit Karte bezahlen? Pour demander l’addition : Die Rechnung, bitte.",
+      "contrast": [
+        {
+          "de": "Kann ich mit Karte bezahlen?",
+          "fr": "Puis-je payer par carte ?",
+          "ok": true
+        },
+        {
+          "de": "Die Rechnung, bitte.",
+          "fr": "L’addition, s’il vous plaît.",
+          "ok": true
+        },
+        {
+          "de": "Kann ich Karte kosten?",
+          "fr": "—",
+          "ok": false,
+          "why": "kosten parle du prix ; bezahlen parle du paiement."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u3.bezahlen.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Kann ich mit Karte ____?",
+          "answer": "bezahlen",
+          "acceptedAnswers": [
+            "bezahlen"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u3.bezahlen.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Die ____, bitte.",
+          "answer": "Rechnung",
+          "acceptedAnswers": [
+            "Rechnung"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "de-a1-u3-l1",
+      "order": 1,
+      "phase": "Comprends",
+      "title": "Comprendre une commande",
+      "objectiveIds": [
+        "obj.u3.reperer"
+      ],
+      "durationMinutes": 30,
+      "reveil": {
+        "cardIds": [
+          "card.u1.guten-tag",
+          "card.u1.sie",
+          "card.u2.auch",
+          "card.u2.ich-habe"
+        ],
+        "itemCount": 4,
+        "maxSeconds": 90,
+        "selection": "cartes dues/ratées des unités précédentes avant les nouveaux blocs du café"
+      },
+      "blocks": [
+        {
+          "id": "blk.u3.l1.intro",
+          "type": "intro",
+          "title": "Ta mission",
+          "text": "Nora commande au comptoir. Repère ce qu’elle prend, ce qu’elle refuse et comment elle paie."
+        },
+        {
+          "id": "blk.u3.l1.dialogue",
+          "type": "dialogueRef",
+          "dialogueId": "de-a1-u3-dialogue",
+          "speeds": [
+            "slow",
+            "natural"
+          ],
+          "instruction": "Première écoute : situation générale. Deuxième écoute : produits, préférence, prix et paiement."
+        },
+        {
+          "id": "blk.u3.l1.strategy",
+          "type": "strategy",
+          "title": "Mots repères",
+          "textDe": "bitte · danke · Euro · Karte",
+          "textFr": "Ces mots suffisent souvent à reconnaître une commande et un paiement avant de tout comprendre."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u3-l1-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u3.reperer",
+          "cardIds": [
+            "card.u3.kaffee",
+            "card.u3.kaesebroetchen"
+          ],
+          "promptLang": "de",
+          "prompt": "Was bestellt Nora?",
+          "audioRef": "de-a1-u3-dialogue#seg2",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Einen Kaffee und ein Käsebrötchen.",
+              "correct": true,
+              "feedback": "Ja. Nora commande exactement ces deux produits."
+            },
+            {
+              "id": "b",
+              "text": "Einen Tee und eine Suppe.",
+              "correct": false,
+              "feedback": "Tee et Suppe n’apparaissent pas dans sa commande."
+            },
+            {
+              "id": "c",
+              "text": "Ein Wasser und einen Kuchen.",
+              "correct": false,
+              "feedback": "Wasser et Kuchen sont du vocabulaire du café, mais pas la commande entendue."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u3-l1-e2",
+          "type": "audioCloze",
+          "objectiveId": "obj.u3.reperer",
+          "cardIds": [
+            "card.u3.ohne",
+            "card.u3.zucker"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Aber ____ Zucker.",
+          "audioRef": "de-a1-u3-dialogue#seg4",
+          "answer": "ohne",
+          "acceptedAnswers": [
+            "ohne"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^mit$",
+              "accept": false,
+              "note": "Nora ne veut pas de sucre : ohne Zucker."
+            }
+          ],
+          "remediationRef": "rem.u3.mit-ohne"
+        },
+        {
+          "id": "de-a1-u3-l1-e3",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u3.reperer",
+          "cardIds": [
+            "card.u3.sonst-noch"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Frage hörst du?",
+          "audioRef": "de-a1-u3-dialogue#seg5",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Sonst noch etwas?",
+              "correct": true,
+              "feedback": "Ja. Le service demande si Nora veut autre chose."
+            },
+            {
+              "id": "b",
+              "text": "Was kostet das?",
+              "correct": false,
+              "feedback": "Was kostet das? demande le prix ; ce n’est pas la question entendue."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u3-l1-e4",
+          "type": "dictation",
+          "objectiveId": "obj.u3.reperer",
+          "cardIds": [
+            "card.u3.was-kostet"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib den Satz, den du hörst.",
+          "audioRef": "de-a1-u3-dialogue#seg6",
+          "answer": "Was kostet das?",
+          "acceptedAnswers": [
+            "Was kostet das?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^was kosten das$",
+              "accept": false,
+              "note": "Le sujet das est singulier : kostet."
+            }
+          ],
+          "remediationRef": "rem.u3.preis"
+        },
+        {
+          "id": "de-a1-u3-l1-e5",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u3.commander",
+          "cardIds": [
+            "card.u3.haette-gern"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris en allemand : « Je voudrais un café. »",
+          "answer": "Ich hätte gern einen Kaffee.",
+          "acceptedAnswers": [
+            "Ich hätte gern einen Kaffee.",
+            "Ich haette gern einen Kaffee."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^ich gern haette einen kaffee$",
+              "accept": false,
+              "note": "Garde le bloc : Ich hätte gern …"
+            }
+          ],
+          "remediationRef": "rem.u3.haette-gern"
+        }
+      ],
+      "completionMessage": "Tu peux extraire l’essentiel d’une commande sans passer par une traduction mot à mot."
+    },
+    {
+      "id": "de-a1-u3-l2",
+      "order": 2,
+      "phase": "Pratique",
+      "title": "Choisir et personnaliser une commande",
+      "objectiveIds": [
+        "obj.u3.personnaliser",
+        "obj.u3.interagir"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u3.haette-gern",
+          "card.u3.kaffee",
+          "card.u3.ohne",
+          "card.u2.mein",
+          "card.u1.sie"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "erreurs récentes d’abord, puis cartes dues U1–U3"
+      },
+      "blocks": [
+        {
+          "id": "blk.u3.l2.menu",
+          "type": "model",
+          "title": "Petit menu de travail",
+          "textDe": "Kaffee · Tee · Wasser · Käsebrötchen · Kuchen",
+          "textFr": "Utilise ces produits pour varier chaque commande au lieu de répéter le même exemple."
+        },
+        {
+          "id": "blk.u3.l2.custom",
+          "type": "contrast",
+          "title": "Ajouter ou retirer",
+          "textDe": "Kaffee mit Milch. · Tee ohne Zucker. · Wasser ohne Kohlensäure.",
+          "textFr": "mit ajoute ; ohne retire."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u3-l2-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u3.personnaliser",
+          "cardIds": [
+            "card.u3.mit",
+            "card.u3.milch"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris en allemand : « café avec du lait »",
+          "answer": "Kaffee mit Milch",
+          "acceptedAnswers": [
+            "Kaffee mit Milch"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^kaffee ohne milch$",
+              "accept": false,
+              "note": "La consigne demande avec : mit Milch."
+            }
+          ],
+          "remediationRef": "rem.u3.mit-ohne"
+        },
+        {
+          "id": "de-a1-u3-l2-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u3.interagir",
+          "cardIds": [
+            "card.u3.haette-gern",
+            "card.u3.tee"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Bestellung.",
+          "tokens": [
+            "gern",
+            "einen Tee",
+            "Ich",
+            "hätte"
+          ],
+          "answer": [
+            "Ich",
+            "hätte",
+            "gern",
+            "einen Tee"
+          ],
+          "feedbackIncorrect": "Le bloc poli est Ich hätte gern …",
+          "remediationRef": "rem.u3.haette-gern"
+        },
+        {
+          "id": "de-a1-u3-l2-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u3.personnaliser",
+          "cardIds": [
+            "card.u3.mit-milch",
+            "card.u3.ohne-zucker"
+          ],
+          "promptLang": "de",
+          "prompt": "Kaffee mit Milch. → Füge hinzu: kein Zucker.",
+          "answer": "Kaffee mit Milch, aber ohne Zucker.",
+          "acceptedAnswers": [
+            "Kaffee mit Milch, aber ohne Zucker.",
+            "Kaffee mit Milch aber ohne Zucker."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^kaffee mit milch aber mit zucker$",
+              "accept": false,
+              "note": "kein Zucker correspond à ohne Zucker."
+            }
+          ],
+          "remediationRef": "rem.u3.mit-ohne"
+        },
+        {
+          "id": "de-a1-u3-l2-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u3.interagir",
+          "cardIds": [
+            "card.u3.haette-gern",
+            "card.u3.mit-milch",
+            "card.u3.ohne-zucker"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Bestellungen nach.",
+          "targets": [
+            {
+              "id": "o1",
+              "de": "Ich hätte gern einen Kaffee.",
+              "audioRef": "drill.u3.order1",
+              "maxSeconds": 6
+            },
+            {
+              "id": "o2",
+              "de": "Einen Kaffee mit Milch, bitte.",
+              "audioRef": "drill.u3.order2",
+              "maxSeconds": 6
+            },
+            {
+              "id": "o3",
+              "de": "Einen Tee ohne Zucker, bitte.",
+              "audioRef": "drill.u3.order3",
+              "maxSeconds": 6
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "QA manuelle tant que la transcription contrainte n’est pas branchée."
+        },
+        {
+          "id": "de-a1-u3-l2-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u3.interagir",
+          "cardIds": [
+            "card.u3.haette-gern",
+            "card.u3.mit",
+            "card.u3.ohne"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris trois commandes différentes. Utilise Ich hätte gern…, au moins un mit et un ohne.",
+          "minimumWords": 24,
+          "successCriteria": [
+            "Trois commandes",
+            "Ich hätte gern",
+            "mit",
+            "ohne"
+          ],
+          "autoCheck": [
+            "contient hätte gern",
+            "contient mit",
+            "contient ohne"
+          ],
+          "note": "Varie produits et préférences."
+        }
+      ],
+      "completionMessage": "Tu peux personnaliser une commande avec des blocs courts et réutilisables."
+    },
+    {
+      "id": "de-a1-u3-l3",
+      "order": 3,
+      "phase": "Pratique",
+      "title": "Commander avec la bonne forme",
+      "objectiveIds": [
+        "obj.u3.commander"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u3.haette-gern",
+          "card.u3.kaffee",
+          "card.u3.suppe",
+          "card.u3.wasser",
+          "card.u2.das-ist"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "rappel des produits avec leur genre avant le contraste einen/eine/ein"
+      },
+      "blocks": [
+        {
+          "id": "blk.u3.l3.article",
+          "type": "rule",
+          "title": "Trois formes dans la commande",
+          "textDe": "der Kaffee → einen Kaffee · die Suppe → eine Suppe · das Wasser → ein Wasser",
+          "textFr": "Ne mémorise pas seulement le nom : le genre te donne la forme de commande."
+        },
+        {
+          "id": "blk.u3.l3.chunk",
+          "type": "model",
+          "title": "Cadre",
+          "textDe": "Ich hätte gern + einen/eine/ein + Produkt.",
+          "textFr": "Le bloc poli reste fixe ; seule la forme du produit change."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u3-l3-e1",
+          "type": "audioCloze",
+          "objectiveId": "obj.u3.commander",
+          "cardIds": [
+            "card.u3.einen-kaffee"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Ich hätte gern ____ Kaffee.",
+          "audioRef": "drill.u3.einen-kaffee",
+          "answer": "einen",
+          "acceptedAnswers": [
+            "einen"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^ein$",
+              "accept": false,
+              "note": "Kaffee est masculin dans ce bloc de commande : einen Kaffee."
+            }
+          ],
+          "remediationRef": "rem.u3.artikel"
+        },
+        {
+          "id": "de-a1-u3-l3-e2",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u3.commander",
+          "cardIds": [
+            "card.u3.eine-suppe"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris en allemand : « Je voudrais une soupe. »",
+          "answer": "Ich hätte gern eine Suppe.",
+          "acceptedAnswers": [
+            "Ich hätte gern eine Suppe.",
+            "Ich haette gern eine Suppe."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^ich haette gern einen suppe$",
+              "accept": false,
+              "note": "Suppe est féminin : eine Suppe."
+            }
+          ],
+          "remediationRef": "rem.u3.artikel"
+        },
+        {
+          "id": "de-a1-u3-l3-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u3.commander",
+          "cardIds": [
+            "card.u3.ein-wasser",
+            "card.u3.haette-gern"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Bestellung.",
+          "tokens": [
+            "ein Wasser",
+            "gern",
+            "hätte",
+            "Ich"
+          ],
+          "answer": [
+            "Ich",
+            "hätte",
+            "gern",
+            "ein Wasser"
+          ],
+          "feedbackIncorrect": "Le bloc fixe vient d’abord : Ich hätte gern … puis ein Wasser.",
+          "remediationRef": "rem.u3.artikel"
+        },
+        {
+          "id": "de-a1-u3-l3-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u3.commander",
+          "cardIds": [
+            "card.u3.einen-kaffee",
+            "card.u3.eine-suppe"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Bestellung hörst du?",
+          "audioRef": "drill.u3.article-discrimination",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Ich hätte gern einen Kaffee.",
+              "correct": true,
+              "feedback": "Ja. Tu entends einen devant Kaffee."
+            },
+            {
+              "id": "b",
+              "text": "Ich hätte gern eine Suppe.",
+              "correct": false,
+              "feedback": "Suppe et la forme eine ne sont pas dans l’audio."
+            }
+          ],
+          "remediationRef": "rem.u3.artikel"
+        },
+        {
+          "id": "de-a1-u3-l3-e5",
+          "type": "transformation",
+          "objectiveId": "obj.u3.commander",
+          "cardIds": [
+            "card.u3.einen-kaffee",
+            "card.u3.ein-wasser"
+          ],
+          "promptLang": "de",
+          "prompt": "Ich hätte gern einen Kaffee. → Ersetze Kaffee durch Wasser.",
+          "answer": "Ich hätte gern ein Wasser.",
+          "acceptedAnswers": [
+            "Ich hätte gern ein Wasser.",
+            "Ich haette gern ein Wasser."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^ich haette gern einen wasser$",
+              "accept": false,
+              "note": "Wasser est neutre : ein Wasser."
+            }
+          ],
+          "remediationRef": "rem.u3.artikel"
+        }
+      ],
+      "completionMessage": "Tu peux choisir la forme de commande à partir du genre du produit au lieu de deviner."
+    },
+    {
+      "id": "de-a1-u3-l4",
+      "order": 4,
+      "phase": "Produis",
+      "title": "Comprendre un prix et payer",
+      "objectiveIds": [
+        "obj.u3.prix",
+        "obj.u3.payer",
+        "obj.u3.interagir"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u3.was-kostet",
+          "card.u3.das-macht",
+          "card.u3.rechnung",
+          "card.u3.mit-karte",
+          "card.u1.v2"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "prix/paiement dus d’abord, puis structure de question rappelée depuis U1"
+      },
+      "blocks": [
+        {
+          "id": "blk.u3.l4.price",
+          "type": "model",
+          "title": "Demander et entendre le prix",
+          "textDe": "Was kostet das? — Das macht sieben Euro zwanzig.",
+          "textFr": "Dans un prix, sieben Euro zwanzig = 7,20 €."
+        },
+        {
+          "id": "blk.u3.l4.pay",
+          "type": "model",
+          "title": "Payer",
+          "textDe": "Kann ich mit Karte bezahlen? · Die Rechnung, bitte.",
+          "textFr": "Deux blocs couvrent l’essentiel : moyen de paiement et demande d’addition."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u3-l4-e1",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u3.prix",
+          "cardIds": [
+            "card.u3.sieben-zwanzig"
+          ],
+          "promptLang": "de",
+          "prompt": "Welchen Preis hörst du?",
+          "audioRef": "drill.u3.price-720",
+          "choices": [
+            {
+              "id": "a",
+              "text": "7,20 €",
+              "correct": true,
+              "feedback": "Ja. sieben Euro zwanzig = 7,20 €."
+            },
+            {
+              "id": "b",
+              "text": "7,02 €",
+              "correct": false,
+              "feedback": "zwanzig signifie vingt centimes, pas deux."
+            },
+            {
+              "id": "c",
+              "text": "17,20 €",
+              "correct": false,
+              "feedback": "L’audio commence par sieben, pas siebzehn."
+            }
+          ],
+          "remediationRef": "rem.u3.preis"
+        },
+        {
+          "id": "de-a1-u3-l4-e2",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u3.prix",
+          "cardIds": [
+            "card.u3.was-kostet"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe die Frage für den Preis.",
+          "answer": "Was kostet das?",
+          "acceptedAnswers": [
+            "Was kostet das?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^wo kostet das$",
+              "accept": false,
+              "note": "Le prix se demande avec Was kostet das?"
+            }
+          ],
+          "remediationRef": "rem.u3.preis"
+        },
+        {
+          "id": "de-a1-u3-l4-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u3.payer",
+          "cardIds": [
+            "card.u3.mit-karte"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "bezahlen",
+            "mit Karte",
+            "ich",
+            "Kann"
+          ],
+          "answer": [
+            "Kann",
+            "ich",
+            "mit Karte",
+            "bezahlen"
+          ],
+          "feedbackIncorrect": "Avec können, l’action bezahlen reste à la fin : Kann ich mit Karte bezahlen?",
+          "remediationRef": "rem.u3.bezahlen"
+        },
+        {
+          "id": "de-a1-u3-l4-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u3.payer",
+          "cardIds": [
+            "card.u3.was-kostet",
+            "card.u3.rechnung-bitte",
+            "card.u3.mit-karte"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und wiederhole die drei Zahlungsblöcke.",
+          "targets": [
+            {
+              "id": "p1",
+              "de": "Was kostet das?",
+              "audioRef": "drill.u3.pay1",
+              "maxSeconds": 5
+            },
+            {
+              "id": "p2",
+              "de": "Die Rechnung, bitte.",
+              "audioRef": "drill.u3.pay2",
+              "maxSeconds": 5
+            },
+            {
+              "id": "p3",
+              "de": "Kann ich mit Karte bezahlen?",
+              "audioRef": "drill.u3.pay3",
+              "maxSeconds": 7
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Production contrainte uniquement."
+        },
+        {
+          "id": "de-a1-u3-l4-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u3.interagir",
+          "cardIds": [
+            "card.u3.was-kostet",
+            "card.u3.das-macht",
+            "card.u3.mit-karte",
+            "card.u3.rechnung-bitte"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris un mini-échange de 5 à 7 lignes : demande le prix, fais donner un total, puis demande à payer par carte ou demande l’addition.",
+          "minimumWords": 28,
+          "successCriteria": [
+            "Question de prix",
+            "Total en euros",
+            "Moyen de paiement ou addition"
+          ],
+          "autoCheck": [
+            "contient kostet",
+            "contient Euro",
+            "contient bezahlen"
+          ],
+          "note": "Le rôle du serveur peut être simulé dans ton texte."
+        }
+      ],
+      "completionMessage": "Tu peux demander, reconnaître et reformuler un prix simple puis gérer le paiement."
+    },
+    {
+      "id": "de-a1-u3-l5",
+      "order": 5,
+      "phase": "Valide",
+      "title": "Mission finale : commander et payer",
+      "objectiveIds": [
+        "obj.u3.reperer",
+        "obj.u3.personnaliser",
+        "obj.u3.commander",
+        "obj.u3.prix",
+        "obj.u3.payer",
+        "obj.u3.interagir"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u3.haette-gern",
+          "card.u3.mit",
+          "card.u3.ohne",
+          "card.u3.was-kostet",
+          "card.u3.mit-karte"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "erreurs persistantes puis cartes dues nécessaires à la mission"
+      },
+      "blocks": [
+        {
+          "id": "blk.u3.l5.scenario",
+          "type": "scenario",
+          "title": "Situation",
+          "text": "Tu es dans un café. Commande une boisson et un aliment, précise une préférence, réponds à une question du personnel, demande le prix puis paie."
+        },
+        {
+          "id": "blk.u3.l5.success",
+          "type": "rubric",
+          "title": "Réussite",
+          "text": "Deux produits · une personnalisation mit/ohne · commande polie · compréhension d’un prix · paiement. La production libre reste guidée, pas auto-notée comme conversation naturelle."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u3-l5-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u3.interagir",
+          "cardIds": [
+            "card.u3.sonst-noch",
+            "card.u3.nein-danke"
+          ],
+          "promptLang": "de",
+          "prompt": "Service: « Sonst noch etwas? » Welche Antwort passt?",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Nein, danke.",
+              "correct": true,
+              "feedback": "Genau. Tu indiques que tu ne veux rien d’autre."
+            },
+            {
+              "id": "b",
+              "text": "Sieben Euro zwanzig.",
+              "correct": false,
+              "feedback": "C’est un prix, pas une réponse à « autre chose ? »."
+            },
+            {
+              "id": "c",
+              "text": "Mit Karte.",
+              "correct": false,
+              "feedback": "Cela répond à une question sur le paiement, pas sur une commande supplémentaire."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u3-l5-e2",
+          "type": "dictation",
+          "objectiveId": "obj.u3.payer",
+          "cardIds": [
+            "card.u3.mit-karte"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib den Satz, den du hörst.",
+          "audioRef": "drill.u3.final-dictation",
+          "answer": "Kann ich mit Karte bezahlen?",
+          "acceptedAnswers": [
+            "Kann ich mit Karte bezahlen?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^kann ich mit karte kosten$",
+              "accept": false,
+              "note": "Pour payer, le verbe est bezahlen ; kosten parle du prix."
+            }
+          ],
+          "remediationRef": "rem.u3.bezahlen"
+        },
+        {
+          "id": "de-a1-u3-l5-e3",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u3.commander",
+          "cardIds": [
+            "card.u3.haette-gern",
+            "card.u3.einen-kaffee"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris une commande polie pour un café.",
+          "answer": "Ich hätte gern einen Kaffee, bitte.",
+          "acceptedAnswers": [
+            "Ich hätte gern einen Kaffee, bitte.",
+            "Ich haette gern einen Kaffee, bitte."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^ich haette gern ein kaffee bitte$",
+              "accept": false,
+              "note": "Dans ce bloc : einen Kaffee."
+            }
+          ],
+          "remediationRef": "rem.u3.artikel"
+        },
+        {
+          "id": "de-a1-u3-l5-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u3.reperer",
+          "cardIds": [
+            "card.u3.mit",
+            "card.u3.ohne"
+          ],
+          "promptLang": "de",
+          "prompt": "Was möchte die Person?",
+          "audioRef": "drill.u3.final-listening",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Kaffee mit Milch, ohne Zucker.",
+              "correct": true,
+              "feedback": "Ja. L’audio ajoute le lait et retire le sucre."
+            },
+            {
+              "id": "b",
+              "text": "Kaffee ohne Milch, mit Zucker.",
+              "correct": false,
+              "feedback": "Les deux préférences sont inversées."
+            }
+          ],
+          "remediationRef": "rem.u3.mit-ohne"
+        },
+        {
+          "id": "de-a1-u3-l5-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u3.interagir",
+          "cardIds": [
+            "card.u3.haette-gern",
+            "card.u3.mit",
+            "card.u3.ohne",
+            "card.u3.was-kostet",
+            "card.u3.mit-karte"
+          ],
+          "promptLang": "bi",
+          "prompt": "Mission écrite : 8 à 10 lignes entre client et personnel. Commande deux produits, personnalise-en un, réponds à « Sonst noch etwas? », demande le prix et termine par le paiement.",
+          "minimumWords": 46,
+          "successCriteria": [
+            "Deux produits",
+            "mit ou ohne",
+            "Réponse à Sonst noch etwas",
+            "Prix",
+            "Paiement"
+          ],
+          "autoCheck": [
+            "contient hätte gern",
+            "contient kostet",
+            "contient bezahlen"
+          ],
+          "note": "Le texte simule l’interaction ; l’oral libre ne reçoit pas de faux score automatique."
+        }
+      ],
+      "completionMessage": "Unité 3 terminée en QA : tu peux mener une commande simple du premier salut au paiement."
+    }
+  ],
+  "qualityGates": {
+    "exerciseMix": {
+      "recognitionMax": 0.25,
+      "productiveWrittenMin": 0.35,
+      "structureMin": 0.2,
+      "oralMin": 0.2
+    },
+    "promptLang": {
+      "deMin": 0.7,
+      "note": "U3 poursuit la réduction du français ; les productions ouvertes peuvent garder une consigne bilingue."
+    },
+    "spacedRecall": {
+      "minCardsRevisitedPerLesson": 3
+    },
+    "feedback": {
+      "distinctPerDistractor": true
+    },
+    "normalization": {
+      "requiredOn": [
+        "fillBlank",
+        "dictation",
+        "productiveRecall",
+        "transformation",
+        "audioCloze"
+      ]
+    }
+  }
+}

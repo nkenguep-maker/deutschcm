@@ -4,6 +4,7 @@ import {
   A1_V2_SYLLABUS_TOTALS,
   A1_V2_UNIT_1,
   A1_V2_UNIT_2,
+  A1_V2_UNIT_3,
   A1_V2_UNITS,
   MONDE_A1_V2_MANIFEST,
   getA1V2Card,
@@ -65,7 +66,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(A1_V2_SYLLABUS.every((unit) => unit.lessons.length === 5)).toBe(true);
     expect(A1_V2_SYLLABUS.slice(0, 6).every((unit) => unit.origin === "LEGACY_EDITORIAL_REFONTE")).toBe(true);
     expect(A1_V2_SYLLABUS.slice(6).every((unit) => unit.origin === "NEW_RECONSTRUCTION")).toBe(true);
-    expect(MONDE_A1_V2_MANIFEST.integratedUnits).toEqual(["de-a1-u1", "de-a1-u2"]);
+    expect(MONDE_A1_V2_MANIFEST.integratedUnits).toEqual(A1_V2_UNITS.map((unit) => unit.id));
   });
 
   it("makes U1 a full five-lesson template before U2", () => {
@@ -126,6 +127,75 @@ describe("A1 refonte v2 · source contract", () => {
     expect(getA1V2Exercise("de-a1-u2-l3-e2")?.unit.id).toBe("de-a1-u2");
     expect(getA1V2Card("card.u2.mutter")?.de).toBe("die Mutter");
     expect(getA1V2Remediation("rem.u2.mein-meine")?.objectiveId).toBe("obj.u2.possessif");
+  });
+
+  it("integrates U3 as a five-lesson café refonte without opening READY", () => {
+    expect(A1_V2_UNIT_3).toMatchObject({
+      id: "de-a1-u3",
+      order: 3,
+      title: "Commander au café",
+      contentVersion: "2026.09.20-u3-refonte-r1",
+      status: "refonte-a-valider",
+    });
+    expect(A1_V2_UNIT_3.cards).toHaveLength(40);
+    expect(A1_V2_UNIT_3.objectives).toHaveLength(6);
+    expect(A1_V2_UNIT_3.remediations).toHaveLength(5);
+    expect(A1_V2_UNIT_3.lessons).toHaveLength(5);
+    expect(A1_V2_UNIT_3.lessons.flatMap((lesson) => lesson.exercises)).toHaveLength(25);
+    expect(A1_V2_UNIT_3.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
+    expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
+  });
+
+  it("enforces the core doctrine contract on every integrated unit", () => {
+    const allCardIds = new Set(A1_V2_UNITS.flatMap((unit) => unit.cards).map((card) => card.id));
+    for (const unit of A1_V2_UNITS) {
+      const lessonIds = new Set(unit.lessons.map((lesson) => lesson.id));
+      const objectiveIds = new Set(unit.objectives.map((objective) => objective.id));
+      const remediationIds = new Set(unit.remediations.map((remediation) => remediation.id));
+      const exercises = unit.lessons.flatMap((lesson) => lesson.exercises);
+      const ratio = (types: string[]) => exercises.filter((exercise) => types.includes(exercise.type)).length / exercises.length;
+
+      expect(unit.lessons, unit.id).toHaveLength(5);
+      expect(unit.cards, unit.id).toHaveLength(40);
+      expect(exercises, unit.id).toHaveLength(25);
+      expect(unit.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0), unit.id).toBe(180);
+      expect(ratio(["multipleChoice"]), unit.id).toBeLessThanOrEqual(unit.qualityGates.exerciseMix.recognitionMax);
+      expect(ratio(["dictation", "productiveRecall", "transformation", "guidedProduction"]), unit.id).toBeGreaterThanOrEqual(unit.qualityGates.exerciseMix.productiveWrittenMin);
+      expect(ratio(["audioCloze", "reorder"]), unit.id).toBeGreaterThanOrEqual(unit.qualityGates.exerciseMix.structureMin);
+      expect(ratio(["listeningDiscrimination", "shadowing"]), unit.id).toBeGreaterThanOrEqual(unit.qualityGates.exerciseMix.oralMin);
+      expect(exercises.filter((exercise) => exercise.promptLang === "de").length / exercises.length, unit.id).toBeGreaterThanOrEqual(unit.qualityGates.promptLang.deMin);
+
+      for (const card of unit.cards) {
+        expect(lessonIds.has(card.introducedIn), card.id).toBe(true);
+        expect(card.id).not.toMatch(/\\[[0-9]+\\]/);
+      }
+      for (const lesson of unit.lessons) {
+        for (const objectiveId of lesson.objectiveIds) expect(objectiveIds.has(objectiveId), `${lesson.id}:${objectiveId}`).toBe(true);
+        for (const wakeId of lesson.reveil.cardIds) expect(allCardIds.has(wakeId), `${lesson.id}:${wakeId}`).toBe(true);
+        for (const exercise of lesson.exercises) {
+          expect(exercise.id.startsWith(`${lesson.id}-e`), exercise.id).toBe(true);
+          if (exercise.objectiveId) expect(objectiveIds.has(exercise.objectiveId), exercise.id).toBe(true);
+          for (const cardId of exercise.cardIds ?? []) expect(allCardIds.has(cardId), `${exercise.id}:${cardId}`).toBe(true);
+          if (exercise.remediationRef) expect(remediationIds.has(exercise.remediationRef), exercise.id).toBe(true);
+          if (exercise.choices?.length) {
+            const feedbacks = exercise.choices.map((choice) => choice.feedback.trim());
+            expect(new Set(feedbacks).size, exercise.id).toBe(feedbacks.length);
+            expect(exercise.choices.filter((choice) => choice.correct), exercise.id).toHaveLength(1);
+          }
+          if (unit.qualityGates.normalization.requiredOn.includes(exercise.type)) {
+            expect(exercise.normalization?.length ?? 0, exercise.id).toBeGreaterThan(0);
+          }
+        }
+      }
+      for (const remediation of unit.remediations) {
+        for (const item of remediation.items) {
+          if (unit.qualityGates.normalization.requiredOn.includes(item.type)) {
+            expect(item.normalization?.length ?? 0, item.id).toBeGreaterThan(0);
+          }
+        }
+      }
+    }
   });
 
   it("uses only stable references and resolves every objective/card/remediation id", () => {
@@ -347,6 +417,14 @@ describe("A1 refonte v2 · spaced recall and remediation", () => {
     expect(cards).toHaveLength(80);
     expect(cards.some((card) => card.id === "card.u1.heissen")).toBe(true);
     expect(cards.some((card) => card.id === "card.u2.mutter")).toBe(true);
+  });
+
+  it("makes U1–U3 cards available in the U3 Réveil boundary", () => {
+    const cards = getA1V2CardsAvailableForLesson("de-a1-u3-l1");
+    expect(cards).toHaveLength(120);
+    expect(cards.some((card) => card.id === "card.u1.heissen")).toBe(true);
+    expect(cards.some((card) => card.id === "card.u2.mutter")).toBe(true);
+    expect(cards.some((card) => card.id === "card.u3.kaffee")).toBe(true);
   });
 
   it("prioritizes missed/due cards in the Réveil", () => {
