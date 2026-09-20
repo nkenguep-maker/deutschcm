@@ -43,5 +43,10 @@ hours, and the server-side learning memory remains closed to client roles.
 The source-integration gate is now complete (`fullLevelIntegrated=true`), but
 public A1 must remain unavailable while `status=REFONTE_IN_PROGRESS`.
 Two detailed generic mock exams are now integrated in QA. Critical native
-audio, user QA, the full P-1 release gate, and explicit signoff are still
-required before any Production publication or READY status.
+audio, external-user QA, the full P-1 release gate, and explicit signoff are
+still required before any Production publication or READY status.
+
+These remaining requirements are now encoded directly in the A1 manifest as
+fail-closed readiness gates. Production A1 API routes call the canonical
+`isA1V2PublicReady()` helper, so changing `status` alone cannot expose the
+course.

@@ -118,7 +118,10 @@ export function A1V2Overview({ locale }: { locale: string }) {
               <p className={styles.muted}>
                 Niveau complet intégré : {MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated ? "oui" : "non"}<br />
                 Audio natif critique : {MONDE_A1_V2_MANIFEST.readiness.criticalNativeAudioReady ? "oui" : "non"}<br />
-                Examens blancs : {MONDE_A1_V2_MANIFEST.readiness.mockExamsReady ? "oui" : "non"}
+                Examens blancs : {MONDE_A1_V2_MANIFEST.readiness.mockExamsReady ? "oui" : "non"}<br />
+                QA utilisateur externe : {MONDE_A1_V2_MANIFEST.readiness.externalUserQaReady ? "oui" : "non"}<br />
+                Release gate P-1 complet : {MONDE_A1_V2_MANIFEST.readiness.p1ReleaseGateReady ? "oui" : "non"}<br />
+                Signoff explicite : {MONDE_A1_V2_MANIFEST.readiness.explicitSignoffReady ? "oui" : "non"}
               </p>
             </section>
             <section className={styles.card}>

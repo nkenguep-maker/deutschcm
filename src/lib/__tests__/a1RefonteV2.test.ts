@@ -14,6 +14,7 @@ import {
   getA1V2Lesson,
   getA1V2LessonContext,
   getA1V2Remediation,
+  isA1V2PublicReady,
 } from "@/content/monde-a1-v2";
 import { resolveA1V2AudioText } from "@/content/monde-a1-v2/audio";
 import { A1_V2_MOCK_EXAMS } from "@/content/monde-a1-v2/mock-exams";
@@ -53,6 +54,16 @@ describe("A1 refonte v2 · source contract", () => {
     expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
     expect(MONDE_A1_V2_MANIFEST.readiness.criticalNativeAudioReady).toBe(false);
     expect(MONDE_A1_V2_MANIFEST.readiness.mockExamsReady).toBe(true);
+    expect(MONDE_A1_V2_MANIFEST.readiness.externalUserQaReady).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.readiness.p1ReleaseGateReady).toBe(false);
+    expect(MONDE_A1_V2_MANIFEST.readiness.explicitSignoffReady).toBe(false);
+    expect(isA1V2PublicReady()).toBe(false);
+  });
+
+  it("keeps public READY fail-closed behind every release gate", () => {
+    expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
+    expect(Object.values(MONDE_A1_V2_MANIFEST.readiness).some((ready) => ready === false)).toBe(true);
+    expect(isA1V2PublicReady()).toBe(false);
   });
 
   it("locks a transparent 12-unit / 60-lesson reconstruction plan without pretending it is integrated", () => {

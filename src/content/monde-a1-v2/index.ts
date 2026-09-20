@@ -33,8 +33,22 @@ export const MONDE_A1_V2_MANIFEST: A1RefonteManifest = {
     fullLevelIntegrated: true,
     criticalNativeAudioReady: false,
     mockExamsReady: true,
+    externalUserQaReady: false,
+    p1ReleaseGateReady: false,
+    explicitSignoffReady: false,
   },
 };
+
+export function isA1V2PublicReady() {
+  const readiness = MONDE_A1_V2_MANIFEST.readiness;
+  return MONDE_A1_V2_MANIFEST.status === "READY"
+    && readiness.fullLevelIntegrated
+    && readiness.criticalNativeAudioReady
+    && readiness.mockExamsReady
+    && readiness.externalUserQaReady
+    && readiness.p1ReleaseGateReady
+    && readiness.explicitSignoffReady;
+}
 
 export const A1_V2_UNIT_1 = unit1Reference as A1UnitReference;
 export const A1_V2_UNIT_2 = unit2Reference as A1UnitReference;

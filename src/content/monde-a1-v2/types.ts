@@ -156,5 +156,8 @@ export type A1RefonteManifest = {
     fullLevelIntegrated: boolean;
     criticalNativeAudioReady: boolean;
     mockExamsReady: boolean;
+    externalUserQaReady: boolean;
+    p1ReleaseGateReady: boolean;
+    explicitSignoffReady: boolean;
   };
 };

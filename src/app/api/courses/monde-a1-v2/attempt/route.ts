@@ -3,8 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import {
   MONDE_A1_V2_COURSE_ID,
-  MONDE_A1_V2_MANIFEST,
   getA1V2Card,
+  isA1V2PublicReady,
   getA1V2Exercise,
   getA1V2Remediation,
 } from "@/content/monde-a1-v2";
@@ -22,7 +22,7 @@ function error(code: string, message: string, status: number) {
 
 export async function POST(request: NextRequest) {
   if (!isSameOriginRequest(request)) return error("ORIGIN_FORBIDDEN", "Cross-origin mutation refused", 403);
-  if (process.env.VERCEL_ENV === "production" && MONDE_A1_V2_MANIFEST.status !== "READY") {
+  if (process.env.VERCEL_ENV === "production" && !isA1V2PublicReady()) {
     return error("COURSE_NOT_READY", "A1 refonte is not public yet", 404);
   }
 

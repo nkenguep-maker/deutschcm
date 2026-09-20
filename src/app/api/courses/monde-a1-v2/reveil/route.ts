@@ -3,8 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import {
   MONDE_A1_V2_COURSE_ID,
-  MONDE_A1_V2_MANIFEST,
   getA1V2CardsAvailableForLesson,
+  isA1V2PublicReady,
   getA1V2Lesson,
 } from "@/content/monde-a1-v2";
 import { selectWakeCards } from "@/lib/course-content/a1-v2/memory";
@@ -14,7 +14,7 @@ function error(code: string, message: string, status: number) {
 }
 
 export async function GET(request: NextRequest) {
-  if (process.env.VERCEL_ENV === "production" && MONDE_A1_V2_MANIFEST.status !== "READY") {
+  if (process.env.VERCEL_ENV === "production" && !isA1V2PublicReady()) {
     return error("COURSE_NOT_READY", "A1 refonte is not public yet", 404);
   }
 
