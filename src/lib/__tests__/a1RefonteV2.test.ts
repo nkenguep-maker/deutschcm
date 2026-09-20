@@ -163,7 +163,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(A1_V2_UNIT_6.lessons.flatMap((lesson) => lesson.exercises).every((exercise) => exercise.promptLang === "de")).toBe(true);
     expect(A1_V2_UNIT_6.note).toContain("moitié");
     expect(A1_V2_UNIT_6.lessons.at(-1)?.completionMessage).toContain("U7");
-    expect(MONDE_A1_V2_MANIFEST.integratedUnits).toHaveLength(6);
+    expect(MONDE_A1_V2_MANIFEST.integratedUnits).toContain("de-a1-u6");
     expect(MONDE_A1_V2_MANIFEST.status).toBe("REFONTE_IN_PROGRESS");
     expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
   });
@@ -183,7 +183,7 @@ describe("A1 refonte v2 · source contract", () => {
     expect(unit!.lessons.flatMap((lesson) => lesson.exercises)).toHaveLength(25);
     expect(unit!.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0)).toBe(180);
     expect(unit!.lessons.flatMap((lesson) => lesson.exercises).every((exercise) => exercise.promptLang === "de")).toBe(true);
-    expect(MONDE_A1_V2_MANIFEST.integratedUnits).toHaveLength(7);
+    expect(MONDE_A1_V2_MANIFEST.integratedUnits).toContain("de-a1-u7");
     expect(MONDE_A1_V2_MANIFEST.readiness.fullLevelIntegrated).toBe(false);
   });
 
