@@ -42,6 +42,12 @@ function RemediationBox({ remediation }: { remediation: A1Remediation }) {
           </div>
         ))}
       </div>
+      <div className={styles.kicker}>NOUVEAUX ITEMS CIBLÉS</div>
+      <div className={styles.stack}>
+        {remediation.items.map((item) => (
+          <div className={styles.note} key={item.id}>{item.prompt}</div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -180,6 +186,8 @@ export function A1V2LessonPreview({
   const [responses, setResponses] = useState<Record<string, ResponseValue>>({});
   const [results, setResults] = useState<Record<string, ResultState>>({});
   const [objectiveFails, setObjectiveFails] = useState<Record<string, number>>({});
+  const attemptedCount = lesson.exercises.filter((exercise) => Boolean(results[exercise.id])).length;
+  const correctCount = lesson.exercises.filter((exercise) => results[exercise.id]?.evaluation.correct === true).length;
 
   const submit = (exercise: A1Exercise, overrideResponse?: ResponseValue) => {
     const raw = overrideResponse ?? responses[exercise.id] ?? "";
@@ -265,7 +273,7 @@ export function A1V2LessonPreview({
             ))}
 
             <section className={styles.card}>
-              <div className={styles.kicker}>EXERCICES · {lesson.exercises.length}</div>
+              <div className={styles.kicker}>EXERCICES · {attemptedCount}/{lesson.exercises.length} tentés · {correctCount} réussis</div>
               <h2>Travail actif</h2>
               <div className={styles.stack}>
                 {lesson.exercises.map((exercise) => (
