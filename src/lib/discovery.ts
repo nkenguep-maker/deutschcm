@@ -280,8 +280,9 @@ export const DISCOVERY_TOTAL = 4 as const;
 //   courseReady    → le programme complet du Passage existe (P2+)
 //   purchasable    → l'achat peut être délivré réellement (P5)
 //
-// Aujourd'hui : SEUL A1 a du contenu de découverte. Aucun niveau n'a le
-// programme complet ni un pipeline d'achat opérationnel.
+// Aujourd'hui : A1 garde un contenu de découverte, mais le programme 6 unités
+// de 2026.08.04 est archivé. La refonte canonique 12 unités / 60 leçons est
+// en cours sous monde-solo-de-a1 et n'est pas encore READY.
 
 export type MondeLevel = "A1" | "A2" | "B1" | "B2" | "C1";
 
@@ -293,10 +294,9 @@ export interface MondeLevelAvailability {
 }
 
 export const MONDE_LEVEL_AVAILABILITY: Record<MondeLevel, MondeLevelAvailability> = {
-  // A1 · cours adulte canonique intégré : 6 unités × 6 leçons dans
-  // src/data/courses/monde/adulte/de-a1. Checkout public encore fermé.
-  // purchasable=false tant que P5 n'a pas branché le paiement réel.
-  A1: { priced: true, discoveryReady: true,  courseReady: true,  purchasable: false },
+  // A1 · refonte pédagogique v2 en cours. L'ancien 6×6 est un sous-ensemble
+  // archivé et ne prouve plus courseReady.
+  A1: { priced: true, discoveryReady: true,  courseReady: false, purchasable: false },
   A2: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },
   B1: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },
   B2: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },
