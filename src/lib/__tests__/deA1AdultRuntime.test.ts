@@ -7,13 +7,17 @@ const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
 
 describe("German A1 adult runtime provisioning", () => {
-  it("makes the platform source 12x5 while keeping the legacy DB provisioning visibly pending", () => {
-    const migration = read("prisma/migrations/20260920000024_a1_adult_runtime_provision/migration.sql");
+  it("ships an idempotent P-1 provisioning script for the 60-module v2 platform shape", () => {
+    const legacyMigration = read("prisma/migrations/20260920000024_a1_adult_runtime_provision/migration.sql");
+    const v2Provisioning = read("scripts/sql/a1-v2-platform-provision-p1.sql");
     expect(getCourseLessonIds(DE_A1_COURSE.course.id)).toHaveLength(60);
-    expect(migration).toContain("monde-adulte-de-a1");
-    expect(migration).toContain("2026.08.04");
-    expect(migration).toContain("de-a1-u6-l6");
-    expect(migration).not.toContain("de-a1-u7-l1");
+    expect(legacyMigration).toContain("de-a1-u6-l6");
+    expect(legacyMigration).not.toContain("de-a1-u7-l1");
+    expect(v2Provisioning).toContain("12 units × 5 lessons = 60 active platform modules");
+    expect(v2Provisioning).toContain("de-a1-u7-l1");
+    expect(v2Provisioning).toContain("de-a1-u12-l5");
+    expect(v2Provisioning).toContain('"activeInPlatform":false');
+    expect(v2Provisioning).toContain('"isPublished" = false');
   });
 
   it("keeps the final A1 review behind full completion", () => {
@@ -39,7 +43,7 @@ describe("German A1 adult runtime provisioning", () => {
     expect(lessonUi).toContain("block.connectors");
   });
 
-  it("exposes the new platform shape without claiming DB provisioning is complete", () => {
+  it("exposes the new platform shape while public release gates remain independent", () => {
     expect(DE_A1_COURSE.units).toHaveLength(12);
     expect(getCourseLessonIds(DE_A1_COURSE.course.id)).toHaveLength(60);
     expect(DE_A1_COURSE.units.flatMap((unit) => unit.lessons.flatMap((lesson) => lesson.exercises))).toHaveLength(300);
