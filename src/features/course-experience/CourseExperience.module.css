@@ -1,13 +1,14 @@
 .page {
-  --course-page: #f5efe4;
-  --course-surface: #fffaf2;
-  --course-ink: #201a15;
-  --course-muted: #655a50;
-  --course-accent-text: #8a5a1f;
+  --course-page: #F1EBE0;
+  --course-surface: #FBF8F2;
+  --course-ink: #1C1712;
+  --course-muted: #7A7266;
+  --course-accent-text: #A87423;
   min-height: 100vh;
   background: var(--course-page);
   color: var(--course-ink);
   padding: 24px 18px 72px;
+  font-family: var(--yema-font-jakarta, "Plus Jakarta Sans", system-ui, sans-serif);
 }
 
 /* The global Kaffeehaus theme gives every heading and paragraph a light
@@ -57,7 +58,7 @@
   border: 1px solid #d8c9b4;
   border-radius: 28px;
   padding: clamp(24px, 5vw, 58px);
-  box-shadow: 0 18px 50px rgba(62, 43, 24, 0.08);
+  box-shadow: none;
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.6fr);
   gap: 28px;
@@ -76,7 +77,7 @@
 .hero h1,
 .sectionTitle,
 .lessonTitle {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--yema-font-jakarta, "Plus Jakarta Sans", system-ui, sans-serif);
 }
 
 .hero h1 {
@@ -209,7 +210,7 @@
 
 .unitGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 16px;
 }
 
@@ -221,7 +222,7 @@
   padding: 22px;
   display: grid;
   gap: 16px;
-  min-height: 240px;
+  min-height: 0;
 }
 
 .unitCardLocked {
@@ -237,7 +238,7 @@
 
 .unitCard h2 {
   color: var(--course-ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--yema-font-jakarta, "Plus Jakarta Sans", system-ui, sans-serif);
   font-size: 28px;
   margin: 4px 0 8px;
 }
@@ -343,26 +344,29 @@
 }
 
 .lessonHero {
-  border-radius: 28px;
-  background: #241f1a;
-  color: #fff;
-  padding: clamp(26px, 5vw, 52px);
+  border-radius: 0;
+  border: 0;
+  border-bottom: 1px solid #DED5C6;
+  background: transparent;
+  color: var(--course-ink);
+  padding: clamp(20px, 4vw, 40px) 0 28px;
 }
 
 .lessonHero .eyebrow {
-  color: #dfae61;
+  color: #A87423;
 }
 
 .lessonTitle {
-  color: #fff;
-  font-size: clamp(36px, 5vw, 62px);
-  line-height: 1.02;
-  margin: 14px 0;
+  color: var(--course-ink);
+  font-size: clamp(32px, 5vw, 52px);
+  line-height: 1.08;
+  margin: 12px 0;
+  text-wrap: pretty;
 }
 
 .lessonObjective {
-  color: #d8cec1;
-  font-size: 18px;
+  color: var(--course-muted);
+  font-size: 17px;
   line-height: 1.6;
   max-width: 760px;
 }
@@ -375,16 +379,16 @@
 }
 
 .sequenceStep {
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid #CBC0AE;
   border-radius: 999px;
   padding: 9px 13px;
-  color: #bfb4a7;
+  color: #7A7266;
 }
 
 .sequenceCurrent {
-  background: #dfae61;
-  color: #241f1a;
-  border-color: #dfae61;
+  background: rgba(168, 116, 35, 0.09);
+  color: #1C1712;
+  border-color: #A87423;
   font-weight: 800;
 }
 
@@ -399,7 +403,7 @@
 .block h2,
 .block h3 {
   color: var(--course-ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--yema-font-jakarta, "Plus Jakarta Sans", system-ui, sans-serif);
   margin-top: 0;
 }
 
@@ -611,5 +615,141 @@
 
   .topbar {
     margin-bottom: 18px;
+  }
+}
+
+/* A1 v2 · real platform integration · Monde Ivory */
+.objectiveList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.wakeCard {
+  border-left: 3px solid #A87423;
+  background: #F7F1E8;
+}
+
+.compactTitle {
+  margin: 8px 0 12px;
+  font-size: clamp(21px, 3vw, 28px);
+  color: var(--course-ink);
+}
+
+.exerciseHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.exercisePrompt {
+  margin: 6px 0 0;
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 650;
+}
+
+.choiceList,
+.miniStack {
+  display: grid;
+  gap: 10px;
+}
+
+.tokenSelected {
+  border-color: #A87423;
+  background: rgba(168, 116, 35, 0.09);
+}
+
+.orderPreview {
+  min-height: 46px;
+  padding: 12px 14px;
+  border: 1px dashed #CBC0AE;
+  border-radius: 12px;
+  color: var(--course-ink);
+  background: #F7F1E8;
+}
+
+.audioPending {
+  display: inline-flex;
+  margin: 8px 0 12px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #EEE7DC;
+  color: #7A7266;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.feedbackCorrect {
+  border: 1px solid #9BBE9E;
+  background: #EDF6EE;
+}
+
+.feedbackWrong {
+  border: 1px solid #D6A097;
+  background: #FAECE9;
+}
+
+.feedbackManual {
+  border: 1px solid #D8C79E;
+  background: #FAF4E7;
+}
+
+.remediationCard {
+  border: 1px solid #C99A4E;
+  border-radius: 16px;
+  background: #FFF8EC;
+  padding: 22px;
+}
+
+.contrastGrid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 16px 0;
+}
+
+.contrastItem,
+.noteBox {
+  border: 1px solid #DED5C6;
+  border-radius: 12px;
+  padding: 12px;
+  background: #FBF8F2;
+}
+
+.completionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.secondaryOnDark {
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  color: #fff;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+@media (max-width: 780px) {
+  .contrastGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .exerciseHead {
+    flex-direction: column;
+  }
+
+  .completionActions > * {
+    width: 100%;
   }
 }

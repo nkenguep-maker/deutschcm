@@ -44,4 +44,16 @@ describe("German A1 adult runtime provisioning", () => {
     expect(getCourseLessonIds(DE_A1_COURSE.course.id)).toHaveLength(60);
     expect(DE_A1_COURSE.units.flatMap((unit) => unit.lessons.flatMap((lesson) => lesson.exercises))).toHaveLength(300);
   });
+  it("routes the official A1 lesson page through the v2 platform experience", () => {
+    const page = read("src/app/[locale]/learn/[courseId]/[unitId]/[lessonId]/page.tsx");
+    const live = read("src/features/course-experience/a1-v2/A1V2PlatformLesson.tsx");
+    expect(page).toContain("A1V2PlatformLesson");
+    expect(page).toContain('courseId === "monde-adulte-de-a1"');
+    expect(live).toContain("/api/courses/monde-a1-v2/reveil");
+    expect(live).toContain("/api/courses/monde-a1-v2/attempt");
+    expect(live).toContain("/progress");
+    expect(live).toContain("RÉVEIL");
+    expect(live).toContain("Remédiation après 2 erreurs");
+  });
+
 });
