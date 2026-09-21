@@ -1,17 +1,8 @@
-import deA1Meta from "@/data/courses/monde/adulte/de-a1/meta.json";
-import deA1Unit1 from "@/data/courses/monde/adulte/de-a1/u1.json";
-import deA1Unit2 from "@/data/courses/monde/adulte/de-a1/u2.json";
-import deA1Unit3 from "@/data/courses/monde/adulte/de-a1/u3.json";
-import deA1Unit4 from "@/data/courses/monde/adulte/de-a1/u4.json";
-import deA1Unit5 from "@/data/courses/monde/adulte/de-a1/u5.json";
-import deA1Unit6 from "@/data/courses/monde/adulte/de-a1/u6.json";
 import type { CourseContent, CourseLesson, CourseUnit } from "@/data/courses/types";
+import { DE_A1_PLATFORM_COURSE } from "@/lib/course-content/a1-v2/platform-adapter";
 import { assertPathwayPersonalizationIntegrity } from "@/lib/course-content/pathway";
 
-const deA1 = {
-  ...deA1Meta,
-  units: [deA1Unit1, deA1Unit2, deA1Unit3, deA1Unit4, deA1Unit5, deA1Unit6],
-} as unknown as CourseContent;
+const deA1 = DE_A1_PLATFORM_COURSE;
 
 const COURSE_REGISTRY: Record<string, CourseContent> = {
   [deA1.course.id]: deA1,
@@ -60,11 +51,14 @@ export function assertCourseIntegrity(course: CourseContent): void {
   if (units.length !== course.course.unitCount) throw new Error(`COURSE_UNIT_COUNT_MISMATCH:${course.course.id}`);
   if (lessonIds.length !== course.course.lessonCount) throw new Error(`COURSE_LESSON_COUNT_MISMATCH:${course.course.id}`);
   if (new Set(lessonIds).size !== lessonIds.length) throw new Error(`COURSE_DUPLICATE_LESSON_ID:${course.course.id}`);
-  for (const unit of units) {
-    if (unit.lessons.length !== 6) throw new Error(`COURSE_UNIT_LESSON_COUNT:${unit.id}`);
-    for (const lesson of unit.lessons) {
+  for (const [unitIndex, unit] of units.entries()) {
+    if (unit.order !== unitIndex + 1) throw new Error(`COURSE_UNIT_ORDER:${unit.id}`);
+    if (unit.lessons.length === 0) throw new Error(`COURSE_EMPTY_UNIT:${unit.id}`);
+    for (const [lessonIndex, lesson] of unit.lessons.entries()) {
+      if (lesson.order !== lessonIndex + 1) throw new Error(`COURSE_LESSON_ORDER:${lesson.id}`);
       if (lesson.exercises.length === 0) throw new Error(`COURSE_EMPTY_LESSON:${lesson.id}`);
     }
+    if (unit.lessons.at(-1)?.phase !== "Valide") throw new Error(`COURSE_UNIT_FINAL_PHASE:${unit.id}`);
   }
   assertPathwayPersonalizationIntegrity(course);
 }

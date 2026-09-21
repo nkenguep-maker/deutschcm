@@ -7,15 +7,13 @@ const REPO = resolve(__dirname, "../../..");
 const read = (path: string) => readFileSync(resolve(REPO, path), "utf8");
 
 describe("German A1 adult runtime provisioning", () => {
-  it("provisions the canonical course and every stable lesson id", () => {
-    const migration = read(
-      "prisma/migrations/20260920000024_a1_adult_runtime_provision/migration.sql",
-    );
+  it("makes the platform source 12x5 while keeping the legacy DB provisioning visibly pending", () => {
+    const migration = read("prisma/migrations/20260920000024_a1_adult_runtime_provision/migration.sql");
+    expect(getCourseLessonIds(DE_A1_COURSE.course.id)).toHaveLength(60);
     expect(migration).toContain("monde-adulte-de-a1");
     expect(migration).toContain("2026.08.04");
-    for (const lessonId of getCourseLessonIds(DE_A1_COURSE.course.id)) {
-      expect(migration, lessonId).toContain(lessonId);
-    }
+    expect(migration).toContain("de-a1-u6-l6");
+    expect(migration).not.toContain("de-a1-u7-l1");
   });
 
   it("keeps the final A1 review behind full completion", () => {
@@ -30,7 +28,7 @@ describe("German A1 adult runtime provisioning", () => {
     expect(qaPage).toContain('status: "COMPLETED" as const');
   });
 
-  it("renders the supplied high-value lesson blocks instead of dropping their payloads", () => {
+  it("keeps the generic lesson renderer available for non-v2 content", () => {
     const lessonUi = read("src/features/course-experience/LessonExperience.tsx");
     for (const type of ["roleplay", "rubric", "visualFormula", "contrast", "sequenceBuilder"]) {
       expect(lessonUi).toContain(`block.type === "${type}"`);
@@ -41,13 +39,9 @@ describe("German A1 adult runtime provisioning", () => {
     expect(lessonUi).toContain("block.connectors");
   });
 
-  it("keeps the supplied A1 shape exact", () => {
-    expect(DE_A1_COURSE.units).toHaveLength(6);
-    expect(getCourseLessonIds(DE_A1_COURSE.course.id)).toHaveLength(36);
-    expect(
-      DE_A1_COURSE.units.flatMap((unit) =>
-        unit.lessons.flatMap((lesson) => lesson.exercises),
-      ),
-    ).toHaveLength(102);
+  it("exposes the new platform shape without claiming DB provisioning is complete", () => {
+    expect(DE_A1_COURSE.units).toHaveLength(12);
+    expect(getCourseLessonIds(DE_A1_COURSE.course.id)).toHaveLength(60);
+    expect(DE_A1_COURSE.units.flatMap((unit) => unit.lessons.flatMap((lesson) => lesson.exercises))).toHaveLength(300);
   });
 });

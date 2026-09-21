@@ -25,7 +25,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ cou
     const { courseId } = await params;
     const course = getCourseContent(courseId);
     if (!course) return error("COURSE_NOT_FOUND", "Course not found", 404);
-    if (courseId === "monde-adulte-de-a1" && !a1IsCourseReady()) {
+    if (courseId === "monde-adulte-de-a1" && !a1IsCourseReady() && !isTechnicalBetaCourseAccessEnabled()) {
       return error("COURSE_REFONTE_IN_PROGRESS", "A1 refonte in progress", 503);
     }
 

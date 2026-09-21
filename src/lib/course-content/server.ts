@@ -30,7 +30,7 @@ export async function loadCourseViewer(
 ): Promise<CourseViewer> {
   const course = getCourseContent(courseId);
   if (!course) redirect(`/${locale}/dashboard`);
-  if (courseId === "monde-adulte-de-a1" && !a1IsCourseReady()) {
+  if (courseId === "monde-adulte-de-a1" && !a1IsCourseReady() && !isTechnicalBetaCourseAccessEnabled()) {
     redirect(`/${locale}/dashboard/view/mon-cours`);
   }
 
