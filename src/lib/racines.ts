@@ -66,12 +66,13 @@ export const RACINES_STEP_DEFINITIONS: RacinesStepDefinition[] = [
 // ─── Statut opérationnel par langue Racines ────────────────────
 // §6 · une langue n'est déclarée READY que si elle a 4 leçons complètes,
 // parcours cohérent, contenu relu, exercices, progression É1-É5 et droits
-// éditoriaux clairs. Dans l'état actuel du repo · aucune langue Racines
-// n'a de contenu seedé (voir docs/YEMA_P1_FUNNEL.md §15 et audit P2).
+// éditoriaux clairs. Bassa possède désormais un cours É1 intégré, mais reste PARTIAL jusqu'aux
+// relectures natives et aux audios requis (voir docs/YEMA_P1_FUNNEL.md §15 et audit P2).
 
 export type RacinesContentStatus = "READY" | "PARTIAL" | "MISSING";
 
 export const RACINES_LANG_STATUS: Record<string, RacinesContentStatus> = {
+  bassa:   "PARTIAL",
   wolof:   "MISSING",
   douala:  "MISSING",
   lingala: "MISSING",

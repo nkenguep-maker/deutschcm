@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   DashboardCard,
   DashboardEmptyState,
@@ -10,6 +10,7 @@ import {
   DashboardButtonLink,
 } from "@/features/dashboards/shared";
 import type { AssignmentsAvailability, MondeDashboardData } from "../types";
+import { mondeCompletionHref, mondeLessonHref } from "../courseRoutes";
 
 type Props = {
   data: MondeDashboardData;
@@ -27,6 +28,7 @@ function resolveHero(data: MondeDashboardData): HeroState {
 
 export function OverviewSection({ data, assignments }: Props) {
   const t = useTranslations("yemaDashboards.studentMonde.overview");
+  const locale = useLocale();
   const tStatus = useTranslations("yemaDashboards.studentMonde.assignments.status");
   const hero = resolveHero(data);
 
@@ -39,11 +41,11 @@ export function OverviewSection({ data, assignments }: Props) {
 
   const heroCta =
     hero === "ACTIVE_START" && data.nextModule
-      ? { label: t("start"), href: `/courses/${data.nextModule.courseId}/modules/${data.nextModule.moduleId}` as const }
+      ? { label: t("start"), href: mondeLessonHref(locale, data.nextModule) }
       : hero === "ACTIVE_RESUME" && data.nextModule
-        ? { label: t("resume"), href: `/courses/${data.nextModule.courseId}/modules/${data.nextModule.moduleId}` as const }
+        ? { label: t("resume"), href: mondeLessonHref(locale, data.nextModule) }
         : hero === "ACTIVE_DONE"
-          ? { label: t("review"), href: "/progress" as const }
+          ? { label: t("review"), href: mondeCompletionHref(locale) }
           : hero === "EXPIRED"
             ? { label: t("seeOffers"), href: "/activation-intent" as const }
             : { label: t("activate"), href: "/activation-intent" as const };

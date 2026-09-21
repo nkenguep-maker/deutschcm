@@ -79,8 +79,8 @@ export function defaultPeriodFor(rail: Rail): Period {
 // permettent.
 export const WORLD_LANGS_FR = "allemand, anglais, français, et d’autres à venir";
 export const WORLD_LANGS_EN = "German, English, French, and more soon";
-export const RACINES_LANGS_FR = "wolof, bassa, douala, lingala, et d’autres à venir";
-export const RACINES_LANGS_EN = "Wolof, Bassa, Douala, Lingala, and more soon";
+export const RACINES_LANGS_FR = "bassa, douala, lingala, wolof, et d’autres à venir";
+export const RACINES_LANGS_EN = "Bassa, Douala, Lingala, Wolof, and more soon";
 
 // ── Format helpers · locale FR pour espaces insécables ───────────
 const NBSP = " ";

@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { computeMondeAccess } from "@/lib/monde";
 import { getCourseContent, getCourseLessonById } from "@/data/courses/registry";
 import { decideLessonProgress, type CourseProgressStatus } from "@/lib/course-content/validation";
+import { isTechnicalBetaCourseAccessEnabled } from "@/lib/release/technicalBeta";
+import { a1IsCourseReady } from "@/lib/monde";
 
 function error(code: string, message: string, status: number) {
   return NextResponse.json({ ok: false, code, error: message }, { status });
@@ -23,6 +25,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ cou
     const { courseId } = await params;
     const course = getCourseContent(courseId);
     if (!course) return error("COURSE_NOT_FOUND", "Course not found", 404);
+    if (courseId === "monde-adulte-de-a1" && !a1IsCourseReady() && !isTechnicalBetaCourseAccessEnabled()) {
+      return error("COURSE_REFONTE_IN_PROGRESS", "A1 refonte in progress", 503);
+    }
 
     const payload = await request.json().catch(() => null) as {
       lessonId?: unknown;
@@ -55,7 +60,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ cou
     const learningPath = await prisma.learningPath.findFirst({
       where: { userId: dbUser.id, universe: "MONDE", language: "DEUTSCH", status: "ACTIVE" },
       orderBy: { createdAt: "desc" },
-      select: { id: true },
+      select: { id: true, currentLevel: true },
     });
     if (!learningPath) return error("LEARNING_PATH_REQUIRED", "German Monde learning path required", 403);
 
@@ -65,10 +70,23 @@ export async function POST(request: Request, { params }: { params: Promise<{ cou
           { beneficiaryType: "USER", beneficiaryId: dbUser.id },
           { beneficiaryType: "LEARNING_PATH", beneficiaryId: learningPath.id },
         ],
+        status: "ACTIVE",
+        productVariant: {
+          active: true,
+          language: "DEUTSCH",
+          ...(learningPath.currentLevel ? { level: learningPath.currentLevel } : {}),
+          product: { code: "PASSAGE" },
+        },
       },
       select: { startsAt: true, endsAt: true, status: true, metadata: true },
     });
-    if (computeMondeAccess(grants).status !== "ACTIVE") return error("COURSE_ACCESS_REQUIRED", "Active course access required", 403);
+    const technicalBetaA1 =
+      courseId === "monde-adulte-de-a1" &&
+      (learningPath.currentLevel === null || learningPath.currentLevel === "A1") &&
+      isTechnicalBetaCourseAccessEnabled();
+    if (computeMondeAccess(grants, { technicalBetaA1 }).status !== "ACTIVE") {
+      return error("COURSE_ACCESS_REQUIRED", "Active course access required", 403);
+    }
 
     const flatLessons = course.units.flatMap((unit) => unit.lessons);
     const requestedIndex = flatLessons.findIndex((lesson) => lesson.id === lessonId);

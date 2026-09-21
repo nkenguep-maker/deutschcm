@@ -2,6 +2,7 @@ import "server-only";
 
 import type { AppRole, LanguageCode, Prisma, Role, Universe } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { upsertInternalTestPromoGrant } from "@/lib/entitlements/grants";
 
 const INTERNAL_CENTER_CODE = "YEMA-INTERNAL";
 const INTERNAL_TEACHER_CODE = "YEMA-INTERNAL-TEACHER";
@@ -131,35 +132,7 @@ async function ensureFixtureGrant(params: {
   productVariantId: string;
   sourceId: string;
 }) {
-  const existing = await prisma.accessGrant.findFirst({
-    where: {
-      beneficiaryType: "HOUSEHOLD",
-      beneficiaryId: params.householdId,
-      productVariantId: params.productVariantId,
-      sourceType: "PROMO",
-      sourceId: params.sourceId,
-    },
-  });
-  const endsAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-  if (existing) {
-    return prisma.accessGrant.update({
-      where: { id: existing.id },
-      data: { status: "ACTIVE", startsAt: new Date(), endsAt },
-    });
-  }
-  return prisma.accessGrant.create({
-    data: {
-      beneficiaryType: "HOUSEHOLD",
-      beneficiaryId: params.householdId,
-      productVariantId: params.productVariantId,
-      sourceType: "PROMO",
-      sourceId: params.sourceId,
-      startsAt: new Date(),
-      endsAt,
-      status: "ACTIVE",
-      metadata: { internalTest: true } as Prisma.InputJsonValue,
-    },
-  });
+  return upsertInternalTestPromoGrant(params);
 }
 
 export async function ensureInternalTestWorkspace(userId: string) {
@@ -210,7 +183,7 @@ export async function ensureInternalTestWorkspace(userId: string) {
       centerId: center.id,
       isVerified: true,
       speciality: ["Internal test"],
-      languages: ["DEUTSCH", "WOLOF"],
+      languages: ["DEUTSCH", "BASSA"],
       certifications: [],
       code: INTERNAL_TEACHER_CODE,
     },
@@ -219,7 +192,7 @@ export async function ensureInternalTestWorkspace(userId: string) {
       centerId: center.id,
       isVerified: true,
       speciality: ["Internal test"],
-      languages: ["DEUTSCH", "WOLOF"],
+      languages: ["DEUTSCH", "BASSA"],
       certifications: [],
       code: INTERNAL_TEACHER_CODE,
       bio: "Fixture privée pour les tests internes Production YEMA.",
@@ -229,7 +202,7 @@ export async function ensureInternalTestWorkspace(userId: string) {
 
   const [mondePath, racinesPath] = await Promise.all([
     ensureInternalLearningPath({ userId, universe: "MONDE", language: "DEUTSCH", level: "A1" }),
-    ensureInternalLearningPath({ userId, universe: "RACINES", language: "WOLOF" }),
+    ensureInternalLearningPath({ userId, universe: "RACINES", language: "BASSA" }),
   ]);
 
   let household = await prisma.household.findFirst({
@@ -254,7 +227,7 @@ export async function ensureInternalTestWorkspace(userId: string) {
   const rootsFamilyVariant = await ensureFamilyProductVariant({
     code: "ROOTS_FAMILY",
     universe: "RACINES",
-    language: "WOLOF",
+    language: "BASSA",
     durationDays: 365,
   });
   await Promise.all([
@@ -303,9 +276,9 @@ export async function ensureInternalTestWorkspace(userId: string) {
         avatarAnimal: "tortue",
         age: 9,
         universe: "RACINES",
-        activeLangue: "wolof",
+        activeLangue: "bassa",
         langues: [
-          { langue: "wolof", type: "native", echelle: "E1", etoiles: 0, motsAppris: [] },
+          { langue: "bassa", type: "native", echelle: "E1", etoiles: 0, motsAppris: [] },
         ] as Prisma.InputJsonValue,
       },
     });

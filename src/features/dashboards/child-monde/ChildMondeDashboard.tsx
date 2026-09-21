@@ -43,6 +43,7 @@ export function ChildMondeDashboard({ locale, child, activeSectionId = "maison" 
   const currentLocale = useLocale() || locale;
   const baseHref = `/${currentLocale}/dashboard`;
   const courseHref = `/${currentLocale}/qa/child-course-preview/${COURSE_ID}`;
+  const messagesHref = `/${currentLocale}/messages`;
   const activeSection = ALLOWED.has(activeSectionId) ? activeSectionId : "maison";
   const [exiting, setExiting] = useState(false);
   const [progress, setProgress] = useState<LocalProgress>({ completedLessonIds: [], xp: 0 });
@@ -179,6 +180,7 @@ export function ChildMondeDashboard({ locale, child, activeSectionId = "maison" 
       <div className={game.shell}>
         <header className={game.topbar}>
           <Link className={game.brand} href={`/${currentLocale}`}><span className={game.brandMark}>Y</span> YEMA KIDS</Link>
+          <Link data-testid="child-messages-cta" href={messagesHref} style={{ minHeight: 44, display: "inline-flex", alignItems: "center" }}>{t("openMessages")}</Link>
           <button className={game.exit} type="button" onClick={exitChildMode} disabled={exiting}>{exiting ? "…" : isFr ? "Sortir" : "Exit"}</button>
         </header>
         <div className={game.statusRow}>

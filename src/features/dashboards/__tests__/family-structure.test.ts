@@ -27,7 +27,6 @@ const NAV_LABELS = {
   progression: "Progression",
   sessions: "Séances",
   messages: "Messages",
-  payments: "Paiements",
   settings: "Paramètres",
   sectionLabel: "Ma famille",
 };
@@ -36,18 +35,17 @@ const MOBILE_LABELS = {
   overview: "Accueil",
   children: "Enfants",
   progression: "Progression",
-  payments: "Paiements",
   messages: "Messages",
 };
 
 describe("Family nav (Lot 4A)", () => {
-  it("desktop expose exactement 7 rubriques", () => {
+  it("desktop expose exactement 6 rubriques hors paiement pendant la beta", () => {
     const groups = buildFamilyNav(NAV_LABELS, "/fr/family");
     expect(groups).toHaveLength(1);
-    expect(groups[0].items).toHaveLength(7);
+    expect(groups[0].items).toHaveLength(6);
   });
 
-  it("desktop items ordonnés : overview → children → progression → sessions → messages → payments → settings", () => {
+  it("desktop items ordonnés sans surface de paiement", () => {
     const [g] = buildFamilyNav(NAV_LABELS, "/fr/family");
     expect(g.items.map((i) => i.key)).toEqual([
       "overview",
@@ -55,14 +53,13 @@ describe("Family nav (Lot 4A)", () => {
       "progression",
       "sessions",
       "messages",
-      "payments",
       "settings",
     ]);
   });
 
-  it("mobile expose exactement 5 tabs", () => {
+  it("mobile expose exactement 4 tabs hors paiement pendant la beta", () => {
     const tabs = buildFamilyMobileTabs(MOBILE_LABELS, "/fr/family");
-    expect(tabs).toHaveLength(5);
+    expect(tabs).toHaveLength(4);
   });
 
   it("mobile tabs sans « Paramètres » (accessible via header/action secondaire)", () => {
@@ -71,7 +68,6 @@ describe("Family nav (Lot 4A)", () => {
       "overview",
       "children",
       "progression",
-      "payments",
       "messages",
     ]);
   });

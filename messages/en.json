@@ -193,7 +193,7 @@
       "already_exists": "This email already has an account. Sign in?",
       "invalid_email": "This email doesn't look valid.",
       "invalid_phone": "This phone number doesn't look complete.",
-      "weak_password": "Password · at least eight characters.",
+      "weak_password": "This password is too weak or appears in known breaches. Choose a different one.",
       "rate_limited": "Too many attempts. Wait a minute and try again.",
       "network": "Can't connect. Check your network.",
       "timeout": "The server is taking too long. Check your network and try again.",
@@ -1440,7 +1440,6 @@
         "students": "Students",
         "teachers": "Teachers",
         "classes": "Classes",
-        "billing": "Billing",
         "messages": "Messages",
         "settings": "Settings"
       },
@@ -1448,7 +1447,6 @@
         "overview": "Center",
         "students": "Students",
         "classes": "Classes",
-        "billing": "Billing",
         "messages": "Messages"
       },
       "overview": {

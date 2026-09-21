@@ -1,0 +1,1803 @@
+{
+  "id": "de-a1-u12",
+  "order": 12,
+  "title": "Consolider son autonomie A1",
+  "schemaVersion": "2.0",
+  "contentVersion": "2026.09.20-u12-reconstruction-r1",
+  "status": "reconstruction-a-valider",
+  "note": "U12 est une reconstruction nouvelle de consolidation. Elle n’introduit pas de grammaire lourde : elle entraîne la compréhension multi-situations, la réparation de communication, les erreurs A1 fréquentes, la réactivation transversale et l’enchaînement de situations réelles. Son intégration complète le contenu source 12×5, mais n’ouvre pas le niveau public sans audio natif critique, examens blancs, QA utilisateurs et signoff.",
+  "cards": [
+    {
+      "id": "card.u12.ich-verstehe-nicht",
+      "kind": "chunk",
+      "de": "Ich verstehe nicht.",
+      "fr": "Je ne comprends pas.",
+      "introducedIn": "de-a1-u12-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.noch-einmal-bitte",
+      "kind": "chunk",
+      "de": "Noch einmal, bitte.",
+      "fr": "Encore une fois, s’il vous plaît.",
+      "introducedIn": "de-a1-u12-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.langsamer-bitte",
+      "kind": "chunk",
+      "de": "Langsamer, bitte.",
+      "fr": "Plus lentement, s’il vous plaît.",
+      "introducedIn": "de-a1-u12-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.koennen-helfen",
+      "kind": "chunk",
+      "de": "Können Sie mir helfen?",
+      "fr": "Pouvez-vous m’aider ?",
+      "introducedIn": "de-a1-u12-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.ich-habe-frage",
+      "kind": "chunk",
+      "de": "Ich habe eine Frage.",
+      "fr": "J’ai une question.",
+      "introducedIn": "de-a1-u12-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.ich-weiss-nicht",
+      "kind": "chunk",
+      "de": "Ich weiß nicht.",
+      "fr": "Je ne sais pas.",
+      "introducedIn": "de-a1-u12-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.ich-bin-nicht-sicher",
+      "kind": "chunk",
+      "de": "Ich bin nicht sicher.",
+      "fr": "Je ne suis pas sûr(e).",
+      "introducedIn": "de-a1-u12-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.was-bedeutet",
+      "kind": "chunk",
+      "de": "Was bedeutet …?",
+      "fr": "Que signifie… ?",
+      "introducedIn": "de-a1-u12-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.wie-schreibt-man",
+      "kind": "chunk",
+      "de": "Wie schreibt man das?",
+      "fr": "Comment cela s’écrit ?",
+      "introducedIn": "de-a1-u12-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.buchstabieren-bitte",
+      "kind": "chunk",
+      "de": "Bitte buchstabieren Sie das.",
+      "fr": "Épelez cela, s’il vous plaît.",
+      "introducedIn": "de-a1-u12-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.einen-moment",
+      "kind": "chunk",
+      "de": "Einen Moment, bitte.",
+      "fr": "Un instant, s’il vous plaît.",
+      "introducedIn": "de-a1-u12-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.kein-problem",
+      "kind": "chunk",
+      "de": "Kein Problem.",
+      "fr": "Pas de problème.",
+      "introducedIn": "de-a1-u12-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.vielleicht",
+      "kind": "lexical",
+      "de": "vielleicht",
+      "fr": "peut-être",
+      "introducedIn": "de-a1-u12-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.natuerlich",
+      "kind": "lexical",
+      "de": "natürlich",
+      "fr": "bien sûr",
+      "introducedIn": "de-a1-u12-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.leider",
+      "kind": "lexical",
+      "de": "leider",
+      "fr": "malheureusement",
+      "introducedIn": "de-a1-u12-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.genau",
+      "kind": "lexical",
+      "de": "genau",
+      "fr": "exactement",
+      "introducedIn": "de-a1-u12-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.zuerst",
+      "kind": "lexical",
+      "de": "zuerst",
+      "fr": "d’abord",
+      "introducedIn": "de-a1-u12-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.dann",
+      "kind": "lexical",
+      "de": "dann",
+      "fr": "puis",
+      "introducedIn": "de-a1-u12-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.danach",
+      "kind": "lexical",
+      "de": "danach",
+      "fr": "ensuite",
+      "introducedIn": "de-a1-u12-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.spaeter",
+      "kind": "lexical",
+      "de": "später",
+      "fr": "plus tard",
+      "introducedIn": "de-a1-u12-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.jetzt",
+      "kind": "lexical",
+      "de": "jetzt",
+      "fr": "maintenant",
+      "introducedIn": "de-a1-u12-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.zusammen",
+      "kind": "lexical",
+      "de": "zusammen",
+      "fr": "ensemble",
+      "introducedIn": "de-a1-u12-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.allein",
+      "kind": "lexical",
+      "de": "allein",
+      "fr": "seul(e)",
+      "introducedIn": "de-a1-u12-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.wichtig",
+      "kind": "lexical",
+      "de": "wichtig",
+      "fr": "important",
+      "introducedIn": "de-a1-u12-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.richtig",
+      "kind": "lexical",
+      "de": "richtig",
+      "fr": "correct",
+      "introducedIn": "de-a1-u12-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.falsch",
+      "kind": "lexical",
+      "de": "falsch",
+      "fr": "faux / incorrect",
+      "introducedIn": "de-a1-u12-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.fertig",
+      "kind": "lexical",
+      "de": "fertig",
+      "fr": "terminé / prêt",
+      "introducedIn": "de-a1-u12-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.offen",
+      "kind": "lexical",
+      "de": "offen",
+      "fr": "ouvert",
+      "introducedIn": "de-a1-u12-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.geschlossen",
+      "kind": "lexical",
+      "de": "geschlossen",
+      "fr": "fermé",
+      "introducedIn": "de-a1-u12-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.moeglich",
+      "kind": "lexical",
+      "de": "möglich",
+      "fr": "possible",
+      "introducedIn": "de-a1-u12-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.was-soll-ich",
+      "kind": "chunk",
+      "de": "Was soll ich machen?",
+      "fr": "Que dois-je faire ?",
+      "introducedIn": "de-a1-u12-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.wo-muss-ich-hin",
+      "kind": "chunk",
+      "de": "Wo muss ich hin?",
+      "fr": "Où dois-je aller ?",
+      "introducedIn": "de-a1-u12-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.ich-brauche-hilfe",
+      "kind": "chunk",
+      "de": "Ich brauche Hilfe.",
+      "fr": "J’ai besoin d’aide.",
+      "introducedIn": "de-a1-u12-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.ich-moechte",
+      "kind": "structure",
+      "de": "Ich möchte …",
+      "fr": "Je voudrais…",
+      "introducedIn": "de-a1-u12-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.ich-kann",
+      "kind": "structure",
+      "de": "Ich kann …",
+      "fr": "Je peux / sais…",
+      "introducedIn": "de-a1-u12-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.ich-muss",
+      "kind": "structure",
+      "de": "Ich muss …",
+      "fr": "Je dois…",
+      "introducedIn": "de-a1-u12-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.ich-brauche",
+      "kind": "structure",
+      "de": "Ich brauche …",
+      "fr": "J’ai besoin de…",
+      "introducedIn": "de-a1-u12-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.ich-gehe",
+      "kind": "structure",
+      "de": "Ich gehe …",
+      "fr": "Je vais…",
+      "introducedIn": "de-a1-u12-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.ich-fahre",
+      "kind": "structure",
+      "de": "Ich fahre …",
+      "fr": "Je vais en véhicule…",
+      "introducedIn": "de-a1-u12-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u12.ich-komme",
+      "kind": "structure",
+      "de": "Ich komme …",
+      "fr": "Je viens…",
+      "introducedIn": "de-a1-u12-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj.u12.verstehen",
+      "label": "Comprendre l’essentiel dans plusieurs situations A1 enchaînées"
+    },
+    {
+      "id": "obj.u12.reparieren",
+      "label": "Réparer une interaction en demandant de répéter, ralentir, expliquer ou aider"
+    },
+    {
+      "id": "obj.u12.fehler",
+      "label": "Corriger des erreurs fréquentes de position du verbe, modal, nombre et question"
+    },
+    {
+      "id": "obj.u12.abrufen",
+      "label": "Réactiver rapidement du lexique et des chunks issus de tout le niveau"
+    },
+    {
+      "id": "obj.u12.verknuepfen",
+      "label": "Enchaîner deux situations quotidiennes simples sans repartir du français"
+    },
+    {
+      "id": "obj.u12.bilanz",
+      "label": "Réaliser un bilan guidé des fonctions essentielles avant les examens blancs"
+    }
+  ],
+  "remediations": [
+    {
+      "id": "rem.u12.v2",
+      "objectiveId": "obj.u12.fehler",
+      "durationSeconds": 120,
+      "explanation": "Dans une phrase déclarative simple, le verbe conjugué reste en deuxième position : Heute arbeite ich. Am Samstag fahre ich nach Hamburg.",
+      "contrast": [
+        {
+          "de": "Heute arbeite ich im Büro.",
+          "fr": "Aujourd’hui je travaille au bureau.",
+          "ok": true
+        },
+        {
+          "de": "Heute ich arbeite im Büro.",
+          "fr": "—",
+          "ok": false,
+          "why": "Le verbe conjugué doit venir en deuxième position."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u12.v2.i1",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "ich",
+            "Heute",
+            "im Büro",
+            "arbeite"
+          ],
+          "answer": [
+            "Heute",
+            "arbeite",
+            "ich",
+            "im Büro"
+          ],
+          "normalization": []
+        },
+        {
+          "id": "rem.u12.v2.i2",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "nach Berlin",
+            "ich",
+            "Am Freitag",
+            "fahre"
+          ],
+          "answer": [
+            "Am Freitag",
+            "fahre",
+            "ich",
+            "nach Berlin"
+          ],
+          "normalization": []
+        }
+      ]
+    },
+    {
+      "id": "rem.u12.modal",
+      "objectiveId": "obj.u12.fehler",
+      "durationSeconds": 120,
+      "explanation": "Avec un modal, l’action principale reste à la fin : Ich kann gut Deutsch sprechen. Ich muss heute arbeiten.",
+      "contrast": [
+        {
+          "de": "Ich kann gut Deutsch sprechen.",
+          "fr": "Je sais bien parler allemand.",
+          "ok": true
+        },
+        {
+          "de": "Ich kann sprechen gut Deutsch.",
+          "fr": "—",
+          "ok": false,
+          "why": "L’infinitif principal doit rester à la fin."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u12.modal.i1",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "gut Deutsch",
+            "ich",
+            "sprechen",
+            "Kann"
+          ],
+          "answer": [
+            "Kann",
+            "ich",
+            "gut Deutsch",
+            "sprechen"
+          ],
+          "normalization": []
+        },
+        {
+          "id": "rem.u12.modal.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich muss heute ____.",
+          "answer": "arbeiten",
+          "acceptedAnswers": [
+            "arbeiten"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u12.ist-sind",
+      "objectiveId": "obj.u12.fehler",
+      "durationSeconds": 110,
+      "explanation": "ist va avec le singulier, sind avec le pluriel : Der Termin ist… / Die Stühle sind…",
+      "contrast": [
+        {
+          "de": "Der Termin ist um zehn Uhr.",
+          "fr": "Le rendez-vous est à dix heures.",
+          "ok": true
+        },
+        {
+          "de": "Die Stühle sind in der Küche.",
+          "fr": "Les chaises sont dans la cuisine.",
+          "ok": true
+        },
+        {
+          "de": "Die Stühle ist in der Küche.",
+          "fr": "—",
+          "ok": false,
+          "why": "Stühle est pluriel : sind."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u12.ist-sind.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Der Termin ____ morgen.",
+          "answer": "ist",
+          "acceptedAnswers": [
+            "ist"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u12.ist-sind.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Die Fenster ____ offen.",
+          "answer": "sind",
+          "acceptedAnswers": [
+            "sind"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u12.frage",
+      "objectiveId": "obj.u12.fehler",
+      "durationSeconds": 115,
+      "explanation": "Question avec mot interrogatif : Wo wohnst du? Question oui/non : Hast du Zeit? Dans les deux cas, le verbe arrive avant le sujet.",
+      "contrast": [
+        {
+          "de": "Wo arbeitest du?",
+          "fr": "Où travailles-tu ?",
+          "ok": true
+        },
+        {
+          "de": "Hast du heute Zeit?",
+          "fr": "As-tu du temps aujourd’hui ?",
+          "ok": true
+        },
+        {
+          "de": "Wo du arbeitest?",
+          "fr": "—",
+          "ok": false,
+          "why": "Dans la question principale : Wo arbeitest du?"
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u12.frage.i1",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "du",
+            "Wo",
+            "arbeitest"
+          ],
+          "answer": [
+            "Wo",
+            "arbeitest",
+            "du"
+          ],
+          "normalization": []
+        },
+        {
+          "id": "rem.u12.frage.i2",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "du",
+            "Zeit",
+            "Hast"
+          ],
+          "answer": [
+            "Hast",
+            "du",
+            "Zeit"
+          ],
+          "normalization": []
+        }
+      ]
+    },
+    {
+      "id": "rem.u12.reparatur",
+      "objectiveId": "obj.u12.reparieren",
+      "durationSeconds": 105,
+      "explanation": "Quand tu ne comprends pas, ne bloque pas : utilise un bloc de réparation adapté — Noch einmal, bitte / Langsamer, bitte / Was bedeutet…?",
+      "contrast": [
+        {
+          "de": "Noch einmal, bitte.",
+          "fr": "Encore une fois, s’il vous plaît.",
+          "ok": true
+        },
+        {
+          "de": "Langsamer, bitte.",
+          "fr": "Plus lentement, s’il vous plaît.",
+          "ok": true
+        },
+        {
+          "de": "Ich verstehe nicht. Was bedeutet das?",
+          "fr": "Je ne comprends pas. Qu’est-ce que cela signifie ?",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u12.reparatur.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "____ einmal, bitte.",
+          "answer": "Noch",
+          "acceptedAnswers": [
+            "Noch"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u12.reparatur.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Was ____ das?",
+          "answer": "bedeutet",
+          "acceptedAnswers": [
+            "bedeutet"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "de-a1-u12-l1",
+      "order": 1,
+      "phase": "Comprends",
+      "title": "Mehrere A1-Situationen verstehen",
+      "objectiveIds": [
+        "obj.u12.verstehen",
+        "obj.u12.reparieren"
+      ],
+      "durationMinutes": 30,
+      "reveil": {
+        "cardIds": [
+          "card.u10.koennen-wiederholen",
+          "card.u11.reise",
+          "card.u9.termin",
+          "card.u3.haette-gern"
+        ],
+        "itemCount": 4,
+        "maxSeconds": 90,
+        "selection": "Fehler und fällige Karten aus unterschiedlichen Lebensbereichen zuerst"
+      },
+      "blocks": [
+        {
+          "id": "blk.u12.l1.intro",
+          "type": "intro",
+          "title": "Vier Situationen",
+          "textDe": "Bahnhof, Café, Service und Termin: Du hörst kurze Alltagsszenen hintereinander.",
+          "textFr": "Le but est de changer de contexte sans perdre les stratégies A1."
+        },
+        {
+          "id": "blk.u12.l1.dialogue",
+          "type": "dialogueRef",
+          "dialogueId": "de-a1-u12-dialogue",
+          "speeds": [
+            "slow",
+            "natural"
+          ],
+          "instruction": "Höre zuerst nur auf Situation und Schlüsselwörter. Beim zweiten Hören notiere je eine wichtige Information."
+        },
+        {
+          "id": "blk.u12.l1.repair",
+          "type": "strategy",
+          "title": "Nicht verstanden?",
+          "textDe": "Noch einmal, bitte. · Langsamer, bitte. · Was bedeutet …?",
+          "textFr": "Réparer fait partie de l’autonomie, pas d’un échec."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u12-l1-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u12.verstehen",
+          "cardIds": [
+            "card.u11.verspaetung"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Information hörst du am Bahnhof?",
+          "audioRef": "de-a1-u12-dialogue#seg1",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Der Zug hat zehn Minuten Verspätung.",
+              "correct": true,
+              "feedback": "Genau. Die Ansage nennt zehn Minuten Verspätung."
+            },
+            {
+              "id": "b",
+              "text": "Der Zug fällt aus.",
+              "correct": false,
+              "feedback": "Ein Ausfall wird nicht genannt; der Zug ist verspätet."
+            },
+            {
+              "id": "c",
+              "text": "Der Zug fährt pünktlich.",
+              "correct": false,
+              "feedback": "pünktlich widerspricht der genannten Verspätung."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u12-l1-e2",
+          "type": "audioCloze",
+          "objectiveId": "obj.u12.reparieren",
+          "cardIds": [
+            "card.u12.noch-einmal-bitte"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Noch einmal, ____.",
+          "audioRef": "de-a1-u12-dialogue#seg2",
+          "answer": "bitte",
+          "acceptedAnswers": [
+            "bitte"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u12.reparatur"
+        },
+        {
+          "id": "de-a1-u12-l1-e3",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u12.reparieren",
+          "cardIds": [
+            "card.u12.ich-verstehe-nicht",
+            "card.u12.was-bedeutet"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe zwei kurze Sätze: Du verstehst ein Wort nicht und fragst nach der Bedeutung.",
+          "answer": "Ich verstehe nicht. Was bedeutet das?",
+          "acceptedAnswers": [
+            "Ich verstehe nicht. Was bedeutet das?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u12.reparatur"
+        },
+        {
+          "id": "de-a1-u12-l1-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u12.verstehen",
+          "cardIds": [
+            "card.u9.termin"
+          ],
+          "promptLang": "de",
+          "prompt": "Wann ist der Termin?",
+          "audioRef": "de-a1-u12-dialogue#seg8",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Morgen um zehn Uhr.",
+              "correct": true,
+              "feedback": "Ja. Du hörst morgen um zehn Uhr."
+            },
+            {
+              "id": "b",
+              "text": "Heute um zehn Uhr.",
+              "correct": false,
+              "feedback": "Die Uhrzeit stimmt, aber der Tag ist morgen."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u12-l1-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u12.verstehen",
+          "cardIds": [
+            "card.u11.reise",
+            "card.u3.haette-gern",
+            "card.u10.formular",
+            "card.u9.termin"
+          ],
+          "promptLang": "de",
+          "prompt": "Notiere zu vier kurzen Situationen je einen Satz: Bahnhof, Café, Service und Termin.",
+          "minimumWords": 34,
+          "successCriteria": [
+            "Bahnhof",
+            "Café",
+            "Service",
+            "Termin"
+          ],
+          "autoCheck": [
+            "contient Zug",
+            "contient Termin"
+          ],
+          "note": "Kurze Kernaussagen reichen; es geht um schnellen Kontextwechsel."
+        }
+      ],
+      "completionMessage": "Du kannst zwischen mehreren A1-Situationen wechseln und das Wesentliche herausfiltern."
+    },
+    {
+      "id": "de-a1-u12-l2",
+      "order": 2,
+      "phase": "Pratique",
+      "title": "Häufige Fehler reparieren",
+      "objectiveIds": [
+        "obj.u12.fehler",
+        "obj.u12.reparieren"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u1.v2",
+          "card.u6.kann-ich",
+          "card.u7.ist",
+          "card.u8.kann",
+          "card.u10.noch-einmal"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "bekannte Fehlermuster aus dem ganzen Niveau gezielt abrufen"
+      },
+      "blocks": [
+        {
+          "id": "blk.u12.l2.patterns",
+          "type": "rule",
+          "title": "Vier Prüfstellen",
+          "textDe": "Verb auf Position 2 · Modal + Infinitiv am Ende · ist/sind · Fragewort/Verb/Subjekt",
+          "textFr": "Quatre contrôles rapides couvrent une grande part des erreurs A1."
+        },
+        {
+          "id": "blk.u12.l2.repair",
+          "type": "model",
+          "title": "Interaktion retten",
+          "textDe": "Ich bin nicht sicher. · Noch einmal, bitte. · Können Sie mir helfen?",
+          "textFr": "Même avec une erreur, tu peux maintenir l’échange."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u12-l2-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u12.fehler",
+          "cardIds": [
+            "card.u12.zuerst"
+          ],
+          "promptLang": "de",
+          "prompt": "Korrigiere den Satz: Heute ich arbeite im Büro.",
+          "answer": "Heute arbeite ich im Büro.",
+          "acceptedAnswers": [
+            "Heute arbeite ich im Büro."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u12.v2"
+        },
+        {
+          "id": "de-a1-u12-l2-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u12.fehler",
+          "cardIds": [
+            "card.u12.ich-kann",
+            "card.u8.sprechen"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "gut Deutsch",
+            "ich",
+            "sprechen",
+            "Kann"
+          ],
+          "answer": [
+            "Kann",
+            "ich",
+            "gut Deutsch",
+            "sprechen"
+          ],
+          "feedbackIncorrect": "Das Modal steht früh, der Infinitiv sprechen am Ende.",
+          "remediationRef": "rem.u12.modal"
+        },
+        {
+          "id": "de-a1-u12-l2-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u12.fehler",
+          "cardIds": [
+            "card.u12.richtig",
+            "card.u12.falsch"
+          ],
+          "promptLang": "de",
+          "prompt": "Die Stühle ist in der Küche. → Korrigiere nur den Verbfehler.",
+          "answer": "Die Stühle sind in der Küche.",
+          "acceptedAnswers": [
+            "Die Stühle sind in der Küche.",
+            "Die Stuehle sind in der Kueche."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ],
+          "remediationRef": "rem.u12.ist-sind"
+        },
+        {
+          "id": "de-a1-u12-l2-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u12.reparieren",
+          "cardIds": [
+            "card.u12.noch-einmal-bitte",
+            "card.u12.langsamer-bitte",
+            "card.u12.koennen-helfen"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Reparaturblöcke nach.",
+          "targets": [
+            {
+              "id": "r1",
+              "de": "Noch einmal, bitte.",
+              "audioRef": "drill.u12.repair1",
+              "maxSeconds": 5
+            },
+            {
+              "id": "r2",
+              "de": "Langsamer, bitte.",
+              "audioRef": "drill.u12.repair2",
+              "maxSeconds": 5
+            },
+            {
+              "id": "r3",
+              "de": "Können Sie mir helfen?",
+              "audioRef": "drill.u12.repair3",
+              "maxSeconds": 6
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur die vorgegebenen Reparaturblöcke werden verglichen."
+        },
+        {
+          "id": "de-a1-u12-l2-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u12.fehler",
+          "cardIds": [
+            "card.u12.ich-bin-nicht-sicher",
+            "card.u12.noch-einmal-bitte",
+            "card.u12.richtig",
+            "card.u12.falsch"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe vier Mini-Paare: ein typischer falscher A1-Satz und direkt darunter die korrigierte Version.",
+          "minimumWords": 36,
+          "successCriteria": [
+            "Verbposition",
+            "Modal oder Infinitiv",
+            "ist/sind",
+            "Frage"
+          ],
+          "autoCheck": [
+            "contient ?"
+          ],
+          "note": "Nutze einfache Sätze aus deinem bisherigen A1-Wortschatz."
+        }
+      ],
+      "completionMessage": "Du kannst typische A1-Fehler schneller erkennen und eine Interaktion trotzdem weiterführen."
+    },
+    {
+      "id": "de-a1-u12-l3",
+      "order": 3,
+      "phase": "Pratique",
+      "title": "Wortschatz des Niveaus reaktivieren",
+      "objectiveIds": [
+        "obj.u12.abrufen",
+        "obj.u12.fehler"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u2.mutter",
+          "card.u3.kaffee",
+          "card.u5.bahnhof",
+          "card.u7.wohnung",
+          "card.u9.termin"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "fünf Domänen mischen statt blockweise nach Einheit zu wiederholen"
+      },
+      "blocks": [
+        {
+          "id": "blk.u12.l3.network",
+          "type": "strategy",
+          "title": "Nicht nach Einheit denken",
+          "textDe": "Person · Essen · Ort · Wohnen · Gesundheit · Arbeit · Service · Reise",
+          "textFr": "Le lexique devient un réseau, pas douze listes séparées."
+        },
+        {
+          "id": "blk.u12.l3.sequence",
+          "type": "model",
+          "title": "Eine kleine Kette",
+          "textDe": "zuerst · dann · danach · später",
+          "textFr": "Ces connecteurs aident à réutiliser le lexique dans une suite d’actions."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u12-l3-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u12.abrufen",
+          "cardIds": [
+            "card.u12.zuerst",
+            "card.u12.dann",
+            "card.u12.danach"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Zuerst frühstücke ich. Dann fahre ich zur Arbeit. Danach kaufe ich ein.",
+          "answer": "Zuerst frühstücke ich. Dann fahre ich zur Arbeit. Danach kaufe ich ein.",
+          "acceptedAnswers": [
+            "Zuerst frühstücke ich. Dann fahre ich zur Arbeit. Danach kaufe ich ein."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "de-a1-u12-l3-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u12.fehler",
+          "cardIds": [
+            "card.u12.dann",
+            "card.u5.bahnhof"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "zum Bahnhof",
+            "ich",
+            "Dann",
+            "gehe"
+          ],
+          "answer": [
+            "Dann",
+            "gehe",
+            "ich",
+            "zum Bahnhof"
+          ],
+          "feedbackIncorrect": "Nach Dann bleibt das konjugierte Verb in Position 2.",
+          "remediationRef": "rem.u12.v2"
+        },
+        {
+          "id": "de-a1-u12-l3-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u12.abrufen",
+          "cardIds": [
+            "card.u12.allein",
+            "card.u12.zusammen"
+          ],
+          "promptLang": "de",
+          "prompt": "Ich lerne allein. → Ändere auf zusammen.",
+          "answer": "Wir lernen zusammen.",
+          "acceptedAnswers": [
+            "Wir lernen zusammen."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "feedbackIncorrect": "Mit zusammen passt hier wir lernen zusammen."
+        },
+        {
+          "id": "de-a1-u12-l3-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u12.abrufen",
+          "cardIds": [
+            "card.u11.bahnhof",
+            "card.u9.apotheke"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche zwei Orte hörst du?",
+          "audioRef": "drill.u12.places",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Bahnhof und Apotheke.",
+              "correct": true,
+              "feedback": "Genau. Beide Orte kommen im Audio vor."
+            },
+            {
+              "id": "b",
+              "text": "Kino und Universität.",
+              "correct": false,
+              "feedback": "Diese Orte gehören zum A1-Wortschatz, werden hier aber nicht genannt."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u12-l3-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u12.abrufen",
+          "cardIds": [
+            "card.u12.zuerst",
+            "card.u12.dann",
+            "card.u12.danach",
+            "card.u12.spaeter"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe 7–9 Sätze über einen einfachen Tag und nutze Wörter aus mindestens fünf Themenbereichen des Kurses.",
+          "minimumWords": 52,
+          "successCriteria": [
+            "fünf Themenbereiche",
+            "zuerst",
+            "dann",
+            "danach oder später"
+          ],
+          "autoCheck": [
+            "contient zuerst",
+            "contient dann"
+          ],
+          "note": "Mische bewusst Alltag, Arbeit, Essen, Weg, Service, Gesundheit oder Reise."
+        }
+      ],
+      "completionMessage": "Du kannst Wortschatz aus verschiedenen Einheiten gemeinsam abrufen und in einer Handlungskette nutzen."
+    },
+    {
+      "id": "de-a1-u12-l4",
+      "order": 4,
+      "phase": "Produis",
+      "title": "Zwei reale Situationen verbinden",
+      "objectiveIds": [
+        "obj.u12.verknuepfen",
+        "obj.u12.reparieren"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u5.wo-ist",
+          "card.u6.wollen-wir",
+          "card.u9.brauche-termin",
+          "card.u10.formular",
+          "card.u11.ich-fahre-nach"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "zwei Situationen aus unterschiedlichen Domänen kombinieren"
+      },
+      "blocks": [
+        {
+          "id": "blk.u12.l4.scenario",
+          "type": "scenario",
+          "title": "Situation A → Situation B",
+          "textDe": "Du erledigst zuerst eine Aufgabe und wechselst dann in eine zweite Alltagssituation.",
+          "textFr": "L’objectif est le changement de contexte sans reset pédagogique."
+        },
+        {
+          "id": "blk.u12.l4.tools",
+          "type": "model",
+          "title": "Autonomieblöcke",
+          "textDe": "Ich möchte … · Ich brauche … · Wo muss ich hin? · Können Sie mir helfen?",
+          "textFr": "Ces blocs permettent d’entrer dans beaucoup de situations."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u12-l4-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u12.verknuepfen",
+          "cardIds": [
+            "card.u12.ich-brauche",
+            "card.u9.brauche-termin"
+          ],
+          "promptLang": "de",
+          "prompt": "Formuliere: Du brauchst einen Termin beim Arzt.",
+          "answer": "Ich brauche einen Termin beim Arzt.",
+          "acceptedAnswers": [
+            "Ich brauche einen Termin beim Arzt."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "de-a1-u12-l4-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u12.verknuepfen",
+          "cardIds": [
+            "card.u12.wo-muss-ich-hin"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "hin",
+            "ich",
+            "Wo",
+            "muss"
+          ],
+          "answer": [
+            "Wo",
+            "muss",
+            "ich",
+            "hin"
+          ],
+          "feedbackIncorrect": "Fragewort + Modal + Subjekt + Richtungswort.",
+          "remediationRef": "rem.u12.frage"
+        },
+        {
+          "id": "de-a1-u12-l4-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u12.verknuepfen",
+          "cardIds": [
+            "card.u12.ich-fahre",
+            "card.u11.nach"
+          ],
+          "promptLang": "de",
+          "prompt": "Ich gehe nach Hamburg. → Korrigiere für eine Zugreise.",
+          "answer": "Ich fahre nach Hamburg.",
+          "acceptedAnswers": [
+            "Ich fahre nach Hamburg."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "feedbackIncorrect": "Für die Zugreise nutzt du fahren: Ich fahre nach Hamburg."
+        },
+        {
+          "id": "de-a1-u12-l4-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u12.reparieren",
+          "cardIds": [
+            "card.u12.was-soll-ich",
+            "card.u12.wo-muss-ich-hin",
+            "card.u12.ich-brauche-hilfe"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Autonomiefragen nach.",
+          "targets": [
+            {
+              "id": "a1",
+              "de": "Was soll ich machen?",
+              "audioRef": "drill.u12.auto1",
+              "maxSeconds": 6
+            },
+            {
+              "id": "a2",
+              "de": "Wo muss ich hin?",
+              "audioRef": "drill.u12.auto2",
+              "maxSeconds": 5
+            },
+            {
+              "id": "a3",
+              "de": "Ich brauche Hilfe.",
+              "audioRef": "drill.u12.auto3",
+              "maxSeconds": 5
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur modellierte Autonomieblöcke werden verglichen."
+        },
+        {
+          "id": "de-a1-u12-l4-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u12.verknuepfen",
+          "cardIds": [
+            "card.u12.ich-moechte",
+            "card.u12.ich-brauche",
+            "card.u12.koennen-helfen"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe zwei verbundene Situationen in 10–12 Zeilen, zum Beispiel Service + Reise oder Arzt + Apotheke. Nutze mindestens einen Reparaturblock.",
+          "minimumWords": 62,
+          "successCriteria": [
+            "Situation A",
+            "Übergang",
+            "Situation B",
+            "Reparaturblock",
+            "klare Bitte oder Frage"
+          ],
+          "autoCheck": [
+            "contient Ich",
+            "contient ?"
+          ],
+          "note": "Wähle Situationen, die du bereits im Kurs gelernt hast."
+        }
+      ],
+      "completionMessage": "Du kannst zwei einfache Alltagssituationen hintereinander bewältigen und bei Verständnisproblemen aktiv reparieren."
+    },
+    {
+      "id": "de-a1-u12-l5",
+      "order": 5,
+      "phase": "Valide",
+      "title": "A1-Bilanz vor den Probeprüfungen",
+      "objectiveIds": [
+        "obj.u12.verstehen",
+        "obj.u12.reparieren",
+        "obj.u12.fehler",
+        "obj.u12.abrufen",
+        "obj.u12.verknuepfen",
+        "obj.u12.bilanz"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u12.ich-verstehe-nicht",
+          "card.u12.koennen-helfen",
+          "card.u12.zuerst",
+          "card.u12.ich-moechte",
+          "card.u12.ich-brauche"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "persistierende Fehler zuerst, dann die fünf Autonomie-Kernblöcke"
+      },
+      "blocks": [
+        {
+          "id": "blk.u12.l5.scope",
+          "type": "scenario",
+          "title": "Bilan, pas examen blanc",
+          "text": "Cette leçon vérifie les fonctions essentielles du niveau dans le runtime. Elle ne remplace pas les deux examens blancs séparés, encore requis avant READY."
+        },
+        {
+          "id": "blk.u12.l5.success",
+          "type": "rubric",
+          "title": "Erfolg",
+          "text": "mehrere Situationen verstehen · bei Bedarf reparieren · zentrale Satzmuster kontrollieren · Wortschatz mischen · zwei Situationen selbstständig verbinden."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u12-l5-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u12.reparieren",
+          "cardIds": [
+            "card.u12.langsamer-bitte"
+          ],
+          "promptLang": "de",
+          "prompt": "Eine Person spricht zu schnell. Welche Reaktion passt am besten?",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Langsamer, bitte.",
+              "correct": true,
+              "feedback": "Genau. Du bittest direkt um langsameres Sprechen."
+            },
+            {
+              "id": "b",
+              "text": "Was kostet das?",
+              "correct": false,
+              "feedback": "Das fragt nach einem Preis und repariert das Sprechtempo nicht."
+            },
+            {
+              "id": "c",
+              "text": "Wo ist der Bahnhof?",
+              "correct": false,
+              "feedback": "Das ist eine Ortsfrage, keine Reparaturstrategie."
+            }
+          ],
+          "remediationRef": "rem.u12.reparatur"
+        },
+        {
+          "id": "de-a1-u12-l5-e2",
+          "type": "dictation",
+          "objectiveId": "obj.u12.fehler",
+          "cardIds": [
+            "card.u12.ich-kann"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib den Satz, den du hörst.",
+          "audioRef": "drill.u12.final-dictation",
+          "answer": "Ich kann gut Deutsch sprechen.",
+          "acceptedAnswers": [
+            "Ich kann gut Deutsch sprechen."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u12.modal"
+        },
+        {
+          "id": "de-a1-u12-l5-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u12.fehler",
+          "cardIds": [
+            "card.u12.danach"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "ich",
+            "Danach",
+            "zur Apotheke",
+            "gehe"
+          ],
+          "answer": [
+            "Danach",
+            "gehe",
+            "ich",
+            "zur Apotheke"
+          ],
+          "feedbackIncorrect": "Nach Danach steht das konjugierte Verb in Position 2.",
+          "remediationRef": "rem.u12.v2"
+        },
+        {
+          "id": "de-a1-u12-l5-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u12.verstehen",
+          "cardIds": [
+            "card.u12.ich-brauche-hilfe"
+          ],
+          "promptLang": "de",
+          "prompt": "Was braucht die Person?",
+          "audioRef": "drill.u12.final-listening",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Hilfe beim Formular.",
+              "correct": true,
+              "feedback": "Ja. Die Person braucht Hilfe beim Ausfüllen des Formulars."
+            },
+            {
+              "id": "b",
+              "text": "Eine Fahrkarte nach München.",
+              "correct": false,
+              "feedback": "Eine Fahrkarte wird im Audio nicht verlangt."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u12-l5-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u12.bilanz",
+          "cardIds": [
+            "card.u12.ich-moechte",
+            "card.u12.ich-brauche",
+            "card.u12.koennen-helfen",
+            "card.u12.dann"
+          ],
+          "promptLang": "de",
+          "prompt": "A1-Bilanz: Schreibe 12–15 kurze Zeilen mit zwei Alltagssituationen. Stelle Fragen, gib Informationen, bitte um etwas und nutze bei Bedarf einen Reparaturblock.",
+          "minimumWords": 78,
+          "successCriteria": [
+            "zwei Situationen",
+            "mindestens zwei Fragen",
+            "Information über dich",
+            "Bitte/Wunsch",
+            "Reparaturblock",
+            "klarer Abschluss"
+          ],
+          "autoCheck": [
+            "contient Ich",
+            "contient ?"
+          ],
+          "note": "Dies ist die Kursbilanz vor den separaten Probeprüfungen. Freie Qualität wird nicht künstlich automatisch benotet."
+        }
+      ],
+      "completionMessage": "Der komplette 12-Einheiten-Inhalt ist jetzt durchlaufen. Vor READY fehlen weiterhin natives kritisches Audio, zwei Probeprüfungen, Nutzer-QA und Signoff."
+    }
+  ],
+  "qualityGates": {
+    "exerciseMix": {
+      "recognitionMax": 0.25,
+      "productiveWrittenMin": 0.35,
+      "structureMin": 0.2,
+      "oralMin": 0.2
+    },
+    "promptLang": {
+      "deMin": 1,
+      "note": "U12 arbeitet vollständig mit deutschen Übungsanweisungen; französische Hilfen bleiben nur in Erklärungen."
+    },
+    "spacedRecall": {
+      "minCardsRevisitedPerLesson": 3
+    },
+    "feedback": {
+      "distinctPerDistractor": true
+    },
+    "normalization": {
+      "requiredOn": [
+        "fillBlank",
+        "dictation",
+        "productiveRecall",
+        "transformation",
+        "audioCloze"
+      ]
+    }
+  }
+}

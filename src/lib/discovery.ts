@@ -61,7 +61,9 @@ export const LANGUAGES: LanguageStatus[] = [
   { id: "deutsch",  code: "DEUTSCH", universe: "MONDE",   nameFr: "Allemand", nameEn: "German",  status: "active", activatedAt: "2026-07-22" },
   { id: "anglais",  code: null,      universe: "MONDE",   nameFr: "Anglais",  nameEn: "English", status: "soon" },
   { id: "francais", code: null,      universe: "MONDE",   nameFr: "Français", nameEn: "French",  status: "soon" },
-  // Racines · Les racines · aucune langue active tant que le seed n'existe pas.
+  // Racines · Bassa est la première langue de lancement, mais reste "soon"
+  // tant que le contenu Bassa validé n'existe pas dans le repo.
+  { id: "bassa",    code: "BASSA",   universe: "RACINES", nameFr: "Bassa",    nameEn: "Bassa",    status: "soon" },
   { id: "wolof",    code: "WOLOF",   universe: "RACINES", nameFr: "Wolof",    nameEn: "Wolof",    status: "soon" },
   { id: "douala",   code: "DOUALA",  universe: "RACINES", nameFr: "Douala",   nameEn: "Duala",    status: "soon" },
   { id: "lingala",  code: "LINGALA", universe: "RACINES", nameFr: "Lingala",  nameEn: "Lingala",  status: "soon" },
@@ -278,8 +280,9 @@ export const DISCOVERY_TOTAL = 4 as const;
 //   courseReady    → le programme complet du Passage existe (P2+)
 //   purchasable    → l'achat peut être délivré réellement (P5)
 //
-// Aujourd'hui : SEUL A1 a du contenu de découverte. Aucun niveau n'a le
-// programme complet ni un pipeline d'achat opérationnel.
+// Aujourd'hui : A1 garde un contenu de découverte, mais le programme 6 unités
+// de 2026.08.04 est archivé. La refonte canonique 12 unités / 60 leçons est
+// en cours sous monde-solo-de-a1 et n'est pas encore READY.
 
 export type MondeLevel = "A1" | "A2" | "B1" | "B2" | "C1";
 
@@ -291,10 +294,9 @@ export interface MondeLevelAvailability {
 }
 
 export const MONDE_LEVEL_AVAILABILITY: Record<MondeLevel, MondeLevelAvailability> = {
-  // A1 · P2 hardening · courseReady=true (5 leçons × 5 modules dans
-  // src/data/a1-beta-modules.ts, contenu original relu et validé).
-  // purchasable=false tant que P5 n'a pas branché le paiement réel.
-  A1: { priced: true, discoveryReady: true,  courseReady: true,  purchasable: false },
+  // A1 · refonte pédagogique v2 en cours. L'ancien 6×6 est un sous-ensemble
+  // archivé et ne prouve plus courseReady.
+  A1: { priced: true, discoveryReady: true,  courseReady: false, purchasable: false },
   A2: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },
   B1: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },
   B2: { priced: true, discoveryReady: false, courseReady: false, purchasable: false },

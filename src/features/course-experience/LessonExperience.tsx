@@ -178,6 +178,93 @@ function CourseBlockView({ block, unit }: { block: CourseBlock; unit: CourseUnit
     );
   }
 
+  if (block.type === "roleplay") {
+    const followUps = stringArray(block.followUpsDe);
+    const expected = stringArray(block.expectedFunctions);
+    return (
+      <section className={styles.block}>
+        <div className={styles.eyebrow}>Jeu de rôle</div>
+        <h2>{stringValue(block.roleA) ?? "Ton interlocuteur"}</h2>
+        {stringValue(block.openingDe) ? <p className={styles.de}>{String(block.openingDe)}</p> : null}
+        {stringValue(block.openingFr) ? <p className={styles.fr}>{String(block.openingFr)}</p> : null}
+        {followUps.length > 0 ? (
+          <>
+            <h3>Questions possibles</h3>
+            <ul className={styles.list}>{followUps.map((item) => <li key={item} className={styles.de}>{item}</li>)}</ul>
+          </>
+        ) : null}
+        {expected.length > 0 ? (
+          <>
+            <h3>Ta mission</h3>
+            <ul className={styles.list}>{expected.map((item) => <li key={item}>{item}</li>)}</ul>
+          </>
+        ) : null}
+      </section>
+    );
+  }
+
+  if (block.type === "rubric") {
+    const criteria = Array.isArray(block.criteria) ? block.criteria.filter(isRecord) : [];
+    const passScore = typeof block.passScore === "number" ? block.passScore : null;
+    return (
+      <section className={styles.block}>
+        <div className={styles.eyebrow}>Validation</div>
+        <h2>{stringValue(block.title) ?? "Critères de réussite"}</h2>
+        <div className={styles.lessonList}>
+          {criteria.map((criterion, index) => (
+            <div className={styles.card} key={`${String(criterion.label ?? "critère")}-${index}`}>
+              <h3>{String(criterion.label ?? "Critère")}{typeof criterion.points === "number" ? ` · ${criterion.points} pts` : ""}</h3>
+              {stringValue(criterion.description) ? <p className={styles.muted}>{String(criterion.description)}</p> : null}
+            </div>
+          ))}
+        </div>
+        {passScore !== null ? <p className={styles.muted}>Seuil de validation : {passScore} %.</p> : null}
+      </section>
+    );
+  }
+
+  if (block.type === "visualFormula") {
+    return (
+      <section className={styles.block}>
+        <div className={styles.eyebrow}>Structure</div>
+        <h2>{stringValue(block.title) ?? "Formule utile"}</h2>
+        {stringValue(block.before) ? <p className={styles.de}>{String(block.before)}</p> : null}
+        {stringValue(block.after) ? <p className={styles.de}>→ {String(block.after)}</p> : null}
+        {stringValue(block.explanation) ? <p>{String(block.explanation)}</p> : null}
+      </section>
+    );
+  }
+
+  if (block.type === "contrast") {
+    const pairs = Array.isArray(block.pairs) ? block.pairs.filter(isRecord) : [];
+    return (
+      <section className={styles.block}>
+        <div className={styles.eyebrow}>Compare</div>
+        <h2>{stringValue(block.title) ?? "Compare les formes"}</h2>
+        <div className={styles.lessonList}>
+          {pairs.map((pair, index) => (
+            <div className={styles.card} key={`${String(pair.infinitive ?? "forme")}-${index}`}>
+              {stringValue(pair.infinitive) ? <strong className={styles.de}>{String(pair.infinitive)}</strong> : null}
+              {stringValue(pair.sentence) ? <div className={styles.de} style={{ marginTop: 8 }}>{String(pair.sentence)}</div> : null}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (block.type === "sequenceBuilder") {
+    const connectors = stringArray(block.connectors);
+    return (
+      <section className={styles.block}>
+        <div className={styles.eyebrow}>Construis</div>
+        <h2>{stringValue(block.title) ?? "Construis la séquence"}</h2>
+        {connectors.length > 0 ? <div className={styles.chipRow}>{connectors.map((item) => <span className={styles.chip} key={item}>{item}</span>)}</div> : null}
+        {stringValue(block.model) ? <p className={styles.de} style={{ marginTop: 14 }}>{String(block.model)}</p> : null}
+      </section>
+    );
+  }
+
   const title = stringValue(block.title);
   const text = stringValue(block.text);
   const textDe = stringValue(block.textDe);
@@ -346,7 +433,7 @@ function LessonResultPanel({
   const xpValue = result.firstCompletion ? `+${result.xpAwarded}` : result.completed ? `${lesson.xp}` : "0";
   const nextHref = nextLesson
     ? `${baseHref}/${nextLesson.unitId}/${nextLesson.lessonId}`
-    : baseHref;
+    : `${baseHref}/complete`;
 
   return (
     <section className={`${resultStyles.result} ${result.reviewRecommended ? resultStyles.resultReview : ""}`} aria-live="polite">
@@ -376,7 +463,7 @@ function LessonResultPanel({
 
       <div className={resultStyles.actions}>
         {result.completed ? (
-          <Link className={resultStyles.primaryAction} href={nextHref}>{nextLesson ? "Leçon suivante" : "Voir mon parcours"}</Link>
+          <Link className={resultStyles.primaryAction} href={nextHref}>{nextLesson ? "Leçon suivante" : `Voir mon bilan ${course.course.framework.level}`}</Link>
         ) : (
           <button type="button" className={resultStyles.primaryAction} onClick={onRetry}>Reprendre les points à corriger</button>
         )}

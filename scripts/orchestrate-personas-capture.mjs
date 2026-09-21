@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Lot 7C · orchestre npm run capture:personas:p1.
-// Playwright captures pour les 7 adultes × 3 viewports × 2 locales.
-// Enfants (Child Monde/Racines) capturés par les suites messaging existantes.
+// Playwright captures pour les 9 personas × 3 viewports × 2 locales.
+// Les deux enfants passent par une vraie session parent + PIN.
 
 import { spawn, spawnSync } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
@@ -21,15 +21,20 @@ function fail(step, msg, code = 1) {
 }
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-if (!url || !url.includes(P1_REF)) fail(0, `URL non-P1`);
+if (!url || !url.includes(P1_REF)) fail(0, "URL non-P1");
 for (const b of BLOCKED) if (url.includes(b)) fail(0, `blocklisted ${b}`);
 if (!process.env.P1_TEST_PASSWORD) fail(0, "P1_TEST_PASSWORD absent", 2);
 
 async function main() {
   console.log("[personas-capture] STEP 1 · fixtures QA");
-  spawnSync("node", ["scripts/test-baseline/yema-qa-fixtures.mjs"], { stdio: "inherit", env: process.env });
+  const fixtures = spawnSync("node", ["scripts/test-baseline/yema-qa-fixtures.mjs"], {
+    stdio: "inherit",
+    env: process.env,
+  });
+  if (fixtures.error) fail(1, `fixtures impossibles à lancer · ${fixtures.error.message}`);
+  if (fixtures.status !== 0) fail(1, `fixtures QA en échec · exit ${fixtures.status ?? "unknown"}`);
 
-  console.log(`[personas-capture] STEP 2 · next start port ${PORT} (redesign flag ON · HMAC injected)`);
+  console.log(`[personas-capture] STEP 2 · next start port ${PORT} (9 personas · workspaces P-1 ON)`);
   const hmacSecret = process.env.YEMA_CHILD_SESSION_SECRET
     ?? process.env.SUPABASE_JWT_SECRET
     ?? randomBytes(32).toString("base64");
@@ -39,6 +44,11 @@ async function main() {
       ...process.env,
       YEMA_DASHBOARD_REDESIGN_ENABLED: "true",
       YEMA_CHILD_SESSION_SECRET: hmacSecret,
+      YEMA_CENTER_REAL_DATA_ENABLED: "true",
+      YEMA_CENTER_RLS_CONFIRMED: "true",
+      YEMA_COACH_WORKSPACE_ENABLED: "true",
+      YEMA_ROOTS_COACH_RLS_CONFIRMED: "true",
+      YEMA_CIRCLE_ENABLED: "true",
     },
   });
   let ready = false;
@@ -48,7 +58,7 @@ async function main() {
 
   let captureCode = 1;
   try {
-    console.log("[personas-capture] STEP 3 · Playwright captures 7 personas");
+    console.log("[personas-capture] STEP 3 · Playwright captures 9 personas");
     const pw = spawnSync("npx", [
       "playwright", "test",
       "--config", "playwright.personas.config.ts",
@@ -59,7 +69,12 @@ async function main() {
         PLAYWRIGHT_BASE_URL: `http://127.0.0.1:${PORT}`,
       },
     });
-    captureCode = pw.status ?? 1;
+    if (pw.error) {
+      console.error(`[personas-capture] Playwright impossible à lancer · ${pw.error.message}`);
+      captureCode = 1;
+    } else {
+      captureCode = pw.status ?? 1;
+    }
   } finally {
     server.kill("SIGTERM");
   }

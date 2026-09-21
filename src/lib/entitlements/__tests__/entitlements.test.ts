@@ -9,12 +9,14 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { getEntitlements, validateAddonPurchase } from "@/lib/entitlements";
 import { createGrant } from "@/lib/entitlements/grants";
 import { canAddAdult, canAddDependent } from "@/lib/entitlements/household";
+import { shouldRunDatabaseIntegrationTests } from "@/lib/__tests__/databaseIntegration";
 
 const adapter = new PrismaPg({ connectionString: process.env.DIRECT_URL! });
 const db = new PrismaClient({ adapter, log: ["error"] });
 
 const TAG = `ent_test_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 const uid = (label: string) => `${TAG}_${label}`;
+const describeDatabase = shouldRunDatabaseIntegrationTests() ? describe : describe.skip;
 
 // Contexte partagé
 let passageA1Xaf: string;
@@ -34,71 +36,84 @@ async function makeUser(label: string) {
   });
 }
 
-beforeAll(async () => {
-  // Récupère les variants issus du seed (fixtures partagées)
-  const passageProd = await db.product.findUnique({ where: { code: "PASSAGE" } });
-  const teacherProd = await db.product.findUnique({ where: { code: "TEACHER_ADDON" } });
-  const soloProd = await db.product.findUnique({ where: { code: "ROOTS_SOLO" } });
-  const familyProd = await db.product.findUnique({ where: { code: "ROOTS_FAMILY" } });
-  if (!passageProd || !teacherProd || !soloProd || !familyProd) {
-    throw new Error("Seed manquant. Lance : npx tsx prisma/seed.ts");
-  }
+describeDatabase("getEntitlements", () => {
+  beforeAll(async () => {
+    const passageProd = await db.product.findUnique({ where: { code: "PASSAGE" } });
+    const teacherProd = await db.product.findUnique({ where: { code: "TEACHER_ADDON" } });
+    const soloProd = await db.product.findUnique({ where: { code: "ROOTS_SOLO" } });
+    const familyProd = await db.product.findUnique({ where: { code: "ROOTS_FAMILY" } });
+    if (!passageProd || !teacherProd || !soloProd || !familyProd) {
+      throw new Error("Seed manquant. Lance : npx tsx prisma/seed.ts");
+    }
 
-  const passageA1 = await db.productVariant.findFirst({
-    where: { productId: passageProd.id, language: "DEUTSCH", level: "A1", currency: "XAF" },
+    const passageA1 = await db.productVariant.findFirst({
+      where: { productId: passageProd.id, language: "DEUTSCH", level: "A1", currency: "XAF" },
+    });
+    const passageB1 = await db.productVariant.findFirst({
+      where: { productId: passageProd.id, language: "DEUTSCH", level: "B1", currency: "XAF" },
+    });
+    const teacherA1 = await db.productVariant.findFirst({
+      where: { productId: teacherProd.id, language: "DEUTSCH", level: "A1", currency: "XAF" },
+    });
+    const solo = await db.productVariant.findFirst({
+      where: { productId: soloProd.id, currency: "XAF", durationDays: 365 },
+    });
+    const family = await db.productVariant.findFirst({
+      where: { productId: familyProd.id, currency: "XAF", durationDays: 365 },
+    });
+    passageA1Xaf = passageA1!.id;
+    passageB1Xaf = passageB1!.id;
+    teacherA1Xaf = teacherA1!.id;
+    rootsSoloYearXaf = solo!.id;
+    rootsFamilyYearXaf = family!.id;
   });
-  const passageB1 = await db.productVariant.findFirst({
-    where: { productId: passageProd.id, language: "DEUTSCH", level: "B1", currency: "XAF" },
-  });
-  const teacherA1 = await db.productVariant.findFirst({
-    where: { productId: teacherProd.id, language: "DEUTSCH", level: "A1", currency: "XAF" },
-  });
-  const solo = await db.productVariant.findFirst({
-    where: { productId: soloProd.id, currency: "XAF", durationDays: 365 },
-  });
-  const family = await db.productVariant.findFirst({
-    where: { productId: familyProd.id, currency: "XAF", durationDays: 365 },
-  });
-  passageA1Xaf = passageA1!.id;
-  passageB1Xaf = passageB1!.id;
-  teacherA1Xaf = teacherA1!.id;
-  rootsSoloYearXaf = solo!.id;
-  rootsFamilyYearXaf = family!.id;
-});
 
-afterAll(async () => {
-  // Cleanup ciblé : tout ce qui a le TAG dans l'id.
-  await db.accessGrant.deleteMany({ where: { sourceId: { startsWith: TAG } } });
-  await db.dependentProfile.deleteMany({ where: { householdId: { startsWith: TAG } } });
-  await db.householdMembership.deleteMany({ where: { householdId: { startsWith: TAG } } });
-  await db.household.deleteMany({ where: { id: { startsWith: TAG } } });
-  await db.learningPath.deleteMany({ where: { userId: { startsWith: TAG } } });
-  await db.userAppRole.deleteMany({ where: { userId: { startsWith: TAG } } });
-  await db.userRole.deleteMany({ where: { userId: { startsWith: TAG } } });
-  await db.user.deleteMany({ where: { id: { startsWith: TAG } } });
-  await db.$disconnect();
-});
-
-describe("getEntitlements", () => {
+  afterAll(async () => {
+    await db.accessGrant.deleteMany({ where: { sourceId: { startsWith: TAG } } });
+    await db.dependentProfile.deleteMany({ where: { householdId: { startsWith: TAG } } });
+    await db.householdMembership.deleteMany({ where: { householdId: { startsWith: TAG } } });
+    await db.household.deleteMany({ where: { id: { startsWith: TAG } } });
+    await db.learningPath.deleteMany({ where: { userId: { startsWith: TAG } } });
+    await db.userAppRole.deleteMany({ where: { userId: { startsWith: TAG } } });
+    await db.userRole.deleteMany({ where: { userId: { startsWith: TAG } } });
+    await db.user.deleteMany({ where: { id: { startsWith: TAG } } });
+    await db.$disconnect();
+  });
   it("Passage A1 payé → COURSE_ACCESS allowed sur le bon parcours, denied sur un autre parcours/langue", async () => {
     const u = await makeUser("u1");
     const pathDe = await db.learningPath.create({
       data: { id: uid("path_u1_de"), userId: u.id, universe: "MONDE", language: "DEUTSCH", currentLevel: "A1" },
     });
 
-    // Sans grant → deny sauf gratuits (COURSE_ACCESS 1re leçon + AI 5min)
+    // Sans grant → seule la ressource de découverte explicite est gratuite.
     const beforeCert = await getEntitlements({ userId: u.id, learningPathId: pathDe.id, capability: "CERTIFICATE" });
     expect(beforeCert.allowed).toBe(false); // CERTIFICATE requiert un Passage
+    const genericCourse = await getEntitlements({ userId: u.id, learningPathId: pathDe.id, capability: "COURSE_ACCESS" });
+    expect(genericCourse.allowed).toBe(false);
+    const freeLesson = await getEntitlements({
+      userId: u.id,
+      learningPathId: pathDe.id,
+      capability: "COURSE_ACCESS",
+      resourceId: "de-a1-u1-l1",
+    });
+    expect(freeLesson.allowed).toBe(true);
+    const lockedLesson = await getEntitlements({
+      userId: u.id,
+      learningPathId: pathDe.id,
+      capability: "COURSE_ACCESS",
+      resourceId: "de-a1-u1-l2",
+    });
+    expect(lockedLesson.allowed).toBe(false);
     const beforeAi = await getEntitlements({ userId: u.id, learningPathId: pathDe.id, capability: "AI_TEXT" });
     expect(beforeAi.allowed).toBe(true); // AI limitée gratuite
     expect(beforeAi.limits?.max).toBe(5);
 
-    // Crée un grant Passage A1
+    // Crée un grant synthétique de test (PROMO) · les grants ORDER exigent désormais un OrderItem payé confirmé.
     await createGrant({
       beneficiaryType: "USER",
       beneficiaryId: u.id,
       productVariant: { id: passageA1Xaf, durationDays: 120 },
-      sourceType: "ORDER",
+      sourceType: "PROMO",
       sourceId: uid("ord1"),
     });
 
@@ -132,7 +147,7 @@ describe("getEntitlements", () => {
       beneficiaryType: "USER",
       beneficiaryId: u.id,
       productVariant: { id: passageA1Xaf, durationDays: 120 },
-      sourceType: "ORDER",
+      sourceType: "PROMO",
       sourceId: uid("ord2"),
     });
     const v1 = await validateAddonPurchase({
@@ -160,7 +175,7 @@ describe("getEntitlements", () => {
       beneficiaryType: "USER",
       beneficiaryId: u.id,
       productVariant: { id: passageA1Xaf, durationDays: 120 },
-      sourceType: "ORDER",
+      sourceType: "PROMO",
       sourceId: uid("ord3"),
     });
     // Parcours racines
@@ -248,6 +263,19 @@ describe("getEntitlements", () => {
 
     const rAi = await getEntitlements({ userId: u.id, learningPathId: pRacines.id, capability: "AI_TEXT" });
     expect(rAi.allowed).toBe(false);
+    const genericRacinesCourse = await getEntitlements({
+      userId: u.id,
+      learningPathId: pRacines.id,
+      capability: "COURSE_ACCESS",
+    });
+    expect(genericRacinesCourse.allowed).toBe(false);
+    const freeRacinesLesson = await getEntitlements({
+      userId: u.id,
+      learningPathId: pRacines.id,
+      capability: "COURSE_ACCESS",
+      resourceId: "ln-e1-u1-l1",
+    });
+    expect(freeRacinesLesson.allowed).toBe(true);
     const rVeillee = await getEntitlements({ userId: u.id, learningPathId: pRacines.id, capability: "VEILLEE_CONTENT" });
     expect(rVeillee.allowed).toBe(true);
   });
@@ -262,7 +290,7 @@ describe("getEntitlements", () => {
       beneficiaryType: "USER",
       beneficiaryId: u.id,
       productVariant: { id: passageB1Xaf, durationDays: 120 },
-      sourceType: "ORDER",
+      sourceType: "PROMO",
       sourceId: uid("ord_exp"),
       startsAt: new Date(Date.now() - 200 * 86400_000),
       endsAt: new Date(Date.now() - 80 * 86400_000),
@@ -288,7 +316,7 @@ describe("getEntitlements", () => {
       beneficiaryType: "HOUSEHOLD",
       beneficiaryId: h.id,
       productVariant: { id: rootsFamilyYearXaf, durationDays: 365 },
-      sourceType: "ORDER",
+      sourceType: "PROMO",
       sourceId: uid("ord_fam"),
     });
 

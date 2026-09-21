@@ -41,12 +41,12 @@ export function runA1ValidationAudit() {
     .flatMap((unit) => unit.lessons)
     .reduce((sum, lesson) => sum + lesson.xp, 0);
 
-  checks.push(check("course-has-six-units", DE_A1_COURSE.units.length === 6, {
+  checks.push(check("course-has-twelve-units", DE_A1_COURSE.units.length === 12, {
     unitCount: DE_A1_COURSE.units.length,
   }));
   checks.push(check(
-    "course-has-thirty-six-lessons",
-    DE_A1_COURSE.units.every((unit) => unit.lessons.length === 6),
+    "course-has-sixty-lessons",
+    DE_A1_COURSE.units.every((unit) => unit.lessons.length === 5),
     { lessonCount: DE_A1_COURSE.units.reduce((sum, unit) => sum + unit.lessons.length, 0) },
   ));
 

@@ -22,6 +22,7 @@ import type { MondePath } from "./mondePath";
 // NEXT_PUBLIC.
 
 type Props = {
+  resumeHref: string;
   input: {
     learningGoal?: string | null;
     mondePath?: MondePath | null;
@@ -33,7 +34,7 @@ type Props = {
   };
 };
 
-export function MondeIvoryOverview({ input }: Props) {
+export function MondeIvoryOverview({ input, resumeHref }: Props) {
   const router = useRouter();
   const locale = useLocale();
 
@@ -50,7 +51,7 @@ export function MondeIvoryOverview({ input }: Props) {
   });
 
   const goToOnboarding = () => router.push(`/${locale}/onboarding`);
-  const resumeCourse = () => router.push(`/${locale}/apprentissage`);
+  const resumeCourse = () => router.push(resumeHref);
 
   return (
     <div

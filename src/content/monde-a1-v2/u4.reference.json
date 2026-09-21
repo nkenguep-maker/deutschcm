@@ -1,0 +1,1803 @@
+{
+  "id": "de-a1-u4",
+  "order": 4,
+  "title": "Décrire sa journée",
+  "schemaVersion": "2.0",
+  "contentVersion": "2026.09.20-u4-refonte-r1",
+  "status": "refonte-a-valider",
+  "note": "Refonte v2 du matériau éditorial legacy U4 : routine, horaires et verbes séparables. Les anciennes mécaniques ne sont pas portées.",
+  "cards": [
+    {
+      "id": "card.u4.aufstehen",
+      "kind": "lexical",
+      "de": "aufstehen",
+      "fr": "se lever",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.stehe-auf",
+      "kind": "chunk",
+      "de": "Ich stehe … auf.",
+      "fr": "Je me lève…",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.fruehstuecken",
+      "kind": "lexical",
+      "de": "frühstücken",
+      "fr": "prendre le petit-déjeuner",
+      "introducedIn": "de-a1-u4-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.anfangen",
+      "kind": "lexical",
+      "de": "anfangen",
+      "fr": "commencer",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.fange-an",
+      "kind": "chunk",
+      "de": "Ich fange … an.",
+      "fr": "Je commence…",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.arbeiten",
+      "kind": "lexical",
+      "de": "arbeiten",
+      "fr": "travailler",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.mittag-essen",
+      "kind": "chunk",
+      "de": "Mittag essen",
+      "fr": "déjeuner",
+      "introducedIn": "de-a1-u4-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.nach-hause",
+      "kind": "chunk",
+      "de": "nach Hause gehen",
+      "fr": "rentrer à la maison",
+      "introducedIn": "de-a1-u4-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.kochen",
+      "kind": "lexical",
+      "de": "kochen",
+      "fr": "cuisiner",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.anrufen",
+      "kind": "lexical",
+      "de": "anrufen",
+      "fr": "appeler au téléphone",
+      "introducedIn": "de-a1-u4-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.rufe-an",
+      "kind": "chunk",
+      "de": "Ich rufe … an.",
+      "fr": "J’appelle…",
+      "introducedIn": "de-a1-u4-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.fernsehen",
+      "kind": "lexical",
+      "de": "fernsehen",
+      "fr": "regarder la télévision",
+      "introducedIn": "de-a1-u4-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.sehe-fern",
+      "kind": "chunk",
+      "de": "Ich sehe … fern.",
+      "fr": "Je regarde la télévision…",
+      "introducedIn": "de-a1-u4-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.schlafen-gehen",
+      "kind": "chunk",
+      "de": "schlafen gehen",
+      "fr": "aller dormir",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.morgens",
+      "kind": "lexical",
+      "de": "morgens",
+      "fr": "le matin",
+      "introducedIn": "de-a1-u4-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.mittags",
+      "kind": "lexical",
+      "de": "mittags",
+      "fr": "à midi",
+      "introducedIn": "de-a1-u4-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.abends",
+      "kind": "lexical",
+      "de": "abends",
+      "fr": "le soir",
+      "introducedIn": "de-a1-u4-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.zuerst",
+      "kind": "lexical",
+      "de": "zuerst",
+      "fr": "d’abord",
+      "introducedIn": "de-a1-u4-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.dann",
+      "kind": "lexical",
+      "de": "dann",
+      "fr": "ensuite",
+      "introducedIn": "de-a1-u4-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.danach",
+      "kind": "lexical",
+      "de": "danach",
+      "fr": "après",
+      "introducedIn": "de-a1-u4-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.meistens",
+      "kind": "lexical",
+      "de": "meistens",
+      "fr": "la plupart du temps",
+      "introducedIn": "de-a1-u4-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.oft",
+      "kind": "lexical",
+      "de": "oft",
+      "fr": "souvent",
+      "introducedIn": "de-a1-u4-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.um",
+      "kind": "lexical",
+      "de": "um",
+      "fr": "à (heure précise)",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.gegen",
+      "kind": "lexical",
+      "de": "gegen",
+      "fr": "vers (heure approximative)",
+      "introducedIn": "de-a1-u4-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.von-bis",
+      "kind": "chunk",
+      "de": "von … bis …",
+      "fr": "de … à …",
+      "introducedIn": "de-a1-u4-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.halb-sieben",
+      "kind": "chunk",
+      "de": "halb sieben",
+      "fr": "6 h 30",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.acht-uhr",
+      "kind": "chunk",
+      "de": "acht Uhr",
+      "fr": "8 h",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.elf-uhr",
+      "kind": "chunk",
+      "de": "elf Uhr",
+      "fr": "23 h / 11 h selon contexte",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.wann",
+      "kind": "lexical",
+      "de": "wann",
+      "fr": "quand / à quelle heure",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.wann-stehst",
+      "kind": "structure",
+      "de": "Wann stehst du auf?",
+      "fr": "À quelle heure te lèves-tu ?",
+      "introducedIn": "de-a1-u4-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.wann-faengst",
+      "kind": "structure",
+      "de": "Wann fängst du an zu arbeiten?",
+      "fr": "Quand commences-tu à travailler ?",
+      "introducedIn": "de-a1-u4-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.was-machst",
+      "kind": "structure",
+      "de": "Was machst du abends?",
+      "fr": "Que fais-tu le soir ?",
+      "introducedIn": "de-a1-u4-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.separable-rule",
+      "kind": "structure",
+      "de": "Verb 2 + … + Präfix am Ende",
+      "fr": "verbe conjugué en 2e position, préfixe à la fin",
+      "introducedIn": "de-a1-u4-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.time-front",
+      "kind": "structure",
+      "de": "Morgens trinke ich Kaffee.",
+      "fr": "Le matin, je bois du café.",
+      "introducedIn": "de-a1-u4-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.abends-koche",
+      "kind": "structure",
+      "de": "Abends koche ich.",
+      "fr": "Le soir, je cuisine.",
+      "introducedIn": "de-a1-u4-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.gegen-sechs",
+      "kind": "chunk",
+      "de": "gegen sechs",
+      "fr": "vers six heures",
+      "introducedIn": "de-a1-u4-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.um-halb-acht",
+      "kind": "chunk",
+      "de": "um halb acht",
+      "fr": "à 7 h 30",
+      "introducedIn": "de-a1-u4-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.kollegen",
+      "kind": "lexical",
+      "de": "die Kollegen",
+      "fr": "les collègues",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.zu-hause",
+      "kind": "chunk",
+      "de": "zu Hause",
+      "fr": "à la maison",
+      "introducedIn": "de-a1-u4-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u4.fertig",
+      "kind": "lexical",
+      "de": "fertig",
+      "fr": "fini / prêt",
+      "introducedIn": "de-a1-u4-l5",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj.u4.reperer",
+      "label": "Repérer actions et horaires dans une journée"
+    },
+    {
+      "id": "obj.u4.sequence",
+      "label": "Organiser une routine avec zuerst, dann et danach"
+    },
+    {
+      "id": "obj.u4.separable",
+      "label": "Construire des phrases avec des verbes séparables"
+    },
+    {
+      "id": "obj.u4.time",
+      "label": "Exprimer une heure précise ou approximative"
+    },
+    {
+      "id": "obj.u4.v2",
+      "label": "Maintenir le verbe en deuxième position après un moment initial"
+    },
+    {
+      "id": "obj.u4.interagir",
+      "label": "Décrire sa journée et répondre à des questions d’horaires"
+    }
+  ],
+  "remediations": [
+    {
+      "id": "rem.u4.separable",
+      "objectiveId": "obj.u4.separable",
+      "durationSeconds": 120,
+      "explanation": "Dans une phrase principale, le verbe conjugué reste tôt et le préfixe séparable va à la fin.",
+      "contrast": [
+        {
+          "de": "Ich stehe um sieben Uhr auf.",
+          "fr": "Je me lève à sept heures.",
+          "ok": true
+        },
+        {
+          "de": "Ich aufstehe um sieben Uhr.",
+          "fr": "—",
+          "ok": false,
+          "why": "aufstehen se sépare : stehe … auf."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u4.separable.i1",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "auf",
+            "Ich",
+            "um sieben Uhr",
+            "stehe"
+          ],
+          "answer": [
+            "Ich",
+            "stehe",
+            "um sieben Uhr",
+            "auf"
+          ],
+          "normalization": []
+        },
+        {
+          "id": "rem.u4.separable.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich rufe meine Schwester ____.",
+          "answer": "an",
+          "acceptedAnswers": [
+            "an"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u4.halb",
+      "objectiveId": "obj.u4.time",
+      "durationSeconds": 110,
+      "explanation": "halb sieben signifie 6 h 30 : la moitié avant sept.",
+      "contrast": [
+        {
+          "de": "halb sieben",
+          "fr": "6 h 30",
+          "ok": true
+        },
+        {
+          "de": "halb neun",
+          "fr": "8 h 30",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u4.halb.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "6:30 = halb ____.",
+          "answer": "sieben",
+          "acceptedAnswers": [
+            "sieben"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u4.halb.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "8:30 = halb ____.",
+          "answer": "neun",
+          "acceptedAnswers": [
+            "neun"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u4.um-gegen",
+      "objectiveId": "obj.u4.time",
+      "durationSeconds": 105,
+      "explanation": "um donne une heure précise ; gegen donne une approximation.",
+      "contrast": [
+        {
+          "de": "Ich fange um acht Uhr an.",
+          "fr": "Je commence à huit heures.",
+          "ok": true
+        },
+        {
+          "de": "Gegen sechs bin ich zu Hause.",
+          "fr": "Vers six heures, je suis à la maison.",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u4.um-gegen.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich fange ____ acht Uhr an.",
+          "answer": "um",
+          "acceptedAnswers": [
+            "um"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u4.um-gegen.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "____ sechs bin ich zu Hause. (ungefähr)",
+          "answer": "Gegen",
+          "acceptedAnswers": [
+            "Gegen"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u4.time-v2",
+      "objectiveId": "obj.u4.v2",
+      "durationSeconds": 115,
+      "explanation": "Si Morgens, Mittags ou Abends ouvre la phrase, le verbe reste en deuxième position.",
+      "contrast": [
+        {
+          "de": "Morgens trinke ich Kaffee.",
+          "fr": "Le matin, je bois du café.",
+          "ok": true
+        },
+        {
+          "de": "Morgens ich trinke Kaffee.",
+          "fr": "—",
+          "ok": false,
+          "why": "Le verbe doit rester deuxième : Morgens trinke ich …"
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u4.time-v2.i1",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "ich",
+            "Kaffee",
+            "Morgens",
+            "trinke"
+          ],
+          "answer": [
+            "Morgens",
+            "trinke",
+            "ich",
+            "Kaffee"
+          ],
+          "normalization": []
+        },
+        {
+          "id": "rem.u4.time-v2.i2",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "ich",
+            "Abends",
+            "koche"
+          ],
+          "answer": [
+            "Abends",
+            "koche",
+            "ich"
+          ],
+          "normalization": []
+        }
+      ]
+    },
+    {
+      "id": "rem.u4.sequence",
+      "objectiveId": "obj.u4.sequence",
+      "durationSeconds": 105,
+      "explanation": "zuerst ouvre la première étape, dann la suivante, danach ce qui vient après.",
+      "contrast": [
+        {
+          "de": "Zuerst stehe ich auf. Dann frühstücke ich. Danach arbeite ich.",
+          "fr": "D’abord je me lève. Ensuite je déjeune. Après je travaille.",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u4.sequence.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "____ stehe ich auf. Dann frühstücke ich.",
+          "answer": "Zuerst",
+          "acceptedAnswers": [
+            "Zuerst"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u4.sequence.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Zuerst arbeite ich. ____ gehe ich nach Hause.",
+          "answer": "Danach",
+          "acceptedAnswers": [
+            "Danach"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "de-a1-u4-l1",
+      "order": 1,
+      "phase": "Comprends",
+      "title": "Comprendre une routine quotidienne",
+      "objectiveIds": [
+        "obj.u4.reperer",
+        "obj.u4.time"
+      ],
+      "durationMinutes": 30,
+      "reveil": {
+        "cardIds": [
+          "card.u1.wohnen.in",
+          "card.u2.arbeiten",
+          "card.u3.kaffee",
+          "card.u3.guten-tag"
+        ],
+        "itemCount": 4,
+        "maxSeconds": 90,
+        "selection": "cartes dues/ratées U1–U3 avant les nouveaux horaires"
+      },
+      "blocks": [
+        {
+          "id": "blk.u4.l1.intro",
+          "type": "intro",
+          "title": "Ta mission",
+          "text": "Repère les actions et les heures dans la journée de Samira."
+        },
+        {
+          "id": "blk.u4.l1.dialogue",
+          "type": "dialogueRef",
+          "dialogueId": "de-a1-u4-dialogue",
+          "speeds": [
+            "slow",
+            "natural"
+          ],
+          "instruction": "Première écoute : actions. Deuxième écoute : heures."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u4-l1-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u4.reperer",
+          "cardIds": [
+            "card.u4.halb-sieben",
+            "card.u4.aufstehen"
+          ],
+          "promptLang": "de",
+          "prompt": "Wann steht Samira auf?",
+          "audioRef": "de-a1-u4-dialogue#seg2",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Um halb sieben.",
+              "correct": true,
+              "feedback": "Ja. halb sieben = 6 h 30."
+            },
+            {
+              "id": "b",
+              "text": "Um halb acht.",
+              "correct": false,
+              "feedback": "halb acht serait 7 h 30."
+            },
+            {
+              "id": "c",
+              "text": "Um acht Uhr.",
+              "correct": false,
+              "feedback": "8 h correspond au début du travail."
+            }
+          ],
+          "remediationRef": "rem.u4.halb"
+        },
+        {
+          "id": "de-a1-u4-l1-e2",
+          "type": "audioCloze",
+          "objectiveId": "obj.u4.reperer",
+          "cardIds": [
+            "card.u4.fange-an",
+            "card.u4.acht-uhr"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Ich fange um acht Uhr ____.",
+          "audioRef": "de-a1-u4-dialogue#seg4",
+          "answer": "an",
+          "acceptedAnswers": [
+            "an"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^auf$",
+              "accept": false,
+              "note": "Le verbe est anfangen : an."
+            }
+          ],
+          "remediationRef": "rem.u4.separable"
+        },
+        {
+          "id": "de-a1-u4-l1-e3",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u4.reperer",
+          "cardIds": [
+            "card.u4.gegen-sechs"
+          ],
+          "promptLang": "de",
+          "prompt": "Wann ist Samira zu Hause?",
+          "audioRef": "de-a1-u4-dialogue#seg6",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Gegen sechs.",
+              "correct": true,
+              "feedback": "Genau. gegen = environ."
+            },
+            {
+              "id": "b",
+              "text": "Um sechs.",
+              "correct": false,
+              "feedback": "L’audio dit gegen, pas um."
+            }
+          ],
+          "remediationRef": "rem.u4.um-gegen"
+        },
+        {
+          "id": "de-a1-u4-l1-e4",
+          "type": "dictation",
+          "objectiveId": "obj.u4.reperer",
+          "cardIds": [
+            "card.u4.rufe-an"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib den Satzteil.",
+          "audioRef": "drill.u4.call-family",
+          "answer": "Ich rufe meine Familie an.",
+          "acceptedAnswers": [
+            "Ich rufe meine Familie an."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^ich anrufe meine familie$",
+              "accept": false,
+              "note": "anrufen se sépare : rufe … an."
+            }
+          ],
+          "remediationRef": "rem.u4.separable"
+        },
+        {
+          "id": "de-a1-u4-l1-e5",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u4.time",
+          "cardIds": [
+            "card.u4.gegen",
+            "card.u4.gegen-sechs"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: ungefähr um sechs Uhr.",
+          "answer": "gegen sechs",
+          "acceptedAnswers": [
+            "gegen sechs"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^um sechs$",
+              "accept": false,
+              "note": "um = précis ; gegen = environ."
+            }
+          ],
+          "remediationRef": "rem.u4.um-gegen"
+        }
+      ],
+      "completionMessage": "Tu repères les actions et horaires essentiels."
+    },
+    {
+      "id": "de-a1-u4-l2",
+      "order": 2,
+      "phase": "Pratique",
+      "title": "Nommer et ordonner les actions du quotidien",
+      "objectiveIds": [
+        "obj.u4.sequence",
+        "obj.u4.interagir"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u4.aufstehen",
+          "card.u4.arbeiten",
+          "card.u4.kochen",
+          "card.u3.kaffee",
+          "card.u2.mutter"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "actions dues/ratées puis rappels inter-unités"
+      },
+      "blocks": [
+        {
+          "id": "blk.u4.l2.actions",
+          "type": "model",
+          "title": "Actions utiles",
+          "textDe": "aufstehen · frühstücken · arbeiten · Mittag essen · nach Hause gehen · kochen · anrufen"
+        },
+        {
+          "id": "blk.u4.l2.sequence",
+          "type": "rule",
+          "title": "Chronologie",
+          "textDe": "Zuerst stehe ich auf. Dann frühstücke ich. Danach arbeite ich."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u4-l2-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u4.sequence",
+          "cardIds": [
+            "card.u4.zuerst",
+            "card.u4.aufstehen"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Zuerst + aufstehen.",
+          "answer": "Zuerst stehe ich auf.",
+          "acceptedAnswers": [
+            "Zuerst stehe ich auf."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^zuerst ich stehe auf$",
+              "accept": false,
+              "note": "Le verbe reste en deuxième position."
+            }
+          ],
+          "remediationRef": "rem.u4.time-v2"
+        },
+        {
+          "id": "de-a1-u4-l2-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u4.sequence",
+          "cardIds": [
+            "card.u4.dann",
+            "card.u4.fruehstuecken"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "ich",
+            "Dann",
+            "frühstücke"
+          ],
+          "answer": [
+            "Dann",
+            "frühstücke",
+            "ich"
+          ],
+          "feedbackIncorrect": "Après Dann, le verbe vient immédiatement.",
+          "remediationRef": "rem.u4.time-v2"
+        },
+        {
+          "id": "de-a1-u4-l2-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u4.sequence",
+          "cardIds": [
+            "card.u4.danach",
+            "card.u4.nach-hause"
+          ],
+          "promptLang": "de",
+          "prompt": "Ich arbeite. Ich gehe nach Hause. → Verbinde mit Danach.",
+          "answer": "Ich arbeite. Danach gehe ich nach Hause.",
+          "acceptedAnswers": [
+            "Ich arbeite. Danach gehe ich nach Hause."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u4.time-v2"
+        },
+        {
+          "id": "de-a1-u4-l2-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u4.interagir",
+          "cardIds": [
+            "card.u4.zuerst",
+            "card.u4.dann",
+            "card.u4.danach"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich nach.",
+          "targets": [
+            {
+              "id": "s1",
+              "de": "Zuerst stehe ich auf.",
+              "audioRef": "drill.u4.seq1",
+              "maxSeconds": 5
+            },
+            {
+              "id": "s2",
+              "de": "Dann frühstücke ich.",
+              "audioRef": "drill.u4.seq2",
+              "maxSeconds": 5
+            },
+            {
+              "id": "s3",
+              "de": "Danach arbeite ich.",
+              "audioRef": "drill.u4.seq3",
+              "maxSeconds": 5
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Validation contrainte uniquement."
+        },
+        {
+          "id": "de-a1-u4-l2-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u4.interagir",
+          "cardIds": [
+            "card.u4.zuerst",
+            "card.u4.dann",
+            "card.u4.danach"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris 5 à 7 phrases sur ton matin avec zuerst, dann et danach.",
+          "minimumWords": 30,
+          "successCriteria": [
+            "Cinq actions",
+            "zuerst",
+            "dann",
+            "danach"
+          ],
+          "autoCheck": [
+            "contient zuerst",
+            "contient dann",
+            "contient danach"
+          ]
+        }
+      ],
+      "completionMessage": "Tu peux ordonner les actions d’une journée."
+    },
+    {
+      "id": "de-a1-u4-l3",
+      "order": 3,
+      "phase": "Pratique",
+      "title": "Maîtriser les verbes séparables",
+      "objectiveIds": [
+        "obj.u4.separable",
+        "obj.u4.v2"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u4.stehe-auf",
+          "card.u4.fange-an",
+          "card.u4.rufe-an",
+          "card.u4.dann",
+          "card.u1.v2"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "verbes séparables et règle V2 réactivés ensemble"
+      },
+      "blocks": [
+        {
+          "id": "blk.u4.l3.rule",
+          "type": "rule",
+          "title": "Le verbe s’ouvre",
+          "textDe": "aufstehen → Ich stehe um sieben Uhr auf. · anrufen → Ich rufe meine Mutter an."
+        },
+        {
+          "id": "blk.u4.l3.v2",
+          "type": "contrast",
+          "title": "Deux règles ensemble",
+          "textDe": "Abends rufe ich meine Mutter an."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u4-l3-e1",
+          "type": "audioCloze",
+          "objectiveId": "obj.u4.separable",
+          "cardIds": [
+            "card.u4.stehe-auf"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Ich stehe um sieben Uhr ____.",
+          "audioRef": "drill.u4.stehe-auf",
+          "answer": "auf",
+          "acceptedAnswers": [
+            "auf"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u4.separable"
+        },
+        {
+          "id": "de-a1-u4-l3-e2",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u4.separable",
+          "cardIds": [
+            "card.u4.rufe-an",
+            "card.u2.mutter"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Ich + meine Mutter + anrufen.",
+          "answer": "Ich rufe meine Mutter an.",
+          "acceptedAnswers": [
+            "Ich rufe meine Mutter an."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^ich anrufe meine mutter$",
+              "accept": false,
+              "note": "anrufen se sépare : rufe … an."
+            }
+          ],
+          "remediationRef": "rem.u4.separable"
+        },
+        {
+          "id": "de-a1-u4-l3-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u4.separable",
+          "cardIds": [
+            "card.u4.sehe-fern"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "abends",
+            "fern",
+            "Ich",
+            "sehe"
+          ],
+          "answer": [
+            "Ich",
+            "sehe",
+            "abends",
+            "fern"
+          ],
+          "feedbackIncorrect": "fern va à la fin.",
+          "remediationRef": "rem.u4.separable"
+        },
+        {
+          "id": "de-a1-u4-l3-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u4.v2",
+          "cardIds": [
+            "card.u4.abends",
+            "card.u4.rufe-an"
+          ],
+          "promptLang": "de",
+          "prompt": "Welcher Satz ist korrekt?",
+          "audioRef": "drill.u4.abends-anrufen",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Abends rufe ich meine Familie an.",
+              "correct": true,
+              "feedback": "Oui : Abends + verbe + sujet + … + an."
+            },
+            {
+              "id": "b",
+              "text": "Abends ich rufe meine Familie an.",
+              "correct": false,
+              "feedback": "Le verbe doit rester en deuxième position."
+            }
+          ],
+          "remediationRef": "rem.u4.time-v2"
+        },
+        {
+          "id": "de-a1-u4-l3-e5",
+          "type": "transformation",
+          "objectiveId": "obj.u4.v2",
+          "cardIds": [
+            "card.u4.abends-koche"
+          ],
+          "promptLang": "de",
+          "prompt": "Ich koche abends. → Beginne mit Abends.",
+          "answer": "Abends koche ich.",
+          "acceptedAnswers": [
+            "Abends koche ich."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u4.time-v2"
+        }
+      ],
+      "completionMessage": "Tu combines V2 et préfixe final."
+    },
+    {
+      "id": "de-a1-u4-l4",
+      "order": 4,
+      "phase": "Produis",
+      "title": "Dire l’heure et structurer la journée",
+      "objectiveIds": [
+        "obj.u4.time",
+        "obj.u4.v2",
+        "obj.u4.interagir"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u4.um",
+          "card.u4.gegen",
+          "card.u4.von-bis",
+          "card.u4.halb-sieben",
+          "card.u3.sieben-zwanzig"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "heures dues puis rappel des nombres U3"
+      },
+      "blocks": [
+        {
+          "id": "blk.u4.l4.time",
+          "type": "model",
+          "title": "Heures",
+          "textDe": "um sieben Uhr · um halb acht · gegen sechs · von acht bis fünf"
+        },
+        {
+          "id": "blk.u4.l4.front",
+          "type": "rule",
+          "title": "Moment en première position",
+          "textDe": "Morgens stehe ich früh auf. Mittags esse ich. Abends koche ich."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u4-l4-e1",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u4.time",
+          "cardIds": [
+            "card.u4.um-halb-acht"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Uhrzeit hörst du?",
+          "audioRef": "drill.u4.halb-acht",
+          "choices": [
+            {
+              "id": "a",
+              "text": "7:30",
+              "correct": true,
+              "feedback": "halb acht = 7 h 30."
+            },
+            {
+              "id": "b",
+              "text": "8:30",
+              "correct": false,
+              "feedback": "8 h 30 = halb neun."
+            },
+            {
+              "id": "c",
+              "text": "8:00",
+              "correct": false,
+              "feedback": "8 h = acht Uhr."
+            }
+          ],
+          "remediationRef": "rem.u4.halb"
+        },
+        {
+          "id": "de-a1-u4-l4-e2",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u4.time",
+          "cardIds": [
+            "card.u4.von-bis"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: arbeiten, 8–5 Uhr.",
+          "answer": "Ich arbeite von acht bis fünf.",
+          "acceptedAnswers": [
+            "Ich arbeite von acht bis fünf.",
+            "Ich arbeite von 8 bis 5."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "feedbackIncorrect": "Utilise von … bis …"
+        },
+        {
+          "id": "de-a1-u4-l4-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u4.v2",
+          "cardIds": [
+            "card.u4.morgens",
+            "card.u3.kaffee"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "Kaffee",
+            "Morgens",
+            "ich",
+            "trinke"
+          ],
+          "answer": [
+            "Morgens",
+            "trinke",
+            "ich",
+            "Kaffee"
+          ],
+          "feedbackIncorrect": "Après Morgens, trinke vient en deuxième position.",
+          "remediationRef": "rem.u4.time-v2"
+        },
+        {
+          "id": "de-a1-u4-l4-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u4.interagir",
+          "cardIds": [
+            "card.u4.stehe-auf",
+            "card.u4.von-bis",
+            "card.u4.gegen-sechs"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich nach.",
+          "targets": [
+            {
+              "id": "t1",
+              "de": "Morgens stehe ich um halb sieben auf.",
+              "audioRef": "drill.u4.time1",
+              "maxSeconds": 7
+            },
+            {
+              "id": "t2",
+              "de": "Ich arbeite von acht bis fünf.",
+              "audioRef": "drill.u4.time2",
+              "maxSeconds": 6
+            },
+            {
+              "id": "t3",
+              "de": "Gegen sechs bin ich zu Hause.",
+              "audioRef": "drill.u4.time3",
+              "maxSeconds": 6
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Validation contrainte uniquement."
+        },
+        {
+          "id": "de-a1-u4-l4-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u4.interagir",
+          "cardIds": [
+            "card.u4.um",
+            "card.u4.gegen",
+            "card.u4.von-bis"
+          ],
+          "promptLang": "bi",
+          "prompt": "Écris 6 à 8 phrases avec trois horaires, gegen et von…bis.",
+          "minimumWords": 42,
+          "successCriteria": [
+            "Trois horaires",
+            "gegen",
+            "von…bis"
+          ],
+          "autoCheck": [
+            "contient gegen",
+            "contient von",
+            "contient bis"
+          ]
+        }
+      ],
+      "completionMessage": "Tu situes tes actions dans le temps."
+    },
+    {
+      "id": "de-a1-u4-l5",
+      "order": 5,
+      "phase": "Valide",
+      "title": "Mission finale : une journée typique",
+      "objectiveIds": [
+        "obj.u4.reperer",
+        "obj.u4.sequence",
+        "obj.u4.separable",
+        "obj.u4.time",
+        "obj.u4.v2",
+        "obj.u4.interagir"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u4.stehe-auf",
+          "card.u4.fange-an",
+          "card.u4.um",
+          "card.u4.gegen",
+          "card.u4.dann"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "erreurs persistantes puis cartes dues"
+      },
+      "blocks": [
+        {
+          "id": "blk.u4.l5.scenario",
+          "type": "scenario",
+          "title": "Situation",
+          "text": "Un collègue te demande comment se passe une journée normale."
+        },
+        {
+          "id": "blk.u4.l5.success",
+          "type": "rubric",
+          "title": "Réussite",
+          "text": "Cinq actions, trois horaires, deux verbes séparables et une chronologie claire."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u4-l5-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u4.separable",
+          "cardIds": [
+            "card.u4.stehe-auf"
+          ],
+          "promptLang": "de",
+          "prompt": "Welcher Satz ist korrekt?",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Ich stehe um sieben Uhr auf.",
+              "correct": true,
+              "feedback": "Correct : stehe … auf."
+            },
+            {
+              "id": "b",
+              "text": "Ich aufstehe um sieben Uhr.",
+              "correct": false,
+              "feedback": "aufstehen doit se séparer."
+            },
+            {
+              "id": "c",
+              "text": "Ich um sieben Uhr stehe auf.",
+              "correct": false,
+              "feedback": "La cible A1 garde stehe en deuxième position."
+            }
+          ],
+          "remediationRef": "rem.u4.separable"
+        },
+        {
+          "id": "de-a1-u4-l5-e2",
+          "type": "dictation",
+          "objectiveId": "obj.u4.time",
+          "cardIds": [
+            "card.u4.gegen-sechs",
+            "card.u4.zu-hause"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib den Satz.",
+          "audioRef": "drill.u4.final-dictation",
+          "answer": "Gegen sechs bin ich zu Hause.",
+          "acceptedAnswers": [
+            "Gegen sechs bin ich zu Hause."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "nearMisses": [
+            {
+              "pattern": "^um sechs bin ich zu hause$",
+              "accept": false,
+              "note": "L’audio dit gegen."
+            }
+          ],
+          "remediationRef": "rem.u4.um-gegen"
+        },
+        {
+          "id": "de-a1-u4-l5-e3",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u4.v2",
+          "cardIds": [
+            "card.u4.abends-koche"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: abends + kochen.",
+          "answer": "Abends koche ich.",
+          "acceptedAnswers": [
+            "Abends koche ich."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u4.time-v2"
+        },
+        {
+          "id": "de-a1-u4-l5-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u4.reperer",
+          "cardIds": [
+            "card.u4.wann-faengst",
+            "card.u4.fange-an"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Frage hörst du?",
+          "audioRef": "drill.u4.final-listening",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Wann fängst du an zu arbeiten?",
+              "correct": true,
+              "feedback": "La question porte sur le début du travail."
+            },
+            {
+              "id": "b",
+              "text": "Wann gehst du schlafen?",
+              "correct": false,
+              "feedback": "Cette question porte sur le coucher."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u4-l5-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u4.interagir",
+          "cardIds": [
+            "card.u4.zuerst",
+            "card.u4.dann",
+            "card.u4.stehe-auf",
+            "card.u4.fange-an"
+          ],
+          "promptLang": "bi",
+          "prompt": "Mission : 8 à 10 phrases, cinq actions, trois horaires, deux connecteurs et deux verbes séparables.",
+          "minimumWords": 50,
+          "successCriteria": [
+            "Cinq actions",
+            "Trois horaires",
+            "Deux connecteurs",
+            "Deux verbes séparables"
+          ],
+          "autoCheck": [
+            "contient stehe",
+            "contient auf",
+            "contient dann"
+          ]
+        }
+      ],
+      "completionMessage": "Unité 4 terminée en QA."
+    }
+  ],
+  "qualityGates": {
+    "exerciseMix": {
+      "recognitionMax": 0.25,
+      "productiveWrittenMin": 0.35,
+      "structureMin": 0.2,
+      "oralMin": 0.2
+    },
+    "promptLang": {
+      "deMin": 0.8,
+      "note": "U4 augmente fortement la part allemande ; U5 visera 100 % des consignes d’exercice en allemand."
+    },
+    "spacedRecall": {
+      "minCardsRevisitedPerLesson": 3
+    },
+    "feedback": {
+      "distinctPerDistractor": true
+    },
+    "normalization": {
+      "requiredOn": [
+        "fillBlank",
+        "dictation",
+        "productiveRecall",
+        "transformation",
+        "audioCloze"
+      ]
+    }
+  }
+}

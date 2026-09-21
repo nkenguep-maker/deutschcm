@@ -31,3 +31,12 @@ export interface CenterClassRow {
   maxStudents?: number;
   code?: string | null;
 }
+
+export interface CenterPendingRow {
+  id: string;
+  fromUserId: string;
+  fromUserFullName: string;
+  toClassroomId: string;
+  toClassroomName: string;
+  createdAt: string;
+}

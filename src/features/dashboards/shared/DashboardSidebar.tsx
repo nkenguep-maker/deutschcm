@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { YemaWordmark } from "./YemaWordmark";
 import type { NavGroup } from "./types";
+import { DashboardSignOutButton } from "./DashboardSignOutButton";
 
 type Props = {
   groups: NavGroup[];
@@ -32,6 +33,7 @@ export function DashboardSidebar({
   const localeBase = brandHref === "/" ? "" : brandHref.replace(/\/$/, "");
   const offersHref = `${localeBase}/offers` || "/offers";
   const offersLabel = brandHref.startsWith("/en") ? "All offers" : "Toutes les offres";
+  const locale = brandHref.startsWith("/en") ? "en" : "fr";
 
   return (
     <nav
@@ -152,27 +154,30 @@ export function DashboardSidebar({
       </div>
 
       {!isChildPersona ? (
-        <Link
-          href={offersHref}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 10,
-            minHeight: 44,
-            padding: "10px 14px",
-            borderRadius: "var(--yema-r-chip)",
-            border: "1px solid var(--yema-gold-edge)",
-            background: "var(--yema-gold-glow)",
-            color: "var(--yema-gold-light)",
-            fontSize: 13,
-            fontWeight: 700,
-            textDecoration: "none",
-          }}
-        >
-          <span>{offersLabel}</span>
-          <span aria-hidden="true">→</span>
-        </Link>
+        <div style={{ display: "grid", gap: 8 }}>
+          <Link
+            href={offersHref}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 10,
+              minHeight: 44,
+              padding: "10px 14px",
+              borderRadius: "var(--yema-r-chip)",
+              border: "1px solid var(--yema-gold-edge)",
+              background: "var(--yema-gold-glow)",
+              color: "var(--yema-gold-light)",
+              fontSize: 13,
+              fontWeight: 700,
+              textDecoration: "none",
+            }}
+          >
+            <span>{offersLabel}</span>
+            <span aria-hidden="true">→</span>
+          </Link>
+          <DashboardSignOutButton locale={locale} />
+        </div>
       ) : null}
 
       {footer}

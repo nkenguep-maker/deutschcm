@@ -1,16 +1,21 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import prisma from "@/lib/prisma";
 import { grantRole, syncUserMetadata, type SpaceRole } from "@/lib/roles";
 import { sendEmail, emailRoleGranted } from "@/lib/resend";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 
 // Endpoint admin — accorde un rôle à un compte. Rôle ADMIN uniquement.
 // grantedBy = id de l'admin. Envoie un email de notification via Resend.
 
 const VALID: SpaceRole[] = ["STUDENT", "TEACHER", "CENTER", "ADMIN"];
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -44,11 +49,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Admin only" }, { status: 403 });
   }
 
-  const { userId, role } = (await request.json()) as {
-    userId?: string;
-    role?: string;
-  };
-  if (!userId || !role || !VALID.includes(role as SpaceRole)) {
+  const body = await request.json().catch(() => null);
+  const userId = body && typeof body === "object" && !Array.isArray(body)
+    ? (body as { userId?: unknown }).userId
+    : null;
+  const role = body && typeof body === "object" && !Array.isArray(body)
+    ? (body as { role?: unknown }).role
+    : null;
+  if (
+    typeof userId !== "string" || userId.length === 0 || userId.length > 128 ||
+    typeof role !== "string" || !VALID.includes(role as SpaceRole)
+  ) {
     return NextResponse.json({ error: "Invalid params" }, { status: 400 });
   }
 
@@ -63,10 +74,9 @@ export async function POST(request: Request) {
   await grantRole({ userId: target.id, role: role as SpaceRole, grantedBy: adminDb.id });
   await syncUserMetadata({ supabaseId: target.supabaseId });
 
-  // Fire-and-forget email — ne bloque pas la réponse
   sendEmail({
     to: target.email,
-    subject: `Yema · nouvel accès accordé`,
+    subject: "Yema · nouvel accès accordé",
     html: emailRoleGranted(target.fullName, role),
   }).catch((err) => console.error("[roles/grant] email failed:", err));
 

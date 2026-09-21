@@ -3,6 +3,8 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
 import { DifficultyLevel, ModuleType } from "@prisma/client";
+import { hasActiveRole, type SpaceRole } from "@/lib/roles";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 
 const LEVEL_ICONS: Record<string, string> = {
   A1: "👋", A2: "🏙️", B1: "🌍", B2: "📰", C1: "🎭",
@@ -24,8 +26,13 @@ async function getAuthUser() {
   if (!user) return null;
   return prisma.user.findUnique({
     where: { supabaseId: user.id },
-    select: { id: true, role: true },
+    select: { id: true },
   });
+}
+
+async function hasAnyActiveRole(userId: string, roles: SpaceRole[]): Promise<boolean> {
+  const checks = await Promise.all(roles.map((role) => hasActiveRole(userId, role)));
+  return checks.some(Boolean);
 }
 
 // ── GET: list courses (published for students, all for admin/teacher) ──────────
@@ -36,7 +43,7 @@ export async function GET(request: NextRequest) {
 
   if (includeUnpublished) {
     const user = await getAuthUser();
-    if (!user || (user.role !== "ADMIN" && user.role !== "TEACHER")) {
+    if (!user || !(await hasAnyActiveRole(user.id, ["ADMIN", "TEACHER"]))) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
   }
@@ -103,9 +110,12 @@ export async function GET(request: NextRequest) {
 
 // ── POST: save generatedData to DB without re-running Gemini ─────────────────
 export async function POST(request: NextRequest) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const user = await getAuthUser();
-  const allowed = ["ADMIN", "TEACHER", "CENTER"];
-  if (!user || !allowed.includes(user.role)) {
+  if (!user || !(await hasAnyActiveRole(user.id, ["ADMIN", "TEACHER", "CENTER"]))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -206,8 +216,12 @@ export async function POST(request: NextRequest) {
 
 // ── PATCH: publish or unpublish a course (and all its modules) ────────────────
 export async function PATCH(request: NextRequest) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const user = await getAuthUser();
-  if (!user || (user.role !== "ADMIN" && user.role !== "TEACHER")) {
+  if (!user || !(await hasAnyActiveRole(user.id, ["ADMIN", "TEACHER"]))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

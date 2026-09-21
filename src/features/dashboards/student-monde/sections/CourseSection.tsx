@@ -9,14 +9,13 @@ import {
   DashboardSectionHeader,
   DashboardStatusChip,
 } from "@/features/dashboards/shared";
+import { OFFICIAL_A1_COURSE_ID } from "../courseRoutes";
 import type { MondeAccessStatus, MondeCourseSummary } from "../types";
 
 type Props = {
   courses: MondeCourseSummary[];
   accessStatus: MondeAccessStatus;
 };
-
-const OFFICIAL_A1_COURSE_ID = "monde-adulte-de-a1";
 
 export function CourseSection({ courses, accessStatus }: Props) {
   const t = useTranslations("yemaDashboards.studentMonde.course");

@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import prisma from "@/lib/prisma";
 import { revokeRole, syncUserMetadata, type SpaceRole } from "@/lib/roles";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 
 // Endpoint admin — retire un rôle d'un compte. Protège deux cas :
 // (1) jamais retirer le dernier rôle actif (déjà géré dans revokeRole)
@@ -10,7 +11,11 @@ import { revokeRole, syncUserMetadata, type SpaceRole } from "@/lib/roles";
 
 const VALID: SpaceRole[] = ["STUDENT", "TEACHER", "CENTER", "ADMIN"];
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -44,11 +49,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Admin only" }, { status: 403 });
   }
 
-  const { userId, role } = (await request.json()) as {
-    userId?: string;
-    role?: string;
-  };
-  if (!userId || !role || !VALID.includes(role as SpaceRole)) {
+  const body = await request.json().catch(() => null);
+  const userId = body && typeof body === "object" && !Array.isArray(body)
+    ? (body as { userId?: unknown }).userId
+    : null;
+  const role = body && typeof body === "object" && !Array.isArray(body)
+    ? (body as { role?: unknown }).role
+    : null;
+  if (
+    typeof userId !== "string" || userId.length === 0 || userId.length > 128 ||
+    typeof role !== "string" || !VALID.includes(role as SpaceRole)
+  ) {
     return NextResponse.json({ error: "Invalid params" }, { status: 400 });
   }
 
@@ -73,6 +84,5 @@ export async function POST(request: Request) {
   }
 
   await syncUserMetadata({ supabaseId: target.supabaseId });
-
   return NextResponse.json({ ok: true });
 }

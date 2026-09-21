@@ -19,6 +19,7 @@ const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
   display: "swap",
+  preload: false,
   weight: ["400", "500"],
   style: ["normal", "italic"],
 })
@@ -26,12 +27,14 @@ const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin"],
   display: "swap",
+  preload: false,
   weight: ["400", "500", "600"],
 })
 const jetbrains = JetBrains_Mono({
   variable: "--font-jetbrains",
   subsets: ["latin"],
   display: "swap",
+  preload: false,
   weight: ["500"],
 })
 

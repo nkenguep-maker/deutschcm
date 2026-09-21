@@ -4,6 +4,8 @@ import { getCourseContent, getCourseLesson, getCourseLessonById, getCourseUnit, 
 import { loadCourseViewer } from "@/lib/course-content/server";
 import { resolveCourseLessonForPathway, resolveCourseUnitForPathway } from "@/lib/course-content/pathway";
 import { AudioLessonExperience } from "@/features/course-experience/AudioLessonExperience";
+import { A1V2PlatformLesson } from "@/features/course-experience/a1-v2/A1V2PlatformLesson";
+import { getA1V2LessonContext } from "@/content/monde-a1-v2";
 import styles from "@/features/course-experience/CourseExperience.module.css";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +62,24 @@ export default async function LessonPage({ params }: { params: Promise<{ locale:
   }
 
   const next = getNextCourseLesson(courseId, lessonId);
+
+  if (courseId === "monde-adulte-de-a1") {
+    const v2 = getA1V2LessonContext(lessonId);
+    if (!v2 || v2.unit.id !== unitId) notFound();
+    return (
+      <A1V2PlatformLesson
+        unit={v2.unit}
+        lesson={v2.lesson}
+        locale={locale}
+        courseId={courseId}
+        alreadyCompleted={completed.has(lessonId)}
+        initialScore={currentProgress?.score ?? null}
+        accessActive={viewer.accessStatus === "ACTIVE"}
+        nextLesson={next ? { unitId: next.unit.id, lessonId: next.lesson.id, title: next.lesson.title } : null}
+      />
+    );
+  }
+
   const resolved = getCourseLessonById(courseId, lessonId);
   if (!resolved) notFound();
   const resolvedUnit = resolveCourseUnitForPathway(unit, viewer.pathwayVariant);

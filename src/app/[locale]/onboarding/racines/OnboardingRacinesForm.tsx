@@ -15,6 +15,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { BrandY } from "@/components/brand/BrandY";
+import { SeuilGreetings } from "@/components/seuil/SeuilGreeting";
 import { frTypo } from "@/components/landing/typo";
 import { classifyAuthError, withTimeout } from "@/lib/authErrors";
 
@@ -178,8 +179,8 @@ export function OnboardingRacinesForm() {
         supabase.auth.updateUser({
           data: {
             universe: "racines",
-            onboarding: { language: "wolof", link, startPoint },
-            activeLanguage: "wolof",
+            onboarding: { language: "bassa", link, startPoint },
+            activeLanguage: "bassa",
           },
         }),
       );
@@ -195,7 +196,7 @@ export function OnboardingRacinesForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           universe: "RACINES",
-          language: "WOLOF",
+          language: "BASSA",
           intention: link ? intentionMap[link] : undefined,
           onboardingAnswers: { link, startPoint },
         }),
@@ -208,7 +209,7 @@ export function OnboardingRacinesForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           role: "STUDENT",
-          activeLanguage: "wolof",
+          activeLanguage: "bassa",
         }),
       }));
       if (ocRes.status === 401) { showError("session_expired"); return; }
@@ -233,6 +234,7 @@ export function OnboardingRacinesForm() {
 
   return (
     <div className="entry-page entry-universe-racines" data-universe="racines">
+      <SeuilGreetings locale={loc} visibleCount={3} pool="sources" variant="entry" />
       <header className="entry-header">
         <Link href={`/${locale}`} className="entry-brand" aria-label="YEMA">
           <BrandY variant="sources" state="static" size={36} />

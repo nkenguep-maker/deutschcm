@@ -25,23 +25,25 @@ function stripComments(src: string): string {
 const centerFiles = walk(join(ROOT, "center"));
 const adminFiles = walk(join(ROOT, "admin"));
 
-describe("Center nav (Lot 4B)", () => {
+describe("Center nav (Lot 4B · bêta technique)", () => {
   const labels = {
     overview: "Vue", students: "Élèves", teachers: "Enseignants",
-    classes: "Classes", billing: "Facturation", messages: "Messages",
+    classes: "Classes", messages: "Messages",
     settings: "Paramètres", sectionLabel: "Mon centre",
   };
-  it("desktop expose exactement 7 rubriques", () => {
+  it("desktop expose exactement 6 rubriques sans facturation", () => {
     const [g] = buildCenterNav(labels, "/fr/center");
-    expect(g.items).toHaveLength(7);
+    expect(g.items).toHaveLength(6);
+    expect(g.items.map((i) => i.key)).toEqual(["overview", "students", "teachers", "classes", "messages", "settings"]);
+    expect(g.items.map((i) => i.key)).not.toContain("billing");
   });
-  it("mobile expose exactement 5 tabs (Centre/Élèves/Classes/Facturation/Messages)", () => {
+  it("mobile expose exactement 4 tabs (Centre/Élèves/Classes/Messages)", () => {
     const tabs = buildCenterMobileTabs(
-      { overview: "Centre", students: "Élèves", classes: "Classes", billing: "Facturation", messages: "Messages" },
+      { overview: "Centre", students: "Élèves", classes: "Classes", messages: "Messages" },
       "/fr/center",
     );
-    expect(tabs).toHaveLength(5);
-    expect(tabs.map((t) => t.key)).toEqual(["overview", "students", "classes", "billing", "messages"]);
+    expect(tabs).toHaveLength(4);
+    expect(tabs.map((t) => t.key)).toEqual(["overview", "students", "classes", "messages"]);
   });
 });
 
@@ -108,11 +110,13 @@ describe("Center/Admin i18n parité + shape (Lot 4B)", () => {
     expect(y2.center).toBeDefined();
     expect(y2.admin).toBeDefined();
   });
-  it("center.nav a 7 clés · center.mobileNav a 5 clés", () => {
+  it("center.nav a 6 clés · center.mobileNav a 4 clés", () => {
     const nav = (fr as { yemaDashboards: { center: { nav: Record<string, string>; mobileNav: Record<string, string> } } })
       .yemaDashboards.center;
-    expect(Object.keys(nav.nav)).toHaveLength(7);
-    expect(Object.keys(nav.mobileNav)).toHaveLength(5);
+    expect(Object.keys(nav.nav)).toHaveLength(6);
+    expect(Object.keys(nav.mobileNav)).toHaveLength(4);
+    expect(nav.nav).not.toHaveProperty("billing");
+    expect(nav.mobileNav).not.toHaveProperty("billing");
   });
   it("admin.nav a 4 clés · admin.mobileNav a 4 clés", () => {
     const nav = (fr as { yemaDashboards: { admin: { nav: Record<string, string>; mobileNav: Record<string, string> } } })

@@ -1,6 +1,8 @@
 // P4.6-A · GET / POST /api/messaging/conversations/[conversationId]/messages
 // GET  : liste des messages (accès vérifié)
-// POST : envoi de message (kind + contenu validés server-side)
+// POST : envoi de message texte/guidé uniquement. L'audio passe par
+//        /api/messaging/conversations/[conversationId]/audio et les CARD/SYSTEM
+//        sont réservés aux actions serveur de domaine.
 
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -8,11 +10,26 @@ import { isMessagingEnabled } from "@/lib/flags";
 import { resolveMessagingActor } from "@/lib/messaging/actor";
 import { listConversationMessages } from "@/lib/messaging/conversations";
 import { sendMessage } from "@/lib/messaging/messages";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 
 export const dynamic = "force-dynamic";
 function notFound() { return NextResponse.json({ error: "Not found" }, { status: 404 }); }
 function badRequest(code: string) { return NextResponse.json({ error: "Bad request", code }, { status: 400 }); }
 function forbidden(code: string) { return NextResponse.json({ error: "Forbidden", code }, { status: 403 }); }
+function rateLimited() {
+  return NextResponse.json(
+    { error: "Too many requests", code: "rate_limited" },
+    { status: 429, headers: { "Retry-After": "300" } },
+  );
+}
+
+const BAD_REQUEST_DENIALS = new Set([
+  "text_required_missing",
+  "text_too_long",
+  "guided_phrase_missing_or_inactive",
+  "guided_phrase_wrong_scope",
+  "idempotency_key_invalid",
+]);
 
 export async function GET(
   req: NextRequest,
@@ -32,6 +49,8 @@ export async function POST(
   ctx: { params: Promise<{ conversationId: string }> },
 ) {
   if (!isMessagingEnabled()) return notFound();
+  if (!isSameOriginRequest(req)) return forbidden("origin_mismatch");
+
   const actor = await resolveMessagingActor();
   if (!actor) return notFound();
   const { conversationId } = await ctx.params;
@@ -40,10 +59,10 @@ export async function POST(
   try { body = await req.json(); } catch { return badRequest("bad_json"); }
   const b = (body ?? {}) as Record<string, unknown>;
 
-  const kind = String(b.kind ?? "").toUpperCase() as
-    | "TEXT" | "AUDIO" | "GUIDED_PHRASE" | "CARD" | "SYSTEM";
-  if (!["TEXT", "AUDIO", "GUIDED_PHRASE", "CARD"].includes(kind)) {
-    // SYSTEM refusé côté client. Autres valeurs invalides.
+  const kind = String(b.kind ?? "").toUpperCase() as "TEXT" | "GUIDED_PHRASE";
+  if (!["TEXT", "GUIDED_PHRASE"].includes(kind)) {
+    // AUDIO a son endpoint multipart dédié. CARD et SYSTEM sont émis par
+    // des actions serveur de domaine, jamais par un payload client générique.
     return badRequest("invalid_kind");
   }
 
@@ -52,10 +71,6 @@ export async function POST(
     kind,
     body: typeof b.body === "string" ? b.body : null,
     guidedPhraseId: typeof b.guidedPhraseId === "string" ? b.guidedPhraseId : null,
-    audioAssetId: typeof b.audioAssetId === "string" ? b.audioAssetId : null,
-    cardType: (typeof b.cardType === "string" ? b.cardType : null) as never,
-    cardPayload: (b.cardPayload ?? null) as Record<string, unknown> | null,
-    replyToMessageId: typeof b.replyToMessageId === "string" ? b.replyToMessageId : null,
     idempotencyKey: typeof b.idempotencyKey === "string" ? b.idempotencyKey : null,
   });
 
@@ -63,6 +78,8 @@ export async function POST(
     if (result.error === "actor_not_allowed" || result.error === "conversation_not_found") {
       return notFound();
     }
+    if (result.error === "rate_limited") return rateLimited();
+    if (BAD_REQUEST_DENIALS.has(result.error)) return badRequest(result.error);
     return forbidden(result.error);
   }
   return NextResponse.json({ messageId: result.messageId }, { status: 201 });

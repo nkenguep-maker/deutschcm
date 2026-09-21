@@ -5,6 +5,20 @@
 import { test, expect } from "playwright/test";
 import { PERSONAS } from "./personas";
 
+async function expectCanonicalNotFound(page: import("playwright/test").Page, response: import("playwright/test").Response | null) {
+  // App Router may stream `notFound()` with HTTP 200. In that case the rendered
+  // 404 boundary and `noindex` are the security-relevant contract.
+  if (response?.status() === 404) return;
+
+  expect(response?.status()).toBe(200);
+  await expect(page.getByRole("heading", { level: 1, name: /La porte que vous cherchez|The door you are looking for/i })).toBeVisible();
+  const robotsContents = await page.locator("meta[name='robots']").evaluateAll((elements) =>
+    elements.map((element) => element.getAttribute("content")?.toLowerCase() ?? ""),
+  );
+  expect(robotsContents).toContainEqual(expect.stringMatching(/noindex/));
+  expect(robotsContents).not.toContainEqual(expect.stringMatching(/(^|,\s*)index(?:\s*,|$)/));
+}
+
 test.describe("État anonymous · redirect /login", () => {
   test("Teacher /assignments anonyme · redirect", async ({ page }) => {
     await page.goto("/fr/teacher/assignments");
@@ -44,14 +58,14 @@ test.describe("État not-found · id inexistant → 404 canonique", () => {
     const context = await browser.newContext({ storageState: PERSONAS.studentA.storageStateFile });
     const page = await context.newPage();
     const resp = await page.goto("/fr/student/submissions/does-not-exist-p4-5-b2");
-    expect(resp?.status()).toBe(404);
+    await expectCanonicalNotFound(page, resp);
     await context.close();
   });
   test("Student · assignment id inexistant", async ({ browser }) => {
     const context = await browser.newContext({ storageState: PERSONAS.studentA.storageStateFile });
     const page = await context.newPage();
     const resp = await page.goto("/fr/student/assignments/does-not-exist-p4-5-b2");
-    expect(resp?.status()).toBe(404);
+    await expectCanonicalNotFound(page, resp);
     await context.close();
   });
 });

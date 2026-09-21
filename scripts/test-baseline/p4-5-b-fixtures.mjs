@@ -43,6 +43,13 @@ async function ensureAppRole(userId, role) {
     update: {}, create: { userId, role },
   });
 }
+async function ensureUserRole(userId, role) {
+  await db.userRole.upsert({
+    where: { userId_role: { userId, role } },
+    update: { status: "ACTIVE", onboarded: true },
+    create: { userId, role, status: "ACTIVE", onboarded: true },
+  });
+}
 async function ensureClassroom(id, teacherId, name) {
   return db.classroom.upsert({
     where: { id },
@@ -118,9 +125,25 @@ async function main() {
   const studentBUser = await ensureUser(`${PREFIX}student_b_user`, `${PREFIX}student_b@example.com`, "STUDENT");
   const studentNoEnrollUser = await ensureUser(`${PREFIX}student_no_enroll_user`, `${PREFIX}student_no_enroll@example.com`, "STUDENT");
   const studentRemovedUser = await ensureUser(`${PREFIX}student_removed_user`, `${PREFIX}student_removed@example.com`, "STUDENT");
-  const centerAdminUser = await ensureUser(`${PREFIX}center_admin_user`, `${PREFIX}center_admin@example.com`, "ADMIN");
+  const centerAdminUser = await ensureUser(`${PREFIX}center_admin_user`, `${PREFIX}center_admin@example.com`, "CENTER");
   const rootsCoachUser = await ensureUser(`${PREFIX}roots_coach_user`, `${PREFIX}roots_coach@example.com`, "STUDENT");
-  const yemaAdminNoBindUser = await ensureUser(`${PREFIX}yema_admin_no_bind_user`, `${PREFIX}yema_admin_no_bind@example.com`, "STUDENT");
+  const yemaAdminNoBindUser = await ensureUser(`${PREFIX}yema_admin_no_bind_user`, `${PREFIX}yema_admin_no_bind@example.com`, "ADMIN");
+
+  // `user_roles` est la source de vérité qui est synchronisée dans
+  // Supabase app_metadata. Sans ces rows, le proxy refuse les vraies
+  // sessions E2E même lorsque les identités Auth sont valides.
+  await Promise.all([
+    ensureUserRole(teacherAUser.id, "TEACHER"),
+    ensureUserRole(teacherBUser.id, "TEACHER"),
+    ensureUserRole(teacherNoBindingUser.id, "TEACHER"),
+    ensureUserRole(studentAUser.id, "STUDENT"),
+    ensureUserRole(studentBUser.id, "STUDENT"),
+    ensureUserRole(studentNoEnrollUser.id, "STUDENT"),
+    ensureUserRole(studentRemovedUser.id, "STUDENT"),
+    ensureUserRole(centerAdminUser.id, "CENTER"),
+    ensureUserRole(rootsCoachUser.id, "STUDENT"),
+    ensureUserRole(yemaAdminNoBindUser.id, "ADMIN"),
+  ]);
 
   await ensureAppRole(centerAdminUser.id, "CENTER_ADMIN");
   await ensureAppRole(rootsCoachUser.id, "RACINES_COACH");

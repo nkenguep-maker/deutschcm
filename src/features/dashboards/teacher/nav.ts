@@ -17,7 +17,7 @@ export function buildTeacherNav(
     label: labels.sectionLabel,
     items: [
       { key: "overview", label: labels.overview, href: baseHref },
-      { key: "classes", label: labels.classes, href: `${baseHref}#classes` },
+      { key: "classes", label: labels.classes, href: `${baseHref}#mes-classes` },
       { key: "assignments", label: labels.assignments, href: `${baseHref}#devoirs` },
       { key: "corrections", label: labels.corrections, href: `${baseHref}#corrections` },
       { key: "resources", label: labels.resources, href: `${baseHref}#ressources` },

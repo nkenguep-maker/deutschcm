@@ -1,0 +1,1811 @@
+{
+  "id": "de-a1-u6",
+  "order": 6,
+  "title": "Faire des achats et organiser une sortie",
+  "schemaVersion": "2.0",
+  "contentVersion": "2026.09.20-u6-refonte-r1",
+  "status": "refonte-a-valider",
+  "note": "U6 refondue à partir du matériau éditorial legacy : achat d’un vêtement, tailles/couleurs, können, proposition avec wollen wir et rendez-vous. L’ancien message « fin A1 » est supprimé : U6 est seulement la moitié du nouveau niveau 12 unités.",
+  "cards": [
+    {
+      "id": "card.u6.suche",
+      "kind": "chunk",
+      "de": "Ich suche …",
+      "fr": "Je cherche…",
+      "introducedIn": "de-a1-u6-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.jacke",
+      "kind": "lexical",
+      "de": "die Jacke",
+      "fr": "la veste",
+      "introducedIn": "de-a1-u6-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.tshirt",
+      "kind": "lexical",
+      "de": "das T-Shirt",
+      "fr": "le tee-shirt",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.hose",
+      "kind": "lexical",
+      "de": "die Hose",
+      "fr": "le pantalon",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.groesse",
+      "kind": "lexical",
+      "de": "die Größe",
+      "fr": "la taille",
+      "introducedIn": "de-a1-u6-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.anprobieren",
+      "kind": "lexical",
+      "de": "anprobieren",
+      "fr": "essayer un vêtement",
+      "introducedIn": "de-a1-u6-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.passen",
+      "kind": "lexical",
+      "de": "passen",
+      "fr": "aller / convenir",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.ich-nehme",
+      "kind": "chunk",
+      "de": "Ich nehme …",
+      "fr": "Je prends…",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.schwarz",
+      "kind": "lexical",
+      "de": "schwarz",
+      "fr": "noir",
+      "introducedIn": "de-a1-u6-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.weiss",
+      "kind": "lexical",
+      "de": "weiß",
+      "fr": "blanc",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.blau",
+      "kind": "lexical",
+      "de": "blau",
+      "fr": "bleu",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.rot",
+      "kind": "lexical",
+      "de": "rot",
+      "fr": "rouge",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.gruen",
+      "kind": "lexical",
+      "de": "grün",
+      "fr": "vert",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.grau",
+      "kind": "lexical",
+      "de": "grau",
+      "fr": "gris",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.klein",
+      "kind": "lexical",
+      "de": "klein",
+      "fr": "petit",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.gross",
+      "kind": "lexical",
+      "de": "groß",
+      "fr": "grand",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.zu-klein",
+      "kind": "chunk",
+      "de": "zu klein",
+      "fr": "trop petit",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.zu-gross",
+      "kind": "chunk",
+      "de": "zu groß",
+      "fr": "trop grand",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.welche-groesse",
+      "kind": "chunk",
+      "de": "Welche Größe haben Sie?",
+      "fr": "Quelle taille faites-vous ?",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.haben-sie-das",
+      "kind": "chunk",
+      "de": "Haben Sie das in Größe …?",
+      "fr": "Avez-vous cela en taille… ?",
+      "introducedIn": "de-a1-u6-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.kann-ich",
+      "kind": "structure",
+      "de": "Kann ich …?",
+      "fr": "Puis-je… ?",
+      "introducedIn": "de-a1-u6-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.koennen-rule",
+      "kind": "structure",
+      "de": "Modal + … + Infinitiv am Ende",
+      "fr": "Modal + … + infinitif à la fin",
+      "introducedIn": "de-a1-u6-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.kann-anprobieren",
+      "kind": "chunk",
+      "de": "Kann ich die Jacke anprobieren?",
+      "fr": "Puis-je essayer la veste ?",
+      "introducedIn": "de-a1-u6-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.kann-karte",
+      "kind": "chunk",
+      "de": "Kann ich mit Karte bezahlen?",
+      "fr": "Puis-je payer par carte ?",
+      "introducedIn": "de-a1-u6-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.zeit-haben",
+      "kind": "chunk",
+      "de": "Zeit haben",
+      "fr": "avoir du temps",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.hast-du-zeit",
+      "kind": "chunk",
+      "de": "Hast du heute Abend Zeit?",
+      "fr": "As-tu du temps ce soir ?",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.treffen",
+      "kind": "lexical",
+      "de": "sich treffen",
+      "fr": "se retrouver",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.wir-treffen-uns",
+      "kind": "chunk",
+      "de": "Wir treffen uns um …",
+      "fr": "Nous nous retrouvons à…",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.wollen-wir",
+      "kind": "structure",
+      "de": "Wollen wir …?",
+      "fr": "On… ? / Voulons-nous… ?",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.kino",
+      "kind": "lexical",
+      "de": "das Kino",
+      "fr": "le cinéma",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.ins-kino",
+      "kind": "chunk",
+      "de": "ins Kino gehen",
+      "fr": "aller au cinéma",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.kaffee-trinken",
+      "kind": "chunk",
+      "de": "einen Kaffee trinken",
+      "fr": "prendre un café",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.spazieren",
+      "kind": "chunk",
+      "de": "spazieren gehen",
+      "fr": "aller se promener",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.essen-gehen",
+      "kind": "chunk",
+      "de": "essen gehen",
+      "fr": "aller manger",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.konzert",
+      "kind": "chunk",
+      "de": "ein Konzert besuchen",
+      "fr": "aller à un concert",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.um",
+      "kind": "lexical",
+      "de": "um",
+      "fr": "à (heure précise)",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.vor-dem-kino",
+      "kind": "chunk",
+      "de": "vor dem Kino",
+      "fr": "devant le cinéma",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.am-bahnhof",
+      "kind": "chunk",
+      "de": "am Bahnhof",
+      "fr": "à la gare",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.gern",
+      "kind": "chunk",
+      "de": "Gern!",
+      "fr": "Avec plaisir !",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u6.bis-spaeter",
+      "kind": "chunk",
+      "de": "Bis später!",
+      "fr": "À plus tard !",
+      "introducedIn": "de-a1-u6-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj.u6.reperer",
+      "label": "Repérer produit, couleur, taille, prix, activité, heure et lieu dans deux scènes"
+    },
+    {
+      "id": "obj.u6.acheter",
+      "label": "Demander un vêtement, préciser couleur/taille et décider de l’achat"
+    },
+    {
+      "id": "obj.u6.koennen",
+      "label": "Formuler une demande avec können et l’infinitif final"
+    },
+    {
+      "id": "obj.u6.ajuster",
+      "label": "Dire si un vêtement convient ou s’il est trop grand/petit"
+    },
+    {
+      "id": "obj.u6.proposer",
+      "label": "Proposer une activité avec Wollen wir…? et accepter/refuser simplement"
+    },
+    {
+      "id": "obj.u6.rendezvous",
+      "label": "Fixer une heure et un lieu de rendez-vous de façon précise"
+    }
+  ],
+  "remediations": [
+    {
+      "id": "rem.u6.koennen",
+      "objectiveId": "obj.u6.koennen",
+      "durationSeconds": 120,
+      "explanation": "Avec können, le modal conjugué vient tôt et l’action principale reste à la fin : Kann ich die Jacke anprobieren?",
+      "contrast": [
+        {
+          "de": "Kann ich die Jacke anprobieren?",
+          "fr": "Puis-je essayer la veste ?",
+          "ok": true
+        },
+        {
+          "de": "Kann ich anprobieren die Jacke?",
+          "fr": "—",
+          "ok": false,
+          "why": "L’infinitif anprobieren va à la fin."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u6.koennen.i1",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "ich",
+            "die Jacke",
+            "anprobieren",
+            "Kann"
+          ],
+          "answer": [
+            "Kann",
+            "ich",
+            "die Jacke",
+            "anprobieren"
+          ],
+          "normalization": []
+        },
+        {
+          "id": "rem.u6.koennen.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Kann ich mit Karte ____?",
+          "answer": "bezahlen",
+          "acceptedAnswers": [
+            "bezahlen"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u6.groesse",
+      "objectiveId": "obj.u6.ajuster",
+      "durationSeconds": 110,
+      "explanation": "zu groß = trop grand ; zu klein = trop petit. gut passen indique que l’article convient.",
+      "contrast": [
+        {
+          "de": "Die Jacke ist zu groß.",
+          "fr": "La veste est trop grande.",
+          "ok": true
+        },
+        {
+          "de": "Die Hose ist zu klein.",
+          "fr": "Le pantalon est trop petit.",
+          "ok": true
+        },
+        {
+          "de": "Die Jacke passt gut.",
+          "fr": "La veste va bien.",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u6.groesse.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Die Jacke ist zu ____.",
+          "answer": "groß",
+          "acceptedAnswers": [
+            "groß",
+            "gross"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "eszett"
+          ]
+        },
+        {
+          "id": "rem.u6.groesse.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Die Hose ist zu ____.",
+          "answer": "klein",
+          "acceptedAnswers": [
+            "klein"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u6.wollen",
+      "objectiveId": "obj.u6.proposer",
+      "durationSeconds": 110,
+      "explanation": "Pour proposer une activité : Wollen wir + complément + infinitif ? L’infinitif reste à la fin : Wollen wir ins Kino gehen?",
+      "contrast": [
+        {
+          "de": "Wollen wir ins Kino gehen?",
+          "fr": "On va au cinéma ?",
+          "ok": true
+        },
+        {
+          "de": "Wir wollen ins Kino gehen.",
+          "fr": "Nous voulons aller au cinéma.",
+          "ok": false,
+          "why": "C’est une affirmation, pas une proposition-question."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u6.wollen.i1",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue den Vorschlag.",
+          "tokens": [
+            "wir",
+            "ins Kino",
+            "gehen",
+            "Wollen"
+          ],
+          "answer": [
+            "Wollen",
+            "wir",
+            "ins Kino",
+            "gehen"
+          ],
+          "normalization": []
+        },
+        {
+          "id": "rem.u6.wollen.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "____ wir einen Kaffee trinken?",
+          "answer": "Wollen",
+          "acceptedAnswers": [
+            "Wollen"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u6.um-vor",
+      "objectiveId": "obj.u6.rendezvous",
+      "durationSeconds": 110,
+      "explanation": "um introduit l’heure précise ; vor dem Kino indique un point de rencontre devant le cinéma.",
+      "contrast": [
+        {
+          "de": "Wir treffen uns um acht.",
+          "fr": "On se retrouve à huit heures.",
+          "ok": true
+        },
+        {
+          "de": "Wir treffen uns vor dem Kino.",
+          "fr": "On se retrouve devant le cinéma.",
+          "ok": true
+        },
+        {
+          "de": "Wir treffen uns vor acht.",
+          "fr": "—",
+          "ok": false,
+          "why": "Pour l’heure prévue dans ce contexte, utilise um acht."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u6.um-vor.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Wir treffen uns ____ acht.",
+          "answer": "um",
+          "acceptedAnswers": [
+            "um"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u6.um-vor.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Wir treffen uns ____ dem Kino.",
+          "answer": "vor",
+          "acceptedAnswers": [
+            "vor"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u6.suche-nehme",
+      "objectiveId": "obj.u6.acheter",
+      "durationSeconds": 105,
+      "explanation": "Ich suche… exprime le besoin au début ; Ich nehme… exprime la décision finale d’achat.",
+      "contrast": [
+        {
+          "de": "Ich suche eine schwarze Jacke.",
+          "fr": "Je cherche une veste noire.",
+          "ok": true
+        },
+        {
+          "de": "Ich nehme die Jacke.",
+          "fr": "Je prends la veste.",
+          "ok": true
+        },
+        {
+          "de": "Ich nehme eine Jacke.",
+          "fr": "Je prends une veste.",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u6.suche-nehme.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich ____ eine schwarze Jacke.",
+          "answer": "suche",
+          "acceptedAnswers": [
+            "suche"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u6.suche-nehme.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Sie passt gut. Ich ____ sie.",
+          "answer": "nehme",
+          "acceptedAnswers": [
+            "nehme"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "de-a1-u6-l1",
+      "order": 1,
+      "phase": "Comprends",
+      "title": "Einkauf und Verabredung verstehen",
+      "objectiveIds": [
+        "obj.u6.reperer"
+      ],
+      "durationMinutes": 30,
+      "reveil": {
+        "cardIds": [
+          "card.u5.rechts",
+          "card.u4.halb-sieben",
+          "card.u3.was-kostet",
+          "card.u3.mit-karte"
+        ],
+        "itemCount": 4,
+        "maxSeconds": 90,
+        "selection": "fällige/fehlerhafte Karten zuerst ; Preis, Richtung und Uhrzeit werden für die zwei Szenen reaktiviert"
+      },
+      "blocks": [
+        {
+          "id": "blk.u6.l1.intro",
+          "type": "intro",
+          "title": "Zwei Szenen",
+          "textDe": "Im ersten Teil kauft Lina eine Jacke. Im zweiten Teil verabredet sie sich mit Ben.",
+          "textFr": "Sépare mentalement les deux scènes : boutique puis sortie."
+        },
+        {
+          "id": "blk.u6.l1.dialogue",
+          "type": "dialogueRef",
+          "dialogueId": "de-a1-u6-dialogue",
+          "speeds": [
+            "slow",
+            "natural"
+          ],
+          "instruction": "Höre zuerst auf Produkt, Größe und Preis. Beim zweiten Hören: Aktivität, Uhrzeit und Treffpunkt."
+        },
+        {
+          "id": "blk.u6.l1.split",
+          "type": "strategy",
+          "title": "Informationen trennen",
+          "textDe": "Geschäft: Produkt · Farbe · Größe · Preis. Verabredung: Aktivität · Uhrzeit · Ort.",
+          "textFr": "Deux colonnes mentales réduisent la charge d’écoute."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u6-l1-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u6.reperer",
+          "cardIds": [
+            "card.u6.jacke",
+            "card.u6.schwarz",
+            "card.u6.groesse"
+          ],
+          "promptLang": "de",
+          "prompt": "Was sucht Lina?",
+          "audioRef": "de-a1-u6-dialogue#seg2",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Eine schwarze Jacke in Größe M.",
+              "correct": true,
+              "feedback": "Ja. Produkt, Farbe und Größe stehen alle in derselben Antwort."
+            },
+            {
+              "id": "b",
+              "text": "Eine blaue Hose in Größe S.",
+              "correct": false,
+              "feedback": "Hose, blau und Größe S werden nicht genannt."
+            },
+            {
+              "id": "c",
+              "text": "Ein weißes T-Shirt.",
+              "correct": false,
+              "feedback": "T-Shirt gehört zum Wortschatz, aber nicht zu Linas Einkauf."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u6-l1-e2",
+          "type": "audioCloze",
+          "objectiveId": "obj.u6.reperer",
+          "cardIds": [
+            "card.u6.anprobieren"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Kann ich sie ____?",
+          "audioRef": "de-a1-u6-dialogue#seg4",
+          "answer": "anprobieren",
+          "acceptedAnswers": [
+            "anprobieren"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u6.koennen"
+        },
+        {
+          "id": "de-a1-u6-l1-e3",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u6.reperer",
+          "cardIds": [
+            "card.u6.wollen-wir",
+            "card.u6.ins-kino"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe Bens Vorschlag für das Kino.",
+          "answer": "Wollen wir ins Kino gehen?",
+          "acceptedAnswers": [
+            "Wollen wir ins Kino gehen?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u6.wollen"
+        },
+        {
+          "id": "de-a1-u6-l1-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u6.reperer",
+          "cardIds": [
+            "card.u6.vor-dem-kino"
+          ],
+          "promptLang": "de",
+          "prompt": "Wo treffen sich Lina und Ben?",
+          "audioRef": "de-a1-u6-dialogue#seg9",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Vor dem Kino.",
+              "correct": true,
+              "feedback": "Genau. Lina nennt den Treffpunkt vor dem Kino."
+            },
+            {
+              "id": "b",
+              "text": "Am Bahnhof.",
+              "correct": false,
+              "feedback": "Der Bahnhof ist ein möglicher Treffpunkt, aber nicht in diesem Dialog."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u6-l1-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u6.reperer",
+          "cardIds": [
+            "card.u6.jacke",
+            "card.u6.groesse",
+            "card.u6.ins-kino",
+            "card.u6.vor-dem-kino"
+          ],
+          "promptLang": "de",
+          "prompt": "Notiere die zwei Szenen in 4–6 kurzen Sätzen: Einkauf und Verabredung.",
+          "minimumWords": 28,
+          "successCriteria": [
+            "Produkt",
+            "Größe",
+            "Aktivität",
+            "Uhrzeit oder Treffpunkt"
+          ],
+          "autoCheck": [
+            "contient Jacke",
+            "contient Kino"
+          ],
+          "note": "Nur die Kernaussagen des Dialogs rekonstruieren."
+        }
+      ],
+      "completionMessage": "Du kannst die wichtigsten Informationen aus Einkauf und Verabredung getrennt erfassen."
+    },
+    {
+      "id": "de-a1-u6-l2",
+      "order": 2,
+      "phase": "Pratique",
+      "title": "Kleidung suchen, anprobieren und wählen",
+      "objectiveIds": [
+        "obj.u6.acheter",
+        "obj.u6.ajuster"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u6.suche",
+          "card.u6.jacke",
+          "card.u6.groesse",
+          "card.u5.rechts",
+          "card.u3.was-kostet"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "Produkt + Größe + bekannte Preis-/Ortsblöcke zusammen abrufen"
+      },
+      "blocks": [
+        {
+          "id": "blk.u6.l2.shop",
+          "type": "model",
+          "title": "Im Geschäft",
+          "textDe": "Ich suche eine schwarze Jacke. · Haben Sie das in Größe L? · Es ist zu groß. · Ich nehme es.",
+          "textFr": "Besoin → taille → essayage/ajustement → décision."
+        },
+        {
+          "id": "blk.u6.l2.colors",
+          "type": "model",
+          "title": "Farben",
+          "textDe": "schwarz · weiß · blau · rot · grün · grau",
+          "textFr": "Associe directement couleur et vêtement."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u6-l2-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u6.acheter",
+          "cardIds": [
+            "card.u6.suche",
+            "card.u6.jacke"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Ich suche eine schwarze Jacke.",
+          "answer": "Ich suche eine schwarze Jacke.",
+          "acceptedAnswers": [
+            "Ich suche eine schwarze Jacke."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u6.suche-nehme"
+        },
+        {
+          "id": "de-a1-u6-l2-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u6.acheter",
+          "cardIds": [
+            "card.u6.haben-sie-das",
+            "card.u6.groesse"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "in Größe L",
+            "das",
+            "Sie",
+            "Haben"
+          ],
+          "answer": [
+            "Haben",
+            "Sie",
+            "das",
+            "in Größe L"
+          ],
+          "feedbackIncorrect": "Die Frage beginnt mit Haben Sie …"
+        },
+        {
+          "id": "de-a1-u6-l2-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u6.ajuster",
+          "cardIds": [
+            "card.u6.zu-gross",
+            "card.u6.zu-klein"
+          ],
+          "promptLang": "de",
+          "prompt": "Die Hose ist zu groß. → Ändere auf das Gegenteil.",
+          "answer": "Die Hose ist zu klein.",
+          "acceptedAnswers": [
+            "Die Hose ist zu klein."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u6.groesse"
+        },
+        {
+          "id": "de-a1-u6-l2-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u6.ajuster",
+          "cardIds": [
+            "card.u6.groesse",
+            "card.u6.zu-klein",
+            "card.u6.ich-nehme"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Einkaufsblöcke nach.",
+          "targets": [
+            {
+              "id": "s1",
+              "de": "Welche Größe haben Sie?",
+              "audioRef": "drill.u6.shop1",
+              "maxSeconds": 6
+            },
+            {
+              "id": "s2",
+              "de": "Es ist zu klein.",
+              "audioRef": "drill.u6.shop2",
+              "maxSeconds": 5
+            },
+            {
+              "id": "s3",
+              "de": "Ich nehme es.",
+              "audioRef": "drill.u6.shop3",
+              "maxSeconds": 5
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur vorgegebene Blöcke werden verglichen."
+        },
+        {
+          "id": "de-a1-u6-l2-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u6.acheter",
+          "cardIds": [
+            "card.u6.suche",
+            "card.u6.haben-sie-das",
+            "card.u6.anprobieren",
+            "card.u6.ich-nehme"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe fünf kurze Sätze im Geschäft: Produkt/Farbe, Größe, Anprobieren, Passform und Kaufentscheidung.",
+          "minimumWords": 34,
+          "successCriteria": [
+            "Produkt und Farbe",
+            "Größe",
+            "anprobieren",
+            "Passform",
+            "Entscheidung"
+          ],
+          "autoCheck": [
+            "contient suche",
+            "contient Größe",
+            "contient anprobieren",
+            "contient nehme"
+          ],
+          "note": "Du kannst ein reales oder erfundenes Produkt wählen."
+        }
+      ],
+      "completionMessage": "Du kannst ein Kleidungsstück suchen, Größe/Farbe nennen, anprobieren und eine Kaufentscheidung ausdrücken."
+    },
+    {
+      "id": "de-a1-u6-l3",
+      "order": 3,
+      "phase": "Pratique",
+      "title": "Mit können höflich fragen",
+      "objectiveIds": [
+        "obj.u6.koennen"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u6.kann-ich",
+          "card.u6.anprobieren",
+          "card.u3.mit-karte",
+          "card.u5.gehen-sie",
+          "card.u1.v2"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "bekannte Verbposition mit dem neuen Modalrahmen verbinden"
+      },
+      "blocks": [
+        {
+          "id": "blk.u6.l3.rule",
+          "type": "rule",
+          "title": "Modal + Infinitiv",
+          "textDe": "Kann + ich + Ergänzung + Infinitiv? → Kann ich die Jacke anprobieren?",
+          "textFr": "Le modal est conjugué tôt ; l’action principale part à la fin."
+        },
+        {
+          "id": "blk.u6.l3.transfer",
+          "type": "model",
+          "title": "Bekannter Transfer",
+          "textDe": "Kann ich mit Karte bezahlen?",
+          "textFr": "Le bloc de paiement U3 devient maintenant un exemple de la règle können."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u6-l3-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u6.koennen",
+          "cardIds": [
+            "card.u6.kann-anprobieren"
+          ],
+          "promptLang": "de",
+          "prompt": "Frage, ob du die Jacke anprobieren darfst.",
+          "answer": "Kann ich die Jacke anprobieren?",
+          "acceptedAnswers": [
+            "Kann ich die Jacke anprobieren?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u6.koennen"
+        },
+        {
+          "id": "de-a1-u6-l3-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u6.koennen",
+          "cardIds": [
+            "card.u6.kann-karte"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "bezahlen",
+            "mit Karte",
+            "ich",
+            "Kann"
+          ],
+          "answer": [
+            "Kann",
+            "ich",
+            "mit Karte",
+            "bezahlen"
+          ],
+          "feedbackIncorrect": "Das Hauptverb bezahlen steht am Ende.",
+          "remediationRef": "rem.u6.koennen"
+        },
+        {
+          "id": "de-a1-u6-l3-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u6.koennen",
+          "cardIds": [
+            "card.u6.koennen-rule",
+            "card.u6.anprobieren"
+          ],
+          "promptLang": "de",
+          "prompt": "Ich probiere die Jacke an. → Mache eine höfliche Kann-ich-Frage.",
+          "answer": "Kann ich die Jacke anprobieren?",
+          "acceptedAnswers": [
+            "Kann ich die Jacke anprobieren?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u6.koennen"
+        },
+        {
+          "id": "de-a1-u6-l3-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u6.koennen",
+          "cardIds": [
+            "card.u6.kann-anprobieren",
+            "card.u6.kann-karte"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Frage hörst du?",
+          "audioRef": "drill.u6.modal-discrimination",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Kann ich die Jacke anprobieren?",
+              "correct": true,
+              "feedback": "Ja. Das Audio endet mit anprobieren."
+            },
+            {
+              "id": "b",
+              "text": "Kann ich mit Karte bezahlen?",
+              "correct": false,
+              "feedback": "Diese Frage endet mit bezahlen und betrifft die Zahlung."
+            }
+          ],
+          "remediationRef": "rem.u6.koennen"
+        },
+        {
+          "id": "de-a1-u6-l3-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u6.koennen",
+          "cardIds": [
+            "card.u6.kann-ich",
+            "card.u6.anprobieren",
+            "card.u6.kann-karte"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe drei verschiedene Kann-ich-Fragen: Anprobieren, Bezahlen und eine eigene einfache Bitte.",
+          "minimumWords": 20,
+          "successCriteria": [
+            "drei Fragen",
+            "Kann ich",
+            "Infinitiv am Ende"
+          ],
+          "autoCheck": [
+            "contient Kann ich",
+            "contient ?"
+          ],
+          "note": "Die dritte Frage darf kreativ sein, aber einfach bleiben."
+        }
+      ],
+      "completionMessage": "Du kannst mit können höflich fragen und das Hauptverb zuverlässig ans Satzende setzen."
+    },
+    {
+      "id": "de-a1-u6-l4",
+      "order": 4,
+      "phase": "Produis",
+      "title": "Eine Aktivität vorschlagen und einen Treffpunkt festlegen",
+      "objectiveIds": [
+        "obj.u6.proposer",
+        "obj.u6.rendezvous"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u6.hast-du-zeit",
+          "card.u6.wollen-wir",
+          "card.u4.halb-sieben",
+          "card.u5.bahnhof",
+          "card.u3.bitte"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "Zeit, Ort und Vorschlag aus mehreren Einheiten kombinieren"
+      },
+      "blocks": [
+        {
+          "id": "blk.u6.l4.proposal",
+          "type": "model",
+          "title": "Vorschlag",
+          "textDe": "Hast du heute Abend Zeit? · Wollen wir ins Kino gehen? · Gern!",
+          "textFr": "Disponibilité → proposition → acceptation."
+        },
+        {
+          "id": "blk.u6.l4.meet",
+          "type": "model",
+          "title": "Treffpunkt",
+          "textDe": "Treffen wir uns um halb acht vor dem Kino?",
+          "textFr": "um = heure ; vor dem Kino = lieu."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u6-l4-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u6.proposer",
+          "cardIds": [
+            "card.u6.wollen-wir",
+            "card.u6.ins-kino"
+          ],
+          "promptLang": "de",
+          "prompt": "Mach einen Vorschlag für das Kino.",
+          "answer": "Wollen wir ins Kino gehen?",
+          "acceptedAnswers": [
+            "Wollen wir ins Kino gehen?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u6.wollen"
+        },
+        {
+          "id": "de-a1-u6-l4-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u6.rendezvous",
+          "cardIds": [
+            "card.u6.wir-treffen-uns",
+            "card.u6.um",
+            "card.u6.vor-dem-kino"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Verabredung.",
+          "tokens": [
+            "vor dem Kino",
+            "wir",
+            "um acht",
+            "Treffen",
+            "uns"
+          ],
+          "answer": [
+            "Treffen",
+            "wir",
+            "uns",
+            "um acht",
+            "vor dem Kino"
+          ],
+          "feedbackIncorrect": "Erst Treffen wir uns, dann Uhrzeit und Treffpunkt.",
+          "remediationRef": "rem.u6.um-vor"
+        },
+        {
+          "id": "de-a1-u6-l4-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u6.proposer",
+          "cardIds": [
+            "card.u6.kaffee-trinken",
+            "card.u6.wollen-wir"
+          ],
+          "promptLang": "de",
+          "prompt": "Wollen wir ins Kino gehen? → Ändere die Aktivität auf Kaffee.",
+          "answer": "Wollen wir einen Kaffee trinken?",
+          "acceptedAnswers": [
+            "Wollen wir einen Kaffee trinken?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u6.wollen"
+        },
+        {
+          "id": "de-a1-u6-l4-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u6.rendezvous",
+          "cardIds": [
+            "card.u6.hast-du-zeit",
+            "card.u6.wollen-wir",
+            "card.u6.vor-dem-kino"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Verabredungsblöcke nach.",
+          "targets": [
+            {
+              "id": "v1",
+              "de": "Hast du heute Abend Zeit?",
+              "audioRef": "drill.u6.meet1",
+              "maxSeconds": 6
+            },
+            {
+              "id": "v2",
+              "de": "Wollen wir ins Kino gehen?",
+              "audioRef": "drill.u6.meet2",
+              "maxSeconds": 6
+            },
+            {
+              "id": "v3",
+              "de": "Treffen wir uns um halb acht vor dem Kino?",
+              "audioRef": "drill.u6.meet3",
+              "maxSeconds": 8
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur modellierte Blöcke, keine freie Gesprächsnote."
+        },
+        {
+          "id": "de-a1-u6-l4-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u6.rendezvous",
+          "cardIds": [
+            "card.u6.hast-du-zeit",
+            "card.u6.wollen-wir",
+            "card.u6.um",
+            "card.u6.vor-dem-kino"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe einen kurzen Chat: Verfügbarkeit fragen, Aktivität vorschlagen, Uhrzeit und Treffpunkt vereinbaren, freundlich beenden.",
+          "minimumWords": 32,
+          "successCriteria": [
+            "Zeitfrage",
+            "Vorschlag",
+            "Uhrzeit",
+            "Ort",
+            "Abschluss"
+          ],
+          "autoCheck": [
+            "contient Zeit",
+            "contient Wollen wir",
+            "contient um"
+          ],
+          "note": "Nutze eine Aktivität deiner Wahl."
+        }
+      ],
+      "completionMessage": "Du kannst eine einfache Aktivität vorschlagen und Uhrzeit sowie Treffpunkt eindeutig vereinbaren."
+    },
+    {
+      "id": "de-a1-u6-l5",
+      "order": 5,
+      "phase": "Valide",
+      "title": "Mission: Einkauf und Verabredung",
+      "objectiveIds": [
+        "obj.u6.reperer",
+        "obj.u6.acheter",
+        "obj.u6.koennen",
+        "obj.u6.ajuster",
+        "obj.u6.proposer",
+        "obj.u6.rendezvous"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u6.suche",
+          "card.u6.kann-anprobieren",
+          "card.u6.ich-nehme",
+          "card.u6.wollen-wir",
+          "card.u6.vor-dem-kino"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "persistierende Fehler zuerst, dann die Kernblöcke beider Szenen"
+      },
+      "blocks": [
+        {
+          "id": "blk.u6.l5.scenario",
+          "type": "scenario",
+          "title": "Situation",
+          "text": "Du kaufst zuerst ein Kleidungsstück. Danach kontaktierst du eine Person und vereinbarst eine Aktivität mit Uhrzeit und Treffpunkt."
+        },
+        {
+          "id": "blk.u6.l5.success",
+          "type": "rubric",
+          "title": "Erfolg",
+          "text": "Produkt/Farbe/Größe · höfliche Kann-ich-Frage · Passform und Entscheidung · Wollen-wir-Vorschlag · Uhrzeit + Treffpunkt. U6 beendet nicht A1; danach folgen U7–U12."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u6-l5-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u6.ajuster",
+          "cardIds": [
+            "card.u6.passen",
+            "card.u6.ich-nehme"
+          ],
+          "promptLang": "de",
+          "prompt": "Die Jacke passt gut. Welche Reaktion passt?",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Ich nehme sie.",
+              "correct": true,
+              "feedback": "Genau. Die Jacke passt, also kann die Kaufentscheidung folgen."
+            },
+            {
+              "id": "b",
+              "text": "Wo ist der Bahnhof?",
+              "correct": false,
+              "feedback": "Das ist eine Orientierungsfrage aus U5, keine Reaktion auf die Passform."
+            },
+            {
+              "id": "c",
+              "text": "Sie ist zu klein.",
+              "correct": false,
+              "feedback": "Das widerspricht passt gut."
+            }
+          ],
+          "remediationRef": "rem.u6.suche-nehme"
+        },
+        {
+          "id": "de-a1-u6-l5-e2",
+          "type": "dictation",
+          "objectiveId": "obj.u6.rendezvous",
+          "cardIds": [
+            "card.u6.wollen-wir",
+            "card.u6.kaffee-trinken"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib den Vorschlag, den du hörst.",
+          "audioRef": "drill.u6.final-dictation",
+          "answer": "Wollen wir einen Kaffee trinken?",
+          "acceptedAnswers": [
+            "Wollen wir einen Kaffee trinken?"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u6.wollen"
+        },
+        {
+          "id": "de-a1-u6-l5-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u6.koennen",
+          "cardIds": [
+            "card.u6.kann-anprobieren"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "anprobieren",
+            "die Jacke",
+            "ich",
+            "Kann"
+          ],
+          "answer": [
+            "Kann",
+            "ich",
+            "die Jacke",
+            "anprobieren"
+          ],
+          "feedbackIncorrect": "Das Hauptverb anprobieren steht am Ende.",
+          "remediationRef": "rem.u6.koennen"
+        },
+        {
+          "id": "de-a1-u6-l5-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u6.rendezvous",
+          "cardIds": [
+            "card.u6.vor-dem-kino",
+            "card.u6.am-bahnhof"
+          ],
+          "promptLang": "de",
+          "prompt": "Wo ist der Treffpunkt?",
+          "audioRef": "drill.u6.final-listening",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Vor dem Kino.",
+              "correct": true,
+              "feedback": "Ja. Der Treffpunkt ist vor dem Kino."
+            },
+            {
+              "id": "b",
+              "text": "Am Bahnhof.",
+              "correct": false,
+              "feedback": "Der Bahnhof ist eine mögliche Alternative, aber nicht im Audio."
+            }
+          ],
+          "remediationRef": "rem.u6.um-vor"
+        },
+        {
+          "id": "de-a1-u6-l5-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u6.rendezvous",
+          "cardIds": [
+            "card.u6.suche",
+            "card.u6.kann-anprobieren",
+            "card.u6.ich-nehme",
+            "card.u6.wollen-wir",
+            "card.u6.um"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe beide Szenen in 10–12 kurzen Zeilen: Einkauf komplett, danach Vorschlag mit Uhrzeit und Treffpunkt.",
+          "minimumWords": 58,
+          "successCriteria": [
+            "Produkt/Farbe/Größe",
+            "Kann-ich-Frage",
+            "Passform",
+            "Kaufentscheidung",
+            "Vorschlag",
+            "Uhrzeit",
+            "Treffpunkt"
+          ],
+          "autoCheck": [
+            "contient suche",
+            "contient Kann ich",
+            "contient nehme",
+            "contient Wollen wir",
+            "contient um"
+          ],
+          "note": "U6 ist eine Zwischenmission des 12-Einheiten-Niveaus, nicht das A1-Ende."
+        }
+      ],
+      "completionMessage": "U6 ist in QA abgeschlossen. Du beherrschst zwei weitere Alltagssituationen; der neue A1-Kurs geht mit U7 weiter."
+    }
+  ],
+  "qualityGates": {
+    "exerciseMix": {
+      "recognitionMax": 0.25,
+      "productiveWrittenMin": 0.35,
+      "structureMin": 0.2,
+      "oralMin": 0.2
+    },
+    "promptLang": {
+      "deMin": 1,
+      "note": "Ab U5 bleiben die Übungsanweisungen auf Deutsch; französische Hilfen sind nur noch Erklärungshilfen."
+    },
+    "spacedRecall": {
+      "minCardsRevisitedPerLesson": 3
+    },
+    "feedback": {
+      "distinctPerDistractor": true
+    },
+    "normalization": {
+      "requiredOn": [
+        "fillBlank",
+        "dictation",
+        "productiveRecall",
+        "transformation",
+        "audioCloze"
+      ]
+    }
+  }
+}

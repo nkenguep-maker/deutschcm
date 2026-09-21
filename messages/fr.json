@@ -193,7 +193,7 @@
       "already_exists": "Cet e-mail a déjà un compte. Se connecter ?",
       "invalid_email": "Cet e-mail n’a pas l’air valide.",
       "invalid_phone": "Ce numéro n’a pas l’air complet.",
-      "weak_password": "Mot de passe · au moins huit caractères.",
+      "weak_password": "Ce mot de passe est trop faible ou figure dans des fuites connues. Choisissez-en un autre.",
       "rate_limited": "Trop de tentatives. Attendez une minute puis réessayez.",
       "network": "Connexion impossible, vérifiez votre réseau.",
       "timeout": "Le serveur met trop de temps à répondre. Vérifiez votre réseau et réessayez.",
@@ -1440,7 +1440,6 @@
         "students": "Élèves",
         "teachers": "Enseignants",
         "classes": "Classes",
-        "billing": "Facturation",
         "messages": "Messages",
         "settings": "Paramètres"
       },
@@ -1448,7 +1447,6 @@
         "overview": "Centre",
         "students": "Élèves",
         "classes": "Classes",
-        "billing": "Facturation",
         "messages": "Messages"
       },
       "overview": {

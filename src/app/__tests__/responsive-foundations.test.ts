@@ -68,8 +68,9 @@ describe("Texte long · anti-overflow explicite", () => {
     expect(src).toMatch(/text-wrap-anywhere/);
   });
   it("group : nom + créateur dans overflowWrap anywhere", () => {
-    const src = read("src/app/[locale]/group/page.tsx");
-    expect(src).toMatch(/overflowWrap:\s*["']anywhere["']/);
+    const src = read("src/features/groups/StudyGroupPage.tsx");
+    const matches = src.match(/overflowWrap:\s*["']anywhere["']/g) ?? [];
+    expect(matches).toHaveLength(3);
   });
 });
 

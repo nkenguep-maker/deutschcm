@@ -1,8 +1,8 @@
 "use client";
 
 // MaisonPorte · la porte du fond. Fin de la landing.
-// Une phrase, un titre en Fraunces, un CTA unique brass vers /register.
-// Aucun formulaire ici, aucune promesse chiffrée. Une porte ouverte.
+// CTA unique vers l'inscription canonique. Si la bêta fermée est activée,
+// le layout /register applique lui-même le gate serveur vers /beta.
 
 import Link from "next/link";
 import { frTypo } from "@/components/landing/typo";
@@ -16,16 +16,16 @@ interface Copy {
 
 const COPY_FR: Copy = {
   kicker: "La porte du fond",
-  title: "Entrez.",
-  titleEm: "La maison est ouverte.",
-  cta: "Créer mon compte",
+  title: "Votre parcours commence ici.",
+  titleEm: "Choisissez ensuite votre espace YEMA.",
+  cta: "S’inscrire",
 };
 
 const COPY_EN: Copy = {
   kicker: "The back door",
-  title: "Come in.",
-  titleEm: "The house is open.",
-  cta: "Create my account",
+  title: "Your journey starts here.",
+  titleEm: "Then choose your YEMA space.",
+  cta: "Sign up",
 };
 
 export function MaisonPorte({ locale }: { locale: "fr" | "en" }) {

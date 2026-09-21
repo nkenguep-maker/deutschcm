@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sanitizeInternalNext } from "@/lib/authRedirect";
+import { sanitizeInternalNext, sanitizeOptionalInternalNext } from "@/lib/authRedirect";
 
 describe("sanitizeInternalNext", () => {
   it("keeps valid localized and unlocalized internal paths", () => {
@@ -18,5 +18,17 @@ describe("sanitizeInternalNext", () => {
     expect(sanitizeInternalNext(null, "/fallback")).toBe("/fallback");
     expect(sanitizeInternalNext("", "/fallback")).toBe("/fallback");
     expect(sanitizeInternalNext("dashboard", "/fallback")).toBe("/fallback");
+  });
+});
+
+describe("sanitizeOptionalInternalNext", () => {
+  it("returns a valid internal route", () => {
+    expect(sanitizeOptionalInternalNext("/fr/test-niveau?source=beta")).toBe("/fr/test-niveau?source=beta");
+  });
+
+  it("returns null for absent or external destinations", () => {
+    expect(sanitizeOptionalInternalNext(null)).toBeNull();
+    expect(sanitizeOptionalInternalNext("https://example.com/path")).toBeNull();
+    expect(sanitizeOptionalInternalNext("//example.com/path")).toBeNull();
   });
 });

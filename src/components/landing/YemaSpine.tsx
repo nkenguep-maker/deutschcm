@@ -69,9 +69,6 @@ export function YemaSpine({
           : `YEMA progression — current stage ${current}`}
         onMouseLeave={() => { setHovered(null); emitDetail(null); }}
       >
-        <span className="spine-bar" aria-hidden="true" />
-        <span className="spine-bar-fill" aria-hidden="true" />
-
         {YEMA_LEVELS.map((lvl, i) => {
           const status: SpineStatus = i < currentIdx ? "done" : i === currentIdx ? "on" : "next";
           const name = isFr ? lvl.name : lvl.nameEn;

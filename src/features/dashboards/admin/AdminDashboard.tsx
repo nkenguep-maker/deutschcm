@@ -31,8 +31,9 @@ export function AdminDashboard({ locale, personas, audit, env, activeSectionId =
   const t = useTranslations("yemaDashboards.admin");
   const tCommon = useTranslations("yemaDashboards.common");
   const currentLocale = useLocale();
+  const effectiveLocale = currentLocale ?? locale;
   const activeSection = ALLOWED.has(activeSectionId) ? activeSectionId : "console";
-  const baseHref = `/${currentLocale ?? locale}/admin`;
+  const baseHref = `/${effectiveLocale}/admin`;
   const activeHref = sectionPageHref(baseHref, activeSection, "console");
   const personaLabel = t("personaLabel");
   const personaSubtitle = t("personaSubtitle");
@@ -40,8 +41,8 @@ export function AdminDashboard({ locale, personas, audit, env, activeSectionId =
   const navGroups = routeSectionNav(buildAdminNav({ console: t("nav.console"), accounts: t("nav.accounts"), audit: t("nav.audit"), environment: t("nav.environment"), sectionLabel: t("sidebarSection") }, baseHref), baseHref, "console");
   const mobileTabs = routeSectionTabs(buildAdminMobileTabs({ console: t("mobileNav.console"), accounts: t("mobileNav.accounts"), audit: t("mobileNav.audit"), environment: t("mobileNav.environment") }, baseHref), baseHref, "console");
   const activeTab = ({ console: "console", comptes: "accounts", audit: "audit", environnement: "environment" } as Record<string, string>)[activeSection];
-  const sidebar = <DashboardSidebar groups={navGroups} activeHref={activeHref} personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${currentLocale ?? locale}`} previewBadge={tCommon("previewBadge")} />;
-  const mobileHeader = <DashboardMobileHeader personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${currentLocale ?? locale}`} />;
+  const sidebar = <DashboardSidebar groups={navGroups} activeHref={activeHref} personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${effectiveLocale}`} previewBadge={tCommon("previewBadge")} />;
+  const mobileHeader = <DashboardMobileHeader personaLabel={personaLabel} personaSubtitle={personaSubtitle} brandHref={`/${effectiveLocale}`} />;
 
   const consoleSection = (
     <section id="console" style={{ display: "grid", gap: 12 }}>
@@ -50,6 +51,19 @@ export function AdminDashboard({ locale, personas, audit, env, activeSectionId =
         <DashboardCard><div className="yema-mono">{t("console.envLabel")}</div><div style={{ marginTop: 8, fontWeight: 600 }}>{env.nodeEnv ?? t("console.envUnknown")}</div></DashboardCard>
         <DashboardCard><div className="yema-mono">{t("console.qaStatus")}</div><div style={{ marginTop: 8 }}><DashboardStatusChip tone={env.qaModeEnabled ? "success" : "muted"}>{env.qaModeEnabled ? t("console.qaActive") : t("console.qaInactive")}</DashboardStatusChip></div></DashboardCard>
         <DashboardCard tone="gold"><div style={{ fontWeight: 600 }}>{t("console.productionIntact")}</div><div style={{ marginTop: 6, color: "var(--yema-text-muted)" }}>{t("console.productionIntactHelp")}</div></DashboardCard>
+        {env.closedBetaEnabled ? (
+          <DashboardCard tone="gold">
+            <div className="yema-mono">{effectiveLocale === "en" ? "CLOSED BETA" : "BÊTA FERMÉE"}</div>
+            <div style={{ marginTop: 8, fontWeight: 600 }}>
+              {effectiveLocale === "en" ? "Invitation admission is active" : "Les invitations sont actives"}
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <Link href={`${baseHref}/beta`} style={{ color: "var(--yema-gold-light)", textDecoration: "none" }}>
+                {effectiveLocale === "en" ? "Invite a tester →" : "Inviter un testeur →"}
+              </Link>
+            </div>
+          </DashboardCard>
+        ) : null}
       </div>
     </section>
   );
@@ -66,7 +80,7 @@ export function AdminDashboard({ locale, personas, audit, env, activeSectionId =
   const auditSection = (
     <section id="audit" style={{ display: "grid", gap: 12 }}>
       <DashboardSectionHeader title={t("audit.title")} description={t("audit.description")} />
-      {audit.length === 0 ? <DashboardCard><DashboardEmptyState title={t("audit.empty")} /></DashboardCard> : <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 6 }}>{audit.map((row) => <li key={row.id}><DashboardCard tone="surface-2"><div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}><div style={{ flex: 1 }}><div className="yema-mono" style={{ color: "var(--yema-gold-light)" }}>{row.action}</div><div style={{ marginTop: 2, color: "var(--yema-text-muted)" }}>{row.targetType}{row.actorRole ? ` · ${row.actorRole}` : ""}{row.actorHash ? ` · ${row.actorHash}` : ` · ${t("audit.actorAnonymous")}`}</div></div><div className="yema-mono">{formatDate(row.createdAt, currentLocale ?? locale)}</div></div></DashboardCard></li>)}</ul>}
+      {audit.length === 0 ? <DashboardCard><DashboardEmptyState title={t("audit.empty")} /></DashboardCard> : <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 6 }}>{audit.map((row) => <li key={row.id}><DashboardCard tone="surface-2"><div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}><div style={{ flex: 1 }}><div className="yema-mono" style={{ color: "var(--yema-gold-light)" }}>{row.action}</div><div style={{ marginTop: 2, color: "var(--yema-text-muted)" }}>{row.targetType}{row.actorRole ? ` · ${row.actorRole}` : ""}{row.actorHash ? ` · ${row.actorHash}` : ` · ${t("audit.actorAnonymous")}`}</div></div><div className="yema-mono">{formatDate(row.createdAt, effectiveLocale)}</div></div></DashboardCard></li>)}</ul>}
     </section>
   );
 
@@ -76,6 +90,7 @@ export function AdminDashboard({ locale, personas, audit, env, activeSectionId =
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
         <DashboardCard><div className="yema-mono">{t("environment.projectRef")}</div><div className="yema-mono" style={{ marginTop: 8 }}>{env.projectRef ?? "—"}</div></DashboardCard>
         <DashboardCard><div className="yema-mono">{t("environment.qaSessionTitle")}</div><div className="yema-mono" style={{ marginTop: 8 }}>{t("environment.qaSessionMinutes", { minutes: env.qaSessionMaxMinutes })}</div></DashboardCard>
+        <DashboardCard><div className="yema-mono">{effectiveLocale === "en" ? "Closed beta" : "Bêta fermée"}</div><div style={{ marginTop: 8 }}><DashboardStatusChip tone={env.closedBetaEnabled ? "success" : "muted"}>{env.closedBetaEnabled ? "on" : "off"}</DashboardStatusChip></div></DashboardCard>
       </div>
       <DashboardCard><h3>{t("environment.flagsTitle")}</h3><ul style={{ listStyle: "none", padding: 0, display: "grid", gap: 6 }}>{env.flags.map((flag) => <li key={flag.key} style={{ display: "flex", justifyContent: "space-between", gap: 12 }}><span className="yema-mono">{flag.key}</span><DashboardStatusChip tone={flag.enabled ? "success" : "muted"}>{flag.enabled ? "on" : "off"}</DashboardStatusChip></li>)}</ul></DashboardCard>
     </section>

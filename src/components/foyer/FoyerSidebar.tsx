@@ -106,7 +106,7 @@ export function FoyerSidebar({
     <aside className={`app-sidebar foyer-sidebar ${open ? "open" : ""}`} aria-label={t("Navigation")}>
       <Link href={`/${locale}/dashboard`} className="app-sidebar-brand" onClick={onClose}>
         <BrandY variant={cap === "transmettre" ? "sources" : "world"} state="static" size={34} />
-        <span className="foyer-sidebar-brand-lbl">Yema</span>
+        <span className="foyer-sidebar-brand-lbl">YEMA</span>
       </Link>
 
       <p className="app-sidebar-space-lbl foyer-sidebar-space-lbl">{spaceLabel.toUpperCase()}</p>

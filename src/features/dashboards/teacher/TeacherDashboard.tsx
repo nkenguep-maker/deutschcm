@@ -101,7 +101,12 @@ export function TeacherDashboard({ locale, activeSectionId = "accueil" }: Props)
 
   const { data, classes, assignments, assignmentsError, students, studentsError } = state;
   const centerName = data.center?.name ?? null;
-  const meta = centerName ? t("meta", { center: centerName }) : t("metaWithoutCenter");
+  const meta = centerName
+    ? t("meta", { center: centerName })
+    : data.profile.city
+      ? data.profile.city
+      : t("metaWithoutCenter");
+  const greeting = data.profile.fullName?.trim().split(/\s+/)[0] || personaLabel;
   const content: Record<string, React.ReactNode> = {
     accueil: <><TeacherOverviewSection data={data} />{classes.length === 0 && assignments.length === 0 && data.stats.activeStudentCount === 0 ? <DashboardCard><DashboardEmptyState title={t("overview.kpisEmptyHelp")} /></DashboardCard> : null}</>,
     classes: <TeacherClassesSection classes={classes} loading={false} baseHref={baseHref} />,
@@ -113,6 +118,6 @@ export function TeacherDashboard({ locale, activeSectionId = "accueil" }: Props)
 
   return shell(
     <div data-live-persona-section={activeSection} style={{ display: "flex", flexDirection: "column", gap: 32 }}>{content[activeSection]}</div>,
-    <DashboardHeader title={personaLabel} subtitle={meta} meta={!data.teacher.isVerified ? <DashboardStatusChip tone="alert">{t("unverifiedBadge")}</DashboardStatusChip> : undefined} />,
+    <DashboardHeader title={greeting} subtitle={meta} meta={!data.teacher.isVerified ? <DashboardStatusChip tone="alert">{t("unverifiedBadge")}</DashboardStatusChip> : undefined} />,
   );
 }

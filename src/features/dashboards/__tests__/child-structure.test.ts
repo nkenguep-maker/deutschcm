@@ -56,8 +56,12 @@ describe("Child navs (Lot 5)", () => {
 });
 
 describe("Child dashboards structure (Lot 5)", () => {
-  it("aucun composant enfant ne contient <h1", () => {
-    const off = [...cmFiles, ...crFiles].filter((f) => /<h1[\s>]/.test(readFileSync(f, "utf-8")));
+  it("chaque dashboard enfant expose un unique titre principal", () => {
+    const dashboards = [
+      join(ROOT, "child-monde/ChildMondeDashboard.tsx"),
+      join(ROOT, "child-racines/ChildRacinesDashboard.tsx"),
+    ];
+    const off = dashboards.filter((file) => (readFileSync(file, "utf-8").match(/<h1[\s>]/g) ?? []).length !== 1);
     expect(off).toEqual([]);
   });
 

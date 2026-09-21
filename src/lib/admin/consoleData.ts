@@ -37,6 +37,7 @@ export interface AdminConsoleEnvSummary {
   projectRef: string | null;
   nodeEnv: string | null;
   qaModeEnabled: boolean;
+  closedBetaEnabled: boolean;
   qaSessionMaxMinutes: number;
   flags: Array<{ key: string; enabled: boolean }>;
 }
@@ -95,6 +96,7 @@ export function getAdminEnvSummary(): AdminConsoleEnvSummary {
     projectRef,
     nodeEnv: process.env.NODE_ENV ?? null,
     qaModeEnabled: getFlag("QA_MODE_ENABLED"),
+    closedBetaEnabled: process.env.YEMA_CLOSED_BETA_ENABLED === "true",
     qaSessionMaxMinutes: 120, // valeur documentée dans qa/config.ts
     flags,
   };

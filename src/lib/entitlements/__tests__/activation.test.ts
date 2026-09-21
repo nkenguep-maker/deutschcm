@@ -7,12 +7,14 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { getActivationStatus } from "@/lib/entitlements/activation";
 import { grantFromOrderItem } from "@/lib/entitlements/grants";
+import { shouldRunDatabaseIntegrationTests } from "@/lib/__tests__/databaseIntegration";
 
 const adapter = new PrismaPg({ connectionString: process.env.DIRECT_URL! });
 const db = new PrismaClient({ adapter, log: ["error"] });
 
 const TAG = `act_test_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 const uid = (label: string) => `${TAG}_${label}`;
+const describeDatabase = shouldRunDatabaseIntegrationTests() ? describe : describe.skip;
 
 let passageA1Xaf: string;
 let teacherA1Xaf: string;
@@ -71,37 +73,36 @@ async function makeOrder(params: {
   return order;
 }
 
-beforeAll(async () => {
-  const passageProd = await db.product.findUnique({ where: { code: "PASSAGE" } });
-  const teacherProd = await db.product.findUnique({ where: { code: "TEACHER_ADDON" } });
-  const soloProd = await db.product.findUnique({ where: { code: "ROOTS_SOLO" } });
-  if (!passageProd || !teacherProd || !soloProd) {
-    throw new Error("Seed manquant. Lance : npx tsx prisma/seed.ts");
-  }
-  const passageA1 = await db.productVariant.findFirst({
-    where: { productId: passageProd.id, language: "DEUTSCH", level: "A1", currency: "XAF" },
+describeDatabase("getActivationStatus", () => {
+  beforeAll(async () => {
+    const passageProd = await db.product.findUnique({ where: { code: "PASSAGE" } });
+    const teacherProd = await db.product.findUnique({ where: { code: "TEACHER_ADDON" } });
+    const soloProd = await db.product.findUnique({ where: { code: "ROOTS_SOLO" } });
+    if (!passageProd || !teacherProd || !soloProd) {
+      throw new Error("Seed manquant. Lance : npx tsx prisma/seed.ts");
+    }
+    const passageA1 = await db.productVariant.findFirst({
+      where: { productId: passageProd.id, language: "DEUTSCH", level: "A1", currency: "XAF" },
+    });
+    const teacherA1 = await db.productVariant.findFirst({
+      where: { productId: teacherProd.id, language: "DEUTSCH", level: "A1", currency: "XAF" },
+    });
+    const solo = await db.productVariant.findFirst({
+      where: { productId: soloProd.id, currency: "XAF", durationDays: 365 },
+    });
+    passageA1Xaf = passageA1!.id;
+    teacherA1Xaf = teacherA1!.id;
+    rootsSoloYearXaf = solo!.id;
   });
-  const teacherA1 = await db.productVariant.findFirst({
-    where: { productId: teacherProd.id, language: "DEUTSCH", level: "A1", currency: "XAF" },
-  });
-  const solo = await db.productVariant.findFirst({
-    where: { productId: soloProd.id, currency: "XAF", durationDays: 365 },
-  });
-  passageA1Xaf = passageA1!.id;
-  teacherA1Xaf = teacherA1!.id;
-  rootsSoloYearXaf = solo!.id;
-});
 
-afterAll(async () => {
-  await db.accessGrant.deleteMany({ where: { sourceId: { startsWith: TAG } } });
-  await db.payment.deleteMany({ where: { id: { startsWith: TAG } } });
-  await db.orderItem.deleteMany({ where: { id: { startsWith: TAG } } });
-  await db.order.deleteMany({ where: { id: { startsWith: TAG } } });
-  await db.user.deleteMany({ where: { id: { startsWith: TAG } } });
-  await db.$disconnect();
-});
-
-describe("getActivationStatus", () => {
+  afterAll(async () => {
+    await db.accessGrant.deleteMany({ where: { sourceId: { startsWith: TAG } } });
+    await db.payment.deleteMany({ where: { id: { startsWith: TAG } } });
+    await db.orderItem.deleteMany({ where: { id: { startsWith: TAG } } });
+    await db.order.deleteMany({ where: { id: { startsWith: TAG } } });
+    await db.user.deleteMany({ where: { id: { startsWith: TAG } } });
+    await db.$disconnect();
+  });
   it("Passage seul + paiement confirmé + grants → tout_pret = true, ambiance world, 3 étapes", async () => {
     const u = await makeUser("u1");
     const order = await makeOrder({
@@ -187,6 +188,55 @@ describe("getActivationStatus", () => {
     });
     const s = await getActivationStatus(order.id);
     expect(s!.echec).toEqual({ kind: "ORDER_CANCELLED" });
+  });
+
+  it("refuse de créer un grant ORDER sans paiement confirmé exact", async () => {
+    const u = await makeUser("u_provenance_pending");
+    const order = await makeOrder({
+      userId: u.id,
+      variants: [passageA1Xaf],
+      paymentStatus: "PENDING",
+      orderStatus: "PAID",
+    });
+
+    await expect(grantFromOrderItem(order.items[0].id)).rejects.toThrow(
+      /no exact confirmed payment provenance/,
+    );
+  });
+
+  it("refuse un paiement confirmé dont le montant ne correspond pas à l'order", async () => {
+    const u = await makeUser("u_provenance_amount");
+    const order = await makeOrder({
+      userId: u.id,
+      variants: [passageA1Xaf],
+      paymentStatus: "CONFIRMED",
+    });
+    await db.payment.updateMany({
+      where: { orderId: order.id },
+      data: { amount: 9999 },
+    });
+
+    await expect(grantFromOrderItem(order.items[0].id)).rejects.toThrow(
+      /no exact confirmed payment provenance/,
+    );
+  });
+
+  it("grantFromOrderItem est idempotent pour un même order item", async () => {
+    const u = await makeUser("u_provenance_idempotent");
+    const order = await makeOrder({
+      userId: u.id,
+      variants: [passageA1Xaf],
+      paymentStatus: "CONFIRMED",
+    });
+
+    const first = await grantFromOrderItem(order.items[0].id);
+    const second = await grantFromOrderItem(order.items[0].id);
+    expect(second.id).toBe(first.id);
+
+    const count = await db.accessGrant.count({
+      where: { orderItemId: order.items[0].id },
+    });
+    expect(count).toBe(1);
   });
 
   it("orderId inconnu → null", async () => {

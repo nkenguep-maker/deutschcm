@@ -7,16 +7,19 @@ import {
   getRacinesEditorialGate,
   getRacinesLessonIds,
   isRacinesCoursePubliclyReady,
+  bassaE1,
   lingalaE1,
   medumbaE1,
 } from "@/content/racines-e1-solo";
 
-const courses = [medumbaE1, lingalaE1];
+const courses = [bassaE1, medumbaE1, lingalaE1];
 
 describe("Racines adult solo E1 pilot courses", () => {
   it("keeps both uploaded course contracts intact", () => {
+    expect(() => assertRacinesCourseIntegrity(bassaE1)).not.toThrow();
     expect(() => assertRacinesCourseIntegrity(medumbaE1)).not.toThrow();
     expect(() => assertRacinesCourseIntegrity(lingalaE1)).not.toThrow();
+    expect(bassaE1.course.id).toBe("racines-solo-bas-e1");
     expect(medumbaE1.course.id).toBe("racines-solo-byv-e1");
     expect(lingalaE1.course.id).toBe("racines-solo-ln-e1");
   });
@@ -53,10 +56,13 @@ describe("Racines adult solo E1 pilot courses", () => {
   });
 
   it("keeps both courses behind editorial and native-audio gates", () => {
+    expect(getRacinesEditorialGate(bassaE1)).toBe("REVIEW_REQUIRED");
     expect(getRacinesEditorialGate(medumbaE1)).toBe("REVIEW_REQUIRED");
     expect(getRacinesEditorialGate(lingalaE1)).toBe("REVIEW_REQUIRED");
+    expect(bassaE1.audioManifest.status).toBe("scripts-ready-audio-not-produced");
     expect(medumbaE1.audioManifest.status).toBe("scripts-ready-audio-not-produced");
     expect(lingalaE1.audioManifest.status).toBe("scripts-ready-audio-not-produced");
+    expect(isRacinesCoursePubliclyReady(bassaE1)).toBe(false);
     expect(isRacinesCoursePubliclyReady(medumbaE1)).toBe(false);
     expect(isRacinesCoursePubliclyReady(lingalaE1)).toBe(false);
   });
@@ -64,5 +70,17 @@ describe("Racines adult solo E1 pilot courses", () => {
   it("preserves the Medumba native-review warning and does not invent one for Lingala", () => {
     expect(JSON.stringify(medumbaE1)).toContain("constructed-from-attested-pattern");
     expect(JSON.stringify(lingalaE1)).not.toContain("constructed-from-attested-pattern");
+  });
+});
+
+
+describe("Racines Bassa launch course", () => {
+  it("keeps Bassa as the launch language without marking unfinished editorial/audio work READY", () => {
+    expect(bassaE1.course.learningLanguage.code).toBe("bas");
+    expect(bassaE1.course.unitCount).toBe(8);
+    expect(bassaE1.course.lessonCount).toBe(40);
+    expect(bassaE1.course.exerciseCount).toBe(120);
+    expect(getRacinesEditorialGate(bassaE1)).toBe("REVIEW_REQUIRED");
+    expect(isRacinesCoursePubliclyReady(bassaE1)).toBe(false);
   });
 });

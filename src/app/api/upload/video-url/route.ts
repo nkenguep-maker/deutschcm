@@ -3,6 +3,8 @@ import { createServerClient } from "@supabase/ssr";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
+import { hasActiveRole, type SpaceRole } from "@/lib/roles";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 
 const BUCKET = "course-videos";
 
@@ -20,19 +22,32 @@ async function getAuthUser() {
   );
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
-  return prisma.user.findUnique({ where: { supabaseId: user.id }, select: { id: true, role: true } });
+  return prisma.user.findUnique({ where: { supabaseId: user.id }, select: { id: true } });
+}
+
+async function hasAnyActiveRole(userId: string, roles: SpaceRole[]): Promise<boolean> {
+  const checks = await Promise.all(roles.map((role) => hasActiveRole(userId, role)));
+  return checks.some(Boolean);
 }
 
 export async function POST(request: NextRequest) {
-  const dbUser = await getAuthUser();
-  const allowed = ["ADMIN", "TEACHER", "CENTER"];
-  if (!dbUser || !allowed.includes(dbUser.role)) {
+  if (!isSameOriginRequest(request)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { filename } = await request.json();
-  if (!filename || typeof filename !== "string") {
-    return NextResponse.json({ error: "filename requis" }, { status: 400 });
+  const dbUser = await getAuthUser();
+  if (!dbUser || !(await hasAnyActiveRole(dbUser.id, ["ADMIN", "TEACHER", "CENTER"]))) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const body = await request.json().catch(() => null) as { filename?: unknown } | null;
+  const filename = body?.filename;
+  if (
+    typeof filename !== "string" ||
+    filename.trim().length === 0 ||
+    filename.length > 180
+  ) {
+    return NextResponse.json({ error: "filename invalide" }, { status: 400 });
   }
 
   const supabaseAdmin = createSupabaseAdmin(
@@ -44,7 +59,7 @@ export async function POST(request: NextRequest) {
   // Create bucket if it doesn't exist
   await supabaseAdmin.storage.createBucket(BUCKET, { public: true, fileSizeLimit: 524288000 }); // 500MB limit
 
-  const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const safeName = filename.trim().replace(/[^a-zA-Z0-9._-]/g, "_");
   const path = `videos/${Date.now()}-${safeName}`;
 
   const { data, error } = await supabaseAdmin.storage.from(BUCKET).createSignedUploadUrl(path);

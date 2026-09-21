@@ -5,11 +5,9 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useMessagingRealtime } from "./hooks/useMessagingRealtime";
 
-// P4.6-B · CTA + badge non-lus consommable par les 9 dashboards.
-// P4.6-B.1 · badge mis à jour via Realtime inbox event · refetch minimal.
-// Quand YEMA_MESSAGING_ENABLED=false → l'API renvoie 404 · le composant
-// affiche null · le placeholder legacy prend seul l'espace.
-
+// P4.6-B · CTA + badge non-lus consommable par les dashboards.
+// Quand la messagerie est désactivée, on affiche un état explicite au lieu
+// de laisser chaque dashboard afficher un faux « bientôt disponible ».
 export function MessagesInboxLink() {
   const t = useTranslations("yemaMessaging");
   const locale = useLocale();
@@ -33,6 +31,7 @@ export function MessagesInboxLink() {
           setAvailable(false);
           return null;
         }
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
       })
       .then((data: { totalUnread: number } | null) => {
@@ -56,10 +55,16 @@ export function MessagesInboxLink() {
     onEvent: () => refetchSummary(),
   });
 
-  if (available !== true) return null;
+  if (available === null) {
+    return <p aria-live="polite" style={{ margin: 0 }}>{t("loading")}</p>;
+  }
+
+  if (available === false) {
+    return <p role="status" style={{ margin: 0 }}>{t("featureDisabled")}</p>;
+  }
 
   return (
-    <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 10 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
       <Link
         href={`/${locale}/messages`}
         style={{

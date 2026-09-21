@@ -1,4 +1,5 @@
 import { gunzipSync } from "node:zlib";
+import bassaCourse from "./bas/course.json";
 import medumbaMeta from "./byv/meta.json";
 import medumbaU1 from "./byv/u1.json";
 import medumbaU2 from "./byv/u2.json";
@@ -27,6 +28,8 @@ function decodeCourse(encoded: string): YemaRacinesCourseContent {
   return JSON.parse(gunzipSync(compressed).toString("utf8")) as YemaRacinesCourseContent;
 }
 
+export const bassaE1 = bassaCourse as unknown as YemaRacinesCourseContent;
+
 export const medumbaE1 = combineCourse(medumbaMeta, [
   medumbaU1, medumbaU2, medumbaU3, medumbaU4,
   medumbaU5, medumbaU6, medumbaU7, medumbaU8,
@@ -38,6 +41,7 @@ export const medumbaE1 = combineCourse(medumbaMeta, [
 export const lingalaE1 = decodeCourse(LINGALA_E1_GZIP_BASE64_PREFIX + LINGALA_E1_GZIP_BASE64);
 
 export const racinesSoloCourses = {
+  "racines-solo-bas-e1": bassaE1,
   "racines-solo-byv-e1": medumbaE1,
   "racines-solo-ln-e1": lingalaE1,
 } as const;
@@ -146,6 +150,7 @@ export function assertRacinesCourseIntegrity(course: YemaRacinesCourseContent): 
   assert(course.course.exerciseCount === 120, `${course.course.id}: metadata exerciseCount mismatch`);
 }
 
+assertRacinesCourseIntegrity(bassaE1);
 assertRacinesCourseIntegrity(medumbaE1);
 assertRacinesCourseIntegrity(lingalaE1);
 

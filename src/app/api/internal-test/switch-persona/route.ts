@@ -11,9 +11,11 @@ import {
   isInternalTesterEmail,
   type InternalPersonaId,
 } from "@/lib/internalTest";
+import { isInternalTestEnvironment } from "@/lib/internalTestEnvironment";
 import { ensureInternalTestWorkspace } from "@/lib/internalTestProvisioning";
 import { verifyInternalPersonaFixture } from "@/lib/internalPersonaVerification";
 import { getUserRoles } from "@/lib/roles";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 import {
   CHILD_SESSION_COOKIE_NAME,
   CHILD_SESSION_TTL_SECONDS,
@@ -28,7 +30,7 @@ function cookieOptions(maxAge: number, httpOnly = true) {
   return {
     httpOnly,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
+    sameSite: "strict" as const,
     path: "/",
     maxAge,
   };
@@ -79,9 +81,6 @@ async function setEffectivePersonaMetadata(params: {
     };
   }
 
-  // La route est déjà authentifiée et strictement réservée au propriétaire.
-  // Mettre à jour l'utilisateur courant évite de dépendre d'une Service Role
-  // absente ou rattachée à un autre projet Vercel/Supabase.
   const { data, error } = await params.supabase.auth.updateUser({
     data: nextMetadata,
   });
@@ -97,6 +96,16 @@ async function refreshBrowserSession(supabase: ServerSupabaseClient): Promise<bo
 }
 
 export async function POST(req: NextRequest) {
+  // This endpoint can mutate persona fixtures and temporarily overlay route
+  // authorization. It is deliberately unavailable on Production or on any
+  // Supabase project other than the canonical P-1 baseline.
+  if (!isInternalTestEnvironment()) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  if (!isSameOriginRequest(req)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const form = await req.formData().catch(() => null);
   if (!form) return NextResponse.json({ error: "BAD_FORM" }, { status: 400 });
 

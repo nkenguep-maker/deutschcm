@@ -1,0 +1,1792 @@
+{
+  "id": "de-a1-u11",
+  "order": 11,
+  "title": "Voyager, météo et projets proches",
+  "schemaVersion": "2.0",
+  "contentVersion": "2026.09.20-u11-reconstruction-r1",
+  "status": "reconstruction-a-valider",
+  "note": "U11 est une reconstruction nouvelle à partir du syllabus canonique. Elle combine informations de voyage simples, météo, jours/dates et projets proches au présent avec marqueurs temporels, sans introduire artificiellement un futur grammatical avancé.",
+  "cards": [
+    {
+      "id": "card.u11.reise",
+      "kind": "lexical",
+      "de": "die Reise",
+      "fr": "le voyage",
+      "introducedIn": "de-a1-u11-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.zug",
+      "kind": "lexical",
+      "de": "der Zug",
+      "fr": "le train",
+      "introducedIn": "de-a1-u11-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.bus",
+      "kind": "lexical",
+      "de": "der Bus",
+      "fr": "le bus",
+      "introducedIn": "de-a1-u11-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.flug",
+      "kind": "lexical",
+      "de": "der Flug",
+      "fr": "le vol",
+      "introducedIn": "de-a1-u11-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.bahnhof",
+      "kind": "lexical",
+      "de": "der Bahnhof",
+      "fr": "la gare",
+      "introducedIn": "de-a1-u11-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.flughafen",
+      "kind": "lexical",
+      "de": "der Flughafen",
+      "fr": "l’aéroport",
+      "introducedIn": "de-a1-u11-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.abfahrt",
+      "kind": "lexical",
+      "de": "die Abfahrt",
+      "fr": "le départ",
+      "introducedIn": "de-a1-u11-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.ankunft",
+      "kind": "lexical",
+      "de": "die Ankunft",
+      "fr": "l’arrivée",
+      "introducedIn": "de-a1-u11-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.gleis",
+      "kind": "lexical",
+      "de": "das Gleis",
+      "fr": "la voie / quai ferroviaire",
+      "introducedIn": "de-a1-u11-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.verspaetung",
+      "kind": "lexical",
+      "de": "die Verspätung",
+      "fr": "le retard",
+      "introducedIn": "de-a1-u11-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.puenktlich",
+      "kind": "lexical",
+      "de": "pünktlich",
+      "fr": "à l’heure",
+      "introducedIn": "de-a1-u11-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.faehren",
+      "kind": "lexical",
+      "de": "fahren",
+      "fr": "aller en véhicule",
+      "introducedIn": "de-a1-u11-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.fliegen",
+      "kind": "lexical",
+      "de": "fliegen",
+      "fr": "prendre l’avion / voler",
+      "introducedIn": "de-a1-u11-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.nach",
+      "kind": "lexical",
+      "de": "nach",
+      "fr": "vers / à (ville)",
+      "introducedIn": "de-a1-u11-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.mit-dem-zug",
+      "kind": "chunk",
+      "de": "mit dem Zug",
+      "fr": "en train",
+      "introducedIn": "de-a1-u11-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.am-montag",
+      "kind": "chunk",
+      "de": "am Montag",
+      "fr": "lundi",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.am-freitag",
+      "kind": "chunk",
+      "de": "am Freitag",
+      "fr": "vendredi",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.am-samstag",
+      "kind": "chunk",
+      "de": "am Samstag",
+      "fr": "samedi",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.am-sonntag",
+      "kind": "chunk",
+      "de": "am Sonntag",
+      "fr": "dimanche",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.morgen",
+      "kind": "lexical",
+      "de": "morgen",
+      "fr": "demain",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.naechste-woche",
+      "kind": "chunk",
+      "de": "nächste Woche",
+      "fr": "la semaine prochaine",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.wochenende",
+      "kind": "lexical",
+      "de": "das Wochenende",
+      "fr": "le week-end",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.datum",
+      "kind": "lexical",
+      "de": "das Datum",
+      "fr": "la date",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.am-zwoelften",
+      "kind": "chunk",
+      "de": "am zwölften Oktober",
+      "fr": "le 12 octobre",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.wetter",
+      "kind": "lexical",
+      "de": "das Wetter",
+      "fr": "la météo",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.sonnig",
+      "kind": "lexical",
+      "de": "sonnig",
+      "fr": "ensoleillé",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.regen",
+      "kind": "lexical",
+      "de": "der Regen",
+      "fr": "la pluie",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.regnen",
+      "kind": "structure",
+      "de": "Es regnet.",
+      "fr": "Il pleut.",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.windig",
+      "kind": "lexical",
+      "de": "windig",
+      "fr": "venteux",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.kalt",
+      "kind": "lexical",
+      "de": "kalt",
+      "fr": "froid",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.warm",
+      "kind": "lexical",
+      "de": "warm",
+      "fr": "doux / chaud",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.wie-ist-wetter",
+      "kind": "structure",
+      "de": "Wie ist das Wetter?",
+      "fr": "Quel temps fait-il ?",
+      "introducedIn": "de-a1-u11-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.ich-fahre-nach",
+      "kind": "chunk",
+      "de": "Ich fahre nach …",
+      "fr": "Je vais à…",
+      "introducedIn": "de-a1-u11-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.wann-faehrst",
+      "kind": "structure",
+      "de": "Wann fährst du?",
+      "fr": "Quand pars-tu ?",
+      "introducedIn": "de-a1-u11-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.am-samstag-fahre",
+      "kind": "chunk",
+      "de": "Am Samstag fahre ich …",
+      "fr": "Samedi, je vais…",
+      "introducedIn": "de-a1-u11-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.um-acht-ab",
+      "kind": "chunk",
+      "de": "Der Zug fährt um acht Uhr ab.",
+      "fr": "Le train part à huit heures.",
+      "introducedIn": "de-a1-u11-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.zehn-min-verspaetung",
+      "kind": "chunk",
+      "de": "zehn Minuten Verspätung",
+      "fr": "dix minutes de retard",
+      "introducedIn": "de-a1-u11-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.was-nimmst-du",
+      "kind": "structure",
+      "de": "Was nimmst du mit?",
+      "fr": "Qu’emportes-tu ?",
+      "introducedIn": "de-a1-u11-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.ich-nehme-mit",
+      "kind": "chunk",
+      "de": "Ich nehme … mit.",
+      "fr": "J’emporte…",
+      "introducedIn": "de-a1-u11-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u11.gute-reise",
+      "kind": "chunk",
+      "de": "Gute Reise!",
+      "fr": "Bon voyage !",
+      "introducedIn": "de-a1-u11-l5",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj.u11.info",
+      "label": "Comprendre une information de voyage simple : départ, heure, voie ou retard"
+    },
+    {
+      "id": "obj.u11.wetter",
+      "label": "Comprendre et décrire une météo très simple"
+    },
+    {
+      "id": "obj.u11.datum",
+      "label": "Utiliser jours, dates et marqueurs temporels proches"
+    },
+    {
+      "id": "obj.u11.ziel",
+      "label": "Dire où et quand on va avec un moyen de transport simple"
+    },
+    {
+      "id": "obj.u11.plan",
+      "label": "Préparer un petit déplacement avec heure, transport et objets essentiels"
+    },
+    {
+      "id": "obj.u11.interaktion",
+      "label": "Présenter et comprendre un projet de voyage court"
+    }
+  ],
+  "remediations": [
+    {
+      "id": "rem.u11.am-um",
+      "objectiveId": "obj.u11.datum",
+      "durationSeconds": 110,
+      "explanation": "am introduit un jour ou une date ; um introduit une heure précise : am Samstag, um acht Uhr.",
+      "contrast": [
+        {
+          "de": "am Samstag",
+          "fr": "samedi",
+          "ok": true
+        },
+        {
+          "de": "um acht Uhr",
+          "fr": "à huit heures",
+          "ok": true
+        },
+        {
+          "de": "um Samstag",
+          "fr": "—",
+          "ok": false,
+          "why": "Pour un jour, utilise am."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u11.am-um.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "____ Samstag fahre ich nach Hamburg.",
+          "answer": "Am",
+          "acceptedAnswers": [
+            "Am"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u11.am-um.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Der Zug fährt ____ acht Uhr ab.",
+          "answer": "um",
+          "acceptedAnswers": [
+            "um"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u11.nach",
+      "objectiveId": "obj.u11.ziel",
+      "durationSeconds": 105,
+      "explanation": "Pour une destination-ville simple, utilise nach : nach Berlin, nach Hamburg, nach Wien.",
+      "contrast": [
+        {
+          "de": "Ich fahre nach Berlin.",
+          "fr": "Je vais à Berlin.",
+          "ok": true
+        },
+        {
+          "de": "Ich fahre nach Hamburg.",
+          "fr": "Je vais à Hambourg.",
+          "ok": true
+        },
+        {
+          "de": "Ich fahre in Berlin.",
+          "fr": "—",
+          "ok": false,
+          "why": "Pour exprimer la destination vers une ville ici, utilise nach."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u11.nach.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich fahre ____ Wien.",
+          "answer": "nach",
+          "acceptedAnswers": [
+            "nach"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u11.nach.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Wir fahren ____ Berlin.",
+          "answer": "nach",
+          "acceptedAnswers": [
+            "nach"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u11.wetter",
+      "objectiveId": "obj.u11.wetter",
+      "durationSeconds": 110,
+      "explanation": "Pour une propriété météo : Es ist sonnig/kalt/warm. Pour la pluie comme action : Es regnet.",
+      "contrast": [
+        {
+          "de": "Es ist sonnig.",
+          "fr": "Il fait beau / ensoleillé.",
+          "ok": true
+        },
+        {
+          "de": "Es ist kalt.",
+          "fr": "Il fait froid.",
+          "ok": true
+        },
+        {
+          "de": "Es regnet.",
+          "fr": "Il pleut.",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u11.wetter.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Es ____ sonnig.",
+          "answer": "ist",
+          "acceptedAnswers": [
+            "ist"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u11.wetter.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Es ____.",
+          "answer": "regnet",
+          "acceptedAnswers": [
+            "regnet"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u11.verb2",
+      "objectiveId": "obj.u11.ziel",
+      "durationSeconds": 115,
+      "explanation": "Quand la phrase commence par un temps, le verbe reste en position 2 : Am Samstag fahre ich nach Hamburg.",
+      "contrast": [
+        {
+          "de": "Am Samstag fahre ich nach Hamburg.",
+          "fr": "Samedi, je vais à Hambourg.",
+          "ok": true
+        },
+        {
+          "de": "Am Samstag ich fahre nach Hamburg.",
+          "fr": "—",
+          "ok": false,
+          "why": "Après Am Samstag, fahre reste en deuxième position."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u11.verb2.i1",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "ich",
+            "nach Berlin",
+            "Am Freitag",
+            "fahre"
+          ],
+          "answer": [
+            "Am Freitag",
+            "fahre",
+            "ich",
+            "nach Berlin"
+          ],
+          "normalization": []
+        },
+        {
+          "id": "rem.u11.verb2.i2",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "wir",
+            "mit dem Zug",
+            "Morgen",
+            "fahren"
+          ],
+          "answer": [
+            "Morgen",
+            "fahren",
+            "wir",
+            "mit dem Zug"
+          ],
+          "normalization": []
+        }
+      ]
+    },
+    {
+      "id": "rem.u11.verspaetung",
+      "objectiveId": "obj.u11.info",
+      "durationSeconds": 105,
+      "explanation": "Verspätung signale un retard. zehn Minuten Verspätung = dix minutes de retard. pünktlich = à l’heure.",
+      "contrast": [
+        {
+          "de": "Der Zug hat zehn Minuten Verspätung.",
+          "fr": "Le train a dix minutes de retard.",
+          "ok": true
+        },
+        {
+          "de": "Der Zug ist pünktlich.",
+          "fr": "Le train est à l’heure.",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u11.verspaetung.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Der Zug hat zehn Minuten ____.",
+          "answer": "Verspätung",
+          "acceptedAnswers": [
+            "Verspätung",
+            "Verspaetung"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ]
+        },
+        {
+          "id": "rem.u11.verspaetung.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Keine Verspätung: Der Zug ist ____.",
+          "answer": "pünktlich",
+          "acceptedAnswers": [
+            "pünktlich",
+            "puenktlich"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ]
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "de-a1-u11-l1",
+      "order": 1,
+      "phase": "Comprends",
+      "title": "Eine Reiseinformation verstehen",
+      "objectiveIds": [
+        "obj.u11.info"
+      ],
+      "durationMinutes": 30,
+      "reveil": {
+        "cardIds": [
+          "card.u5.bahnhof",
+          "card.u5.fahrkarte",
+          "card.u4.acht-uhr",
+          "card.u10.nummer"
+        ],
+        "itemCount": 4,
+        "maxSeconds": 90,
+        "selection": "Transport, Uhrzeit und Zahlen aus früheren Einheiten zuerst reaktivieren"
+      },
+      "blocks": [
+        {
+          "id": "blk.u11.l1.intro",
+          "type": "intro",
+          "title": "Bahnhofsinformation",
+          "textDe": "Lea hört eine Information zu ihrem Zug. Höre auf Ziel, Abfahrt, Gleis und Verspätung.",
+          "textFr": "Quatre données simples structurent l’écoute."
+        },
+        {
+          "id": "blk.u11.l1.dialogue",
+          "type": "dialogueRef",
+          "dialogueId": "de-a1-u11-dialogue",
+          "speeds": [
+            "slow",
+            "natural"
+          ],
+          "instruction": "Höre zuerst nur auf Ziel und Uhrzeit. Beim zweiten Hören: Gleis und Verspätung."
+        },
+        {
+          "id": "blk.u11.l1.board",
+          "type": "strategy",
+          "title": "Vier Felder",
+          "textDe": "Ziel · Abfahrt · Gleis · Verspätung",
+          "textFr": "Convertis l’annonce en quatre champs."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u11-l1-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u11.info",
+          "cardIds": [
+            "card.u11.zug"
+          ],
+          "promptLang": "de",
+          "prompt": "Wohin fährt der Zug?",
+          "audioRef": "de-a1-u11-dialogue#seg1",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Nach Hamburg.",
+              "correct": true,
+              "feedback": "Ja. Die Information nennt Hamburg als Ziel."
+            },
+            {
+              "id": "b",
+              "text": "Nach Wien.",
+              "correct": false,
+              "feedback": "Wien wird in dieser Reiseinformation nicht genannt."
+            },
+            {
+              "id": "c",
+              "text": "Nach Köln.",
+              "correct": false,
+              "feedback": "Köln ist nicht das Ziel des Zuges."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u11-l1-e2",
+          "type": "audioCloze",
+          "objectiveId": "obj.u11.info",
+          "cardIds": [
+            "card.u11.gleis"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Abfahrt von Gleis ____.",
+          "audioRef": "de-a1-u11-dialogue#seg1",
+          "answer": "vier",
+          "acceptedAnswers": [
+            "vier",
+            "4"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "de-a1-u11-l1-e3",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u11.info",
+          "cardIds": [
+            "card.u11.um-acht-ab"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Der Zug fährt um acht Uhr ab.",
+          "answer": "Der Zug fährt um acht Uhr ab.",
+          "acceptedAnswers": [
+            "Der Zug fährt um acht Uhr ab.",
+            "Der Zug faehrt um acht Uhr ab."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ],
+          "remediationRef": "rem.u11.am-um"
+        },
+        {
+          "id": "de-a1-u11-l1-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u11.info",
+          "cardIds": [
+            "card.u11.zehn-min-verspaetung"
+          ],
+          "promptLang": "de",
+          "prompt": "Wie viel Verspätung hat der Zug?",
+          "audioRef": "de-a1-u11-dialogue#seg2",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Zehn Minuten.",
+              "correct": true,
+              "feedback": "Genau. Die Ansage nennt zehn Minuten Verspätung."
+            },
+            {
+              "id": "b",
+              "text": "Zwanzig Minuten.",
+              "correct": false,
+              "feedback": "Zwanzig wird nicht genannt."
+            }
+          ],
+          "remediationRef": "rem.u11.verspaetung"
+        },
+        {
+          "id": "de-a1-u11-l1-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u11.info",
+          "cardIds": [
+            "card.u11.abfahrt",
+            "card.u11.gleis",
+            "card.u11.verspaetung",
+            "card.u11.zug"
+          ],
+          "promptLang": "de",
+          "prompt": "Notiere die Reiseinformation in vier kurzen Sätzen: Ziel, Abfahrt, Gleis, Verspätung.",
+          "minimumWords": 24,
+          "successCriteria": [
+            "Ziel",
+            "Abfahrt",
+            "Gleis",
+            "Verspätung"
+          ],
+          "autoCheck": [
+            "contient Zug",
+            "contient Gleis"
+          ],
+          "note": "Kurze Informationssätze reichen."
+        }
+      ],
+      "completionMessage": "Du kannst die Kerndaten einer einfachen Reiseinformation verstehen."
+    },
+    {
+      "id": "de-a1-u11-l2",
+      "order": 2,
+      "phase": "Pratique",
+      "title": "Wetter, Tage und Daten",
+      "objectiveIds": [
+        "obj.u11.wetter",
+        "obj.u11.datum"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u11.am-freitag",
+          "card.u11.morgen",
+          "card.u10.datum",
+          "card.u9.morgen",
+          "card.u4.wann"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "Zeitmarker und Datum aus früheren Einheiten verbinden"
+      },
+      "blocks": [
+        {
+          "id": "blk.u11.l2.weather",
+          "type": "model",
+          "title": "Wetter",
+          "textDe": "sonnig · Es regnet. · windig · kalt · warm",
+          "textFr": "Petit noyau météo utile pour un déplacement."
+        },
+        {
+          "id": "blk.u11.l2.time",
+          "type": "model",
+          "title": "Wann?",
+          "textDe": "am Freitag · am Samstag · morgen · nächste Woche · am zwölften Oktober",
+          "textFr": "Jour/date proche, sans futur complexe."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u11-l2-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u11.wetter",
+          "cardIds": [
+            "card.u11.regnen"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe den Satz für Regen.",
+          "answer": "Es regnet.",
+          "acceptedAnswers": [
+            "Es regnet."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u11.wetter"
+        },
+        {
+          "id": "de-a1-u11-l2-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u11.datum",
+          "cardIds": [
+            "card.u11.am-samstag"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Zeitblock.",
+          "tokens": [
+            "Samstag",
+            "Am"
+          ],
+          "answer": [
+            "Am",
+            "Samstag"
+          ],
+          "feedbackIncorrect": "Für einen Wochentag: am + Tag.",
+          "remediationRef": "rem.u11.am-um"
+        },
+        {
+          "id": "de-a1-u11-l2-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u11.wetter",
+          "cardIds": [
+            "card.u11.sonnig",
+            "card.u11.kalt"
+          ],
+          "promptLang": "de",
+          "prompt": "Es ist sonnig. → Ändere das Wetter auf kalt.",
+          "answer": "Es ist kalt.",
+          "acceptedAnswers": [
+            "Es ist kalt."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u11.wetter"
+        },
+        {
+          "id": "de-a1-u11-l2-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u11.wetter",
+          "cardIds": [
+            "card.u11.sonnig",
+            "card.u11.regnen",
+            "card.u11.windig"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Wettersätze nach.",
+          "targets": [
+            {
+              "id": "w1",
+              "de": "Es ist sonnig.",
+              "audioRef": "drill.u11.weather1",
+              "maxSeconds": 5
+            },
+            {
+              "id": "w2",
+              "de": "Es regnet.",
+              "audioRef": "drill.u11.weather2",
+              "maxSeconds": 4
+            },
+            {
+              "id": "w3",
+              "de": "Es ist windig.",
+              "audioRef": "drill.u11.weather3",
+              "maxSeconds": 5
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur vorgegebene Wettersätze werden verglichen."
+        },
+        {
+          "id": "de-a1-u11-l2-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u11.datum",
+          "cardIds": [
+            "card.u11.am-freitag",
+            "card.u11.naechste-woche",
+            "card.u11.wetter"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe vier kurze Reisepläne mit Tag/Datum und Wetter.",
+          "minimumWords": 28,
+          "successCriteria": [
+            "vier Zeitangaben",
+            "mindestens zwei Wetterangaben"
+          ],
+          "autoCheck": [
+            "contient am",
+            "contient Es"
+          ],
+          "note": "Kurze Plan-Sätze im Präsens genügen."
+        }
+      ],
+      "completionMessage": "Du kannst einfache Wetterangaben mit Tagen und nahen Daten verbinden."
+    },
+    {
+      "id": "de-a1-u11-l3",
+      "order": 3,
+      "phase": "Pratique",
+      "title": "Sagen, wohin und wann ich fahre",
+      "objectiveIds": [
+        "obj.u11.ziel",
+        "obj.u11.datum"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u11.ich-fahre-nach",
+          "card.u11.wann-faehrst",
+          "card.u5.nach",
+          "card.u4.wann",
+          "card.u9.heute"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "bekannte Frage Wann und Richtungswort nach zuerst reaktivieren"
+      },
+      "blocks": [
+        {
+          "id": "blk.u11.l3.destination",
+          "type": "rule",
+          "title": "Stadt als Ziel",
+          "textDe": "Ich fahre nach Berlin. · Wir fahren nach Wien.",
+          "textFr": "Pour les villes de cette leçon : nach + ville."
+        },
+        {
+          "id": "blk.u11.l3.verb2",
+          "type": "rule",
+          "title": "Zeit zuerst",
+          "textDe": "Am Samstag fahre ich nach Hamburg. · Morgen fahren wir mit dem Zug.",
+          "textFr": "Le marqueur de temps peut venir en tête ; le verbe reste en position 2."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u11-l3-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u11.ziel",
+          "cardIds": [
+            "card.u11.ich-fahre-nach"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Ich fahre nach Berlin.",
+          "answer": "Ich fahre nach Berlin.",
+          "acceptedAnswers": [
+            "Ich fahre nach Berlin."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u11.nach"
+        },
+        {
+          "id": "de-a1-u11-l3-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u11.ziel",
+          "cardIds": [
+            "card.u11.am-samstag-fahre"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "ich",
+            "nach Hamburg",
+            "Am Samstag",
+            "fahre"
+          ],
+          "answer": [
+            "Am Samstag",
+            "fahre",
+            "ich",
+            "nach Hamburg"
+          ],
+          "feedbackIncorrect": "Nach Am Samstag steht das Verb fahre an Position 2.",
+          "remediationRef": "rem.u11.verb2"
+        },
+        {
+          "id": "de-a1-u11-l3-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u11.ziel",
+          "cardIds": [
+            "card.u11.mit-dem-zug",
+            "card.u11.bus"
+          ],
+          "promptLang": "de",
+          "prompt": "Ich fahre mit dem Zug. → Ändere auf Bus.",
+          "answer": "Ich fahre mit dem Bus.",
+          "acceptedAnswers": [
+            "Ich fahre mit dem Bus."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "de-a1-u11-l3-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u11.datum",
+          "cardIds": [
+            "card.u11.am-freitag",
+            "card.u11.am-samstag"
+          ],
+          "promptLang": "de",
+          "prompt": "Wann fährt die Person?",
+          "audioRef": "drill.u11.when",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Am Samstag.",
+              "correct": true,
+              "feedback": "Ja. Du hörst Am Samstag."
+            },
+            {
+              "id": "b",
+              "text": "Am Freitag.",
+              "correct": false,
+              "feedback": "Freitag wäre ein anderer Reisetag."
+            }
+          ],
+          "remediationRef": "rem.u11.am-um"
+        },
+        {
+          "id": "de-a1-u11-l3-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u11.ziel",
+          "cardIds": [
+            "card.u11.ich-fahre-nach",
+            "card.u11.mit-dem-zug",
+            "card.u11.am-samstag"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe fünf kurze Sätze über ein nahes Reiseziel: wann, wohin, Verkehrsmittel und Abfahrtszeit.",
+          "minimumWords": 32,
+          "successCriteria": [
+            "Zeit",
+            "Ziel",
+            "Verkehrsmittel",
+            "Uhrzeit"
+          ],
+          "autoCheck": [
+            "contient fahre",
+            "contient nach"
+          ],
+          "note": "Präsens + Zeitmarker reicht für den nahen Plan."
+        }
+      ],
+      "completionMessage": "Du kannst sagen, wann, wohin und womit du bei einem nahen Plan fährst."
+    },
+    {
+      "id": "de-a1-u11-l4",
+      "order": 4,
+      "phase": "Produis",
+      "title": "Eine kurze Reise vorbereiten",
+      "objectiveIds": [
+        "obj.u11.plan",
+        "obj.u11.interaktion"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u11.was-nimmst-du",
+          "card.u11.ich-nehme-mit",
+          "card.u6.ich-nehme",
+          "card.u3.wasser",
+          "card.u10.datum"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "mitnehmen wird mit bekannten Ich-nehme-Blöcken verbunden"
+      },
+      "blocks": [
+        {
+          "id": "blk.u11.l4.plan",
+          "type": "model",
+          "title": "Mini-Plan",
+          "textDe": "Am Samstag fahre ich nach Hamburg. Der Zug fährt um acht Uhr ab. Es ist kalt. Ich nehme eine Jacke und Wasser mit.",
+          "textFr": "Temps → transport → météo → objets."
+        },
+        {
+          "id": "blk.u11.l4.pack",
+          "type": "model",
+          "title": "Mitnehmen",
+          "textDe": "Was nimmst du mit? — Ich nehme eine Jacke, Wasser und mein Handy mit.",
+          "textFr": "Réutilise le lexique déjà appris."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u11-l4-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u11.plan",
+          "cardIds": [
+            "card.u11.ich-nehme-mit"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Ich nehme Wasser mit.",
+          "answer": "Ich nehme Wasser mit.",
+          "acceptedAnswers": [
+            "Ich nehme Wasser mit."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "de-a1-u11-l4-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u11.plan",
+          "cardIds": [
+            "card.u11.um-acht-ab"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "um acht Uhr",
+            "Der Zug",
+            "ab",
+            "fährt"
+          ],
+          "answer": [
+            "Der Zug",
+            "fährt",
+            "um acht Uhr",
+            "ab"
+          ],
+          "feedbackIncorrect": "Beim trennbaren Verb steht ab am Ende."
+        },
+        {
+          "id": "de-a1-u11-l4-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u11.plan",
+          "cardIds": [
+            "card.u11.kalt",
+            "card.u11.warm"
+          ],
+          "promptLang": "de",
+          "prompt": "Es ist kalt. → Ändere auf warm.",
+          "answer": "Es ist warm.",
+          "acceptedAnswers": [
+            "Es ist warm."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u11.wetter"
+        },
+        {
+          "id": "de-a1-u11-l4-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u11.interaktion",
+          "cardIds": [
+            "card.u11.wann-faehrst",
+            "card.u11.was-nimmst-du",
+            "card.u11.gute-reise"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Reiseblöcke nach.",
+          "targets": [
+            {
+              "id": "p1",
+              "de": "Wann fährst du?",
+              "audioRef": "drill.u11.plan1",
+              "maxSeconds": 5
+            },
+            {
+              "id": "p2",
+              "de": "Was nimmst du mit?",
+              "audioRef": "drill.u11.plan2",
+              "maxSeconds": 5
+            },
+            {
+              "id": "p3",
+              "de": "Gute Reise!",
+              "audioRef": "drill.u11.plan3",
+              "maxSeconds": 4
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur vorgegebene Reiseblöcke werden verglichen."
+        },
+        {
+          "id": "de-a1-u11-l4-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u11.plan",
+          "cardIds": [
+            "card.u11.am-samstag-fahre",
+            "card.u11.um-acht-ab",
+            "card.u11.wetter",
+            "card.u11.ich-nehme-mit"
+          ],
+          "promptLang": "de",
+          "prompt": "Plane eine kurze Reise in 7–9 Sätzen: Tag, Ziel, Verkehrsmittel, Abfahrt, Wetter und drei Dinge zum Mitnehmen.",
+          "minimumWords": 45,
+          "successCriteria": [
+            "Tag",
+            "Ziel",
+            "Transport",
+            "Uhrzeit",
+            "Wetter",
+            "drei Dinge"
+          ],
+          "autoCheck": [
+            "contient fahre",
+            "contient Wetter",
+            "contient mit"
+          ],
+          "note": "Ein erfundener Plan ist erlaubt."
+        }
+      ],
+      "completionMessage": "Du kannst einen kleinen Reiseplan mit Transport, Wetter und Gepäck formulieren."
+    },
+    {
+      "id": "de-a1-u11-l5",
+      "order": 5,
+      "phase": "Valide",
+      "title": "Mission: eine kurze Reise organisieren",
+      "objectiveIds": [
+        "obj.u11.info",
+        "obj.u11.wetter",
+        "obj.u11.datum",
+        "obj.u11.ziel",
+        "obj.u11.plan",
+        "obj.u11.interaktion"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u11.gleis",
+          "card.u11.verspaetung",
+          "card.u11.am-samstag",
+          "card.u11.ich-fahre-nach",
+          "card.u11.ich-nehme-mit"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "Kerninformationen des Reiseplans zuerst"
+      },
+      "blocks": [
+        {
+          "id": "blk.u11.l5.scenario",
+          "type": "scenario",
+          "title": "Situation",
+          "text": "Du planst einen kurzen Ausflug. Verstehe eine Reiseinformation, nenne Wetter/Datum und erkläre deinen Plan mit Ziel, Transport, Zeit und Gepäck."
+        },
+        {
+          "id": "blk.u11.l5.success",
+          "type": "rubric",
+          "title": "Erfolg",
+          "text": "Reiseinformation korrekt erfassen · Tag/Datum + Wetter · Ziel mit nach · Verkehrsmittel/Uhrzeit · drei Dinge zum Mitnehmen."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u11-l5-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u11.info",
+          "cardIds": [
+            "card.u11.verspaetung"
+          ],
+          "promptLang": "de",
+          "prompt": "Was bedeutet « zehn Minuten Verspätung »?",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Der Zug kommt zehn Minuten später.",
+              "correct": true,
+              "feedback": "Genau. Verspätung bedeutet, dass die geplante Zeit überschritten wird."
+            },
+            {
+              "id": "b",
+              "text": "Der Zug fährt zehn Minuten früher.",
+              "correct": false,
+              "feedback": "früher ist das Gegenteil von Verspätung."
+            },
+            {
+              "id": "c",
+              "text": "Der Zug steht auf Gleis zehn.",
+              "correct": false,
+              "feedback": "Gleis ist die Bahnsteig-/Spurnummer, nicht die Verspätung."
+            }
+          ],
+          "remediationRef": "rem.u11.verspaetung"
+        },
+        {
+          "id": "de-a1-u11-l5-e2",
+          "type": "dictation",
+          "objectiveId": "obj.u11.ziel",
+          "cardIds": [
+            "card.u11.am-samstag-fahre"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib den Satz, den du hörst.",
+          "audioRef": "drill.u11.final-dictation",
+          "answer": "Am Samstag fahre ich nach Hamburg.",
+          "acceptedAnswers": [
+            "Am Samstag fahre ich nach Hamburg.",
+            "Am Samstag fahre ich nach Hamburg"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u11.verb2"
+        },
+        {
+          "id": "de-a1-u11-l5-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u11.info",
+          "cardIds": [
+            "card.u11.um-acht-ab"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Abfahrtsinformation.",
+          "tokens": [
+            "ab",
+            "um acht Uhr",
+            "Der Zug",
+            "fährt"
+          ],
+          "answer": [
+            "Der Zug",
+            "fährt",
+            "um acht Uhr",
+            "ab"
+          ],
+          "feedbackIncorrect": "Der Zug fährt um acht Uhr ab."
+        },
+        {
+          "id": "de-a1-u11-l5-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u11.wetter",
+          "cardIds": [
+            "card.u11.sonnig",
+            "card.u11.regnen"
+          ],
+          "promptLang": "de",
+          "prompt": "Wie ist das Wetter?",
+          "audioRef": "drill.u11.final-weather",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Es ist sonnig.",
+              "correct": true,
+              "feedback": "Ja. Das Audio nennt sonniges Wetter."
+            },
+            {
+              "id": "b",
+              "text": "Es regnet.",
+              "correct": false,
+              "feedback": "Regen wird im Audio nicht genannt."
+            }
+          ],
+          "remediationRef": "rem.u11.wetter"
+        },
+        {
+          "id": "de-a1-u11-l5-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u11.interaktion",
+          "cardIds": [
+            "card.u11.ich-fahre-nach",
+            "card.u11.mit-dem-zug",
+            "card.u11.wetter",
+            "card.u11.ich-nehme-mit",
+            "card.u11.gute-reise"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe deinen kompletten Kurzreiseplan in 10–12 Zeilen und beantworte zwei mögliche Rückfragen zu Zeit und Gepäck.",
+          "minimumWords": 58,
+          "successCriteria": [
+            "Tag/Ziel",
+            "Transport",
+            "Abfahrt",
+            "Wetter",
+            "Gepäck",
+            "zwei Antworten"
+          ],
+          "autoCheck": [
+            "contient fahre",
+            "contient nach",
+            "contient mit"
+          ],
+          "note": "U11 bleibt QA-Inhalt bis Gesamtlevel- und Audiofreigabe."
+        }
+      ],
+      "completionMessage": "U11 ist in QA abgeschlossen: Du kannst einfache Reiseinformationen verstehen und einen nahen Reiseplan beschreiben."
+    }
+  ],
+  "qualityGates": {
+    "exerciseMix": {
+      "recognitionMax": 0.25,
+      "productiveWrittenMin": 0.35,
+      "structureMin": 0.2,
+      "oralMin": 0.2
+    },
+    "promptLang": {
+      "deMin": 1,
+      "note": "Ab U5 sind alle Übungsanweisungen auf Deutsch."
+    },
+    "spacedRecall": {
+      "minCardsRevisitedPerLesson": 3
+    },
+    "feedback": {
+      "distinctPerDistractor": true
+    },
+    "normalization": {
+      "requiredOn": [
+        "fillBlank",
+        "dictation",
+        "productiveRecall",
+        "transformation",
+        "audioCloze"
+      ]
+    }
+  }
+}

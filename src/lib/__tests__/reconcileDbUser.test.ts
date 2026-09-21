@@ -7,6 +7,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { reconcileDbUser, ReconcileError } from "@/lib/reconcileDbUser";
 import type { User } from "@supabase/supabase-js";
+import { shouldRunDatabaseIntegrationTests } from "./databaseIntegration";
 
 const adapter = new PrismaPg({ connectionString: process.env.DIRECT_URL! });
 const db = new PrismaClient({ adapter, log: ["error"] });
@@ -14,6 +15,7 @@ const db = new PrismaClient({ adapter, log: ["error"] });
 const TAG = `reconcile_test_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 const uid = (label: string) => `${TAG}_${label}`;
 const emailFor = (label: string) => `${uid(label)}@yema.test`;
+const describeDatabase = shouldRunDatabaseIntegrationTests() ? describe : describe.skip;
 
 function makeAuthUser(supabaseId: string, email: string | undefined, fullName?: string): User {
   return {
@@ -26,18 +28,16 @@ function makeAuthUser(supabaseId: string, email: string | undefined, fullName?: 
   } as unknown as User;
 }
 
-afterAll(async () => {
-  // Nettoyage best-effort — supprime UserRole puis User taggés.
-  const users = await db.user.findMany({ where: { email: { startsWith: TAG } }, select: { id: true } });
-  const ids = users.map((u) => u.id);
-  if (ids.length > 0) {
-    await db.userRole.deleteMany({ where: { userId: { in: ids } } });
-    await db.user.deleteMany({ where: { id: { in: ids } } });
-  }
-  await db.$disconnect();
-});
-
-describe("reconcileDbUser", () => {
+describeDatabase("reconcileDbUser", () => {
+  afterAll(async () => {
+    const users = await db.user.findMany({ where: { email: { startsWith: TAG } }, select: { id: true } });
+    const ids = users.map((u) => u.id);
+    if (ids.length > 0) {
+      await db.userRole.deleteMany({ where: { userId: { in: ids } } });
+      await db.user.deleteMany({ where: { id: { in: ids } } });
+    }
+    await db.$disconnect();
+  });
   it("Supabase user existant et jamais vu en Prisma → path=created_fresh", async () => {
     const sb = uid("sb_fresh");
     const email = emailFor("fresh");

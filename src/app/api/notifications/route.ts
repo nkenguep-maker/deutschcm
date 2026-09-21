@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
@@ -19,7 +19,8 @@ async function getAuthUser() {
   return user;
 }
 
-// GET /api/notifications — get user notifications
+// GET /api/notifications — legacy read endpoint kept for compatibility.
+// The canonical notifications UI reads through /api/social?action=notifications.
 export async function GET() {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -34,44 +35,12 @@ export async function GET() {
   return NextResponse.json({ notifications });
 }
 
-// POST /api/notifications — create/send notification
-export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const { type, studentId, reason, groupCode, classroomCode } = body;
-
-  const TEMPLATES: Record<string, { title: string; body: (ctx: Record<string, string>) => string }> = {
-    "validate-student": {
-      title: "✅ Inscription validée !",
-      body: (c) => `Votre inscription a été validée. Bienvenue dans la classe ${c.classroomName ?? ""} !`,
-    },
-    "refuse-student": {
-      title: "❌ Inscription refusée",
-      body: (c) => `Votre inscription a été refusée. Raison : ${c.reason ?? "Non précisée"}. Vous continuez en mode solo.`,
-    },
-    "group-invite": {
-      title: "👥 Invitation groupe d'étude",
-      body: (c) => `Vous avez été invité dans un groupe. Code : ${c.groupCode ?? ""}`,
-    },
-    "class-code-valid": {
-      title: "🏫 Code classe trouvé",
-      body: (c) => `Le code ${c.classroomCode ?? ""} est valide ! Votre demande a été envoyée à l'enseignant.`,
-    },
-  };
-
-  const tpl = TEMPLATES[type];
-  if (!tpl || !studentId) return NextResponse.json({ error: "Missing type or studentId" }, { status: 400 });
-
-  const ctx: Record<string, string> = { reason: reason ?? "", groupCode: groupCode ?? "", classroomCode: classroomCode ?? "" };
-
-  await prisma.notification.create({
-    data: {
-      userId: studentId,
-      title: tpl.title,
-      body: tpl.body(ctx),
-      type,
-    },
-  });
-
-  // In production: also send email via Resend / Supabase email
-  return NextResponse.json({ ok: true });
+// Notifications must be emitted by the domain action that proved authorization
+// (class request, group request/invite, assignment, etc.). A generic client-facing
+// "send notification" endpoint would let callers spoof events and recipients.
+export async function POST() {
+  return NextResponse.json(
+    { error: "Notifications are emitted by authorized domain actions" },
+    { status: 405, headers: { Allow: "GET" } }
+  );
 }

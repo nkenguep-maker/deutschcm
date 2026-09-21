@@ -87,11 +87,51 @@ describe("Lot 7C · matrice cohérente avec fixtures QA (yema-qa-fixtures.mjs)",
 });
 
 describe("Lot 7C · orchestrateurs P-1 fail-closed", () => {
-  it("test:personas:p1 refuse URL non-P-1 + exige P1_TEST_PASSWORD", () => {
+  it("le wrapper P-1 empêche Next.js de recharger .env.local", () => {
+    const src = readRepo("scripts/test-baseline/run-p4-5-b2-p1.mjs");
+    expect(src).toMatch(/childEnv\.__NEXT_PROCESSED_ENV\s*=\s*"true"/);
+    expect(src).toMatch(/NODE_OPTIONS.*block-next-local-env/);
+    const blocker = readRepo("scripts/test-baseline/block-next-local-env.cjs");
+    expect(blocker).toMatch(/nextEnvFile/);
+    expect(blocker).toMatch(/error\.code = "ENOENT"/);
+  });
+
+  it("test:personas:p1 délègue le chargement et les refus P-1 au wrapper strict", () => {
     const src = readRepo("scripts/test-personas-p1.mjs");
-    expect(src).toMatch(/kzzagbojjkivdzzcrmxn/);
-    expect(src).toMatch(/sbjhvlrkbyjckdxujjsk/);
-    expect(src).toMatch(/MISSING P1_TEST_PASSWORD/);
+    expect(src).toMatch(/scripts\/test-baseline\/run-p4-5-b2-p1\.mjs/);
+    expect(src).not.toMatch(/process\.env\.NEXT_PUBLIC_SUPABASE_URL/);
+    const wrapper = readRepo("scripts/test-baseline/run-p4-5-b2-p1.mjs");
+    expect(wrapper).toMatch(/kzzagbojjkivdzzcrmxn/);
+    expect(wrapper).toMatch(/P1_TEST_PASSWORD/);
+  });
+
+  it("E2E B2 provisionne Auth avant Playwright et nettoie les deux plans dans finally", () => {
+    const pkg = JSON.parse(readRepo("package.json"));
+    const src = readRepo("scripts/orchestrate-e2e-b2-p1.mjs");
+
+    expect(pkg.scripts["test:e2e:b2"]).toBe(
+      "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag on -- node scripts/orchestrate-e2e-b2-p1.mjs --flag on",
+    );
+    expect(pkg.scripts["test:e2e:b2:flag-off"]).toBe(
+      "node scripts/test-baseline/run-p4-5-b2-p1.mjs --flag off -- node scripts/orchestrate-e2e-b2-p1.mjs --flag off",
+    );
+    expect(src).toMatch(/p4-5-b-fixtures\.mjs/);
+    expect(src).toMatch(/p4-5-b-auth-fixtures\.mjs/);
+    expect(src.indexOf("p4-5-b-auth-fixtures.mjs")).toBeLessThan(src.indexOf("primaryResult = runPlaywright(mode)"));
+    expect(src).toMatch(/finally\s*\{[\s\S]*p4-5-b-cleanup\.mjs[\s\S]*p4-5-b-auth-cleanup\.mjs/);
+    expect(src).toMatch(/data cleanup failed/);
+    expect(src).toMatch(/Auth cleanup failed/);
+    expect(readRepo("scripts/test-baseline/p4-5-b-cleanup.mjs")).toMatch(/process\.exitCode = 1/);
+    const dataFixtures = readRepo("scripts/test-baseline/p4-5-b-fixtures.mjs");
+    const authFixtures = readRepo("scripts/test-baseline/p4-5-b-auth-fixtures.mjs");
+    const authSetup = readRepo("tests/e2e/p4-5-b2b3-b2/auth.setup.ts");
+    expect(dataFixtures).toMatch(/db\.userRole\.upsert/);
+    expect(authFixtures).toMatch(/app_metadata/);
+    expect(authSetup).toMatch(/page\.goto\("\/api\/me"/);
+    expect(authSetup).toMatch(/expected successful auth sync/);
+    expect(authSetup).toMatch(/attempt < 12/);
+    expect(authSetup).toMatch(/expected authenticated \/api\/me/);
+    expect(readRepo("playwright.p4-5-b2.config.ts")).toMatch(/http:\/\/localhost:\$\{PORT\}/);
   });
 
   it("test:entitlements:p1 refuse URL non-P-1 + exige SUPABASE_SERVICE_ROLE_KEY", () => {
@@ -873,10 +913,13 @@ describe("Gate 8D · final-deployment-e2e · Coach A/B provisioning + isolation 
   const orc = readRepo("scripts/orchestrate-final-deployment-e2e-p1.ts");
   const pkg = JSON.parse(readRepo("package.json"));
 
-  it("wrapper fail-closed · exige P1_TEST_PASSWORD + SUPABASE_SERVICE_ROLE_KEY", () => {
-    expect(wrapper).toMatch(/MISSING P1_TEST_PASSWORD/);
-    expect(wrapper).toMatch(/MISSING SUPABASE_SERVICE_ROLE_KEY/);
-    expect(wrapper).toMatch(/kzzagbojjkivdzzcrmxn/);
+  it("wrapper délègue les refus P-1 au chargeur strict", () => {
+    expect(wrapper).toMatch(/scripts\/test-baseline\/run-p4-5-b2-p1\.mjs/);
+    expect(wrapper).not.toMatch(/process\.env\.NEXT_PUBLIC_SUPABASE_URL/);
+    const strictRunner = readRepo("scripts/test-baseline/run-p4-5-b2-p1.mjs");
+    expect(strictRunner).toMatch(/P1_TEST_PASSWORD/);
+    expect(strictRunner).toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
+    expect(strictRunner).toMatch(/kzzagbojjkivdzzcrmxn/);
   });
 
   it("npm scripts test:final-deployment-e2e:p1 + capture:final-deployment-e2e:p1 branchés", () => {
@@ -1053,7 +1096,9 @@ describe("Gate 8A · CHILD_WORLD_SINGLE + ROOTS adulte 3 · tests actifs orchest
 
   it("STEP 12 · ROOTS adulte 3e via service canonique assignAdultRootsSeat", () => {
     expect(src).toMatch(/ROOTS_FAMILY 3e adulte via assignAdultRootsSeat/);
-    expect(src).toMatch(/assignAdultRootsSeat contient household_seats_exhausted/);
+    expect(src).toContain('["tsx", "scripts/test-roots-adult-seats-p1.ts"]');
+    expect(src).toMatch(/3e adulte refusé, siège libéré réutilisable et non-membre refusé/);
+    expect(src).not.toMatch(/test actif 3e adulte différé/);
   });
 
   it("cleanup CHILD_WORLD_SINGLE grant temporaire dans finally", () => {
@@ -1334,13 +1379,13 @@ describe("Release Canonicalization · /family + /center/stats + QA fail-closed +
     expect(proxy).toMatch(/pathname\.startsWith\("\/famille"\)/);
   });
 
-  it("Personas matrix · family + child_* pointent vers /fr/family (canonique)", () => {
+  it("Personas matrix · family et enfants pointent vers leurs destinations canoniques", () => {
     const matrix = readRepo("src/lib/personas/matrix.ts");
     // family homeRoute = /fr/family
     expect(matrix).toMatch(/id:\s*"family"[\s\S]{0,300}homeRoute:\s*"\/fr\/family"/);
-    // child_monde + child_racines · homeRoute canonique /fr/family (plus /famille/enfant)
-    expect(matrix).toMatch(/id:\s*"child_monde"[\s\S]{0,300}homeRoute:\s*"\/fr\/family"/);
-    expect(matrix).toMatch(/id:\s*"child_racines"[\s\S]{0,300}homeRoute:\s*"\/fr\/family"/);
+    // Les enfants arrivent sur le dashboard après ouverture de la session PIN.
+    expect(matrix).toMatch(/id:\s*"child_monde"[\s\S]{0,300}homeRoute:\s*"\/fr\/dashboard"/);
+    expect(matrix).toMatch(/id:\s*"child_racines"[\s\S]{0,300}homeRoute:\s*"\/fr\/dashboard"/);
     // Aucune référence résiduelle à /fr/famille dans les homeRoutes.
     expect(matrix).not.toMatch(/homeRoute:\s*"\/fr\/famille/);
   });

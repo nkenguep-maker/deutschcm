@@ -1,0 +1,1822 @@
+{
+  "id": "de-a1-u8",
+  "order": 8,
+  "title": "Travail, études et compétences",
+  "schemaVersion": "2.0",
+  "contentVersion": "2026.09.20-u8-reconstruction-r1",
+  "status": "reconstruction-a-valider",
+  "note": "U8 est une reconstruction nouvelle à partir du syllabus canonique. Elle couvre activité professionnelle ou études, lieux de travail, horaires, tâches simples et compétences avec können, avec 100 % des consignes d’exercice en allemand.",
+  "cards": [
+    {
+      "id": "card.u8.beruf",
+      "kind": "lexical",
+      "de": "der Beruf",
+      "fr": "le métier",
+      "introducedIn": "de-a1-u8-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.arbeit",
+      "kind": "lexical",
+      "de": "die Arbeit",
+      "fr": "le travail",
+      "introducedIn": "de-a1-u8-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.arbeiten",
+      "kind": "lexical",
+      "de": "arbeiten",
+      "fr": "travailler",
+      "introducedIn": "de-a1-u8-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.studieren",
+      "kind": "lexical",
+      "de": "studieren",
+      "fr": "faire des études supérieures",
+      "introducedIn": "de-a1-u8-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.student",
+      "kind": "lexical",
+      "de": "der Student / die Studentin",
+      "fr": "l’étudiant / l’étudiante",
+      "introducedIn": "de-a1-u8-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.verkaeufer",
+      "kind": "lexical",
+      "de": "der Verkäufer / die Verkäuferin",
+      "fr": "le vendeur / la vendeuse",
+      "introducedIn": "de-a1-u8-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.lehrer",
+      "kind": "lexical",
+      "de": "der Lehrer / die Lehrerin",
+      "fr": "l’enseignant / l’enseignante",
+      "introducedIn": "de-a1-u8-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.koch",
+      "kind": "lexical",
+      "de": "der Koch / die Köchin",
+      "fr": "le cuisinier / la cuisinière",
+      "introducedIn": "de-a1-u8-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.fahrer",
+      "kind": "lexical",
+      "de": "der Fahrer / die Fahrerin",
+      "fr": "le conducteur / la conductrice",
+      "introducedIn": "de-a1-u8-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.buero",
+      "kind": "lexical",
+      "de": "das Büro",
+      "fr": "le bureau",
+      "introducedIn": "de-a1-u8-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.schule",
+      "kind": "lexical",
+      "de": "die Schule",
+      "fr": "l’école",
+      "introducedIn": "de-a1-u8-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.universitaet",
+      "kind": "lexical",
+      "de": "die Universität",
+      "fr": "l’université",
+      "introducedIn": "de-a1-u8-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.geschaeft",
+      "kind": "lexical",
+      "de": "das Geschäft",
+      "fr": "le magasin / commerce",
+      "introducedIn": "de-a1-u8-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.restaurant",
+      "kind": "lexical",
+      "de": "das Restaurant",
+      "fr": "le restaurant",
+      "introducedIn": "de-a1-u8-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.firma",
+      "kind": "lexical",
+      "de": "die Firma",
+      "fr": "l’entreprise",
+      "introducedIn": "de-a1-u8-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.kollege",
+      "kind": "lexical",
+      "de": "der Kollege / die Kollegin",
+      "fr": "le collègue / la collègue",
+      "introducedIn": "de-a1-u8-l2",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.kunde",
+      "kind": "lexical",
+      "de": "der Kunde / die Kundin",
+      "fr": "le client / la cliente",
+      "introducedIn": "de-a1-u8-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.anfangen",
+      "kind": "lexical",
+      "de": "anfangen",
+      "fr": "commencer",
+      "introducedIn": "de-a1-u8-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.aufhoeren",
+      "kind": "lexical",
+      "de": "aufhören",
+      "fr": "finir / arrêter",
+      "introducedIn": "de-a1-u8-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.pause",
+      "kind": "lexical",
+      "de": "die Pause",
+      "fr": "la pause",
+      "introducedIn": "de-a1-u8-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.von-bis",
+      "kind": "structure",
+      "de": "von … bis …",
+      "fr": "de… à…",
+      "introducedIn": "de-a1-u8-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.um-acht",
+      "kind": "chunk",
+      "de": "um acht Uhr",
+      "fr": "à huit heures",
+      "introducedIn": "de-a1-u8-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.am-montag",
+      "kind": "chunk",
+      "de": "am Montag",
+      "fr": "le lundi",
+      "introducedIn": "de-a1-u8-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.jeden-tag",
+      "kind": "chunk",
+      "de": "jeden Tag",
+      "fr": "chaque jour",
+      "introducedIn": "de-a1-u8-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.telefonieren",
+      "kind": "lexical",
+      "de": "telefonieren",
+      "fr": "téléphoner",
+      "introducedIn": "de-a1-u8-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.schreiben",
+      "kind": "lexical",
+      "de": "schreiben",
+      "fr": "écrire",
+      "introducedIn": "de-a1-u8-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.lesen",
+      "kind": "lexical",
+      "de": "lesen",
+      "fr": "lire",
+      "introducedIn": "de-a1-u8-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.rechnen",
+      "kind": "lexical",
+      "de": "rechnen",
+      "fr": "calculer",
+      "introducedIn": "de-a1-u8-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.fahren",
+      "kind": "lexical",
+      "de": "fahren",
+      "fr": "conduire / aller en véhicule",
+      "introducedIn": "de-a1-u8-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.kochen",
+      "kind": "lexical",
+      "de": "kochen",
+      "fr": "cuisiner",
+      "introducedIn": "de-a1-u8-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.sprechen",
+      "kind": "lexical",
+      "de": "sprechen",
+      "fr": "parler",
+      "introducedIn": "de-a1-u8-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.deutsch",
+      "kind": "lexical",
+      "de": "Deutsch",
+      "fr": "allemand",
+      "introducedIn": "de-a1-u8-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.englisch",
+      "kind": "lexical",
+      "de": "Englisch",
+      "fr": "anglais",
+      "introducedIn": "de-a1-u8-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.kann",
+      "kind": "structure",
+      "de": "ich kann …",
+      "fr": "je peux / sais…",
+      "introducedIn": "de-a1-u8-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.kann-gut",
+      "kind": "chunk",
+      "de": "Ich kann gut …",
+      "fr": "Je sais bien…",
+      "introducedIn": "de-a1-u8-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.kann-nicht",
+      "kind": "chunk",
+      "de": "Ich kann nicht gut …",
+      "fr": "Je ne sais pas bien…",
+      "introducedIn": "de-a1-u8-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.was-machst",
+      "kind": "structure",
+      "de": "Was machst du beruflich?",
+      "fr": "Que fais-tu dans la vie ?",
+      "introducedIn": "de-a1-u8-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.wo-arbeitest",
+      "kind": "structure",
+      "de": "Wo arbeitest du?",
+      "fr": "Où travailles-tu ?",
+      "introducedIn": "de-a1-u8-l1",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.wann-arbeitest",
+      "kind": "structure",
+      "de": "Wann arbeitest du?",
+      "fr": "Quand travailles-tu ?",
+      "introducedIn": "de-a1-u8-l3",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    },
+    {
+      "id": "card.u8.was-kannst",
+      "kind": "structure",
+      "de": "Was kannst du gut?",
+      "fr": "Qu’est-ce que tu sais bien faire ?",
+      "introducedIn": "de-a1-u8-l4",
+      "srs": {
+        "intervals": [
+          1,
+          3,
+          7,
+          21
+        ]
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj.u8.profil",
+      "label": "Comprendre une présentation professionnelle ou étudiante simple"
+    },
+    {
+      "id": "obj.u8.metiers",
+      "label": "Nommer quelques métiers, études et lieux de travail fréquents"
+    },
+    {
+      "id": "obj.u8.horaires",
+      "label": "Parler simplement de ses jours, horaires et pauses"
+    },
+    {
+      "id": "obj.u8.taches",
+      "label": "Nommer quelques tâches courantes au travail ou dans les études"
+    },
+    {
+      "id": "obj.u8.competences",
+      "label": "Dire ce que l’on sait faire avec können"
+    },
+    {
+      "id": "obj.u8.presenter",
+      "label": "Se présenter très simplement dans un contexte professionnel ou d’études"
+    }
+  ],
+  "remediations": [
+    {
+      "id": "rem.u8.arbeiten-studieren",
+      "objectiveId": "obj.u8.profil",
+      "durationSeconds": 105,
+      "explanation": "arbeiten = travailler ; studieren = faire des études à l’université. Choisis le verbe selon la situation, pas selon le lieu.",
+      "contrast": [
+        {
+          "de": "Ich arbeite in einer Firma.",
+          "fr": "Je travaille dans une entreprise.",
+          "ok": true
+        },
+        {
+          "de": "Ich studiere an der Universität.",
+          "fr": "J’étudie à l’université.",
+          "ok": true
+        },
+        {
+          "de": "Ich studiere in einer Firma.",
+          "fr": "—",
+          "ok": false,
+          "why": "Dans une entreprise, on travaille normalement : arbeiten."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u8.arbeiten-studieren.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich ____ in einer Firma.",
+          "answer": "arbeite",
+          "acceptedAnswers": [
+            "arbeite"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u8.arbeiten-studieren.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich ____ an der Universität.",
+          "answer": "studiere",
+          "acceptedAnswers": [
+            "studiere"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u8.von-bis",
+      "objectiveId": "obj.u8.horaires",
+      "durationSeconds": 110,
+      "explanation": "von … bis … encadre une durée de travail : Ich arbeite von acht bis vier. Pour une heure ponctuelle, utilise um.",
+      "contrast": [
+        {
+          "de": "Ich arbeite von acht bis vier.",
+          "fr": "Je travaille de huit à quatre.",
+          "ok": true
+        },
+        {
+          "de": "Ich fange um acht Uhr an.",
+          "fr": "Je commence à huit heures.",
+          "ok": true
+        },
+        {
+          "de": "Ich arbeite um acht bis vier.",
+          "fr": "—",
+          "ok": false,
+          "why": "Une plage horaire utilise von … bis …"
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u8.von-bis.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich arbeite ____ acht bis vier.",
+          "answer": "von",
+          "acceptedAnswers": [
+            "von"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u8.von-bis.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich fange ____ acht Uhr an.",
+          "answer": "um",
+          "acceptedAnswers": [
+            "um"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u8.kann",
+      "objectiveId": "obj.u8.competences",
+      "durationSeconds": 120,
+      "explanation": "Avec können, le verbe principal reste à la fin : Ich kann gut Deutsch sprechen. Le bloc ich kann exprime une capacité.",
+      "contrast": [
+        {
+          "de": "Ich kann gut Deutsch sprechen.",
+          "fr": "Je sais bien parler allemand.",
+          "ok": true
+        },
+        {
+          "de": "Ich kann gut rechnen.",
+          "fr": "Je sais bien calculer.",
+          "ok": true
+        },
+        {
+          "de": "Ich kann sprechen gut Deutsch.",
+          "fr": "—",
+          "ok": false,
+          "why": "Le verbe principal sprechen reste à la fin."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u8.kann.i1",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "gut",
+            "Deutsch",
+            "sprechen",
+            "Ich",
+            "kann"
+          ],
+          "answer": [
+            "Ich",
+            "kann",
+            "gut",
+            "Deutsch",
+            "sprechen"
+          ],
+          "normalization": []
+        },
+        {
+          "id": "rem.u8.kann.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "Ich ____ gut rechnen.",
+          "answer": "kann",
+          "acceptedAnswers": [
+            "kann"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u8.frage-beruf",
+      "objectiveId": "obj.u8.presenter",
+      "durationSeconds": 105,
+      "explanation": "Was machst du beruflich? demande l’activité professionnelle. Wo arbeitest du? demande le lieu. Wann arbeitest du? demande le moment.",
+      "contrast": [
+        {
+          "de": "Was machst du beruflich? — Ich bin Verkäufer.",
+          "fr": "Que fais-tu dans la vie ? — Je suis vendeur.",
+          "ok": true
+        },
+        {
+          "de": "Wo arbeitest du? — In einem Geschäft.",
+          "fr": "Où travailles-tu ? — Dans un magasin.",
+          "ok": true
+        },
+        {
+          "de": "Wann arbeitest du? — Von neun bis fünf.",
+          "fr": "Quand travailles-tu ? — De neuf à cinq.",
+          "ok": true
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u8.frage-beruf.i1",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "____ arbeitest du?",
+          "answer": "Wo",
+          "acceptedAnswers": [
+            "Wo"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        },
+        {
+          "id": "rem.u8.frage-beruf.i2",
+          "type": "fillBlank",
+          "promptLang": "de",
+          "prompt": "____ arbeitest du?",
+          "answer": "Wann",
+          "acceptedAnswers": [
+            "Wann"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rem.u8.verb2",
+      "objectiveId": "obj.u8.taches",
+      "durationSeconds": 115,
+      "explanation": "Dans une phrase déclarative simple, le verbe conjugué reste en position 2 : Morgens telefoniere ich mit Kunden. Ich schreibe E-Mails.",
+      "contrast": [
+        {
+          "de": "Morgens telefoniere ich mit Kunden.",
+          "fr": "Le matin, je téléphone avec des clients.",
+          "ok": true
+        },
+        {
+          "de": "Ich schreibe E-Mails.",
+          "fr": "J’écris des e-mails.",
+          "ok": true
+        },
+        {
+          "de": "Morgens ich telefoniere mit Kunden.",
+          "fr": "—",
+          "ok": false,
+          "why": "Après Morgens, le verbe conjugué reste en deuxième position."
+        }
+      ],
+      "items": [
+        {
+          "id": "rem.u8.verb2.i1",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "ich",
+            "mit Kunden",
+            "Morgens",
+            "telefoniere"
+          ],
+          "answer": [
+            "Morgens",
+            "telefoniere",
+            "ich",
+            "mit Kunden"
+          ],
+          "normalization": []
+        },
+        {
+          "id": "rem.u8.verb2.i2",
+          "type": "reorder",
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "E-Mails",
+            "Ich",
+            "schreibe"
+          ],
+          "answer": [
+            "Ich",
+            "schreibe",
+            "E-Mails"
+          ],
+          "normalization": []
+        }
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "id": "de-a1-u8-l1",
+      "order": 1,
+      "phase": "Comprends",
+      "title": "Eine berufliche Vorstellung verstehen",
+      "objectiveIds": [
+        "obj.u8.profil"
+      ],
+      "durationMinutes": 30,
+      "reveil": {
+        "cardIds": [
+          "card.u1.sprechen",
+          "card.u4.arbeiten",
+          "card.u4.acht-uhr",
+          "card.u6.kann-ich"
+        ],
+        "itemCount": 4,
+        "maxSeconds": 90,
+        "selection": "fällige Karten zu Sprache, Arbeit, Uhrzeit und können zuerst"
+      },
+      "blocks": [
+        {
+          "id": "blk.u8.l1.intro",
+          "type": "intro",
+          "title": "Neue Person",
+          "textDe": "Mara stellt sich auf der Arbeit vor. Höre auf Beruf, Arbeitsort, Arbeitszeit und Sprachen.",
+          "textFr": "Repère quatre informations réutilisables."
+        },
+        {
+          "id": "blk.u8.l1.dialogue",
+          "type": "dialogueRef",
+          "dialogueId": "de-a1-u8-dialogue",
+          "speeds": [
+            "slow",
+            "natural"
+          ],
+          "instruction": "Höre zuerst auf das Gesamtprofil. Beim zweiten Hören: Beruf, Ort, Uhrzeit, Kompetenz."
+        },
+        {
+          "id": "blk.u8.l1.strategy",
+          "type": "strategy",
+          "title": "Vier Fragen",
+          "textDe": "Was? · Wo? · Wann? · Was kann die Person?",
+          "textFr": "Ces quatre questions structurent toute l’unité."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u8-l1-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u8.profil",
+          "cardIds": [
+            "card.u8.verkaeufer"
+          ],
+          "promptLang": "de",
+          "prompt": "Was macht Mara beruflich?",
+          "audioRef": "de-a1-u8-dialogue#seg2",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Sie ist Verkäuferin.",
+              "correct": true,
+              "feedback": "Ja. Mara sagt: Ich bin Verkäuferin."
+            },
+            {
+              "id": "b",
+              "text": "Sie ist Lehrerin.",
+              "correct": false,
+              "feedback": "Lehrerin wird nicht als Maras Beruf genannt."
+            },
+            {
+              "id": "c",
+              "text": "Sie ist Studentin.",
+              "correct": false,
+              "feedback": "Mara spricht über ihre Arbeit, nicht über ein Studium."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u8-l1-e2",
+          "type": "audioCloze",
+          "objectiveId": "obj.u8.profil",
+          "cardIds": [
+            "card.u8.geschaeft"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und ergänze: Ich arbeite in einem ____.",
+          "audioRef": "de-a1-u8-dialogue#seg2",
+          "answer": "Geschäft",
+          "acceptedAnswers": [
+            "Geschäft",
+            "Geschaeft"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ]
+        },
+        {
+          "id": "de-a1-u8-l1-e3",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u8.profil",
+          "cardIds": [
+            "card.u8.von-bis"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe Maras Arbeitszeit: von neun bis fünf.",
+          "answer": "Ich arbeite von neun bis fünf.",
+          "acceptedAnswers": [
+            "Ich arbeite von neun bis fünf.",
+            "Ich arbeite von neun bis fuenf."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ],
+          "remediationRef": "rem.u8.von-bis"
+        },
+        {
+          "id": "de-a1-u8-l1-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u8.profil",
+          "cardIds": [
+            "card.u8.englisch",
+            "card.u8.kann"
+          ],
+          "promptLang": "de",
+          "prompt": "Was kann Mara gut?",
+          "audioRef": "de-a1-u8-dialogue#seg6",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Englisch sprechen.",
+              "correct": true,
+              "feedback": "Genau. Mara sagt, dass sie gut Englisch sprechen kann."
+            },
+            {
+              "id": "b",
+              "text": "Auto fahren.",
+              "correct": false,
+              "feedback": "Fahren wird in diesem Profil nicht als Kompetenz genannt."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u8-l1-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u8.profil",
+          "cardIds": [
+            "card.u8.beruf",
+            "card.u8.geschaeft",
+            "card.u8.von-bis",
+            "card.u8.kann-gut"
+          ],
+          "promptLang": "de",
+          "prompt": "Notiere Maras Profil in vier kurzen Sätzen: Beruf, Arbeitsort, Arbeitszeit, eine Kompetenz.",
+          "minimumWords": 24,
+          "successCriteria": [
+            "Beruf",
+            "Ort",
+            "Zeit",
+            "Kompetenz"
+          ],
+          "autoCheck": [
+            "contient arbeite",
+            "contient von",
+            "contient kann"
+          ],
+          "note": "Nur die Kernaussagen rekonstruieren."
+        }
+      ],
+      "completionMessage": "Du kannst die wichtigsten Informationen einer einfachen beruflichen Vorstellung verstehen."
+    },
+    {
+      "id": "de-a1-u8-l2",
+      "order": 2,
+      "phase": "Pratique",
+      "title": "Berufe, Studium und Arbeitsorte",
+      "objectiveIds": [
+        "obj.u8.metiers",
+        "obj.u8.presenter"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u8.beruf",
+          "card.u8.arbeiten",
+          "card.u8.studieren",
+          "card.u7.wo-ist",
+          "card.u2.arbeiten"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "Beruf/Studium plus bekannte Wo-Frage zusammen abrufen"
+      },
+      "blocks": [
+        {
+          "id": "blk.u8.l2.jobs",
+          "type": "model",
+          "title": "Berufe",
+          "textDe": "Verkäufer/in · Lehrer/in · Koch/Köchin · Fahrer/in · Student/in",
+          "textFr": "Commence par quelques métiers fréquents, pas une longue liste."
+        },
+        {
+          "id": "blk.u8.l2.places",
+          "type": "model",
+          "title": "Orte",
+          "textDe": "Büro · Schule · Universität · Geschäft · Restaurant · Firma",
+          "textFr": "Métier et lieu doivent pouvoir se combiner."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u8-l2-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u8.metiers",
+          "cardIds": [
+            "card.u8.lehrer"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe den Beruf für eine Person, die in einer Schule unterrichtet.",
+          "answer": "Lehrer",
+          "acceptedAnswers": [
+            "Lehrer",
+            "Lehrerin",
+            "der Lehrer",
+            "die Lehrerin"
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "feedbackIncorrect": "Ein typischer Beruf an der Schule ist Lehrer oder Lehrerin."
+        },
+        {
+          "id": "de-a1-u8-l2-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u8.presenter",
+          "cardIds": [
+            "card.u8.wo-arbeitest",
+            "card.u8.buero"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue die Frage.",
+          "tokens": [
+            "du",
+            "Wo",
+            "arbeitest"
+          ],
+          "answer": [
+            "Wo",
+            "arbeitest",
+            "du"
+          ],
+          "feedbackIncorrect": "W-Frage: Wo + Verb + Subjekt.",
+          "remediationRef": "rem.u8.frage-beruf"
+        },
+        {
+          "id": "de-a1-u8-l2-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u8.profil",
+          "cardIds": [
+            "card.u8.arbeiten",
+            "card.u8.studieren",
+            "card.u8.universitaet"
+          ],
+          "promptLang": "de",
+          "prompt": "Ich arbeite in einer Firma. → Ändere auf Studium an der Universität.",
+          "answer": "Ich studiere an der Universität.",
+          "acceptedAnswers": [
+            "Ich studiere an der Universität.",
+            "Ich studiere an der Universitaet."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct",
+            "umlaut"
+          ],
+          "remediationRef": "rem.u8.arbeiten-studieren"
+        },
+        {
+          "id": "de-a1-u8-l2-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u8.metiers",
+          "cardIds": [
+            "card.u8.verkaeufer",
+            "card.u8.koch",
+            "card.u8.student"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Berufsprofile nach.",
+          "targets": [
+            {
+              "id": "j1",
+              "de": "Ich bin Verkäuferin.",
+              "audioRef": "drill.u8.job1",
+              "maxSeconds": 5
+            },
+            {
+              "id": "j2",
+              "de": "Ich bin Koch.",
+              "audioRef": "drill.u8.job2",
+              "maxSeconds": 5
+            },
+            {
+              "id": "j3",
+              "de": "Ich bin Student.",
+              "audioRef": "drill.u8.job3",
+              "maxSeconds": 5
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur vorgegebene Sätze werden verglichen."
+        },
+        {
+          "id": "de-a1-u8-l2-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u8.presenter",
+          "cardIds": [
+            "card.u8.was-machst",
+            "card.u8.wo-arbeitest",
+            "card.u8.beruf"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe drei kurze Profile: Beruf oder Studium plus passender Ort.",
+          "minimumWords": 30,
+          "successCriteria": [
+            "drei Profile",
+            "Beruf oder Studium",
+            "Arbeits-/Studienort"
+          ],
+          "autoCheck": [
+            "contient Ich"
+          ],
+          "note": "Die Profile dürfen erfunden sein."
+        }
+      ],
+      "completionMessage": "Du kannst einige Berufe, Studienrollen und typische Arbeitsorte benennen und verbinden."
+    },
+    {
+      "id": "de-a1-u8-l3",
+      "order": 3,
+      "phase": "Pratique",
+      "title": "Über Arbeitszeiten und Aufgaben sprechen",
+      "objectiveIds": [
+        "obj.u8.horaires",
+        "obj.u8.taches"
+      ],
+      "durationMinutes": 35,
+      "reveil": {
+        "cardIds": [
+          "card.u8.von-bis",
+          "card.u8.um-acht",
+          "card.u4.von-bis",
+          "card.u4.wann-faengst",
+          "card.u8.pause"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "bekannte Uhrzeitstrukturen werden in den Arbeitskontext übertragen"
+      },
+      "blocks": [
+        {
+          "id": "blk.u8.l3.time",
+          "type": "rule",
+          "title": "Arbeitszeit",
+          "textDe": "Ich arbeite von acht bis vier. · Ich fange um acht Uhr an. · Um zwölf habe ich Pause.",
+          "textFr": "Plage horaire, début ponctuel, pause."
+        },
+        {
+          "id": "blk.u8.l3.tasks",
+          "type": "model",
+          "title": "Einfache Aufgaben",
+          "textDe": "telefonieren · E-Mails schreiben · lesen · mit Kunden sprechen",
+          "textFr": "Quelques tâches fréquentes suffisent au niveau A1."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u8-l3-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u8.horaires",
+          "cardIds": [
+            "card.u8.von-bis"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Ich arbeite von acht bis vier.",
+          "answer": "Ich arbeite von acht bis vier.",
+          "acceptedAnswers": [
+            "Ich arbeite von acht bis vier."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u8.von-bis"
+        },
+        {
+          "id": "de-a1-u8-l3-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u8.taches",
+          "cardIds": [
+            "card.u8.telefonieren",
+            "card.u8.kunde"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "ich",
+            "mit Kunden",
+            "Morgens",
+            "telefoniere"
+          ],
+          "answer": [
+            "Morgens",
+            "telefoniere",
+            "ich",
+            "mit Kunden"
+          ],
+          "feedbackIncorrect": "Nach Morgens steht das konjugierte Verb an Position 2.",
+          "remediationRef": "rem.u8.verb2"
+        },
+        {
+          "id": "de-a1-u8-l3-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u8.horaires",
+          "cardIds": [
+            "card.u8.von-bis",
+            "card.u8.um-acht"
+          ],
+          "promptLang": "de",
+          "prompt": "Ich arbeite von acht bis vier. → Sage nur den Arbeitsbeginn.",
+          "answer": "Ich fange um acht Uhr an.",
+          "acceptedAnswers": [
+            "Ich fange um acht Uhr an."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u8.von-bis"
+        },
+        {
+          "id": "de-a1-u8-l3-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u8.taches",
+          "cardIds": [
+            "card.u8.schreiben",
+            "card.u8.telefonieren"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Aufgabe hörst du?",
+          "audioRef": "drill.u8.task",
+          "choices": [
+            {
+              "id": "a",
+              "text": "E-Mails schreiben.",
+              "correct": true,
+              "feedback": "Ja. Das Audio nennt E-Mails schreiben."
+            },
+            {
+              "id": "b",
+              "text": "Mit Kunden telefonieren.",
+              "correct": false,
+              "feedback": "Telefonieren wäre eine andere Aufgabe; das Audio nennt schreiben."
+            }
+          ],
+          "remediationRef": "rem.u8.verb2"
+        },
+        {
+          "id": "de-a1-u8-l3-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u8.horaires",
+          "cardIds": [
+            "card.u8.wann-arbeitest",
+            "card.u8.von-bis",
+            "card.u8.pause",
+            "card.u8.telefonieren"
+          ],
+          "promptLang": "de",
+          "prompt": "Beschreibe einen einfachen Arbeitstag in 5–7 Sätzen: Beginn, Ende, Pause und zwei Aufgaben.",
+          "minimumWords": 35,
+          "successCriteria": [
+            "Beginn",
+            "Ende",
+            "Pause",
+            "zwei Aufgaben"
+          ],
+          "autoCheck": [
+            "contient von",
+            "contient bis",
+            "contient Pause"
+          ],
+          "note": "Auch ein erfundener Arbeitstag ist erlaubt."
+        }
+      ],
+      "completionMessage": "Du kannst einen einfachen Tagesablauf bei Arbeit oder Studium mit Zeiten und Aufgaben beschreiben."
+    },
+    {
+      "id": "de-a1-u8-l4",
+      "order": 4,
+      "phase": "Produis",
+      "title": "Sagen, was ich kann",
+      "objectiveIds": [
+        "obj.u8.competences",
+        "obj.u8.presenter"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u8.kann",
+          "card.u6.koennen-rule",
+          "card.u1.sprechen",
+          "card.u8.rechnen",
+          "card.u8.fahren"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "können wird aus U6 in persönliche Kompetenzen übertragen"
+      },
+      "blocks": [
+        {
+          "id": "blk.u8.l4.rule",
+          "type": "rule",
+          "title": "Kompetenz mit können",
+          "textDe": "Ich kann gut Deutsch sprechen. · Ich kann kochen. · Ich kann nicht gut Auto fahren.",
+          "textFr": "Modal conjugué + infinitif final."
+        },
+        {
+          "id": "blk.u8.l4.profile",
+          "type": "model",
+          "title": "Mini-Profil",
+          "textDe": "Ich bin Student. Ich spreche Englisch und Deutsch. Ich kann gut rechnen und schreiben.",
+          "textFr": "Métier/études + langues + deux compétences."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u8-l4-e1",
+          "type": "productiveRecall",
+          "objectiveId": "obj.u8.competences",
+          "cardIds": [
+            "card.u8.kann-gut",
+            "card.u8.deutsch",
+            "card.u8.sprechen"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe: Ich kann gut Deutsch sprechen.",
+          "answer": "Ich kann gut Deutsch sprechen.",
+          "acceptedAnswers": [
+            "Ich kann gut Deutsch sprechen."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u8.kann"
+        },
+        {
+          "id": "de-a1-u8-l4-e2",
+          "type": "reorder",
+          "objectiveId": "obj.u8.competences",
+          "cardIds": [
+            "card.u8.kann",
+            "card.u8.rechnen"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "rechnen",
+            "gut",
+            "Ich",
+            "kann"
+          ],
+          "answer": [
+            "Ich",
+            "kann",
+            "gut",
+            "rechnen"
+          ],
+          "feedbackIncorrect": "Mit können bleibt rechnen am Ende.",
+          "remediationRef": "rem.u8.kann"
+        },
+        {
+          "id": "de-a1-u8-l4-e3",
+          "type": "transformation",
+          "objectiveId": "obj.u8.competences",
+          "cardIds": [
+            "card.u8.kann-gut",
+            "card.u8.kann-nicht",
+            "card.u8.fahren"
+          ],
+          "promptLang": "de",
+          "prompt": "Ich kann gut Auto fahren. → Ändere auf eine schwache Kompetenz.",
+          "answer": "Ich kann nicht gut Auto fahren.",
+          "acceptedAnswers": [
+            "Ich kann nicht gut Auto fahren."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u8.kann"
+        },
+        {
+          "id": "de-a1-u8-l4-e4",
+          "type": "shadowing",
+          "objectiveId": "obj.u8.competences",
+          "cardIds": [
+            "card.u8.kann-gut",
+            "card.u8.kochen",
+            "card.u8.sprechen"
+          ],
+          "promptLang": "de",
+          "prompt": "Hör zu und sprich die drei Kompetenzsätze nach.",
+          "targets": [
+            {
+              "id": "c1",
+              "de": "Ich kann gut kochen.",
+              "audioRef": "drill.u8.skill1",
+              "maxSeconds": 5
+            },
+            {
+              "id": "c2",
+              "de": "Ich kann gut Deutsch sprechen.",
+              "audioRef": "drill.u8.skill2",
+              "maxSeconds": 6
+            },
+            {
+              "id": "c3",
+              "de": "Ich kann gut rechnen.",
+              "audioRef": "drill.u8.skill3",
+              "maxSeconds": 5
+            }
+          ],
+          "scoring": {
+            "engine": "whisper",
+            "mode": "constrained",
+            "metric": "intelligibility",
+            "passThreshold": 0.7
+          },
+          "note": "Nur vorgegebene Kompetenzsätze werden verglichen."
+        },
+        {
+          "id": "de-a1-u8-l4-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u8.presenter",
+          "cardIds": [
+            "card.u8.beruf",
+            "card.u8.kann-gut",
+            "card.u8.englisch",
+            "card.u8.deutsch"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe ein Mini-Profil in 6–8 Sätzen: Beruf/Studium, Ort, Sprache(n), zwei Kompetenzen und eine Sache, die du nicht gut kannst.",
+          "minimumWords": 42,
+          "successCriteria": [
+            "Beruf oder Studium",
+            "Ort",
+            "Sprache",
+            "zwei Kompetenzen",
+            "eine schwache Kompetenz"
+          ],
+          "autoCheck": [
+            "contient Ich",
+            "contient kann"
+          ],
+          "note": "Das Profil darf real oder erfunden sein."
+        }
+      ],
+      "completionMessage": "Du kannst einfache Fähigkeiten und Grenzen mit können ausdrücken."
+    },
+    {
+      "id": "de-a1-u8-l5",
+      "order": 5,
+      "phase": "Valide",
+      "title": "Mission: mich bei der Arbeit vorstellen",
+      "objectiveIds": [
+        "obj.u8.profil",
+        "obj.u8.metiers",
+        "obj.u8.horaires",
+        "obj.u8.taches",
+        "obj.u8.competences",
+        "obj.u8.presenter"
+      ],
+      "durationMinutes": 40,
+      "reveil": {
+        "cardIds": [
+          "card.u8.was-machst",
+          "card.u8.wo-arbeitest",
+          "card.u8.von-bis",
+          "card.u8.kann-gut",
+          "card.u8.was-kannst"
+        ],
+        "itemCount": 5,
+        "maxSeconds": 90,
+        "selection": "persistierende Fehler und Kernfragen der Selbstvorstellung zuerst"
+      },
+      "blocks": [
+        {
+          "id": "blk.u8.l5.scenario",
+          "type": "scenario",
+          "title": "Situation",
+          "text": "Du lernst neue Kolleginnen/Kollegen oder Mitstudierende kennen. Stelle dich kurz vor und beantworte einfache Fragen zu Tätigkeit, Ort, Zeit, Aufgaben und Fähigkeiten."
+        },
+        {
+          "id": "blk.u8.l5.success",
+          "type": "rubric",
+          "title": "Erfolg",
+          "text": "Tätigkeit/Studium · Ort · Arbeits-/Studienzeit · zwei Aufgaben · zwei Kompetenzen mit können · verständliche kurze Antworten."
+        }
+      ],
+      "exercises": [
+        {
+          "id": "de-a1-u8-l5-e1",
+          "type": "multipleChoice",
+          "objectiveId": "obj.u8.presenter",
+          "cardIds": [
+            "card.u8.was-machst"
+          ],
+          "promptLang": "de",
+          "prompt": "Welche Frage passt zu einer beruflichen Vorstellung?",
+          "choices": [
+            {
+              "id": "a",
+              "text": "Was machst du beruflich?",
+              "correct": true,
+              "feedback": "Genau. Die Frage zielt direkt auf die berufliche Tätigkeit."
+            },
+            {
+              "id": "b",
+              "text": "Wo ist die Küche?",
+              "correct": false,
+              "feedback": "Das ist eine Ortsfrage aus dem Wohnkontext."
+            },
+            {
+              "id": "c",
+              "text": "Was kostet die Jacke?",
+              "correct": false,
+              "feedback": "Das ist eine Preisfrage aus dem Einkaufskontext."
+            }
+          ],
+          "remediationRef": "rem.u8.frage-beruf"
+        },
+        {
+          "id": "de-a1-u8-l5-e2",
+          "type": "dictation",
+          "objectiveId": "obj.u8.competences",
+          "cardIds": [
+            "card.u8.kann-gut",
+            "card.u8.englisch",
+            "card.u8.sprechen"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreib den Satz, den du hörst.",
+          "audioRef": "drill.u8.final-dictation",
+          "answer": "Ich kann gut Englisch sprechen.",
+          "acceptedAnswers": [
+            "Ich kann gut Englisch sprechen."
+          ],
+          "normalization": [
+            "case",
+            "space",
+            "punct"
+          ],
+          "remediationRef": "rem.u8.kann"
+        },
+        {
+          "id": "de-a1-u8-l5-e3",
+          "type": "reorder",
+          "objectiveId": "obj.u8.horaires",
+          "cardIds": [
+            "card.u8.von-bis"
+          ],
+          "promptLang": "de",
+          "prompt": "Baue den Satz.",
+          "tokens": [
+            "von neun",
+            "Ich",
+            "bis fünf",
+            "arbeite"
+          ],
+          "answer": [
+            "Ich",
+            "arbeite",
+            "von neun",
+            "bis fünf"
+          ],
+          "feedbackIncorrect": "Der Zeitrahmen bleibt zusammen: von neun bis fünf.",
+          "remediationRef": "rem.u8.von-bis"
+        },
+        {
+          "id": "de-a1-u8-l5-e4",
+          "type": "listeningDiscrimination",
+          "objectiveId": "obj.u8.profil",
+          "cardIds": [
+            "card.u8.buero",
+            "card.u8.restaurant"
+          ],
+          "promptLang": "de",
+          "prompt": "Wo arbeitet die Person?",
+          "audioRef": "drill.u8.final-place",
+          "choices": [
+            {
+              "id": "a",
+              "text": "In einem Büro.",
+              "correct": true,
+              "feedback": "Ja. Das Audio nennt ein Büro."
+            },
+            {
+              "id": "b",
+              "text": "In einem Restaurant.",
+              "correct": false,
+              "feedback": "Restaurant wäre ein anderer Arbeitsort; das Audio nennt Büro."
+            }
+          ]
+        },
+        {
+          "id": "de-a1-u8-l5-e5",
+          "type": "guidedProduction",
+          "objectiveId": "obj.u8.presenter",
+          "cardIds": [
+            "card.u8.was-machst",
+            "card.u8.wo-arbeitest",
+            "card.u8.wann-arbeitest",
+            "card.u8.was-kannst"
+          ],
+          "promptLang": "de",
+          "prompt": "Schreibe deine Vorstellung in 10–12 kurzen Sätzen: Tätigkeit/Studium, Ort, Zeit, zwei Aufgaben, Sprachen und zwei Fähigkeiten.",
+          "minimumWords": 58,
+          "successCriteria": [
+            "Tätigkeit/Studium",
+            "Ort",
+            "Zeit",
+            "zwei Aufgaben",
+            "Sprachen",
+            "zwei Fähigkeiten"
+          ],
+          "autoCheck": [
+            "contient Ich",
+            "contient arbeite",
+            "contient kann"
+          ],
+          "note": "U8 bleibt QA-Inhalt bis Gesamtlevel-, Audio- und Nutzerfreigabe."
+        }
+      ],
+      "completionMessage": "U8 ist in QA abgeschlossen: Du kannst dich sehr einfach zu Arbeit, Studium, Zeiten, Aufgaben und Fähigkeiten vorstellen."
+    }
+  ],
+  "qualityGates": {
+    "exerciseMix": {
+      "recognitionMax": 0.25,
+      "productiveWrittenMin": 0.35,
+      "structureMin": 0.2,
+      "oralMin": 0.2
+    },
+    "promptLang": {
+      "deMin": 1,
+      "note": "Ab U5 sind alle Übungsanweisungen auf Deutsch."
+    },
+    "spacedRecall": {
+      "minCardsRevisitedPerLesson": 3
+    },
+    "feedback": {
+      "distinctPerDistractor": true
+    },
+    "normalization": {
+      "requiredOn": [
+        "fillBlank",
+        "dictation",
+        "productiveRecall",
+        "transformation",
+        "audioCloze"
+      ]
+    }
+  }
+}

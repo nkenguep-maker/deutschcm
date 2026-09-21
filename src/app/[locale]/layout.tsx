@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import { routing } from "@/i18n/routing"
 import { TestSpaceBar } from "@/components/TestSpaceBar"
 import { QaTestBar } from "@/components/qa/QaTestBar"
+import { isQaModeActive } from "@/lib/qa/config"
 
 // SEO · métadonnées localisées par locale. Le canonique et les
 // alternates hreflang pointent vers l'URL locale (jamais la racine)
@@ -88,7 +89,6 @@ export async function generateMetadata({
       images: [`/${key}/opengraph-image`],
       creator: "@yema",
     },
-    robots: { index: true, follow: true },
     alternates: {
       canonical: url,
       languages: {
@@ -112,12 +112,14 @@ export default async function LocaleLayout({
   if (!routing.locales.includes(locale as "fr" | "en")) {
     notFound()
   }
+  const qaModeActive = isQaModeActive()
 
-  const messages = (await import(`../../../messages/${locale}.json`)).default
-
+  // next-intl inherits locale/messages from src/i18n/request.ts when this
+  // provider is rendered by a Server Component. Avoid importing the same
+  // locale JSON a second time in the layout.
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
-      <QaTestBar />
+    <NextIntlClientProvider>
+      {qaModeActive ? <QaTestBar /> : null}
       <TestSpaceBar />
       {children}
     </NextIntlClientProvider>

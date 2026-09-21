@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
+import { isSameOriginRequest } from "@/lib/security/requestOrigin";
 
 async function getAuthUser() {
   const cookieStore = await cookies();
@@ -13,25 +14,42 @@ async function getAuthUser() {
         getAll: () => cookieStore.getAll(),
         setAll: (list) => list.forEach(({ name, value, options }) => cookieStore.set(name, value, options)),
       },
-    }
+    },
   );
   const { data: { user } } = await supabase.auth.getUser();
   return user;
 }
 
-// GET /api/classroom — list enrolled classrooms, feed, or leaderboard
+async function hasActiveClassroomEnrollment(userId: string, classroomId: string): Promise<boolean> {
+  const enrollment = await prisma.classroomEnrollment.findUnique({
+    where: { classroomId_userId: { classroomId, userId } },
+    select: { isActive: true },
+  });
+  return enrollment?.isActive === true;
+}
+
+function notFound() {
+  return NextResponse.json({ error: "Classroom not found" }, { status: 404 });
+}
+
+// Legacy learner endpoint.
+//
+// Reads are limited to the authenticated learner's own active enrollments.
+// Mutating join/submission flows moved to the P4.7 approval/versioned routes
+// and are deliberately not reimplemented here.
 export async function GET(request: NextRequest) {
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const dbUser = await prisma.user.findUnique({ where: { supabaseId: authUser.id } });
+  const dbUser = await prisma.user.findUnique({
+    where: { supabaseId: authUser.id },
+    select: { id: true },
+  });
   if (!dbUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  const url = new URL(request.url);
-  const action = url.searchParams.get("action");
-  const classroomId = url.searchParams.get("classroomId");
+  const action = request.nextUrl.searchParams.get("action");
+  const classroomId = request.nextUrl.searchParams.get("classroomId");
 
-  // List enrolled classrooms
   if (!action) {
     const enrollments = await prisma.classroomEnrollment.findMany({
       where: { userId: dbUser.id, isActive: true },
@@ -40,28 +58,44 @@ export async function GET(request: NextRequest) {
           include: {
             teacher: { include: { user: { select: { fullName: true } } } },
             assignments: { orderBy: { dueDate: "asc" }, take: 3 },
-            enrollments: { where: { isActive: true } },
+            enrollments: { where: { isActive: true }, select: { id: true } },
           },
         },
       },
     });
-    return NextResponse.json({ classrooms: enrollments.map(e => e.classroom) });
+    return NextResponse.json({ classrooms: enrollments.map((entry) => entry.classroom) });
   }
 
-  if (!classroomId) return NextResponse.json({ error: "classroomId required" }, { status: 400 });
+  if (!classroomId || classroomId.length > 128) {
+    return NextResponse.json({ error: "classroomId required" }, { status: 400 });
+  }
 
-  // Leaderboard
+  // Never let a guessed classroom ID become an oracle for leaderboard or
+  // assignments. This legacy surface is learner-only; teacher/admin use their
+  // dedicated scoped endpoints.
+  if (!(await hasActiveClassroomEnrollment(dbUser.id, classroomId))) {
+    return notFound();
+  }
+
   if (action === "leaderboard") {
     const enrollments = await prisma.classroomEnrollment.findMany({
       where: { classroomId, isActive: true },
-      include: { user: { select: { id: true, fullName: true, xpTotal: true, streakDays: true } } },
+      include: {
+        user: {
+          select: {
+            id: true,
+            fullName: true,
+            xpTotal: true,
+            streakDays: true,
+          },
+        },
+      },
       orderBy: { user: { xpTotal: "desc" } },
       take: 10,
     });
-    return NextResponse.json({ leaderboard: enrollments.map(e => e.user) });
+    return NextResponse.json({ leaderboard: enrollments.map((entry) => entry.user) });
   }
 
-  // Assignments for this class
   if (action === "assignments") {
     const assignments = await prisma.assignment.findMany({
       where: { classroomId },
@@ -76,49 +110,42 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ error: "Unknown action" }, { status: 400 });
 }
 
-// POST /api/classroom — join or send message
 export async function POST(request: NextRequest) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const authUser = await getAuthUser();
   if (!authUser) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const dbUser = await prisma.user.findUnique({ where: { supabaseId: authUser.id } });
+  const dbUser = await prisma.user.findUnique({
+    where: { supabaseId: authUser.id },
+    select: { id: true },
+  });
   if (!dbUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  const body = await request.json();
-  const { type } = body;
+  const body = await request.json().catch(() => null) as { type?: unknown } | null;
+  const type = body?.type;
 
   if (type === "join") {
-    const { code } = body;
-    const classroom = await prisma.classroom.findUnique({ where: { code } });
-    if (!classroom) return NextResponse.json({ error: "Code invalide" }, { status: 404 });
-    if (!classroom.isActive) return NextResponse.json({ error: "Cette classe est inactive" }, { status: 400 });
-
-    const count = await prisma.classroomEnrollment.count({ where: { classroomId: classroom.id, isActive: true } });
-    if (count >= classroom.maxStudents) return NextResponse.json({ error: "Classe complète" }, { status: 400 });
-
-    const enrollment = await prisma.classroomEnrollment.upsert({
-      where: { classroomId_userId: { classroomId: classroom.id, userId: dbUser.id } },
-      update: { isActive: true },
-      create: { classroomId: classroom.id, userId: dbUser.id },
-    });
-    return NextResponse.json({ enrollment, classroom });
+    return NextResponse.json(
+      {
+        error: "Use the classroom approval workflow",
+        code: "CLASSROOM_JOIN_APPROVAL_REQUIRED",
+        endpoint: "/api/classroom/join",
+      },
+      { status: 410 },
+    );
   }
 
   if (type === "submit") {
-    // Legacy V1 branch · pré-P4.5 · score+feedback columns sur submission.
-    // Doit passer par le workflow P4.5-B `/api/student/submissions/*`
-    // pour les nouveaux clients. Ici on maintient la compat V1 en
-    // ciblant la version 1 par défaut (le workflow historique n'utilise
-    // pas le versioning P4.5-B).
-    const { assignmentId, score, feedback } = body;
-    const submission = await prisma.assignmentSubmission.upsert({
-      where: {
-        assignmentId_userId_version: { assignmentId, userId: dbUser.id, version: 1 },
+    return NextResponse.json(
+      {
+        error: "Use the versioned student submission workflow",
+        code: "CLASSROOM_SUBMISSION_WORKFLOW_REQUIRED",
       },
-      update: { score, feedback },
-      create: { assignmentId, userId: dbUser.id, score, feedback, version: 1 },
-    });
-    return NextResponse.json({ submission });
+      { status: 410 },
+    );
   }
 
   return NextResponse.json({ error: "Unknown action" }, { status: 400 });

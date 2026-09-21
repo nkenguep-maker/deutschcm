@@ -1,10 +1,12 @@
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import prisma from "@/lib/prisma";
+import { assertSupabaseResult, SupabaseOperationError } from "@/lib/supabase/assertResult";
 import type { Role } from "@prisma/client";
 
 // Multi-rôles YEMA — source de vérité = table user_roles (Prisma).
-// Miroir en lecture rapide = user_metadata.roles / .active_space (Supabase auth).
-// Le middleware lit user_metadata pour éviter une requête DB par route.
+// Miroir d'autorisation en lecture rapide = app_metadata Supabase, écrit
+// uniquement par le client admin. user_metadata est contrôlable par
+// l'utilisateur et ne doit jamais décider d'un accès.
 
 export type SpaceRole = "STUDENT" | "TEACHER" | "CENTER" | "ADMIN";
 
@@ -114,10 +116,8 @@ export async function requireRoleOnboarding(params: {
 }
 
 // Marque l'onboarding fait pour UN rôle. Ne touche pas les autres.
-// Idempotent : si la ligne UserRole n'existe pas encore (racE condition,
+// Idempotent : si la ligne UserRole n'existe pas encore (race condition,
 // user créé hors du chemin normal, etc.), on la CRÉE avec onboarded=true.
-// Sans ce upsert, un update sur une ligne inexistante throw P2025 et
-// bloque tout le flow d'onboarding.
 export async function markRoleOnboarded(userId: string, role: SpaceRole): Promise<void> {
   await prisma.userRole.upsert({
     where: { userId_role: { userId, role: role as Role } },
@@ -131,9 +131,10 @@ export async function markRoleOnboarded(userId: string, role: SpaceRole): Promis
   });
 }
 
-// Sync user_metadata Supabase avec l'état DB. Appelé après chaque
+// Sync le miroir d'autorisation Supabase avec l'état DB. Appelé après chaque
 // mutation (grant, revoke, onboarding complete, register).
-// Le middleware lit user_metadata donc pas de requête DB par route protégée.
+// IMPORTANT : app_metadata est réservé aux écritures admin Supabase.
+// user_metadata reste du profil utilisateur et n'est jamais une source authz.
 export async function syncUserMetadata(params: {
   supabaseId: string;
   activeSpace?: SpaceRole;
@@ -141,30 +142,38 @@ export async function syncUserMetadata(params: {
   const { supabaseId, activeSpace } = params;
   const user = await prisma.user.findUnique({
     where: { supabaseId },
-    select: { id: true },
+    select: { id: true, role: true },
   });
   if (!user) return;
 
   const roles = await getUserRoles(user.id);
   const rolesList = roles.map((r) => r.role);
   const onboardedMap = Object.fromEntries(roles.map((r) => [r.role, r.onboarded]));
+  const trustedPrimary = user.role as SpaceRole;
 
   const chosenActive =
     activeSpace && rolesList.includes(activeSpace)
       ? activeSpace
-      : rolesList[0] ?? "STUDENT";
+      : rolesList.includes(trustedPrimary)
+        ? trustedPrimary
+        : rolesList[0] ?? "STUDENT";
 
   const admin = adminClient();
-  // Récupérer le user_metadata existant pour merge
-  const { data: current } = await admin.auth.admin.getUserById(supabaseId);
-  const existing = (current?.user?.user_metadata ?? {}) as Record<string, unknown>;
+  const currentResult = await admin.auth.admin.getUserById(supabaseId);
+  assertSupabaseResult(currentResult, "auth.admin.getUserById");
+  const current = currentResult.data;
+  if (!current.user) {
+    throw new SupabaseOperationError("auth.admin.getUserById", "AUTH_USER_NOT_FOUND");
+  }
+  const existing = (current?.user?.app_metadata ?? {}) as Record<string, unknown>;
 
-  await admin.auth.admin.updateUserById(supabaseId, {
-    user_metadata: {
+  const updateResult = await admin.auth.admin.updateUserById(supabaseId, {
+    app_metadata: {
       ...existing,
       roles: rolesList,
       onboarded_map: onboardedMap,
       active_space: chosenActive,
     },
   });
+  assertSupabaseResult(updateResult, "auth.admin.updateUserById");
 }

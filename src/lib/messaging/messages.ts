@@ -6,9 +6,13 @@ import { assertConversationAccess } from "./conversations";
 import { getRule, isKindAllowedForActor } from "./matrix";
 import { isMessagingAudioEnabled } from "@/lib/flags";
 import { broadcastMessageCreated } from "./realtimePublisher";
+import { hasReachedMessageSendQuota } from "./rateLimit";
 
 // P4.6-A · envoi de message côté serveur · toute autorité de sender,
 // participant et content vient du serveur.
+
+const MAX_TEXT_CHARS = 4_000;
+const MAX_IDEMPOTENCY_KEY_CHARS = 128;
 
 export type SendMessageDenial =
   | "actor_not_allowed"
@@ -17,6 +21,7 @@ export type SendMessageDenial =
   | "missing_required_context"
   | "kind_not_allowed"
   | "text_required_missing"
+  | "text_too_long"
   | "child_cannot_send_text"
   | "guided_phrase_missing_or_inactive"
   | "guided_phrase_wrong_scope"
@@ -24,7 +29,10 @@ export type SendMessageDenial =
   | "audio_not_ready"
   | "card_type_missing_or_invalid"
   | "replies_disabled"
-  | "duplicate_idempotency";
+  | "reply_target_invalid"
+  | "idempotency_key_invalid"
+  | "duplicate_idempotency"
+  | "rate_limited";
 
 export interface SendMessageInput {
   conversationId: string;
@@ -54,14 +62,33 @@ export async function assertCanSendMessage(
     return { ok: false, error: "kind_not_allowed" };
   }
 
-  if (input.replyToMessageId && !rule.supportsReplies) {
-    return { ok: false, error: "replies_disabled" };
+  if (input.idempotencyKey && input.idempotencyKey.length > MAX_IDEMPOTENCY_KEY_CHARS) {
+    return { ok: false, error: "idempotency_key_invalid" };
+  }
+
+  if (input.replyToMessageId) {
+    if (!rule.supportsReplies) {
+      return { ok: false, error: "replies_disabled" };
+    }
+    const replyTarget = await prisma.messagingMessage.findFirst({
+      where: {
+        id: input.replyToMessageId,
+        conversationId: input.conversationId,
+      },
+      select: { id: true },
+    });
+    if (!replyTarget) {
+      return { ok: false, error: "reply_target_invalid" };
+    }
   }
 
   switch (input.kind) {
     case "TEXT": {
       if (!input.body || input.body.trim().length === 0) {
         return { ok: false, error: "text_required_missing" };
+      }
+      if (input.body.length > MAX_TEXT_CHARS) {
+        return { ok: false, error: "text_too_long" };
       }
       return { ok: true };
     }
@@ -90,9 +117,24 @@ export async function assertCanSendMessage(
       }
       const asset = await prisma.messagingAudioAsset.findUnique({
         where: { id: input.audioAssetId },
-        select: { status: true },
+        select: {
+          status: true,
+          conversationId: true,
+          ownerUserId: true,
+          ownerChildProfileId: true,
+        },
       });
-      if (!asset || asset.status !== "READY") {
+      const ownedByActor = actor.actorType === "USER"
+        ? asset?.ownerUserId === actor.userId
+        : asset?.ownerChildProfileId === actor.childProfileId;
+      if (
+        !asset ||
+        asset.status !== "READY" ||
+        asset.conversationId !== input.conversationId ||
+        !ownedByActor
+      ) {
+        // Une seule erreur volontairement générique : ne révèle ni
+        // existence ni ownership d'un asset appartenant à un autre acteur.
         return { ok: false, error: "audio_not_ready" };
       }
       return { ok: true };
@@ -123,7 +165,9 @@ export async function sendMessage(
   if (!gate.ok) return gate;
 
   // Idempotence : si la clé existe déjà pour cette conversation, on
-  // retourne le message existant (comportement upsert-like).
+  // retourne le message existant (comportement upsert-like). Cette
+  // vérification précède le quota pour que les retries réseau ne soient
+  // jamais traités comme du spam.
   if (input.idempotencyKey) {
     const existing = await prisma.messagingMessage.findUnique({
       where: {
@@ -135,6 +179,10 @@ export async function sendMessage(
       select: { id: true },
     });
     if (existing) return { ok: true, messageId: existing.id };
+  }
+
+  if (await hasReachedMessageSendQuota(actor)) {
+    return { ok: false, error: "rate_limited" };
   }
 
   // Résolution du body pour GUIDED_PHRASE : on récupère le texte

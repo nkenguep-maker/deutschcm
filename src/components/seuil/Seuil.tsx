@@ -2,10 +2,8 @@
 
 // Seuil — l'entrée immersive YEMA. Une fois par session, la séquence
 // s'anime :
-//   t=400   "Il y a des maisons qu'on n'a jamais quittées."
-//   t=1500  "Des voix qui n'attendaient que vous."
-//   t=2600  Y + YEMA + slogan
-//   t=3900  hero + sub + CTA + ghost
+// Le contenu principal apparaît immédiatement avec un court stagger. Les
+// salutations gardent leur cycle lent et portent l'effet polyglotte.
 //
 // Le texte est TOUJOURS dans le DOM au render (SEO + LCP).
 // La séquence n'anime que opacity/transform.
@@ -27,6 +25,7 @@ import { VoixPlayer } from "@/components/voix/VoixPlayer";
 import { STORIES } from "@/lib/voix/stories";
 
 const SESSION_KEY = "yema.seuil.seen";
+const FIRST_VISIT_REVEAL_MS = 120;
 
 interface SeuilCopy {
   heroL1: string;
@@ -101,20 +100,14 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
       return;
     }
 
-    // Un seul beat, plus de logo central. Silence de 1.4s (le temps
-    // de sentir la braise et les salutations qui flottent), puis le
-    // hero entre en stagger :
-    //   1.4s   L1 (« L'Afrique parle. »)
-    //   +550   L2 (« Toutes ses langues. »)
-    //   +1200  sous-titre
-    //   +1750  CTA laiton
-    //   +2100  ghost audio
-    // Dernier élément visible ~3.5s au total.
+    // Le hero entre presque immédiatement. Son stagger reste perceptible,
+    // mais la proposition et l'inscription ne sont jamais retenues derrière
+    // une longue intro sur une première visite.
     const timers: number[] = [];
     timers.push(window.setTimeout(() => {
       setPhase(1);
       sessionStorage.setItem(SESSION_KEY, "1");
-    }, 1400));
+    }, FIRST_VISIT_REVEAL_MS));
     return () => {
       timers.forEach((t) => window.clearTimeout(t));
     };
@@ -178,20 +171,20 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
               <span className="seuil-hero-line" style={{ ["--stagger" as string]: "0ms" }}>
                 {copy.heroL1}
               </span>
-              <span className="seuil-hero-line" style={{ ["--stagger" as string]: "500ms" }}>
+              <span className="seuil-hero-line" style={{ ["--stagger" as string]: "160ms" }}>
                 <em>{copy.heroL2}</em>
               </span>
             </h1>
-            <p className="seuil-hero-sub" style={{ ["--stagger" as string]: "1050ms" }}>{copy.heroSub}</p>
+            <p className="seuil-hero-sub" style={{ ["--stagger" as string]: "320ms" }}>{copy.heroSub}</p>
 
             {/* Le slogan — signature courte de la maison YEMA */}
-            <p className="seuil-hero-slogan" style={{ ["--stagger" as string]: "1350ms" }}>
+            <p className="seuil-hero-slogan" style={{ ["--stagger" as string]: "440ms" }}>
               <em>{copy.slogan}</em>
             </p>
 
             <div className="seuil-cta-row">
               <a href={entryHref} className="seuil-cta" onClick={handleEntry}
-                 style={{ ["--stagger" as string]: "1700ms" }}>
+                 style={{ ["--stagger" as string]: "600ms" }}>
                 {copy.cta}
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
                      stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"
@@ -204,7 +197,7 @@ export function Seuil({ locale, entryHref = "#landing", forceReplay = false }: S
                 className={`seuil-cta-ghost ${miniPlayerOpen ? "open" : ""}`}
                 onClick={handleGhostAudio}
                 aria-expanded={miniPlayerOpen}
-                style={{ ["--stagger" as string]: "2050ms" }}
+                style={{ ["--stagger" as string]: "760ms" }}
               >
                 {copy.ctaGhost}
               </button>

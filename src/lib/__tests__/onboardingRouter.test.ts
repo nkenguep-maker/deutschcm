@@ -14,7 +14,7 @@ function input(universe: "MONDE" | "RACINES"): FunnelInput {
     hasActiveAccessGrant: false,
     learningPath: {
       universe,
-      language: universe === "MONDE" ? "DEUTSCH" : "WOLOF",
+      language: universe === "MONDE" ? "DEUTSCH" : "BASSA",
       currentLevel: null,
       onboardingAnswers: null,
     },
@@ -41,6 +41,6 @@ describe("onboarding router · LANGUAGE_SELECTED", () => {
     expect(routerSource).not.toMatch(
       /step === "UNIVERSE_SELECTED" \|\| step === "LANGUAGE_SELECTED"/,
     );
-    expect(routerSource).toMatch(/const dest = nextFunnelHref\(step,/);
+    expect(routerSource).toMatch(/href:\s*nextFunnelHref\(step,/);
   });
 });

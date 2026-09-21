@@ -5,6 +5,7 @@ export { DashboardMobileNavigation } from "./DashboardMobileNavigation";
 export { DashboardTabBar } from "./DashboardTabBar";
 export type { DashboardTab } from "./DashboardTabBar";
 export { DashboardMobileHeader } from "./DashboardMobileHeader";
+export { DashboardSignOutButton } from "./DashboardSignOutButton";
 export { DashboardSectionHeader } from "./DashboardSectionHeader";
 export { DashboardCard } from "./DashboardCard";
 export { DashboardMetric } from "./DashboardMetric";

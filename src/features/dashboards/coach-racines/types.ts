@@ -1,5 +1,3 @@
-// Types miroir des réponses /api/roots-coach/* — copies minimales.
-
 export interface CoachLanguageBreakdown {
   language: string;
   activeCircleCount: number;
@@ -16,6 +14,11 @@ export interface CoachDashboardStats {
 
 export interface CoachDashboardResponse {
   actorRole: "RACINES_COACH";
+  profile: {
+    fullName: string | null;
+    city: string | null;
+    qualifications: string | null;
+  };
   stats: CoachDashboardStats;
 }
 
